@@ -192,12 +192,7 @@ export function Sidebar() {
         <div className="flex-1" />
 
         {/* User Profile */}
-        <UserProfile
-          name="Yasin"
-          status="Premium User"
-          avatar="Y"
-          online={true}
-        />
+        <UserProfile />
       </div>
     </aside>
   );
