@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, ArrowRight } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { GradientText } from '@/components/atoms/GradientText';
 import { PrimaryButton } from '@/components/atoms/PrimaryButton';
 
@@ -60,11 +60,11 @@ export function HeroSection() {
               'fadeInUp 600ms cubic-bezier(0.4, 0, 0.2, 1) 300ms backwards',
           }}
         >
-          <PrimaryButton href="/studio" size="lg" icon>
+          <PrimaryButton href="/auth/signup" size="lg" icon>
             Start Creating Free
           </PrimaryButton>
-          <PrimaryButton href="/gallery" size="lg" variant="secondary">
-            View Examples
+          <PrimaryButton href="/auth/login" size="lg" variant="secondary">
+            Sign In
           </PrimaryButton>
         </div>
 

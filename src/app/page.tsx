@@ -88,18 +88,18 @@ export default function LandingPage() {
                 <ul className="space-y-2 text-sm text-white/60">
                   <li>
                     <a
-                      href="/studio"
+                      href="/auth/login"
                       className="transition-colors hover:text-purple-400"
                     >
-                      Studio
+                      Sign In
                     </a>
                   </li>
                   <li>
                     <a
-                      href="/gallery"
+                      href="/auth/signup"
                       className="transition-colors hover:text-purple-400"
                     >
-                      Gallery
+                      Sign Up
                     </a>
                   </li>
                   <li>
