@@ -46,16 +46,9 @@ export function RightSidebar() {
     <aside
       className={`fixed bottom-0 right-0 top-0 z-[100] w-[260px] border-l border-[rgba(139,92,246,0.15)] bg-[rgba(10,10,10,0.7)] shadow-[-4px_0_24px_rgba(0,0,0,0.3)] backdrop-blur-[24px] backdrop-saturate-[200%] transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)] ${rightOpen ? 'translate-x-0' : 'translate-x-full'}`}
     >
-      <div className="sidebar-scroll flex h-full flex-col overflow-y-auto px-4 py-4">
-        {/* Header - Compact */}
-        <div className="mb-4">
-          <h2 className="text-xs font-semibold uppercase tracking-wide text-white/80">
-            Configuration
-          </h2>
-        </div>
-
+      <div className="sidebar-scroll flex h-full flex-col overflow-y-auto px-4 py-3">
         {/* Gender Selection - Inline */}
-        <div className="mb-3">
+        <div className="mb-2">
           <SelectionDropdown
             label="Gender"
             placeholder="Select..."
@@ -68,7 +61,7 @@ export function RightSidebar() {
         </div>
 
         {/* Jewelry Type Selection - Inline */}
-        <div className="mb-3">
+        <div className="mb-2">
           <SelectionDropdown
             label="Jewelry"
             placeholder="Select..."
@@ -82,23 +75,20 @@ export function RightSidebar() {
         </div>
 
         {/* Divider */}
-        <div className="mb-4 h-px bg-white/5" />
+        <div className="my-2 h-px bg-white/5" />
 
-        {/* Mode Tabs - Compact */}
-        <div className="mb-3">
-          <div className="mb-1.5 flex items-center justify-between">
-            <label className="text-[10px] font-medium uppercase tracking-wide text-white/60">
-              Mode
-            </label>
-            {areModesDisabled && (
-              <span className="text-[9px] text-white/30">Complete above</span>
-            )}
-          </div>
+        {/* Mode Tabs - Ultra Compact */}
+        <div className="mb-2">
+          {areModesDisabled && (
+            <div className="mb-1 text-center text-[9px] text-white/30">
+              Complete selections
+            </div>
+          )}
           <div className="flex gap-0.5 rounded-md border border-white/10 bg-white/[0.02] p-0.5">
             <button
               onClick={() => setActiveMode('quick')}
               disabled={areModesDisabled}
-              className={`flex-1 rounded px-2 py-1 text-[11px] font-medium transition-all duration-200 ${
+              className={`flex-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-all duration-200 ${
                 activeMode === 'quick' && !areModesDisabled
                   ? 'bg-purple-500/20 text-purple-300'
                   : areModesDisabled
@@ -111,7 +101,7 @@ export function RightSidebar() {
             <button
               onClick={() => setActiveMode('selective')}
               disabled={areModesDisabled}
-              className={`flex-1 rounded px-2 py-1 text-[11px] font-medium transition-all duration-200 ${
+              className={`flex-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-all duration-200 ${
                 activeMode === 'selective' && !areModesDisabled
                   ? 'bg-purple-500/20 text-purple-300'
                   : areModesDisabled
@@ -124,7 +114,7 @@ export function RightSidebar() {
             <button
               onClick={() => setActiveMode('advanced')}
               disabled={areModesDisabled}
-              className={`flex-1 rounded px-2 py-1 text-[11px] font-medium transition-all duration-200 ${
+              className={`flex-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-all duration-200 ${
                 activeMode === 'advanced' && !areModesDisabled
                   ? 'bg-purple-500/20 text-purple-300'
                   : areModesDisabled

@@ -65,13 +65,13 @@ export function SelectionDropdown({
 
   return (
     <div
-      className={inline ? 'flex items-center gap-2' : 'relative'}
+      className={inline ? 'flex items-center gap-1.5' : 'relative'}
       ref={dropdownRef}
     >
       {/* Label */}
       <label
-        className={`text-xs font-medium text-white/70 ${
-          inline ? 'min-w-[60px] shrink-0' : 'mb-2 block'
+        className={`text-[10px] font-medium uppercase tracking-wide text-white/60 ${
+          inline ? 'min-w-[50px] shrink-0' : 'mb-2 block'
         }`}
       >
         {label}
@@ -88,7 +88,7 @@ export function SelectionDropdown({
           type="button"
           onClick={() => !disabled && setIsOpen(!isOpen)}
           disabled={disabled}
-          className={`flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left text-sm transition-all duration-200 ${
+          className={`flex w-full items-center justify-between rounded-lg border px-2.5 py-1.5 text-left text-xs transition-all duration-200 ${
             disabled
               ? 'cursor-not-allowed border-white/5 bg-white/[0.01] text-white/20'
               : isOpen
@@ -98,11 +98,11 @@ export function SelectionDropdown({
                   : 'border-white/10 bg-white/[0.02] text-white/50 hover:border-white/20 hover:bg-white/[0.03]'
           }`}
         >
-          <span className="truncate">
+          <span className="truncate text-xs">
             {selectedOption ? selectedOption.label : placeholder}
           </span>
           <ChevronDown
-            className={`ml-2 h-4 w-4 flex-shrink-0 transition-transform duration-200 ${
+            className={`ml-1.5 h-3.5 w-3.5 flex-shrink-0 transition-transform duration-200 ${
               isOpen ? 'rotate-180' : 'rotate-0'
             } ${disabled ? 'text-white/20' : 'text-white/60'}`}
           />
@@ -117,7 +117,7 @@ export function SelectionDropdown({
                   key={option.value}
                   type="button"
                   onClick={() => handleSelect(option.value)}
-                  className={`flex w-full items-center justify-between px-3 py-2 text-left text-sm transition-all duration-150 ${
+                  className={`flex w-full items-center justify-between px-2.5 py-1.5 text-left text-xs transition-all duration-150 ${
                     value === option.value
                       ? 'bg-purple-500/20 text-purple-300'
                       : 'text-white/80 hover:bg-white/[0.05] hover:text-white'
@@ -125,7 +125,7 @@ export function SelectionDropdown({
                 >
                   <span>{option.label}</span>
                   {value === option.value && (
-                    <Check className="h-4 w-4 text-purple-400" />
+                    <Check className="h-3.5 w-3.5 text-purple-400" />
                   )}
                 </button>
               ))}
