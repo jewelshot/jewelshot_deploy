@@ -48,6 +48,7 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
     show: boolean;
     presetName: string;
     presetId: string;
+    requiresModel: boolean;
   } | null>(null);
 
   // Modes are disabled until both gender and jewelry are selected
@@ -65,6 +66,7 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
       show: true,
       presetName: preset.name,
       presetId,
+      requiresModel: preset.requiresModel,
     });
   };
 
@@ -182,6 +184,8 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
           <PresetConfirmModal
             presetName={confirmModal.presetName}
             jewelryType={jewelryType || ''}
+            requiresModel={confirmModal.requiresModel}
+            gender={gender || undefined}
             onConfirm={handleConfirmGeneration}
             onCancel={() => setConfirmModal(null)}
           />

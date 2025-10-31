@@ -48,4 +48,42 @@ STYLE REFERENCE: Match quality of Tiffany, Cartier, high-end jewelry brand produ
 OUTPUT QUALITY: Maximum resolution and detail, photorealistic yet enhanced, premium commercial grade, conversion-optimized product imagery.`;
     },
   },
+
+  'luxury-editorial': {
+    name: 'Luxury Editorial',
+    requiresModel: true,
+    buildPrompt: (jewelryType: string, gender?: string) => {
+      const genderText = gender ? `${gender} model wearing ` : '';
+
+      return `Luxury editorial magazine jewelry photography featuring ${genderText}${jewelryType}.
+
+PRESERVE EXACT JEWELRY STRUCTURE: Maintain all design details, geometry, stone count unchanged.
+
+DRAMATIC BACKGROUND: Deep dramatic dark background with rich black to charcoal gradient and atmospheric depth. Sophisticated editorial magazine backdrop with subtle atmospheric haze.
+
+LIGHTING: Dramatic high-contrast studio lighting with powerful side key light creating bold shadows and sophisticated rim lighting. Chiaroscuro cinematic effect. Moody lighting that enhances mystery and luxury.
+
+METAL BRILLIANCE: Maximum metal brilliance with striking highlights against darkness. Smooth luxurious gradients on curved surfaces. Mirror-polished premium finish emphasizing precious metal richness.
+
+GEMSTONE DRAMA: Intensely vibrant gemstone colors with deep saturation and captivating fire. Crystal clarity with dramatic light play through facets. Jewel-like intensity and captivating sparkle.
+
+CONTRAST: Very high contrast for visual impact with rich shadows retaining detail and crisp bright highlights. Strong tonal separation for bold visual punch. Editorial magazine quality contrast.
+
+SHADOWS: Prominent dramatic shadows as design element with soft gradient falloff. Adds mystery and depth. Sophisticated shadow play enhancing three-dimensional form.
+
+ATMOSPHERE: Sophisticated moody ambiance with mysterious elegance. Premium brand feeling. Aspirational quality with hint of luxury.
+
+COLOR GRADING: Rich deep tones with slightly cool undertones for sophistication. Editorial color palette. Magazine-worthy color treatment enhancing luxury feel.
+
+COMPOSITION: Bold confident framing with jewelry as hero statement piece. Dynamic angles. Editorial magazine layout ready. Artistic yet commercial.
+
+TECHNICAL QUALITY: Ultra sharp details. Maximum clarity. Professional editorial retouching. Eliminate all imperfections. Pristine condition. Publication standard.
+
+MOOD: Powerful, mysterious, sophisticated, luxurious, dramatic, aspirational, bold, elegant.
+
+STYLE REFERENCE: Match Vogue jewelry editorials, Cartier campaigns, high-end fashion magazine photography, luxury brand advertising.
+
+OUTPUT: Editorial magazine publication ready. Premium luxury positioning. Visually striking. Emotionally engaging.`;
+    },
+  },
 };

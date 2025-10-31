@@ -4,6 +4,8 @@ import { Sparkles, X } from 'lucide-react';
 interface PresetConfirmModalProps {
   presetName: string;
   jewelryType: string;
+  requiresModel?: boolean;
+  gender?: string;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -15,9 +17,15 @@ interface PresetConfirmModalProps {
 export function PresetConfirmModal({
   presetName,
   jewelryType,
+  requiresModel,
+  gender,
   onConfirm,
   onCancel,
 }: PresetConfirmModalProps) {
+  const description = requiresModel
+    ? `This will generate a luxury editorial style ${jewelryType} photo featuring a ${gender?.toLowerCase() || 'model'}. The process may take 15-30 seconds.`
+    : `This will generate a professional ${jewelryType} photo using AI. The process may take 10-30 seconds.`;
+
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center">
       {/* Backdrop */}
@@ -49,10 +57,7 @@ export function PresetConfirmModal({
         </h3>
 
         {/* Description */}
-        <p className="mb-6 text-center text-sm text-white/60">
-          This will generate a professional {jewelryType} photo using AI. The
-          process may take 10-30 seconds.
-        </p>
+        <p className="mb-6 text-center text-sm text-white/60">{description}</p>
 
         {/* Actions */}
         <div className="flex gap-3">
