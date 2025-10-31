@@ -9,7 +9,7 @@
 
 import React, { useState } from 'react';
 import { useSidebarStore } from '@/store/sidebarStore';
-import { SelectionDropdown } from '@/components/atoms/SelectionDropdown';
+import { ConfigurationAccordion } from '@/components/molecules/ConfigurationAccordion';
 
 type Gender = 'male' | 'female' | null;
 type JewelryType = 'ring' | 'necklace' | 'earring' | 'bracelet' | null;
@@ -36,9 +36,6 @@ export function RightSidebar() {
   const [jewelryType, setJewelryType] = useState<JewelryType>(null);
   const [activeMode, setActiveMode] = useState<Mode>('quick');
 
-  // Jewelry selection is disabled until gender is selected
-  const isJewelryDisabled = !gender;
-
   // Modes are disabled until both gender and jewelry are selected
   const areModesDisabled = !gender || !jewelryType;
 
@@ -47,30 +44,15 @@ export function RightSidebar() {
       className={`fixed bottom-0 right-0 top-0 z-[100] w-[260px] border-l border-[rgba(139,92,246,0.15)] bg-[rgba(10,10,10,0.7)] shadow-[-4px_0_24px_rgba(0,0,0,0.3)] backdrop-blur-[24px] backdrop-saturate-[200%] transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)] ${rightOpen ? 'translate-x-0' : 'translate-x-full'}`}
     >
       <div className="sidebar-scroll flex h-full flex-col overflow-y-auto px-4 py-3">
-        {/* Gender Selection - Inline */}
+        {/* Configuration Accordion */}
         <div className="mb-2">
-          <SelectionDropdown
-            label="Gender"
-            placeholder="Select..."
-            options={genderOptions}
-            value={gender}
-            onChange={(value) => setGender(value as Gender)}
-            required
-            inline
-          />
-        </div>
-
-        {/* Jewelry Type Selection - Inline */}
-        <div className="mb-2">
-          <SelectionDropdown
-            label="Jewelry"
-            placeholder="Select..."
-            options={jewelryOptions}
-            value={jewelryType}
-            onChange={(value) => setJewelryType(value as JewelryType)}
-            disabled={isJewelryDisabled}
-            required
-            inline
+          <ConfigurationAccordion
+            gender={gender}
+            jewelryType={jewelryType}
+            onGenderChange={(value) => setGender(value as Gender)}
+            onJewelryChange={(value) => setJewelryType(value as JewelryType)}
+            genderOptions={genderOptions}
+            jewelryOptions={jewelryOptions}
           />
         </div>
 
