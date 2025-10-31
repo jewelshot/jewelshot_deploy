@@ -7,129 +7,45 @@
 export interface PresetPrompt {
   name: string;
   requiresModel: boolean; // whether gender is needed
-  stages: 2; // two-stage processing
-  buildStage1Prompt: (jewelryType: string, gender?: string) => string;
-  buildStage2Prompt: (jewelryType: string, gender?: string) => string;
+  buildPrompt: (jewelryType: string, gender?: string) => string;
 }
 
 export const presetPrompts: Record<string, PresetPrompt> = {
   'e-commerce': {
     name: 'E-Commerce Clean',
     requiresModel: false,
-    stages: 2,
+    buildPrompt: (jewelryType: string) => {
+      return `Transform ${jewelryType} photo to professional commercial quality.
 
-    // Stage 1: Preparation & Retouch
-    buildStage1Prompt: (jewelryType: string) => {
-      return `Jewelry enhancement and cleaning preparation phase.
+PRESERVE CRITICAL: Maintain exact jewelry structure, geometry, stone count, design details unchanged.
 
-PRESERVE EXACTLY:
-- Exact ${jewelryType} geometry unchanged
-- All dimensions and proportions
-- Exact number of gemstones
-- All prongs, bezels, channel settings
+BACKGROUND TRANSFORMATION: Replace any background with pure seamless white, soft natural fade at edges, professional product photography backdrop.
 
-REMOVE IMPERFECTIONS:
-- All dust particles
-- Surface scratches
-- Fingerprints and smudges
-- Spots and stains
-- Tarnish and discoloration
+DEEP CLEANING: Remove all dust, dirt, fingerprints, smudges, gum residue, scratches, blemishes, tarnish, oxidation, marks, stains completely. Pristine showroom condition.
 
-METAL ENHANCEMENT:
-Rose Gold: Linear gradient #B76E79 to #E6C7A3, +80% mirror polish, pink-golden undertones
-Yellow Gold: Radial gradient #FFD700 core to #FFA500 edges, +85% brilliant shine, rich saturation
-White Gold/Platinum: Gradient #E5E4E2 to #BCC6CC, +90% chrome mirror, silvery bright
-Silver: Pure #C0C0C0, +75% polished finish, bright clean
-- Ultra smooth polished surface
-- Enhanced engraving and texture details
+METAL ENHANCEMENT: Dramatically enhance metal brilliance and reflectivity, create smooth gradient transitions across curved surfaces, boost natural metal color richness, mirror-polished finish, remove any dullness, professional jeweler polish quality.
 
-GEMSTONE ENHANCEMENT:
-- Clarity: +80% crystal clear, reduce inclusions
-- Color: +70% saturation, preserve authentic hue, rich depth
-- Brilliance: +90% sparkle, sharpen facets, optimize reflections
-Diamonds: D colorless, VVS1 clarity, ideal cut
-Colored stones: Crystal clarity, rich vivid color, maximum brilliance
+GEMSTONE TRANSFORMATION: Maximize gemstone clarity and transparency, significantly boost color saturation and vibrancy, enhance internal fire and brilliance, sharpen every facet edge, optimize light return and sparkle, crystal clear quality.
 
-TECHNICAL:
-- Ultra sharp across entire jewelry
-- Extra sharp on facets
-- +40% micro-contrast
-- Perfect white balance
-- Optimal exposure
-- +45% saturation
-- Zero noise/grain
-- Remove chromatic aberration
+LIGHTING OPTIMIZATION: Apply professional studio three-point lighting. Soft diffused key light from above-front, subtle fill light reducing harsh shadows, gentle rim light separating subject from background, neutral daylight color temperature, even illumination.
 
-Output: Maximum detail preservation, ready for styling phase.`;
-    },
+REFLECTIONS AND HIGHLIGHTS: Create natural realistic reflections on metal surfaces showing curvature, add crisp white highlights on high points, smooth gradient rolloff on rounded areas, professional jewelry photography lighting marks.
 
-    // Stage 2: E-Commerce Styling
-    buildStage2Prompt: (jewelryType: string) => {
-      const framingMap: Record<string, string> = {
-        ring: 'Close-up filling 70% of frame',
-        necklace: 'Full length centered vertical display',
-        earring: 'Pair side-by-side or elegant single display',
-        bracelet: 'Curved display showing natural shape',
-      };
+SHADOW REFINEMENT: Minimal soft shadow beneath jewelry if needed, very subtle and diffused, natural product photography shadow, low opacity.
 
-      const angleMap: Record<string, string> = {
-        ring: 'Slight top angle 15 degrees',
-        necklace: 'Straight-on front view',
-        earring: 'Slight side angle showcasing design',
-        bracelet: 'Three-quarter view showing curve',
-      };
+COLOR CORRECTION: Perfect white balance neutral accurate colors, optimize exposure avoiding blown highlights or crushed shadows, enhance overall color richness and depth, professional color grading.
 
-      const framing = framingMap[jewelryType] || 'Optimal framing';
-      const angle = angleMap[jewelryType] || 'Best viewing angle';
+SHARPNESS CLARITY: Ultra sharp focus across entire jewelry piece, every detail crystal clear, maximum clarity and definition, remove any softness or blur, commercial photography sharpness.
 
-      return `Professional e-commerce catalog styling for enhanced ${jewelryType}.
+CONTRAST ENHANCEMENT: Boost micro-contrast for detail pop, optimize tonal range for depth and dimension, enhance three-dimensional appearance, professional catalog quality contrast.
 
-BACKGROUND:
-- Pure white seamless RGB(255,255,255)
-- No gradient, flat uniform
-- Zero texture, smooth
-- Soft natural edges
-- Perfect subject separation
+FINAL POLISH: Eliminate all digital noise and artifacts, smooth any rough textures, perfect professional finish, ready for e-commerce or print catalog, luxury jewelry presentation standard.
 
-STUDIO LIGHTING SETUP:
-Key Light: 45° above front, large softbox diffused, 80% intensity, 5500K daylight
-Fill Light: Opposite side lower, reflector bounce, 40% intensity, softens shadows
-Rim Light: Behind slightly above, 30% intensity, edge definition, separates from background
-Quality: Soft, even, professional commercial grade
+COMPOSITION OPTIMIZATION: Center jewelry perfectly in frame, optimal viewing angle showcasing design, balanced negative space, professional product photography framing.
 
-SHADOWS:
-- Minimal 10% opacity maximum
-- Soft diffused if present
-- Subtle downward direction
-- Cool gray neutral color
+STYLE REFERENCE: Match quality of Tiffany, Cartier, high-end jewelry brand product photos, luxury commercial catalog standard, museum-quality presentation.
 
-COMPOSITION:
-- ${framing}
-- Perfectly centered and balanced
-- 25% breathing room (negative space)
-- Optimal viewing angle
-
-CAMERA SETTINGS:
-- ${angle}
-- Slight orthographic perspective (minimal distortion)
-- 85mm portrait lens equivalent
-
-DEPTH OF FIELD:
-- Entire jewelry in perfect focus
-- No background blur, all sharp
-- Everything crisp and clear
-
-FINAL POLISH:
-- Commercial catalog quality
-- Pristine showroom perfect
-- Premium, desirable, professional
-
-STYLE REFERENCE:
-Tiffany catalog, Cartier website standard
-Clean, trustworthy, professional
-Maximize conversion, showcase quality
-
-Output: E-commerce ready, maximum quality, zoom-functionality ready.`;
+OUTPUT QUALITY: Maximum resolution and detail, photorealistic yet enhanced, premium commercial grade, conversion-optimized product imagery.`;
     },
   },
 };

@@ -32,7 +32,7 @@ import KeyboardShortcutsModal from '@/components/molecules/KeyboardShortcutsModa
 import AILoadingOverlay from '@/components/atoms/AILoadingOverlay';
 
 interface CanvasProps {
-  onPresetPrompt?: (stage1Prompt: string, stage2Prompt: string) => void;
+  onPresetPrompt?: (prompt: string) => void;
 }
 
 export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
@@ -132,12 +132,6 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
   const [rightImagePosition, setRightImagePosition] = useState({ x: 0, y: 0 });
   const [activeImage, setActiveImage] = useState<'left' | 'right'>('right'); // Which image is on top
 
-  // Two-stage processing state
-  const [processingStage, setProcessingStage] = useState<{
-    stage: 1 | 2;
-    stage2Prompt: string;
-  } | null>(null);
-
   const {
     edit: editWithAI,
     isEditing: isAIEditing,
@@ -145,59 +139,30 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
   } = useImageEdit({
     onSuccess: (result) => {
       if (result.images && result.images.length > 0) {
-        // Check if this is stage 1 of two-stage processing
-        if (processingStage && processingStage.stage === 1) {
-          // Stage 1 complete - DON'T update canvas
-          logger.info('Stage 1 complete, starting Stage 2');
-          setProcessingStage({
-            stage: 2,
-            stage2Prompt: processingStage.stage2Prompt,
-          });
-
-          // Immediately start stage 2 with stage 1 result
-          editWithAI({
-            image_url: result.images[0].url,
-            prompt: processingStage.stage2Prompt,
-          });
-        } else {
-          // Stage 2 complete OR single-stage edit - update canvas
-          setIsAIImageLoading(true); // Start loading overlay
-          setUploadedImage(result.images[0].url);
-          showToast('Image edited successfully!', 'success');
-          setProcessingStage(null); // Reset stage tracking
-        }
+        setIsAIImageLoading(true); // Start loading overlay
+        setUploadedImage(result.images[0].url);
+        showToast('Image edited successfully!', 'success');
       }
     },
     onError: (error) => {
       setIsAIImageLoading(false); // Clear loading state on error
-      const stageInfo = processingStage
-        ? ` (Stage ${processingStage.stage})`
-        : '';
-      showToast(
-        `${error.message || 'Failed to edit image'}${stageInfo}`,
-        'error'
-      );
-      setProcessingStage(null); // Reset stage tracking
+      showToast(error.message || 'Failed to edit image', 'error');
     },
   });
 
-  // Two-stage preset generation
+  // Preset generation
   const handlePresetGeneration = useCallback(
-    (stage1Prompt: string, stage2Prompt: string) => {
+    (prompt: string) => {
       if (!uploadedImage) {
         showToast('Please upload an image first', 'warning');
         return;
       }
 
-      // Set stage state to track two-stage processing
-      setProcessingStage({ stage: 1, stage2Prompt });
-
-      // Start Stage 1: Preprocessing
+      // Start generation with comprehensive prompt
       editWithAI({
         image_url: uploadedImage,
-        prompt: stage1Prompt,
+        prompt,
       });
-      // onSuccess handler will automatically chain to stage 2
     },
     [uploadedImage, editWithAI, showToast]
   );
@@ -208,14 +173,14 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       // Store reference for external trigger
       (
         window as Window & {
-          __canvasPresetHandler?: (stage1: string, stage2: string) => void;
+          __canvasPresetHandler?: (prompt: string) => void;
         }
       ).__canvasPresetHandler = handlePresetGeneration;
     }
     return () => {
       delete (
         window as Window & {
-          __canvasPresetHandler?: (stage1: string, stage2: string) => void;
+          __canvasPresetHandler?: (prompt: string) => void;
         }
       ).__canvasPresetHandler;
     };
@@ -784,13 +749,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
                 {/* AI Loading Overlay for Side-by-Side View */}
                 {(isAIEditing || isAIImageLoading) && (
                   <div className="absolute inset-0 z-50">
-                    <AILoadingOverlay
-                      progress={
-                        processingStage
-                          ? `Stage ${processingStage.stage}/2: ${aiProgress}`
-                          : aiProgress
-                      }
-                    />
+                    <AILoadingOverlay progress={aiProgress} />
                   </div>
                 )}
 

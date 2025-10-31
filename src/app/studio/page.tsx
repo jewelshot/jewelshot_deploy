@@ -48,17 +48,14 @@ const BottomBarToggle = dynamic(
 );
 
 export default function StudioPage() {
-  // Handle two-stage preset generation from RightSidebar
-  const handleGenerateWithPreset = (
-    stage1Prompt: string,
-    stage2Prompt: string
-  ) => {
+  // Handle preset generation from RightSidebar
+  const handleGenerateWithPreset = (prompt: string) => {
     // Trigger Canvas generation via global handler
     const win = window as Window & {
-      __canvasPresetHandler?: (stage1: string, stage2: string) => void;
+      __canvasPresetHandler?: (prompt: string) => void;
     };
     if (win.__canvasPresetHandler) {
-      win.__canvasPresetHandler(stage1Prompt, stage2Prompt);
+      win.__canvasPresetHandler(prompt);
     }
   };
 
