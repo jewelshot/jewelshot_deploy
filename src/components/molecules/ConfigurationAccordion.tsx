@@ -24,17 +24,19 @@ export function ConfigurationAccordion({
   jewelryOptions,
 }: ConfigurationAccordionProps) {
   const [isExpanded, setIsExpanded] = useState(true);
+  const [hasAutoCollapsed, setHasAutoCollapsed] = useState(false);
 
-  // Auto-collapse when both are selected
+  // Auto-collapse ONLY ONCE when both selections are completed
   useEffect(() => {
-    if (gender && jewelryType && isExpanded) {
+    if (gender && jewelryType && !hasAutoCollapsed) {
       // Wait 300ms before auto-collapse for smooth UX
       const timer = setTimeout(() => {
         setIsExpanded(false);
+        setHasAutoCollapsed(true); // Mark as collapsed, won't auto-collapse again
       }, 300);
       return () => clearTimeout(timer);
     }
-  }, [gender, jewelryType, isExpanded]);
+  }, [gender, jewelryType, hasAutoCollapsed]);
 
   const isComplete = gender && jewelryType;
   const isJewelryDisabled = !gender;
