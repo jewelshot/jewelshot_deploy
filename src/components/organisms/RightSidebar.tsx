@@ -46,59 +46,59 @@ export function RightSidebar() {
     <aside
       className={`fixed bottom-0 right-0 top-0 z-[100] w-[260px] border-l border-[rgba(139,92,246,0.15)] bg-[rgba(10,10,10,0.7)] shadow-[-4px_0_24px_rgba(0,0,0,0.3)] backdrop-blur-[24px] backdrop-saturate-[200%] transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)] ${rightOpen ? 'translate-x-0' : 'translate-x-full'}`}
     >
-      <div className="sidebar-scroll flex h-full flex-col overflow-y-auto px-4 py-6">
-        {/* Header */}
-        <div className="mb-6">
-          <h2 className="text-sm font-semibold text-white">AI Generation</h2>
-          <p className="mt-1 text-xs text-white/50">
-            Configure your image settings
-          </p>
+      <div className="sidebar-scroll flex h-full flex-col overflow-y-auto px-4 py-4">
+        {/* Header - Compact */}
+        <div className="mb-4">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-white/80">
+            Configuration
+          </h2>
         </div>
 
-        {/* Gender Selection */}
-        <div className="mb-6">
+        {/* Gender Selection - Inline */}
+        <div className="mb-3">
           <SelectionDropdown
             label="Gender"
-            placeholder="Select gender..."
+            placeholder="Select..."
             options={genderOptions}
             value={gender}
             onChange={(value) => setGender(value as Gender)}
             required
+            inline
           />
         </div>
 
-        {/* Jewelry Type Selection */}
-        <div className="mb-6">
+        {/* Jewelry Type Selection - Inline */}
+        <div className="mb-3">
           <SelectionDropdown
-            label="Jewelry Type"
-            placeholder="Select jewelry type..."
+            label="Jewelry"
+            placeholder="Select..."
             options={jewelryOptions}
             value={jewelryType}
             onChange={(value) => setJewelryType(value as JewelryType)}
             disabled={isJewelryDisabled}
             required
-            helperText={isJewelryDisabled ? '(Select gender first)' : undefined}
+            inline
           />
         </div>
 
         {/* Divider */}
-        <div className="mb-6 h-px bg-white/5" />
+        <div className="mb-4 h-px bg-white/5" />
 
-        {/* Mode Tabs */}
-        <div className="mb-4">
-          <label className="mb-2 block text-xs font-medium text-white/70">
-            Generation Mode
+        {/* Mode Tabs - Compact */}
+        <div className="mb-3">
+          <div className="mb-1.5 flex items-center justify-between">
+            <label className="text-[10px] font-medium uppercase tracking-wide text-white/60">
+              Mode
+            </label>
             {areModesDisabled && (
-              <span className="ml-1 text-[10px] text-white/40">
-                (Complete selections first)
-              </span>
+              <span className="text-[9px] text-white/30">Complete above</span>
             )}
-          </label>
-          <div className="flex gap-1 rounded-lg border border-white/10 bg-white/[0.02] p-1">
+          </div>
+          <div className="flex gap-0.5 rounded-md border border-white/10 bg-white/[0.02] p-0.5">
             <button
               onClick={() => setActiveMode('quick')}
               disabled={areModesDisabled}
-              className={`flex-1 rounded-md px-2 py-1.5 text-xs font-medium transition-all duration-200 ${
+              className={`flex-1 rounded px-2 py-1 text-[11px] font-medium transition-all duration-200 ${
                 activeMode === 'quick' && !areModesDisabled
                   ? 'bg-purple-500/20 text-purple-300'
                   : areModesDisabled
@@ -111,7 +111,7 @@ export function RightSidebar() {
             <button
               onClick={() => setActiveMode('selective')}
               disabled={areModesDisabled}
-              className={`flex-1 rounded-md px-2 py-1.5 text-xs font-medium transition-all duration-200 ${
+              className={`flex-1 rounded px-2 py-1 text-[11px] font-medium transition-all duration-200 ${
                 activeMode === 'selective' && !areModesDisabled
                   ? 'bg-purple-500/20 text-purple-300'
                   : areModesDisabled
@@ -119,12 +119,12 @@ export function RightSidebar() {
                     : 'text-white/60 hover:text-white'
               }`}
             >
-              Selective
+              Select
             </button>
             <button
               onClick={() => setActiveMode('advanced')}
               disabled={areModesDisabled}
-              className={`flex-1 rounded-md px-2 py-1.5 text-xs font-medium transition-all duration-200 ${
+              className={`flex-1 rounded px-2 py-1 text-[11px] font-medium transition-all duration-200 ${
                 activeMode === 'advanced' && !areModesDisabled
                   ? 'bg-purple-500/20 text-purple-300'
                   : areModesDisabled
@@ -132,7 +132,7 @@ export function RightSidebar() {
                     : 'text-white/60 hover:text-white'
               }`}
             >
-              Advanced
+              Adv
             </button>
           </div>
         </div>
