@@ -164,9 +164,13 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
             // Save original image for comparison
             setOriginalImage(result);
             resetTransform();
-            // Open image analysis modal after successful upload
-            setShowAnalysisModal(true);
-            logger.info('Image uploaded successfully, opening analysis modal');
+            // Open image analysis modal after a short delay to prevent layout shift
+            setTimeout(() => {
+              setShowAnalysisModal(true);
+              logger.info(
+                'Image uploaded successfully, opening analysis modal'
+              );
+            }, 300);
           } else {
             throw new Error('Failed to read image file');
           }
