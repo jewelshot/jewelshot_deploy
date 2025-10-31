@@ -31,7 +31,11 @@ import ViewModeSelector from '@/components/atoms/ViewModeSelector';
 import KeyboardShortcutsModal from '@/components/molecules/KeyboardShortcutsModal';
 import AILoadingOverlay from '@/components/atoms/AILoadingOverlay';
 
-export function Canvas() {
+interface CanvasProps {
+  onPresetPrompt?: (prompt: string) => void;
+}
+
+export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -145,6 +149,37 @@ export function Canvas() {
       showToast(error.message || 'Failed to edit image', 'error');
     },
   });
+
+  // Handle preset generation
+  const handlePresetGeneration = useCallback(
+    (prompt: string) => {
+      if (!uploadedImage) {
+        showToast('Please upload an image first', 'warning');
+        return;
+      }
+
+      editWithAI({
+        image_url: uploadedImage,
+        prompt,
+      });
+    },
+    [uploadedImage, editWithAI, showToast]
+  );
+
+  // Expose generation handler via callback
+  useEffect(() => {
+    if (onPresetPrompt) {
+      // Store reference for external trigger
+      (
+        window as Window & { __canvasPresetHandler?: (prompt: string) => void }
+      ).__canvasPresetHandler = handlePresetGeneration;
+    }
+    return () => {
+      delete (
+        window as Window & { __canvasPresetHandler?: (prompt: string) => void }
+      ).__canvasPresetHandler;
+    };
+  }, [onPresetPrompt, handlePresetGeneration]);
 
   // Canvas handlers (extracted to hook for better organization)
   const {

@@ -11,6 +11,8 @@ import React, { useState } from 'react';
 import { useSidebarStore } from '@/store/sidebarStore';
 import { ConfigurationAccordion } from '@/components/molecules/ConfigurationAccordion';
 import { QuickModeContent } from '@/components/molecules/QuickModeContent';
+import { PresetConfirmModal } from '@/components/molecules/PresetConfirmModal';
+import { presetPrompts } from '@/lib/preset-prompts';
 
 type Gender = 'male' | 'female' | null;
 type JewelryType = 'ring' | 'necklace' | 'earring' | 'bracelet' | null;
@@ -29,7 +31,11 @@ const jewelryOptions = [
   { value: 'bracelet', label: 'Bracelet' },
 ];
 
-export function RightSidebar() {
+interface RightSidebarProps {
+  onGenerateWithPreset?: (prompt: string) => void;
+}
+
+export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
   const { rightOpen } = useSidebarStore();
 
   // Selection states
@@ -37,13 +43,45 @@ export function RightSidebar() {
   const [jewelryType, setJewelryType] = useState<JewelryType>(null);
   const [activeMode, setActiveMode] = useState<Mode>('quick');
 
+  // Modal state
+  const [confirmModal, setConfirmModal] = useState<{
+    show: boolean;
+    presetName: string;
+    presetId: string;
+  } | null>(null);
+
   // Modes are disabled until both gender and jewelry are selected
   const areModesDisabled = !gender || !jewelryType;
 
   // Handle preset selection
-  const handlePresetSelect = (presetName: string) => {
-    console.log('Preset selected:', presetName, { gender, jewelryType });
-    // TODO: Trigger AI generation with preset + gender + jewelryType
+  const handlePresetSelect = (presetId: string) => {
+    if (!jewelryType) return;
+
+    const preset = presetPrompts[presetId];
+    if (!preset) return;
+
+    // Show confirmation modal
+    setConfirmModal({
+      show: true,
+      presetName: preset.name,
+      presetId,
+    });
+  };
+
+  // Handle generation confirmation
+  const handleConfirmGeneration = () => {
+    if (!confirmModal || !jewelryType) return;
+
+    const preset = presetPrompts[confirmModal.presetId];
+    const prompt = preset.buildPrompt(jewelryType, gender || undefined);
+
+    // Close modal
+    setConfirmModal(null);
+
+    // Trigger generation
+    if (onGenerateWithPreset) {
+      onGenerateWithPreset(prompt);
+    }
   };
 
   return (
@@ -137,6 +175,16 @@ export function RightSidebar() {
               </div>
             )}
           </div>
+        )}
+
+        {/* Confirmation Modal */}
+        {confirmModal?.show && (
+          <PresetConfirmModal
+            presetName={confirmModal.presetName}
+            jewelryType={jewelryType || ''}
+            onConfirm={handleConfirmGeneration}
+            onCancel={() => setConfirmModal(null)}
+          />
         )}
       </div>
     </aside>

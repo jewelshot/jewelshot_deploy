@@ -48,6 +48,17 @@ const BottomBarToggle = dynamic(
 );
 
 export default function StudioPage() {
+  // Handle preset generation from RightSidebar
+  const handleGenerateWithPreset = (prompt: string) => {
+    // Trigger Canvas generation via global handler
+    const win = window as Window & {
+      __canvasPresetHandler?: (prompt: string) => void;
+    };
+    if (win.__canvasPresetHandler) {
+      win.__canvasPresetHandler(prompt);
+    }
+  };
+
   return (
     <>
       {/* Aurora Background */}
@@ -62,7 +73,7 @@ export default function StudioPage() {
       <SidebarToggle />
 
       {/* Right Sidebar */}
-      <RightSidebar />
+      <RightSidebar onGenerateWithPreset={handleGenerateWithPreset} />
       <RightSidebarToggle />
 
       {/* Bottom Bar */}
@@ -71,7 +82,7 @@ export default function StudioPage() {
 
       {/* Canvas Area - Wrapped in Error Boundary */}
       <ErrorBoundary fallback={<CanvasFallback />}>
-        <Canvas />
+        <Canvas onPresetPrompt={handleGenerateWithPreset} />
       </ErrorBoundary>
     </>
   );
