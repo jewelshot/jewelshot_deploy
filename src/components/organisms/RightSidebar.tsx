@@ -9,11 +9,24 @@
 
 import React, { useState } from 'react';
 import { useSidebarStore } from '@/store/sidebarStore';
-import { SelectionButton } from '@/components/atoms/SelectionButton';
+import { SelectionDropdown } from '@/components/atoms/SelectionDropdown';
 
 type Gender = 'male' | 'female' | null;
 type JewelryType = 'ring' | 'necklace' | 'earring' | 'bracelet' | null;
 type Mode = 'quick' | 'selective' | 'advanced';
+
+// Dropdown options
+const genderOptions = [
+  { value: 'male', label: 'Male' },
+  { value: 'female', label: 'Female' },
+];
+
+const jewelryOptions = [
+  { value: 'ring', label: 'Ring' },
+  { value: 'necklace', label: 'Necklace' },
+  { value: 'earring', label: 'Earring' },
+  { value: 'bracelet', label: 'Bracelet' },
+];
 
 export function RightSidebar() {
   const { rightOpen } = useSidebarStore();
@@ -44,59 +57,28 @@ export function RightSidebar() {
 
         {/* Gender Selection */}
         <div className="mb-6">
-          <label className="mb-2 block text-xs font-medium text-white/70">
-            Gender <span className="text-red-400">*</span>
-          </label>
-          <div className="grid grid-cols-2 gap-2">
-            <SelectionButton
-              label="Male"
-              selected={gender === 'male'}
-              onClick={() => setGender('male')}
-            />
-            <SelectionButton
-              label="Female"
-              selected={gender === 'female'}
-              onClick={() => setGender('female')}
-            />
-          </div>
+          <SelectionDropdown
+            label="Gender"
+            placeholder="Select gender..."
+            options={genderOptions}
+            value={gender}
+            onChange={(value) => setGender(value as Gender)}
+            required
+          />
         </div>
 
         {/* Jewelry Type Selection */}
         <div className="mb-6">
-          <label className="mb-2 block text-xs font-medium text-white/70">
-            Jewelry Type <span className="text-red-400">*</span>
-            {isJewelryDisabled && (
-              <span className="ml-1 text-[10px] text-white/40">
-                (Select gender first)
-              </span>
-            )}
-          </label>
-          <div className="grid grid-cols-2 gap-2">
-            <SelectionButton
-              label="Ring"
-              selected={jewelryType === 'ring'}
-              onClick={() => setJewelryType('ring')}
-              disabled={isJewelryDisabled}
-            />
-            <SelectionButton
-              label="Necklace"
-              selected={jewelryType === 'necklace'}
-              onClick={() => setJewelryType('necklace')}
-              disabled={isJewelryDisabled}
-            />
-            <SelectionButton
-              label="Earring"
-              selected={jewelryType === 'earring'}
-              onClick={() => setJewelryType('earring')}
-              disabled={isJewelryDisabled}
-            />
-            <SelectionButton
-              label="Bracelet"
-              selected={jewelryType === 'bracelet'}
-              onClick={() => setJewelryType('bracelet')}
-              disabled={isJewelryDisabled}
-            />
-          </div>
+          <SelectionDropdown
+            label="Jewelry Type"
+            placeholder="Select jewelry type..."
+            options={jewelryOptions}
+            value={jewelryType}
+            onChange={(value) => setJewelryType(value as JewelryType)}
+            disabled={isJewelryDisabled}
+            required
+            helperText={isJewelryDisabled ? '(Select gender first)' : undefined}
+          />
         </div>
 
         {/* Divider */}
