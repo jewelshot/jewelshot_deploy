@@ -191,6 +191,7 @@ export function Canvas() {
     setLeftImagePosition,
     setRightImagePosition,
     showToast,
+    openRight,
   });
 
   // Handle AI image load complete

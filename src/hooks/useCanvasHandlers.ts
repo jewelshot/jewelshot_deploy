@@ -65,6 +65,9 @@ interface UseCanvasHandlersProps {
     message: string,
     type: 'success' | 'error' | 'warning' | 'info'
   ) => void;
+
+  // Sidebar control
+  openRight: () => void;
 }
 
 export function useCanvasHandlers(props: UseCanvasHandlersProps) {
@@ -101,6 +104,7 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
     setLeftImagePosition,
     setRightImagePosition,
     showToast,
+    openRight,
   } = props;
 
   const router = useRouter();
@@ -160,7 +164,9 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
             // Save original image for comparison
             setOriginalImage(result);
             resetTransform();
-            logger.info('Image uploaded successfully');
+            // Auto-open right sidebar for AI generation setup
+            openRight();
+            logger.info('Image uploaded successfully, opening right sidebar');
           } else {
             throw new Error('Failed to read image file');
           }
@@ -211,6 +217,7 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
       resetTransform,
       resetImageState,
       fileInputRef,
+      openRight,
     ]
   );
 
