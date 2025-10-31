@@ -77,8 +77,10 @@ export function ConfigurationAccordion({
 
       {/* Accordion Content */}
       <div
-        className={`overflow-hidden transition-all duration-300 ease-out ${
-          isExpanded ? 'max-h-[200px] opacity-100' : 'max-h-0 opacity-0'
+        className={`transition-all duration-300 ease-out ${
+          isExpanded
+            ? 'max-h-[400px] opacity-100'
+            : 'max-h-0 overflow-hidden opacity-0'
         }`}
       >
         <div className="space-y-2 pt-2">
