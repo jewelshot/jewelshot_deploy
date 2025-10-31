@@ -32,7 +32,7 @@ const jewelryOptions = [
 ];
 
 interface RightSidebarProps {
-  onGenerateWithPreset?: (prompt: string) => void;
+  onGenerateWithPreset?: (stage1Prompt: string, stage2Prompt: string) => void;
 }
 
 export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
@@ -73,14 +73,21 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
     if (!confirmModal || !jewelryType) return;
 
     const preset = presetPrompts[confirmModal.presetId];
-    const prompt = preset.buildPrompt(jewelryType, gender || undefined);
+    const stage1Prompt = preset.buildStage1Prompt(
+      jewelryType,
+      gender || undefined
+    );
+    const stage2Prompt = preset.buildStage2Prompt(
+      jewelryType,
+      gender || undefined
+    );
 
     // Close modal
     setConfirmModal(null);
 
-    // Trigger generation
+    // Trigger two-stage generation
     if (onGenerateWithPreset) {
-      onGenerateWithPreset(prompt);
+      onGenerateWithPreset(stage1Prompt, stage2Prompt);
     }
   };
 
