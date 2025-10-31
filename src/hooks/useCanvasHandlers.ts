@@ -65,6 +65,9 @@ interface UseCanvasHandlersProps {
     message: string,
     type: 'success' | 'error' | 'warning' | 'info'
   ) => void;
+
+  // Modal control
+  setShowAnalysisModal: (show: boolean) => void;
 }
 
 export function useCanvasHandlers(props: UseCanvasHandlersProps) {
@@ -101,6 +104,7 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
     setLeftImagePosition,
     setRightImagePosition,
     showToast,
+    setShowAnalysisModal,
   } = props;
 
   const router = useRouter();
@@ -157,7 +161,12 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
           const result = event.target?.result;
           if (typeof result === 'string') {
             setUploadedImage(result);
+            // Save original image for comparison
+            setOriginalImage(result);
             resetTransform();
+            // Open image analysis modal after successful upload
+            setShowAnalysisModal(true);
+            logger.info('Image uploaded successfully, opening analysis modal');
           } else {
             throw new Error('Failed to read image file');
           }
@@ -201,12 +210,14 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
     [
       showToast,
       setUploadedImage,
+      setOriginalImage,
       setFileName,
       setFileSize,
       setIsLoading,
       resetTransform,
       resetImageState,
       fileInputRef,
+      setShowAnalysisModal,
     ]
   );
 

@@ -30,6 +30,7 @@ import UIToggleButton from '@/components/atoms/UIToggleButton';
 import ViewModeSelector from '@/components/atoms/ViewModeSelector';
 import KeyboardShortcutsModal from '@/components/molecules/KeyboardShortcutsModal';
 import AILoadingOverlay from '@/components/atoms/AILoadingOverlay';
+import { ImageAnalysisModal } from '@/components/molecules/ImageAnalysisModal';
 
 export function Canvas() {
   const searchParams = useSearchParams();
@@ -112,6 +113,13 @@ export function Canvas() {
   const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
   const [isPromptExpanded, setIsPromptExpanded] = useState(false);
 
+  // Image Analysis Modal (for initial setup)
+  const [showAnalysisModal, setShowAnalysisModal] = useState(false);
+  const [imageAnalysis, setImageAnalysis] = useState<{
+    jewelryType: string;
+    modelType: string;
+  } | null>(null);
+
   // Toast notifications
   const { showToast, hideToast, toastState } = useToast();
 
@@ -184,6 +192,7 @@ export function Canvas() {
     activeImage,
     leftImageScale,
     rightImageScale,
+    setShowAnalysisModal,
     leftImagePosition,
     rightImagePosition,
     setLeftImageScale,
@@ -1052,6 +1061,19 @@ export function Canvas() {
           />
         )}
       </div>
+
+      {/* Image Analysis Modal */}
+      <ImageAnalysisModal
+        isOpen={showAnalysisModal}
+        onClose={() => setShowAnalysisModal(false)}
+        onComplete={(data) => {
+          setImageAnalysis(data);
+          setShowAnalysisModal(false);
+          // Auto-open right sidebar after analysis
+          openRight();
+          logger.info('Image analysis completed:', data);
+        }}
+      />
 
       {/* Keyboard Shortcuts Help Modal */}
       <KeyboardShortcutsModal
