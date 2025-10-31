@@ -1,0 +1,42 @@
+import React from 'react';
+import { PresetCard } from '@/components/atoms/PresetCard';
+
+interface QuickModeContentProps {
+  onPresetSelect: (presetName: string) => void;
+}
+
+/**
+ * QuickModeContent - Quick presets for instant generation
+ * Shows visual preset cards for one-click generation
+ */
+export function QuickModeContent({ onPresetSelect }: QuickModeContentProps) {
+  const presets = [
+    {
+      id: 'e-commerce',
+      title: 'E-Commerce',
+      imagePath: '/presets/e-commerce.webp',
+    },
+    // Future presets will be added here
+  ];
+
+  return (
+    <div className="space-y-2">
+      {/* Info text */}
+      <p className="text-[9px] text-white/40">
+        Select a preset style for instant generation
+      </p>
+
+      {/* Preset Cards */}
+      <div className="grid grid-cols-2 gap-2">
+        {presets.map((preset) => (
+          <PresetCard
+            key={preset.id}
+            title={preset.title}
+            imagePath={preset.imagePath}
+            onClick={() => onPresetSelect(preset.id)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}

@@ -10,6 +10,7 @@
 import React, { useState } from 'react';
 import { useSidebarStore } from '@/store/sidebarStore';
 import { ConfigurationAccordion } from '@/components/molecules/ConfigurationAccordion';
+import { QuickModeContent } from '@/components/molecules/QuickModeContent';
 
 type Gender = 'male' | 'female' | null;
 type JewelryType = 'ring' | 'necklace' | 'earring' | 'bracelet' | null;
@@ -38,6 +39,12 @@ export function RightSidebar() {
 
   // Modes are disabled until both gender and jewelry are selected
   const areModesDisabled = !gender || !jewelryType;
+
+  // Handle preset selection
+  const handlePresetSelect = (presetName: string) => {
+    console.log('Preset selected:', presetName, { gender, jewelryType });
+    // TODO: Trigger AI generation with preset + gender + jewelryType
+  };
 
   return (
     <aside
@@ -111,24 +118,20 @@ export function RightSidebar() {
 
         {/* Mode Content */}
         {!areModesDisabled && (
-          <div className="flex-1">
+          <div className="flex-1 overflow-y-auto">
             {activeMode === 'quick' && (
-              <div className="rounded-lg border border-white/10 bg-white/[0.02] p-4">
-                <p className="text-xs text-white/60">
-                  Quick presets coming soon...
-                </p>
-              </div>
+              <QuickModeContent onPresetSelect={handlePresetSelect} />
             )}
             {activeMode === 'selective' && (
-              <div className="rounded-lg border border-white/10 bg-white/[0.02] p-4">
-                <p className="text-xs text-white/60">
+              <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3">
+                <p className="text-[9px] text-white/40">
                   Selective options coming soon...
                 </p>
               </div>
             )}
             {activeMode === 'advanced' && (
-              <div className="rounded-lg border border-white/10 bg-white/[0.02] p-4">
-                <p className="text-xs text-white/60">
+              <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3">
+                <p className="text-[9px] text-white/40">
                   Advanced settings coming soon...
                 </p>
               </div>
