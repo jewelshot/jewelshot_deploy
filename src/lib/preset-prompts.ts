@@ -55,35 +55,47 @@ OUTPUT QUALITY: Maximum resolution and detail, photorealistic yet enhanced, prem
     buildPrompt: (jewelryType: string, gender?: string) => {
       const genderText = gender ? `${gender} model wearing ` : '';
 
-      return `Luxury editorial magazine jewelry photography featuring ${genderText}${jewelryType}.
+      return `High-fashion magazine campaign photography featuring ${genderText}${jewelryType}.
 
-PRESERVE EXACT JEWELRY STRUCTURE: Maintain all design details, geometry, stone count unchanged.
+CRITICAL PRESERVE RULES - ABSOLUTELY MANDATORY:
+- ABSOLUTELY NO changes to jewelry structure, shape, or form whatsoever
+- EXACT original geometry must be maintained, zero distortion or warping
+- EXACT same number of gemstones, do not add or remove any stones
+- EXACT original stone positions, do not move or relocate any gems
+- PRESERVE all prongs, bezels, channels, settings exactly as original
+- MAINTAIN every engraving, texture, pattern, filigree, detail unchanged
+- KEEP exact proportions, do not resize or reshape any elements
+- DO NOT add, remove, or modify any metal components
+- ZERO design alterations, only enhance what already exists
+- NEVER add decorative elements, extra stones, or new features
+- NEVER remove any existing design elements or details
+- NEVER morph, distort, elongate, compress, or transform shapes
 
-DRAMATIC BACKGROUND: Deep dramatic dark background with rich black to charcoal gradient and atmospheric depth. Sophisticated editorial magazine backdrop with subtle atmospheric haze.
+ENHANCEMENT SCOPE: ONLY enhance lighting, background, metal polish, gemstone brilliance, remove imperfections. NEVER change jewelry design itself.
 
-LIGHTING: Dramatic high-contrast studio lighting with powerful side key light creating bold shadows and sophisticated rim lighting. Chiaroscuro cinematic effect. Moody lighting that enhances mystery and luxury.
+BACKGROUND: Deep dramatic dark background with rich black to charcoal gradient. Sophisticated depth. Editorial magazine backdrop with subtle atmospheric haze.
 
-METAL BRILLIANCE: Maximum metal brilliance with striking highlights against darkness. Smooth luxurious gradients on curved surfaces. Mirror-polished premium finish emphasizing precious metal richness.
+LIGHTING MOOD: Dramatic high-contrast studio lighting with single powerful key light from side-angle creating bold shadows. Moody chiaroscuro effect. Sophisticated rim lighting separating jewelry from darkness. Cinematic quality illumination.
 
-GEMSTONE DRAMA: Intensely vibrant gemstone colors with deep saturation and captivating fire. Crystal clarity with dramatic light play through facets. Jewel-like intensity and captivating sparkle.
+METAL ENHANCEMENT: Maximum brilliance and reflectivity on EXISTING metal surfaces only. Create striking highlights against dark background. Smooth luxurious gradients on curved surfaces. Mirror-polished premium finish. Emphasize precious metal richness without altering metal structure.
 
-CONTRAST: Very high contrast for visual impact with rich shadows retaining detail and crisp bright highlights. Strong tonal separation for bold visual punch. Editorial magazine quality contrast.
+GEMSTONE DRAMA: Intensely vibrant color on EXISTING gemstones only. Deep saturated hues. Maximum fire and brilliance. Crystal clarity. Dramatic light play through facets. Jewel-like intensity. Captivating sparkle. Maintain exact gemstone shapes and cuts.
 
-SHADOWS: Prominent dramatic shadows as design element with soft gradient falloff. Adds mystery and depth. Sophisticated shadow play enhancing three-dimensional form.
+CONTRAST INTENSITY: Very high contrast for dramatic impact. Deep rich shadows with detail. Bright crisp highlights. Strong tonal separation. Bold visual punch. Editorial magazine quality.
 
-ATMOSPHERE: Sophisticated moody ambiance with mysterious elegance. Premium brand feeling. Aspirational quality with hint of luxury.
+SHADOWS: Prominent dramatic shadows as design element with soft gradient falloff. Adds mystery and depth. Sophisticated shadow play. Enhances three-dimensional form.
 
-COLOR GRADING: Rich deep tones with slightly cool undertones for sophistication. Editorial color palette. Magazine-worthy color treatment enhancing luxury feel.
+ATMOSPHERE: Sophisticated moody ambiance. Hint of luxury. Editorial sophistication. Mysterious elegance. Premium brand feeling. Aspirational quality.
 
-COMPOSITION: Bold confident framing with jewelry as hero statement piece. Dynamic angles. Editorial magazine layout ready. Artistic yet commercial.
+COLOR GRADING: Rich deep tones with slightly cool undertones for sophistication. Enhance luxury feel. Editorial color palette. Magazine-worthy color treatment.
 
-TECHNICAL QUALITY: Ultra sharp details. Maximum clarity. Professional editorial retouching. Eliminate all imperfections. Pristine condition. Publication standard.
+COMPOSITION: Bold confident framing with jewelry as hero statement piece. Dynamic angles possible. Editorial magazine layout ready. Artistic yet commercial.
 
-MOOD: Powerful, mysterious, sophisticated, luxurious, dramatic, aspirational, bold, elegant.
+TECHNICAL QUALITY: Ultra sharp details. Maximum clarity. Professional retouching. Eliminate all imperfections. Pristine condition. Editorial publication standard.
 
-STYLE REFERENCE: Match Vogue jewelry editorials, Cartier campaigns, high-end fashion magazine photography, luxury brand advertising.
+STYLE REFERENCE: Vogue jewelry editorials, Cartier campaigns, high-end fashion magazine photography, luxury brand advertising.
 
-OUTPUT: Editorial magazine publication ready. Premium luxury positioning. Visually striking. Emotionally engaging.`;
+OUTPUT QUALITY: Editorial magazine publication ready. Premium luxury positioning. Visually striking. Emotionally engaging.`;
     },
   },
 };
