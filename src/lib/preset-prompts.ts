@@ -12,70 +12,74 @@ export interface PresetPrompt {
 
 export const presetPrompts: Record<string, PresetPrompt> = {
   'e-commerce': {
-    name: 'E-Commerce Clean',
+    name: 'White Background',
     requiresModel: false,
     buildPrompt: (jewelryType: string) => {
-      // Special optimized prompt for rings
-      if (jewelryType.toLowerCase() === 'ring') {
-        return `Professional e-commerce product photography for ring.
+      return `Professional white background product photography for e-commerce ${jewelryType}.
 
-PRESERVE CRITICAL: Exact ring geometry, stone count, placement, all details unchanged. Zero alterations to design.
+STYLE: Professional e-commerce Tiffany & Co catalog standard.
 
-CAMERA ANGLE: 20-25 degrees above front angle. Ring fills 70-75% of frame. Minimal edges visible. Perfectly centered composition. Optimal showcase angle for ring design.
+JEWELRY TYPE: ${jewelryType.charAt(0).toUpperCase() + jewelryType.slice(1)}
 
-BACKGROUND: Pure white seamless. RGB(255,255,255) uniform white. Soft natural fade at edges. Professional e-commerce backdrop.
+BACKGROUND:
+- Type: Pure white seamless
+- Color: #FFFFFF (RGB 255,255,255)
+- Gradient: Subtle gray to white (5% transition)
+- Quality: Professional studio backdrop
 
-LIGHTING SETUP: Studio gradient environment lighting. Soft ambient illumination from all directions. Focused key light specifically for gemstones to maximize brilliance. Neutral daylight color temperature. Professional catalog lighting.
+LIGHTING SETUP:
+- System: Studio three-point lighting
+- Key light: Soft diffused from top-front angle
+- Fill light: Gentle ambient illumination
+- Rim light: Subtle edge highlight for separation
+- Temperature: 5500K neutral daylight
+- Quality: Soft professional studio lighting
 
-GEMSTONE FOCUS: Every single facet visible and razor sharp. Crystal clarity throughout. Internal fire and light play enhanced. Facet edges sharp and defined. Cut quality clearly visible. Vibrant accurate colors. Maximize brilliance realistically. All stones individually countable and clear.
+JEWELRY PLACEMENT:
+- Position: Perfectly centered in frame
+- Angle: Three-quarter view showcasing design
+- Rotation: Slight diagonal (15 degrees) for dimension
+- Elevation: Floating with slight lift effect
 
-METAL FINISH: Smooth gradient reflections on curved band surfaces showing natural light rolloff and volume. Controlled highlights that preserve detail without blown-out areas. Seamless transitions across surfaces. Mirror polish finish. Accurate metal color representation. Strategic reflections enhance three-dimensional form.
+SHADOWS:
+- Type: Soft drop shadow beneath jewelry
+- Opacity: 20-30% for subtle grounding
+- Blur: High diffusion for natural look
+- Color: Neutral gray tone
 
-SHARPNESS: Focus stacking level sharpness across entire ring. Razor-sharp edges on all elements. Engravings readable and clear. Zero blur anywhere. Macro-level detail clarity. Commercial photography standard.
+REFLECTIONS:
+- Metal surfaces: High polish realistic reflections
+- Gemstones: Natural sparkle and brilliance
+- Floor reflection: Subtle 10% opacity for luxury feel
 
-DEPTH AND DIMENSION: Subtle shadow beneath ring for dimensional grounding. Curved surfaces clearly apparent. Visual separation from background. Three-dimensional form obvious.
+PRODUCT DETAILS:
+- Focus: Razor sharp throughout entire piece
+- Metal tone: Preserve authentic original color
+- Gemstones: Brilliant clarity with maximum fire
+- Texture: Highly detailed surface rendering
 
-CLEANING: Remove all dust, dirt, fingerprints, scratches, blemishes, tarnish completely. Pristine flawless showroom condition.
+COMPOSITION:
+- Framing: Product fills 60% of frame
+- Spacing: Balanced negative space around jewelry
+- Alignment: Perfectly centered and level
 
-TECHNICAL QUALITY: Ultra high resolution output. Maximum sharpness with no artifacts. Balanced contrast for detail. Perfect white balance. Smooth tonal range throughout.
+TECHNICAL SPECIFICATIONS:
+- Resolution: 300 DPI minimum
+- Aspect ratio: 1:1 square or 4:3 standard
+- Color space: sRGB for web optimization
+- Depth of field: All elements in sharp focus
 
-OUTPUT STANDARD: Professional catalog quality. Conversion optimized for e-commerce platforms. Ready for zoom functionality.
+STYLE REFERENCE: Tiffany & Co catalog photography standard. Professional luxury brand e-commerce imagery.
 
-STYLE REFERENCE: Amazon jewelry photography standard. Etsy professional listings. Trendyol catalog quality. Online marketplace best practices.`;
-      }
+AVOID:
+- Colored backgrounds
+- Harsh shadows
+- Overexposure or blown highlights
+- Any blur or soft focus
+- Distortion or warping
+- Color cast or tint
 
-      // General prompt for other jewelry types
-      return `Transform ${jewelryType} photo to professional commercial quality.
-
-PRESERVE CRITICAL: Maintain exact jewelry structure, geometry, stone count, design details unchanged.
-
-BACKGROUND TRANSFORMATION: Replace any background with pure seamless white, soft natural fade at edges, professional product photography backdrop.
-
-DEEP CLEANING: Remove all dust, dirt, fingerprints, smudges, gum residue, scratches, blemishes, tarnish, oxidation, marks, stains completely. Pristine showroom condition.
-
-METAL ENHANCEMENT: Dramatically enhance metal brilliance and reflectivity, create smooth gradient transitions across curved surfaces, boost natural metal color richness, mirror-polished finish, remove any dullness, professional jeweler polish quality.
-
-GEMSTONE TRANSFORMATION: Maximize gemstone clarity and transparency, significantly boost color saturation and vibrancy, enhance internal fire and brilliance, sharpen every facet edge, optimize light return and sparkle, crystal clear quality.
-
-LIGHTING OPTIMIZATION: Apply professional studio three-point lighting. Soft diffused key light from above-front, subtle fill light reducing harsh shadows, gentle rim light separating subject from background, neutral daylight color temperature, even illumination.
-
-REFLECTIONS AND HIGHLIGHTS: Create natural realistic reflections on metal surfaces showing curvature, add crisp white highlights on high points, smooth gradient rolloff on rounded areas, professional jewelry photography lighting marks.
-
-SHADOW REFINEMENT: Minimal soft shadow beneath jewelry if needed, very subtle and diffused, natural product photography shadow, low opacity.
-
-COLOR CORRECTION: Perfect white balance neutral accurate colors, optimize exposure avoiding blown highlights or crushed shadows, enhance overall color richness and depth, professional color grading.
-
-SHARPNESS CLARITY: Ultra sharp focus across entire jewelry piece, every detail crystal clear, maximum clarity and definition, remove any softness or blur, commercial photography sharpness.
-
-CONTRAST ENHANCEMENT: Boost micro-contrast for detail pop, optimize tonal range for depth and dimension, enhance three-dimensional appearance, professional catalog quality contrast.
-
-FINAL POLISH: Eliminate all digital noise and artifacts, smooth any rough textures, perfect professional finish, ready for e-commerce or print catalog, luxury jewelry presentation standard.
-
-COMPOSITION OPTIMIZATION: Center jewelry perfectly in frame, optimal viewing angle showcasing design, balanced negative space, professional product photography framing.
-
-STYLE REFERENCE: Match quality of Tiffany, Cartier, high-end jewelry brand product photos, luxury commercial catalog standard, museum-quality presentation.
-
-OUTPUT QUALITY: Maximum resolution and detail, photorealistic yet enhanced, premium commercial grade, conversion-optimized product imagery.`;
+OUTPUT: Professional e-commerce ready. Catalog quality. Web and print optimized.`;
     },
   },
 

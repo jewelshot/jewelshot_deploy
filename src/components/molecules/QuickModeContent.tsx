@@ -13,7 +13,7 @@ export function QuickModeContent({ onPresetSelect }: QuickModeContentProps) {
   const presets = [
     {
       id: 'e-commerce',
-      title: 'E-Commerce',
+      title: 'White Background',
       imagePath: '/presets/e-commerce.webp',
     },
     {
