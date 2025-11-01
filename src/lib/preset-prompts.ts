@@ -98,4 +98,48 @@ STYLE REFERENCE: Vogue jewelry editorials, Cartier campaigns, high-end fashion m
 OUTPUT QUALITY: Editorial magazine publication ready. Premium luxury positioning. Visually striking. Emotionally engaging.`;
     },
   },
+
+  'instagram-ready': {
+    name: 'Instagram Ready',
+    requiresModel: false,
+    buildPrompt: (jewelryType: string) => {
+      return `Transform ${jewelryType} photo to Instagram-optimized social media content.
+
+CRITICAL PRESERVE - ABSOLUTELY NO CHANGES:
+- Exact jewelry structure, shape, form, and geometry unchanged
+- Exact number, placement, size, and cut of all gemstones preserved
+- All prongs, settings, engravings, textures maintained unchanged
+- Never add new elements, stones, or decorative features
+- Never remove any existing design elements
+- Zero warping, morphing, or proportion changes
+
+ENHANCEMENT ONLY: Improve lighting, background, colors, polish. Never alter jewelry design itself.
+
+BACKGROUND: Clean attractive background with soft gradient or subtle texture. Instagram aesthetic. Visually appealing modern backdrop. Social media style. Attention-grabbing yet not distracting from jewelry.
+
+LIGHTING: Bright vibrant lighting. Eye-catching illumination. Dynamic yet soft. Instagram-worthy quality. Attention-grabbing brightness. Optimized for mobile screens. Flattering illumination that makes jewelry pop.
+
+METAL ENHANCEMENT: Enhance existing metal surfaces only. High shine and brilliance. Striking reflections. Premium polished look. Social media pop. Eye-catching metallic sheen. Scroll-stopping metal finish.
+
+GEMSTONE ENHANCEMENT: Boost existing gemstones only. Vivid saturated colors. Maximum sparkle and fire. Crystal clarity. Scroll-stopping brilliance. Maintain exact gemstone shapes and cuts. Make stones irresistibly vibrant.
+
+CLEANING: Remove all imperfections completely. Flawless pristine condition. Social media perfect. Zero dust, scratches, or blemishes. Picture-perfect finish.
+
+COLOR TREATMENT: Vibrant rich colors. Slightly boosted saturation for impact. Warm inviting tones. Instagram color palette. Visually striking. Algorithm-friendly color grading. Eye-catching hues.
+
+CONTRAST: Punchy high contrast. Bold visual impact. Details pop dramatically. Engaging and dynamic. Thumb-stopping contrast levels. Makes jewelry stand out instantly.
+
+SHARPNESS: Crisp sharp details. Perfect clarity. Mobile screen optimized sharpness. Pin-sharp focus. Looks amazing on phones and tablets.
+
+MOOD: Attractive, engaging, appealing. Scroll-stopping quality. Aspirational feel. Like-worthy aesthetic. Share-worthy presentation. Saves-worthy appeal.
+
+COMPOSITION: Bold confident framing. Jewelry as hero. Dynamic angles possible. Instagram grid ready. Square or vertical friendly. Feed-optimized composition.
+
+TECHNICAL: Eliminate all noise and artifacts. Maximum visual appeal. Mobile screen optimized. Fast-loading friendly. Compression-resistant quality.
+
+STYLE REFERENCE: Top jewelry Instagram accounts. Viral jewelry posts. High engagement content. Influencer-quality presentation. Trending jewelry photography style.
+
+OUTPUT QUALITY: Engagement optimized. Save-worthy. Shareable quality. Algorithm friendly. Instagram feed ready. Story-ready. Reels-ready. Maximum social media impact.`;
+    },
+  },
 };
