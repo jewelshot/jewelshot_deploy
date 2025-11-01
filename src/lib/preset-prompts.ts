@@ -15,6 +15,36 @@ export const presetPrompts: Record<string, PresetPrompt> = {
     name: 'E-Commerce Clean',
     requiresModel: false,
     buildPrompt: (jewelryType: string) => {
+      // Special optimized prompt for rings
+      if (jewelryType.toLowerCase() === 'ring') {
+        return `Professional e-commerce product photography for ring.
+
+PRESERVE CRITICAL: Exact ring geometry, stone count, placement, all details unchanged. Zero alterations to design.
+
+CAMERA ANGLE: 20-25 degrees above front angle. Ring fills 70-75% of frame. Minimal edges visible. Perfectly centered composition. Optimal showcase angle for ring design.
+
+BACKGROUND: Pure white seamless. RGB(255,255,255) uniform white. Soft natural fade at edges. Professional e-commerce backdrop.
+
+LIGHTING SETUP: Studio gradient environment lighting. Soft ambient illumination from all directions. Focused key light specifically for gemstones to maximize brilliance. Neutral daylight color temperature. Professional catalog lighting.
+
+GEMSTONE FOCUS: Every single facet visible and razor sharp. Crystal clarity throughout. Internal fire and light play enhanced. Facet edges sharp and defined. Cut quality clearly visible. Vibrant accurate colors. Maximize brilliance realistically. All stones individually countable and clear.
+
+METAL FINISH: Smooth gradient reflections on curved band surfaces showing natural light rolloff and volume. Controlled highlights that preserve detail without blown-out areas. Seamless transitions across surfaces. Mirror polish finish. Accurate metal color representation. Strategic reflections enhance three-dimensional form.
+
+SHARPNESS: Focus stacking level sharpness across entire ring. Razor-sharp edges on all elements. Engravings readable and clear. Zero blur anywhere. Macro-level detail clarity. Commercial photography standard.
+
+DEPTH AND DIMENSION: Subtle shadow beneath ring for dimensional grounding. Curved surfaces clearly apparent. Visual separation from background. Three-dimensional form obvious.
+
+CLEANING: Remove all dust, dirt, fingerprints, scratches, blemishes, tarnish completely. Pristine flawless showroom condition.
+
+TECHNICAL QUALITY: Ultra high resolution output. Maximum sharpness with no artifacts. Balanced contrast for detail. Perfect white balance. Smooth tonal range throughout.
+
+OUTPUT STANDARD: Professional catalog quality. Conversion optimized for e-commerce platforms. Ready for zoom functionality.
+
+STYLE REFERENCE: Amazon jewelry photography standard. Etsy professional listings. Trendyol catalog quality. Online marketplace best practices.`;
+      }
+
+      // General prompt for other jewelry types
       return `Transform ${jewelryType} photo to professional commercial quality.
 
 PRESERVE CRITICAL: Maintain exact jewelry structure, geometry, stone count, design details unchanged.
