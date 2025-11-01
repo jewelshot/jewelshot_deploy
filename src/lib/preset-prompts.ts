@@ -273,99 +273,104 @@ OUTPUT: Lifestyle content ready. Relatable and polished. Social platform optimiz
   },
 
   'still-life': {
-    name: 'Still Life',
+    name: 'Still Life Stone',
     requiresModel: false,
     buildPrompt: (jewelryType: string) => {
-      // Dynamic placement based on jewelry type
+      // Dynamic stone placement based on jewelry type
       let placementInstructions = '';
       const type = jewelryType.toLowerCase();
 
       if (type === 'ring') {
         placementInstructions =
-          'Ring placement: Standing upright or laying flat on surface. Natural elegant positioning.';
+          'Ring: Resting on stone surface top. Secure stable positioning on textured stone.';
       } else if (type === 'necklace') {
         placementInstructions =
-          'Necklace placement: Gracefully arranged with natural curve. Flowing elegant drape.';
+          'Necklace: Draped elegantly over stone curves. Following natural stone contours.';
       } else if (type === 'earring') {
         placementInstructions =
-          'Earrings placement: Paired side by side or artistically staggered. Balanced composition.';
+          'Earrings: Paired on stone surface. Stable positioning on natural texture.';
       } else if (type === 'bracelet') {
         placementInstructions =
-          'Bracelet placement: Circular form displayed or elegantly draped. Natural curved shape.';
+          'Bracelet: Draped gracefully around stone form. Following organic shape.';
       } else {
         placementInstructions =
-          'Jewelry placement: Elegant arrangement with natural positioning. Artistic yet authentic.';
+          'Jewelry: Arranged naturally on stone surface. Secure stable positioning.';
       }
 
-      return `Minimal still life composition with natural lighting for ${jewelryType}.
+      return `Natural stone display with warm lighting for ${jewelryType} lifestyle product photography.
 
-STYLE: Contemporary minimal still life photography.
+STYLE: Organic minimal natural stone display.
 
 JEWELRY TYPE: ${jewelryType.charAt(0).toUpperCase() + jewelryType.slice(1)}
 
 BACKGROUND:
-- Type: Neutral surface with character
-- Color: Warm beige cream tone
-- Texture: Smooth matte finish
-- Gradient: Subtle tonal variation for depth
-- Quality: Contemporary minimal aesthetic
+- Type: Flat horizontal surface
+- Color: Warm beige sand tone
+- Texture: Smooth matte uniform
+- Quality: Natural minimal aesthetic
+
+DISPLAY ELEMENT - NATURAL STONE:
+- Object: Large natural stone rock
+- Size: Medium to large prominent feature
+- Texture: Porous organic limestone or sandstone
+- Color: Natural beige cream with organic variations
+- Shape: Rounded oval organic form
+- Position: Lower left to center area of frame
+- Surface: Textured weathered natural appearance
 
 LIGHTING:
-- Source: Natural window light quality
-- Direction: Soft side angle at 45 degrees
-- Quality: Diffused and gentle
-- Temperature: Warm 5000K morning light
-- Shadows: Organic window frame shadow patterns
-- Shadow intensity: Soft 20-40% opacity
+- Source: Natural directional sunlight quality
+- Direction: Top left at 45 degree angle
+- Quality: Warm direct with soft edges
+- Temperature: Warm 4500K golden hour light
+- Intensity: Bright natural highlight
 
-JEWELRY PLACEMENT:
+SHADOWS - STRONG DEFINED:
+- Stone shadow: Strong defined cast shadow
+- Direction: Bottom right diagonal from stone
+- Opacity: Deep 60-80% for dramatic effect
+- Edge: Soft gradient transition
+- Color: Warm brown tone
+
+JEWELRY PLACEMENT ON STONE:
 - ${placementInstructions}
-- Surface: Flat horizontal placement on surface
-- Spacing: Balanced negative space around jewelry
-- Presentation: Natural organic positioning
+- Positioning: Secure stable on stone texture
+- Integration: Jewelry naturally placed on stone surface
+- Visibility: Clear prominent display on stone
 
 COMPOSITION:
-- Style: Minimal clean contemporary
-- Framing: Product fills 40-50% of frame
-- Positioning: Off-center artistic or centered balanced
-- Breathing room: Generous negative space around jewelry
-- Aesthetic: Contemporary lifestyle editorial
-
-SHADOWS:
-- Type: Natural window cast shadows
-- Pattern: Geometric organic shadow shapes
-- Opacity: Soft transparent quality
-- Direction: Consistent with light source angle
+- Stone prominence: 40-50% of frame
+- Jewelry visibility: Clear prominent on stone surface
+- Framing: Stone and jewelry together as unit
+- Angle: Slight top down at 30 degrees
+- Aesthetic: Natural organic lifestyle
 
 PRESERVE ORIGINAL DESIGN - CRITICAL:
-- Gemstone shape: Exact original cut
+- Gemstone shape: Exact original
 - Gemstone size: Precise dimensions
-- Gemstone count: Exact placement
-- Setting structure: Preserve all design elements
-- Metal details: Maintain authentic finish
-- Proportions: Exact ratios maintained
-- CRITICAL: Design untouched. Only scene and lighting change.
+- Setting structure: Preserve all elements
+- Metal details: Authentic finish
+- CRITICAL: Design untouched. Only scene changes.
 
 ATMOSPHERE:
-- Mood: Warm inviting elegant
-- Aesthetic: Contemporary minimal lifestyle
-- Feeling: Calm sophisticated peaceful
+- Mood: Natural organic warm earthy
+- Aesthetic: Lifestyle organic minimal
+- Feeling: Grounded natural authentic
 
 TECHNICAL SPECIFICATIONS:
 - Resolution: 300 DPI minimum
-- Aspect ratio: 1:1 square or 4:5 vertical
-- Focus: Sharp product with soft background depth
+- Aspect ratio: 4:5 vertical or 1:1 square
+- Focus: Sharp product and sharp stone texture both
 
-STYLE REFERENCE: Contemporary still life photography. Minimal aesthetic. Natural window light. Social media editorial.
+STYLE REFERENCE: Natural stone lifestyle photography. Organic product display. Warm earthy aesthetic.
 
 AVOID:
-- Cluttered props or distractions
-- Harsh lighting or hard shadows
-- Cold tones or clinical feel
-- Busy backgrounds
-- Design alterations of any kind
+- Artificial props or elements
+- Cold lighting or clinical feel
+- Design alterations of jewelry
+- Flat surface only displays
 
-OUTPUT: Social media ready. Web optimized. Contemporary minimal still life aesthetic. Natural authentic presentation.`;
+OUTPUT: Lifestyle ready. Natural organic aesthetic. Stone display photography. Warm earthy presentation.`;
     },
   },
 };
