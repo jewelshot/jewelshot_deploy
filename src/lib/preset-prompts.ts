@@ -33,7 +33,6 @@ LIGHTING SETUP:
 - Fill light: Gentle ambient illumination
 - Rim light: Subtle edge highlight for separation
 - Temperature: 5500K neutral daylight
-- Quality: Soft professional studio lighting
 
 JEWELRY PLACEMENT:
 - Position: Perfectly centered in frame
@@ -51,35 +50,38 @@ REFLECTIONS:
 - Metal surfaces: High polish realistic reflections
 - Gemstones: Natural sparkle and brilliance
 - Floor reflection: Subtle 10% opacity for luxury feel
+- Note: Surface reflections are adjustable
 
-PRODUCT DETAILS:
-- Focus: Razor sharp throughout entire piece
-- Metal tone: Preserve authentic original color
-- Gemstones: Brilliant clarity with maximum fire
-- Texture: Highly detailed surface rendering
+PRESERVE ORIGINAL DESIGN - CRITICAL:
+- Gemstone shape: Exact original cut and form unchanged
+- Gemstone size: Maintain precise dimensions exactly
+- Gemstone count: Keep exact number and placement
+- Setting structure: Preserve prong and bezel design
+- Band shape: Maintain original form completely
+- Engravings: Keep all text and patterns intact
+- Texture details: Preserve milgrain, filigree, hammered textures
+- Metal work: Maintain twisted, braided elements
+- Proportions: Exact width, height, depth ratios
+- CRITICAL: Only lighting and reflections change. Design completely untouched.
 
 COMPOSITION:
 - Framing: Product fills 60% of frame
-- Spacing: Balanced negative space around jewelry
 - Alignment: Perfectly centered and level
 
 TECHNICAL SPECIFICATIONS:
 - Resolution: 300 DPI minimum
 - Aspect ratio: 1:1 square or 4:3 standard
-- Color space: sRGB for web optimization
-- Depth of field: All elements in sharp focus
+- Focus: Razor sharp on all details
 
-STYLE REFERENCE: Tiffany & Co catalog photography standard. Professional luxury brand e-commerce imagery.
+STYLE REFERENCE: Tiffany & Co catalog photography standard.
 
 AVOID:
-- Colored backgrounds
+- Design alterations of any kind
+- Gemstone modifications
 - Harsh shadows
-- Overexposure or blown highlights
-- Any blur or soft focus
-- Distortion or warping
 - Color cast or tint
 
-OUTPUT: Professional e-commerce ready. Catalog quality. Web and print optimized.`;
+OUTPUT: Professional e-commerce ready. Catalog quality. Design integrity preserved.`;
     },
   },
 
