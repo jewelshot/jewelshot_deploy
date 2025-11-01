@@ -26,6 +26,11 @@ export function QuickModeContent({ onPresetSelect }: QuickModeContentProps) {
       title: 'Instagram Ready',
       imagePath: '/presets/instagram-ready.webp',
     },
+    {
+      id: 'quick-clean',
+      title: 'Quick Clean',
+      imagePath: '/presets/quick-clean.webp',
+    },
   ];
 
   return (
@@ -36,7 +41,7 @@ export function QuickModeContent({ onPresetSelect }: QuickModeContentProps) {
       </p>
 
       {/* Preset Cards */}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 gap-2">
         {presets.map((preset) => (
           <PresetCard
             key={preset.id}

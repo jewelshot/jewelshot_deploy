@@ -142,4 +142,50 @@ STYLE REFERENCE: Top jewelry Instagram accounts. Viral jewelry posts. High engag
 OUTPUT QUALITY: Engagement optimized. Save-worthy. Shareable quality. Algorithm friendly. Instagram feed ready. Story-ready. Reels-ready. Maximum social media impact.`;
     },
   },
+
+  'quick-clean': {
+    name: 'Quick Clean',
+    requiresModel: false,
+    buildPrompt: (jewelryType: string) => {
+      return `Fast professional retouch and enhancement for ${jewelryType} photo.
+
+CRITICAL PRESERVE - ABSOLUTELY MANDATORY:
+- Exact jewelry structure, shape, form, and geometry unchanged
+- Exact number, placement, size, and cut of all gemstones preserved
+- All prongs, settings, engravings, textures maintained unchanged
+- ORIGINAL BACKGROUND completely unchanged
+- ORIGINAL LIGHTING setup preserved exactly
+- ORIGINAL COMPOSITION unchanged
+- ORIGINAL CAMERA angle preserved
+- ORIGINAL SHADOWS maintained
+- Never add new elements, stones, or decorative features
+- Never remove any existing design elements
+- Zero warping, morphing, or proportion changes
+- Background, lighting, composition - absolutely no changes whatsoever
+
+ENHANCEMENT SCOPE: ONLY clean and enhance jewelry itself. Nothing else changes.
+
+CLEANING FOCUS: Remove all dust, dirt, fingerprints, gum residue, smudges, scratches, surface blemishes, tarnish, marks completely FROM JEWELRY ONLY. Do not touch background.
+
+METAL ENHANCEMENT: Enhance existing metal surfaces only. Improve polish and shine. Clean reflections. Remove dullness. Professional jeweler clean. Maintain natural metal appearance.
+
+GEMSTONE ENHANCEMENT: Boost existing gemstones only. Improve clarity. Enhance natural color slightly. Increase sparkle. Maintain exact gemstone shapes and cuts. Subtle natural enhancement.
+
+SHARPNESS: Slightly improve focus and detail clarity on jewelry. Gentle enhancement. Not aggressive.
+
+COLOR CORRECTION: Minimal color correction on jewelry only if needed. Maintain natural authentic appearance. No dramatic changes.
+
+CONTRAST: Subtle contrast boost on jewelry for better definition. Gentle enhancement only.
+
+BACKGROUND RULE: Absolutely preserve original background, lighting setup, shadows, composition, camera angle. No changes whatsoever. Original photo character must remain.
+
+SPEED PRIORITY: Quick efficient enhancement. Minimal changes. Natural looking result. Fast processing.
+
+TECHNICAL: Clean professional appearance while maintaining authentic original photo feel. Looks like professional jeweler cleaned the piece but photo stays the same.
+
+STYLE REFERENCE: Professional jeweler cleaning and polish. Subtle enhancement. Original photo integrity preserved.
+
+OUTPUT: Improved jewelry appearance with original photo character completely preserved. Quick natural-looking enhancement.`;
+    },
+  },
 };
