@@ -188,4 +188,50 @@ STYLE REFERENCE: Professional jeweler cleaning and polish. Subtle enhancement. O
 OUTPUT: Improved jewelry appearance with original photo character completely preserved. Quick natural-looking enhancement.`;
     },
   },
+
+  'lifestyle-natural': {
+    name: 'Lifestyle Natural',
+    requiresModel: false,
+    buildPrompt: (jewelryType: string) => {
+      return `Create authentic lifestyle photography for ${jewelryType}.
+
+CRITICAL PRESERVE - ABSOLUTELY NO CHANGES:
+- Exact jewelry structure, shape, form, and geometry unchanged
+- Exact number, placement, size, and cut of all gemstones preserved
+- All prongs, settings, engravings, textures maintained unchanged
+- Never add new elements, stones, or decorative features
+- Never remove any existing design elements
+- Zero warping, morphing, or proportion changes
+
+ENHANCEMENT ONLY: Improve lighting, background, polish. Never alter jewelry design itself.
+
+BACKGROUND: Soft warm neutral background. Gentle beige cream tones. Subtle natural texture hint. Organic feel. Lifestyle photography backdrop. Inviting cozy warmth. Natural materials suggestion.
+
+LIGHTING: Natural soft window light quality. Gentle diffused illumination. Warm golden undertones. Soft shadows with smooth transitions. Authentic daylight feel. Approachable intimate lighting. Not harsh or dramatic.
+
+METAL ENHANCEMENT: Enhance existing metal surfaces only. Natural polished finish. Warm glow. Soft subtle reflections. Everyday wearable look. Authentic precious metal appearance. Not overly shiny.
+
+GEMSTONE ENHANCEMENT: Boost existing gemstones only. Naturally vibrant colors clear and brilliant but not overly intense. Authentic sparkle. Real-life appearance. Maintain exact gemstone shapes and cuts. Realistic brilliance.
+
+CLEANING: Remove all dust, dirt, imperfections completely. Pristine condition while maintaining natural authentic feel. Perfect yet approachable.
+
+SHADOWS: Soft natural shadows. Gentle falloff. Subtle depth. Organic shadow quality. Real-world lighting. Comfortable shadow presence.
+
+CONTRAST: Moderate gentle contrast. Soft tonal transitions. Comfortable natural look. Lifestyle balance. Not aggressive or punchy.
+
+COLOR TREATMENT: Warm natural tones. Slightly golden undertones. Cozy inviting palette. Authentic lifestyle aesthetic. Comfortable warm hues.
+
+SHARPNESS: Crisp clear details. Natural clarity. Not overly sharp. Real-life focus quality. Comfortable sharpness level.
+
+MOOD: Warm inviting approachable. Everyday luxury. Relatable sophistication. Comfortable authentic. Intimate lifestyle feeling. Cozy and personal.
+
+COMPOSITION: Relaxed natural framing. Jewelry showcased comfortably. Lifestyle context. Approachable presentation. Organic placement.
+
+TECHNICAL: Professional lifestyle quality while maintaining authentic natural feel. Polished yet relatable. Editorial lifestyle standard.
+
+STYLE REFERENCE: Lifestyle Instagram content. Natural jewelry photography. Everyday luxury aesthetic. Organic lifestyle imagery. Warm authentic presentation.
+
+OUTPUT: Lifestyle content ready. Relatable and polished. Social platform optimized. Everyday luxury appeal. Warm and inviting result.`;
+    },
+  },
 };

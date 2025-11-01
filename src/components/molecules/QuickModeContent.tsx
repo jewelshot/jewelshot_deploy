@@ -31,6 +31,11 @@ export function QuickModeContent({ onPresetSelect }: QuickModeContentProps) {
       title: 'Quick Clean',
       imagePath: '/presets/quick-clean.webp',
     },
+    {
+      id: 'lifestyle-natural',
+      title: 'Lifestyle Natural',
+      imagePath: '/presets/lifestyle-natural.webp',
+    },
   ];
 
   return (
