@@ -36,6 +36,11 @@ export function QuickModeContent({ onPresetSelect }: QuickModeContentProps) {
       title: 'Lifestyle Natural',
       imagePath: '/presets/lifestyle-natural.webp',
     },
+    {
+      id: 'still-life',
+      title: 'Still Life',
+      imagePath: '/presets/still-life.webp',
+    },
   ];
 
   return (

@@ -271,4 +271,101 @@ STYLE REFERENCE: Lifestyle Instagram content. Natural jewelry photography. Every
 OUTPUT: Lifestyle content ready. Relatable and polished. Social platform optimized. Everyday luxury appeal. Warm and inviting result.`;
     },
   },
+
+  'still-life': {
+    name: 'Still Life',
+    requiresModel: false,
+    buildPrompt: (jewelryType: string) => {
+      // Dynamic placement based on jewelry type
+      let placementInstructions = '';
+      const type = jewelryType.toLowerCase();
+
+      if (type === 'ring') {
+        placementInstructions =
+          'Ring placement: Standing upright or laying flat on surface. Natural elegant positioning.';
+      } else if (type === 'necklace') {
+        placementInstructions =
+          'Necklace placement: Gracefully arranged with natural curve. Flowing elegant drape.';
+      } else if (type === 'earring') {
+        placementInstructions =
+          'Earrings placement: Paired side by side or artistically staggered. Balanced composition.';
+      } else if (type === 'bracelet') {
+        placementInstructions =
+          'Bracelet placement: Circular form displayed or elegantly draped. Natural curved shape.';
+      } else {
+        placementInstructions =
+          'Jewelry placement: Elegant arrangement with natural positioning. Artistic yet authentic.';
+      }
+
+      return `Minimal still life composition with natural lighting for ${jewelryType}.
+
+STYLE: Contemporary minimal still life photography.
+
+JEWELRY TYPE: ${jewelryType.charAt(0).toUpperCase() + jewelryType.slice(1)}
+
+BACKGROUND:
+- Type: Neutral surface with character
+- Color: Warm beige cream tone
+- Texture: Smooth matte finish
+- Gradient: Subtle tonal variation for depth
+- Quality: Contemporary minimal aesthetic
+
+LIGHTING:
+- Source: Natural window light quality
+- Direction: Soft side angle at 45 degrees
+- Quality: Diffused and gentle
+- Temperature: Warm 5000K morning light
+- Shadows: Organic window frame shadow patterns
+- Shadow intensity: Soft 20-40% opacity
+
+JEWELRY PLACEMENT:
+- ${placementInstructions}
+- Surface: Flat horizontal placement on surface
+- Spacing: Balanced negative space around jewelry
+- Presentation: Natural organic positioning
+
+COMPOSITION:
+- Style: Minimal clean contemporary
+- Framing: Product fills 40-50% of frame
+- Positioning: Off-center artistic or centered balanced
+- Breathing room: Generous negative space around jewelry
+- Aesthetic: Contemporary lifestyle editorial
+
+SHADOWS:
+- Type: Natural window cast shadows
+- Pattern: Geometric organic shadow shapes
+- Opacity: Soft transparent quality
+- Direction: Consistent with light source angle
+
+PRESERVE ORIGINAL DESIGN - CRITICAL:
+- Gemstone shape: Exact original cut
+- Gemstone size: Precise dimensions
+- Gemstone count: Exact placement
+- Setting structure: Preserve all design elements
+- Metal details: Maintain authentic finish
+- Proportions: Exact ratios maintained
+- CRITICAL: Design untouched. Only scene and lighting change.
+
+ATMOSPHERE:
+- Mood: Warm inviting elegant
+- Aesthetic: Contemporary minimal lifestyle
+- Feeling: Calm sophisticated peaceful
+
+TECHNICAL SPECIFICATIONS:
+- Resolution: 300 DPI minimum
+- Aspect ratio: 1:1 square or 4:5 vertical
+- Focus: Sharp product with soft background depth
+
+STYLE REFERENCE: Contemporary still life photography. Minimal aesthetic. Natural window light. Social media editorial.
+
+AVOID:
+- Cluttered props or distractions
+- Harsh lighting or hard shadows
+- Cold tones or clinical feel
+- Busy backgrounds
+- Design alterations of any kind
+
+OUTPUT: Social media ready. Web optimized. Contemporary minimal still life aesthetic. Natural authentic presentation.`;
+    },
+  },
 };
