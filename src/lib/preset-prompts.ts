@@ -34,11 +34,14 @@ LIGHTING SETUP:
 - Rim light: Subtle edge highlight for separation
 - Temperature: 5500K neutral daylight
 
-JEWELRY PLACEMENT:
+JEWELRY PLACEMENT - CRITICAL:
 - Position: Perfectly centered in frame
-- Angle: Three-quarter view showcasing design
-- Rotation: Slight diagonal (15 degrees) for dimension
+- Angle: Three-quarter view at 30-45 degrees
+- Visibility: Show top, side, and front simultaneously
+- Orientation: Complete form readable in single view
+- Rotation: Optimal showcase angle for maximum clarity
 - Elevation: Floating with slight lift effect
+- CRITICAL: Entire product structure visible in single view
 
 SHADOWS:
 - Type: Soft drop shadow beneath jewelry
@@ -50,19 +53,17 @@ REFLECTIONS:
 - Metal surfaces: High polish realistic reflections
 - Gemstones: Natural sparkle and brilliance
 - Floor reflection: Subtle 10% opacity for luxury feel
-- Note: Surface reflections are adjustable
 
 PRESERVE ORIGINAL DESIGN - CRITICAL:
-- Gemstone shape: Exact original cut and form unchanged
-- Gemstone size: Maintain precise dimensions exactly
-- Gemstone count: Keep exact number and placement
+- Gemstone shape: Exact original cut
+- Gemstone size: Maintain precise dimensions
+- Gemstone count: Exact number and placement
 - Setting structure: Preserve prong and bezel design
-- Band shape: Maintain original form completely
-- Engravings: Keep all text and patterns intact
-- Texture details: Preserve milgrain, filigree, hammered textures
-- Metal work: Maintain twisted, braided elements
-- Proportions: Exact width, height, depth ratios
-- CRITICAL: Only lighting and reflections change. Design completely untouched.
+- Band shape: Maintain original form
+- Engravings: Keep all details intact
+- Texture: Preserve all surface work
+- Proportions: Exact ratios
+- CRITICAL: Only lighting and reflections change. Design untouched.
 
 COMPOSITION:
 - Framing: Product fills 60% of frame
@@ -77,11 +78,11 @@ STYLE REFERENCE: Tiffany & Co catalog photography standard.
 
 AVOID:
 - Design alterations of any kind
-- Gemstone modifications
-- Harsh shadows
-- Color cast or tint
+- Flat top-only view
+- Pure side view
+- Obscured details
 
-OUTPUT: Professional e-commerce ready. Catalog quality. Design integrity preserved.`;
+OUTPUT: Professional e-commerce ready. Catalog quality. Complete product visibility.`;
     },
   },
 
