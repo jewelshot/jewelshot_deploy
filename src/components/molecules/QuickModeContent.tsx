@@ -17,11 +17,6 @@ export function QuickModeContent({ onPresetSelect }: QuickModeContentProps) {
       imagePath: '/presets/e-commerce.webp',
     },
     {
-      id: 'lifestyle',
-      title: 'Lifestyle',
-      imagePath: '/presets/lifestyle.webp',
-    },
-    {
       id: 'still-life',
       title: 'Still Life',
       imagePath: '/presets/still-life.webp',
@@ -32,14 +27,14 @@ export function QuickModeContent({ onPresetSelect }: QuickModeContentProps) {
       imagePath: '/presets/on-model.webp',
     },
     {
-      id: 'close-up',
-      title: 'Close Up',
-      imagePath: '/presets/close-up.webp',
-    },
-    {
       id: 'luxury',
       title: 'Luxury',
       imagePath: '/presets/luxury.webp',
+    },
+    {
+      id: 'close-up',
+      title: 'Close Up',
+      imagePath: '/presets/close-up.webp',
     },
   ];
 
