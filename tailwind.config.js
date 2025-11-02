@@ -23,6 +23,9 @@ module.exports = {
         fadeInScale: 'fadeInScale 300ms ease-out forwards',
         'spin-slow': 'spin 3s linear infinite',
         'glow-pulse': 'glow-pulse 2s ease-in-out infinite',
+        'bounce-horizontal': 'bounce-horizontal 2s ease-in-out infinite',
+        'fade-in': 'fade-in 400ms ease-in forwards',
+        'fade-out': 'fade-out 300ms ease-out forwards',
       },
       keyframes: {
         fadeInSlide: {
@@ -59,6 +62,34 @@ module.exports = {
           },
           '50%': {
             boxShadow: '0 0 20px 0 rgba(139, 92, 246, 0.4)',
+          },
+        },
+        'bounce-horizontal': {
+          '0%, 100%': {
+            transform: 'translateX(0)',
+          },
+          '50%': {
+            transform: 'translateX(-12px)',
+          },
+        },
+        'fade-in': {
+          from: {
+            opacity: '0',
+            transform: 'scale(0.95)',
+          },
+          to: {
+            opacity: '1',
+            transform: 'scale(1)',
+          },
+        },
+        'fade-out': {
+          from: {
+            opacity: '1',
+            transform: 'scale(1)',
+          },
+          to: {
+            opacity: '0',
+            transform: 'scale(0.95)',
           },
         },
       },

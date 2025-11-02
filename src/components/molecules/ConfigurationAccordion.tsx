@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { SelectionDropdown } from '@/components/atoms/SelectionDropdown';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 interface ConfigurationAccordionProps {
   gender: string | null;
@@ -23,23 +23,52 @@ export function ConfigurationAccordion({
   jewelryOptions,
 }: ConfigurationAccordionProps) {
   const isJewelryDisabled = !gender;
-
   const isComplete = gender && jewelryType;
+  const [isVisible, setIsVisible] = useState(!gender);
+  const [isAnimatingOut, setIsAnimatingOut] = useState(false);
+
+  // Handle gender selection - trigger fade out
+  useEffect(() => {
+    if (gender && isVisible) {
+      const timer = setTimeout(() => {
+        setIsAnimatingOut(true);
+      }, 0);
+      const hideTimer = setTimeout(() => {
+        setIsVisible(false);
+        setIsAnimatingOut(false);
+      }, 300); // Match fade-out duration
+      return () => {
+        clearTimeout(timer);
+        clearTimeout(hideTimer);
+      };
+    } else if (!gender && !isVisible) {
+      const timer = setTimeout(() => {
+        setIsVisible(true);
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [gender, isVisible]);
 
   return (
     <div className="relative">
-      {/* Overlay Tooltip */}
-      {!isComplete && (
-        <div className="pointer-events-none absolute -left-2 top-1/2 z-10 w-[200px] -translate-x-full -translate-y-1/2 animate-fadeInSlide">
-          <div className="rounded-lg border border-purple-500/30 bg-gradient-to-r from-purple-500/10 to-pink-500/10 p-2.5 shadow-lg backdrop-blur-sm">
+      {/* Overlay Tooltip - Top Bar Level */}
+      {isVisible && (
+        <div
+          className={`pointer-events-none absolute -left-3 top-0 z-50 w-[220px] -translate-x-full ${
+            isAnimatingOut ? 'animate-fade-out' : 'animate-fade-in'
+          }`}
+        >
+          <div className="rounded-lg border border-purple-500/30 bg-gradient-to-r from-purple-500/10 to-pink-500/10 p-3 shadow-lg backdrop-blur-sm">
             <div className="flex items-center gap-2">
               <div className="flex-1">
-                <p className="text-[10px] font-medium leading-relaxed text-white/90">
+                <p className="text-[11px] font-medium leading-relaxed text-white/90">
                   <span className="block text-purple-300">Get Started:</span>
-                  Please select model gender and product type
+                  Please select gender and jewelry type
                 </p>
               </div>
-              <ArrowLeft className="h-4 w-4 flex-shrink-0 animate-pulse text-purple-400" />
+              <div className="animate-bounce-horizontal">
+                <ArrowRight className="h-5 w-5 flex-shrink-0 text-purple-400" />
+              </div>
             </div>
           </div>
         </div>
