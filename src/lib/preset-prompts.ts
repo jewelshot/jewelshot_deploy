@@ -224,6 +224,103 @@ OUTPUT: Improved jewelry appearance with original photo character completely pre
     },
   },
 
+  lifestyle: {
+    name: 'Lifestyle',
+    requiresModel: true,
+    buildPrompt: (jewelryType: string, gender?: string) => {
+      const genderText = gender ? `${gender} model` : 'model';
+
+      let placementInstructions = '';
+      const type = jewelryType.toLowerCase();
+
+      if (type === 'ring') {
+        placementInstructions =
+          'Ring: Hand in natural gesture. Holding coffee cup or touching hair. Casual everyday action.';
+      } else if (type === 'necklace') {
+        placementInstructions =
+          'Necklace: Visible while laughing walking or casual activity. Natural movement context.';
+      } else if (type === 'earring') {
+        placementInstructions =
+          'Earrings: Shown during head turn or natural movement. Organic visibility.';
+      } else if (type === 'bracelet') {
+        placementInstructions =
+          'Bracelet: Wrist during everyday actions. Reaching gesturing or natural activity.';
+      } else {
+        placementInstructions =
+          'Jewelry: Layered with outfit in casual drape. Natural everyday context.';
+      }
+
+      return `Natural everyday lifestyle imagery for ${jewelryType} with ${genderText}.
+
+STYLE: Authentic lifestyle editorial.
+
+JEWELRY TYPE: ${jewelryType.charAt(0).toUpperCase() + jewelryType.slice(1)}
+
+MODEL: ${genderText.charAt(0).toUpperCase() + genderText.slice(1)}
+
+SETTING:
+- Location: Natural environment cafe home outdoor or urban
+- Background: Soft blurred natural context
+- Elements: Organic casual realistic props
+
+MODEL APPEARANCE:
+- Overall: Relatable natural approachable
+- Clothing: Casual contemporary everyday wear
+- Makeup: Minimal fresh natural
+- Hair: Relaxed effortless styled
+- Pose: Candid natural movement authentic
+- Expression: Genuine smile relaxed confident
+
+LIGHTING:
+- Source: Natural window light or outdoor daylight
+- Direction: Soft diffused ambient
+- Temperature: Warm 4800K to 5200K golden
+- Quality: Gentle flattering organic
+- Time of day: Morning or afternoon soft light
+
+JEWELRY PLACEMENT:
+- ${placementInstructions}
+- Integration: Jewelry in natural everyday context
+- Visibility: Clear within lifestyle activity
+
+CAMERA ANGLE:
+- Position: Eye level natural perspective
+- Distance: Medium to wide environmental context
+- Focus: Jewelry visible lifestyle context clear
+
+COMPOSITION:
+- Framing: Environmental storytelling balanced
+- Negative space: Natural organic not forced
+- Style: Editorial Instagram feed aesthetic
+
+PRESERVE ORIGINAL DESIGN - CRITICAL:
+- Gemstone shape: Exact original
+- Gemstone size: Precise dimensions
+- Setting structure: Preserve all elements
+- Metal details: Authentic finish
+- CRITICAL: Design untouched.
+
+MOOD AND ATMOSPHERE:
+- Atmosphere: Warm inviting aspirational yet accessible
+- Emotion: Joy confidence everyday elegance
+- Tone: Bright positive authentic
+
+TECHNICAL SPECIFICATIONS:
+- Resolution: 300 DPI minimum
+- Aspect ratio: 4:5 vertical or 1:1 square Instagram optimized
+- Depth of field: Shallow jewelry sharp background softly blurred
+
+AVOID:
+- Stiff poses or forced moments
+- Harsh studio lighting
+- Sterile backgrounds
+- Unnatural moments
+- Design alterations
+
+OUTPUT: Social media ready. Lifestyle editorial quality. Authentic everyday elegance. Relatable aspirational content.`;
+    },
+  },
+
   'lifestyle-natural': {
     name: 'Lifestyle Natural',
     requiresModel: false,
