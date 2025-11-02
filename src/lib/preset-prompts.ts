@@ -368,28 +368,22 @@ OUTPUT: Lifestyle content ready. Relatable and polished. Social platform optimiz
   },
 
   'still-life': {
-    name: 'Still Life Stone',
+    name: 'Still Life',
     requiresModel: false,
     buildPrompt: (jewelryType: string) => {
-      // Dynamic stone placement based on jewelry type
       let placementInstructions = '';
       const type = jewelryType.toLowerCase();
 
       if (type === 'ring') {
-        placementInstructions =
-          'Ring: Resting on stone surface top. Secure stable positioning on textured stone.';
+        placementInstructions = 'Ring: Resting on stone surface top.';
       } else if (type === 'necklace') {
-        placementInstructions =
-          'Necklace: Draped elegantly over stone curves. Following natural stone contours.';
+        placementInstructions = 'Necklace: Draped over stone curves.';
       } else if (type === 'earring') {
-        placementInstructions =
-          'Earrings: Paired on stone surface. Stable positioning on natural texture.';
+        placementInstructions = 'Earrings: Paired on stone surface.';
       } else if (type === 'bracelet') {
-        placementInstructions =
-          'Bracelet: Draped gracefully around stone form. Following organic shape.';
+        placementInstructions = 'Bracelet: Draped around stone form.';
       } else {
-        placementInstructions =
-          'Jewelry: Arranged naturally on stone surface. Secure stable positioning.';
+        placementInstructions = 'Chain: Arranged on stone naturally.';
       }
 
       return `Natural stone display with warm lighting for ${jewelryType} lifestyle product photography.

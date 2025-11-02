@@ -43,7 +43,7 @@ export function QuickModeContent({ onPresetSelect }: QuickModeContentProps) {
     },
     {
       id: 'still-life',
-      title: 'Still Life Stone',
+      title: 'Still Life',
       imagePath: '/presets/still-life.webp',
     },
     {
