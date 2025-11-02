@@ -371,4 +371,108 @@ AVOID:
 OUTPUT: Lifestyle ready. Natural organic aesthetic. Stone display photography. Warm earthy presentation.`;
     },
   },
+
+  'on-model': {
+    name: 'On Model',
+    requiresModel: true,
+    buildPrompt: (jewelryType: string, gender?: string) => {
+      const genderText = gender ? `${gender} model` : 'model';
+
+      // Dynamic placement based on jewelry type
+      let placementInstructions = '';
+      const type = jewelryType.toLowerCase();
+
+      if (type === 'ring') {
+        placementInstructions =
+          'Ring: Hand in elegant pose. Fingers extended naturally. Jewelry clearly visible and prominent.';
+      } else if (type === 'necklace') {
+        placementInstructions =
+          'Necklace: Positioned on neck and decollete area. Centered placement. Chain flat against skin. Full visibility.';
+      } else if (type === 'earring') {
+        placementInstructions =
+          'Earrings: Head turned at slight angle. Ear fully visible. Jewelry prominent and clear.';
+      } else if (type === 'bracelet') {
+        placementInstructions =
+          'Bracelet: Wrist and arm positioned to showcase jewelry. Prominent display. Clear visibility.';
+      } else {
+        placementInstructions =
+          'Jewelry: Positioned naturally on body. Clear prominent display. Full visibility maintained.';
+      }
+
+      return `Professional model photography showing ${jewelryType} on ${genderText} for e-commerce.
+
+STYLE: Clean commercial model photography.
+
+JEWELRY TYPE: ${jewelryType.charAt(0).toUpperCase() + jewelryType.slice(1)}
+
+MODEL: ${genderText.charAt(0).toUpperCase() + genderText.slice(1)}
+
+BACKGROUND:
+- Type: Neutral solid backdrop
+- Color: Soft white light gray or warm beige
+- Texture: Seamless paper smooth
+- Quality: Professional studio backdrop
+
+MODEL APPEARANCE:
+- Overall: Professional elegant natural
+- Skin tone: Even and well lit
+- Makeup: Natural polished minimal
+- Hair: Neat styled away from jewelry area
+- Expression: Neutral serene with slight smile
+- Pose: Relaxed natural confident
+
+LIGHTING SETUP:
+- Setup: Soft studio lighting
+- Key light: Diffused from front at 45 degrees
+- Fill light: Even wrap around illumination
+- Temperature: 5500K neutral white
+- Quality: Soft flattering with no harsh shadows
+
+JEWELRY PLACEMENT ON BODY:
+- ${placementInstructions}
+- Integration: Jewelry naturally worn on body
+- Visibility: Clear and prominent in frame
+- Focus: Jewelry is the hero product
+
+CAMERA ANGLE:
+- Position: Eye level or slightly above
+- Distance: Medium close-up framing
+- Focus: Jewelry sharp with model providing context
+
+COMPOSITION:
+- Framing: Jewelry prominent with model supporting
+- Negative space: Minimal and product focused
+- Alignment: Jewelry centered in frame
+- Balance: Professional commercial composition
+
+PRESERVE ORIGINAL DESIGN - CRITICAL:
+- Gemstone shape: Exact original
+- Gemstone size: Precise dimensions
+- Setting structure: Preserve all elements
+- Metal details: Authentic finish
+- Proportions: Exact ratios maintained
+- CRITICAL: Design completely untouched.
+
+MOOD AND ATMOSPHERE:
+- Atmosphere: Professional clean trustworthy
+- Tone: Bright inviting commercial
+- Feel: E-commerce optimized presentation
+
+TECHNICAL SPECIFICATIONS:
+- Resolution: 300 DPI minimum
+- Aspect ratio: 3:4 vertical or 1:1 square
+- Depth of field: Jewelry sharp with slight background blur
+
+STYLE REFERENCE: Professional e-commerce model photography. Clean commercial presentation. Product focused.
+
+AVOID:
+- Busy backgrounds or distractions
+- Dramatic shadows or harsh lighting
+- Obscured jewelry or poor visibility
+- Unnatural poses or forced positioning
+- Design alterations of any kind
+
+OUTPUT: E-commerce ready. Professional model photography. Clean commercial quality. Product focused presentation.`;
+    },
+  },
 };
