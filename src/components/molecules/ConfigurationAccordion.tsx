@@ -51,10 +51,10 @@ export function ConfigurationAccordion({
 
   return (
     <div className="relative">
-      {/* Overlay Tooltip - Top Bar Level */}
+      {/* Overlay Tooltip - Left Side */}
       {isVisible && (
         <div
-          className={`pointer-events-none absolute -left-3 top-0 z-50 w-[220px] -translate-x-full ${
+          className={`pointer-events-none absolute -left-3 top-1/2 z-50 w-[220px] -translate-x-full -translate-y-1/2 ${
             isAnimatingOut ? 'animate-fade-out' : 'animate-fade-in'
           }`}
         >
