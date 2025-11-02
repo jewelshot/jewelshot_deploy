@@ -27,7 +27,7 @@ export function ConfigurationAccordion({
 
   return (
     <div
-      className={`flex items-center gap-2 rounded-lg p-2 transition-all duration-300 ${isComplete ? 'bg-white/[0.02]' : 'bg-purple-500/5'}`}
+      className={`flex items-center gap-2 rounded-lg border p-2 transition-all duration-300 ${isComplete ? 'border-white/10 bg-white/[0.02]' : 'border-purple-500/30 bg-white/[0.02]'}`}
     >
       {/* Gender Selection */}
       <div className="flex-1">
