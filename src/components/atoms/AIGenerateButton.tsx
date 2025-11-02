@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Sparkles, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 interface AIGenerateButtonProps {
   onClick: () => void;
@@ -49,15 +49,7 @@ export function AIGenerateButton({
             <span className="text-xs font-medium">Generating...</span>
           </>
         ) : (
-          <>
-            <Sparkles
-              className="h-3.5 w-3.5 transition-transform duration-200 group-hover:scale-110"
-              style={{
-                filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8))',
-              }}
-            />
-            <span className="text-xs font-medium">Generate</span>
-          </>
+          <span className="text-xs font-medium">Generate</span>
         )}
       </div>
     </button>
