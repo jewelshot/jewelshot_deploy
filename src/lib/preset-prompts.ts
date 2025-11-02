@@ -52,16 +52,31 @@ REFLECTIONS:
 - Gemstones: Natural sparkle and brilliance
 - Floor reflection: Subtle 10 percent opacity
 
-PRESERVE ORIGINAL DESIGN - CRITICAL:
-- Gemstone shape: Exact original cut
-- Gemstone size: Maintain precise dimensions
-- Gemstone count: Exact number and placement
-- Setting structure: Preserve prong and bezel design
-- Band shape: Maintain original form
-- Engravings: Keep all details intact
-- Texture: Preserve all surface work
-- Proportions: Exact ratios
-- CRITICAL: Only lighting and reflections change. Design untouched.
+PRESERVE ORIGINAL DESIGN - CRITICAL MANDATORY STRICT:
+- ABSOLUTELY FORBIDDEN: ANY changes to jewelry design structure shape or form
+- EXACT gemstone shape: Original cut MUST be preserved pixel-perfect
+- EXACT gemstone size: Precise dimensions NO scaling NO resizing
+- EXACT gemstone count: Same number DO NOT add DO NOT remove stones
+- EXACT gemstone position: DO NOT move relocate or shift any gems
+- EXACT setting structure: All prongs bezels channels UNCHANGED
+- EXACT band shape: Original form NO morphing NO warping
+- EXACT engravings: All details intact NO additions NO removals
+- EXACT texture: All surface work preserved NO alterations
+- EXACT proportions: Precise ratios MAINTAINED
+- CRITICAL RULE: ONLY lighting and reflections change. JEWELRY DESIGN 100% UNTOUCHED.
+- ZERO design modifications permitted. ZERO tolerance for changes.
+
+DO NOT ADD NEW JEWELRY:
+- DO NOT add additional jewelry pieces to the image
+- DO NOT add jewelry to models or objects not already wearing jewelry
+- ONLY enhance and optimize the EXISTING jewelry in the photo
+- FORBIDDEN: Adding rings necklaces bracelets earrings to empty hands necks wrists ears
+
+FOCUS PRIORITY:
+- Primary focus: ALWAYS on the jewelry product
+- Sharpness: Jewelry MUST be razor sharp in focus
+- Depth of field: Jewelry sharp background may be soft
+- Clarity: Product details crystal clear and crisp
 
 COMPOSITION:
 - Framing: Product fills 60 percent of frame
@@ -70,7 +85,9 @@ COMPOSITION:
 TECHNICAL SPECIFICATIONS:
 - Resolution: 300 DPI minimum
 - Aspect ratio: 1:1 square or 4:3 standard
-- Focus: Razor sharp on all details
+- Focus: Ultra sharp crystal clear on ALL jewelry details
+- Sharpness: Maximum clarity professional grade
+- Quality: Pristine razor-sharp product photography
 
 AVOID:
 - Design alterations of any kind
@@ -92,21 +109,36 @@ OUTPUT: Professional e-commerce ready. Catalog quality. Complete product visibil
 
       return `High-fashion magazine campaign photography featuring ${genderText}${jewelryType}.
 
-CRITICAL PRESERVE RULES - ABSOLUTELY MANDATORY:
-- ABSOLUTELY NO changes to jewelry structure, shape, or form whatsoever
-- EXACT original geometry must be maintained, zero distortion or warping
-- EXACT same number of gemstones, do not add or remove any stones
-- EXACT original stone positions, do not move or relocate any gems
-- PRESERVE all prongs, bezels, channels, settings exactly as original
-- MAINTAIN every engraving, texture, pattern, filigree, detail unchanged
-- KEEP exact proportions, do not resize or reshape any elements
-- DO NOT add, remove, or modify any metal components
-- ZERO design alterations, only enhance what already exists
-- NEVER add decorative elements, extra stones, or new features
-- NEVER remove any existing design elements or details
-- NEVER morph, distort, elongate, compress, or transform shapes
+CRITICAL PRESERVE RULES - ABSOLUTELY MANDATORY STRICT:
+- ABSOLUTELY FORBIDDEN: ANY changes to jewelry design structure shape or form WHATSOEVER
+- EXACT gemstone shape: Original cut MUST be preserved pixel-perfect NO exceptions EVER
+- EXACT gemstone size: Precise dimensions NO scaling NO resizing STRICTLY FORBIDDEN
+- EXACT gemstone count: Same number DO NOT add DO NOT remove stones MANDATORY
+- EXACT gemstone position: DO NOT move relocate or shift any gems FORBIDDEN
+- EXACT setting structure: All prongs bezels channels 100% UNCHANGED NO modifications
+- EXACT band shape: Original form NO morphing NO warping NO transformation EVER
+- EXACT engravings: All details intact NO additions NO removals NO changes
+- EXACT texture: All surface work preserved NO alterations WHATSOEVER
+- EXACT proportions: Precise ratios MAINTAINED NO resizing NO reshaping
+- ZERO design modifications permitted. ZERO tolerance for ANY changes.
+- CRITICAL RULE: ONLY lighting background and polish change. JEWELRY DESIGN 100% UNTOUCHED.
 
-ENHANCEMENT SCOPE: ONLY enhance lighting, background, metal polish, gemstone brilliance, remove imperfections. NEVER change jewelry design itself.
+DO NOT ADD NEW JEWELRY - STRICTLY FORBIDDEN:
+- DO NOT add additional jewelry pieces to the image ABSOLUTELY FORBIDDEN
+- DO NOT add jewelry to models not already wearing jewelry STRICTLY PROHIBITED
+- DO NOT add rings to empty hands DO NOT add necklaces to bare necks FORBIDDEN
+- DO NOT add bracelets to bare wrists DO NOT add earrings to bare ears FORBIDDEN
+- ONLY enhance and photograph the EXISTING jewelry already in the photo
+- FORBIDDEN: Creating new jewelry on model body parts that are bare
+
+FOCUS PRIORITY - MANDATORY:
+- Primary focus: ALWAYS on the jewelry product NO EXCEPTIONS MANDATORY
+- Sharpness: Jewelry MUST be ultra sharp razor-sharp in focus REQUIRED
+- Depth of field: Jewelry perfectly sharp background may be dramatic bokeh
+- Clarity: Product details crystal clear crisp pristine and pin-sharp
+- Model: Supporting element only NEVER the primary focus jewelry is hero
+
+ENHANCEMENT SCOPE: ONLY enhance lighting, background, metal polish, gemstone brilliance, remove imperfections. NEVER EVER change jewelry design itself.
 
 BACKGROUND: Deep dramatic dark background with rich black to charcoal gradient. Sophisticated depth. Editorial magazine backdrop with subtle atmospheric haze.
 
@@ -126,7 +158,7 @@ COLOR GRADING: Rich deep tones with slightly cool undertones for sophistication.
 
 COMPOSITION: Bold confident framing with jewelry as hero statement piece. Dynamic angles possible. Editorial magazine layout ready. Artistic yet commercial.
 
-TECHNICAL QUALITY: Ultra sharp details. Maximum clarity. Professional retouching. Eliminate all imperfections. Pristine condition. Editorial publication standard.
+TECHNICAL QUALITY: Ultra sharp details crystal clear. Maximum clarity razor-sharp focus. Professional retouching. Eliminate all imperfections. Pristine condition. Editorial publication standard. Pin-sharp product photography.
 
 STYLE REFERENCE: Vogue jewelry editorials, Cartier campaigns, high-end fashion magazine photography, luxury brand advertising.
 
@@ -203,12 +235,34 @@ COMPOSITION:
 - Negative space: Natural organic not forced
 - Style: Editorial Instagram feed aesthetic
 
-PRESERVE ORIGINAL DESIGN - CRITICAL:
-- Gemstone shape: Exact original
-- Gemstone size: Precise dimensions
-- Setting structure: Preserve all elements
-- Metal details: Authentic finish
-- CRITICAL: Design untouched.
+PRESERVE ORIGINAL DESIGN - CRITICAL MANDATORY STRICT:
+- ABSOLUTELY FORBIDDEN: ANY changes to jewelry design structure shape or form
+- EXACT gemstone shape: Original cut MUST be preserved pixel-perfect NO exceptions
+- EXACT gemstone size: Precise dimensions NO scaling NO resizing
+- EXACT gemstone count: Same number DO NOT add DO NOT remove stones
+- EXACT gemstone position: DO NOT move relocate or shift any gems
+- EXACT setting structure: All prongs bezels channels UNCHANGED
+- EXACT band shape: Original form NO morphing NO warping
+- EXACT engravings: All details intact NO additions NO removals
+- EXACT texture: All surface work preserved NO alterations
+- EXACT proportions: Precise ratios MAINTAINED
+- CRITICAL RULE: ONLY lighting and reflections change. JEWELRY DESIGN 100% UNTOUCHED.
+- ZERO design modifications permitted. ZERO tolerance for changes.
+
+DO NOT ADD NEW JEWELRY - STRICTLY FORBIDDEN:
+- DO NOT add additional jewelry pieces to the image FORBIDDEN
+- DO NOT add jewelry to models not already wearing jewelry STRICTLY PROHIBITED
+- DO NOT add rings to empty hands DO NOT add necklaces to bare necks
+- DO NOT add bracelets to bare wrists DO NOT add earrings to bare ears
+- ONLY enhance and photograph the EXISTING jewelry already in the photo
+- FORBIDDEN: Creating new jewelry on model body parts
+
+FOCUS PRIORITY - MANDATORY:
+- Primary focus: ALWAYS on the jewelry product NO EXCEPTIONS
+- Sharpness: Jewelry MUST be ultra sharp razor-sharp in focus REQUIRED
+- Depth of field: Jewelry perfectly sharp background softly blurred lifestyle context
+- Clarity: Product details crystal clear crisp and pristine
+- Model: Supporting lifestyle element jewelry is hero
 
 MOOD AND ATMOSPHERE:
 - Atmosphere: Warm inviting aspirational yet accessible
@@ -218,14 +272,17 @@ MOOD AND ATMOSPHERE:
 TECHNICAL SPECIFICATIONS:
 - Resolution: 300 DPI minimum
 - Aspect ratio: 4:5 vertical or 1:1 square Instagram optimized
-- Depth of field: Shallow jewelry sharp background softly blurred
+- Focus: Ultra sharp crystal clear on jewelry razor-sharp product details
+- Sharpness: Maximum clarity on jewelry professional grade
+- Quality: Pristine sharp lifestyle product photography
 
 AVOID:
 - Stiff poses or forced moments
 - Harsh studio lighting
 - Sterile backgrounds
 - Unnatural moments
-- Design alterations
+- Design alterations ANY changes
+- Adding new jewelry to bare body parts
 
 OUTPUT: Social media ready. Lifestyle editorial quality. Authentic everyday elegance. Relatable aspirational content.`;
     },
@@ -298,12 +355,30 @@ COMPOSITION:
 - Angle: Slight top down at 30 degrees
 - Aesthetic: Natural organic lifestyle
 
-PRESERVE ORIGINAL DESIGN - CRITICAL:
-- Gemstone shape: Exact original
-- Gemstone size: Precise dimensions
-- Setting structure: Preserve all elements
-- Metal details: Authentic finish
-- CRITICAL: Design untouched. Only scene changes.
+PRESERVE ORIGINAL DESIGN - CRITICAL MANDATORY STRICT:
+- ABSOLUTELY FORBIDDEN: ANY changes to jewelry design structure shape or form
+- EXACT gemstone shape: Original cut MUST be preserved pixel-perfect
+- EXACT gemstone size: Precise dimensions NO scaling NO resizing
+- EXACT gemstone count: Same number DO NOT add DO NOT remove
+- EXACT gemstone position: DO NOT move relocate or shift gems
+- EXACT setting structure: All prongs bezels channels UNCHANGED
+- EXACT band shape: Original form NO morphing NO warping
+- EXACT engravings: All details intact NO additions NO removals
+- EXACT texture: All surface work preserved NO alterations
+- EXACT proportions: Precise ratios MAINTAINED
+- CRITICAL RULE: ONLY scene lighting and stone change. JEWELRY DESIGN 100% UNTOUCHED.
+- ZERO design modifications permitted. ZERO tolerance for changes.
+
+DO NOT ADD NEW JEWELRY:
+- DO NOT add additional jewelry pieces FORBIDDEN
+- ONLY enhance the EXISTING jewelry in the photo
+- FORBIDDEN: Creating new jewelry pieces
+
+FOCUS PRIORITY - MANDATORY:
+- Primary focus: ALWAYS on the jewelry product NO EXCEPTIONS
+- Sharpness: Jewelry MUST be ultra sharp razor-sharp in focus
+- Stone texture: Also sharp for context
+- Clarity: Product details crystal clear crisp pristine
 
 ATMOSPHERE:
 - Mood: Natural organic warm earthy
@@ -313,15 +388,18 @@ ATMOSPHERE:
 TECHNICAL SPECIFICATIONS:
 - Resolution: 300 DPI minimum
 - Aspect ratio: 4:5 vertical or 1:1 square
-- Focus: Sharp product and sharp stone texture both
+- Focus: Ultra sharp jewelry and sharp stone texture both razor-sharp
+- Sharpness: Maximum clarity professional grade
+- Quality: Pristine sharp product photography
 
 STYLE REFERENCE: Natural stone lifestyle photography. Organic product display. Warm earthy aesthetic.
 
 AVOID:
 - Artificial props or elements
 - Cold lighting or clinical feel
-- Design alterations of jewelry
+- Design alterations of jewelry ANY changes
 - Flat surface only displays
+- Adding new jewelry pieces
 
 OUTPUT: Lifestyle ready. Natural organic aesthetic. Stone display photography. Warm earthy presentation.`;
     },
@@ -400,13 +478,34 @@ COMPOSITION:
 - Alignment: Jewelry centered in frame
 - Balance: Professional commercial composition
 
-PRESERVE ORIGINAL DESIGN - CRITICAL:
-- Gemstone shape: Exact original
-- Gemstone size: Precise dimensions
-- Setting structure: Preserve all elements
-- Metal details: Authentic finish
-- Proportions: Exact ratios maintained
-- CRITICAL: Design completely untouched.
+PRESERVE ORIGINAL DESIGN - CRITICAL MANDATORY STRICT:
+- ABSOLUTELY FORBIDDEN: ANY changes to jewelry design structure shape or form
+- EXACT gemstone shape: Original cut MUST be preserved pixel-perfect
+- EXACT gemstone size: Precise dimensions NO scaling NO resizing
+- EXACT gemstone count: Same number DO NOT add DO NOT remove
+- EXACT gemstone position: DO NOT move relocate or shift gems
+- EXACT setting structure: All prongs bezels channels UNCHANGED
+- EXACT band shape: Original form NO morphing NO warping
+- EXACT engravings: All details intact NO additions NO removals
+- EXACT texture: All surface work preserved NO alterations
+- EXACT proportions: Precise ratios MAINTAINED
+- CRITICAL RULE: ONLY lighting and positioning change. JEWELRY DESIGN 100% UNTOUCHED.
+- ZERO design modifications permitted. ZERO tolerance for changes.
+
+DO NOT ADD NEW JEWELRY - STRICTLY FORBIDDEN:
+- DO NOT add additional jewelry pieces to the image FORBIDDEN
+- DO NOT add jewelry to models not already wearing jewelry STRICTLY PROHIBITED
+- DO NOT add rings to empty hands DO NOT add necklaces to bare necks
+- DO NOT add bracelets to bare wrists DO NOT add earrings to bare ears
+- ONLY enhance and photograph the EXISTING jewelry already worn
+- FORBIDDEN: Creating new jewelry on model body parts
+
+FOCUS PRIORITY - MANDATORY:
+- Primary focus: ALWAYS on the jewelry product NO EXCEPTIONS
+- Sharpness: Jewelry MUST be ultra sharp razor-sharp in focus REQUIRED
+- Depth of field: Jewelry perfectly sharp model/background slight blur
+- Clarity: Product details crystal clear crisp pristine pin-sharp
+- Model: Supporting element jewelry is hero
 
 MOOD AND ATMOSPHERE:
 - Atmosphere: Professional clean trustworthy
@@ -416,7 +515,9 @@ MOOD AND ATMOSPHERE:
 TECHNICAL SPECIFICATIONS:
 - Resolution: 300 DPI minimum
 - Aspect ratio: 3:4 vertical or 1:1 square
-- Depth of field: Jewelry sharp with slight background blur
+- Focus: Ultra sharp crystal clear on jewelry razor-sharp product
+- Sharpness: Maximum clarity professional grade
+- Quality: Pristine sharp e-commerce product photography
 
 STYLE REFERENCE: Professional e-commerce model photography. Clean commercial presentation. Product focused.
 
@@ -425,7 +526,8 @@ AVOID:
 - Dramatic shadows or harsh lighting
 - Obscured jewelry or poor visibility
 - Unnatural poses or forced positioning
-- Design alterations of any kind
+- Design alterations of ANY kind
+- Adding new jewelry to bare body parts
 
 OUTPUT: E-commerce ready. Professional model photography. Clean commercial quality. Product focused presentation.`;
     },
@@ -502,31 +604,51 @@ COMPOSITION:
 - Focus point: Most important detail centered
 - Negative space: Minimal clean not distracting
 
-PRESERVE ORIGINAL DESIGN - CRITICAL:
-- Gemstone shape: Exact original cut
-- Gemstone size: Precise dimensions
-- Setting structure: Preserve exact construction
-- Metal details: Authentic every detail
-- Engravings: Exact reproduction
-- Texture: Accurate surface finish
-- CRITICAL: Perfect detail accuracy. Design untouched.
+PRESERVE ORIGINAL DESIGN - CRITICAL MANDATORY STRICT:
+- ABSOLUTELY FORBIDDEN: ANY changes to jewelry design structure shape or form
+- EXACT gemstone shape: Original cut MUST be preserved pixel-perfect
+- EXACT gemstone size: Precise dimensions NO scaling NO resizing
+- EXACT gemstone count: Same number DO NOT add DO NOT remove
+- EXACT gemstone position: DO NOT move relocate or shift gems
+- EXACT setting structure: All prongs bezels channels construction UNCHANGED
+- EXACT band shape: Original form NO morphing NO warping
+- EXACT engravings: All details text patterns symbols EXACT reproduction
+- EXACT texture: Accurate surface finish brushed polished hammered PRESERVED
+- EXACT proportions: Precise ratios MAINTAINED
+- CRITICAL RULE: ONLY magnification and lighting change. JEWELRY DESIGN 100% UNTOUCHED.
+- ZERO design modifications permitted. ZERO tolerance for changes.
+
+DO NOT ADD NEW JEWELRY:
+- DO NOT add additional jewelry pieces FORBIDDEN
+- ONLY magnify and showcase the EXISTING jewelry details
+- FORBIDDEN: Creating new decorative elements
+
+FOCUS PRIORITY - MANDATORY MACRO:
+- Primary focus: ALWAYS on the jewelry craftsmanship detail NO EXCEPTIONS
+- Sharpness: Detail area MUST be ultra sharp razor-sharp macro focus REQUIRED
+- Depth of field: Selective focus on critical detail shallow dramatic bokeh
+- Clarity: Micro details crystal clear crisp pristine pin-sharp
+- Magnification: Extreme close-up revealing craftsmanship
 
 TECHNICAL SPECIFICATIONS:
 - Resolution: Ultra high 300 DPI plus
 - Aspect ratio: 1:1 square or 4:5 vertical
 - Focus stacking: Optional for extended depth
-- Sharpness: Maximum detail capture
+- Sharpness: Maximum detail capture ultra sharp macro
+- Focus: Razor-sharp on focal point crystal clear
+- Quality: Pristine sharp macro product photography
 
 MOOD:
 - Atmosphere: Intimate revealing craftsmanship appreciation
 - Tone: Clean precise professional
 
 AVOID:
-- Motion blur or soft focus
+- Motion blur or soft focus ANY blur
 - Overexposure blown highlights
 - Underexposure lost shadow detail
 - Chromatic aberration
-- Design alterations
+- Design alterations ANY changes
+- Adding new decorative elements
 
 OUTPUT: Macro detail photography. Craftsmanship showcase. Professional quality. Extreme close-up clarity.`;
     },
@@ -609,13 +731,34 @@ COMPOSITION:
 - Balance: Asymmetric dynamic tension
 - Style: Vogue Harpers Bazaar high fashion editorial
 
-PRESERVE ORIGINAL DESIGN - CRITICAL:
-- Gemstone shape: Exact original
-- Gemstone size: Precise dimensions
-- Setting structure: Preserve all elements
-- Metal details: Authentic finish
-- Engravings: Exact reproduction
-- CRITICAL: Design completely untouched.
+PRESERVE ORIGINAL DESIGN - CRITICAL MANDATORY STRICT:
+- ABSOLUTELY FORBIDDEN: ANY changes to jewelry design structure shape or form
+- EXACT gemstone shape: Original cut MUST be preserved pixel-perfect
+- EXACT gemstone size: Precise dimensions NO scaling NO resizing
+- EXACT gemstone count: Same number DO NOT add DO NOT remove
+- EXACT gemstone position: DO NOT move relocate or shift gems
+- EXACT setting structure: All prongs bezels channels UNCHANGED
+- EXACT band shape: Original form NO morphing NO warping
+- EXACT engravings: All details EXACT reproduction NO changes
+- EXACT texture: All surface work preserved NO alterations
+- EXACT proportions: Precise ratios MAINTAINED
+- CRITICAL RULE: ONLY lighting styling and background change. JEWELRY DESIGN 100% UNTOUCHED.
+- ZERO design modifications permitted. ZERO tolerance for changes.
+
+DO NOT ADD NEW JEWELRY - STRICTLY FORBIDDEN:
+- DO NOT add additional jewelry pieces to the image FORBIDDEN
+- DO NOT add jewelry to models not already wearing jewelry STRICTLY PROHIBITED
+- DO NOT add rings to empty hands DO NOT add necklaces to bare necks
+- DO NOT add bracelets to bare wrists DO NOT add earrings to bare ears
+- ONLY enhance and photograph the EXISTING jewelry already worn
+- FORBIDDEN: Creating new jewelry on model body parts
+
+FOCUS PRIORITY - MANDATORY:
+- Primary focus: ALWAYS on the jewelry product NO EXCEPTIONS
+- Sharpness: Jewelry MUST be ultra sharp razor-sharp in focus REQUIRED
+- Depth of field: Jewelry perfectly sharp dramatic bokeh background
+- Clarity: Product details crystal clear crisp pristine pin-sharp
+- Model: Editorial styling element jewelry is hero
 
 MOOD:
 - Atmosphere: Sophisticated powerful exclusive aspirational
@@ -625,15 +768,19 @@ MOOD:
 TECHNICAL SPECIFICATIONS:
 - Resolution: Ultra high 300 DPI plus
 - Aspect ratio: 3:4 vertical or 2:3 editorial
+- Focus: Ultra sharp crystal clear on jewelry razor-sharp product
+- Sharpness: Maximum clarity editorial professional grade
 - Depth of field: Shallow jewelry razor sharp dramatic bokeh
 - Post processing: Refined color grading editorial finish
+- Quality: Pristine sharp luxury editorial photography
 
 AVOID:
 - Casual elements or flat lighting
 - Cluttered backgrounds
 - Amateur styling
-- Design alterations
+- Design alterations ANY changes
 - Overprocessing
+- Adding new jewelry to bare body parts
 
 OUTPUT: Premium editorial ready. High fashion campaign quality. Luxury catalog standard. Aspirational prestige presentation.`;
     },
