@@ -22,24 +22,9 @@ export function QuickModeContent({ onPresetSelect }: QuickModeContentProps) {
       imagePath: '/presets/luxury-editorial.webp',
     },
     {
-      id: 'instagram-ready',
-      title: 'Instagram Ready',
-      imagePath: '/presets/instagram-ready.webp',
-    },
-    {
-      id: 'quick-clean',
-      title: 'Quick Clean',
-      imagePath: '/presets/quick-clean.webp',
-    },
-    {
       id: 'lifestyle',
       title: 'Lifestyle',
       imagePath: '/presets/lifestyle.webp',
-    },
-    {
-      id: 'lifestyle-natural',
-      title: 'Lifestyle Natural',
-      imagePath: '/presets/lifestyle-natural.webp',
     },
     {
       id: 'still-life',
