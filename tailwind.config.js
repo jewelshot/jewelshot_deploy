@@ -21,6 +21,7 @@ module.exports = {
         fadeInSlide: 'fadeInSlide 500ms ease-out forwards',
         shimmer: 'shimmer 2s infinite',
         fadeInScale: 'fadeInScale 300ms ease-out forwards',
+        'spin-slow': 'spin 3s linear infinite',
       },
       keyframes: {
         fadeInSlide: {

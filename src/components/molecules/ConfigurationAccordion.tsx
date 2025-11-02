@@ -23,8 +23,12 @@ export function ConfigurationAccordion({
 }: ConfigurationAccordionProps) {
   const isJewelryDisabled = !gender;
 
+  const isComplete = gender && jewelryType;
+
   return (
-    <div className="flex items-center gap-2">
+    <div
+      className={`flex items-center gap-2 rounded-lg p-2 transition-all duration-300 ${isComplete ? 'bg-white/[0.02]' : 'bg-purple-500/5'}`}
+    >
       {/* Gender Selection */}
       <div className="flex-1">
         <SelectionDropdown

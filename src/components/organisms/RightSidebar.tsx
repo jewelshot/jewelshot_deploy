@@ -92,15 +92,26 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
     >
       <div className="sidebar-scroll flex h-full flex-col overflow-y-auto px-4 py-3">
         {/* Configuration Accordion */}
-        <div className="mb-2">
-          <ConfigurationAccordion
-            gender={gender}
-            jewelryType={jewelryType}
-            onGenderChange={(value) => setGender(value as Gender)}
-            onJewelryChange={(value) => setJewelryType(value as JewelryType)}
-            genderOptions={genderOptions}
-            jewelryOptions={jewelryOptions}
-          />
+        <div className="relative mb-2">
+          {/* Attention Indicator */}
+          {areModesDisabled && (
+            <div className="pointer-events-none absolute -inset-1 rounded-lg">
+              {/* Animated rotating gradient border */}
+              <div className="absolute inset-0 animate-spin-slow rounded-lg bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 opacity-50 blur-sm" />
+              {/* Pulse glow effect */}
+              <div className="absolute inset-0 animate-pulse rounded-lg bg-purple-500/30 blur-md" />
+            </div>
+          )}
+          <div className="relative">
+            <ConfigurationAccordion
+              gender={gender}
+              jewelryType={jewelryType}
+              onGenderChange={(value) => setGender(value as Gender)}
+              onJewelryChange={(value) => setJewelryType(value as JewelryType)}
+              genderOptions={genderOptions}
+              jewelryOptions={jewelryOptions}
+            />
+          </div>
         </div>
 
         {/* Divider */}
@@ -109,11 +120,28 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
         {/* Mode Tabs - Ultra Compact */}
         <div className="mb-2">
           {areModesDisabled && (
-            <div className="mb-1 text-center text-[9px] text-white/30">
-              Complete selections
+            <div className="mb-2 flex items-center justify-center gap-1 rounded-md border border-purple-500/30 bg-purple-500/5 p-2 text-center">
+              <svg
+                className="h-3 w-3 animate-bounce text-purple-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 15l7-7 7 7"
+                />
+              </svg>
+              <span className="text-[10px] font-medium text-purple-300">
+                Select gender & jewelry above
+              </span>
             </div>
           )}
-          <div className="flex gap-0.5 rounded-md border border-white/10 bg-white/[0.02] p-0.5">
+          <div
+            className={`flex gap-0.5 rounded-md border p-0.5 transition-all duration-300 ${areModesDisabled ? 'border-white/5 bg-white/[0.01]' : 'border-white/10 bg-white/[0.02]'}`}
+          >
             <button
               onClick={() => setActiveMode('quick')}
               disabled={areModesDisabled}
@@ -157,27 +185,27 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
         </div>
 
         {/* Mode Content */}
-        {!areModesDisabled && (
-          <div className="flex-1 overflow-y-auto">
-            {activeMode === 'quick' && (
-              <QuickModeContent onPresetSelect={handlePresetSelect} />
-            )}
-            {activeMode === 'selective' && (
-              <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3">
-                <p className="text-[9px] text-white/40">
-                  Selective options coming soon...
-                </p>
-              </div>
-            )}
-            {activeMode === 'advanced' && (
-              <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3">
-                <p className="text-[9px] text-white/40">
-                  Advanced settings coming soon...
-                </p>
-              </div>
-            )}
-          </div>
-        )}
+        <div
+          className={`flex-1 overflow-y-auto transition-all duration-300 ${areModesDisabled ? 'pointer-events-none opacity-30 blur-sm' : 'opacity-100'}`}
+        >
+          {activeMode === 'quick' && (
+            <QuickModeContent onPresetSelect={handlePresetSelect} />
+          )}
+          {activeMode === 'selective' && (
+            <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3">
+              <p className="text-[9px] text-white/40">
+                Selective options coming soon...
+              </p>
+            </div>
+          )}
+          {activeMode === 'advanced' && (
+            <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3">
+              <p className="text-[9px] text-white/40">
+                Advanced settings coming soon...
+              </p>
+            </div>
+          )}
+        </div>
 
         {/* Confirmation Modal */}
         {confirmModal?.show && (
