@@ -7,14 +7,22 @@
 export interface PresetPrompt {
   name: string;
   requiresModel: boolean; // whether gender is needed
-  buildPrompt: (jewelryType: string, gender?: string) => string;
+  buildPrompt: (
+    jewelryType: string,
+    gender?: string,
+    aspectRatio?: string
+  ) => string;
 }
 
 export const presetPrompts: Record<string, PresetPrompt> = {
   'e-commerce': {
     name: 'White Background',
     requiresModel: false,
-    buildPrompt: (jewelryType: string) => {
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '9:16'
+    ) => {
       return `Professional e-commerce catalog photography for ${jewelryType}. Pristine white background. Ultra-sharp product focus.
 
 CRITICAL PRESERVATION - ZERO TOLERANCE:
@@ -54,14 +62,18 @@ Resolution: 300 DPI minimum
 Sharpness: Razor-sharp crystal clear every detail
 Quality: Pristine professional catalog grade
 
-OUTPUT: E-commerce ready. Tiffany catalog standard. 3:4 aspect ratio portrait.`;
+OUTPUT: E-commerce ready. Tiffany catalog standard. Aspect ratio ${aspectRatio}.`;
     },
   },
 
   lifestyle: {
     name: 'Lifestyle',
     requiresModel: true,
-    buildPrompt: (jewelryType: string, gender?: string) => {
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '9:16'
+    ) => {
       const genderText = gender ? `${gender}` : 'model';
       const type = jewelryType.toLowerCase();
 
@@ -120,14 +132,18 @@ Resolution: 300 DPI Instagram optimized
 Sharpness: Crystal clear product details pin-sharp
 Model: Supporting context jewelry hero
 
-OUTPUT: Social media Instagram ready. 3:4 aspect ratio portrait. Authentic everyday elegance. Lifestyle editorial quality.`;
+OUTPUT: Social media Instagram ready. Aspect ratio ${aspectRatio}. Authentic everyday elegance. Lifestyle editorial quality.`;
     },
   },
 
   'still-life': {
     name: 'Still Life',
     requiresModel: false,
-    buildPrompt: (jewelryType: string) => {
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '9:16'
+    ) => {
       const type = jewelryType.toLowerCase();
       const placement =
         {
@@ -183,14 +199,18 @@ Resolution: 300 DPI minimum
 Sharpness: Maximum clarity professional grade
 Quality: Pristine sharp lifestyle product photography
 
-OUTPUT: Natural organic lifestyle ready. 3:4 aspect ratio portrait. Stone display aesthetic. Warm earthy presentation.`;
+OUTPUT: Natural organic lifestyle ready. Aspect ratio ${aspectRatio}. Stone display aesthetic. Warm earthy presentation.`;
     },
   },
 
   'on-model': {
     name: 'On Model',
     requiresModel: true,
-    buildPrompt: (jewelryType: string, gender?: string) => {
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '9:16'
+    ) => {
       const genderText = gender ? `${gender}` : 'model';
       const type = jewelryType.toLowerCase();
 
@@ -251,14 +271,18 @@ Resolution: 300 DPI e-commerce grade
 Sharpness: Pin-sharp crystal clear product details
 Model: Supporting context jewelry hero
 
-OUTPUT: E-commerce ready. 3:4 aspect ratio portrait. Professional model photography. Clean commercial product-focused.`;
+OUTPUT: E-commerce ready. Aspect ratio ${aspectRatio}. Professional model photography. Clean commercial product-focused.`;
     },
   },
 
   'close-up': {
     name: 'Close Up',
     requiresModel: false,
-    buildPrompt: (jewelryType: string) => {
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '9:16'
+    ) => {
       const type = jewelryType.toLowerCase();
       const focus =
         {
@@ -317,14 +341,18 @@ Sharpness: Maximum capture crystal clear pin-sharp micro details
 Focus stacking: Optional extended depth
 Quality: Pristine macro product photography
 
-OUTPUT: Macro craftsmanship showcase. 3:4 aspect ratio portrait. Extreme close-up detail. Professional quality.`;
+OUTPUT: Macro craftsmanship showcase. Aspect ratio ${aspectRatio}. Extreme close-up detail. Professional quality.`;
     },
   },
 
   luxury: {
     name: 'Luxury',
     requiresModel: true,
-    buildPrompt: (jewelryType: string, gender?: string) => {
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '9:16'
+    ) => {
       const genderText = gender ? `${gender}` : 'model';
       const type = jewelryType.toLowerCase();
 
@@ -387,7 +415,7 @@ Post-processing: Refined color grading editorial finish
 Model: Editorial styling jewelry hero
 Quality: Pristine luxury editorial photography
 
-OUTPUT: Premium luxury editorial ready. 3:4 aspect ratio portrait. High-fashion campaign. Aspirational prestige.`;
+OUTPUT: Premium luxury editorial ready. Aspect ratio ${aspectRatio}. High-fashion campaign. Aspirational prestige.`;
     },
   },
 };
