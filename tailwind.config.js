@@ -22,6 +22,7 @@ module.exports = {
         shimmer: 'shimmer 2s infinite',
         fadeInScale: 'fadeInScale 300ms ease-out forwards',
         'spin-slow': 'spin 3s linear infinite',
+        'glow-pulse': 'glow-pulse 2s ease-in-out infinite',
       },
       keyframes: {
         fadeInSlide: {
@@ -50,6 +51,14 @@ module.exports = {
           to: {
             opacity: '1',
             transform: 'scale(1) translateY(0)',
+          },
+        },
+        'glow-pulse': {
+          '0%, 100%': {
+            opacity: '0',
+          },
+          '50%': {
+            opacity: '1',
           },
         },
       },
