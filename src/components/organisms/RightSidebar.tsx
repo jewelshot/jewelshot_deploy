@@ -39,7 +39,7 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
   const { rightOpen } = useSidebarStore();
 
   // Selection states
-  const [gender, setGender] = useState<Gender>('women');
+  const [gender, setGender] = useState<Gender>(null);
   const [jewelryType, setJewelryType] = useState<JewelryType>(null);
   const [activeMode, setActiveMode] = useState<Mode>('quick');
 
