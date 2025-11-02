@@ -20,7 +20,6 @@ import SidebarLogo from '@/components/molecules/SidebarLogo';
 import NavigationItem from '@/components/molecules/NavigationItem';
 import SectionHeader from '@/components/atoms/SectionHeader';
 import UserProfile from '@/components/molecules/UserProfile';
-import SelectionNotification from '@/components/molecules/SelectionNotification';
 import {
   Home,
   Palette,
@@ -72,8 +71,6 @@ export function Sidebar() {
   const { leftOpen } = useSidebarStore();
   const pathname = usePathname();
   const [galleryCount, setGalleryCount] = useState(0);
-  const [showSelectionNotification, setShowSelectionNotification] =
-    useState(true);
 
   // Update gallery count
   useEffect(() => {
@@ -103,25 +100,6 @@ export function Sidebar() {
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('gallery-updated', handleGallerySave);
-    };
-  }, []);
-
-  // Listen for selection changes
-  useEffect(() => {
-    const handleSelectionChange = (e: CustomEvent) => {
-      setShowSelectionNotification(!e.detail.isComplete);
-    };
-
-    window.addEventListener(
-      'selection-state-changed',
-      handleSelectionChange as EventListener
-    );
-
-    return () => {
-      window.removeEventListener(
-        'selection-state-changed',
-        handleSelectionChange as EventListener
-      );
     };
   }, []);
 
@@ -178,13 +156,6 @@ export function Sidebar() {
             />
           ))}
         </nav>
-
-        {/* Selection Notification - Only show on Studio page */}
-        {pathname === '/studio' && (
-          <div className="mb-3">
-            <SelectionNotification visible={showSelectionNotification} />
-          </div>
-        )}
 
         {/* Tools Section */}
         <SectionHeader title="TOOLS" />

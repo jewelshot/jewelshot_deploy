@@ -7,7 +7,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSidebarStore } from '@/store/sidebarStore';
 import { ConfigurationAccordion } from '@/components/molecules/ConfigurationAccordion';
 import { QuickModeContent } from '@/components/molecules/QuickModeContent';
@@ -42,16 +42,6 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
   const [gender, setGender] = useState<Gender>(null);
   const [jewelryType, setJewelryType] = useState<JewelryType>(null);
   const [activeMode, setActiveMode] = useState<Mode>('quick');
-
-  // Notify selection state changes
-  useEffect(() => {
-    const isComplete = Boolean(gender && jewelryType);
-    window.dispatchEvent(
-      new CustomEvent('selection-state-changed', {
-        detail: { isComplete },
-      })
-    );
-  }, [gender, jewelryType]);
 
   // Modal state
   const [confirmModal, setConfirmModal] = useState<{
