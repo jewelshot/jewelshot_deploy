@@ -566,4 +566,105 @@ AVOID:
 OUTPUT: E-commerce ready. Professional model photography. Clean commercial quality. Product focused presentation.`;
     },
   },
+
+  'close-up': {
+    name: 'Close Up',
+    requiresModel: false,
+    buildPrompt: (jewelryType: string) => {
+      let focusInstructions = '';
+      const type = jewelryType.toLowerCase();
+
+      if (type === 'ring') {
+        focusInstructions =
+          'Ring: Gemstone center prong setting and band texture visible.';
+      } else if (type === 'necklace') {
+        focusInstructions =
+          'Necklace: Pendant detail chain link and clasp mechanism.';
+      } else if (type === 'earring') {
+        focusInstructions =
+          'Earrings: Post setting gemstone cut and metal finish.';
+      } else if (type === 'bracelet') {
+        focusInstructions = 'Bracelet: Link detail clasp texture and pattern.';
+      } else {
+        focusInstructions =
+          'Chain: Individual link construction texture and finish.';
+      }
+
+      return `Extreme close-up macro photography highlighting ${jewelryType} craftsmanship and details.
+
+STYLE: Macro detail craftsmanship focus.
+
+JEWELRY TYPE: ${jewelryType.charAt(0).toUpperCase() + jewelryType.slice(1)}
+
+BACKGROUND:
+- Type: Minimal blurred neutral
+- Color: Soft bokeh white cream or black
+- Texture: Out of focus smooth gradient
+
+LIGHTING:
+- Setup: Controlled macro lighting
+- Key light: Soft directional front slight angle
+- Fill light: Subtle shadow detail preservation
+- Temperature: 5500K neutral accurate color
+- Quality: Crisp controlled no hot spots
+- Special: Ring light or diffused macro flash optional
+
+CAMERA SETUP:
+- Lens: Macro 100mm equivalent
+- Distance: Extreme close-up
+- Angle: Optimal detail showcase varies by jewelry type
+- Magnification: High detail visible
+
+JEWELRY FOCUS:
+- ${focusInstructions}
+- Primary focus: Most important craftsmanship detail
+- Sharpness: Razor sharp on focal point
+
+DEPTH OF FIELD:
+- Style: Shallow selective focus
+- In focus: Primary detail razor sharp
+- Out of focus: Gentle bokeh background element
+- Effect: Draws eye to craftsmanship
+
+DETAILS TO HIGHLIGHT:
+- Gemstones: Facets brilliance clarity cut precision
+- Metal work: Texture polish brushed hammered finish
+- Setting: Prongs bezels channels construction
+- Engravings: Text patterns symbols readable
+- Surface: Grain reflections micro details
+
+COMPOSITION:
+- Framing: Detail fills 70 to 80 percent of frame
+- Focus point: Most important detail centered
+- Negative space: Minimal clean not distracting
+
+PRESERVE ORIGINAL DESIGN - CRITICAL:
+- Gemstone shape: Exact original cut
+- Gemstone size: Precise dimensions
+- Setting structure: Preserve exact construction
+- Metal details: Authentic every detail
+- Engravings: Exact reproduction
+- Texture: Accurate surface finish
+- CRITICAL: Perfect detail accuracy. Design untouched.
+
+TECHNICAL SPECIFICATIONS:
+- Resolution: Ultra high 300 DPI plus
+- Aspect ratio: 1:1 square or 4:5 vertical
+- Focus stacking: Optional for extended depth
+- Sharpness: Maximum detail capture
+
+MOOD:
+- Atmosphere: Intimate revealing craftsmanship appreciation
+- Tone: Clean precise professional
+
+AVOID:
+- Motion blur or soft focus
+- Overexposure blown highlights
+- Underexposure lost shadow detail
+- Chromatic aberration
+- Design alterations
+
+OUTPUT: Macro detail photography. Craftsmanship showcase. Professional quality. Extreme close-up clarity.`;
+    },
+  },
 };

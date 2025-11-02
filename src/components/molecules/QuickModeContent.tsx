@@ -51,6 +51,11 @@ export function QuickModeContent({ onPresetSelect }: QuickModeContentProps) {
       title: 'On Model',
       imagePath: '/presets/on-model.webp',
     },
+    {
+      id: 'close-up',
+      title: 'Close Up',
+      imagePath: '/presets/close-up.webp',
+    },
   ];
 
   return (
