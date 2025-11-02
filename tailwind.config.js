@@ -55,10 +55,10 @@ module.exports = {
         },
         'glow-pulse': {
           '0%, 100%': {
-            opacity: '0',
+            boxShadow: '0 0 0 0 rgba(139, 92, 246, 0)',
           },
           '50%': {
-            opacity: '1',
+            boxShadow: '0 0 20px 0 rgba(139, 92, 246, 0.4)',
           },
         },
       },

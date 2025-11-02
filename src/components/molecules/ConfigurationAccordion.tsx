@@ -26,41 +26,34 @@ export function ConfigurationAccordion({
   const isComplete = gender && jewelryType;
 
   return (
-    <div className="relative">
-      {/* Animated glow background */}
-      {!isComplete && (
-        <div className="pointer-events-none absolute -inset-1 animate-glow-pulse rounded-lg bg-purple-500/40 blur-lg" />
-      )}
+    <div
+      className={`flex items-center gap-2 rounded-lg border p-2 transition-all duration-300 ${
+        isComplete
+          ? 'border-white/10 bg-white/[0.02]'
+          : 'animate-glow-pulse border-purple-500/60 bg-white/[0.02]'
+      }`}
+    >
+      {/* Gender Selection */}
+      <div className="flex-1">
+        <SelectionDropdown
+          label=""
+          placeholder="Gender"
+          options={genderOptions}
+          value={gender}
+          onChange={onGenderChange}
+        />
+      </div>
 
-      <div
-        className={`relative flex items-center gap-2 rounded-lg border p-2 transition-all duration-300 ${
-          isComplete
-            ? 'border-white/10 bg-white/[0.02]'
-            : 'border-purple-500/60 bg-white/[0.02]'
-        }`}
-      >
-        {/* Gender Selection */}
-        <div className="flex-1">
-          <SelectionDropdown
-            label=""
-            placeholder="Gender"
-            options={genderOptions}
-            value={gender}
-            onChange={onGenderChange}
-          />
-        </div>
-
-        {/* Jewelry Type Selection */}
-        <div className="flex-1">
-          <SelectionDropdown
-            label=""
-            placeholder="Jewelry"
-            options={jewelryOptions}
-            value={jewelryType}
-            onChange={onJewelryChange}
-            disabled={isJewelryDisabled}
-          />
-        </div>
+      {/* Jewelry Type Selection */}
+      <div className="flex-1">
+        <SelectionDropdown
+          label=""
+          placeholder="Jewelry"
+          options={jewelryOptions}
+          value={jewelryType}
+          onChange={onJewelryChange}
+          disabled={isJewelryDisabled}
+        />
       </div>
     </div>
   );
