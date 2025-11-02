@@ -147,20 +147,20 @@ OUTPUT: Social media Instagram ready. Aspect ratio ${aspectRatio}. Authentic eve
       const type = jewelryType.toLowerCase();
       const placement =
         {
-          ring: 'Resting on stone surface top',
-          necklace: 'Draped over stone curves',
-          earring: 'Paired on stone surface',
-          bracelet: 'Draped around stone form',
-        }[type] || 'Arranged on stone naturally';
+          ring: 'Resting elegantly on flat surface centered composition',
+          necklace: 'Gracefully draped with gentle curves natural flow',
+          earring: 'Paired symmetrically minimal spacing refined placement',
+          bracelet: 'Arranged in elegant circle or gentle curve',
+        }[type] || 'Positioned with intentional minimalist composition';
 
-      return `Natural stone lifestyle ${jewelryType} display. Warm golden-hour lighting. Organic minimal aesthetic.
+      return `Minimalist still life ${jewelryType} photography. Soft pastel aesthetics. Gentle shadows. Clean modern presentation.
 
 CRITICAL PRESERVATION - ZERO TOLERANCE:
 EXACT jewelry structure geometry shape form UNCHANGED pixel-perfect
 EXACT gemstone count size position cut NO additions NO removals NO moves
 EXACT setting prongs bezels channels metal work UNCHANGED
 EXACT engravings texture proportions NO modifications
-ONLY scene lighting stone change JEWELRY DESIGN 100% UNTOUCHED
+ONLY lighting background composition change JEWELRY DESIGN 100% UNTOUCHED
 
 STRICTLY FORBIDDEN - NEGATIVE PROMPT:
 distorted warped morphed jewelry shapes
@@ -168,38 +168,60 @@ added removed moved gemstones
 blurry soft-focus product
 new jewelry pieces
 design alterations modifications
-artificial props clinical lighting
-flat surface only displays
+harsh shadows strong contrast
+cluttered busy compositions dark moody tones
 
 STYLE & COMPOSITION:
-Natural stone: Large porous organic limestone beige/cream RGB(220,205,190)
-Stone size: Medium-large prominent 40-50% frame lower-left to center
-Background: Flat horizontal warm beige sand tone RGB(230,215,200) smooth matte
-Jewelry placement: ${placement} secure on stone texture
-Camera angle: Slight top-down 30 degree showing stone and jewelry together
-Aesthetic: Organic minimal natural lifestyle
+Minimalist modern still life aesthetic clean refined
+Background: Soft pastel gradient smooth seamless
+Color palette: Light pastel tones RGB(245,235,240) to RGB(250,245,245)
+Surface: Matte smooth flat horizontal plane pristine clean
+Jewelry placement: ${placement}
+Camera angle: Straight overhead flat lay 90 degree top-down view
+Negative space: Generous breathing room minimal elements
+Aesthetic: Contemporary minimalist editorial clean
+
+PASTEL COLOR PALETTE:
+Primary background: Soft blush pink pale peach cream ivory light lavender
+Accent tones: Subtle pastel blue mint green soft coral barely-there
+Gradient: Gentle smooth transition between pastel hues
+Overall feel: Airy light dreamy ethereal feminine elegant
+Color intensity: Very soft muted desaturated pastel quality
 
 LIGHTING - TECHNICAL SPECS:
-Natural directional sunlight quality top-left 45 degree angle
-Color temp: Warm 4500K golden hour light
-Quality: Warm direct with soft edges bright highlight
-Shadows: Strong defined cast shadow bottom-right diagonal 65-75% opacity
-Shadow edge: Soft gradient warm brown tone
-Effect: Dramatic depth strong definition
+Soft diffused lighting gentle even illumination no harsh highlights
+Key light: Large diffused softbox overhead or front angle
+Fill light: Bounce cards wrap-around soft fill no dark shadows
+Color temp: Cool 6000K to neutral 5500K clean fresh feel
+Quality: Ultra-soft feathered edges no hard light
+Shadow style: Minimal barely visible subtle soft edges
+Shadow color: Cool gray or matching pastel tone very transparent
+Shadow opacity: 10-20% maximum extremely subtle gentle
+Effect: Dreamy ethereal soft romantic minimalist
 
-ATMOSPHERE & MOOD:
-Mood: Natural organic warm earthy grounded
-Aesthetic: Lifestyle minimal authentic
-Feel: Natural stone product display
+COMPOSITION & FRAMING:
+Jewelry position: Centered or rule-of-thirds intentional placement
+Surrounding space: Clean empty generous negative space
+Props: NONE or single minimal geometric shape if needed
+Surface texture: Smooth matte no distractions
+Symmetry: Balanced harmonious peaceful composition
+Visual weight: Light airy floating ethereal feel
 
 FOCUS & SHARPNESS - MANDATORY:
-PRIMARY FOCUS: Jewelry product ultra-sharp f/8 aperture
-Stone texture: Also sharp for context both razor-sharp
-Resolution: 300 DPI minimum
-Sharpness: Maximum clarity professional grade
-Quality: Pristine sharp lifestyle product photography
+PRIMARY FOCUS: Jewelry product ultra-sharp f/5.6-f/8 aperture
+Depth of field: All elements in focus edge-to-edge sharpness
+Resolution: 300 DPI editorial grade
+Sharpness: Crystal clear razor-sharp every detail
+Quality: Pristine professional minimalist product photography
 
-OUTPUT: Natural organic lifestyle ready. Aspect ratio ${aspectRatio}. Stone display aesthetic. Warm earthy presentation.`;
+MOOD & ATMOSPHERE:
+Mood: Serene peaceful calming gentle refined
+Aesthetic: Modern minimalist Scandinavian Japanese zen
+Feel: Airy light dreamy soft feminine elegant
+Emotion: Tranquil sophisticated understated luxury
+Style reference: Kinfolk magazine aesthetic Pinterest minimalism
+
+OUTPUT: Editorial minimalist still life. Aspect ratio ${aspectRatio}. Soft pastel aesthetics. Gentle shadows. Contemporary clean.`;
     },
   },
 
