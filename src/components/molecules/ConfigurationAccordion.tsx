@@ -27,7 +27,11 @@ export function ConfigurationAccordion({
 
   return (
     <div
-      className={`flex items-center gap-2 rounded-lg border p-2 transition-all duration-300 ${isComplete ? 'border-white/10 bg-white/[0.02]' : 'border-purple-500/30 bg-white/[0.02]'}`}
+      className={`flex items-center gap-2 rounded-lg border p-2 transition-all duration-300 ${
+        isComplete
+          ? 'border-white/10 bg-white/[0.02]'
+          : 'animate-pulse border-purple-500/50 bg-white/[0.02] shadow-[0_0_20px_rgba(139,92,246,0.3)]'
+      }`}
     >
       {/* Gender Selection */}
       <div className="flex-1">
