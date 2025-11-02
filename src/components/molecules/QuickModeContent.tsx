@@ -27,6 +27,11 @@ export function QuickModeContent({ onPresetSelect }: QuickModeContentProps) {
       imagePath: '/presets/on-model.webp',
     },
     {
+      id: 'lifestyle',
+      title: 'Lifestyle',
+      imagePath: '/presets/lifestyle.webp',
+    },
+    {
       id: 'luxury',
       title: 'Luxury',
       imagePath: '/presets/luxury.webp',
