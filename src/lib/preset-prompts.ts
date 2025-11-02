@@ -58,61 +58,6 @@ OUTPUT: E-commerce ready. Tiffany catalog standard. 3:4 aspect ratio portrait.`;
     },
   },
 
-  'luxury-editorial': {
-    name: 'Luxury Editorial',
-    requiresModel: true,
-    buildPrompt: (jewelryType: string, gender?: string) => {
-      const genderText = gender ? `${gender} model` : 'model';
-
-      return `High-fashion editorial ${jewelryType} on ${genderText}. Dramatic chiaroscuro lighting. Vogue-style sophistication.
-
-CRITICAL PRESERVATION - ZERO TOLERANCE:
-EXACT jewelry structure geometry shape form UNCHANGED pixel-perfect
-EXACT gemstone count size position cut NO additions NO removals NO moves
-EXACT setting prongs bezels channels metal work UNCHANGED
-EXACT engravings texture proportions NO modifications
-ONLY lighting styling background change JEWELRY DESIGN 100% UNTOUCHED
-
-STRICTLY FORBIDDEN - NEGATIVE PROMPT:
-distorted warped morphed jewelry shapes
-added removed moved gemstones
-blurry soft-focus product
-new jewelry on bare hands necks wrists ears
-design alterations modifications
-flat lighting low contrast
-casual styling amateur composition
-
-STYLE & COMPOSITION:
-Deep dramatic dark background: black to charcoal gradient RGB(20,20,20) to RGB(60,60,60)
-Atmospheric haze subtle sophisticated depth
-Bold confident framing jewelry hero statement
-Model: Supporting element ${genderText} editorial styled
-Dynamic angles asymmetric composition Vogue Harpers Bazaar aesthetic
-
-LIGHTING - TECHNICAL SPECS:
-Dramatic chiaroscuro: single powerful key light side-angle 60-75 degree creating bold shadows
-Rim light: Strong separation edge definition from darkness
-Color temp: Cool 5800K or warm 4200K intentional mood
-High contrast: Deep shadows with detail bright crisp highlights
-Quality: Crisp controlled cinematic editorial
-
-METAL & GEMSTONE ENHANCEMENT:
-Metal: Maximum brilliance reflectivity striking highlights mirror polish
-Gemstones: Intensely vibrant saturated colors maximum fire brilliance
-Shadows: Prominent dramatic as design element soft gradient falloff
-Color grading: Rich deep tones cool undertones editorial palette
-
-FOCUS & SHARPNESS - MANDATORY:
-PRIMARY FOCUS: Jewelry product ultra-sharp f/2.8-f/4 aperture
-Depth of field: Jewelry razor-sharp dramatic bokeh background
-Resolution: 300 DPI editorial grade
-Sharpness: Pin-sharp crystal clear every detail
-Model: Soft context jewelry crisp
-
-OUTPUT: Vogue Cartier campaign standard. 3:4 aspect ratio portrait. Premium aspirational. Emotionally striking.`;
-    },
-  },
-
   lifestyle: {
     name: 'Lifestyle',
     requiresModel: true,
