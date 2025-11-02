@@ -14,14 +14,14 @@ import { QuickModeContent } from '@/components/molecules/QuickModeContent';
 import { PresetConfirmModal } from '@/components/molecules/PresetConfirmModal';
 import { presetPrompts } from '@/lib/preset-prompts';
 
-type Gender = 'woman' | 'man' | null;
+type Gender = 'women' | 'men' | null;
 type JewelryType = 'ring' | 'necklace' | 'earring' | 'bracelet' | null;
 type Mode = 'quick' | 'selective' | 'advanced';
 
 // Dropdown options
 const genderOptions = [
-  { value: 'woman', label: 'Woman' },
-  { value: 'man', label: 'Man' },
+  { value: 'women', label: 'Women' },
+  { value: 'men', label: 'Men' },
 ];
 
 const jewelryOptions = [
@@ -39,7 +39,7 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
   const { rightOpen } = useSidebarStore();
 
   // Selection states
-  const [gender, setGender] = useState<Gender>('woman');
+  const [gender, setGender] = useState<Gender>('women');
   const [jewelryType, setJewelryType] = useState<JewelryType>(null);
   const [activeMode, setActiveMode] = useState<Mode>('quick');
 
