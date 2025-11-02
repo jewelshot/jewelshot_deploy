@@ -17,42 +17,40 @@ export const presetPrompts: Record<string, PresetPrompt> = {
     buildPrompt: (jewelryType: string) => {
       return `Professional white background product photography for e-commerce ${jewelryType}.
 
-STYLE: Professional e-commerce Tiffany & Co catalog standard.
+STYLE: Professional e-commerce Tiffany style catalog standard.
 
 JEWELRY TYPE: ${jewelryType.charAt(0).toUpperCase() + jewelryType.slice(1)}
 
 BACKGROUND:
 - Type: Pure white seamless
-- Color: #FFFFFF (RGB 255,255,255)
-- Gradient: Subtle gray to white (5% transition)
-- Quality: Professional studio backdrop
+- Color: #FFFFFF
+- Gradient: Subtle gray to white 5 percent transition
 
 LIGHTING SETUP:
-- System: Studio three-point lighting
-- Key light: Soft diffused from top-front angle
+- Setup: Studio three-point lighting
+- Key light: Soft diffused from top front
 - Fill light: Gentle ambient illumination
-- Rim light: Subtle edge highlight for separation
+- Rim light: Subtle edge highlight
 - Temperature: 5500K neutral daylight
 
 JEWELRY PLACEMENT - CRITICAL:
 - Position: Perfectly centered in frame
-- Angle: Three-quarter view at 30-45 degrees
-- Visibility: Show top, side, and front simultaneously
+- Angle: Three-quarter view 30 to 45 degrees
+- Visibility: Show top side and front simultaneously
 - Orientation: Complete form readable in single view
-- Rotation: Optimal showcase angle for maximum clarity
 - Elevation: Floating with slight lift effect
 - CRITICAL: Entire product structure visible in single view
 
 SHADOWS:
 - Type: Soft drop shadow beneath jewelry
-- Opacity: 20-30% for subtle grounding
+- Opacity: 20 to 30 percent for subtle grounding
 - Blur: High diffusion for natural look
 - Color: Neutral gray tone
 
 REFLECTIONS:
 - Metal surfaces: High polish realistic reflections
 - Gemstones: Natural sparkle and brilliance
-- Floor reflection: Subtle 10% opacity for luxury feel
+- Floor reflection: Subtle 10 percent opacity
 
 PRESERVE ORIGINAL DESIGN - CRITICAL:
 - Gemstone shape: Exact original cut
@@ -66,7 +64,7 @@ PRESERVE ORIGINAL DESIGN - CRITICAL:
 - CRITICAL: Only lighting and reflections change. Design untouched.
 
 COMPOSITION:
-- Framing: Product fills 60% of frame
+- Framing: Product fills 60 percent of frame
 - Alignment: Perfectly centered and level
 
 TECHNICAL SPECIFICATIONS:
@@ -74,13 +72,13 @@ TECHNICAL SPECIFICATIONS:
 - Aspect ratio: 1:1 square or 4:3 standard
 - Focus: Razor sharp on all details
 
-STYLE REFERENCE: Tiffany & Co catalog photography standard.
-
 AVOID:
 - Design alterations of any kind
 - Flat top-only view
 - Pure side view
 - Obscured details
+- Harsh shadows
+- Color cast
 
 OUTPUT: Professional e-commerce ready. Catalog quality. Complete product visibility.`;
     },
