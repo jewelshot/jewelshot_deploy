@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronRight, ChevronDown, Check } from 'lucide-react';
+import React from 'react';
 import { SelectionDropdown } from '@/components/atoms/SelectionDropdown';
 
 interface ConfigurationAccordionProps {
@@ -12,8 +11,7 @@ interface ConfigurationAccordionProps {
 }
 
 /**
- * ConfigurationAccordion - Auto-collapsing accordion for gender/jewelry selection
- * Collapses automatically when both selections are complete
+ * ConfigurationAccordion - Simple side-by-side dropdowns for gender/jewelry selection
  */
 export function ConfigurationAccordion({
   gender,
@@ -23,92 +21,31 @@ export function ConfigurationAccordion({
   genderOptions,
   jewelryOptions,
 }: ConfigurationAccordionProps) {
-  const [isExpanded, setIsExpanded] = useState(true);
-  const [hasAutoCollapsed, setHasAutoCollapsed] = useState(false);
-
-  // Auto-collapse ONLY ONCE when both selections are completed
-  useEffect(() => {
-    if (gender && jewelryType && !hasAutoCollapsed) {
-      // Wait 300ms before auto-collapse for smooth UX
-      const timer = setTimeout(() => {
-        setIsExpanded(false);
-        setHasAutoCollapsed(true); // Mark as collapsed, won't auto-collapse again
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [gender, jewelryType, hasAutoCollapsed]);
-
-  const isComplete = gender && jewelryType;
   const isJewelryDisabled = !gender;
 
-  // Get labels for collapsed view
-  const genderLabel = genderOptions.find((opt) => opt.value === gender)?.label;
-  const jewelryLabel = jewelryOptions.find(
-    (opt) => opt.value === jewelryType
-  )?.label;
-
   return (
-    <div className="relative">
-      {/* Accordion Header */}
-      <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className={`flex w-full items-center justify-between rounded-lg border px-2.5 py-1.5 text-left transition-all duration-200 ${
-          isExpanded
-            ? 'border-purple-500/30 bg-white/[0.03]'
-            : isComplete
-              ? 'border-white/10 bg-white/[0.02] hover:border-purple-500/20 hover:bg-white/[0.03]'
-              : 'border-red-400/30 bg-red-400/5'
-        }`}
-      >
-        <div className="flex items-center gap-1.5">
-          {isExpanded ? (
-            <ChevronDown className="h-3 w-3 text-white/60" />
-          ) : (
-            <ChevronRight className="h-3 w-3 text-white/60" />
-          )}
-          <span className="text-[10px] font-medium text-white/70">
-            {isComplete
-              ? `${genderLabel} • ${jewelryLabel}`
-              : 'Select Gender & Jewelry'}
-          </span>
-        </div>
-        {isComplete && !isExpanded && (
-          <Check className="h-3 w-3 text-green-400" />
-        )}
-      </button>
+    <div className="flex items-center gap-2">
+      {/* Gender Selection */}
+      <div className="flex-1">
+        <SelectionDropdown
+          label=""
+          placeholder="Gender"
+          options={genderOptions}
+          value={gender}
+          onChange={onGenderChange}
+        />
+      </div>
 
-      {/* Accordion Content */}
-      <div
-        className={`transition-all duration-300 ease-out ${
-          isExpanded
-            ? 'max-h-[400px] opacity-100'
-            : 'max-h-0 overflow-hidden opacity-0'
-        }`}
-      >
-        <div className="space-y-2 pt-2">
-          {/* Gender Selection */}
-          <SelectionDropdown
-            label="Gender"
-            placeholder="Select..."
-            options={genderOptions}
-            value={gender}
-            onChange={onGenderChange}
-            required
-            inline
-          />
-
-          {/* Jewelry Type Selection */}
-          <SelectionDropdown
-            label="Jewelry"
-            placeholder="Select..."
-            options={jewelryOptions}
-            value={jewelryType}
-            onChange={onJewelryChange}
-            disabled={isJewelryDisabled}
-            required
-            inline
-          />
-        </div>
+      {/* Jewelry Type Selection */}
+      <div className="flex-1">
+        <SelectionDropdown
+          label=""
+          placeholder="Jewelry"
+          options={jewelryOptions}
+          value={jewelryType}
+          onChange={onJewelryChange}
+          disabled={isJewelryDisabled}
+        />
       </div>
     </div>
   );

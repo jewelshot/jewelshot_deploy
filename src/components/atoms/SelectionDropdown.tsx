@@ -69,20 +69,22 @@ export function SelectionDropdown({
       ref={dropdownRef}
     >
       {/* Label */}
-      <label
-        className={`text-[10px] font-medium uppercase tracking-wide text-white/60 ${
-          inline ? 'min-w-[50px] shrink-0' : 'mb-2 block'
-        }`}
-      >
-        {label}
-        {required && <span className="ml-0.5 text-red-400">*</span>}
-        {!inline && helperText && (
-          <span className="ml-1 text-[10px] text-white/40">{helperText}</span>
-        )}
-      </label>
+      {label && (
+        <label
+          className={`text-[10px] font-medium uppercase tracking-wide text-white/60 ${
+            inline ? 'min-w-[50px] shrink-0' : 'mb-2 block'
+          }`}
+        >
+          {label}
+          {required && <span className="ml-0.5 text-red-400">*</span>}
+          {!inline && helperText && (
+            <span className="ml-1 text-[10px] text-white/40">{helperText}</span>
+          )}
+        </label>
+      )}
 
       {/* Dropdown Container (for relative positioning in inline mode) */}
-      <div className={inline ? 'relative flex-1' : 'relative'}>
+      <div className={label && inline ? 'relative flex-1' : 'relative'}>
         {/* Dropdown Button */}
         <button
           type="button"
