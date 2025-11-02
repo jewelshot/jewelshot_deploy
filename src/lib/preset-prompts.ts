@@ -667,4 +667,111 @@ AVOID:
 OUTPUT: Macro detail photography. Craftsmanship showcase. Professional quality. Extreme close-up clarity.`;
     },
   },
+
+  luxury: {
+    name: 'Luxury',
+    requiresModel: true,
+    buildPrompt: (jewelryType: string, gender?: string) => {
+      const genderText = gender ? `${gender} model` : 'model';
+
+      let placementInstructions = '';
+      const type = jewelryType.toLowerCase();
+
+      if (type === 'ring') {
+        placementInstructions =
+          'Ring: Elegant hand pose. Architectural fingers. Jewelry hero.';
+      } else if (type === 'necklace') {
+        placementInstructions =
+          'Necklace: Statement neck and decollete. Centered dramatic.';
+      } else if (type === 'earring') {
+        placementInstructions =
+          'Earrings: Profile or three-quarter face. Jewelry prominent.';
+      } else if (type === 'bracelet') {
+        placementInstructions =
+          'Bracelet: Wrist elevated. Elegant gesture. Refined pose.';
+      } else {
+        placementInstructions =
+          'Chain: Layered draped. Styled intentionally. Sophisticated.';
+      }
+
+      return `High-end editorial photography for ${jewelryType} with ${genderText} for premium campaigns.
+
+STYLE: Luxury editorial high fashion.
+
+JEWELRY TYPE: ${jewelryType.charAt(0).toUpperCase() + jewelryType.slice(1)}
+
+MODEL: ${genderText.charAt(0).toUpperCase() + genderText.slice(1)}
+
+SETTING:
+- Location: Sophisticated upscale environment
+- Background: Elegant dramatic deep tones or architectural
+- Elements: Luxurious minimal curated props
+- Atmosphere: Exclusive aspirational refined
+
+MODEL APPEARANCE:
+- Overall: Editorial high fashion sophisticated
+- Clothing: Designer evening wear formal elegant
+- Makeup: Professional editorial dramatic polished
+- Hair: Professionally styled sleek elegant
+- Pose: Confident powerful elegant statuesque
+- Expression: Serene mysterious confident editorial
+
+LIGHTING:
+- Setup: Dramatic directional controlled
+- Key light: Strong defined sculpting light
+- Fill light: Minimal controlled shadows preserved
+- Rim light: Strong separation edge definition
+- Temperature: Cool 5800K to warm 4200K intentional
+- Quality: Crisp dramatic high contrast
+- Mood: Chiaroscuro inspired dimensional
+
+JEWELRY PLACEMENT:
+- ${placementInstructions}
+- Visibility: Jewelry as hero statement
+- Context: Editorial intentional styling
+
+CAMERA ANGLE:
+- Position: Dramatic low angle or direct eye level
+- Distance: Medium close intimate yet powerful
+- Perspective: Editorial intentional composed
+
+COLOR PALETTE:
+- Tones: Rich deep blacks jewel tones or monochromatic
+- Contrast: High dramatic separation
+- Saturation: Controlled intentional sophisticated
+
+COMPOSITION:
+- Framing: Editorial rule-breaking intentional negative space
+- Balance: Asymmetric dynamic tension
+- Style: Vogue Harpers Bazaar high fashion editorial
+
+PRESERVE ORIGINAL DESIGN - CRITICAL:
+- Gemstone shape: Exact original
+- Gemstone size: Precise dimensions
+- Setting structure: Preserve all elements
+- Metal details: Authentic finish
+- Engravings: Exact reproduction
+- CRITICAL: Design completely untouched.
+
+MOOD:
+- Atmosphere: Sophisticated powerful exclusive aspirational
+- Emotion: Confidence luxury desire prestige
+- Tone: Dramatic elegant timeless
+
+TECHNICAL SPECIFICATIONS:
+- Resolution: Ultra high 300 DPI plus
+- Aspect ratio: 3:4 vertical or 2:3 editorial
+- Depth of field: Shallow jewelry razor sharp dramatic bokeh
+- Post processing: Refined color grading editorial finish
+
+AVOID:
+- Casual elements or flat lighting
+- Cluttered backgrounds
+- Amateur styling
+- Design alterations
+- Overprocessing
+
+OUTPUT: Premium editorial ready. High fashion campaign quality. Luxury catalog standard. Aspirational prestige presentation.`;
+    },
+  },
 };
