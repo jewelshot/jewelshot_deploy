@@ -7,6 +7,9 @@ import {
   menModels,
   locations,
   moods,
+  lightingStyles,
+  cameraAngles,
+  poses,
   buildSelectivePrompt,
 } from '@/lib/selective-options';
 
@@ -27,13 +30,23 @@ export function SelectiveModeContent({
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
+  const [selectedLighting, setSelectedLighting] = useState<string | null>(null);
+  const [selectedAngle, setSelectedAngle] = useState<string | null>(null);
+  const [selectedPose, setSelectedPose] = useState<string | null>(null);
 
   // Get model options based on gender
   const modelOptions = gender === 'women' ? womenModels : menModels;
 
   // Check if all selections are made
   const isComplete =
-    selectedModel && selectedLocation && selectedMood && gender && jewelryType;
+    selectedModel &&
+    selectedLocation &&
+    selectedMood &&
+    selectedLighting &&
+    selectedAngle &&
+    selectedPose &&
+    gender &&
+    jewelryType;
 
   // Handle generation
   const handleGenerate = () => {
@@ -46,6 +59,9 @@ export function SelectiveModeContent({
         selectedModel,
         selectedLocation,
         selectedMood,
+        selectedLighting,
+        selectedAngle,
+        selectedPose,
         aspectRatio
       );
 
@@ -129,6 +145,81 @@ export function SelectiveModeContent({
               image={mood.image}
               isSelected={selectedMood === mood.id}
               onSelect={setSelectedMood}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Lighting Section */}
+      <div>
+        <div className="mb-1.5 flex items-center justify-between">
+          <span className="text-[9px] font-medium uppercase tracking-wide text-white/60">
+            💎 Lighting Style
+          </span>
+          {selectedLighting && (
+            <span className="text-[8px] text-purple-400">✓ Selected</span>
+          )}
+        </div>
+        <div className="grid grid-cols-2 gap-1.5">
+          {lightingStyles.map((lighting) => (
+            <SelectiveCard
+              key={lighting.id}
+              id={lighting.id}
+              name={lighting.name}
+              description={lighting.description}
+              image={lighting.image}
+              isSelected={selectedLighting === lighting.id}
+              onSelect={setSelectedLighting}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Camera Angle Section */}
+      <div>
+        <div className="mb-1.5 flex items-center justify-between">
+          <span className="text-[9px] font-medium uppercase tracking-wide text-white/60">
+            📐 Camera Angle
+          </span>
+          {selectedAngle && (
+            <span className="text-[8px] text-purple-400">✓ Selected</span>
+          )}
+        </div>
+        <div className="grid grid-cols-2 gap-1.5">
+          {cameraAngles.map((angle) => (
+            <SelectiveCard
+              key={angle.id}
+              id={angle.id}
+              name={angle.name}
+              description={angle.description}
+              image={angle.image}
+              isSelected={selectedAngle === angle.id}
+              onSelect={setSelectedAngle}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Pose Section */}
+      <div>
+        <div className="mb-1.5 flex items-center justify-between">
+          <span className="text-[9px] font-medium uppercase tracking-wide text-white/60">
+            🤲 Pose / Gesture
+          </span>
+          {selectedPose && (
+            <span className="text-[8px] text-purple-400">✓ Selected</span>
+          )}
+        </div>
+        <div className="grid grid-cols-2 gap-1.5">
+          {poses.map((pose) => (
+            <SelectiveCard
+              key={pose.id}
+              id={pose.id}
+              name={pose.name}
+              description={pose.description}
+              image={pose.image}
+              isSelected={selectedPose === pose.id}
+              onSelect={setSelectedPose}
             />
           ))}
         </div>

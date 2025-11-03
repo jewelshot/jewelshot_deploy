@@ -152,6 +152,114 @@ export const moods: SelectiveOption[] = [
   },
 ];
 
+// LIGHTING STYLE OPTIONS
+export const lightingStyles: SelectiveOption[] = [
+  {
+    id: 'lighting-soft-diffused',
+    name: 'Soft Diffused',
+    description: 'Gentle wrap-around',
+    image: '/selective/lighting/soft-diffused.svg',
+    prompt:
+      'Soft diffused lighting gentle wrap-around illumination. Large softbox or window light even distribution no harsh shadows. Flattering smooth quality tender feel. Multiple light sources balanced fill soft edges. Color temp 5500K neutral daylight accurate white balance.',
+  },
+  {
+    id: 'lighting-hard-directional',
+    name: 'Hard Directional',
+    description: 'Dramatic shadows',
+    image: '/selective/lighting/hard-directional.svg',
+    prompt:
+      'Hard directional lighting strong key light defined shadows. Single focused source 45-60 degree angle crisp edges. High contrast dramatic depth dimensional modeling. Minimal fill light preserved shadows strong visual impact. Powerful chiaroscuro effect sculpted forms.',
+  },
+  {
+    id: 'lighting-natural-window',
+    name: 'Natural Window',
+    description: 'Organic daylight',
+    image: '/selective/lighting/natural-window.svg',
+    prompt:
+      'Natural window light organic daylight soft indirect illumination. Large window diffused by sheer curtains gentle gradient. Authentic feel environmental realism warm inviting quality. Color temp 4800-5200K morning or afternoon golden light. Subtle shadows natural falloff organic atmosphere.',
+  },
+  {
+    id: 'lighting-studio-perfect',
+    name: 'Studio Perfect',
+    description: 'Technical precision',
+    image: '/selective/lighting/studio-perfect.svg',
+    prompt:
+      'Studio perfect lighting technical precision three-point setup. Key light 45 degree front diffused, fill light ambient wrap, rim light edge separation. Color temp 5500K precise neutral accurate. Controlled shadows 25% opacity soft gradation. Professional commercial catalog grade even illumination.',
+  },
+];
+
+// CAMERA ANGLE OPTIONS
+export const cameraAngles: SelectiveOption[] = [
+  {
+    id: 'angle-straight-on',
+    name: 'Straight On',
+    description: 'Direct frontal',
+    image: '/selective/angles/straight-on.svg',
+    prompt:
+      'Straight-on camera angle direct frontal view eye-level perspective. Camera perpendicular to subject 0-degree tilt centered composition. Clean symmetrical framing straightforward honest presentation. Product or model facing camera directly unobstructed clear view. Professional catalog commercial standard.',
+  },
+  {
+    id: 'angle-three-quarter',
+    name: 'Three-Quarter',
+    description: 'Dynamic depth',
+    image: '/selective/angles/three-quarter.svg',
+    prompt:
+      'Three-quarter camera angle 35-45 degree perspective dynamic depth. Shows top side and front simultaneously dimensional view. Most flattering revealing angle editorial standard. Creates visual interest depth perception sculptural quality. Rule-of-thirds composition engaging perspective.',
+  },
+  {
+    id: 'angle-profile-side',
+    name: 'Profile Side',
+    description: 'Elegant silhouette',
+    image: '/selective/angles/profile-side.svg',
+    prompt:
+      'Profile side camera angle 90-degree lateral perspective elegant silhouette. Shows full side view clean outline distinctive shape. Emphasizes contours lines and form dramatic presentation. Minimal distraction focused clean composition. Fashion editorial artistic sophisticated aesthetic.',
+  },
+  {
+    id: 'angle-top-down',
+    name: 'Top-Down',
+    description: 'Flat lay style',
+    image: '/selective/angles/top-down.svg',
+    prompt:
+      'Top-down camera angle overhead 90-degree flat lay perspective. Bird-eye view complete visibility all elements visible. Modern editorial Instagram aesthetic clean organized layout. Generous negative space minimal distraction focused composition. Contemporary minimalist presentation style.',
+  },
+];
+
+// POSE/GESTURE OPTIONS
+export const poses: SelectiveOption[] = [
+  {
+    id: 'pose-relaxed-natural',
+    name: 'Relaxed Natural',
+    description: 'Effortless ease',
+    image: '/selective/poses/relaxed-natural.svg',
+    prompt:
+      'Relaxed natural pose effortless ease casual comfort. Soft shoulders loose hands gentle expression authentic genuine. No tension organic positioning everyday realism. Approachable friendly inviting demeanor warm presence. Lifestyle aesthetic real-life candid moment unforced.',
+  },
+  {
+    id: 'pose-elegant-posed',
+    name: 'Elegant Posed',
+    description: 'Refined grace',
+    image: '/selective/poses/elegant-posed.svg',
+    prompt:
+      'Elegant posed gesture refined grace intentional positioning. Extended fingers architectural hand placement deliberate composition. Sophisticated poise timeless beauty classic editorial stance. Controlled graceful movements statuesque presence. High-fashion luxury aesthetic polished professional.',
+  },
+  {
+    id: 'pose-dynamic-motion',
+    name: 'Dynamic Motion',
+    description: 'Active energy',
+    image: '/selective/poses/dynamic-motion.svg',
+    prompt:
+      'Dynamic motion pose active energy movement captured mid-action. Hair movement fabric flow gesture in progress alive vibrant. Energetic contemporary modern editorial feel spontaneous authentic. Conveys vitality joy confidence bold presence. Fashion-forward youthful spirited aesthetic.',
+  },
+  {
+    id: 'pose-close-detail',
+    name: 'Close Detail',
+    description: 'Intimate focus',
+    image: '/selective/poses/close-detail.svg',
+    prompt:
+      'Close detail pose intimate focus macro perspective tight framing. Jewelry primary subject hand or body supporting minimal. Extreme proximity reveals craftsmanship textures details. Controlled minimal movement precise positioning product hero. Commercial product-focused editorial catalog quality.',
+  },
+];
+
 // BUILD SELECTIVE PROMPT
 export function buildSelectivePrompt(
   jewelryType: string,
@@ -159,6 +267,9 @@ export function buildSelectivePrompt(
   modelId: string,
   locationId: string,
   moodId: string,
+  lightingId: string,
+  angleId: string,
+  poseId: string,
   aspectRatio: string = '9:16'
 ): string {
   // Get selected options
@@ -166,13 +277,23 @@ export function buildSelectivePrompt(
   const selectedModel = modelOptions.find((m) => m.id === modelId);
   const selectedLocation = locations.find((l) => l.id === locationId);
   const selectedMood = moods.find((m) => m.id === moodId);
+  const selectedLighting = lightingStyles.find((l) => l.id === lightingId);
+  const selectedAngle = cameraAngles.find((a) => a.id === angleId);
+  const selectedPose = poses.find((p) => p.id === poseId);
 
-  if (!selectedModel || !selectedLocation || !selectedMood) {
+  if (
+    !selectedModel ||
+    !selectedLocation ||
+    !selectedMood ||
+    !selectedLighting ||
+    !selectedAngle ||
+    !selectedPose
+  ) {
     throw new Error('Invalid selective options');
   }
 
   // Build comprehensive prompt
-  return `Professional editorial ${jewelryType} photography. ${selectedModel.name} in ${selectedLocation.name} setting. ${selectedMood.name} mood aesthetic.
+  return `Professional editorial ${jewelryType} photography. ${selectedModel.name} in ${selectedLocation.name} setting. ${selectedMood.name} mood. ${selectedLighting.name} lighting. ${selectedAngle.name} angle. ${selectedPose.name} pose.
 
 CRITICAL PRESERVATION - ZERO TOLERANCE:
 EXACT jewelry structure geometry shape form UNCHANGED pixel-perfect
@@ -199,6 +320,15 @@ ${selectedLocation.prompt}
 MOOD & ATMOSPHERE:
 ${selectedMood.prompt}
 
+LIGHTING STYLE:
+${selectedLighting.prompt}
+
+CAMERA ANGLE & PERSPECTIVE:
+${selectedAngle.prompt}
+
+POSE & GESTURE:
+${selectedPose.prompt}
+
 JEWELRY PLACEMENT & STYLING:
 Jewelry hero primary focus naturally worn prominently visible
 ${jewelryType === 'ring' ? 'Hand elegant gesture fingers extended naturally' : ''}
@@ -207,17 +337,11 @@ ${jewelryType === 'earring' ? 'Head angle ear visible jewelry prominent' : ''}
 ${jewelryType === 'bracelet' ? 'Wrist arm positioned showcase display' : ''}
 Product centered clear unobstructed view sharp focus
 
-LIGHTING & TECHNICAL:
-Professional lighting setup flattering controlled quality
-Color accurate white balance 5500K neutral daylight
-Soft shadows dimensional depth natural wrap-around
-Jewelry highlighted model complemented balanced exposure
-
 COMPOSITION & FRAMING:
-Editorial composition rule-of-thirds intentional negative space
-Medium shot jewelry prominent model supporting context
-Clean framing balanced visual weight professional grade
-Background supporting jewelry hero uncluttered refined
+Editorial composition intentional negative space professional grade
+Jewelry prominent model supporting context balanced visual weight
+Clean framing refined presentation uncluttered background
+Supporting jewelry hero focused controlled refined
 
 FOCUS & SHARPNESS - MANDATORY:
 PRIMARY FOCUS: Jewelry product ultra-sharp f/4-f/5.6 aperture
