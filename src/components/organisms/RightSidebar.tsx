@@ -11,6 +11,7 @@ import React, { useState } from 'react';
 import { useSidebarStore } from '@/store/sidebarStore';
 import { ConfigurationAccordion } from '@/components/molecules/ConfigurationAccordion';
 import { QuickModeContent } from '@/components/molecules/QuickModeContent';
+import { SelectiveModeContent } from '@/components/molecules/SelectiveModeContent';
 import { PresetConfirmModal } from '@/components/molecules/PresetConfirmModal';
 import { presetPrompts } from '@/lib/preset-prompts';
 
@@ -206,11 +207,12 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
             <QuickModeContent onPresetSelect={handlePresetSelect} />
           )}
           {activeMode === 'selective' && (
-            <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3">
-              <p className="text-[9px] text-white/40">
-                Selective options coming soon...
-              </p>
-            </div>
+            <SelectiveModeContent
+              gender={gender}
+              jewelryType={jewelryType}
+              aspectRatio={aspectRatio}
+              onGenerate={onGenerateWithPreset}
+            />
           )}
           {activeMode === 'advanced' && (
             <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3">
