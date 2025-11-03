@@ -31,6 +31,18 @@ const jewelryOptions = [
   { value: 'earring', label: 'Earring' },
 ];
 
+// Aspect ratio options
+const aspectRatioOptions = [
+  { value: '1:1', label: '1:1', description: 'Square' },
+  { value: '4:5', label: '4:5', description: 'Portrait' },
+  { value: '3:4', label: '3:4', description: 'Classic' },
+  { value: '2:3', label: '2:3', description: 'Standard' },
+  { value: '9:16', label: '9:16', description: 'Story' },
+  { value: '16:9', label: '16:9', description: 'Landscape' },
+  { value: '21:9', label: '21:9', description: 'Ultrawide' },
+  { value: '4:3', label: '4:3', description: 'Classic' },
+];
+
 interface RightSidebarProps {
   onGenerateWithPreset?: (prompt: string) => void;
 }
@@ -41,6 +53,7 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
   // Selection states
   const [gender, setGender] = useState<Gender>(null);
   const [jewelryType, setJewelryType] = useState<JewelryType>(null);
+  const [aspectRatio, setAspectRatio] = useState<string>('9:16'); // Default: 9:16
   const [activeMode, setActiveMode] = useState<Mode>('quick');
 
   // Modal state
@@ -75,7 +88,11 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
     if (!confirmModal || !jewelryType) return;
 
     const preset = presetPrompts[confirmModal.presetId];
-    const prompt = preset.buildPrompt(jewelryType, gender || undefined);
+    const prompt = preset.buildPrompt(
+      jewelryType,
+      gender || undefined,
+      aspectRatio
+    );
 
     // Close modal
     setConfirmModal(null);
@@ -101,6 +118,34 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
             genderOptions={genderOptions}
             jewelryOptions={jewelryOptions}
           />
+        </div>
+
+        {/* Aspect Ratio Selection */}
+        <div className="mb-2">
+          <div className="mb-1.5 flex items-center justify-between">
+            <span className="text-[9px] font-medium uppercase tracking-wide text-white/60">
+              Aspect Ratio
+            </span>
+            <span className="text-[9px] text-white/40">{aspectRatio}</span>
+          </div>
+          <div className="grid grid-cols-4 gap-1">
+            {aspectRatioOptions.map((option) => (
+              <button
+                key={option.value}
+                onClick={() => setAspectRatio(option.value)}
+                className={`rounded border px-1.5 py-1 text-[9px] font-medium transition-all duration-200 ${
+                  aspectRatio === option.value
+                    ? 'border-purple-500/50 bg-purple-500/20 text-purple-300'
+                    : 'border-white/10 bg-white/[0.02] text-white/60 hover:border-white/20 hover:bg-white/[0.05] hover:text-white'
+                }`}
+              >
+                <div className="font-semibold">{option.label}</div>
+                <div className="text-[7px] text-white/40">
+                  {option.description}
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Divider */}
