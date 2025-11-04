@@ -1,0 +1,195 @@
+// NEW CANVAS.TSX RETURN STATEMENT (after line 698)
+
+  return (
+    <>
+      {/* File Input (keep - needed for file uploads) */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+        className="hidden"
+      />
+
+      {/* ===================================================================
+          REFACTORED: Canvas Core - Image Rendering Engine
+          ================================================================= */}
+      <CanvasCore
+        uploadedImage={uploadedImage}
+        originalImage={originalImage}
+        isLoading={isLoading}
+        isAIEditing={isAIEditing}
+        isAIImageLoading={isAIImageLoading}
+        aiProgress={aiProgress}
+        viewMode={viewMode}
+        activeImage={activeImage}
+        onActiveImageChange={setActiveImage}
+        scale={scale}
+        position={position}
+        onScaleChange={setScale}
+        onPositionChange={setPosition}
+        leftImageScale={leftImageScale}
+        leftImagePosition={leftImagePosition}
+        onLeftImageScaleChange={setLeftImageScale}
+        onLeftImagePositionChange={setLeftImagePosition}
+        rightImageScale={rightImageScale}
+        rightImagePosition={rightImagePosition}
+        onRightImageScaleChange={setRightImageScale}
+        onRightImagePositionChange={setRightImagePosition}
+        transform={transform}
+        adjustFilters={adjustFilters}
+        colorFilters={colorFilters}
+        filterEffects={filterEffects}
+        background={background}
+        canvasControlsVisible={canvasControlsVisible}
+        isPromptExpanded={isPromptExpanded}
+        leftOpen={leftOpen}
+        rightOpen={rightOpen}
+        topOpen={topOpen}
+        bottomOpen={bottomOpen}
+        leftPos={leftPos}
+        rightPos={rightPos}
+        topPos={topPos}
+        bottomPos={bottomPos}
+        imagePadding={imagePadding}
+        backgroundStyles={backgroundStyles}
+        onImageLoad={handleAIImageLoad}
+        onImageError={handleAIImageError}
+        onUploadClick={handleUploadClick}
+      />
+
+      {/* ===================================================================
+          REFACTORED: Canvas Controls - All UI Controls
+          ================================================================= */}
+      {uploadedImage && (
+        <CanvasControls
+          hasImage={!!uploadedImage}
+          fileName={fileName}
+          fileSize={fileSize}
+          isAIEditing={isAIEditing}
+          aiProgress={aiProgress}
+          scale={scale}
+          leftImageScale={leftImageScale}
+          rightImageScale={rightImageScale}
+          viewMode={viewMode}
+          activeImage={activeImage}
+          hasOriginalImage={!!originalImage}
+          leftOpen={leftOpen}
+          rightOpen={rightOpen}
+          topOpen={topOpen}
+          bottomOpen={bottomOpen}
+          allBarsOpen={allBarsOpen}
+          controlsVisible={canvasControlsVisible}
+          isFullscreen={isFullscreen}
+          isEditPanelOpen={isEditPanelOpen}
+          isPromptExpanded={isPromptExpanded}
+          background={background}
+          onZoomIn={handleZoomIn}
+          onZoomOut={handleZoomOut}
+          onFitScreen={handleFitScreen}
+          onToggleAllBars={toggleAll}
+          onToggleFullscreen={toggleFullscreen}
+          onToggleUI={() => setCanvasControlsVisible(!canvasControlsVisible)}
+          onToggleEditPanel={handleToggleEditPanel}
+          onCloseImage={handleCloseImage}
+          onDelete={handleDelete}
+          onSave={handleSave}
+          onDownload={handleDownload}
+          onBackgroundChange={setBackground}
+          onViewModeChange={setViewMode}
+          onImageEdited={(url) => setUploadedImage(url)}
+          onAIError={(error) => showToast(error.message, 'error')}
+          onPromptExpandedChange={setIsPromptExpanded}
+          currentImageUrl={uploadedImage || ''}
+        />
+      )}
+
+      {/* ===================================================================
+          REFACTORED: AI Edit Manager - AI Generation Logic
+          ================================================================= */}
+      <AIEditManager
+        uploadedImage={uploadedImage}
+        fileName={fileName}
+        onImageUpdate={setUploadedImage}
+        onOriginalImageSet={setOriginalImage}
+        onLoadingChange={setIsAIImageLoading}
+        onSuccess={(msg) => showToast(msg, 'success')}
+        onError={(msg) => showToast(msg, 'error')}
+      />
+
+      {/* ===================================================================
+          REFACTORED: Canvas Modals - All Modal Components
+          ================================================================= */}
+      <CanvasModals
+        isCropMode={isCropMode}
+        cropRatio={cropRatio}
+        uploadedImage={uploadedImage}
+        onCropApply={handleCropApply}
+        onCropCancel={handleCropCancel}
+        showKeyboardHelp={showKeyboardHelp}
+        onCloseKeyboardHelp={() => setShowKeyboardHelp(false)}
+        isEditPanelOpen={isEditPanelOpen}
+        onEditPanelClose={() => setIsEditPanelOpen(false)}
+        leftOpen={leftOpen}
+        topOpen={topOpen}
+        onCropRatioChange={handleCropRatioChange}
+        transform={transform}
+        onTransformChange={(transformData) => {
+          setTransform({
+            rotation: transformData.rotation,
+            flipHorizontal: transformData.flipHorizontal,
+            flipVertical: transformData.flipVertical,
+          });
+        }}
+        adjustFilters={adjustFilters}
+        onAdjustFiltersChange={(filters) => {
+          setAdjustFilters({
+            brightness: filters.brightness,
+            contrast: filters.contrast,
+            exposure: filters.exposure,
+            highlights: filters.highlights,
+            shadows: filters.shadows,
+            whites: filters.whites,
+            blacks: filters.blacks,
+            clarity: filters.clarity,
+            sharpness: filters.sharpness,
+            dehaze: filters.dehaze,
+          });
+        }}
+        colorFilters={colorFilters}
+        onColorFiltersChange={(filters) => {
+          setColorFilters({
+            temperature: filters.temperature || 0,
+            tint: filters.tint || 0,
+            saturation: filters.saturation || 0,
+            vibrance: filters.vibrance || 0,
+          });
+        }}
+        filterEffects={filterEffects}
+        onFilterEffectsChange={(effects) => {
+          setFilterEffects({
+            vignetteAmount: effects.vignetteAmount || 0,
+            vignetteSize: effects.vignetteSize || 50,
+            vignetteFeather: effects.vignetteFeather || 50,
+            grainAmount: effects.grainAmount || 0,
+            grainSize: effects.grainSize || 50,
+            fadeAmount: effects.fadeAmount || 0,
+          });
+        }}
+        isLoading={isLoading}
+      />
+
+      {/* Toast Notifications (managed by useToast hook) */}
+      {toastState.visible && (
+        <Toast
+          message={toastState.message}
+          type={toastState.type}
+          onClose={hideToast}
+        />
+      )}
+    </>
+  );
+}
+
+export default Canvas;
+
