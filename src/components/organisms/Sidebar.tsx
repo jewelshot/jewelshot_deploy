@@ -18,19 +18,11 @@ import { usePathname } from 'next/navigation';
 import { useSidebarStore } from '@/store/sidebarStore';
 import SidebarLogo from '@/components/molecules/SidebarLogo';
 import NavigationItem from '@/components/molecules/NavigationItem';
-import SectionHeader from '@/components/atoms/SectionHeader';
 import UserProfile from '@/components/molecules/UserProfile';
 import {
   Home,
   Palette,
   Image,
-  FolderOpen,
-  Sparkles,
-  Scissors,
-  Droplet,
-  Zap,
-  Settings,
-  CreditCard,
 } from 'lucide-react';
 
 // Tools section (Coming Soon - All tools are integrated in Studio)
