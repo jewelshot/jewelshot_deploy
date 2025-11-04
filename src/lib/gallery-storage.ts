@@ -130,7 +130,7 @@ export async function saveImageToGallery(
 }
 
 /**
- * Save image to Supabase
+ * Save image to Supabase (uploads to Storage + saves metadata)
  */
 async function saveToSupabase(
   src: string,
@@ -147,15 +147,59 @@ async function saveToSupabase(
     } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
-    // Insert image record
+    // Download the image from the external URL (FAL.AI or data URL)
+    let blob: Blob;
+    let actualFileSize = options?.fileSize || 0;
+
+    if (src.startsWith('data:')) {
+      // Data URL (uploaded file)
+      const response = await fetch(src);
+      blob = await response.blob();
+      actualFileSize = blob.size;
+    } else {
+      // External URL (FAL.AI)
+      const response = await fetch(src);
+      if (!response.ok) {
+        throw new Error('Failed to fetch image from URL');
+      }
+      blob = await response.blob();
+      actualFileSize = blob.size;
+    }
+
+    // Generate unique filename
+    const timestamp = Date.now();
+    const randomId = Math.random().toString(36).substring(2, 9);
+    const extension = blob.type.split('/')[1] || 'jpg';
+    const fileName = `${user.id}/${timestamp}_${randomId}.${extension}`;
+
+    // Upload to Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('images')
+      .upload(fileName, blob, {
+        contentType: blob.type,
+        cacheControl: '3600',
+        upsert: false,
+      });
+
+    if (uploadError) {
+      logger.error('Failed to upload image to storage:', uploadError);
+      throw new Error('Failed to upload image to storage');
+    }
+
+    // Get public URL
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from('images').getPublicUrl(uploadData.path);
+
+    // Insert image record with Storage URL
     const { data, error } = await supabase
       .from('images')
       .insert({
         user_id: user.id,
-        original_url: src,
-        generated_url: src,
+        original_url: src.startsWith('data:') ? publicUrl : src, // Keep FAL.AI URL as original
+        generated_url: publicUrl, // Use Storage URL for generated
         name: alt,
-        size: options?.fileSize || 0,
+        size: actualFileSize,
         prompt: options?.prompt || null,
         style: options?.style || null,
       })
@@ -163,9 +207,16 @@ async function saveToSupabase(
       .single();
 
     if (error) {
-      logger.error('Failed to save image to Supabase:', error);
+      // Cleanup: Delete uploaded file if DB insert fails
+      await supabase.storage.from('images').remove([uploadData.path]);
+      logger.error('Failed to save image to database:', error);
       throw new Error('Failed to save image to gallery');
     }
+
+    logger.info('✅ Image saved to Supabase:', {
+      id: data.id,
+      storageUrl: publicUrl,
+    });
 
     return {
       id: data.id,
@@ -178,7 +229,9 @@ async function saveToSupabase(
     };
   } catch (error) {
     logger.error('Error saving to Supabase:', error);
-    throw new Error('Failed to save image. Please try again.');
+    const message =
+      error instanceof Error ? error.message : 'Failed to save image';
+    throw new Error(message);
   }
 }
 

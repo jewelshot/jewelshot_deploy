@@ -303,28 +303,28 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
     }
 
     try {
-      // Save to gallery
-      await Promise.resolve().then(() => {
-        rateLimiters.gallery.recordRequest();
+      // Record rate limit before async operation
+      rateLimiters.gallery.recordRequest();
 
-        const savedImage = saveImageToGallery(
-          uploadedImage,
-          fileName || 'edited-image.jpg',
-          originalImage ? 'ai-edited' : 'manual'
-        );
+      // Save to gallery (await the async function)
+      const savedImage = await saveImageToGallery(
+        uploadedImage,
+        fileName || 'edited-image.jpg',
+        originalImage ? 'ai-edited' : 'manual'
+      );
 
-        if (!savedImage) {
-          throw new Error('Failed to save image');
-        }
+      if (!savedImage) {
+        throw new Error('Failed to save image');
+      }
 
-        // Dispatch custom event for gallery sync
-        window.dispatchEvent(new Event('gallery-updated'));
+      // Dispatch custom event for gallery sync
+      window.dispatchEvent(new Event('gallery-updated'));
 
-        showToast('Image saved to gallery!', 'success');
-      });
+      showToast('Image saved to gallery!', 'success');
     } catch (error) {
       logger.error('Failed to save image:', error);
-      showToast('Failed to save image to gallery', 'error');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to save image to gallery';
+      showToast(errorMessage, 'error');
     }
   }, [uploadedImage, fileName, originalImage, showToast]);
 
