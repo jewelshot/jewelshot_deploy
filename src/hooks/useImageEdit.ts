@@ -6,7 +6,7 @@
 
 import { useState, useCallback } from 'react';
 import { editImage, type EditInput, type FalOutput } from '@/lib/ai/fal-client';
-import { aiRateLimiter } from '@/lib/rate-limiter';
+import { rateLimiters } from '@/lib/rate-limiter';
 
 interface UseImageEditOptions {
   onSuccess?: (result: FalOutput) => void;
@@ -22,10 +22,10 @@ export function useImageEdit(options?: UseImageEditOptions) {
   const edit = useCallback(
     async (input: EditInput) => {
       // Rate limit check
-      if (!aiRateLimiter.canMakeRequest()) {
-        const waitTime = Math.ceil(aiRateLimiter.getTimeUntilReset() / 1000);
+      if (!rateLimiters.ai.canMakeRequest()) {
+        const remaining = rateLimiters.ai.getRemainingRequests();
         const error = new Error(
-          `Rate limit exceeded. Please wait ${waitTime}s.`
+          `Rate limit exceeded. You have ${remaining} requests remaining.`
         );
         setError(error);
         options?.onError?.(error);
@@ -38,7 +38,7 @@ export function useImageEdit(options?: UseImageEditOptions) {
       setResult(null);
 
       try {
-        aiRateLimiter.recordRequest();
+        rateLimiters.ai.recordRequest();
 
         const output = await editImage(input, (status, message) => {
           setProgress(message || status);

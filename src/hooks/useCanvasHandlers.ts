@@ -9,14 +9,14 @@ import { useCallback, RefObject } from 'react';
 import { useRouter } from 'next/navigation';
 import { createScopedLogger } from '@/lib/logger';
 import { validateFile } from '@/lib/validators';
-import { uploadRateLimiter, galleryRateLimiter } from '@/lib/rate-limiter';
+import { rateLimiters } from '@/lib/rate-limiter';
 import { saveImageToGallery } from '@/lib/gallery-storage';
 
 const logger = createScopedLogger('CanvasHandlers');
 
 interface UseCanvasHandlersProps {
   // Refs
-  fileInputRef: RefObject<HTMLInputElement>;
+  fileInputRef: RefObject<HTMLInputElement | null>;
 
   // Image state
   uploadedImage: string | null;
@@ -123,10 +123,10 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
       if (!file) return;
 
       // Check rate limit
-      const rateLimit = uploadRateLimiter.checkLimit();
-      if (!rateLimit.allowed) {
+      if (!rateLimiters.upload.canMakeRequest()) {
+        const remaining = rateLimiters.upload.getRemainingRequests();
         showToast(
-          `Too many uploads. Please wait ${rateLimit.retryAfter} seconds.`,
+          `Too many uploads. ${remaining} uploads remaining in this time window.`,
           'warning'
         );
         return;
@@ -147,7 +147,7 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
       }
 
       // Record successful upload
-      uploadRateLimiter.recordRequest();
+      rateLimiters.upload.recordRequest();
 
       setIsLoading(true);
       setFileName(file.name);
@@ -293,10 +293,10 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
     if (!uploadedImage) return;
 
     // Check rate limit
-    const rateLimit = galleryRateLimiter.checkLimit();
-    if (!rateLimit.allowed) {
+    if (!rateLimiters.gallery.canMakeRequest()) {
+      const remaining = rateLimiters.gallery.getRemainingRequests();
       showToast(
-        `Too many saves. Please wait ${rateLimit.retryAfter} seconds.`,
+        `Too many saves. ${remaining} saves remaining.`,
         'warning'
       );
       return;
@@ -305,7 +305,7 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
     try {
       // Save to gallery
       await Promise.resolve().then(() => {
-        galleryRateLimiter.recordRequest();
+        rateLimiters.gallery.recordRequest();
 
         const savedImage = saveImageToGallery(
           uploadedImage,

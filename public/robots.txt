@@ -1,0 +1,16 @@
+# Jewelshot Studio - Robots.txt
+
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Disallow admin and API routes
+Disallow: /api/
+Disallow: /auth/callback
+
+# Sitemap location
+Sitemap: https://jewelshot.com/sitemap.xml
+
+# Crawl delay (optional, be nice to servers)
+Crawl-delay: 1
+

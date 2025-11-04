@@ -143,3 +143,9 @@ export function FiltersPanel({ onFilterChange }: FiltersPanelProps) {
 }
 
 export default FiltersPanel;
+
+
+
+
+
+

@@ -76,7 +76,7 @@ export function CropFrame({
   // Set container ref on mount
   useEffect(() => {
     if (frameRef.current) {
-      containerRef.current = frameRef.current.parentElement;
+      containerRef.current = frameRef.current.parentElement as HTMLDivElement | null;
     }
   }, []);
 

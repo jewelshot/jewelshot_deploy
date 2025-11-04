@@ -226,3 +226,9 @@ export function calculateScaleParams(clarityAmount: number): {
     return { numScales: 3, baseRadius: 4 };
   }
 }
+
+
+
+
+
+

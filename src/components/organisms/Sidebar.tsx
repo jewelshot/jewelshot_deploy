@@ -76,8 +76,9 @@ export function Sidebar() {
   useEffect(() => {
     const updateCount = () => {
       if (typeof window !== 'undefined') {
-        import('@/lib/gallery-storage').then(({ getGalleryImageCount }) => {
-          setGalleryCount(getGalleryImageCount());
+        import('@/lib/gallery-storage').then(async ({ getGalleryImageCount }) => {
+          const count = await getGalleryImageCount();
+          setGalleryCount(count);
         });
       }
     };

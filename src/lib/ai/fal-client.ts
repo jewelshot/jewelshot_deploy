@@ -1,41 +1,19 @@
 /**
  * ============================================================================
- * FAL.AI CLIENT - CLEAN & MINIMAL IMPLEMENTATION
+ * FAL.AI CLIENT - SECURE API PROXY IMPLEMENTATION
  * ============================================================================
  *
- * This is a fresh, minimal integration with fal.ai Nano Banana API.
- * Following the official documentation exactly:
- * https://fal.ai/models/fal-ai/nano-banana
- * https://fal.ai/models/fal-ai/nano-banana/edit
+ * Client-side wrapper that calls Next.js API routes (server-side proxy)
+ * This keeps the FAL.AI API key secure on the server
+ *
+ * API Routes:
+ * - /api/ai/generate - Text-to-image generation
+ * - /api/ai/edit - Image-to-image editing
  */
 
-import { fal } from '@fal-ai/client';
 import { createScopedLogger } from '@/lib/logger';
 
 const logger = createScopedLogger('FAL.AI');
-
-// ============================================================================
-// CONFIGURATION
-// ============================================================================
-
-/**
- * Initialize fal.ai client with API key
- */
-function initializeFalClient() {
-  const apiKey = process.env.NEXT_PUBLIC_FAL_KEY;
-
-  if (!apiKey) {
-    logger.warn('⚠️ FAL_KEY not found. AI features will be disabled.');
-    return;
-  }
-
-  fal.config({
-    credentials: apiKey,
-  });
-}
-
-// Auto-initialize on import
-initializeFalClient();
 
 // ============================================================================
 // TYPES - Based on official fal.ai documentation
@@ -89,40 +67,18 @@ export interface FalOutput {
 export type ProgressCallback = (status: string, message?: string) => void;
 
 // ============================================================================
-// HELPER FUNCTIONS
+// CONFIGURATION
 // ============================================================================
 
-/**
- * Upload a data URI or blob to fal.ai storage
- * Only uploads if it's a base64 data URI, otherwise returns the URL as-is
- */
-async function uploadIfNeeded(imageUrl: string): Promise<string> {
-  // If it's already a URL, return it
-  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-    return imageUrl;
-  }
-
-  // If it's a data URI, upload it
-  if (imageUrl.startsWith('data:')) {
-    // Convert data URI to Blob
-    const response = await fetch(imageUrl);
-    const blob = await response.blob();
-    const file = new File([blob], 'image.jpg', { type: blob.type });
-
-    // Upload to fal.ai storage
-    const uploadedUrl = await fal.storage.upload(file);
-    return uploadedUrl;
-  }
-
-  throw new Error('Invalid image URL format');
-}
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
 // ============================================================================
 // TEXT-TO-IMAGE GENERATION
 // ============================================================================
 
 /**
- * Generate image from text prompt
+ * Generate image from text prompt (via API proxy)
  *
  * @example
  * ```ts
@@ -140,29 +96,29 @@ export async function generateImage(
   try {
     if (onProgress) onProgress('INITIALIZING', 'Starting generation...');
 
-    const result = await fal.subscribe('fal-ai/nano-banana', {
-      input: {
+    const response = await fetch(`${API_BASE_URL}/api/ai/generate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
         prompt: input.prompt,
         num_images: input.num_images ?? 1,
         output_format: input.output_format ?? 'jpeg',
         aspect_ratio: input.aspect_ratio ?? '1:1',
-      },
-      logs: true,
-      onQueueUpdate: (update) => {
-        if (onProgress) {
-          if (update.status === 'IN_QUEUE') {
-            onProgress('IN_QUEUE', 'Waiting in queue...');
-          } else if (update.status === 'IN_PROGRESS') {
-            const lastLog = update.logs?.[update.logs.length - 1];
-            onProgress('IN_PROGRESS', lastLog?.message || 'Generating...');
-          } else if (update.status === 'COMPLETED') {
-            onProgress('COMPLETED', 'Generation complete!');
-          }
-        }
-      },
+      }),
     });
 
-    return result.data as FalOutput;
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to generate image');
+    }
+
+    const result = await response.json();
+
+    if (onProgress) onProgress('COMPLETED', 'Generation complete!');
+
+    return result as FalOutput;
   } catch (error) {
     logger.error('❌ Generation failed:', error);
     throw error;
@@ -174,7 +130,7 @@ export async function generateImage(
 // ============================================================================
 
 /**
- * Edit existing image with AI
+ * Edit existing image with AI (via API proxy)
  *
  * @example
  * ```ts
@@ -190,44 +146,33 @@ export async function editImage(
   onProgress?: ProgressCallback
 ): Promise<FalOutput> {
   try {
-    // Step 1: Upload image if needed
-    if (onProgress) onProgress('UPLOADING', 'Uploading image...');
+    if (onProgress) onProgress('UPLOADING', 'Preparing image...');
 
-    const uploadedUrl = await uploadIfNeeded(input.image_url);
-    logger.debug('✅ Image uploaded:', uploadedUrl);
-
-    // Step 2: Call edit API
-    if (onProgress) onProgress('EDITING', 'Processing with AI...');
-
-    // Build the API request - exactly as per documentation
-    const apiRequest = {
-      prompt: input.prompt,
-      image_urls: [uploadedUrl], // Edit API expects an array
-      num_images: input.num_images ?? 1,
-      output_format: input.output_format ?? 'jpeg',
-    };
-
-    logger.debug('🚀 Calling fal-ai/nano-banana/edit with:', apiRequest);
-
-    const result = await fal.subscribe('fal-ai/nano-banana/edit', {
-      input: apiRequest,
-      logs: true,
-      onQueueUpdate: (update) => {
-        if (onProgress) {
-          if (update.status === 'IN_QUEUE') {
-            onProgress('IN_QUEUE', 'Waiting in queue...');
-          } else if (update.status === 'IN_PROGRESS') {
-            const lastLog = update.logs?.[update.logs.length - 1];
-            onProgress('IN_PROGRESS', lastLog?.message || 'Editing...');
-          } else if (update.status === 'COMPLETED') {
-            onProgress('COMPLETED', 'Edit complete!');
-          }
-        }
+    const response = await fetch(`${API_BASE_URL}/api/ai/edit`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify({
+        prompt: input.prompt,
+        image_url: input.image_url,
+        num_images: input.num_images ?? 1,
+        output_format: input.output_format ?? 'jpeg',
+      }),
     });
 
-    logger.debug('✅ Edit successful:', result.data);
-    return result.data as FalOutput;
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to edit image');
+    }
+
+    if (onProgress) onProgress('EDITING', 'Processing with AI...');
+
+    const result = await response.json();
+
+    if (onProgress) onProgress('COMPLETED', 'Edit complete!');
+
+    return result as FalOutput;
   } catch (error) {
     logger.error('❌ Edit failed:', error);
     throw error;
@@ -235,8 +180,8 @@ export async function editImage(
 }
 
 /**
- * Check if fal.ai is configured
+ * Check if fal.ai is configured (always true since it's server-side now)
  */
 export function isFalConfigured(): boolean {
-  return !!process.env.NEXT_PUBLIC_FAL_KEY;
+  return true; // Server-side API key, always available
 }

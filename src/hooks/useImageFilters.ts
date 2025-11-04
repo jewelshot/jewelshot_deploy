@@ -125,7 +125,7 @@ export function useImageFilters(): ImageFiltersState {
   // Load last saved filters on mount
   const [adjustFilters, setAdjustFilters] = useState<AdjustFilters>(() => {
     const saved = loadLastFilters();
-    return saved?.adjust || DEFAULT_ADJUST_FILTERS;
+    return (saved?.adjust || DEFAULT_ADJUST_FILTERS) as AdjustFilters;
   });
   const [colorFilters, setColorFilters] = useState<ColorFilters>(() => {
     const saved = loadLastFilters();

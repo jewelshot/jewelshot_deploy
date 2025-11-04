@@ -122,7 +122,10 @@ export function ToastContainer() {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   useEffect(() => {
-    return toastManager.subscribe(setToasts);
+    const unsubscribe = toastManager.subscribe(setToasts);
+    return () => {
+      if (typeof unsubscribe === 'function') unsubscribe();
+    };
   }, []);
 
   if (toasts.length === 0) return null;
@@ -142,3 +145,9 @@ export function ToastContainer() {
 }
 
 export default ToastContainer;
+
+
+
+
+
+

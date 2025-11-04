@@ -291,3 +291,9 @@ The app will automatically migrate existing localStorage data to Supabase when u
 - [Supabase Docs](https://supabase.com/docs)
 - [Next.js SSR Guide](https://supabase.com/docs/guides/auth/server-side/nextjs)
 - [RLS Policies](https://supabase.com/docs/guides/auth/row-level-security)
+
+
+
+
+
+

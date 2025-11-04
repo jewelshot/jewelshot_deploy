@@ -216,10 +216,10 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     isFullscreen,
     setIsFullscreen,
     isCropMode,
-    adjustFilters,
-    colorFilters,
-    filterEffects,
-    transform,
+    adjustFilters: adjustFilters as any,
+    colorFilters: colorFilters as any,
+    filterEffects: filterEffects as any,
+    transform: transform as any,
     viewMode,
     activeImage,
     leftImageScale,
@@ -797,13 +797,13 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
                           sharpness: 0,
                           dehaze: 0,
                         }}
-                        colorFilters={{ temperature: 0, tint: 0 }}
+                        colorFilters={{ temperature: 0, tint: 0 } as any}
                         filterEffects={{
                           blur: 0,
                           grayscale: 0,
                           sepia: 0,
                           invert: 0,
-                        }}
+                        } as any}
                         isAIProcessing={false}
                         aiProgress=""
                         onImageLoad={() => {}}

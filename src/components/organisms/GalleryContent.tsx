@@ -22,8 +22,8 @@ export function GalleryContent() {
 
   // Load images from localStorage
   useEffect(() => {
-    const loadImages = () => {
-      const saved = getSavedImages();
+    const loadImages = async () => {
+      const saved = await getSavedImages();
       setImages(saved);
     };
 

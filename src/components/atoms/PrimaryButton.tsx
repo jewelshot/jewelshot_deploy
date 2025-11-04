@@ -9,6 +9,8 @@ interface PrimaryButtonProps {
   size?: 'sm' | 'md' | 'lg';
   variant?: 'primary' | 'secondary' | 'ghost';
   className?: string;
+  type?: 'button' | 'submit' | 'reset';
+  disabled?: boolean;
 }
 
 /**
@@ -23,6 +25,8 @@ export function PrimaryButton({
   size = 'md',
   variant = 'primary',
   className = '',
+  type = 'button',
+  disabled = false,
 }: PrimaryButtonProps) {
   const sizeClasses = {
     sm: 'px-4 py-2 text-sm',
@@ -63,8 +67,14 @@ export function PrimaryButton({
   }
 
   return (
-    <button onClick={onClick} className={baseClasses}>
+    <button onClick={onClick} type={type} disabled={disabled} className={baseClasses}>
       {content}
     </button>
   );
 }
+
+
+
+
+
+

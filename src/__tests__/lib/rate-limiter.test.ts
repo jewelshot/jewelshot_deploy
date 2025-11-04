@@ -286,3 +286,9 @@ describe('formatWaitTime', () => {
     expect(formatWaitTime(90)).toBe('2 minutes'); // Rounds up
   });
 });
+
+
+
+
+
+
