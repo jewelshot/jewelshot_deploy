@@ -75,7 +75,8 @@ function VerifyEmailContent() {
       }
 
       // Check if email is verified
-      const isVerified = user?.email_confirmed_at || (user as any)?.confirmed_at;
+      const isVerified = user?.email_confirmed_at || 
+        ('confirmed_at' in (user || {}) && (user as { confirmed_at?: string })?.confirmed_at);
 
       if (isVerified) {
         setMessage('✅ Email verified! Redirecting...');

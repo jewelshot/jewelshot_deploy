@@ -55,7 +55,8 @@ export async function middleware(request: NextRequest) {
   if (user && isProtectedPath && !isVerifyEmailPage) {
     // Check if email is confirmed
     // Supabase returns confirmed_at or email_confirmed_at depending on version
-    const isEmailVerified = user.email_confirmed_at || (user as any).confirmed_at;
+    const isEmailVerified = user.email_confirmed_at || 
+      ('confirmed_at' in user && (user as { confirmed_at?: string }).confirmed_at);
     
     if (!isEmailVerified) {
       const url = request.nextUrl.clone();

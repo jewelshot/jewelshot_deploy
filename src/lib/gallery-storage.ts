@@ -7,7 +7,7 @@
 
 import { createClient } from './supabase/client';
 import { createScopedLogger } from './logger';
-import type { Image } from './supabase/types';
+import type { Image, Database } from './supabase/types';
 
 const logger = createScopedLogger('Gallery Storage');
 
@@ -193,19 +193,18 @@ async function saveToSupabase(
     } = supabase.storage.from('images').getPublicUrl(uploadData.path);
 
     // Insert image record with Storage URL
-    const { data, error } = (await (supabase
-      .from('images') as any)
-      .insert({
-        user_id: user.id,
-        original_url: src.startsWith('data:') ? publicUrl : src, // Keep FAL.AI URL as original
-        generated_url: publicUrl, // Use Storage URL for generated
-        name: alt,
-        size: actualFileSize,
-        prompt: options?.prompt || null,
-        style: options?.style || null,
-      })
+    // @ts-expect-error - Supabase types are not properly inferred. Need to regenerate types from live DB schema.
+    const { data, error } = await supabase.from('images').insert({
+      user_id: user.id,
+      original_url: src.startsWith('data:') ? publicUrl : src,
+      generated_url: publicUrl,
+      name: alt,
+      size: actualFileSize,
+      prompt: options?.prompt || null,
+      style: options?.style || null,
+    })
       .select()
-      .single()) as { data: Image | null; error: any };
+      .single();
 
     if (error || !data) {
       // Cleanup: Delete uploaded file if DB insert fails
@@ -215,17 +214,24 @@ async function saveToSupabase(
     }
 
     logger.info('✅ Image saved to Supabase:', {
-      id: data.id,
+      // @ts-expect-error - data type not properly inferred
+      id: data?.id,
       storageUrl: publicUrl,
     });
 
     return {
+      // @ts-expect-error - data type not properly inferred
       id: data.id,
+      // @ts-expect-error - data type not properly inferred
       src: data.generated_url || data.original_url,
+      // @ts-expect-error - data type not properly inferred
       alt: data.name,
+      // @ts-expect-error - data type not properly inferred
       createdAt: new Date(data.created_at),
       type,
+      // @ts-expect-error - data type not properly inferred
       prompt: data.prompt || undefined,
+      // @ts-expect-error - data type not properly inferred
       style: data.style || undefined,
     };
   } catch (error) {

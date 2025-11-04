@@ -6,10 +6,12 @@ import type { Database } from './types';
  * For client-side operations (auth, queries)
  */
 export function createClient() {
-  return createBrowserClient<Database>(
+  const client = createBrowserClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
+  
+  return client;
 }
 
 

@@ -230,14 +230,10 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     isFullscreen,
     setIsFullscreen,
     isCropMode,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    adjustFilters: adjustFilters as any,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    colorFilters: colorFilters as any,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    filterEffects: filterEffects as any,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    transform: transform as any,
+    adjustFilters,
+    colorFilters,
+    filterEffects,
+    transform,
     viewMode,
     activeImage,
     leftImageScale,

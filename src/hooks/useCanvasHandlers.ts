@@ -1,6 +1,4 @@
 /**
-import React from 'react';
-
  * Canvas Event Handlers Hook
  *
  * Extracted from Canvas.tsx to reduce component size.
@@ -14,6 +12,8 @@ import { validateFile } from '@/lib/validators';
 import { rateLimiters } from '@/lib/rate-limiter';
 import { compressImage, shouldCompress } from '@/lib/image-compression';
 import { saveImageToGallery } from '@/lib/gallery-storage';
+import type { AdjustFilters, ColorFilters, FilterEffects } from './useImageFilters';
+import type { Transform } from './useImageTransform';
 
 const logger = createScopedLogger('CanvasHandlers');
 
@@ -46,10 +46,10 @@ interface UseCanvasHandlersProps {
   isCropMode: boolean;
 
   // Filters
-  adjustFilters: Record<string, number>;
-  colorFilters: Record<string, number>;
-  filterEffects: Record<string, number>;
-  transform: { rotation: number; flipX: boolean; flipY: boolean };
+  adjustFilters: AdjustFilters;
+  colorFilters: ColorFilters;
+  filterEffects: FilterEffects;
+  transform: Transform;
 
   // View mode
   viewMode: 'normal' | 'side-by-side';
@@ -384,7 +384,7 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
           ctx.rotate((transform.rotation * Math.PI) / 180);
         }
 
-        ctx.scale(transform.flipX ? -1 : 1, transform.flipY ? -1 : 1);
+        ctx.scale(transform.flipHorizontal ? -1 : 1, transform.flipVertical ? -1 : 1);
 
         // Apply filters
         const filters = [];
