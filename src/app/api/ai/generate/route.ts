@@ -1,11 +1,14 @@
 /**
  * API Route: /api/ai/generate
  * Secure server-side proxy for FAL.AI text-to-image generation
+ * 🔒 Authentication Required
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { fal } from '@fal-ai/client';
 import { createScopedLogger } from '@/lib/logger';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
 const logger = createScopedLogger('API:Generate');
 
@@ -14,8 +17,73 @@ fal.config({
   credentials: process.env.FAL_AI_API_KEY || '',
 });
 
+// Rate limiting store (in-memory, resets on server restart)
+const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT = 10; // 10 requests
+const RATE_WINDOW = 60 * 1000; // per minute
+
 export async function POST(request: NextRequest) {
   try {
+    // 🔒 AUTHENTICATION CHECK
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          },
+        },
+      }
+    );
+
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      logger.warn('Unauthorized API access attempt');
+      return NextResponse.json(
+        { error: 'Unauthorized. Please sign in.' },
+        { status: 401 }
+      );
+    }
+
+    // 🛡️ SERVER-SIDE RATE LIMITING
+    const userId = user.id;
+    const now = Date.now();
+    const userLimit = rateLimitStore.get(userId);
+
+    if (userLimit && now < userLimit.resetAt) {
+      if (userLimit.count >= RATE_LIMIT) {
+        const retryAfter = Math.ceil((userLimit.resetAt - now) / 1000);
+        logger.warn(`Rate limit exceeded for user ${userId}`);
+        return NextResponse.json(
+          {
+            error: 'Rate limit exceeded',
+            message: `Too many requests. Try again in ${retryAfter} seconds.`,
+            retryAfter,
+          },
+          {
+            status: 429,
+            headers: {
+              'Retry-After': retryAfter.toString(),
+            },
+          }
+        );
+      }
+      userLimit.count += 1;
+    } else {
+      rateLimitStore.set(userId, { count: 1, resetAt: now + RATE_WINDOW });
+    }
+
     // Check if API key is configured
     if (!process.env.FAL_AI_API_KEY) {
       return NextResponse.json(
@@ -66,14 +134,26 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// OPTIONS for CORS preflight
-export async function OPTIONS() {
+// OPTIONS for CORS preflight (Restricted to own domain)
+export async function OPTIONS(request: NextRequest) {
+  const origin = request.headers.get('origin');
+  const allowedOrigins = [
+    process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+    'http://localhost:3000',
+    'http://localhost:3001',
+  ];
+
+  const isAllowedOrigin = allowedOrigins.some((allowed) =>
+    origin?.startsWith(allowed)
+  );
+
   return new NextResponse(null, {
     status: 200,
     headers: {
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': isAllowedOrigin ? origin! : 'null',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Allow-Credentials': 'true',
     },
   });
 }
