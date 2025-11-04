@@ -14,3 +14,6 @@ Sitemap: https://jewelshot.com/sitemap.xml
 # Crawl delay (optional, be nice to servers)
 Crawl-delay: 1
 
+
+
+

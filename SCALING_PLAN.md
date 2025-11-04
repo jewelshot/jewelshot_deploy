@@ -369,3 +369,6 @@ Revenue needed:    $100/month (2.2x buffer)
 
 At $5/month per user → Need 10-20 paying users to break even
 
+
+
+

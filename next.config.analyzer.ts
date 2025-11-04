@@ -13,3 +13,6 @@ const bundleAnalyzer = withBundleAnalyzer({
 
 export default bundleAnalyzer(baseConfig);
 
+
+
+

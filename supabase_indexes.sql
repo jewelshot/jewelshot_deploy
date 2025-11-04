@@ -105,3 +105,6 @@ ANALYZE public.rate_limits;
 -- Total improvement: ~100x faster for common queries
 -- ============================================
 
+
+
+

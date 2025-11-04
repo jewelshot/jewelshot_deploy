@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import React from 'react';
 
 import { Inter } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { ErrorBoundary } from '@/components/organisms/ErrorBoundary';
 import ToastContainer from '@/components/organisms/ToastContainer';
 import './globals.css';
@@ -107,6 +109,8 @@ export default function RootLayout({
       >
         <ErrorBoundary>{children}</ErrorBoundary>
         <ToastContainer />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

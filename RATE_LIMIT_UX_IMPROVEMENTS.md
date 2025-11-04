@@ -293,3 +293,6 @@ Future enhancement: Show `RateLimitError` in canvas when AI requests fail due to
 
 **Next Steps:** Deploy to production and monitor user feedback
 
+
+
+

@@ -116,3 +116,6 @@ export function getEstimatedWaitTime(): number {
   return Math.ceil((queueDepth * AVG_REQUEST_TIME) / GLOBAL_AI_LIMIT);
 }
 
+
+
+
