@@ -38,15 +38,26 @@ export interface CanvasCoreProps {
   aiProgress: string;
   
   // View mode
-  viewMode: 'normal' | 'sideBySide';
+  viewMode: 'normal' | 'side-by-side';
   activeImage: 'left' | 'right';
   onActiveImageChange: (side: 'left' | 'right') => void;
   
-  // Transform & filters
+  // Transform & filters (normal view)
   scale: number;
   position: { x: number; y: number };
   onScaleChange: (scale: number) => void;
   onPositionChange: (pos: { x: number; y: number }) => void;
+  
+  // Side-by-side specific scales & positions
+  leftImageScale: number;
+  leftImagePosition: { x: number; y: number };
+  onLeftImageScaleChange: (scale: number) => void;
+  onLeftImagePositionChange: (pos: { x: number; y: number }) => void;
+  rightImageScale: number;
+  rightImagePosition: { x: number; y: number };
+  onRightImageScaleChange: (scale: number) => void;
+  onRightImagePositionChange: (pos: { x: number; y: number }) => void;
+  
   transform: Transform;
   adjustFilters: AdjustFilters;
   colorFilters: ColorFilters;
@@ -62,6 +73,14 @@ export interface CanvasCoreProps {
   rightOpen: boolean;
   topOpen: boolean;
   bottomOpen: boolean;
+  
+  // Layout positions (from Canvas.tsx)
+  leftPos: number;
+  rightPos: number;
+  topPos: number;
+  bottomPos: number;
+  imagePadding: { top: number; bottom: number; left: number; right: number };
+  backgroundStyles: Record<string, any>;
   
   // Event handlers
   onImageLoad: () => void;
@@ -86,6 +105,14 @@ export default function CanvasCore({
   position,
   onScaleChange,
   onPositionChange,
+  leftImageScale,
+  leftImagePosition,
+  onLeftImageScaleChange,
+  onLeftImagePositionChange,
+  rightImageScale,
+  rightImagePosition,
+  onRightImageScaleChange,
+  onRightImagePositionChange,
   transform,
   adjustFilters,
   colorFilters,
@@ -97,57 +124,18 @@ export default function CanvasCore({
   rightOpen,
   topOpen,
   bottomOpen,
+  leftPos,
+  rightPos,
+  topPos,
+  bottomPos,
+  imagePadding,
+  backgroundStyles,
   onImageLoad,
   onImageError,
   onUploadClick,
 }: CanvasCoreProps) {
-  // Calculate positions for smooth transitions
-  const leftPos = leftOpen ? 260 : 0;
-  const rightPos = rightOpen ? 260 : 0;
-  const topPos = topOpen ? 64 : 0;
-  const bottomPos = bottomOpen ? 40 : 0;
-
-  // Minimal padding to prevent overlap with controls
-  const minHorizontalPadding = Math.min(
-    leftOpen ? 48 : 16,
-    rightOpen ? 48 : 16
-  );
-
-  // Calculate bottom padding aligned with AI Edit Control
-  const aiEditControlBottom = bottomOpen ? 56 : 16;
-  const aiEditControlHeight = 50;
-  const aiEditControlSpacing = bottomOpen ? 0 : 12;
-  const promptAreaHeight = isPromptExpanded ? 110 : 0;
-  const promptAreaSpacing = isPromptExpanded ? 8 : 0;
-
-  const imagePadding = {
-    top: canvasControlsVisible ? 80 : 16,
-    left: canvasControlsVisible ? minHorizontalPadding : 16,
-    right: canvasControlsVisible ? minHorizontalPadding : 16,
-    bottom: canvasControlsVisible
-      ? aiEditControlBottom +
-        aiEditControlHeight +
-        aiEditControlSpacing +
-        promptAreaHeight +
-        promptAreaSpacing
-      : 16,
-  };
-
-  // Background styles
-  const backgroundStyles = {
-    none: {},
-    black: { backgroundColor: '#000000' },
-    gray: { backgroundColor: '#808080' },
-    white: { backgroundColor: '#ffffff' },
-    alpha: {
-      backgroundImage:
-        'linear-gradient(45deg, #808080 25%, transparent 25%), linear-gradient(-45deg, #808080 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #808080 75%), linear-gradient(-45deg, transparent 75%, #808080 75%)',
-      backgroundSize: '16px 16px',
-      backgroundPosition: '0 0, 0 8px, 8px -8px, -8px 0px',
-      backgroundColor: '#ffffff',
-    },
-  };
-
+  // All calculations done in parent Canvas.tsx - props passed directly
+  
   return (
     <div
       className="fixed z-10 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"

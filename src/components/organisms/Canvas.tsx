@@ -16,20 +16,13 @@ import { saveImageToGallery } from '@/lib/gallery-storage';
 import Toast from '@/components/atoms/Toast';
 
 const logger = createScopedLogger('Canvas');
-import AIEditControl from '@/components/molecules/AIEditControl';
-import ZoomControls from '@/components/molecules/ZoomControls';
-import ActionControls from '@/components/molecules/ActionControls';
-import TopLeftControls from '@/components/molecules/TopLeftControls';
-import BackgroundSelector from '@/components/molecules/BackgroundSelector';
-import BottomRightControls from '@/components/molecules/BottomRightControls';
-import EmptyState from '@/components/molecules/EmptyState';
-import LoadingState from '@/components/atoms/LoadingState';
-import ImageViewer from '@/components/molecules/ImageViewer';
-import EditPanel from '@/components/organisms/EditPanel';
-import CropModal from '@/components/organisms/CropModal';
-import UIToggleButton from '@/components/atoms/UIToggleButton';
-import ViewModeSelector from '@/components/atoms/ViewModeSelector';
-import KeyboardShortcutsModal from '@/components/molecules/KeyboardShortcutsModal';
+// New refactored components
+import CanvasCore from './canvas/CanvasCore';
+import CanvasControls from './canvas/CanvasControls';
+import AIEditManager from './canvas/AIEditManager';
+import CanvasModals from './canvas/CanvasModals';
+
+// Keep Toast (managed by useToast hook in Canvas.tsx)
 import AILoadingOverlay from '@/components/atoms/AILoadingOverlay';
 
 interface CanvasProps {
@@ -703,8 +696,11 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     },
   };
 
+// NEW CANVAS.TSX RETURN STATEMENT (after line 698)
+
   return (
     <>
+      {/* File Input (keep - needed for file uploads) */}
       <input
         ref={fileInputRef}
         type="file"
@@ -712,419 +708,186 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
         onChange={handleFileChange}
         className="hidden"
       />
-      <div
-        className="fixed z-10 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
-        style={{
-          left: `${leftPos}px`,
-          right: `${rightPos}px`,
-          top: `${topPos}px`,
-          bottom: `${bottomPos}px`,
-          ...backgroundStyles[background],
-        }}
-      >
-        {!uploadedImage && !isLoading && (
-          <EmptyState onUploadClick={handleUploadClick} />
-        )}
 
-        {isLoading && <LoadingState />}
-
-        {uploadedImage && (
-          <>
-            {/* Image Viewer - Normal or Side by Side */}
-            {viewMode === 'normal' ? (
-              <div
-                className="h-full w-full transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
-                style={{
-                  paddingTop: `${imagePadding.top}px`,
-                  paddingLeft: `${imagePadding.left}px`,
-                  paddingRight: `${imagePadding.right}px`,
-                  paddingBottom: `${imagePadding.bottom}px`,
-                }}
-              >
-                <ImageViewer
-                  src={uploadedImage}
-                  alt="Uploaded"
-                  scale={scale}
-                  position={position}
-                  onScaleChange={setScale}
-                  onPositionChange={setPosition}
-                  transform={transform}
-                  adjustFilters={adjustFilters}
-                  colorFilters={colorFilters}
-                  filterEffects={filterEffects}
-                  isAIProcessing={isAIEditing || isAIImageLoading}
-                  aiProgress={aiProgress}
-                  onImageLoad={handleAIImageLoad}
-                  onImageError={handleAIImageError}
-                  controlsVisible={canvasControlsVisible}
-                />
-              </div>
-            ) : (
-              /* Side by Side View */
-              <div
-                className="relative flex h-full w-full items-center justify-center gap-4 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
-                style={{
-                  paddingTop: `${imagePadding.top}px`,
-                  paddingLeft: `${imagePadding.left}px`,
-                  paddingRight: `${imagePadding.right}px`,
-                  paddingBottom: `${imagePadding.bottom}px`,
-                }}
-              >
-                {/* AI Loading Overlay for Side-by-Side View */}
-                {(isAIEditing || isAIImageLoading) && (
-                  <div className="absolute inset-0 z-50">
-                    <AILoadingOverlay progress={aiProgress} />
-                  </div>
-                )}
-
-                {/* Original Image */}
-                {originalImage && (
-                  <div
-                    className="relative flex h-full w-1/2 flex-col items-center justify-center transition-all duration-200"
-                    style={{
-                      zIndex: activeImage === 'left' ? 10 : 5,
-                      opacity: activeImage === 'left' ? 1 : 0.85,
-                    }}
-                  >
-                    <div
-                      className="relative h-full w-full cursor-pointer transition-all duration-200"
-                      onClick={() => setActiveImage('left')}
-                      title="Click to bring to front"
-                      style={{
-                        filter:
-                          activeImage === 'left'
-                            ? 'drop-shadow(0 0 8px rgba(139, 92, 246, 0.4))'
-                            : 'none',
-                      }}
-                    >
-                      <ImageViewer
-                        src={originalImage}
-                        alt="Original"
-                        scale={leftImageScale}
-                        position={leftImagePosition}
-                        onScaleChange={setLeftImageScale}
-                        onPositionChange={setLeftImagePosition}
-                        transform={{
-                          rotation: 0,
-                          flipHorizontal: false,
-                          flipVertical: false,
-                        }}
-                        adjustFilters={{
-                          brightness: 0,
-                          contrast: 0,
-                          exposure: 0,
-                          highlights: 0,
-                          shadows: 0,
-                          whites: 0,
-                          blacks: 0,
-                          clarity: 0,
-                          sharpness: 0,
-                          dehaze: 0,
-                        }}
-                        colorFilters={{ temperature: 0, tint: 0 } as any}
-                        filterEffects={{
-                          blur: 0,
-                          grayscale: 0,
-                          sepia: 0,
-                          invert: 0,
-                        } as any}
-                        isAIProcessing={false}
-                        aiProgress=""
-                        onImageLoad={() => {}}
-                        onImageError={() => {}}
-                        controlsVisible={canvasControlsVisible}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* AI Generated Image */}
-                <div
-                  className="relative flex h-full w-1/2 flex-col items-center justify-center transition-all duration-200"
-                  style={{
-                    zIndex: activeImage === 'right' ? 10 : 5,
-                    opacity: activeImage === 'right' ? 1 : 0.85,
-                  }}
-                >
-                  <div
-                    className="relative h-full w-full cursor-pointer transition-all duration-200"
-                    onClick={() => setActiveImage('right')}
-                    title="Click to bring to front"
-                    style={{
-                      filter:
-                        activeImage === 'right'
-                          ? 'drop-shadow(0 0 8px rgba(139, 92, 246, 0.4))'
-                          : 'none',
-                    }}
-                  >
-                    <ImageViewer
-                      src={uploadedImage}
-                      alt="AI Generated"
-                      scale={rightImageScale}
-                      position={rightImagePosition}
-                      onScaleChange={setRightImageScale}
-                      onPositionChange={setRightImagePosition}
-                      transform={transform}
-                      adjustFilters={adjustFilters}
-                      colorFilters={colorFilters}
-                      filterEffects={filterEffects}
-                      isAIProcessing={false}
-                      aiProgress=""
-                      onImageLoad={handleAIImageLoad}
-                      onImageError={handleAIImageError}
-                      controlsVisible={canvasControlsVisible}
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Top Left Controls - File Info */}
-            <div
-              className="fixed z-20 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
-              style={{
-                top: topOpen ? '80px' : '16px',
-                left: leftOpen ? '276px' : '16px',
-                opacity: canvasControlsVisible ? 1 : 0,
-                transform: canvasControlsVisible
-                  ? 'translateX(0)'
-                  : 'translateX(-30px)',
-                pointerEvents: canvasControlsVisible ? 'auto' : 'none',
-              }}
-            >
-              <TopLeftControls
-                fileName={fileName}
-                fileSizeInBytes={fileSize}
-                onClose={handleCloseImage}
-                visible={!!uploadedImage}
-              />
-            </div>
-
-            {/* Top Center Controls - View Mode Selector */}
-            {originalImage && (
-              <div
-                className="fixed z-20 flex justify-center transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
-                style={{
-                  top: topOpen ? '80px' : '16px',
-                  left: leftOpen ? '130px' : '0px',
-                  right: rightOpen ? '130px' : '0px',
-                  opacity: canvasControlsVisible ? 1 : 0,
-                  transform: canvasControlsVisible
-                    ? 'translateY(0)'
-                    : 'translateY(-20px)',
-                  pointerEvents: canvasControlsVisible ? 'auto' : 'none',
-                }}
-              >
-                <ViewModeSelector
-                  viewMode={viewMode}
-                  onViewModeChange={setViewMode}
-                  disabled={isAIEditing || isAIImageLoading}
-                />
-              </div>
-            )}
-
-            {/* Top Right Controls */}
-            <div
-              className="fixed z-20 flex items-center gap-2 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
-              style={{
-                top: topOpen ? '80px' : '16px',
-                right: rightOpen ? '276px' : '16px',
-                opacity: canvasControlsVisible ? 1 : 0,
-                transform: canvasControlsVisible
-                  ? 'translateX(0)'
-                  : 'translateX(30px)',
-                pointerEvents: canvasControlsVisible ? 'auto' : 'none',
-              }}
-            >
-              <ZoomControls
-                scale={
-                  viewMode === 'side-by-side'
-                    ? activeImage === 'left'
-                      ? leftImageScale
-                      : rightImageScale
-                    : scale
-                }
-                onZoomIn={handleZoomIn}
-                onZoomOut={handleZoomOut}
-                onFitScreen={handleFitScreen}
-              />
-              <ActionControls
-                allBarsOpen={allBarsOpen}
-                onToggleAllBars={toggleAll}
-                isFullscreen={isFullscreen}
-                onToggleFullscreen={toggleFullscreen}
-              />
-            </div>
-
-            {/* Bottom Left Controls - Background Selector & UI Toggle */}
-            <div
-              className="fixed z-30 flex items-center gap-2 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
-              style={{
-                bottom: bottomOpen ? '56px' : '16px',
-                left: leftOpen ? '276px' : '16px',
-              }}
-            >
-              <div
-                className="transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
-                style={{
-                  opacity: canvasControlsVisible ? 1 : 0,
-                  transform: canvasControlsVisible
-                    ? 'translateX(0) scale(1)'
-                    : 'translateX(-20px) scale(0.95)',
-                  pointerEvents: canvasControlsVisible ? 'auto' : 'none',
-                }}
-              >
-                <div className="rounded-lg border border-[rgba(139,92,246,0.2)] bg-[rgba(10,10,10,0.8)] p-2 backdrop-blur-[16px]">
-                  <BackgroundSelector
-                    background={background}
-                    onBackgroundChange={setBackground}
-                  />
-                </div>
-              </div>
-              {/* UIToggleButton wrapper with explicit z-index and pointer events */}
-              <div className="relative z-10">
-                <UIToggleButton
-                  controlsVisible={canvasControlsVisible}
-                  onToggle={() =>
-                    setCanvasControlsVisible(!canvasControlsVisible)
-                  }
-                />
-              </div>
-            </div>
-
-            {/* Bottom Center - AI Edit Control */}
-            <div
-              className="fixed z-20 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
-              style={{
-                bottom: bottomOpen ? '56px' : '16px',
-                left: leftOpen ? '260px' : '0px',
-                right: rightOpen ? '260px' : '0px',
-                display: 'flex',
-                justifyContent: 'center',
-                transform: canvasControlsVisible
-                  ? 'translateY(0)'
-                  : 'translateY(30px)',
-                opacity: canvasControlsVisible ? 1 : 0,
-                pointerEvents: canvasControlsVisible ? 'auto' : 'none',
-              }}
-            >
-              <AIEditControl
-                currentImageUrl={uploadedImage || ''}
-                onImageEdited={(url) => setUploadedImage(url)}
-                onError={(error) => showToast(error.message, 'error')}
-                isEditing={isAIEditing}
-                progress={aiProgress}
-                visible={!!uploadedImage}
-                onExpandedChange={setIsPromptExpanded}
-              />
-            </div>
-
-            {/* Bottom Right Controls */}
-            <div
-              className="fixed z-20 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
-              style={{
-                bottom: bottomOpen ? '56px' : '16px',
-                right: rightOpen ? '276px' : '16px',
-                opacity: canvasControlsVisible ? 1 : 0,
-                transform: canvasControlsVisible
-                  ? 'translateX(0) scale(1)'
-                  : 'translateX(30px) scale(0.95)',
-                pointerEvents: canvasControlsVisible ? 'auto' : 'none',
-              }}
-            >
-              <BottomRightControls
-                onEdit={handleToggleEditPanel}
-                editActive={isEditPanelOpen}
-                onDelete={handleDelete}
-                onSave={handleSave}
-                onDownload={handleDownload}
-              />
-            </div>
-
-            {/* Edit Panel - Only render when explicitly opened by user */}
-            {uploadedImage && !isLoading && isEditPanelOpen && (
-              <EditPanel
-                isOpen={isEditPanelOpen}
-                onClose={() => setIsEditPanelOpen(false)}
-                initialPosition={{
-                  x: leftOpen ? 276 : 16,
-                  y: topOpen ? 80 + 48 + 12 : 16 + 48 + 12, // top position + file bar height + gap
-                }}
-                leftOpen={leftOpen}
-                topOpen={topOpen}
-                onCropRatioChange={handleCropRatioChange}
-                onTransformChange={(transformData) => {
-                  setTransform({
-                    rotation: transformData.rotation,
-                    flipHorizontal: transformData.flipHorizontal,
-                    flipVertical: transformData.flipVertical,
-                  });
-                }}
-                onAdjustChange={(adjustData) => {
-                  setAdjustFilters({
-                    brightness: adjustData.brightness,
-                    contrast: adjustData.contrast,
-                    exposure: adjustData.exposure,
-                    highlights: adjustData.highlights,
-                    shadows: adjustData.shadows,
-                    whites: adjustData.whites,
-                    blacks: adjustData.blacks,
-                    clarity: adjustData.clarity,
-                    sharpness: adjustData.sharpness,
-                    dehaze: adjustData.dehaze,
-                  });
-                }}
-                onColorChange={(colorData) => {
-                  setColorFilters({
-                    temperature: colorData.temperature || 0,
-                    tint: colorData.tint || 0,
-                    saturation: colorData.saturation || 0,
-                    vibrance: colorData.vibrance || 0,
-                  });
-                }}
-                onFilterChange={(filterData) => {
-                  setFilterEffects({
-                    vignetteAmount: filterData.vignetteAmount || 0,
-                    vignetteSize: filterData.vignetteSize || 50,
-                    vignetteFeather: filterData.vignetteFeather || 50,
-                    grainAmount: filterData.grainAmount || 0,
-                    grainSize: filterData.grainSize || 50,
-                    fadeAmount: filterData.fadeAmount || 0,
-                  });
-                }}
-              />
-            )}
-          </>
-        )}
-
-        {/* Crop Modal */}
-        {uploadedImage && isCropMode && (
-          <CropModal
-            isOpen={isCropMode}
-            imageSrc={uploadedImage}
-            aspectRatio={cropRatio}
-            onApply={handleCropApply}
-            onCancel={handleCropCancel}
-          />
-        )}
-
-        {/* Toast Notifications */}
-        {toastState.visible && (
-          <Toast
-            message={toastState.message}
-            type={toastState.type}
-            onClose={hideToast}
-          />
-        )}
-      </div>
-
-      {/* Keyboard Shortcuts Help Modal */}
-      <KeyboardShortcutsModal
-        isOpen={showKeyboardHelp}
-        onClose={() => setShowKeyboardHelp(false)}
+      {/* ===================================================================
+          REFACTORED: Canvas Core - Image Rendering Engine
+          ================================================================= */}
+      <CanvasCore
+        uploadedImage={uploadedImage}
+        originalImage={originalImage}
+        isLoading={isLoading}
+        isAIEditing={isAIEditing}
+        isAIImageLoading={isAIImageLoading}
+        aiProgress={aiProgress}
+        viewMode={viewMode}
+        activeImage={activeImage}
+        onActiveImageChange={setActiveImage}
+        scale={scale}
+        position={position}
+        onScaleChange={setScale}
+        onPositionChange={setPosition}
+        leftImageScale={leftImageScale}
+        leftImagePosition={leftImagePosition}
+        onLeftImageScaleChange={setLeftImageScale}
+        onLeftImagePositionChange={setLeftImagePosition}
+        rightImageScale={rightImageScale}
+        rightImagePosition={rightImagePosition}
+        onRightImageScaleChange={setRightImageScale}
+        onRightImagePositionChange={setRightImagePosition}
+        transform={transform}
+        adjustFilters={adjustFilters}
+        colorFilters={colorFilters}
+        filterEffects={filterEffects}
+        background={background}
+        canvasControlsVisible={canvasControlsVisible}
+        isPromptExpanded={isPromptExpanded}
+        leftOpen={leftOpen}
+        rightOpen={rightOpen}
+        topOpen={topOpen}
+        bottomOpen={bottomOpen}
+        leftPos={leftPos}
+        rightPos={rightPos}
+        topPos={topPos}
+        bottomPos={bottomPos}
+        imagePadding={imagePadding}
+        backgroundStyles={backgroundStyles}
+        onImageLoad={handleAIImageLoad}
+        onImageError={handleAIImageError}
+        onUploadClick={handleUploadClick}
       />
+
+      {/* ===================================================================
+          REFACTORED: Canvas Controls - All UI Controls
+          ================================================================= */}
+      {uploadedImage && (
+        <CanvasControls
+          hasImage={!!uploadedImage}
+          fileName={fileName}
+          fileSize={fileSize}
+          isAIEditing={isAIEditing}
+          aiProgress={aiProgress}
+          scale={scale}
+          leftImageScale={leftImageScale}
+          rightImageScale={rightImageScale}
+          viewMode={viewMode}
+          activeImage={activeImage}
+          hasOriginalImage={!!originalImage}
+          leftOpen={leftOpen}
+          rightOpen={rightOpen}
+          topOpen={topOpen}
+          bottomOpen={bottomOpen}
+          allBarsOpen={allBarsOpen}
+          controlsVisible={canvasControlsVisible}
+          isFullscreen={isFullscreen}
+          isEditPanelOpen={isEditPanelOpen}
+          isPromptExpanded={isPromptExpanded}
+          background={background}
+          onZoomIn={handleZoomIn}
+          onZoomOut={handleZoomOut}
+          onFitScreen={handleFitScreen}
+          onToggleAllBars={toggleAll}
+          onToggleFullscreen={toggleFullscreen}
+          onToggleUI={() => setCanvasControlsVisible(!canvasControlsVisible)}
+          onToggleEditPanel={handleToggleEditPanel}
+          onCloseImage={handleCloseImage}
+          onDelete={handleDelete}
+          onSave={handleSave}
+          onDownload={handleDownload}
+          onBackgroundChange={setBackground}
+          onViewModeChange={setViewMode}
+          onImageEdited={(url) => setUploadedImage(url)}
+          onAIError={(error) => showToast(error.message, 'error')}
+          onPromptExpandedChange={setIsPromptExpanded}
+          currentImageUrl={uploadedImage || ''}
+        />
+      )}
+
+      {/* ===================================================================
+          REFACTORED: AI Edit Manager - AI Generation Logic
+          ================================================================= */}
+      <AIEditManager
+        uploadedImage={uploadedImage}
+        fileName={fileName}
+        onImageUpdate={setUploadedImage}
+        onOriginalImageSet={setOriginalImage}
+        onLoadingChange={setIsAIImageLoading}
+        onSuccess={(msg) => showToast(msg, 'success')}
+        onError={(msg) => showToast(msg, 'error')}
+      />
+
+      {/* ===================================================================
+          REFACTORED: Canvas Modals - All Modal Components
+          ================================================================= */}
+      <CanvasModals
+        isCropMode={isCropMode}
+        cropRatio={cropRatio}
+        uploadedImage={uploadedImage}
+        onCropApply={handleCropApply}
+        onCropCancel={handleCropCancel}
+        showKeyboardHelp={showKeyboardHelp}
+        onCloseKeyboardHelp={() => setShowKeyboardHelp(false)}
+        isEditPanelOpen={isEditPanelOpen}
+        onEditPanelClose={() => setIsEditPanelOpen(false)}
+        leftOpen={leftOpen}
+        topOpen={topOpen}
+        onCropRatioChange={handleCropRatioChange}
+        transform={transform}
+        onTransformChange={(transformData) => {
+          setTransform({
+            rotation: transformData.rotation,
+            flipHorizontal: transformData.flipHorizontal,
+            flipVertical: transformData.flipVertical,
+          });
+        }}
+        adjustFilters={adjustFilters}
+        onAdjustFiltersChange={(filters) => {
+          setAdjustFilters({
+            brightness: filters.brightness,
+            contrast: filters.contrast,
+            exposure: filters.exposure,
+            highlights: filters.highlights,
+            shadows: filters.shadows,
+            whites: filters.whites,
+            blacks: filters.blacks,
+            clarity: filters.clarity,
+            sharpness: filters.sharpness,
+            dehaze: filters.dehaze,
+          });
+        }}
+        colorFilters={colorFilters}
+        onColorFiltersChange={(filters) => {
+          setColorFilters({
+            temperature: filters.temperature || 0,
+            tint: filters.tint || 0,
+            saturation: filters.saturation || 0,
+            vibrance: filters.vibrance || 0,
+          });
+        }}
+        filterEffects={filterEffects}
+        onFilterEffectsChange={(effects) => {
+          setFilterEffects({
+            vignetteAmount: effects.vignetteAmount || 0,
+            vignetteSize: effects.vignetteSize || 50,
+            vignetteFeather: effects.vignetteFeather || 50,
+            grainAmount: effects.grainAmount || 0,
+            grainSize: effects.grainSize || 50,
+            fadeAmount: effects.fadeAmount || 0,
+          });
+        }}
+        isLoading={isLoading}
+      />
+
+      {/* Toast Notifications (managed by useToast hook) */}
+      {toastState.visible && (
+        <Toast
+          message={toastState.message}
+          type={toastState.type}
+          onClose={hideToast}
+        />
+      )}
     </>
   );
 }
 
 export default Canvas;
+
