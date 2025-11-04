@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { createScopedLogger } from '@/lib/logger';
 import { validateFile } from '@/lib/validators';
 import { rateLimiters } from '@/lib/rate-limiter';
+import { compressImage, shouldCompress } from '@/lib/image-compression';
 import { saveImageToGallery } from '@/lib/gallery-storage';
 
 const logger = createScopedLogger('CanvasHandlers');
@@ -151,8 +152,29 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
 
       setIsLoading(true);
       setFileName(file.name);
-      setFileSize(file.size);
 
+      // Compress image before processing (if needed)
+      let processedFile = file;
+      if (shouldCompress(file)) {
+        showToast('Optimizing image...', 'info');
+        try {
+          processedFile = await compressImage(file, {
+            maxSizeMB: 2,
+            maxWidthOrHeight: 2048,
+            quality: 0.85,
+          });
+          logger.info('Image compressed', {
+            original: `${(file.size / 1024 / 1024).toFixed(2)}MB`,
+            compressed: `${(processedFile.size / 1024 / 1024).toFixed(2)}MB`,
+            saved: `${((1 - processedFile.size / file.size) * 100).toFixed(1)}%`,
+          });
+        } catch (error) {
+          logger.warn('Compression failed, using original file', error);
+          processedFile = file;
+        }
+      }
+
+      setFileSize(processedFile.size);
       const reader = new FileReader();
 
       // Success handler
@@ -194,7 +216,7 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
       };
 
       try {
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(processedFile);
       } catch (error) {
         logger.error('Error reading file:', error);
         showToast('Failed to read file. Please try again.', 'error');

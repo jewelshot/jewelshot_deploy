@@ -73,3 +73,7 @@ storybook-static/
 *.pem
 secrets.json
 .secrets
+
+# Sentry
+.sentryclirc
+sentry.properties
