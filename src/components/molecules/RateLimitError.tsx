@@ -30,23 +30,16 @@ export function RateLimitError({
   compact = false,
 }: RateLimitErrorProps) {
   const [timeRemaining, setTimeRemaining] = useState(Math.ceil(retryAfter / 1000));
-  const [canRetry, setCanRetry] = useState(retryAfter === 0);
+  const canRetry = timeRemaining <= 0;
 
   // Countdown timer
   useEffect(() => {
     if (timeRemaining <= 0) {
-      setCanRetry(true);
       return;
     }
 
     const timer = setInterval(() => {
-      setTimeRemaining((prev) => {
-        if (prev <= 1) {
-          setCanRetry(true);
-          return 0;
-        }
-        return prev - 1;
-      });
+      setTimeRemaining((prev) => Math.max(0, prev - 1));
     }, 1000);
 
     return () => clearInterval(timer);
