@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Palette } from 'lucide-react';
 import BackgroundOption from '@/components/atoms/BackgroundOption';
 
-type BackgroundType = 'none' | 'black' | 'gray' | 'white' | 'alpha';
+export type BackgroundType = 'none' | 'black' | 'gray' | 'white' | 'alpha';
 
 interface BackgroundSelectorProps {
   /**
