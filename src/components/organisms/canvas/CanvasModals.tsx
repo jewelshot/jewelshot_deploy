@@ -10,16 +10,30 @@
  * - Toast notifications
  * 
  * Extracted from Canvas.tsx (1,130 lines → maintainable components)
+ * 
+ * ⚡ PERFORMANCE: All modals are lazy loaded to reduce initial bundle size
  */
 
 'use client';
 
 import React from 'react';
-import CropModal from '@/components/organisms/CropModal';
-import KeyboardShortcutsModal from '@/components/molecules/KeyboardShortcutsModal';
-import EditPanel from '@/components/organisms/EditPanel';
+import dynamic from 'next/dynamic';
 import type { Transform } from '@/hooks/useImageTransform';
 import type { AdjustFilters, ColorFilters, FilterEffects } from '@/hooks/useImageFilters';
+
+// Lazy load heavy modals (150KB+ savings)
+const CropModal = dynamic(() => import('@/components/organisms/CropModal'), {
+  ssr: false,
+});
+
+const KeyboardShortcutsModal = dynamic(
+  () => import('@/components/molecules/KeyboardShortcutsModal'),
+  { ssr: false }
+);
+
+const EditPanel = dynamic(() => import('@/components/organisms/EditPanel'), {
+  ssr: false,
+});
 
 /**
  * Props for CanvasModals component

@@ -5,9 +5,10 @@
  * - Reduce storage costs
  * - Improve upload speed
  * - Better user experience
+ * 
+ * ⚡ PERFORMANCE: browser-image-compression is lazy loaded (~100KB)
  */
 
-import imageCompression from 'browser-image-compression';
 import { createScopedLogger } from './logger';
 
 const logger = createScopedLogger('ImageCompression');
@@ -60,6 +61,9 @@ export async function compressImage(
 
     const startTime = Date.now();
     
+    // Lazy load browser-image-compression (saves ~100KB from initial bundle)
+    const imageCompression = (await import('browser-image-compression')).default;
+    
     const compressedFile = await imageCompression(file, opts);
     
     const compressionTime = Date.now() - startTime;
@@ -104,6 +108,9 @@ export async function compressImageWithProgress(
     logger.info('Compressing image with progress...', {
       originalSize: formatBytes(file.size),
     });
+
+    // Lazy load browser-image-compression
+    const imageCompression = (await import('browser-image-compression')).default;
 
     const compressedFile = await imageCompression(file, opts);
     
