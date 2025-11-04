@@ -70,8 +70,22 @@ export type ProgressCallback = (status: string, message?: string) => void;
 // CONFIGURATION
 // ============================================================================
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+// Use environment variable or dynamic origin (for production)
+const getApiBaseUrl = (): string => {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  
+  // In browser, use current origin (works for production and dev)
+  if (typeof window !== 'undefined') {
+    return window.location.origin;
+  }
+  
+  // SSR fallback (should never happen in this client-side file)
+  return 'http://localhost:3000';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 // Timeout configuration
 const REQUEST_TIMEOUT = 45000; // 45 seconds (FAL.AI can take 20-30s)
