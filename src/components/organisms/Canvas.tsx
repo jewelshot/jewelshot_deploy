@@ -12,6 +12,7 @@ import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useImageEdit } from '@/hooks/useImageEdit';
 import { useCanvasHandlers } from '@/hooks/useCanvasHandlers';
 import { createScopedLogger } from '@/lib/logger';
+import { saveImageToGallery } from '@/lib/gallery-storage';
 import Toast from '@/components/atoms/Toast';
 
 const logger = createScopedLogger('Canvas');
@@ -137,11 +138,34 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     isEditing: isAIEditing,
     progress: aiProgress,
   } = useImageEdit({
-    onSuccess: (result) => {
+    onSuccess: async (result) => {
       if (result.images && result.images.length > 0) {
         setIsAIImageLoading(true); // Start loading overlay
-        setUploadedImage(result.images[0].url);
+        const aiImageUrl = result.images[0].url;
+        setUploadedImage(aiImageUrl);
         showToast('Image edited successfully!', 'success');
+
+        // 🎯 AUTO-SAVE to gallery
+        try {
+          await saveImageToGallery(
+            aiImageUrl,
+            fileName || 'ai-generated-image.jpg',
+            'ai-edited',
+            {
+              style: 'AI Enhanced',
+            }
+          );
+          
+          // Dispatch custom event for gallery sync
+          window.dispatchEvent(new Event('gallery-updated'));
+          
+          logger.info('✅ AI-generated image auto-saved to gallery');
+          showToast('Saved to gallery!', 'success');
+        } catch (error) {
+          logger.error('Failed to auto-save to gallery:', error);
+          // Don't show error toast - image generation was successful
+          // User can manually save from Save button if needed
+        }
       }
     },
     onError: (error) => {
