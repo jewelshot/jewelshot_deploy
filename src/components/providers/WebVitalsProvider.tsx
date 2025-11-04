@@ -47,8 +47,9 @@ export function WebVitalsProvider() {
     }
 
     // Also send to Vercel Analytics if available
-    if (typeof window !== 'undefined' && (window as any).va) {
-      (window as any).va('event', 'webVital', {
+    if (typeof window !== 'undefined' && (window as Window & { va?: (event: string, name: string, data: Record<string, unknown>) => void }).va) {
+      const win = window as Window & { va: (event: string, name: string, data: Record<string, unknown>) => void };
+      win.va('event', 'webVital', {
         name: metric.name,
         value: metric.value,
         rating: metric.rating,

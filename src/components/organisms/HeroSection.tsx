@@ -70,22 +70,44 @@ export function HeroSection() {
 
         {/* Social Proof */}
         <div
-          className="mt-12 flex items-center justify-center gap-8 text-sm text-white/50"
+          className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8 text-sm text-white/50"
           style={{
             animation:
               'fadeInUp 600ms cubic-bezier(0.4, 0, 0.2, 1) 400ms backwards',
           }}
         >
-          <div className="flex items-center gap-2">
-            <div className="flex -space-x-2">
-              <div className="h-8 w-8 rounded-full border-2 border-[#0a0a0a] bg-gradient-to-br from-purple-400 to-purple-600" />
-              <div className="h-8 w-8 rounded-full border-2 border-[#0a0a0a] bg-gradient-to-br from-pink-400 to-pink-600" />
-              <div className="h-8 w-8 rounded-full border-2 border-[#0a0a0a] bg-gradient-to-br from-blue-400 to-blue-600" />
+          <div className="flex items-center gap-3">
+            <div className="flex -space-x-3">
+              <div className="h-10 w-10 rounded-full border-2 border-[#0a0a0a] bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-bold shadow-lg">
+                ✨
+              </div>
+              <div className="h-10 w-10 rounded-full border-2 border-[#0a0a0a] bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center text-white font-bold shadow-lg">
+                💎
+              </div>
+              <div className="h-10 w-10 rounded-full border-2 border-[#0a0a0a] bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg">
+                🌟
+              </div>
             </div>
-            <span>Trusted by 1000+ jewelers</span>
+            <div className="text-left">
+              <div className="text-white font-semibold">10,000+ Users</div>
+              <div className="text-xs text-white/40">Join jewelers worldwide</div>
+            </div>
           </div>
-          <div className="hidden sm:block">•</div>
-          <span className="hidden sm:inline">No credit card required</span>
+          <div className="hidden sm:block h-8 w-px bg-white/10" />
+          <div className="flex items-center gap-2">
+            <div className="flex">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <svg
+                  key={i}
+                  className="h-4 w-4 fill-yellow-400 text-yellow-400"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              ))}
+            </div>
+            <span className="text-white font-medium">4.9/5 Rating</span>
+          </div>
         </div>
       </div>
 

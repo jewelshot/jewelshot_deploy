@@ -39,6 +39,43 @@ const CTASection = dynamic(
   { ssr: false }
 );
 
+const StatsSection = dynamic(
+  () =>
+    import('@/components/organisms/StatsSection').then(
+      (mod) => mod.StatsSection
+    ),
+  { ssr: false }
+);
+
+const LogoCloudSection = dynamic(
+  () =>
+    import('@/components/organisms/LogoCloudSection').then(
+      (mod) => mod.LogoCloudSection
+    ),
+  { ssr: false }
+);
+
+const TestimonialsSection = dynamic(
+  () =>
+    import('@/components/organisms/TestimonialsSection').then(
+      (mod) => mod.TestimonialsSection
+    ),
+  { ssr: false }
+);
+
+const PricingSection = dynamic(
+  () =>
+    import('@/components/organisms/PricingSection').then(
+      (mod) => mod.PricingSection
+    ),
+  { ssr: false }
+);
+
+const Navbar = dynamic(
+  () => import('@/components/organisms/Navbar').then((mod) => mod.Navbar),
+  { ssr: false }
+);
+
 /**
  * Landing Page - Enterprise-grade landing page for Jewelshot
  * Fully responsive, animated, and optimized
@@ -51,16 +88,31 @@ export default function LandingPage() {
         <AuroraBackground />
       </div>
 
+      {/* Navbar */}
+      <Navbar />
+
       {/* Main Content */}
       <div className="relative z-10">
         {/* Hero Section */}
         <HeroSection />
+
+        {/* Logo Cloud */}
+        <LogoCloudSection />
+
+        {/* Stats Section */}
+        <StatsSection />
 
         {/* Features Section */}
         <FeaturesSection />
 
         {/* How It Works Section */}
         <HowItWorksSection />
+
+        {/* Testimonials */}
+        <TestimonialsSection />
+
+        {/* Pricing */}
+        <PricingSection />
 
         {/* CTA Section */}
         <CTASection />
