@@ -76,7 +76,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline'", // Tailwind requires unsafe-inline
               "img-src 'self' data: https: blob:", // Allow images from FAL.AI and Supabase
               "font-src 'self' data:",
-              "connect-src 'self' https://*.supabase.co https://fal.media https://fal.ai wss://*.supabase.co",
+              "connect-src 'self' https://*.supabase.co https://*.fal.media https://fal.ai wss://*.supabase.co",
               "media-src 'self' https: blob:",
               "worker-src 'self' blob:", // Allow web workers for image compression
               "object-src 'none'",
