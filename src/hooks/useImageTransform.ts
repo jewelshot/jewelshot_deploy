@@ -22,12 +22,12 @@
 
 import { useState, useCallback } from 'react';
 
-interface Position {
+export interface Position {
   x: number;
   y: number;
 }
 
-interface Transform {
+export interface Transform {
   rotation: number;
   flipHorizontal: boolean;
   flipVertical: boolean;

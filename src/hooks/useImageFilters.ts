@@ -26,7 +26,7 @@ import { loadLastFilters, saveFilters } from '@/lib/filter-persistence';
 /**
  * Adjust tab filters - Basic light, tone, clarity controls
  */
-interface AdjustFilters {
+export interface AdjustFilters {
   brightness: number; // -100 to 100
   contrast: number; // -100 to 100
   exposure: number; // -100 to 100
@@ -42,7 +42,7 @@ interface AdjustFilters {
 /**
  * Colors tab filters - Temperature, tint, saturation
  */
-interface ColorFilters {
+export interface ColorFilters {
   temperature: number; // -100 to 100
   tint: number; // -100 to 100
   saturation: number; // -100 to 100
@@ -52,7 +52,7 @@ interface ColorFilters {
 /**
  * Filters tab effects - Vignette, grain, fade
  */
-interface FilterEffects {
+export interface FilterEffects {
   vignetteAmount: number; // 0 to 100
   vignetteSize: number; // 0 to 100
   vignetteFeather: number; // 0 to 100
