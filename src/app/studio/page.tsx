@@ -46,6 +46,10 @@ const BottomBar = dynamic(() => import('@/components/organisms/BottomBar'), {
 const BottomBarToggle = dynamic(
   () => import('@/components/atoms/BottomBarToggle')
 );
+const RateLimitIndicator = dynamic(
+  () => import('@/components/molecules/RateLimitIndicator'),
+  { loading: () => null }
+);
 
 export default function StudioPage() {
   // Handle preset generation from RightSidebar
@@ -79,6 +83,17 @@ export default function StudioPage() {
       {/* Bottom Bar */}
       <BottomBar />
       <BottomBarToggle />
+
+      {/* Rate Limit Indicator (Fixed Top-Right) */}
+      <div
+        className="fixed z-30 transition-all duration-[800ms]"
+        style={{
+          top: '80px',
+          right: '16px',
+        }}
+      >
+        <RateLimitIndicator />
+      </div>
 
       {/* Canvas Area - Wrapped in Error Boundary */}
       <ErrorBoundary fallback={<CanvasFallback />}>
