@@ -10,6 +10,11 @@ import { createScopedLogger } from '@/lib/logger';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { checkRateLimit } from '@/lib/rate-limiter-db';
+import {
+  canMakeGlobalAIRequest,
+  recordGlobalAIRequest,
+  getGlobalRateLimitStatus,
+} from '@/lib/rate-limiter-global';
 
 const logger = createScopedLogger('API:Edit');
 
@@ -84,10 +89,36 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 🛡️ SERVER-SIDE RATE LIMITING (Persistent with Supabase)
+    // 🛡️ GLOBAL RATE LIMITING (Protects FAL.AI from overload)
+    if (!canMakeGlobalAIRequest()) {
+      const globalStatus = getGlobalRateLimitStatus();
+      const waitSeconds = Math.ceil(globalStatus.resetIn / 1000);
+      
+      logger.warn('Global AI rate limit reached', {
+        userId: user.id,
+        resetIn: waitSeconds,
+      });
+      
+      return NextResponse.json(
+        {
+          error: 'System busy',
+          message: `AI service is currently at capacity. Please try again in ${waitSeconds} seconds.`,
+          retryAfter: waitSeconds,
+          queuePosition: globalStatus.current - globalStatus.limit,
+        },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': waitSeconds.toString(),
+            'X-RateLimit-Global': 'true',
+          },
+        }
+      );
+    }
+
+    // 🛡️ USER RATE LIMITING (Per-user limits)
     const userId = user.id;
     
-    // Try Supabase rate limiting first, fallback to in-memory
     const rateLimit = await checkRateLimit(userId, {
       endpoint: '/api/ai/edit',
       maxRequests: RATE_LIMIT,
@@ -112,6 +143,9 @@ export async function POST(request: NextRequest) {
         }
       );
     }
+
+    // Record global request
+    recordGlobalAIRequest(userId);
 
     // Check if API key is configured
     if (!process.env.FAL_AI_API_KEY) {
