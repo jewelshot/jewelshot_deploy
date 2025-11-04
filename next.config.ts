@@ -3,9 +3,9 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   /* config options here */
 
-  // ⚠️ TypeScript errors ignored for quick build
+  // TypeScript: Can be bypassed via SKIP_TYPE_CHECK=true in Vercel
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: process.env.SKIP_TYPE_CHECK === 'true',
   },
   
   // Performance optimizations

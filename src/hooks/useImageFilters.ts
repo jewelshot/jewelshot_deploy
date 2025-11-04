@@ -129,11 +129,11 @@ export function useImageFilters(): ImageFiltersState {
   });
   const [colorFilters, setColorFilters] = useState<ColorFilters>(() => {
     const saved = loadLastFilters();
-    return saved?.color || DEFAULT_COLOR_FILTERS;
+    return (saved?.color || DEFAULT_COLOR_FILTERS) as ColorFilters;
   });
   const [filterEffects, setFilterEffects] = useState<FilterEffects>(() => {
     const saved = loadLastFilters();
-    return saved?.effects || DEFAULT_FILTER_EFFECTS;
+    return (saved?.effects || DEFAULT_FILTER_EFFECTS) as FilterEffects;
   });
 
   // Debounce save to avoid too many writes

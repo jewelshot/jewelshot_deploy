@@ -9,6 +9,7 @@ import { fal } from '@fal-ai/client';
 import { createScopedLogger } from '@/lib/logger';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { checkRateLimit } from '@/lib/rate-limiter-db';
 
 const logger = createScopedLogger('API:Edit');
 
@@ -17,10 +18,12 @@ fal.config({
   credentials: process.env.FAL_AI_API_KEY || '',
 });
 
-// Rate limiting store (in-memory, resets on server restart)
-const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
+// Rate limiting configuration
 const RATE_LIMIT = 10; // 10 requests
 const RATE_WINDOW = 60 * 1000; // per minute
+
+// Fallback: In-memory rate limiting (if Supabase service_role not available)
+const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
 
 /**
  * Upload image to FAL.AI storage if needed
@@ -81,32 +84,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 🛡️ SERVER-SIDE RATE LIMITING
+    // 🛡️ SERVER-SIDE RATE LIMITING (Persistent with Supabase)
     const userId = user.id;
-    const now = Date.now();
-    const userLimit = rateLimitStore.get(userId);
+    
+    // Try Supabase rate limiting first, fallback to in-memory
+    const rateLimit = await checkRateLimit(userId, {
+      endpoint: '/api/ai/edit',
+      maxRequests: RATE_LIMIT,
+      windowMs: RATE_WINDOW,
+    });
 
-    if (userLimit && now < userLimit.resetAt) {
-      if (userLimit.count >= RATE_LIMIT) {
-        const retryAfter = Math.ceil((userLimit.resetAt - now) / 1000);
-        logger.warn(`Rate limit exceeded for user ${userId}`);
-        return NextResponse.json(
-          {
-            error: 'Rate limit exceeded',
-            message: `Too many requests. Try again in ${retryAfter} seconds.`,
-            retryAfter,
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        {
+          error: 'Rate limit exceeded',
+          message: `Too many requests. Try again in ${rateLimit.retryAfter} seconds.`,
+          retryAfter: rateLimit.retryAfter,
+          remaining: 0,
+        },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': rateLimit.retryAfter?.toString() || '60',
+            'X-RateLimit-Limit': RATE_LIMIT.toString(),
+            'X-RateLimit-Remaining': '0',
           },
-          {
-            status: 429,
-            headers: {
-              'Retry-After': retryAfter.toString(),
-            },
-          }
-        );
-      }
-      userLimit.count += 1;
-    } else {
-      rateLimitStore.set(userId, { count: 1, resetAt: now + RATE_WINDOW });
+        }
+      );
     }
 
     // Check if API key is configured

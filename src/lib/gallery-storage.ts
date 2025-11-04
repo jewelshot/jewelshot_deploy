@@ -7,6 +7,7 @@
 
 import { createClient } from './supabase/client';
 import { createScopedLogger } from './logger';
+import type { Image } from './supabase/types';
 
 const logger = createScopedLogger('Gallery Storage');
 
@@ -74,7 +75,7 @@ async function getSupabaseImages(): Promise<SavedImage[]> {
     }
 
     return (
-      data?.map((img) => ({
+      (data as Image[])?.map((img) => ({
         id: img.id,
         src: img.generated_url || img.original_url,
         alt: img.name,
@@ -192,8 +193,8 @@ async function saveToSupabase(
     } = supabase.storage.from('images').getPublicUrl(uploadData.path);
 
     // Insert image record with Storage URL
-    const { data, error } = await supabase
-      .from('images')
+    const { data, error } = (await (supabase
+      .from('images') as any)
       .insert({
         user_id: user.id,
         original_url: src.startsWith('data:') ? publicUrl : src, // Keep FAL.AI URL as original
@@ -204,9 +205,9 @@ async function saveToSupabase(
         style: options?.style || null,
       })
       .select()
-      .single();
+      .single()) as { data: Image | null; error: any };
 
-    if (error) {
+    if (error || !data) {
       // Cleanup: Delete uploaded file if DB insert fails
       await supabase.storage.from('images').remove([uploadData.path]);
       logger.error('Failed to save image to database:', error);

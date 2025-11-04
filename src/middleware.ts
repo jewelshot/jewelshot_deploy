@@ -48,8 +48,25 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Redirect to studio if accessing auth pages while logged in
-  if (request.nextUrl.pathname.startsWith('/auth') && user) {
+  // 🔒 EMAIL VERIFICATION CHECK
+  // If user is logged in but email not verified, redirect to verify page
+  const isVerifyEmailPage = request.nextUrl.pathname === '/auth/verify-email';
+  
+  if (user && isProtectedPath && !isVerifyEmailPage) {
+    // Check if email is confirmed
+    // Supabase returns confirmed_at or email_confirmed_at depending on version
+    const isEmailVerified = user.email_confirmed_at || (user as any).confirmed_at;
+    
+    if (!isEmailVerified) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/auth/verify-email';
+      url.searchParams.set('redirectTo', request.nextUrl.pathname);
+      return NextResponse.redirect(url);
+    }
+  }
+
+  // Redirect to studio if accessing auth pages while logged in (except verify-email)
+  if (request.nextUrl.pathname.startsWith('/auth') && user && !isVerifyEmailPage) {
     const url = request.nextUrl.clone();
     url.pathname = '/studio';
     return NextResponse.redirect(url);
