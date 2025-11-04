@@ -33,38 +33,16 @@ import {
   CreditCard,
 } from 'lucide-react';
 
-// Tools section
+// Tools section (Coming Soon - All tools are integrated in Studio)
 const toolsItems = [
-  {
-    icon: Sparkles,
-    label: 'AI Generate',
-    href: '/tools/ai-generate',
-    badge: { variant: 'pro' as const },
-  },
-  {
-    icon: Scissors,
-    label: 'Background Remove',
-    href: '/tools/background-remove',
-    badge: { variant: 'dot' as const, color: 'green' as const },
-  },
-  { icon: Droplet, label: 'Color Enhance', href: '/tools/color-enhance' },
-  { icon: Zap, label: 'Resize & Crop', href: '/tools/resize-crop' },
+  // Removed: Tools are now in Studio page
+  // Future: Separate tool pages can be added here
 ];
 
-// Settings section
+// Settings section (Coming Soon)
 const settingsItems = [
-  {
-    icon: Settings,
-    label: 'Preferences',
-    href: '/settings/preferences',
-    shortcut: '⌘,',
-  },
-  {
-    icon: CreditCard,
-    label: 'Billing',
-    href: '/settings/billing',
-    badge: { variant: 'count' as const, count: 1 },
-  },
+  // Removed: Settings pages not yet implemented
+  // Future: Add preferences and billing pages
 ];
 
 export function Sidebar() {
@@ -122,12 +100,13 @@ export function Sidebar() {
           ? { variant: 'count' as const, count: galleryCount }
           : undefined,
     },
-    {
-      icon: FolderOpen,
-      label: 'Projects',
-      href: '/projects',
-      badge: { variant: 'count' as const, count: 3 },
-    },
+    // Removed: Projects page not yet implemented
+    // {
+    //   icon: FolderOpen,
+    //   label: 'Projects',
+    //   href: '/projects',
+    //   badge: { variant: 'count' as const, count: 3 },
+    // },
   ];
 
   return (
