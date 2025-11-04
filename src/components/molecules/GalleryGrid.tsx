@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import ImageCard from '@/components/atoms/ImageCard';
 
 export interface GalleryImage {

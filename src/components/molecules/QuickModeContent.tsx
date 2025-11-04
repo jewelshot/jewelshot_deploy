@@ -1,4 +1,3 @@
-import React from 'react';
 import { PresetCard } from '@/components/atoms/PresetCard';
 
 interface QuickModeContentProps {

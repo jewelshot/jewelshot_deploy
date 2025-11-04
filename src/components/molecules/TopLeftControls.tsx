@@ -1,4 +1,3 @@
-import React from 'react';
 import FileInfo from './FileInfo';
 import CloseButton from '@/components/atoms/CloseButton';
 

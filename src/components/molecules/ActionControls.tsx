@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import ToggleAllBarsButton from '@/components/atoms/ToggleAllBarsButton';
 import FullscreenButton from '@/components/atoms/FullscreenButton';
 

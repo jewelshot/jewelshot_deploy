@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import GallerySearchInput from '@/components/atoms/GallerySearchInput';
 import FilterChip from '@/components/atoms/FilterChip';
 import SortButton, { SortOption } from '@/components/atoms/SortButton';

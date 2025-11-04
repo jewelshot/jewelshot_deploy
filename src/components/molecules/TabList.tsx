@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import TabButton from '@/components/atoms/TabButton';
 
 interface Tab {

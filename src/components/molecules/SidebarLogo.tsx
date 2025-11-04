@@ -12,7 +12,6 @@
 
 'use client';
 
-import React from 'react';
 import { Gem } from 'lucide-react';
 
 export function SidebarLogo() {

@@ -13,6 +13,9 @@ import {
   getBodyPartGroup,
   buildAdvancedPrompt,
 } from '@/lib/advanced-parameters';
+import { createScopedLogger } from '@/lib/logger';
+
+const logger = createScopedLogger('AdvancedMode');
 
 interface AdvancedModeContentProps {
   gender: 'women' | 'men' | null;
@@ -52,7 +55,7 @@ export function AdvancedModeContent({
         onGenerate(prompt);
       }
     } catch (error) {
-      console.error('Error building advanced prompt:', error);
+      logger.error('Error building advanced prompt:', error);
     }
   };
 

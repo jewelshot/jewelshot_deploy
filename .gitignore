@@ -77,3 +77,4 @@ secrets.json
 # Sentry
 .sentryclirc
 sentry.properties
+.github/workflows/

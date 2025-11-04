@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { ZoomIn, ZoomOut, Locate } from 'lucide-react';
 import ZoomButton from '@/components/atoms/ZoomButton';
 import ZoomDisplay from '@/components/atoms/ZoomDisplay';

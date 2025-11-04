@@ -13,6 +13,9 @@ import { LogOut, ChevronDown } from 'lucide-react';
 import Avatar from '@/components/atoms/Avatar';
 import OnlineIndicator from '@/components/atoms/OnlineIndicator';
 import UserInfo from '@/components/atoms/UserInfo';
+import { createScopedLogger } from '@/lib/logger';
+
+const logger = createScopedLogger('UserProfile');
 import { createClient } from '@/lib/supabase/client';
 
 export function UserProfile() {
@@ -55,7 +58,7 @@ export function UserProfile() {
       await supabase.auth.signOut();
       router.push('/');
     } catch (error) {
-      console.error('Logout error:', error);
+      logger.error('Logout error:', error);
     } finally {
       setIsLoggingOut(false);
     }

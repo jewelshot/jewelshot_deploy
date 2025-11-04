@@ -4,6 +4,10 @@
  * Saves and restores image filter settings to/from localStorage
  */
 
+import { createScopedLogger } from './logger';
+
+const logger = createScopedLogger('FilterPersistence');
+
 export interface FilterState {
   adjust: {
     brightness?: number;
@@ -46,7 +50,7 @@ export function loadLastFilters(): FilterState | null {
     const parsed = JSON.parse(stored) as FilterState;
     return parsed;
   } catch (error) {
-    console.error('Failed to load last filters:', error);
+    logger.error('Failed to load last filters:', error);
     return null;
   }
 }
@@ -60,7 +64,7 @@ export function saveFilters(filters: FilterState): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(filters));
   } catch (error) {
-    console.error('Failed to save filters:', error);
+    logger.error('Failed to save filters:', error);
   }
 }
 
@@ -73,7 +77,7 @@ export function clearSavedFilters(): void {
   try {
     localStorage.removeItem(STORAGE_KEY);
   } catch (error) {
-    console.error('Failed to clear filters:', error);
+    logger.error('Failed to clear filters:', error);
   }
 }
 

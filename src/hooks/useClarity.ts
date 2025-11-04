@@ -5,6 +5,9 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { applyClarity, clarityValueToParams } from '@/utils/clarity';
+import { createScopedLogger } from '@/lib/logger';
+
+const logger = createScopedLogger('useClarity');
 
 interface UseClarityOptions {
   /**
@@ -177,7 +180,7 @@ export function useClarity(options: UseClarityOptions): UseClarityResult {
         return;
       }
 
-      console.error('Clarity enhancement error:', err);
+      logger.error('Clarity enhancement error:', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
       setProcessedSrc(originalSrc);
     } finally {

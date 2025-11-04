@@ -1,4 +1,6 @@
 /**
+import React from 'react';
+
  * NavigationItem Component (Molecule)
  *
  * A single navigation item for the sidebar menu.
@@ -20,7 +22,6 @@
 
 'use client';
 
-import React from 'react';
 import Link from 'next/link';
 import Badge from '@/components/atoms/Badge';
 import NavIcon from '@/components/atoms/NavIcon';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { SelectionDropdown } from '@/components/atoms/SelectionDropdown';
 
 interface ConfigurationAccordionProps {

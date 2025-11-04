@@ -2,6 +2,9 @@
 
 import React, { Component, ReactNode } from 'react';
 import { AlertCircle, RefreshCw } from 'lucide-react';
+import { createScopedLogger } from '@/lib/logger';
+
+const logger = createScopedLogger('ErrorBoundary');
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -48,7 +51,7 @@ export class ErrorBoundary extends Component<
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     // Log error to console in development
     if (process.env.NODE_ENV === 'development') {
-      console.error('Error Boundary caught an error:', error, errorInfo);
+      logger.error('Error Boundary caught an error:', error, errorInfo);
     }
 
     // In production, send to error tracking service (Sentry, etc.)

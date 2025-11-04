@@ -1,4 +1,3 @@
-import React from 'react';
 import FileName from '@/components/atoms/FileName';
 import FileSize from '@/components/atoms/FileSize';
 

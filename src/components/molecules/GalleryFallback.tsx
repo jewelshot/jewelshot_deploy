@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { ImageOff, RefreshCw, Trash2 } from 'lucide-react';
 
 interface GalleryFallbackProps {

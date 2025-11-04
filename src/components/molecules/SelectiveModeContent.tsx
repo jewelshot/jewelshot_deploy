@@ -12,6 +12,9 @@ import {
   poses,
   buildSelectivePrompt,
 } from '@/lib/selective-options';
+import { createScopedLogger } from '@/lib/logger';
+
+const logger = createScopedLogger('SelectiveMode');
 
 interface SelectiveModeContentProps {
   gender: 'women' | 'men' | null;
@@ -69,7 +72,7 @@ export function SelectiveModeContent({
         onGenerate(prompt);
       }
     } catch (error) {
-      console.error('Error building selective prompt:', error);
+      logger.error('Error building selective prompt:', error);
     }
   };
 

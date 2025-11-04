@@ -1,4 +1,6 @@
 /**
+import React from 'react';
+
  * Canvas Event Handlers Hook
  *
  * Extracted from Canvas.tsx to reduce component size.

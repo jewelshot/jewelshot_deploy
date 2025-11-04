@@ -1,5 +1,6 @@
-import React from 'react';
 import { Camera, Upload } from 'lucide-react';
+import React from 'react';
+
 
 interface EmptyStateProps {
   onUploadClick: () => void;

@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
