@@ -193,8 +193,8 @@ async function saveToSupabase(
     } = supabase.storage.from('images').getPublicUrl(uploadData.path);
 
     // Insert image record with Storage URL
-    // @ts-expect-error - Supabase types are not properly inferred. Need to regenerate types from live DB schema.
-    const { data, error } = await supabase.from('images').insert({
+    type ImageInsert = Database['public']['Tables']['images']['Insert'];
+    const insertData: ImageInsert = {
       user_id: user.id,
       original_url: src.startsWith('data:') ? publicUrl : src,
       generated_url: publicUrl,
@@ -202,9 +202,19 @@ async function saveToSupabase(
       size: actualFileSize,
       prompt: options?.prompt || null,
       style: options?.style || null,
-    })
+    };
+
+    // Type assertion needed due to Supabase client not inferring Database types correctly
+    const result = (await supabase
+      .from('images')
+      .insert(insertData as never) // Bypass Supabase's type check
       .select()
-      .single();
+      .single()) as {
+      data: Image | null;
+      error: { message: string } | null;
+    };
+
+    const { data, error } = result;
 
     if (error || !data) {
       // Cleanup: Delete uploaded file if DB insert fails
@@ -214,24 +224,17 @@ async function saveToSupabase(
     }
 
     logger.info('✅ Image saved to Supabase:', {
-      // @ts-expect-error - data type not properly inferred
       id: data?.id,
       storageUrl: publicUrl,
     });
 
     return {
-      // @ts-expect-error - data type not properly inferred
       id: data.id,
-      // @ts-expect-error - data type not properly inferred
       src: data.generated_url || data.original_url,
-      // @ts-expect-error - data type not properly inferred
       alt: data.name,
-      // @ts-expect-error - data type not properly inferred
       createdAt: new Date(data.created_at),
       type,
-      // @ts-expect-error - data type not properly inferred
       prompt: data.prompt || undefined,
-      // @ts-expect-error - data type not properly inferred
       style: data.style || undefined,
     };
   } catch (error) {
