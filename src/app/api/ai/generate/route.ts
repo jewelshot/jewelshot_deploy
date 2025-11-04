@@ -159,13 +159,14 @@ export async function POST(request: NextRequest) {
 
     // Return result
     return NextResponse.json(result.data);
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('Generation failed:', error);
 
+    const message = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
       {
         error: 'Failed to generate image',
-        message: error?.message || 'Unknown error',
+        message,
       },
       { status: 500 }
     );

@@ -127,7 +127,7 @@ function VerifyEmailContent() {
             <p className="text-sm text-white/80">
               1. Check your email inbox (and spam folder)<br />
               2. Click the verification link<br />
-              3. Return here and click "I've Verified My Email"
+              3. Return here and click &ldquo;I&apos;ve Verified My Email&rdquo;
             </p>
           </div>
 

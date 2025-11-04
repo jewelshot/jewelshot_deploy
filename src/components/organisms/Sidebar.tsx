@@ -34,13 +34,13 @@ import {
 } from 'lucide-react';
 
 // Tools section (Coming Soon - All tools are integrated in Studio)
-const toolsItems = [
+const toolsItems: never[] = [
   // Removed: Tools are now in Studio page
   // Future: Separate tool pages can be added here
 ];
 
 // Settings section (Coming Soon)
-const settingsItems = [
+const settingsItems: never[] = [
   // Removed: Settings pages not yet implemented
   // Future: Add preferences and billing pages
 ];
@@ -137,36 +137,8 @@ export function Sidebar() {
           ))}
         </nav>
 
-        {/* Tools Section */}
-        <SectionHeader title="TOOLS" />
-        <nav className="mb-2 flex flex-col gap-1">
-          {toolsItems.map((item, index) => (
-            <NavigationItem
-              key={item.href}
-              icon={item.icon}
-              label={item.label}
-              href={item.href}
-              badge={item.badge}
-              animationDelay={300 + index * 50}
-            />
-          ))}
-        </nav>
-
-        {/* Settings Section */}
-        <SectionHeader title="SETTINGS" />
-        <nav className="mb-4 flex flex-col gap-1">
-          {settingsItems.map((item, index) => (
-            <NavigationItem
-              key={item.href}
-              icon={item.icon}
-              label={item.label}
-              href={item.href}
-              badge={item.badge}
-              shortcut={item.shortcut}
-              animationDelay={500 + index * 50}
-            />
-          ))}
-        </nav>
+        {/* Tools Section - Removed (integrated in Studio) */}
+        {/* Settings Section - Removed (not yet implemented) */}
 
         {/* Spacer */}
         <div className="flex-1" />

@@ -15,7 +15,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import ImageViewer from '@/components/molecules/ImageViewer';
 import EmptyState from '@/components/molecules/EmptyState';
 import LoadingState from '@/components/atoms/LoadingState';
@@ -45,8 +45,8 @@ export interface CanvasCoreProps {
   // Transform & filters (normal view)
   scale: number;
   position: { x: number; y: number };
-  onScaleChange: (scale: number) => void;
-  onPositionChange: (pos: { x: number; y: number }) => void;
+  onScaleChange: Dispatch<SetStateAction<number>>;
+  onPositionChange: Dispatch<SetStateAction<{ x: number; y: number }>>;
   
   // Side-by-side specific scales & positions
   leftImageScale: number;
@@ -80,7 +80,7 @@ export interface CanvasCoreProps {
   topPos: number;
   bottomPos: number;
   imagePadding: { top: number; bottom: number; left: number; right: number };
-  backgroundStyles: Record<string, any>;
+  backgroundStyles: Record<string, React.CSSProperties>;
   
   // Event handlers
   onImageLoad: () => void;
