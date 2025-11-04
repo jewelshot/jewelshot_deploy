@@ -22,9 +22,6 @@ import CanvasControls from './canvas/CanvasControls';
 import AIEditManager from './canvas/AIEditManager';
 import CanvasModals from './canvas/CanvasModals';
 
-// Keep Toast (managed by useToast hook in Canvas.tsx)
-import AILoadingOverlay from '@/components/atoms/AILoadingOverlay';
-
 interface CanvasProps {
   onPresetPrompt?: (prompt: string) => void;
 }
@@ -233,9 +230,13 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     isFullscreen,
     setIsFullscreen,
     isCropMode,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     adjustFilters: adjustFilters as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     colorFilters: colorFilters as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     filterEffects: filterEffects as any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     transform: transform as any,
     viewMode,
     activeImage,
