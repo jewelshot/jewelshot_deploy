@@ -32,9 +32,11 @@ export async function GET() {
     if (error) {
       // Kullanıcı yoksa oluştur (fallback)
       if (error.code === 'PGRST116') {
+        const insertData = [{ user_id: user.id, credits_remaining: 10 }];
         const { data: newData, error: insertError } = await supabase
           .from('user_credits')
-          .insert([{ user_id: user.id, credits_remaining: 10 }])
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .insert(insertData as any)
           .select()
           .single();
 
@@ -46,11 +48,17 @@ export async function GET() {
           );
         }
 
+        const typedData = newData as {
+          credits_remaining: number;
+          credits_used: number;
+          total_credits_purchased: number;
+        };
+
         return NextResponse.json({
           success: true,
-          credits: newData.credits_remaining,
-          used: newData.credits_used,
-          total_purchased: newData.total_credits_purchased,
+          credits: typedData.credits_remaining,
+          used: typedData.credits_used,
+          total_purchased: typedData.total_credits_purchased,
         });
       }
 
@@ -61,12 +69,19 @@ export async function GET() {
       );
     }
 
+    const typedData = data as {
+      credits_remaining: number;
+      credits_used: number;
+      total_credits_purchased: number;
+      last_generation_at: string | null;
+    };
+
     return NextResponse.json({
       success: true,
-      credits: data.credits_remaining,
-      used: data.credits_used,
-      total_purchased: data.total_credits_purchased,
-      last_generation_at: data.last_generation_at,
+      credits: typedData.credits_remaining,
+      used: typedData.credits_used,
+      total_purchased: typedData.total_credits_purchased,
+      last_generation_at: typedData.last_generation_at,
     });
   } catch (error) {
     console.error('[Credits Check] Unexpected error:', error);
