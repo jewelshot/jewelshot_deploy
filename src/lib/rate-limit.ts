@@ -62,7 +62,9 @@ export async function checkRateLimit(
     } = await supabase.auth.getUser();
     const userId = user?.id;
     const ipAddress =
-      request.headers.get('x-forwarded-for') || request.ip || 'unknown';
+      request.headers.get('x-forwarded-for') ||
+      request.headers.get('x-real-ip') ||
+      'unknown';
 
     // Get rate limit config
     const config = RATE_LIMITS[endpoint] || RATE_LIMITS['default'];
