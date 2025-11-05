@@ -3,14 +3,19 @@
  *
  * Main studio workspace with sidebar and canvas.
  * Uses dynamic imports for better code splitting.
+ * Mobile-responsive with simplified interface for touch devices.
  */
 
 'use client';
 
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import AuroraBackground from '@/components/atoms/AuroraBackground';
 import ErrorBoundary from '@/components/organisms/ErrorBoundary';
 import CanvasFallback from '@/components/molecules/CanvasFallback';
+import { useBreakpoint } from '@/hooks/useMediaQuery';
+import MobileStudioWarning from '@/components/organisms/MobileStudioWarning';
+import MobileStudio from '@/components/organisms/MobileStudio';
 
 // Dynamic imports for heavy components
 const Canvas = dynamic(() => import('@/components/organisms/Canvas'), {
@@ -52,6 +57,19 @@ const RateLimitIndicator = dynamic(
 );
 
 export default function StudioPage() {
+  const { isMobile } = useBreakpoint();
+  const [showMobileStudio, setShowMobileStudio] = useState(false);
+
+  // Initialize warning dismissed state from sessionStorage
+  const [warningDismissed, setWarningDismissed] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return (
+        sessionStorage.getItem('mobile-studio-warning-dismissed') === 'true'
+      );
+    }
+    return false;
+  });
+
   // Handle preset generation from RightSidebar
   const handleGenerateWithPreset = (prompt: string) => {
     // Trigger Canvas generation via global handler
@@ -63,6 +81,21 @@ export default function StudioPage() {
     }
   };
 
+  // Mobile: Show warning or simplified studio
+  if (isMobile && !warningDismissed) {
+    return (
+      <MobileStudioWarning
+        onTryMobileVersion={() => setShowMobileStudio(true)}
+      />
+    );
+  }
+
+  // Mobile: Simplified studio
+  if (isMobile && showMobileStudio) {
+    return <MobileStudio onBack={() => setShowMobileStudio(false)} />;
+  }
+
+  // Desktop: Full studio
   return (
     <>
       {/* Aurora Background */}
