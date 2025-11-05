@@ -19,10 +19,11 @@ const logger = createScopedLogger('API:Images');
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    // Next.js 16: params is now a Promise
+    const { id } = await params;
 
     if (!id || typeof id !== 'string') {
       return NextResponse.json({ error: 'Invalid image ID' }, { status: 400 });
