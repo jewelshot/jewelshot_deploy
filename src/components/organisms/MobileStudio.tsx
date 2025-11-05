@@ -11,7 +11,15 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Upload, Sparkles, Download, X, Sliders, Camera } from 'lucide-react';
+import {
+  Upload,
+  Sparkles,
+  Download,
+  X,
+  Sliders,
+  Camera,
+  Share2,
+} from 'lucide-react';
 import { useImageEdit } from '@/hooks/useImageEdit';
 import { logger } from '@/lib/logger';
 import { presetPrompts } from '@/lib/preset-prompts';
@@ -230,6 +238,63 @@ export function MobileStudio() {
     }
   };
 
+  const handleShare = async () => {
+    if (!image) return;
+
+    try {
+      // Check if Web Share API is supported
+      if (!navigator.share) {
+        logger.warn(
+          '[MobileStudio] Web Share API not supported, falling back to download'
+        );
+        alert(
+          'Sharing is not supported on this device. The image will be downloaded instead.'
+        );
+        await handleDownload();
+        return;
+      }
+
+      // Fetch image as blob
+      const response = await fetch(image);
+      const blob = await response.blob();
+
+      // Create File object for sharing
+      const file = new File([blob], `jewelshot-${Date.now()}.jpg`, {
+        type: 'image/jpeg',
+      });
+
+      // Check if files can be shared
+      if (navigator.canShare && !navigator.canShare({ files: [file] })) {
+        logger.warn(
+          '[MobileStudio] File sharing not supported, falling back to download'
+        );
+        alert(
+          'File sharing is not supported on this device. The image will be downloaded instead.'
+        );
+        await handleDownload();
+        return;
+      }
+
+      // Share via native share sheet
+      await navigator.share({
+        files: [file],
+        title: 'Jewelshot AI-Edited Image',
+        text: 'Check out this image I created with Jewelshot!',
+      });
+
+      logger.info('[MobileStudio] Image shared successfully');
+      setHasUnsavedChanges(false); // Mark as saved after sharing
+    } catch (error) {
+      // User cancelled or error occurred
+      if (error instanceof Error && error.name === 'AbortError') {
+        logger.info('[MobileStudio] Share cancelled by user');
+      } else {
+        logger.error('[MobileStudio] Share failed:', error);
+        alert('Failed to share image. Please try again.');
+      }
+    }
+  };
+
   // Use smooth progress for realistic animation
   const getProgressPercentage = () => {
     return Math.round(smoothProgress);
@@ -314,7 +379,7 @@ export function MobileStudio() {
         onChange={handleFileSelect}
         className="hidden"
       />
-      {/* Camera capture */}
+      {/* Camera capture - ALWAYS rear camera */}
       <input
         ref={cameraInputRef}
         type="file"
@@ -322,6 +387,7 @@ export function MobileStudio() {
         capture="environment"
         onChange={handleFileSelect}
         className="hidden"
+        aria-label="Take photo with rear camera"
       />
 
       {/* Top Bar - Compact */}
@@ -337,6 +403,16 @@ export function MobileStudio() {
           <div className="flex items-center gap-1.5">
             {image && (
               <>
+                {/* Share Button - Compact */}
+                <button
+                  onClick={handleShare}
+                  disabled={isEditing}
+                  className="group flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-blue-500/10 backdrop-blur-xl transition-all hover:border-blue-400/30 hover:bg-blue-500/20 active:scale-90 disabled:opacity-50"
+                  aria-label="Share image"
+                >
+                  <Share2 className="h-4 w-4 text-blue-300 transition-colors group-hover:text-white" />
+                </button>
+
                 {/* Download Button - Compact */}
                 <button
                   onClick={handleDownload}

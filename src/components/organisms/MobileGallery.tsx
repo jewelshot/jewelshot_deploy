@@ -12,7 +12,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Sparkles, Download, Trash2, Search } from 'lucide-react';
+import { Sparkles, Download, Trash2, Search, Share2 } from 'lucide-react';
 import {
   getSavedImages,
   deleteImageFromGallery,
@@ -93,6 +93,60 @@ export function MobileGallery() {
     } catch (error) {
       logger.error('[MobileGallery] Failed to delete image:', error);
       alert('Failed to delete image. Please try again.');
+    }
+  };
+
+  const handleShare = async (image: SavedImage) => {
+    try {
+      // Check if Web Share API is supported
+      if (!navigator.share) {
+        logger.warn(
+          '[MobileGallery] Web Share API not supported, falling back to download'
+        );
+        alert(
+          'Sharing is not supported on this device. The image will be downloaded instead.'
+        );
+        await handleDownload(image);
+        return;
+      }
+
+      // Fetch image as blob
+      const response = await fetch(image.src);
+      const blob = await response.blob();
+
+      // Create File object for sharing
+      const file = new File([blob], `jewelshot-${image.id}.jpg`, {
+        type: 'image/jpeg',
+      });
+
+      // Check if files can be shared
+      if (navigator.canShare && !navigator.canShare({ files: [file] })) {
+        logger.warn(
+          '[MobileGallery] File sharing not supported, falling back to download'
+        );
+        alert(
+          'File sharing is not supported on this device. The image will be downloaded instead.'
+        );
+        await handleDownload(image);
+        return;
+      }
+
+      // Share via native share sheet
+      await navigator.share({
+        files: [file],
+        title: 'Jewelshot AI-Edited Image',
+        text: 'Check out this image I created with Jewelshot!',
+      });
+
+      logger.info('[MobileGallery] Image shared successfully:', image.id);
+    } catch (error) {
+      // User cancelled or error occurred
+      if (error instanceof Error && error.name === 'AbortError') {
+        logger.info('[MobileGallery] Share cancelled by user');
+      } else {
+        logger.error('[MobileGallery] Share failed:', error);
+        alert('Failed to share image. Please try again.');
+      }
     }
   };
 
@@ -211,6 +265,18 @@ export function MobileGallery() {
                 {/* Overlay on Touch */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 transition-opacity group-active:opacity-100">
                   <div className="absolute bottom-2 left-2 right-2 flex gap-1.5">
+                    {/* Share - Compact */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleShare(image);
+                      }}
+                      className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-blue-500/10 backdrop-blur-xl transition-all hover:bg-blue-500/20 active:scale-90"
+                      aria-label="Share"
+                    >
+                      <Share2 className="h-3.5 w-3.5 text-blue-300" />
+                    </button>
+
                     {/* Download - Compact */}
                     <button
                       onClick={(e) => {
@@ -280,7 +346,18 @@ export function MobileGallery() {
 
             {/* Actions - Compact */}
             <div className="relative mt-2 flex gap-1.5">
-              {/* Download - Gradient */}
+              {/* Share - Blue Gradient */}
+              <button
+                onClick={() => handleShare(selectedImage)}
+                className="group relative flex-1 overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 p-[1px] shadow-md shadow-blue-500/30 transition-all hover:shadow-lg hover:shadow-blue-500/50 active:scale-95"
+              >
+                <div className="flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 px-4 py-2.5 text-sm font-semibold text-white transition-all group-hover:from-blue-600 group-hover:to-cyan-600">
+                  <Share2 className="h-4 w-4" />
+                  Share
+                </div>
+              </button>
+
+              {/* Download - Purple Gradient */}
               <button
                 onClick={() => handleDownload(selectedImage)}
                 className="group relative flex-1 overflow-hidden rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 p-[1px] shadow-md shadow-purple-500/30 transition-all hover:shadow-lg hover:shadow-purple-500/50 active:scale-95"
@@ -291,7 +368,7 @@ export function MobileGallery() {
                 </div>
               </button>
 
-              {/* Delete - Compact */}
+              {/* Delete - Red */}
               <button
                 onClick={() => {
                   handleDelete(selectedImage);
