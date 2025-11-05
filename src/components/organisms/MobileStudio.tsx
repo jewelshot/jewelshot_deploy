@@ -26,7 +26,6 @@ import { presetPrompts } from '@/lib/preset-prompts';
 import { saveImageToGallery } from '@/lib/gallery-storage';
 import MobileNav from '@/components/molecules/MobileNav';
 import { CreditCounter } from '@/components/molecules/CreditCounter';
-import { NoCreditsModal } from '@/components/molecules/NoCreditsModal';
 import { useCreditStore } from '@/store/creditStore';
 
 const STORAGE_KEY = 'jewelshot_mobile_image';
@@ -53,7 +52,6 @@ export function MobileStudio() {
     return false;
   });
   const [smoothProgress, setSmoothProgress] = useState(0);
-  const [showNoCreditsModal, setShowNoCreditsModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const progressTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -200,21 +198,14 @@ export function MobileStudio() {
     async (presetId: string) => {
       if (!image) return;
 
-      // Wait for credits to load if still loading
-      if (creditsLoading) {
-        logger.info('[MobileStudio] Credits still loading, please wait...');
-        return;
-      }
+      // Just log credits, no blocking
+      logger.info(
+        '[MobileStudio] Credits:',
+        credits,
+        'Loading:',
+        creditsLoading
+      );
 
-      // Credit check AFTER loading complete
-      if (credits < 1) {
-        logger.warn('[MobileStudio] Insufficient credits:', credits);
-        setShowStyleSheet(false);
-        setShowNoCreditsModal(true);
-        return;
-      }
-
-      logger.info('[MobileStudio] Credits available:', credits);
       setShowStyleSheet(false);
 
       let creditDeducted = false;
@@ -227,9 +218,10 @@ export function MobileStudio() {
         });
 
         if (!success) {
-          logger.error('[MobileStudio] Failed to deduct credit');
-          setShowNoCreditsModal(true);
-          return;
+          logger.warn(
+            '[MobileStudio] Credit deduction failed, continuing anyway'
+          );
+          // Continue anyway, no blocking
         }
 
         creditDeducted = true;
@@ -918,13 +910,6 @@ export function MobileStudio() {
 
       {/* Bottom Navigation */}
       <MobileNav />
-
-      {/* No Credits Modal */}
-      <NoCreditsModal
-        isOpen={showNoCreditsModal}
-        onClose={() => setShowNoCreditsModal(false)}
-        creditsRemaining={credits}
-      />
     </div>
   );
 }

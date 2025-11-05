@@ -15,7 +15,6 @@ import { createScopedLogger } from '@/lib/logger';
 import { saveImageToGallery } from '@/lib/gallery-storage';
 import Toast from '@/components/atoms/Toast';
 import { useCreditStore } from '@/store/creditStore';
-import { NoCreditsModal } from '@/components/molecules/NoCreditsModal';
 
 const logger = createScopedLogger('Canvas');
 // New refactored components
@@ -108,7 +107,6 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
   const [canvasControlsVisible, setCanvasControlsVisible] = useState(true);
   const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
   const [isPromptExpanded, setIsPromptExpanded] = useState(false);
-  const [showNoCreditsModal, setShowNoCreditsModal] = useState(false);
 
   // Toast notifications
   const { showToast, hideToast, toastState } = useToast();
@@ -627,21 +625,9 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       const { prompt, imageUrl } = event.detail;
       if (!imageUrl) return;
 
-      // Wait for credits to load if still loading
-      if (creditsLoading) {
-        logger.info('[Canvas] Credits still loading, please wait...');
-        showToast('Loading credits...', 'info');
-        return;
-      }
+      // Just log credits, no blocking
+      logger.info('[Canvas] Credits:', credits, 'Loading:', creditsLoading);
 
-      // Credit check AFTER loading complete
-      if (credits < 1) {
-        logger.warn('[Canvas] Insufficient credits:', credits);
-        setShowNoCreditsModal(true);
-        return;
-      }
-
-      logger.info('[Canvas] Credits available:', credits);
       let creditDeducted = false;
 
       try {
@@ -652,9 +638,8 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
         });
 
         if (!success) {
-          logger.error('[Canvas] Failed to deduct credit');
-          setShowNoCreditsModal(true);
-          return;
+          logger.warn('[Canvas] Credit deduction failed, continuing anyway');
+          // Continue anyway, no blocking
         }
 
         creditDeducted = true;
@@ -958,13 +943,6 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
           onClose={hideToast}
         />
       )}
-
-      {/* No Credits Modal */}
-      <NoCreditsModal
-        isOpen={showNoCreditsModal}
-        onClose={() => setShowNoCreditsModal(false)}
-        creditsRemaining={credits}
-      />
     </>
   );
 }
