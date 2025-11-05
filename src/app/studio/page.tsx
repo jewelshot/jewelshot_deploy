@@ -58,15 +58,7 @@ const RateLimitIndicator = dynamic(
 export default function StudioPage() {
   const { isMobile, isTablet, isDesktop } = useBreakpoint();
 
-  // Debug: Log breakpoint detection
-  useEffect(() => {
-    console.log('[Studio] Breakpoint detection:', {
-      isMobile,
-      isTablet,
-      isDesktop,
-      windowWidth: typeof window !== 'undefined' ? window.innerWidth : 'N/A',
-    });
-  }, [isMobile, isTablet, isDesktop]);
+  // Breakpoint detection (no logging in production)
 
   // Handle preset generation from RightSidebar
   const handleGenerateWithPreset = (prompt: string) => {

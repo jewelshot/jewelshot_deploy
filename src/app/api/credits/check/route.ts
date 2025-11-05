@@ -1,5 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
+import { createScopedLogger } from '@/lib/logger';
+
+const logger = createScopedLogger('API:Credits:Check');
 
 /**
  * GET /api/credits/check
@@ -41,7 +44,7 @@ export async function GET() {
           .single();
 
         if (insertError) {
-          console.error('[Credits Check] Insert error:', insertError);
+          logger.error('Insert error:', insertError.message);
           return NextResponse.json(
             { error: 'Failed to create user credits', credits: 0 },
             { status: 500 }
@@ -62,7 +65,7 @@ export async function GET() {
         });
       }
 
-      console.error('[Credits Check] Error:', error);
+      logger.error('Error:', error.message);
       return NextResponse.json(
         { error: 'Failed to fetch credits', credits: 0 },
         { status: 500 }
@@ -84,7 +87,10 @@ export async function GET() {
       last_generation_at: typedData.last_generation_at,
     });
   } catch (error) {
-    console.error('[Credits Check] Unexpected error:', error);
+    logger.error(
+      'Unexpected error:',
+      error instanceof Error ? error.message : 'Unknown'
+    );
     return NextResponse.json(
       { error: 'Internal server error', credits: 0 },
       { status: 500 }

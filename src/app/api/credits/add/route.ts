@@ -1,5 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { createScopedLogger } from '@/lib/logger';
+
+const logger = createScopedLogger('API:Credits:Add');
 
 /**
  * POST /api/credits/add
@@ -51,7 +54,7 @@ export async function POST(request: NextRequest) {
     const { data, error } = await supabase.rpc('add_credits', params as any);
 
     if (error) {
-      console.error('[Credits Add] RPC error:', error);
+      logger.error('RPC error:', error.message);
       return NextResponse.json(
         { error: 'Failed to add credits', success: false },
         { status: 500 }
@@ -81,7 +84,10 @@ export async function POST(request: NextRequest) {
       message: result.message,
     });
   } catch (error) {
-    console.error('[Credits Add] Unexpected error:', error);
+    logger.error(
+      'Unexpected error:',
+      error instanceof Error ? error.message : 'Unknown'
+    );
     return NextResponse.json(
       { error: 'Internal server error', success: false },
       { status: 500 }

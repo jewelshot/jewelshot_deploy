@@ -4,18 +4,15 @@ import { useReportWebVitals } from 'next/web-vitals';
 
 /**
  * Web Vitals Provider
- * 
+ *
  * Reports Core Web Vitals to analytics for performance monitoring
  * Tracks: CLS, FID, FCP, LCP, TTFB, INP
- * 
+ *
  * @see https://web.dev/vitals/
  */
 export function WebVitalsProvider() {
   useReportWebVitals((metric) => {
-    // Log to console in development
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[Web Vitals]', metric.name, metric.value, metric.rating);
-    }
+    // Vitals tracked automatically by Vercel Analytics
 
     // Send to analytics
     const body = JSON.stringify({
@@ -47,8 +44,25 @@ export function WebVitalsProvider() {
     }
 
     // Also send to Vercel Analytics if available
-    if (typeof window !== 'undefined' && (window as Window & { va?: (event: string, name: string, data: Record<string, unknown>) => void }).va) {
-      const win = window as Window & { va: (event: string, name: string, data: Record<string, unknown>) => void };
+    if (
+      typeof window !== 'undefined' &&
+      (
+        window as Window & {
+          va?: (
+            event: string,
+            name: string,
+            data: Record<string, unknown>
+          ) => void;
+        }
+      ).va
+    ) {
+      const win = window as Window & {
+        va: (
+          event: string,
+          name: string,
+          data: Record<string, unknown>
+        ) => void;
+      };
       win.va('event', 'webVital', {
         name: metric.name,
         value: metric.value,
@@ -59,4 +73,3 @@ export function WebVitalsProvider() {
 
   return null; // This component doesn't render anything
 }
-

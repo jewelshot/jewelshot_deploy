@@ -25,16 +25,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Log in development
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[Web Vitals API]', {
-        name: metric.name,
-        value: metric.value,
-        rating: metric.rating,
-        delta: metric.delta,
-        id: metric.id,
-      });
-    }
+    // Vitals tracked automatically by Vercel Analytics
 
     // In production, forward to your monitoring service
     if (process.env.NODE_ENV === 'production') {
@@ -64,8 +55,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
-    console.error('[Web Vitals API] Error:', error);
-
     // Don't break the client if analytics fail
     return NextResponse.json(
       { error: 'Failed to process metric' },

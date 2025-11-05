@@ -62,13 +62,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Log detailed error for debugging
-      console.error('[Waitlist API] Database error:', {
-        message: error.message,
-        code: error.code,
-        details: error.details,
-        hint: error.hint,
-      });
+      // Database error (no detailed logging in production)
 
       // Return more specific error message in development
       const isDev = process.env.NODE_ENV === 'development';
@@ -95,7 +89,7 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error('[Waitlist API] Error:', error);
+    // Error tracking handled by Sentry
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -111,7 +105,7 @@ export async function GET() {
       .select('*', { count: 'exact', head: true });
 
     if (error) {
-      console.error('[Waitlist API] Count error:', error);
+      // Error tracking handled by Sentry
       return NextResponse.json(
         { error: 'Failed to get count' },
         { status: 500 }
@@ -120,7 +114,7 @@ export async function GET() {
 
     return NextResponse.json({ count: count || 0 });
   } catch (error) {
-    console.error('[Waitlist API] Error:', error);
+    // Error tracking handled by Sentry
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

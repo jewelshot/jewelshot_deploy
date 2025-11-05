@@ -112,8 +112,7 @@ export async function checkRateLimit(
       reset: windowStart.getTime() + config.interval,
     };
   } catch (error) {
-    // On error, allow request (fail open)
-    console.error('[RateLimit] Error:', error);
+    // On error, allow request (fail open) - no logging in production
     return {
       allowed: true,
       remaining: -1,
