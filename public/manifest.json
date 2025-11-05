@@ -1,35 +1,72 @@
 {
-  "name": "Jewelshot Studio",
+  "name": "Jewelshot - AI-Powered Image Editing Studio",
   "short_name": "Jewelshot",
-  "description": "AI-Powered Jewelry Photo Editor",
-  "start_url": "/",
+  "description": "Professional AI-powered image editing studio. Transform, enhance, and edit your images with cutting-edge artificial intelligence.",
+  "start_url": "/studio?source=pwa",
   "display": "standalone",
-  "background_color": "#0a0a0b",
-  "theme_color": "#8b5cf6",
-  "orientation": "portrait-primary",
+  "background_color": "#0a0a0a",
+  "theme_color": "#9333ea",
+  "orientation": "any",
+  "scope": "/",
+  "lang": "en-US",
+  "dir": "ltr",
   "icons": [
     {
       "src": "/favicon.ico",
-      "sizes": "any",
+      "sizes": "48x48",
       "type": "image/x-icon"
-    }
-  ],
-  "categories": ["photo", "productivity", "business"],
-  "screenshots": [
-    {
-      "src": "/screenshot-desktop.jpg",
-      "sizes": "1280x720",
-      "type": "image/jpeg",
-      "form_factor": "wide",
-      "label": "Jewelshot Studio Editor"
     },
     {
-      "src": "/screenshot-mobile.jpg",
-      "sizes": "750x1334",
-      "type": "image/jpeg",
-      "form_factor": "narrow",
-      "label": "Jewelshot Studio Mobile"
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "maskable"
     }
-  ]
+  ],
+  "categories": ["photo", "productivity", "graphics", "design", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Studio",
+      "short_name": "Studio",
+      "description": "Open image editing studio",
+      "url": "/studio",
+      "icons": [
+        {
+          "src": "/apple-touch-icon.png",
+          "sizes": "180x180",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Gallery",
+      "short_name": "Gallery",
+      "description": "View your image gallery",
+      "url": "/gallery",
+      "icons": [
+        {
+          "src": "/apple-touch-icon.png",
+          "sizes": "180x180",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/og-image.jpg",
+      "sizes": "1200x630",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "Jewelshot Studio - AI Image Editor"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
 }
-
