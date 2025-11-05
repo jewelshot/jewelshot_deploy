@@ -114,7 +114,12 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
   const { showToast, hideToast, toastState } = useToast();
 
   // Credit store
-  const { credits, deductCredit } = useCreditStore();
+  const { credits, deductCredit, fetchCredits } = useCreditStore();
+
+  // Fetch credits on mount
+  useEffect(() => {
+    fetchCredits();
+  }, [fetchCredits]);
 
   // AI Image Edit & Comparison
   // Track AI image loading state

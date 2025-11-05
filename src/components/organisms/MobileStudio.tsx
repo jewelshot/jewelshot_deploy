@@ -59,7 +59,12 @@ export function MobileStudio() {
   const progressTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Credit store
-  const { credits, deductCredit } = useCreditStore();
+  const { credits, deductCredit, fetchCredits } = useCreditStore();
+
+  // Fetch credits on mount
+  useEffect(() => {
+    fetchCredits();
+  }, [fetchCredits]);
 
   const { edit, isEditing, progress } = useImageEdit({
     onSuccess: async (result) => {
