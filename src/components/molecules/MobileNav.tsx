@@ -7,13 +7,43 @@
 
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Home, Sparkles, Image } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { Home, Sparkles, Image, User, LogOut } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 export function MobileNav() {
   const pathname = usePathname();
+  const router = useRouter();
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [userName, setUserName] = useState<string>('');
+
+  // Fetch user name
+  useEffect(() => {
+    const fetchUser = async () => {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        setUserName(
+          user.user_metadata?.full_name?.split(' ')[0] ||
+            user.email?.split('@')[0] ||
+            'User'
+        );
+      }
+    };
+    fetchUser();
+  }, []);
+
+  // Handle logout
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push('/auth/login');
+    router.refresh();
+  };
 
   const isActive = (path: string) => {
     if (path === '/') return pathname === '/';
@@ -98,7 +128,60 @@ export function MobileNav() {
               </Link>
             );
           })}
+
+          {/* Profile Button */}
+          <button
+            onClick={() => setShowProfileMenu(!showProfileMenu)}
+            className="group relative flex flex-col items-center gap-1 py-1 transition-all duration-200"
+          >
+            <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-white/[0.03] transition-all duration-200 group-hover:bg-white/[0.08] group-active:scale-90">
+              <User className="h-5 w-5 text-white/50 transition-all duration-200 group-hover:text-white/80" />
+            </div>
+            <span className="text-[10px] font-medium text-white/50 transition-all duration-200 group-hover:text-white/80">
+              Profile
+            </span>
+          </button>
         </div>
+
+        {/* Profile Menu Popup */}
+        {showProfileMenu && (
+          <>
+            {/* Backdrop */}
+            <div
+              className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm"
+              onClick={() => setShowProfileMenu(false)}
+            />
+
+            {/* Menu */}
+            <div className="fixed bottom-20 right-4 z-50 w-64 overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/95 shadow-2xl backdrop-blur-xl">
+              {/* User Info */}
+              <div className="border-b border-white/10 p-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-500">
+                    <span className="text-sm font-semibold text-white">
+                      {userName.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-white">{userName}</p>
+                    <p className="text-xs text-white/50">Signed in</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Logout Button */}
+              <button
+                onClick={handleLogout}
+                className="flex w-full items-center gap-3 p-4 text-left transition-colors hover:bg-white/5 active:bg-white/10"
+              >
+                <LogOut className="h-5 w-5 text-red-400" />
+                <span className="text-sm font-medium text-red-400">
+                  Log Out
+                </span>
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </nav>
   );
