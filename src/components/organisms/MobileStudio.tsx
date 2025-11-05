@@ -14,6 +14,7 @@ import React, { useState, useRef } from 'react';
 import { Upload, Sparkles, Download, X, Sliders } from 'lucide-react';
 import { useImageEdit } from '@/hooks/useImageEdit';
 import { logger } from '@/lib/logger';
+import { presetPrompts } from '@/lib/preset-prompts';
 
 interface MobileStudioProps {
   onBack?: () => void;
@@ -49,15 +50,28 @@ export function MobileStudio({ onBack }: MobileStudioProps) {
     reader.readAsDataURL(file);
   };
 
-  const handleStyleApply = async (style: string) => {
+  const handleStyleApply = async (presetId: string) => {
     if (!image) return;
 
     setShowStyleSheet(false);
 
     try {
+      // Use the same preset prompts as desktop Quick Mode
+      const preset = presetPrompts[presetId];
+      if (!preset) {
+        logger.error('[MobileStudio] Unknown preset:', presetId);
+        return;
+      }
+
+      // Build the full professional prompt
+      // Default to 'ring' as jewelry type, '9:16' aspect ratio for mobile
+      const prompt = preset.buildPrompt('ring', undefined, '9:16');
+
+      logger.info('[MobileStudio] Applying preset:', presetId);
+
       await edit({
         image_url: image,
-        prompt: `Apply ${style} style to this jewelry image`,
+        prompt,
       });
     } catch (error) {
       logger.error('[MobileStudio] Style application failed:', error);
@@ -73,13 +87,44 @@ export function MobileStudio({ onBack }: MobileStudioProps) {
     link.click();
   };
 
+  // Use same presets as desktop Quick Mode
   const styles = [
-    { name: 'Clean White', emoji: '⚪', prompt: 'clean white background' },
-    { name: 'Luxury Gold', emoji: '🟡', prompt: 'luxury gold theme' },
-    { name: 'Minimalist', emoji: '◽', prompt: 'minimalist style' },
-    { name: 'Dramatic', emoji: '⚫', prompt: 'dramatic lighting' },
-    { name: 'Vintage', emoji: '🟤', prompt: 'vintage aesthetic' },
-    { name: 'Modern', emoji: '🔷', prompt: 'modern contemporary' },
+    {
+      id: 'e-commerce',
+      name: 'White Background',
+      emoji: '⚪',
+      description: 'E-commerce catalog',
+    },
+    {
+      id: 'still-life',
+      name: 'Still Life',
+      emoji: '🌸',
+      description: 'Minimalist pastel',
+    },
+    {
+      id: 'on-model',
+      name: 'On Model',
+      emoji: '👤',
+      description: 'Product focused',
+    },
+    {
+      id: 'lifestyle',
+      name: 'Lifestyle',
+      emoji: '☕',
+      description: 'Natural everyday',
+    },
+    {
+      id: 'luxury',
+      name: 'Luxury',
+      emoji: '💎',
+      description: 'High-fashion editorial',
+    },
+    {
+      id: 'close-up',
+      name: 'Close Up',
+      emoji: '🔍',
+      description: 'Macro detail',
+    },
   ];
 
   return (
@@ -217,13 +262,16 @@ export function MobileStudio({ onBack }: MobileStudioProps) {
             <div className="grid grid-cols-2 gap-3">
               {styles.map((style) => (
                 <button
-                  key={style.name}
-                  onClick={() => handleStyleApply(style.name)}
+                  key={style.id}
+                  onClick={() => handleStyleApply(style.id)}
                   disabled={isEditing}
                   className="flex flex-col items-center gap-2 rounded-xl border border-white/10 bg-white/5 p-4 text-center transition-all hover:bg-white/10 active:scale-95 disabled:opacity-50"
                 >
                   <span className="text-3xl">{style.emoji}</span>
                   <span className="font-medium text-white">{style.name}</span>
+                  <span className="text-[10px] text-white/50">
+                    {style.description}
+                  </span>
                 </button>
               ))}
             </div>
