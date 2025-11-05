@@ -86,49 +86,118 @@ export function MobileGallery() {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-black">
-        <div className="text-center">
-          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-purple-500 border-t-transparent"></div>
-          <p className="text-sm text-white/70">Loading gallery...</p>
+      <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-[#0a0a0a] via-[#1a0a2e] to-[#0a0a0a]">
+        {/* Aurora Background */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div
+            className="absolute -left-1/4 -top-1/4 h-96 w-96 animate-pulse rounded-full bg-purple-600/20 blur-[100px]"
+            style={{ animationDuration: '8s' }}
+          ></div>
+          <div
+            className="absolute -right-1/4 top-1/3 h-96 w-96 animate-pulse rounded-full bg-pink-600/15 blur-[100px]"
+            style={{ animationDuration: '10s', animationDelay: '2s' }}
+          ></div>
+        </div>
+
+        {/* Loading Content */}
+        <div className="relative text-center">
+          <div className="relative mx-auto mb-6 h-16 w-16">
+            {/* Spinning Ring */}
+            <div className="absolute inset-0 animate-spin rounded-full border-4 border-purple-500/20 border-t-purple-500"></div>
+            {/* Inner Glow */}
+            <div className="absolute inset-0 animate-pulse rounded-full bg-purple-500/20 blur-xl"></div>
+          </div>
+          <p className="text-sm font-medium">
+            <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent">
+              Loading gallery...
+            </span>
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-black">
-      {/* Top Bar */}
-      <div className="relative z-10 border-b border-white/10 bg-black/50 p-4 backdrop-blur-xl">
-        <h1 className="flex items-center gap-2 text-lg font-semibold text-white">
-          <Sparkles className="h-5 w-5 text-purple-400" />
-          My Gallery
-        </h1>
-        <p className="mt-1 text-xs text-white/50">
-          {images.length} {images.length === 1 ? 'image' : 'images'}
-        </p>
+    <div className="fixed inset-0 flex flex-col overflow-hidden bg-gradient-to-br from-[#0a0a0a] via-[#1a0a2e] to-[#0a0a0a]">
+      {/* Aurora Background Effect */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div
+          className="absolute -left-1/4 -top-1/4 h-96 w-96 animate-pulse rounded-full bg-purple-600/20 blur-[100px]"
+          style={{ animationDuration: '8s' }}
+        ></div>
+        <div
+          className="absolute -right-1/4 top-1/3 h-96 w-96 animate-pulse rounded-full bg-pink-600/15 blur-[100px]"
+          style={{ animationDuration: '10s', animationDelay: '2s' }}
+        ></div>
+        <div
+          className="absolute -bottom-1/4 left-1/3 h-96 w-96 animate-pulse rounded-full bg-blue-600/10 blur-[100px]"
+          style={{ animationDuration: '12s', animationDelay: '4s' }}
+        ></div>
+      </div>
+
+      {/* Top Bar - Glassmorphic */}
+      <div className="relative z-10 m-3 overflow-hidden rounded-3xl border border-white/20 bg-gradient-to-r from-white/[0.08] via-white/[0.05] to-white/[0.08] p-4 shadow-2xl backdrop-blur-2xl">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 via-pink-500 to-purple-600 shadow-lg shadow-purple-500/30">
+              <Sparkles className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold">
+                <span className="bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
+                  Gallery
+                </span>
+              </h1>
+              <p className="text-xs text-white/50">
+                {images.length} {images.length === 1 ? 'image' : 'images'}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Gallery Grid */}
-      <div className="flex-1 overflow-y-auto p-4 pb-20">
+      <div className="relative flex-1 overflow-y-auto p-4 pb-20">
         {images.length === 0 ? (
-          /* Empty State */
-          <div className="flex h-full flex-col items-center justify-center text-center">
-            <div className="mb-4 rounded-2xl bg-purple-500/20 p-6">
-              <Search className="h-16 w-16 text-purple-400" />
+          /* Empty State - Premium Glassmorphic Card */
+          <div className="flex h-full flex-col items-center justify-center p-6 text-center">
+            <div className="relative overflow-hidden rounded-3xl border border-white/20 bg-gradient-to-br from-white/[0.08] via-white/[0.03] to-white/[0.08] p-12 shadow-2xl backdrop-blur-2xl">
+              {/* Glow Effect */}
+              <div className="absolute -left-10 -top-10 h-32 w-32 animate-pulse rounded-full bg-purple-500/20 blur-3xl"></div>
+              <div
+                className="absolute -bottom-10 -right-10 h-32 w-32 animate-pulse rounded-full bg-pink-500/20 blur-3xl"
+                style={{ animationDelay: '1s' }}
+              ></div>
+
+              {/* Icon Container */}
+              <div className="relative mb-6 flex justify-center">
+                <div className="flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-purple-500/30 via-pink-500/20 to-purple-500/30 shadow-xl shadow-purple-500/20 backdrop-blur-xl">
+                  <Search className="h-12 w-12 text-purple-300" />
+                </div>
+              </div>
+
+              {/* Text */}
+              <h2 className="relative mb-2 text-2xl font-bold">
+                <span className="bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
+                  No Images Yet
+                </span>
+              </h2>
+              <p className="relative text-sm text-white/60">
+                Generate your first AI-edited image in Studio!
+              </p>
             </div>
-            <h2 className="mb-2 text-xl font-bold text-white">No Images Yet</h2>
-            <p className="mb-6 text-white/70">
-              Generate your first AI-edited image in Studio!
-            </p>
           </div>
         ) : (
-          /* Image Grid */
-          <div className="grid grid-cols-2 gap-3">
-            {images.map((image) => (
+          /* Image Grid - Premium Glassmorphic Cards */
+          <div className="relative grid grid-cols-2 gap-3">
+            {images.map((image, index) => (
               <div
                 key={image.id}
                 onClick={() => setSelectedImage(image)}
-                className="group relative aspect-square overflow-hidden rounded-xl bg-white/5 backdrop-blur-xl transition-all active:scale-95"
+                className="group relative aspect-square overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 via-white/[0.02] to-white/5 backdrop-blur-xl transition-all hover:border-white/20 hover:shadow-lg active:scale-95"
+                style={{
+                  animation: `fadeInUp 0.3s ease-out ${index * 0.05}s backwards`,
+                }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -137,25 +206,28 @@ export function MobileGallery() {
                   className="h-full w-full object-cover"
                 />
 
-                {/* Overlay on Hover/Touch */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 transition-opacity group-active:opacity-100">
-                  <div className="absolute bottom-2 left-2 right-2 flex gap-2">
+                {/* Gradient Overlay on Hover/Touch */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-purple-900/20 to-transparent opacity-0 transition-opacity group-active:opacity-100">
+                  <div className="absolute bottom-3 left-3 right-3 flex gap-2">
+                    {/* Download - Glassmorphic */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDownload(image);
                       }}
-                      className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 backdrop-blur-xl transition-all hover:bg-white/30 active:scale-90"
+                      className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/20 bg-white/10 backdrop-blur-xl transition-all hover:bg-white/20 active:scale-90"
                       aria-label="Download"
                     >
                       <Download className="h-4 w-4 text-white" />
                     </button>
+
+                    {/* Delete - Glassmorphic */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDelete(image);
                       }}
-                      className="flex h-8 w-8 items-center justify-center rounded-full bg-red-500/20 backdrop-blur-xl transition-all hover:bg-red-500/30 active:scale-90"
+                      className="flex h-10 w-10 items-center justify-center rounded-xl border border-red-500/30 bg-red-500/10 backdrop-blur-xl transition-all hover:border-red-500/50 hover:bg-red-500/20 active:scale-90"
                       aria-label="Delete"
                     >
                       <Trash2 className="h-4 w-4 text-red-400" />
@@ -163,9 +235,9 @@ export function MobileGallery() {
                   </div>
                 </div>
 
-                {/* AI Badge */}
+                {/* AI Badge - Premium Gradient */}
                 {image.type === 'ai-edited' && (
-                  <div className="absolute right-2 top-2 rounded-full bg-purple-500/80 px-2 py-1 text-[10px] font-medium text-white backdrop-blur-xl">
+                  <div className="absolute right-2 top-2 rounded-xl border border-purple-400/30 bg-gradient-to-r from-purple-500/80 via-pink-500/80 to-purple-500/80 px-3 py-1.5 text-[10px] font-bold text-white shadow-lg shadow-purple-500/30 backdrop-blur-xl">
                     AI
                   </div>
                 )}
@@ -175,51 +247,75 @@ export function MobileGallery() {
         )}
       </div>
 
-      {/* Image Detail Modal */}
+      {/* Image Detail Modal - Premium Glassmorphic */}
       {selectedImage && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xl"
           onClick={() => setSelectedImage(null)}
         >
           <div
-            className="relative max-h-[80vh] max-w-[90vw]"
+            className="relative max-h-[85vh] max-w-[92vw] overflow-hidden rounded-3xl border border-white/20 bg-gradient-to-br from-white/[0.08] via-white/[0.03] to-white/[0.08] p-3 shadow-2xl backdrop-blur-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={selectedImage.src}
-              alt={selectedImage.alt}
-              className="max-h-[80vh] max-w-[90vw] rounded-xl object-contain"
-            />
+            {/* Aurora Glow */}
+            <div className="pointer-events-none absolute inset-0 overflow-hidden">
+              <div className="absolute -left-1/4 -top-1/4 h-64 w-64 animate-pulse rounded-full bg-purple-600/20 blur-[100px]"></div>
+              <div
+                className="absolute -bottom-1/4 -right-1/4 h-64 w-64 animate-pulse rounded-full bg-pink-600/15 blur-[100px]"
+                style={{ animationDelay: '1s' }}
+              ></div>
+            </div>
 
-            {/* Actions */}
-            <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-3">
+            {/* Image Container */}
+            <div className="relative overflow-hidden rounded-2xl">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={selectedImage.src}
+                alt={selectedImage.alt}
+                className="max-h-[70vh] max-w-full rounded-2xl object-contain"
+              />
+            </div>
+
+            {/* Actions - Glassmorphic */}
+            <div className="relative mt-3 flex gap-2">
+              {/* Download - Premium Gradient */}
               <button
                 onClick={() => handleDownload(selectedImage)}
-                className="flex items-center gap-2 rounded-full bg-purple-500 px-6 py-3 font-medium text-white shadow-lg transition-all hover:bg-purple-600 active:scale-95"
+                className="group relative flex-1 overflow-hidden rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 p-[1px] shadow-xl shadow-purple-500/40 transition-all hover:shadow-2xl hover:shadow-purple-500/60 active:scale-95"
               >
-                <Download className="h-5 w-5" />
-                Download
+                <div className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 px-5 py-3 font-bold text-white transition-all group-hover:from-purple-600 group-hover:via-pink-600 group-hover:to-purple-600">
+                  <Download className="h-5 w-5" />
+                  Download
+                </div>
               </button>
+
+              {/* Delete - Glassmorphic */}
               <button
                 onClick={() => {
                   handleDelete(selectedImage);
                   setSelectedImage(null);
                 }}
-                className="flex items-center gap-2 rounded-full border border-red-500/50 bg-red-500/20 px-6 py-3 font-medium text-white backdrop-blur-xl transition-all hover:bg-red-500/30 active:scale-95"
+                className="group relative flex-1 overflow-hidden rounded-2xl border border-red-500/30 bg-red-500/10 px-5 py-3 font-bold text-white backdrop-blur-xl transition-all hover:border-red-500/50 hover:bg-red-500/20 hover:shadow-lg hover:shadow-red-500/20 active:scale-95"
               >
-                <Trash2 className="h-5 w-5" />
-                Delete
+                <div className="flex items-center justify-center gap-2">
+                  <Trash2 className="h-5 w-5" />
+                  Delete
+                </div>
               </button>
             </div>
 
-            {/* Prompt Info */}
+            {/* Prompt Info - Premium Glassmorphic */}
             {selectedImage.prompt && (
-              <div className="absolute left-4 right-4 top-4 rounded-xl border border-white/10 bg-black/80 p-3 backdrop-blur-xl">
-                <p className="text-[10px] font-medium text-purple-400">
-                  AI PROMPT
-                </p>
-                <p className="mt-1 text-xs text-white/80">
+              <div className="relative mt-3 overflow-hidden rounded-2xl border border-purple-400/20 bg-gradient-to-r from-purple-500/10 via-pink-500/5 to-purple-500/10 p-4 backdrop-blur-xl">
+                <div className="mb-1 flex items-center gap-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-purple-400 shadow-lg shadow-purple-500/50"></div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider">
+                    <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
+                      AI Prompt
+                    </span>
+                  </p>
+                </div>
+                <p className="text-xs leading-relaxed text-white/80">
                   {selectedImage.prompt}
                 </p>
               </div>

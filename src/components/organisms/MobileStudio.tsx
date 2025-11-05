@@ -266,7 +266,23 @@ export function MobileStudio() {
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-black">
+    <div className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-gradient-to-br from-[#0a0a0a] via-[#1a0a2e] to-[#0a0a0a]">
+      {/* Aurora Background Effect */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div
+          className="absolute -left-1/4 -top-1/4 h-96 w-96 animate-pulse rounded-full bg-purple-600/20 blur-[100px]"
+          style={{ animationDuration: '8s' }}
+        ></div>
+        <div
+          className="absolute -right-1/4 top-1/3 h-96 w-96 animate-pulse rounded-full bg-pink-600/15 blur-[100px]"
+          style={{ animationDuration: '10s', animationDelay: '2s' }}
+        ></div>
+        <div
+          className="absolute -bottom-1/4 left-1/3 h-96 w-96 animate-pulse rounded-full bg-blue-600/10 blur-[100px]"
+          style={{ animationDuration: '12s', animationDelay: '4s' }}
+        ></div>
+      </div>
+
       {/* Hidden file inputs */}
       {/* Gallery picker */}
       <input
@@ -286,76 +302,102 @@ export function MobileStudio() {
         className="hidden"
       />
 
-      {/* Top Bar */}
-      <div className="relative z-10 flex items-center justify-between border-b border-white/10 bg-black/50 p-4 backdrop-blur-xl">
-        <h1 className="flex items-center gap-2 text-lg font-semibold text-white">
-          <Sparkles className="h-5 w-5 text-purple-400" />
-          Jewelshot Studio
-        </h1>
+      {/* Top Bar - Glassmorphic */}
+      <div className="relative z-10 m-3 overflow-hidden rounded-3xl border border-white/20 bg-gradient-to-r from-white/[0.08] via-white/[0.05] to-white/[0.08] p-4 shadow-2xl backdrop-blur-2xl">
+        <div className="flex items-center justify-between">
+          <h1 className="flex items-center gap-2 text-lg font-bold">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 via-pink-500 to-purple-600 shadow-lg shadow-purple-500/30">
+              <Sparkles className="h-5 w-5 text-white" />
+            </div>
+            <span className="bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
+              Studio
+            </span>
+          </h1>
 
-        <div className="flex items-center gap-2">
-          {image && (
-            <>
-              {/* Download Button */}
-              <button
-                onClick={handleDownload}
-                disabled={isEditing}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-500 text-white transition-all hover:bg-purple-600 active:scale-95 disabled:opacity-50"
-                aria-label="Download image"
-              >
-                <Download className="h-5 w-5" />
-              </button>
+          <div className="flex items-center gap-2">
+            {image && (
+              <>
+                {/* Download Button - Glassmorphic */}
+                <button
+                  onClick={handleDownload}
+                  disabled={isEditing}
+                  className="group relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl border border-white/20 bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-purple-500/20 backdrop-blur-xl transition-all hover:border-purple-400/50 hover:shadow-lg hover:shadow-purple-500/30 active:scale-90 disabled:opacity-50"
+                  aria-label="Download image"
+                >
+                  <Download className="relative z-10 h-5 w-5 text-purple-300 transition-colors group-hover:text-white" />
+                </button>
 
-              {/* Clear Button */}
-              <button
-                onClick={handleClearImage}
-                disabled={isEditing}
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition-all hover:bg-white/20 active:scale-95 disabled:opacity-50"
-                aria-label="Clear image"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </>
-          )}
+                {/* Clear Button - Glassmorphic */}
+                <button
+                  onClick={handleClearImage}
+                  disabled={isEditing}
+                  className="group relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl border border-white/20 bg-white/5 backdrop-blur-xl transition-all hover:border-red-400/50 hover:bg-red-500/10 hover:shadow-lg hover:shadow-red-500/20 active:scale-90 disabled:opacity-50"
+                  aria-label="Clear image"
+                >
+                  <X className="relative z-10 h-5 w-5 text-white/60 transition-colors group-hover:text-red-400" />
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Canvas Area */}
       <div className="relative flex-1 overflow-hidden">
         {!image ? (
-          /* Upload State */
+          // Upload State - Premium Glassmorphic Card
           <div className="flex h-full flex-col items-center justify-center p-6">
-            <div className="mb-6 rounded-2xl bg-purple-500/20 p-6">
-              <Camera className="h-16 w-16 text-purple-400" />
-            </div>
+            {/* Main Card */}
+            <div className="relative overflow-hidden rounded-3xl border border-white/20 bg-gradient-to-br from-white/[0.08] via-white/[0.03] to-white/[0.08] p-8 shadow-2xl backdrop-blur-2xl">
+              {/* Glow Effect */}
+              <div className="absolute -left-10 -top-10 h-32 w-32 animate-pulse rounded-full bg-purple-500/20 blur-3xl"></div>
+              <div
+                className="absolute -bottom-10 -right-10 h-32 w-32 animate-pulse rounded-full bg-pink-500/20 blur-3xl"
+                style={{ animationDelay: '1s' }}
+              ></div>
 
-            <h2 className="mb-2 text-xl font-bold text-white">
-              Add Your Photo
-            </h2>
+              {/* Icon Container */}
+              <div className="relative mb-6 flex justify-center">
+                <div className="flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-purple-500/30 via-pink-500/20 to-purple-500/30 shadow-xl shadow-purple-500/20 backdrop-blur-xl">
+                  <Camera className="h-12 w-12 text-purple-300" />
+                </div>
+              </div>
 
-            <p className="mb-8 text-center text-white/70">
-              Take a photo or choose from your gallery
-            </p>
+              {/* Text */}
+              <h2 className="relative mb-2 text-center text-2xl font-bold">
+                <span className="bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
+                  Add Your Photo
+                </span>
+              </h2>
 
-            {/* Action Buttons */}
-            <div className="flex w-full max-w-sm flex-col gap-3">
-              {/* Take Photo (Camera) */}
-              <button
-                onClick={() => cameraInputRef.current?.click()}
-                className="flex items-center justify-center gap-3 rounded-xl bg-purple-500 px-8 py-4 font-medium text-white transition-all hover:bg-purple-600 active:scale-95"
-              >
-                <Camera className="h-5 w-5" />
-                Take Photo
-              </button>
+              <p className="relative mb-8 text-center text-sm text-white/60">
+                Take a photo or choose from your gallery
+              </p>
 
-              {/* Choose from Gallery */}
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="flex items-center justify-center gap-3 rounded-xl border border-white/20 bg-white/5 px-8 py-4 font-medium text-white backdrop-blur-xl transition-all hover:bg-white/10 active:scale-95"
-              >
-                <Upload className="h-5 w-5" />
-                Choose from Gallery
-              </button>
+              {/* Action Buttons */}
+              <div className="relative flex w-full flex-col gap-3">
+                {/* Take Photo (Camera) - Premium Gradient */}
+                <button
+                  onClick={() => cameraInputRef.current?.click()}
+                  className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 p-[1px] transition-all hover:shadow-lg hover:shadow-purple-500/50 active:scale-95"
+                >
+                  <div className="flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 px-8 py-4 font-semibold text-white transition-all group-hover:from-purple-600 group-hover:via-pink-600 group-hover:to-purple-600">
+                    <Camera className="h-5 w-5" />
+                    Take Photo
+                  </div>
+                </button>
+
+                {/* Choose from Gallery - Glassmorphic */}
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="group relative overflow-hidden rounded-2xl border border-white/20 bg-white/5 px-8 py-4 font-semibold text-white backdrop-blur-xl transition-all hover:border-white/30 hover:bg-white/10 hover:shadow-lg active:scale-95"
+                >
+                  <div className="flex items-center justify-center gap-3">
+                    <Upload className="h-5 w-5" />
+                    Choose from Gallery
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
         ) : (
@@ -494,79 +536,109 @@ export function MobileStudio() {
         )}
       </div>
 
-      {/* Floating Action Buttons (when image is loaded) */}
+      {/* Floating Action Buttons (when image is loaded) - Premium Glassmorphic */}
       {image && !isEditing && (
         <div className="absolute bottom-28 left-1/2 z-20 -translate-x-1/2">
-          <div className="flex gap-4">
-            {/* Upload New */}
-            <button
-              onClick={() => setShowUploadOptions(true)}
-              className="flex h-14 w-14 items-center justify-center rounded-full border border-white/20 bg-black/50 text-white backdrop-blur-xl transition-all hover:bg-white/10 active:scale-95"
-              aria-label="Add new image"
-            >
-              <Upload className="h-6 w-6" />
-            </button>
+          {/* Container with Aurora Glow */}
+          <div className="relative">
+            {/* Background Glow */}
+            <div className="absolute inset-0 -z-10 animate-pulse rounded-full bg-gradient-to-r from-purple-500/30 via-pink-500/30 to-purple-500/30 blur-2xl"></div>
 
-            {/* Styles */}
-            <button
-              onClick={() => setShowStyleSheet(true)}
-              className="flex h-14 items-center gap-2 rounded-full bg-purple-500 px-6 font-medium text-white shadow-lg transition-all hover:bg-purple-600 active:scale-95"
-            >
-              Styles
-            </button>
+            {/* Buttons */}
+            <div className="flex gap-3">
+              {/* Upload New - Glassmorphic */}
+              <button
+                onClick={() => setShowUploadOptions(true)}
+                className="group flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-white/20 bg-white/10 backdrop-blur-2xl transition-all hover:border-white/30 hover:bg-white/15 hover:shadow-lg active:scale-90"
+                aria-label="Add new image"
+              >
+                <Upload className="h-6 w-6 text-white/80 transition-colors group-hover:text-white" />
+              </button>
 
-            {/* Filters */}
-            <button
-              onClick={() => alert('Filters coming soon!')}
-              className="flex h-14 w-14 items-center justify-center rounded-full border border-white/20 bg-black/50 text-white backdrop-blur-xl transition-all hover:bg-white/10 active:scale-95"
-              aria-label="Filters"
-            >
-              <Sliders className="h-6 w-6" />
-            </button>
+              {/* Styles - Premium Gradient */}
+              <button
+                onClick={() => setShowStyleSheet(true)}
+                className="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 p-[1px] shadow-xl shadow-purple-500/40 transition-all hover:shadow-2xl hover:shadow-purple-500/60 active:scale-90"
+              >
+                <div className="flex h-14 items-center gap-2 rounded-2xl bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 px-6 font-bold text-white transition-all group-hover:from-purple-600 group-hover:via-pink-600 group-hover:to-purple-600">
+                  <Sparkles className="h-5 w-5" />
+                  Styles
+                </div>
+              </button>
+
+              {/* Filters - Glassmorphic */}
+              <button
+                onClick={() => alert('Filters coming soon!')}
+                className="group flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-white/20 bg-white/10 backdrop-blur-2xl transition-all hover:border-white/30 hover:bg-white/15 hover:shadow-lg active:scale-90"
+                aria-label="Filters"
+              >
+                <Sliders className="h-6 w-6 text-white/80 transition-colors group-hover:text-white" />
+              </button>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Bottom Sheet - AI Styles */}
+      {/* Bottom Sheet - AI Styles (Premium Glassmorphic) */}
       {showStyleSheet && (
         <div
-          className="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm"
+          className="fixed inset-0 z-30 bg-black/60 backdrop-blur-md"
           onClick={() => setShowStyleSheet(false)}
         >
           <div
-            className="absolute bottom-0 left-0 right-0 max-h-[70vh] overflow-y-auto rounded-t-3xl border-t border-white/10 bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a] p-6"
+            className="absolute bottom-0 left-0 right-0 max-h-[75vh] overflow-y-auto rounded-t-[2rem] border-t border-white/20 bg-gradient-to-b from-white/[0.12] via-white/[0.08] to-white/[0.12] p-6 shadow-2xl backdrop-blur-3xl"
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Aurora Glow */}
+            <div className="pointer-events-none absolute -top-20 left-0 right-0 h-40 bg-gradient-to-b from-purple-500/10 via-pink-500/5 to-transparent"></div>
+
             {/* Handle */}
-            <div className="mb-4 flex justify-center">
-              <div className="h-1 w-12 rounded-full bg-white/20" />
+            <div className="relative mb-5 flex justify-center">
+              <div className="h-1.5 w-16 rounded-full bg-gradient-to-r from-white/30 via-white/50 to-white/30 shadow-lg" />
             </div>
 
             {/* Header */}
-            <h3 className="mb-4 text-xl font-bold text-white">Choose Style</h3>
+            <h3 className="relative mb-5 text-center text-2xl font-bold">
+              <span className="bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
+                Choose Style
+              </span>
+            </h3>
 
-            {/* Styles Grid */}
-            <div className="grid grid-cols-2 gap-3">
-              {styles.map((style) => (
+            {/* Styles Grid - Premium Cards */}
+            <div className="relative grid grid-cols-2 gap-3">
+              {styles.map((style, index) => (
                 <button
                   key={style.id}
                   onClick={() => handleStyleApply(style.id)}
                   disabled={isEditing}
-                  className="flex flex-col items-center gap-2 rounded-xl border border-white/10 bg-white/5 p-4 text-center transition-all hover:bg-white/10 active:scale-95 disabled:opacity-50"
+                  className="group relative overflow-hidden rounded-2xl border border-white/20 bg-gradient-to-br from-white/10 via-white/5 to-white/10 p-4 text-center backdrop-blur-xl transition-all hover:border-purple-400/40 hover:shadow-lg hover:shadow-purple-500/20 active:scale-95 disabled:opacity-50"
+                  style={{
+                    animation: `fadeInUp 0.3s ease-out ${index * 0.05}s backwards`,
+                  }}
                 >
-                  <span className="text-3xl">{style.emoji}</span>
-                  <span className="font-medium text-white">{style.name}</span>
-                  <span className="text-[10px] text-white/50">
-                    {style.description}
-                  </span>
+                  {/* Hover Glow */}
+                  <div className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100">
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-pink-500/5 to-transparent"></div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="relative">
+                    <div className="mb-2 text-4xl">{style.emoji}</div>
+                    <div className="mb-1 font-bold text-white">
+                      {style.name}
+                    </div>
+                    <div className="text-[11px] text-white/50">
+                      {style.description}
+                    </div>
+                  </div>
                 </button>
               ))}
             </div>
 
-            {/* Cancel */}
+            {/* Cancel - Glassmorphic */}
             <button
               onClick={() => setShowStyleSheet(false)}
-              className="mt-4 w-full rounded-xl border border-white/10 bg-white/5 py-3 font-medium text-white transition-colors hover:bg-white/10"
+              className="relative mt-5 w-full overflow-hidden rounded-2xl border border-white/20 bg-white/5 py-4 font-bold text-white backdrop-blur-xl transition-all hover:border-white/30 hover:bg-white/10 active:scale-95"
             >
               Cancel
             </button>
@@ -574,58 +646,81 @@ export function MobileStudio() {
         </div>
       )}
 
-      {/* Bottom Sheet - Upload Options (Camera or Gallery) */}
+      {/* Bottom Sheet - Upload Options (Premium Glassmorphic) */}
       {showUploadOptions && (
         <div
-          className="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm"
+          className="fixed inset-0 z-30 bg-black/60 backdrop-blur-md"
           onClick={() => setShowUploadOptions(false)}
         >
           <div
-            className="absolute bottom-0 left-0 right-0 rounded-t-3xl border-t border-white/10 bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a] p-6"
+            className="absolute bottom-0 left-0 right-0 rounded-t-[2rem] border-t border-white/20 bg-gradient-to-b from-white/[0.12] via-white/[0.08] to-white/[0.12] p-6 shadow-2xl backdrop-blur-3xl"
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Aurora Glow */}
+            <div className="pointer-events-none absolute -top-20 left-0 right-0 h-40 bg-gradient-to-b from-purple-500/10 via-pink-500/5 to-transparent"></div>
+
             {/* Handle */}
-            <div className="mb-4 flex justify-center">
-              <div className="h-1 w-12 rounded-full bg-white/20" />
+            <div className="relative mb-5 flex justify-center">
+              <div className="h-1.5 w-16 rounded-full bg-gradient-to-r from-white/30 via-white/50 to-white/30 shadow-lg" />
             </div>
 
             {/* Header */}
-            <h3 className="mb-4 text-xl font-bold text-white">Add New Photo</h3>
+            <h3 className="relative mb-5 text-center text-2xl font-bold">
+              <span className="bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
+                Add New Photo
+              </span>
+            </h3>
 
-            {/* Options */}
-            <div className="space-y-3">
-              {/* Take Photo */}
+            {/* Options - Premium Cards */}
+            <div className="relative space-y-3">
+              {/* Take Photo - Glassmorphic with Gradient */}
               <button
                 onClick={() => {
                   setShowUploadOptions(false);
                   cameraInputRef.current?.click();
                 }}
-                className="flex w-full items-center gap-4 rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:bg-white/10 active:scale-95"
+                className="group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl border border-white/20 bg-gradient-to-r from-white/10 via-white/5 to-white/10 p-4 backdrop-blur-xl transition-all hover:border-purple-400/40 hover:shadow-lg hover:shadow-purple-500/20 active:scale-95"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-500/20">
-                  <Camera className="h-6 w-6 text-purple-400" />
+                {/* Hover Glow */}
+                <div className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100">
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-pink-500/5 to-transparent"></div>
                 </div>
-                <div className="flex-1 text-left">
-                  <div className="font-medium text-white">Take Photo</div>
+
+                {/* Icon Container */}
+                <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500/30 via-pink-500/20 to-purple-500/30 shadow-lg shadow-purple-500/10">
+                  <Camera className="h-7 w-7 text-purple-300" />
+                </div>
+
+                {/* Text */}
+                <div className="relative flex-1 text-left">
+                  <div className="font-bold text-white">Take Photo</div>
                   <div className="text-sm text-white/50">
                     Use your camera to capture
                   </div>
                 </div>
               </button>
 
-              {/* Choose from Gallery */}
+              {/* Choose from Gallery - Glassmorphic with Gradient */}
               <button
                 onClick={() => {
                   setShowUploadOptions(false);
                   fileInputRef.current?.click();
                 }}
-                className="flex w-full items-center gap-4 rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:bg-white/10 active:scale-95"
+                className="group relative flex w-full items-center gap-4 overflow-hidden rounded-2xl border border-white/20 bg-gradient-to-r from-white/10 via-white/5 to-white/10 p-4 backdrop-blur-xl transition-all hover:border-blue-400/40 hover:shadow-lg hover:shadow-blue-500/20 active:scale-95"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-500/20">
-                  <Upload className="h-6 w-6 text-blue-400" />
+                {/* Hover Glow */}
+                <div className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100">
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-cyan-500/5 to-transparent"></div>
                 </div>
-                <div className="flex-1 text-left">
-                  <div className="font-medium text-white">
+
+                {/* Icon Container */}
+                <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500/30 via-cyan-500/20 to-blue-500/30 shadow-lg shadow-blue-500/10">
+                  <Upload className="h-7 w-7 text-blue-300" />
+                </div>
+
+                {/* Text */}
+                <div className="relative flex-1 text-left">
+                  <div className="font-bold text-white">
                     Choose from Gallery
                   </div>
                   <div className="text-sm text-white/50">
@@ -635,10 +730,10 @@ export function MobileStudio() {
               </button>
             </div>
 
-            {/* Cancel */}
+            {/* Cancel - Glassmorphic */}
             <button
               onClick={() => setShowUploadOptions(false)}
-              className="mt-4 w-full rounded-xl border border-white/10 bg-white/5 py-3 font-medium text-white transition-colors hover:bg-white/10"
+              className="relative mt-5 w-full overflow-hidden rounded-2xl border border-white/20 bg-white/5 py-4 font-bold text-white backdrop-blur-xl transition-all hover:border-white/30 hover:bg-white/10 active:scale-95"
             >
               Cancel
             </button>
