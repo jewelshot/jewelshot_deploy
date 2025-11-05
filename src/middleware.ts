@@ -1,7 +1,57 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
+// ============================================
+// 🔒 MAINTENANCE MODE CONFIGURATION
+// ============================================
+const MAINTENANCE_MODE = false; // ✅ true = site kapalı, false = site açık
+const MAINTENANCE_PASSWORD = 'jewelshot2024'; // 🔑 Geliştirici bypass şifresi
+
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // ============================================
+  // 🚧 MAINTENANCE MODE CHECK (First Priority)
+  // ============================================
+  if (MAINTENANCE_MODE) {
+    // Allow access to maintenance page itself
+    if (pathname === '/maintenance') {
+      return NextResponse.next();
+    }
+
+    // Allow API routes for waitlist
+    if (pathname.startsWith('/api/waitlist')) {
+      return NextResponse.next();
+    }
+
+    // Bypass API endpoint
+    if (pathname === '/api/maintenance-bypass') {
+      const password = request.nextUrl.searchParams.get('password');
+      if (password === MAINTENANCE_PASSWORD) {
+        const response = NextResponse.redirect(new URL('/', request.url));
+        response.cookies.set('maintenance_bypass', 'true', {
+          maxAge: 60 * 60 * 24 * 7, // 7 days
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+        });
+        return response;
+      }
+      // Wrong password, redirect to maintenance
+      return NextResponse.redirect(new URL('/maintenance', request.url));
+    }
+
+    // Check for bypass cookie
+    const bypassCookie = request.cookies.get('maintenance_bypass');
+    if (!bypassCookie) {
+      // Redirect all traffic to maintenance page
+      return NextResponse.redirect(new URL('/maintenance', request.url));
+    }
+  }
+
+  // ============================================
+  // 🔐 NORMAL AUTH FLOW (if not in maintenance)
+  // ============================================
   let supabaseResponse = NextResponse.next({
     request,
   });
@@ -51,13 +101,15 @@ export async function middleware(request: NextRequest) {
   // 🔒 EMAIL VERIFICATION CHECK
   // If user is logged in but email not verified, redirect to verify page
   const isVerifyEmailPage = request.nextUrl.pathname === '/auth/verify-email';
-  
+
   if (user && isProtectedPath && !isVerifyEmailPage) {
     // Check if email is confirmed
     // Supabase returns confirmed_at or email_confirmed_at depending on version
-    const isEmailVerified = user.email_confirmed_at || 
-      ('confirmed_at' in user && (user as { confirmed_at?: string }).confirmed_at);
-    
+    const isEmailVerified =
+      user.email_confirmed_at ||
+      ('confirmed_at' in user &&
+        (user as { confirmed_at?: string }).confirmed_at);
+
     if (!isEmailVerified) {
       const url = request.nextUrl.clone();
       url.pathname = '/auth/verify-email';
@@ -67,7 +119,11 @@ export async function middleware(request: NextRequest) {
   }
 
   // Redirect to studio if accessing auth pages while logged in (except verify-email)
-  if (request.nextUrl.pathname.startsWith('/auth') && user && !isVerifyEmailPage) {
+  if (
+    request.nextUrl.pathname.startsWith('/auth') &&
+    user &&
+    !isVerifyEmailPage
+  ) {
     const url = request.nextUrl.clone();
     url.pathname = '/studio';
     return NextResponse.redirect(url);
