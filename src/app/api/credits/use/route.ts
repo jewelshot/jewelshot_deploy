@@ -25,11 +25,13 @@ export async function POST(request: NextRequest) {
     const { description = 'AI Generation', metadata = {} } = body;
 
     // use_credit function çağır (Supabase SQL function)
-    const { data, error } = await supabase.rpc('use_credit', {
+    const params = {
       p_user_id: user.id,
       p_description: description,
       p_metadata: metadata,
-    });
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await supabase.rpc('use_credit', params as any);
 
     if (error) {
       console.error('[Credits Use] RPC error:', error);

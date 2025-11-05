@@ -40,13 +40,15 @@ export async function POST(request: NextRequest) {
     }
 
     // add_credits function çağır (Supabase SQL function)
-    const { data, error } = await supabase.rpc('add_credits', {
+    const params = {
       p_user_id: user.id,
       p_amount: amount,
       p_type: type,
       p_description: description,
       p_metadata: metadata,
-    });
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await supabase.rpc('add_credits', params as any);
 
     if (error) {
       console.error('[Credits Add] RPC error:', error);
