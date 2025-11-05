@@ -24,45 +24,69 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { description = 'AI Generation', metadata = {} } = body;
 
-    // use_credit function çağır (Supabase SQL function)
-    const params = {
-      p_user_id: user.id,
-      p_description: description,
-      p_metadata: metadata,
-    };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await supabase.rpc('use_credit', params as any);
+    // ✅ 1. Mevcut credit'i kontrol et
+    const { data: creditData, error: fetchError } = await supabase
+      .from('user_credits')
+      .select('credits_remaining, credits_used')
+      .eq('user_id', user.id)
+      .single();
 
-    if (error) {
-      console.error('[Credits Use] RPC error:', error);
+    if (fetchError || !creditData) {
+      console.error('[Credits Use] Fetch error:', fetchError);
       return NextResponse.json(
-        { error: 'Failed to use credit', success: false },
+        { error: 'Failed to fetch credits', success: false },
         { status: 500 }
       );
     }
 
-    // Response from SQL function
-    const result = (Array.isArray(data) ? data[0] : data) as {
-      success: boolean;
-      credits_remaining: number;
-      message: string;
-    };
-
-    if (!result || !result.success) {
+    // Yetersiz credit kontrolü
+    if (creditData.credits_remaining < 1) {
       return NextResponse.json(
         {
           success: false,
-          error: result?.message || 'Unknown error',
-          credits: result?.credits_remaining || 0,
+          error: 'Insufficient credits',
+          credits: creditData.credits_remaining,
         },
         { status: 400 }
       );
     }
 
+    // ✅ 2. Credit düşür
+    const newCredits = creditData.credits_remaining - 1;
+    const newUsed = (creditData.credits_used || 0) + 1;
+
+    const { error: updateError } = await supabase
+      .from('user_credits')
+      .update({
+        credits_remaining: newCredits,
+        credits_used: newUsed,
+        last_generation_at: new Date().toISOString(),
+      })
+      .eq('user_id', user.id);
+
+    if (updateError) {
+      console.error('[Credits Use] Update error:', updateError);
+      return NextResponse.json(
+        { error: 'Failed to update credits', success: false },
+        { status: 500 }
+      );
+    }
+
+    // ✅ 3. Transaction kaydı oluştur
+    await supabase.from('credit_transactions').insert([
+      {
+        user_id: user.id,
+        amount: -1,
+        transaction_type: 'use',
+        description: description,
+        metadata: metadata,
+      },
+    ]);
+
     return NextResponse.json({
       success: true,
-      credits: result.credits_remaining,
-      message: result.message,
+      credits: newCredits,
+      message: 'Credit used successfully',
     });
   } catch (error) {
     console.error('[Credits Use] Unexpected error:', error);
