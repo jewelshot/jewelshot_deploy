@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Generate Jewelshot Icons</title>
+</head>
+<body>
+  <h2>Icon Generator for Jewelshot</h2>
+  <p>Right-click each canvas below and "Save Image As"</p>
+  
+  <!-- 512x512 Icon -->
+  <div>
+    <h3>icon-512.png (512x512)</h3>
+    <canvas id="icon512" width="512" height="512"></canvas>
+  </div>
+  
+  <!-- 192x192 Icon -->
+  <div>
+    <h3>icon-192.png (192x192)</h3>
+    <canvas id="icon192" width="192" height="192"></canvas>
+  </div>
+  
+  <!-- 180x180 Icon -->
+  <div>
+    <h3>apple-touch-icon.png (180x180)</h3>
+    <canvas id="icon180" width="180" height="180"></canvas>
+  </div>
+
+  <script>
+    function drawIcon(canvas, size) {
+      const ctx = canvas.getContext('2d');
+      
+      // Purple gradient background
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#9333ea'); // Purple
+      gradient.addColorStop(1, '#7c3aed'); // Darker purple
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, size, size);
+      
+      // White diamond/gem icon
+      ctx.fillStyle = '#ffffff';
+      ctx.font = `${size * 0.6}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('💎', size / 2, size / 2);
+      
+      // Optional: Add "JS" text
+      // ctx.fillStyle = '#ffffff';
+      // ctx.font = `bold ${size * 0.4}px Arial`;
+      // ctx.fillText('JS', size / 2, size / 2);
+    }
+    
+    // Generate all icons
+    drawIcon(document.getElementById('icon512'), 512);
+    drawIcon(document.getElementById('icon192'), 192);
+    drawIcon(document.getElementById('icon180'), 180);
+  </script>
+</body>
+</html>
+
