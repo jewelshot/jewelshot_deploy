@@ -81,7 +81,7 @@ export default function StudioPage() {
 
   // Mobile: Show simplified studio directly
   if (isMobile) {
-    return <MobileStudio onBack={() => (window.location.href = '/gallery')} />;
+    return <MobileStudio />;
   }
 
   // Desktop: Full studio

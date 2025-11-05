@@ -10,27 +10,44 @@
 
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Upload, Sparkles, Download, X, Sliders, Camera } from 'lucide-react';
 import { useImageEdit } from '@/hooks/useImageEdit';
 import { logger } from '@/lib/logger';
 import { presetPrompts } from '@/lib/preset-prompts';
 
-interface MobileStudioProps {
-  onBack?: () => void;
-}
+const STORAGE_KEY = 'jewelshot_mobile_image';
 
-export function MobileStudio({ onBack }: MobileStudioProps) {
-  const [image, setImage] = useState<string | null>(null);
+export function MobileStudio() {
+  // Load image from localStorage with lazy initialization
+  const [image, setImage] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      const savedImage = localStorage.getItem(STORAGE_KEY);
+      if (savedImage) {
+        logger.info('[MobileStudio] Loaded image from storage');
+        return savedImage;
+      }
+    }
+    return null;
+  });
+
   const [showStyleSheet, setShowStyleSheet] = useState(false);
   const [showUploadOptions, setShowUploadOptions] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return !!localStorage.getItem(STORAGE_KEY);
+    }
+    return false;
+  });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
-  const { edit, isEditing } = useImageEdit({
+  const { edit, isEditing, progress } = useImageEdit({
     onSuccess: (result) => {
       if (result.images && result.images.length > 0) {
-        setImage(result.images[0].url);
+        const newImage = result.images[0].url;
+        setImage(newImage);
+        setHasUnsavedChanges(true);
         logger.info('[MobileStudio] AI edit successful');
       }
     },
@@ -40,6 +57,28 @@ export function MobileStudio({ onBack }: MobileStudioProps) {
     },
   });
 
+  // Save image to localStorage whenever it changes
+  useEffect(() => {
+    if (image) {
+      localStorage.setItem(STORAGE_KEY, image);
+      logger.info('[MobileStudio] Image saved to storage');
+    }
+  }, [image]);
+
+  // Warn before leaving if there are unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges && image) {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges, image]);
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -48,8 +87,23 @@ export function MobileStudio({ onBack }: MobileStudioProps) {
     reader.onload = (event) => {
       const result = event.target?.result as string;
       setImage(result);
+      setHasUnsavedChanges(true);
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleClearImage = () => {
+    if (hasUnsavedChanges) {
+      const confirmed = confirm(
+        'You have unsaved changes. Are you sure you want to clear the image?'
+      );
+      if (!confirmed) return;
+    }
+
+    setImage(null);
+    setHasUnsavedChanges(false);
+    localStorage.removeItem(STORAGE_KEY);
+    logger.info('[MobileStudio] Image cleared');
   };
 
   const handleStyleApply = async (presetId: string) => {
@@ -87,6 +141,33 @@ export function MobileStudio({ onBack }: MobileStudioProps) {
     link.href = image;
     link.download = `jewelshot-${Date.now()}.jpg`;
     link.click();
+
+    // Mark as saved after download
+    setHasUnsavedChanges(false);
+    logger.info('[MobileStudio] Image downloaded');
+  };
+
+  // Simulate progress percentage for better UX
+  const getProgressPercentage = () => {
+    if (!isEditing) return 0;
+    if (progress.includes('complete') || progress.includes('success'))
+      return 100;
+    if (progress.includes('Uploading') || progress.includes('Initializing'))
+      return 15;
+    if (progress.includes('Processing') || progress.includes('Generating'))
+      return 45;
+    if (progress.includes('Finalizing') || progress.includes('Downloading'))
+      return 85;
+    return 30; // Default
+  };
+
+  const getProgressMessage = () => {
+    const percentage = getProgressPercentage();
+    if (percentage === 100) return 'Complete! ✨';
+    if (percentage > 80) return 'Almost there...';
+    if (percentage > 40) return 'Creating magic...';
+    if (percentage > 10) return 'Starting AI...';
+    return 'Initializing...';
   };
 
   // Use same presets as desktop Quick Mode
@@ -157,17 +238,31 @@ export function MobileStudio({ onBack }: MobileStudioProps) {
           Jewelshot Studio
         </h1>
 
-        {image && (
-          <button
-            onClick={handleDownload}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-500 text-white transition-all hover:bg-purple-600 active:scale-95"
-            aria-label="Download image"
-          >
-            <Download className="h-5 w-5" />
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {image && (
+            <>
+              {/* Download Button */}
+              <button
+                onClick={handleDownload}
+                disabled={isEditing}
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-500 text-white transition-all hover:bg-purple-600 active:scale-95 disabled:opacity-50"
+                aria-label="Download image"
+              >
+                <Download className="h-5 w-5" />
+              </button>
 
-        {!image && <div className="h-10 w-10" />}
+              {/* Clear Button */}
+              <button
+                onClick={handleClearImage}
+                disabled={isEditing}
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition-all hover:bg-white/20 active:scale-95 disabled:opacity-50"
+                aria-label="Clear image"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Canvas Area */}
@@ -211,11 +306,76 @@ export function MobileStudio({ onBack }: MobileStudioProps) {
         ) : (
           /* Image Display */
           <div className="flex h-full items-center justify-center p-4">
+            {/* Enhanced Progress Overlay */}
             {isEditing && (
-              <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-                <div className="text-center">
-                  <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-purple-500 border-t-transparent"></div>
-                  <p className="text-sm text-white">Applying AI magic...</p>
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/80 backdrop-blur-md">
+                <div className="mx-auto max-w-sm space-y-6 p-6 text-center">
+                  {/* Circular Progress */}
+                  <div className="relative mx-auto h-32 w-32">
+                    {/* Background Circle */}
+                    <svg className="h-full w-full -rotate-90 transform">
+                      <circle
+                        cx="64"
+                        cy="64"
+                        r="56"
+                        stroke="rgba(147, 51, 234, 0.2)"
+                        strokeWidth="8"
+                        fill="none"
+                      />
+                      {/* Progress Circle */}
+                      <circle
+                        cx="64"
+                        cy="64"
+                        r="56"
+                        stroke="#9333ea"
+                        strokeWidth="8"
+                        fill="none"
+                        strokeDasharray={`${2 * Math.PI * 56}`}
+                        strokeDashoffset={`${2 * Math.PI * 56 * (1 - getProgressPercentage() / 100)}`}
+                        strokeLinecap="round"
+                        className="transition-all duration-500"
+                      />
+                    </svg>
+                    {/* Percentage */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-white">
+                          {getProgressPercentage()}%
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Progress Messages */}
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-semibold text-white">
+                      {getProgressMessage()}
+                    </h3>
+                    <p className="text-sm text-white/70">
+                      {progress || 'Processing your image...'}
+                    </p>
+                  </div>
+
+                  {/* Animated Dots */}
+                  <div className="flex items-center justify-center gap-2">
+                    <div
+                      className="h-2 w-2 animate-bounce rounded-full bg-purple-500"
+                      style={{ animationDelay: '0ms' }}
+                    ></div>
+                    <div
+                      className="h-2 w-2 animate-bounce rounded-full bg-purple-500"
+                      style={{ animationDelay: '150ms' }}
+                    ></div>
+                    <div
+                      className="h-2 w-2 animate-bounce rounded-full bg-purple-500"
+                      style={{ animationDelay: '300ms' }}
+                    ></div>
+                  </div>
+
+                  {/* Tip */}
+                  <p className="text-xs text-white/50">
+                    💡 This may take 30-60 seconds
+                  </p>
                 </div>
               </div>
             )}
