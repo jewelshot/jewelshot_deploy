@@ -59,11 +59,9 @@ export function MobileStudio() {
           await saveImageToGallery(
             newImage,
             `mobile-${Date.now()}.jpg`,
-            'ai-edited',
-            {
-              prompt: result.prompt,
-              style: result.style,
-            }
+            'ai-edited'
+            // Note: prompt and style metadata not available from FalOutput
+            // Could be added in future if needed
           );
           logger.info('[MobileStudio] Image auto-saved to gallery');
 
