@@ -15,7 +15,7 @@ import React, { useState, useEffect } from 'react';
 import { Sparkles, Download, Trash2, Search } from 'lucide-react';
 import {
   getSavedImages,
-  deleteImage,
+  deleteImageFromGallery,
   type SavedImage,
 } from '@/lib/gallery-storage';
 import { logger } from '@/lib/logger';
@@ -56,7 +56,7 @@ export function MobileGallery() {
     if (!confirmed) return;
 
     try {
-      await deleteImage(image.id);
+      await deleteImageFromGallery(image.id);
       setImages((prev) => prev.filter((img) => img.id !== image.id));
       logger.info('[MobileGallery] Deleted image:', image.id);
     } catch (error) {
