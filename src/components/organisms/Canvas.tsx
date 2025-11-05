@@ -657,15 +657,10 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
   );
 
   useEffect(() => {
-    window.addEventListener(
-      'ai-edit-generate',
-      handleAIEditGenerate as EventListener
-    );
+    const eventHandler = handleAIEditGenerate as unknown as EventListener;
+    window.addEventListener('ai-edit-generate', eventHandler);
     return () => {
-      window.removeEventListener(
-        'ai-edit-generate',
-        handleAIEditGenerate as EventListener
-      );
+      window.removeEventListener('ai-edit-generate', eventHandler);
     };
   }, [handleAIEditGenerate]);
 
