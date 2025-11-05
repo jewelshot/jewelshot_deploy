@@ -15,6 +15,7 @@ import { Upload, Sparkles, Download, X, Sliders, Camera } from 'lucide-react';
 import { useImageEdit } from '@/hooks/useImageEdit';
 import { logger } from '@/lib/logger';
 import { presetPrompts } from '@/lib/preset-prompts';
+import { saveImageToGallery } from '@/lib/gallery-storage';
 import MobileNav from '@/components/molecules/MobileNav';
 
 const STORAGE_KEY = 'jewelshot_mobile_image';
@@ -46,12 +47,30 @@ export function MobileStudio() {
   const progressTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const { edit, isEditing, progress } = useImageEdit({
-    onSuccess: (result) => {
+    onSuccess: async (result) => {
       if (result.images && result.images.length > 0) {
         const newImage = result.images[0].url;
         setImage(newImage);
         setHasUnsavedChanges(true);
         logger.info('[MobileStudio] AI edit successful');
+
+        // Auto-save to gallery (Supabase)
+        try {
+          await saveImageToGallery(newImage, `mobile-${Date.now()}.jpg`, {
+            prompt: result.prompt,
+            style: result.style,
+          });
+          logger.info('[MobileStudio] Image auto-saved to gallery');
+
+          // Trigger gallery refresh event
+          window.dispatchEvent(new CustomEvent('gallery-updated'));
+        } catch (saveError) {
+          logger.error(
+            '[MobileStudio] Failed to auto-save to gallery:',
+            saveError
+          );
+          // Don't block user, just log the error
+        }
       }
     },
     onError: (error) => {

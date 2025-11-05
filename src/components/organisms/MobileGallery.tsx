@@ -11,7 +11,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Sparkles, Download, Trash2, Search } from 'lucide-react';
 import {
   getSavedImages,
@@ -26,11 +26,7 @@ export function MobileGallery() {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<SavedImage | null>(null);
 
-  useEffect(() => {
-    loadImages();
-  }, []);
-
-  const loadImages = async () => {
+  const loadImages = useCallback(async () => {
     try {
       setLoading(true);
       const savedImages = await getSavedImages();
@@ -41,7 +37,23 @@ export function MobileGallery() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadImages();
+
+    // Listen for gallery updates (e.g., from MobileStudio)
+    const handleGalleryUpdate = () => {
+      logger.info(
+        '[MobileGallery] Gallery update event received, reloading...'
+      );
+      loadImages();
+    };
+
+    window.addEventListener('gallery-updated', handleGalleryUpdate);
+    return () =>
+      window.removeEventListener('gallery-updated', handleGalleryUpdate);
+  }, [loadImages]);
 
   const handleDownload = async (image: SavedImage) => {
     try {
