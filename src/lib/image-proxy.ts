@@ -17,18 +17,18 @@ import { createScopedLogger } from './logger';
 const logger = createScopedLogger('ImageProxy');
 
 /**
- * Upload external image URL to Supabase Storage
+ * Upload external image URL to Supabase Storage and return custom URL
  *
  * @param externalUrl - External image URL (e.g., from FAL.ai)
  * @param filename - Optional custom filename
- * @returns Supabase Storage public URL
+ * @returns Custom URL: /api/images/{id}
  */
 export async function proxyImageToSupabase(
   externalUrl: string,
   filename?: string
 ): Promise<string> {
   try {
-    logger.info('Proxying external image to Supabase:', externalUrl);
+    logger.info('Proxying external image...');
 
     // 1. Fetch the image from external URL
     const response = await fetch(externalUrl);
@@ -39,12 +39,12 @@ export async function proxyImageToSupabase(
     const blob = await response.blob();
     const contentType = response.headers.get('content-type') || 'image/jpeg';
 
-    // 2. Generate unique filename
+    // 2. Generate unique filename (generic, no service names)
     const timestamp = Date.now();
     const randomStr = Math.random().toString(36).substring(7);
     const extension = contentType.split('/')[1] || 'jpg';
     const finalFilename =
-      filename || `generated-${timestamp}-${randomStr}.${extension}`;
+      filename || `img-${timestamp}-${randomStr}.${extension}`;
 
     // 3. Get authenticated Supabase client
     const supabase = createClient();
@@ -56,10 +56,10 @@ export async function proxyImageToSupabase(
       throw new Error('User must be authenticated to upload images');
     }
 
-    // 4. Upload to Supabase Storage (generations bucket)
+    // 4. Upload to Supabase Storage
     const filePath = `${user.id}/${finalFilename}`;
 
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('generations')
       .upload(filePath, blob, {
         contentType,
@@ -68,21 +68,38 @@ export async function proxyImageToSupabase(
       });
 
     if (uploadError) {
-      logger.error('Supabase upload failed:', uploadError.message);
+      logger.error('Upload failed:', uploadError.message);
       throw uploadError;
     }
 
-    // 5. Get public URL
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from('generations').getPublicUrl(filePath);
+    // 5. Save metadata to database
+    const { data: imageRecord, error: dbError } = await supabase
+      .from('generated_images')
+      .insert([
+        {
+          user_id: user.id,
+          storage_path: filePath,
+          original_url: externalUrl, // For debugging only
+          format: extension,
+          size_bytes: blob.size,
+        },
+      ])
+      .select('id')
+      .single();
 
-    logger.info('Image proxied successfully:', publicUrl);
-    return publicUrl;
+    if (dbError || !imageRecord) {
+      logger.error('Failed to save metadata:', dbError);
+      throw dbError;
+    }
+
+    // 6. Return custom URL (completely hides Supabase and FAL.ai)
+    const customUrl = `/api/images/${imageRecord.id}`;
+    logger.info('Image proxied successfully');
+
+    return customUrl;
   } catch (error) {
     logger.error('Failed to proxy image:', error);
     // Fallback: return original URL if proxy fails
-    // This ensures the app doesn't break, but logs the issue
     return externalUrl;
   }
 }

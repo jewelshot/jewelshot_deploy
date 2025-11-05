@@ -50,31 +50,35 @@ export function useImageEdit(options?: UseImageEditOptions) {
           setProgress(message || status);
         });
 
-        // 🔒 SECURITY: Proxy FAL.ai URLs through Supabase Storage
-        // This hides the FAL.ai source and maintains control over assets
+        // 🔒 SECURITY: Proxy external URLs through our own domain
+        // Completely hides all external service usage (FAL.ai, Supabase, etc.)
         setProgress('Securing image...');
 
         try {
-          const proxiedUrl = await proxyImageToSupabase(output.url);
-          logger.info('Image proxied:', {
-            original: output.url.substring(0, 50),
-            proxied: proxiedUrl.substring(0, 50),
-          });
+          // Returns: /api/images/{id} (our own domain)
+          const customUrl = await proxyImageToSupabase(output.url);
 
-          // Replace FAL URL with Supabase URL
-          const proxiedOutput: FalOutput = {
+          // Convert relative URL to absolute for better compatibility
+          const absoluteUrl = customUrl.startsWith('http')
+            ? customUrl
+            : `${window.location.origin}${customUrl}`;
+
+          logger.info('Image secured with custom URL');
+
+          // Replace external URL with our custom URL
+          const securedOutput: FalOutput = {
             ...output,
-            url: proxiedUrl,
+            url: absoluteUrl,
           };
 
-          setResult(proxiedOutput);
+          setResult(securedOutput);
           setProgress('Edit complete!');
-          options?.onSuccess?.(proxiedOutput);
+          options?.onSuccess?.(securedOutput);
 
-          return proxiedOutput;
+          return securedOutput;
         } catch (proxyError) {
           // If proxy fails, fallback to original URL
-          logger.error('Failed to proxy image, using original:', proxyError);
+          logger.error('Failed to secure image, using original:', proxyError);
           setResult(output);
           setProgress('Edit complete!');
           options?.onSuccess?.(output);
