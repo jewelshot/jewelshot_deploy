@@ -59,13 +59,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Response from SQL function
-    const result = Array.isArray(data) ? data[0] : data;
+    const result = (Array.isArray(data) ? data[0] : data) as {
+      success: boolean;
+      credits_remaining: number;
+      message: string;
+    };
 
-    if (!result.success) {
+    if (!result || !result.success) {
       return NextResponse.json(
         {
           success: false,
-          error: result.message,
+          error: result?.message || 'Unknown error',
         },
         { status: 400 }
       );
