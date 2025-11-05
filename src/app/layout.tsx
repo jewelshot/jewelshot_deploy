@@ -106,11 +106,6 @@ export const metadata: Metadata = {
     creator: '@jewelshot',
     site: '@jewelshot',
   },
-  icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon.ico',
-    apple: '/apple-touch-icon.png',
-  },
   manifest: '/manifest.json',
   alternates: {
     canonical: 'https://jewelshot.com',
