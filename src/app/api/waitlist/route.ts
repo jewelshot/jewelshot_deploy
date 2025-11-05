@@ -62,9 +62,23 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      console.error('[Waitlist API] Database error:', error);
+      // Log detailed error for debugging
+      console.error('[Waitlist API] Database error:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+      });
+
+      // Return more specific error message in development
+      const isDev = process.env.NODE_ENV === 'development';
       return NextResponse.json(
-        { error: 'Failed to add to waitlist. Please try again.' },
+        {
+          error: isDev
+            ? `Database error: ${error.message}`
+            : 'Failed to add to waitlist. Please try again.',
+          ...(isDev && { details: error }),
+        },
         { status: 500 }
       );
     }
