@@ -14,6 +14,8 @@ import { useCanvasHandlers } from '@/hooks/useCanvasHandlers';
 import { createScopedLogger } from '@/lib/logger';
 import { saveImageToGallery } from '@/lib/gallery-storage';
 import Toast from '@/components/atoms/Toast';
+import { useCreditStore } from '@/store/creditStore';
+import { NoCreditsModal } from '@/components/molecules/NoCreditsModal';
 
 const logger = createScopedLogger('Canvas');
 // New refactored components
@@ -106,9 +108,13 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
   const [canvasControlsVisible, setCanvasControlsVisible] = useState(true);
   const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
   const [isPromptExpanded, setIsPromptExpanded] = useState(false);
+  const [showNoCreditsModal, setShowNoCreditsModal] = useState(false);
 
   // Toast notifications
   const { showToast, hideToast, toastState } = useToast();
+
+  // Credit store
+  const { credits, deductCredit } = useCreditStore();
 
   // AI Image Edit & Comparison
   // Track AI image loading state
@@ -606,10 +612,33 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
   ]);
 
   // Listen for AI edit generation events from AIEditControl
-  useEffect(() => {
-    const handleAIEditGenerate = (event: CustomEvent) => {
+  const handleAIEditGenerate = useCallback(
+    async (event: CustomEvent) => {
       const { prompt, imageUrl } = event.detail;
-      if (imageUrl) {
+      if (!imageUrl) return;
+
+      // Credit check FIRST
+      if (credits < 1) {
+        logger.warn('[Canvas] Insufficient credits');
+        setShowNoCreditsModal(true);
+        return;
+      }
+
+      try {
+        // Use credit
+        const success = await deductCredit({
+          prompt: prompt || 'enhance',
+          style: 'ai-edit',
+        });
+
+        if (!success) {
+          logger.error('[Canvas] Failed to use credit');
+          setShowNoCreditsModal(true);
+          return;
+        }
+
+        logger.info('[Canvas] Credit used, proceeding with AI generation');
+
         // Save original image before AI editing
         setOriginalImage(imageUrl);
 
@@ -619,9 +648,15 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
           num_images: 1,
           output_format: 'jpeg',
         });
+      } catch (error) {
+        logger.error('[Canvas] AI generation failed:', error);
+        showToast('Failed to generate image', 'error');
       }
-    };
+    },
+    [credits, deductCredit, editWithAI, showToast]
+  );
 
+  useEffect(() => {
     window.addEventListener(
       'ai-edit-generate',
       handleAIEditGenerate as EventListener
@@ -632,7 +667,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
         handleAIEditGenerate as EventListener
       );
     };
-  }, [editWithAI]);
+  }, [handleAIEditGenerate]);
 
   // Smooth zoom transition when view mode changes
   useEffect(() => {
@@ -881,6 +916,13 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
           onClose={hideToast}
         />
       )}
+
+      {/* No Credits Modal */}
+      <NoCreditsModal
+        isOpen={showNoCreditsModal}
+        onClose={() => setShowNoCreditsModal(false)}
+        creditsRemaining={credits}
+      />
     </>
   );
 }

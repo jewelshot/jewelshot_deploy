@@ -10,7 +10,7 @@
 
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Upload,
   Sparkles,
@@ -25,6 +25,9 @@ import { logger } from '@/lib/logger';
 import { presetPrompts } from '@/lib/preset-prompts';
 import { saveImageToGallery } from '@/lib/gallery-storage';
 import MobileNav from '@/components/molecules/MobileNav';
+import { CreditCounter } from '@/components/molecules/CreditCounter';
+import { NoCreditsModal } from '@/components/molecules/NoCreditsModal';
+import { useCreditStore } from '@/store/creditStore';
 
 const STORAGE_KEY = 'jewelshot_mobile_image';
 
@@ -50,9 +53,13 @@ export function MobileStudio() {
     return false;
   });
   const [smoothProgress, setSmoothProgress] = useState(0);
+  const [showNoCreditsModal, setShowNoCreditsModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const progressTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Credit store
+  const { credits, deductCredit } = useCreditStore();
 
   const { edit, isEditing, progress } = useImageEdit({
     onSuccess: async (result) => {
@@ -179,33 +186,58 @@ export function MobileStudio() {
     logger.info('[MobileStudio] Image cleared');
   };
 
-  const handleStyleApply = async (presetId: string) => {
-    if (!image) return;
+  const handleStyleApply = useCallback(
+    async (presetId: string) => {
+      if (!image) return;
 
-    setShowStyleSheet(false);
-
-    try {
-      // Use the same preset prompts as desktop Quick Mode
-      const preset = presetPrompts[presetId];
-      if (!preset) {
-        logger.error('[MobileStudio] Unknown preset:', presetId);
+      // Credit check BEFORE closing sheet
+      if (credits < 1) {
+        logger.warn('[MobileStudio] Insufficient credits');
+        setShowStyleSheet(false);
+        setShowNoCreditsModal(true);
         return;
       }
 
-      // Build the full professional prompt
-      // Default to 'ring' as jewelry type, '9:16' aspect ratio for mobile
-      const prompt = preset.buildPrompt('ring', undefined, '9:16');
+      setShowStyleSheet(false);
 
-      logger.info('[MobileStudio] Applying preset:', presetId);
+      try {
+        // Use credit FIRST
+        const success = await deductCredit({
+          prompt: presetId,
+          style: presetId,
+        });
 
-      await edit({
-        image_url: image,
-        prompt,
-      });
-    } catch (error) {
-      logger.error('[MobileStudio] Style application failed:', error);
-    }
-  };
+        if (!success) {
+          logger.error('[MobileStudio] Failed to use credit');
+          setShowNoCreditsModal(true);
+          return;
+        }
+
+        logger.info('[MobileStudio] Credit used, proceeding with generation');
+
+        // Use the same preset prompts as desktop Quick Mode
+        const preset = presetPrompts[presetId];
+        if (!preset) {
+          logger.error('[MobileStudio] Unknown preset:', presetId);
+          return;
+        }
+
+        // Build the full professional prompt
+        // Default to 'ring' as jewelry type, '9:16' aspect ratio for mobile
+        const prompt = preset.buildPrompt('ring', undefined, '9:16');
+
+        logger.info('[MobileStudio] Applying preset:', presetId);
+
+        await edit({
+          image_url: image,
+          prompt,
+        });
+      } catch (error) {
+        logger.error('[MobileStudio] Style application failed:', error);
+      }
+    },
+    [image, credits, deductCredit, edit]
+  );
 
   const handleDownload = async () => {
     if (!image) return;
@@ -401,6 +433,9 @@ export function MobileStudio() {
           </h1>
 
           <div className="flex items-center gap-1.5">
+            {/* Credit Counter */}
+            <CreditCounter variant="mobile" />
+
             {image && (
               <>
                 {/* Share Button - Compact */}
@@ -819,6 +854,13 @@ export function MobileStudio() {
 
       {/* Bottom Navigation */}
       <MobileNav />
+
+      {/* No Credits Modal */}
+      <NoCreditsModal
+        isOpen={showNoCreditsModal}
+        onClose={() => setShowNoCreditsModal(false)}
+        creditsRemaining={credits}
+      />
     </div>
   );
 }

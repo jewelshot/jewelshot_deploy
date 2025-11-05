@@ -82,7 +82,7 @@ export function MobileStudioWarning({
               href="/gallery"
               className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 font-medium text-white transition-all hover:bg-white/10 active:scale-95"
             >
-              <Image className="h-5 w-5" />
+              <Image className="h-5 w-5" aria-hidden="true" />
               View Gallery
             </Link>
 
