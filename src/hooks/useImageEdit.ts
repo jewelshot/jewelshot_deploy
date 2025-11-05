@@ -7,6 +7,10 @@
 import { useState, useCallback } from 'react';
 import { editImage, type EditInput, type FalOutput } from '@/lib/ai/fal-client';
 import { aiRateLimiter } from '@/lib/rate-limiter';
+import { proxyImageToSupabase } from '@/lib/image-proxy';
+import { createScopedLogger } from '@/lib/logger';
+
+const logger = createScopedLogger('useImageEdit');
 
 interface UseImageEditOptions {
   onSuccess?: (result: FalOutput) => void;
@@ -46,11 +50,36 @@ export function useImageEdit(options?: UseImageEditOptions) {
           setProgress(message || status);
         });
 
-        setResult(output);
-        setProgress('Edit complete!');
-        options?.onSuccess?.(output);
+        // 🔒 SECURITY: Proxy FAL.ai URLs through Supabase Storage
+        // This hides the FAL.ai source and maintains control over assets
+        setProgress('Securing image...');
 
-        return output;
+        try {
+          const proxiedUrl = await proxyImageToSupabase(output.url);
+          logger.info('Image proxied:', {
+            original: output.url.substring(0, 50),
+            proxied: proxiedUrl.substring(0, 50),
+          });
+
+          // Replace FAL URL with Supabase URL
+          const proxiedOutput: FalOutput = {
+            ...output,
+            url: proxiedUrl,
+          };
+
+          setResult(proxiedOutput);
+          setProgress('Edit complete!');
+          options?.onSuccess?.(proxiedOutput);
+
+          return proxiedOutput;
+        } catch (proxyError) {
+          // If proxy fails, fallback to original URL
+          logger.error('Failed to proxy image, using original:', proxyError);
+          setResult(output);
+          setProgress('Edit complete!');
+          options?.onSuccess?.(output);
+          return output;
+        }
       } catch (err) {
         const error = err instanceof Error ? err : new Error('Unknown error');
         setError(error);
