@@ -44,10 +44,16 @@ export async function GET(
       return NextResponse.json({ error: 'Image not found' }, { status: 404 });
     }
 
+    // Type assertion for imageData
+    const typedImageData = imageData as {
+      storage_path: string;
+      user_id: string;
+    };
+
     // Fetch image from Supabase Storage
     const { data: fileData, error: storageError } = await supabase.storage
       .from('generations')
-      .download(imageData.storage_path);
+      .download(typedImageData.storage_path);
 
     if (storageError || !fileData) {
       logger.error('Failed to download image:', storageError);
@@ -62,7 +68,10 @@ export async function GET(
     const buffer = Buffer.from(arrayBuffer);
 
     // Determine content type from file extension
-    const extension = imageData.storage_path.split('.').pop()?.toLowerCase();
+    const extension = typedImageData.storage_path
+      .split('.')
+      .pop()
+      ?.toLowerCase();
     const contentType = getContentType(extension || 'jpg');
 
     // Return image with proper headers
