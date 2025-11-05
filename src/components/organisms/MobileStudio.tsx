@@ -11,7 +11,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { Upload, Sparkles, Download, X, Sliders } from 'lucide-react';
+import { Upload, Sparkles, Download, X, Sliders, Camera } from 'lucide-react';
 import { useImageEdit } from '@/hooks/useImageEdit';
 import { logger } from '@/lib/logger';
 import { presetPrompts } from '@/lib/preset-prompts';
@@ -23,7 +23,9 @@ interface MobileStudioProps {
 export function MobileStudio({ onBack }: MobileStudioProps) {
   const [image, setImage] = useState<string | null>(null);
   const [showStyleSheet, setShowStyleSheet] = useState(false);
+  const [showUploadOptions, setShowUploadOptions] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const { edit, isEditing } = useImageEdit({
     onSuccess: (result) => {
@@ -129,11 +131,21 @@ export function MobileStudio({ onBack }: MobileStudioProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-black">
-      {/* Hidden file input */}
+      {/* Hidden file inputs */}
+      {/* Gallery picker */}
       <input
         ref={fileInputRef}
         type="file"
         accept="image/*"
+        onChange={handleFileSelect}
+        className="hidden"
+      />
+      {/* Camera capture */}
+      <input
+        ref={cameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
         onChange={handleFileSelect}
         className="hidden"
       />
@@ -164,23 +176,37 @@ export function MobileStudio({ onBack }: MobileStudioProps) {
           /* Upload State */
           <div className="flex h-full flex-col items-center justify-center p-6">
             <div className="mb-6 rounded-2xl bg-purple-500/20 p-6">
-              <Upload className="h-16 w-16 text-purple-400" />
+              <Camera className="h-16 w-16 text-purple-400" />
             </div>
 
             <h2 className="mb-2 text-xl font-bold text-white">
-              Upload Your Image
+              Add Your Photo
             </h2>
 
-            <p className="mb-6 text-center text-white/70">
-              Tap the button below to select a jewelry photo from your device
+            <p className="mb-8 text-center text-white/70">
+              Take a photo or choose from your gallery
             </p>
 
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="rounded-xl bg-purple-500 px-8 py-4 font-medium text-white transition-all hover:bg-purple-600 active:scale-95"
-            >
-              Choose Photo
-            </button>
+            {/* Action Buttons */}
+            <div className="flex w-full max-w-sm flex-col gap-3">
+              {/* Take Photo (Camera) */}
+              <button
+                onClick={() => cameraInputRef.current?.click()}
+                className="flex items-center justify-center gap-3 rounded-xl bg-purple-500 px-8 py-4 font-medium text-white transition-all hover:bg-purple-600 active:scale-95"
+              >
+                <Camera className="h-5 w-5" />
+                Take Photo
+              </button>
+
+              {/* Choose from Gallery */}
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="flex items-center justify-center gap-3 rounded-xl border border-white/20 bg-white/5 px-8 py-4 font-medium text-white backdrop-blur-xl transition-all hover:bg-white/10 active:scale-95"
+              >
+                <Upload className="h-5 w-5" />
+                Choose from Gallery
+              </button>
+            </div>
           </div>
         ) : (
           /* Image Display */
@@ -210,9 +236,9 @@ export function MobileStudio({ onBack }: MobileStudioProps) {
           <div className="flex gap-4">
             {/* Upload New */}
             <button
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => setShowUploadOptions(true)}
               className="flex h-14 w-14 items-center justify-center rounded-full border border-white/20 bg-black/50 text-white backdrop-blur-xl transition-all hover:bg-white/10 active:scale-95"
-              aria-label="Upload new image"
+              aria-label="Add new image"
             >
               <Upload className="h-6 w-6" />
             </button>
@@ -279,6 +305,78 @@ export function MobileStudio({ onBack }: MobileStudioProps) {
             {/* Cancel */}
             <button
               onClick={() => setShowStyleSheet(false)}
+              className="mt-4 w-full rounded-xl border border-white/10 bg-white/5 py-3 font-medium text-white transition-colors hover:bg-white/10"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Bottom Sheet - Upload Options (Camera or Gallery) */}
+      {showUploadOptions && (
+        <div
+          className="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm"
+          onClick={() => setShowUploadOptions(false)}
+        >
+          <div
+            className="absolute bottom-0 left-0 right-0 rounded-t-3xl border-t border-white/10 bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a] p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Handle */}
+            <div className="mb-4 flex justify-center">
+              <div className="h-1 w-12 rounded-full bg-white/20" />
+            </div>
+
+            {/* Header */}
+            <h3 className="mb-4 text-xl font-bold text-white">Add New Photo</h3>
+
+            {/* Options */}
+            <div className="space-y-3">
+              {/* Take Photo */}
+              <button
+                onClick={() => {
+                  setShowUploadOptions(false);
+                  cameraInputRef.current?.click();
+                }}
+                className="flex w-full items-center gap-4 rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:bg-white/10 active:scale-95"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-500/20">
+                  <Camera className="h-6 w-6 text-purple-400" />
+                </div>
+                <div className="flex-1 text-left">
+                  <div className="font-medium text-white">Take Photo</div>
+                  <div className="text-sm text-white/50">
+                    Use your camera to capture
+                  </div>
+                </div>
+              </button>
+
+              {/* Choose from Gallery */}
+              <button
+                onClick={() => {
+                  setShowUploadOptions(false);
+                  fileInputRef.current?.click();
+                }}
+                className="flex w-full items-center gap-4 rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:bg-white/10 active:scale-95"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-500/20">
+                  <Upload className="h-6 w-6 text-blue-400" />
+                </div>
+                <div className="flex-1 text-left">
+                  <div className="font-medium text-white">
+                    Choose from Gallery
+                  </div>
+                  <div className="text-sm text-white/50">
+                    Select from your photos
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            {/* Cancel */}
+            <button
+              onClick={() => setShowUploadOptions(false)}
               className="mt-4 w-full rounded-xl border border-white/10 bg-white/5 py-3 font-medium text-white transition-colors hover:bg-white/10"
             >
               Cancel
