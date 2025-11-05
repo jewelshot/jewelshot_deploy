@@ -142,47 +142,45 @@ export function MobileNav() {
             </span>
           </button>
         </div>
+      </div>
 
-        {/* Profile Menu Popup */}
-        {showProfileMenu && (
-          <>
-            {/* Backdrop */}
-            <div
-              className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm"
-              onClick={() => setShowProfileMenu(false)}
-            />
+      {/* Profile Menu Popup - OUTSIDE nav container for proper z-index */}
+      {showProfileMenu && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 z-[60] bg-black/20 backdrop-blur-sm"
+            onClick={() => setShowProfileMenu(false)}
+          />
 
-            {/* Menu */}
-            <div className="fixed bottom-20 right-4 z-50 w-64 overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/95 shadow-2xl backdrop-blur-xl">
-              {/* User Info */}
-              <div className="border-b border-white/10 p-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-500">
-                    <span className="text-sm font-semibold text-white">
-                      {userName.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-white">{userName}</p>
-                    <p className="text-xs text-white/50">Signed in</p>
-                  </div>
+          {/* Menu */}
+          <div className="fixed bottom-20 right-4 z-[70] w-64 overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/95 shadow-2xl backdrop-blur-xl">
+            {/* User Info */}
+            <div className="border-b border-white/10 p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-500">
+                  <span className="text-sm font-semibold text-white">
+                    {userName.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-white">{userName}</p>
+                  <p className="text-xs text-white/50">Signed in</p>
                 </div>
               </div>
-
-              {/* Logout Button */}
-              <button
-                onClick={handleLogout}
-                className="flex w-full items-center gap-3 p-4 text-left transition-colors hover:bg-white/5 active:bg-white/10"
-              >
-                <LogOut className="h-5 w-5 text-red-400" />
-                <span className="text-sm font-medium text-red-400">
-                  Log Out
-                </span>
-              </button>
             </div>
-          </>
-        )}
-      </div>
+
+            {/* Logout Button */}
+            <button
+              onClick={handleLogout}
+              className="flex w-full items-center gap-3 p-4 text-left transition-colors hover:bg-white/5 active:bg-white/10"
+            >
+              <LogOut className="h-5 w-5 text-red-400" />
+              <span className="text-sm font-medium text-red-400">Log Out</span>
+            </button>
+          </div>
+        </>
+      )}
     </nav>
   );
 }
