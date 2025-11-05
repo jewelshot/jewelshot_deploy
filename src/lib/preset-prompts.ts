@@ -126,35 +126,60 @@ DIRECT SKIN CONTACT no air gaps no floating appearance
 Natural wearing physics realistic gravity drape
 Band/chain WRAPS jewelry SITS ON jewelry HANGS FROM natural physics
 
-CRITICAL PRESERVATION - ZERO TOLERANCE:
-EXACT jewelry structure geometry shape form UNCHANGED pixel-perfect
-EXACT gemstone count size position cut NO additions NO removals NO moves
-EXACT setting prongs bezels channels metal work UNCHANGED
-EXACT engravings texture proportions NO modifications
-ONLY lighting context change JEWELRY DESIGN 100% UNTOUCHED
+CRITICAL PRESERVATION - ABSOLUTE ZERO TOLERANCE - HIGHEST PRIORITY:
+⛔ JEWELRY DESIGN MUST REMAIN 100% PIXEL-IDENTICAL ⛔
+EXACT jewelry structure: geometry shape form dimensions COMPLETELY UNCHANGED
+EXACT gemstone count: SAME NUMBER of stones NO additions NO removals ZERO changes
+EXACT gemstone position: EXACT same placement arrangement pattern FROZEN
+EXACT gemstone size: SAME dimensions proportions LOCKED
+EXACT setting details: prongs bezels channels metalwork UNTOUCHED
+EXACT engravings: patterns textures inscriptions PRESERVED
+EXACT proportions: ALL ratios dimensions measurements MAINTAINED
+EXACT materials: metal finish texture appearance CONSISTENT
+⚠️ IF JEWELRY CHANGES EVEN 0.1% THE IMAGE IS FAILED ⚠️
+ONLY lighting shadows context environment MAY change
+JEWELRY ITSELF = SACRED UNTOUCHABLE FROZEN LOCKED
 
-STRICTLY FORBIDDEN - NEGATIVE PROMPT:
-distorted warped morphed jewelry shapes
-added removed moved gemstones or decorative elements
-changed gemstone count or arrangement
-modified ring band thickness or curvature
-altered prong settings or metalwork
-blurry soft-focus product
-new jewelry appearing on body
-floating suspended hovering jewelry not touching skin
-flat 2D placement no depth perspective
-jewelry design alterations ANY modifications to original piece
-stiff forced poses
-harsh studio lighting sterile backgrounds
-oversized cartoonish jewelry proportions
+STRICTLY FORBIDDEN - NEGATIVE PROMPT - INSTANT REJECTION:
+❌ distorted warped melted deformed jewelry shapes
+❌ added extra new gemstones decorative elements
+❌ removed missing gemstones parts
+❌ moved repositioned gemstones from original
+❌ changed gemstone count number arrangement
+❌ modified ring band thickness width curvature
+❌ altered prong settings bezels channels
+❌ transformed jewelry structure design
+❌ blurry soft-focus unclear product details
+❌ new jewelry appearing on body parts
+❌ floating suspended hovering jewelry not touching skin
+❌ flat 2D cardboard cutout placement
+❌ jewelry design alterations modifications
+❌ oversized gigantic cartoonish jewelry
+❌ miniature tiny doll-sized jewelry
+❌ stiff rigid forced awkward poses
+❌ mannequin statue lifeless poses
+❌ harsh studio lighting sterile backgrounds
+❌ unnatural hand positions finger poses
+❌ wide distant far away shots
+❌ jewelry too small in frame
 
-STYLE & COMPOSITION:
+STYLE & COMPOSITION - CLOSER FRAMING:
 Natural environment: cafe home outdoor urban setting
 Background: Soft blurred bokeh lifestyle context RGB(200,190,180) warm tones
 Model: ${genderText} relatable natural casual contemporary wear
 Jewelry placement: ${placement}
-Camera: Eye level medium framing environmental storytelling
-Aesthetic: Editorial Instagram feed organic
+Camera: CLOSER framing jewelry fills 40-50% of frame product clearly visible detailed
+Framing: Medium-close shot NOT wide NOT distant jewelry prominent in composition
+Distance: Arm's length to model natural conversation distance
+Aesthetic: Editorial Instagram feed organic candid authentic
+
+MODEL POSE - NATURAL RELAXED:
+Body: Relaxed loose natural everyday movement
+Hands: Gentle organic gestures NOT stiff NOT posed
+Face: Natural expression genuine smile or neutral
+Posture: Comfortable casual authentic real-life positioning
+Energy: Effortless spontaneous candid captured moment
+Movement: Slight natural motion blur acceptable for realism
 
 LIGHTING - TECHNICAL SPECS:
 Natural window light or outdoor daylight soft diffused
@@ -330,36 +355,60 @@ DIRECT SKIN CONTACT no air gaps no floating appearance
 Natural wearing physics realistic gravity drape
 Band/chain WRAPS jewelry SITS ON jewelry HANGS FROM natural physics
 
-CRITICAL PRESERVATION - ZERO TOLERANCE:
-EXACT jewelry structure geometry shape form UNCHANGED pixel-perfect
-EXACT gemstone count size position cut NO additions NO removals NO moves
-EXACT setting prongs bezels channels metal work UNCHANGED
-EXACT engravings texture proportions NO modifications
-ONLY lighting positioning change JEWELRY DESIGN 100% UNTOUCHED
+CRITICAL PRESERVATION - ABSOLUTE ZERO TOLERANCE - HIGHEST PRIORITY:
+⛔ JEWELRY DESIGN MUST REMAIN 100% PIXEL-IDENTICAL ⛔
+EXACT jewelry structure: geometry shape form dimensions COMPLETELY UNCHANGED
+EXACT gemstone count: SAME NUMBER of stones NO additions NO removals ZERO changes
+EXACT gemstone position: EXACT same placement arrangement pattern FROZEN
+EXACT gemstone size: SAME dimensions proportions LOCKED
+EXACT setting details: prongs bezels channels metalwork UNTOUCHED
+EXACT engravings: patterns textures inscriptions PRESERVED
+EXACT proportions: ALL ratios dimensions measurements MAINTAINED
+EXACT materials: metal finish texture appearance CONSISTENT
+⚠️ IF JEWELRY CHANGES EVEN 0.1% THE IMAGE IS FAILED ⚠️
+ONLY lighting shadows positioning MAY change
+JEWELRY ITSELF = SACRED UNTOUCHABLE FROZEN LOCKED
 
-STRICTLY FORBIDDEN - NEGATIVE PROMPT:
-distorted warped morphed jewelry shapes
-added removed moved gemstones or decorative elements
-changed gemstone count or arrangement
-modified ring band thickness or curvature
-altered prong settings or metalwork
-blurry soft-focus product
-new jewelry appearing on body
-floating suspended hovering jewelry not touching skin
-flat 2D placement no depth perspective
-jewelry design alterations ANY modifications to original piece
-busy backgrounds distractions
-harsh lighting dramatic shadows
-unnatural forced poses
-oversized cartoonish jewelry proportions
+STRICTLY FORBIDDEN - NEGATIVE PROMPT - INSTANT REJECTION:
+❌ distorted warped melted deformed jewelry shapes
+❌ added extra new gemstones decorative elements
+❌ removed missing gemstones parts
+❌ moved repositioned gemstones from original
+❌ changed gemstone count number arrangement
+❌ modified ring band thickness width curvature
+❌ altered prong settings bezels channels
+❌ transformed jewelry structure design
+❌ blurry soft-focus unclear product details
+❌ new jewelry appearing on body parts
+❌ floating suspended hovering jewelry not touching skin
+❌ flat 2D cardboard cutout placement
+❌ jewelry design alterations modifications
+❌ oversized gigantic cartoonish jewelry
+❌ miniature tiny doll-sized jewelry
+❌ stiff rigid forced awkward poses
+❌ mannequin statue lifeless poses
+❌ busy cluttered distracting backgrounds
+❌ harsh dramatic lighting shadows
+❌ unnatural hand positions finger poses
+❌ wide distant far away shots
+❌ jewelry too small in frame
 
-STYLE & COMPOSITION:
+STYLE & COMPOSITION - CLOSER FRAMING:
 Background: Neutral solid white/gray/beige RGB(245,245,245) seamless paper smooth
 Model: ${genderText} professional elegant natural polished
 Jewelry placement: ${placement} naturally worn
-Camera: Eye level or slightly above medium close-up
-Framing: Jewelry prominent centered model supporting minimal negative space
+Camera: CLOSER framing jewelry fills 35-45% of frame product clearly visible detailed
+Framing: Medium-close shot NOT wide NOT distant jewelry prominent in composition
+Distance: 1-2 meters to model focused on jewelry area
 Aesthetic: Clean commercial e-commerce product-focused
+
+MODEL POSE - NATURAL ELEGANT:
+Body: Relaxed elegant natural comfortable positioning
+Hands: Graceful gentle gestures NOT stiff NOT forced
+Face: Natural expression serene confident slight smile
+Posture: Comfortable poised authentic elegant positioning
+Energy: Effortless refined natural sophisticated
+Movement: Minimal natural slight organic positioning
 
 LIGHTING - TECHNICAL SPECS:
 Soft studio lighting: key light diffused 45 degree front
@@ -517,36 +566,62 @@ DIRECT SKIN CONTACT no air gaps no floating appearance
 Natural wearing physics realistic gravity drape
 Band/chain WRAPS jewelry SITS ON jewelry HANGS FROM natural physics
 
-CRITICAL PRESERVATION - ZERO TOLERANCE:
-EXACT jewelry structure geometry shape form UNCHANGED pixel-perfect
-EXACT gemstone count size position cut NO additions NO removals NO moves
-EXACT setting prongs bezels channels metal work UNCHANGED
-EXACT engravings texture proportions NO modifications
-ONLY lighting styling background change JEWELRY DESIGN 100% UNTOUCHED
+CRITICAL PRESERVATION - ABSOLUTE ZERO TOLERANCE - HIGHEST PRIORITY:
+⛔ JEWELRY DESIGN MUST REMAIN 100% PIXEL-IDENTICAL ⛔
+EXACT jewelry structure: geometry shape form dimensions COMPLETELY UNCHANGED
+EXACT gemstone count: SAME NUMBER of stones NO additions NO removals ZERO changes
+EXACT gemstone position: EXACT same placement arrangement pattern FROZEN
+EXACT gemstone size: SAME dimensions proportions LOCKED
+EXACT setting details: prongs bezels channels metalwork UNTOUCHED
+EXACT engravings: patterns textures inscriptions PRESERVED
+EXACT proportions: ALL ratios dimensions measurements MAINTAINED
+EXACT materials: metal finish texture appearance CONSISTENT
+⚠️ IF JEWELRY CHANGES EVEN 0.1% THE IMAGE IS FAILED ⚠️
+ONLY lighting styling background atmosphere MAY change
+JEWELRY ITSELF = SACRED UNTOUCHABLE FROZEN LOCKED
 
-STRICTLY FORBIDDEN - NEGATIVE PROMPT:
-distorted warped morphed jewelry shapes
-added removed moved gemstones or decorative elements
-changed gemstone count or arrangement
-modified ring band thickness or curvature
-altered prong settings or metalwork
-blurry soft-focus product
-new jewelry appearing on body
-floating suspended hovering jewelry not touching skin
-flat 2D placement no depth perspective
-jewelry design alterations ANY modifications to original piece
-casual elements flat lighting
-cluttered backgrounds amateur styling overprocessing
-oversized cartoonish jewelry proportions
+STRICTLY FORBIDDEN - NEGATIVE PROMPT - INSTANT REJECTION:
+❌ distorted warped melted deformed jewelry shapes
+❌ added extra new gemstones decorative elements
+❌ removed missing gemstones parts
+❌ moved repositioned gemstones from original
+❌ changed gemstone count number arrangement
+❌ modified ring band thickness width curvature
+❌ altered prong settings bezels channels
+❌ transformed jewelry structure design
+❌ blurry soft-focus unclear product details
+❌ new jewelry appearing on body parts
+❌ floating suspended hovering jewelry not touching skin
+❌ flat 2D cardboard cutout placement
+❌ jewelry design alterations modifications
+❌ oversized gigantic cartoonish jewelry
+❌ miniature tiny doll-sized jewelry
+❌ stiff rigid forced awkward poses
+❌ mannequin statue lifeless poses
+❌ casual elements flat lighting
+❌ cluttered backgrounds amateur styling
+❌ overprocessing artificial editing
+❌ unnatural hand positions finger poses
+❌ wide distant far away shots
+❌ jewelry too small in frame
 
-STYLE & COMPOSITION:
+STYLE & COMPOSITION - CLOSER DRAMATIC FRAMING:
 Sophisticated upscale environment elegant dramatic architectural
 Background: Deep rich blacks RGB(15,15,15) jewel tones monochromatic
 Model: ${genderText} editorial high-fashion designer evening wear dramatic makeup sleek hair
 Jewelry placement: ${placement} hero statement intentional styling
-Camera: Dramatic low angle or eye level medium intimate composed
-Framing: Editorial rule-breaking intentional negative space asymmetric tension
+Camera: CLOSER dramatic framing jewelry fills 40-50% of frame prominent detailed
+Framing: Medium-close editorial composition NOT wide NOT distant jewelry hero dominant
+Distance: 1-2 meters to model focused on jewelry and face/hand area
 Aesthetic: Vogue Harpers Bazaar high-fashion exclusive
+
+MODEL POSE - NATURAL POWERFUL:
+Body: Confident powerful elegant natural sophisticated positioning
+Hands: Graceful dramatic gestures NOT stiff NOT forced elegant movement
+Face: Confident serene mysterious powerful expression natural
+Posture: Poised statuesque authentic editorial positioning
+Energy: Effortless powerful sophisticated refined cinematic
+Movement: Minimal intentional dramatic natural flow
 
 LIGHTING - TECHNICAL SPECS:
 Dramatic directional chiaroscuro: strong key light sculpting defined
