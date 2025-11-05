@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { AuroraBackground } from '@/components/atoms/AuroraBackground';
 import { HeroSection } from '@/components/organisms/HeroSection';
 import { FeaturesSection } from '@/components/organisms/FeaturesSection';
@@ -16,6 +17,23 @@ import { Navbar } from '@/components/organisms/Navbar';
  * Fully responsive, animated, and optimized
  */
 export default function LandingPage() {
+  // Enable scroll for landing page (override globals.css body overflow)
+  useEffect(() => {
+    // Store original styles
+    const originalOverflow = document.body.style.overflow;
+    const originalHeight = document.body.style.height;
+
+    // Enable scroll for landing page
+    document.body.style.overflow = 'auto';
+    document.body.style.height = 'auto';
+
+    // Restore on unmount (when navigating away)
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.body.style.height = originalHeight;
+    };
+  }, []);
+
   return (
     <div className="relative min-h-screen bg-[#0a0a0a]">
       {/* Aurora Background */}
