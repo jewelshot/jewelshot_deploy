@@ -624,6 +624,8 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
         return;
       }
 
+      let creditDeducted = false;
+
       try {
         // Use credit
         const success = await deductCredit({
@@ -632,12 +634,13 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
         });
 
         if (!success) {
-          logger.error('[Canvas] Failed to use credit');
+          logger.error('[Canvas] Failed to deduct credit');
           setShowNoCreditsModal(true);
           return;
         }
 
-        logger.info('[Canvas] Credit used, proceeding with AI generation');
+        creditDeducted = true;
+        logger.info('[Canvas] Credit deducted, proceeding with AI generation');
 
         // Save original image before AI editing
         setOriginalImage(imageUrl);
@@ -651,6 +654,32 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       } catch (error) {
         logger.error('[Canvas] AI generation failed:', error);
         showToast('Failed to generate image', 'error');
+
+        // Refund credit if generation failed AFTER deduction
+        if (creditDeducted) {
+          logger.warn('[Canvas] Refunding credit due to generation failure');
+          try {
+            await fetch('/api/credits/add', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                amount: 1,
+                type: 'refund',
+                description: 'Refund: AI generation failed',
+                metadata: {
+                  error: error instanceof Error ? error.message : 'Unknown',
+                  prompt: prompt || 'enhance',
+                },
+              }),
+            });
+            // Refresh credits after refund
+            const { fetchCredits } = useCreditStore.getState();
+            await fetchCredits();
+            showToast('Credit refunded due to generation failure', 'info');
+          } catch (refundError) {
+            logger.error('[Canvas] Failed to refund credit:', refundError);
+          }
+        }
       }
     },
     [credits, deductCredit, editWithAI, showToast]

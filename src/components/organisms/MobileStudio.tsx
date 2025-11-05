@@ -200,6 +200,8 @@ export function MobileStudio() {
 
       setShowStyleSheet(false);
 
+      let creditDeducted = false;
+
       try {
         // Use credit FIRST
         const success = await deductCredit({
@@ -208,17 +210,32 @@ export function MobileStudio() {
         });
 
         if (!success) {
-          logger.error('[MobileStudio] Failed to use credit');
+          logger.error('[MobileStudio] Failed to deduct credit');
           setShowNoCreditsModal(true);
           return;
         }
 
-        logger.info('[MobileStudio] Credit used, proceeding with generation');
+        creditDeducted = true;
+        logger.info(
+          '[MobileStudio] Credit deducted, proceeding with generation'
+        );
 
         // Use the same preset prompts as desktop Quick Mode
         const preset = presetPrompts[presetId];
         if (!preset) {
           logger.error('[MobileStudio] Unknown preset:', presetId);
+          // Refund credit if preset invalid
+          logger.warn('[MobileStudio] Refunding credit due to invalid preset');
+          await fetch('/api/credits/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              amount: 1,
+              type: 'refund',
+              description: 'Refund: Invalid preset',
+              metadata: { presetId },
+            }),
+          });
           return;
         }
 
@@ -234,6 +251,36 @@ export function MobileStudio() {
         });
       } catch (error) {
         logger.error('[MobileStudio] Style application failed:', error);
+
+        // Refund credit if generation failed AFTER deduction
+        if (creditDeducted) {
+          logger.warn(
+            '[MobileStudio] Refunding credit due to generation failure'
+          );
+          try {
+            await fetch('/api/credits/add', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                amount: 1,
+                type: 'refund',
+                description: 'Refund: Generation failed',
+                metadata: {
+                  error: error instanceof Error ? error.message : 'Unknown',
+                  presetId,
+                },
+              }),
+            });
+            // Refresh credits after refund
+            const { fetchCredits } = useCreditStore.getState();
+            await fetchCredits();
+          } catch (refundError) {
+            logger.error(
+              '[MobileStudio] Failed to refund credit:',
+              refundError
+            );
+          }
+        }
       }
     },
     [image, credits, deductCredit, edit]

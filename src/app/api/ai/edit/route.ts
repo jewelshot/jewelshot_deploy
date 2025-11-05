@@ -93,12 +93,12 @@ export async function POST(request: NextRequest) {
     if (!canMakeGlobalAIRequest()) {
       const globalStatus = getGlobalRateLimitStatus();
       const waitSeconds = Math.ceil(globalStatus.resetIn / 1000);
-      
+
       logger.warn('Global AI rate limit reached', {
         userId: user.id,
         resetIn: waitSeconds,
       });
-      
+
       return NextResponse.json(
         {
           error: 'System busy',
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
 
     // 🛡️ USER RATE LIMITING (Per-user limits)
     const userId = user.id;
-    
+
     const rateLimit = await checkRateLimit(userId, {
       endpoint: '/api/ai/edit',
       maxRequests: RATE_LIMIT,
@@ -146,6 +146,41 @@ export async function POST(request: NextRequest) {
 
     // Record global request
     recordGlobalAIRequest(userId);
+
+    // 💳 CREDIT CHECK (Before expensive AI operation)
+    const { data: creditData, error: creditError } = await supabase
+      .from('user_credits')
+      .select('credits_remaining')
+      .eq('user_id', userId)
+      .single();
+
+    if (creditError || !creditData) {
+      logger.error('Failed to check credits', {
+        userId,
+        error: creditError?.message,
+      });
+      return NextResponse.json(
+        { error: 'Failed to check credits' },
+        { status: 500 }
+      );
+    }
+
+    const typedCreditData = creditData as { credits_remaining: number };
+
+    if (typedCreditData.credits_remaining < 1) {
+      logger.warn('Insufficient credits', {
+        userId,
+        remaining: typedCreditData.credits_remaining,
+      });
+      return NextResponse.json(
+        {
+          error: 'Insufficient credits',
+          message: 'You need at least 1 credit to generate images.',
+          credits: typedCreditData.credits_remaining,
+        },
+        { status: 402 } // Payment Required
+      );
+    }
 
     // Check if API key is configured
     if (!process.env.FAL_AI_API_KEY) {
@@ -230,4 +265,3 @@ export async function OPTIONS(request: NextRequest) {
     },
   });
 }
-

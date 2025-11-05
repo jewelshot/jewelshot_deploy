@@ -1,5 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { createScopedLogger } from '@/lib/logger';
+
+const logger = createScopedLogger('API:Credits:Use');
 
 /**
  * POST /api/credits/use
@@ -17,6 +20,10 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
+      logger.warn('Unauthorized credit use attempt', {
+        error: authError?.message,
+        timestamp: new Date().toISOString(),
+      });
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -24,80 +31,82 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { description = 'AI Generation', metadata = {} } = body;
 
-    // ✅ 1. Mevcut credit'i kontrol et
-    const { data: creditData, error: fetchError } = await supabase
-      .from('user_credits')
-      .select('credits_remaining, credits_used')
-      .eq('user_id', user.id)
-      .single();
+    // ✅ ATOMIC OPERATION: use_credit RPC (prevents race conditions)
+    // SQL function'ı FOR UPDATE lock ile çalışır
+    const rpcParams = {
+      p_user_id: user.id,
+      p_description: description,
+      p_metadata: metadata,
+    };
 
-    if (fetchError || !creditData) {
-      console.error('[Credits Use] Fetch error:', fetchError);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: rpcData, error: rpcError } = await (supabase as any).rpc(
+      'use_credit',
+      rpcParams
+    );
+
+    if (rpcError) {
+      logger.error('RPC use_credit failed', {
+        userId: user.id,
+        error: rpcError.message,
+        code: rpcError.code,
+        description,
+        metadata,
+        timestamp: new Date().toISOString(),
+      });
+
       return NextResponse.json(
-        { error: 'Failed to fetch credits', success: false },
+        { error: 'Failed to use credit', success: false },
         { status: 500 }
       );
     }
 
-    // Type assertion for creditData
-    const typedCreditData = creditData as {
+    // Parse RPC result
+    const result = (Array.isArray(rpcData) ? rpcData[0] : rpcData) as {
+      success: boolean;
       credits_remaining: number;
-      credits_used: number;
+      message: string;
     };
 
-    // Yetersiz credit kontrolü
-    if (typedCreditData.credits_remaining < 1) {
+    // Check if RPC succeeded
+    if (!result || !result.success) {
+      logger.warn('Credit use failed', {
+        userId: user.id,
+        message: result?.message,
+        creditsRemaining: result?.credits_remaining || 0,
+        timestamp: new Date().toISOString(),
+      });
+
       return NextResponse.json(
         {
           success: false,
-          error: 'Insufficient credits',
-          credits: typedCreditData.credits_remaining,
+          error: result?.message || 'Insufficient credits',
+          credits: result?.credits_remaining || 0,
         },
         { status: 400 }
       );
     }
 
-    // ✅ 2. Credit düşür
-    const newCredits = typedCreditData.credits_remaining - 1;
-    const newUsed = (typedCreditData.credits_used || 0) + 1;
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: updateError } = await (supabase as any)
-      .from('user_credits')
-      .update({
-        credits_remaining: newCredits,
-        credits_used: newUsed,
-        last_generation_at: new Date().toISOString(),
-      })
-      .eq('user_id', user.id);
-
-    if (updateError) {
-      console.error('[Credits Use] Update error:', updateError);
-      return NextResponse.json(
-        { error: 'Failed to update credits', success: false },
-        { status: 500 }
-      );
-    }
-
-    // ✅ 3. Transaction kaydı oluştur
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any).from('credit_transactions').insert([
-      {
-        user_id: user.id,
-        amount: -1,
-        transaction_type: 'use',
-        description: description,
-        metadata: metadata,
-      },
-    ]);
+    logger.info('Credit used successfully', {
+      userId: user.id,
+      creditsRemaining: result.credits_remaining,
+      description,
+      timestamp: new Date().toISOString(),
+    });
 
     return NextResponse.json({
       success: true,
-      credits: newCredits,
-      message: 'Credit used successfully',
+      credits: result.credits_remaining,
+      message: result.message,
     });
   } catch (error) {
-    console.error('[Credits Use] Unexpected error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown';
+    logger.error('Unexpected error in credit use', {
+      error: errorMessage,
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+    });
+
     return NextResponse.json(
       { error: 'Internal server error', success: false },
       { status: 500 }
