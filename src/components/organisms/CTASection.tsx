@@ -51,7 +51,7 @@ export function CTASection() {
             </div>
 
             {/* Trust Indicators */}
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-white/50">
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-white/70">
               <div className="flex items-center gap-2">
                 <svg
                   className="h-5 w-5 text-green-500"

@@ -70,7 +70,7 @@ export function HeroSection() {
 
         {/* Social Proof */}
         <div
-          className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8 text-sm text-white/50"
+          className="mt-12 flex flex-col items-center justify-center gap-6 text-sm text-white/70 sm:flex-row sm:gap-8"
           style={{
             animation:
               'fadeInUp 600ms cubic-bezier(0.4, 0, 0.2, 1) 400ms backwards',
@@ -78,22 +78,24 @@ export function HeroSection() {
         >
           <div className="flex items-center gap-3">
             <div className="flex -space-x-3">
-              <div className="h-10 w-10 rounded-full border-2 border-[#0a0a0a] bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-bold shadow-lg">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#0a0a0a] bg-gradient-to-br from-purple-400 to-purple-600 font-bold text-white shadow-lg">
                 ✨
               </div>
-              <div className="h-10 w-10 rounded-full border-2 border-[#0a0a0a] bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center text-white font-bold shadow-lg">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#0a0a0a] bg-gradient-to-br from-pink-400 to-pink-600 font-bold text-white shadow-lg">
                 💎
               </div>
-              <div className="h-10 w-10 rounded-full border-2 border-[#0a0a0a] bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#0a0a0a] bg-gradient-to-br from-blue-400 to-blue-600 font-bold text-white shadow-lg">
                 🌟
               </div>
             </div>
             <div className="text-left">
-              <div className="text-white font-semibold">10,000+ Users</div>
-              <div className="text-xs text-white/40">Join jewelers worldwide</div>
+              <div className="font-semibold text-white">10,000+ Users</div>
+              <div className="text-xs text-white/60">
+                Join jewelers worldwide
+              </div>
             </div>
           </div>
-          <div className="hidden sm:block h-8 w-px bg-white/10" />
+          <div className="hidden h-8 w-px bg-white/10 sm:block" />
           <div className="flex items-center gap-2">
             <div className="flex">
               {Array.from({ length: 5 }).map((_, i) => (
@@ -106,7 +108,7 @@ export function HeroSection() {
                 </svg>
               ))}
             </div>
-            <span className="text-white font-medium">4.9/5 Rating</span>
+            <span className="font-medium text-white">4.9/5 Rating</span>
           </div>
         </div>
       </div>
