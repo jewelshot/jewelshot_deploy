@@ -39,21 +39,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Type assertion for creditData
+    const typedCreditData = creditData as {
+      credits_remaining: number;
+      credits_used: number;
+    };
+
     // Yetersiz credit kontrolü
-    if (creditData.credits_remaining < 1) {
+    if (typedCreditData.credits_remaining < 1) {
       return NextResponse.json(
         {
           success: false,
           error: 'Insufficient credits',
-          credits: creditData.credits_remaining,
+          credits: typedCreditData.credits_remaining,
         },
         { status: 400 }
       );
     }
 
     // ✅ 2. Credit düşür
-    const newCredits = creditData.credits_remaining - 1;
-    const newUsed = (creditData.credits_used || 0) + 1;
+    const newCredits = typedCreditData.credits_remaining - 1;
+    const newUsed = (typedCreditData.credits_used || 0) + 1;
 
     const { error: updateError } = await supabase
       .from('user_credits')
