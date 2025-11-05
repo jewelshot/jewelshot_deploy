@@ -59,7 +59,12 @@ export function MobileStudio() {
   const progressTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Credit store
-  const { credits, deductCredit, fetchCredits } = useCreditStore();
+  const {
+    credits,
+    loading: creditsLoading,
+    deductCredit,
+    fetchCredits,
+  } = useCreditStore();
 
   // Fetch credits on mount
   useEffect(() => {
@@ -195,14 +200,21 @@ export function MobileStudio() {
     async (presetId: string) => {
       if (!image) return;
 
-      // Credit check BEFORE closing sheet
+      // Wait for credits to load if still loading
+      if (creditsLoading) {
+        logger.info('[MobileStudio] Credits still loading, please wait...');
+        return;
+      }
+
+      // Credit check AFTER loading complete
       if (credits < 1) {
-        logger.warn('[MobileStudio] Insufficient credits');
+        logger.warn('[MobileStudio] Insufficient credits:', credits);
         setShowStyleSheet(false);
         setShowNoCreditsModal(true);
         return;
       }
 
+      logger.info('[MobileStudio] Credits available:', credits);
       setShowStyleSheet(false);
 
       let creditDeducted = false;
@@ -288,7 +300,7 @@ export function MobileStudio() {
         }
       }
     },
-    [image, credits, deductCredit, edit]
+    [image, credits, creditsLoading, deductCredit, edit]
   );
 
   const handleDownload = async () => {

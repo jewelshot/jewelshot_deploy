@@ -114,7 +114,12 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
   const { showToast, hideToast, toastState } = useToast();
 
   // Credit store
-  const { credits, deductCredit, fetchCredits } = useCreditStore();
+  const {
+    credits,
+    loading: creditsLoading,
+    deductCredit,
+    fetchCredits,
+  } = useCreditStore();
 
   // Fetch credits on mount
   useEffect(() => {
@@ -622,13 +627,21 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       const { prompt, imageUrl } = event.detail;
       if (!imageUrl) return;
 
-      // Credit check FIRST
+      // Wait for credits to load if still loading
+      if (creditsLoading) {
+        logger.info('[Canvas] Credits still loading, please wait...');
+        showToast('Loading credits...', 'info');
+        return;
+      }
+
+      // Credit check AFTER loading complete
       if (credits < 1) {
-        logger.warn('[Canvas] Insufficient credits');
+        logger.warn('[Canvas] Insufficient credits:', credits);
         setShowNoCreditsModal(true);
         return;
       }
 
+      logger.info('[Canvas] Credits available:', credits);
       let creditDeducted = false;
 
       try {
@@ -687,7 +700,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
         }
       }
     },
-    [credits, deductCredit, editWithAI, showToast]
+    [credits, creditsLoading, deductCredit, editWithAI, showToast]
   );
 
   useEffect(() => {
