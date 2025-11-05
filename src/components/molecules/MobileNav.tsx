@@ -39,20 +39,20 @@ export function MobileNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50">
-      {/* Glassmorphic Container with Gradient Border */}
-      <div className="relative m-2 overflow-hidden rounded-3xl border border-white/20 bg-gradient-to-r from-white/[0.08] via-white/[0.05] to-white/[0.08] shadow-2xl backdrop-blur-2xl">
-        {/* Aurora Glow Effect */}
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute -left-1/4 -top-1/2 h-32 w-32 animate-pulse rounded-full bg-purple-500/30 blur-3xl"></div>
+    <nav className="fixed bottom-0 left-0 right-0 z-50 px-2 pb-2">
+      {/* Compact Glassmorphic Container */}
+      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] shadow-xl backdrop-blur-xl">
+        {/* Subtle Aurora Glow */}
+        <div className="pointer-events-none absolute inset-0 opacity-20">
+          <div className="absolute -left-1/4 -top-1/2 h-20 w-20 animate-pulse rounded-full bg-purple-500/20 blur-2xl" />
           <div
-            className="absolute -right-1/4 -top-1/2 h-32 w-32 animate-pulse rounded-full bg-pink-500/30 blur-3xl"
+            className="absolute -right-1/4 -top-1/2 h-20 w-20 animate-pulse rounded-full bg-pink-500/20 blur-2xl"
             style={{ animationDelay: '1s' }}
-          ></div>
+          />
         </div>
 
-        {/* Navigation Items */}
-        <div className="relative flex items-center justify-around px-6 py-4">
+        {/* Compact Navigation Items */}
+        <div className="relative flex items-center justify-around px-4 py-2">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.href);
@@ -61,44 +61,39 @@ export function MobileNav() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="group relative flex flex-col items-center gap-2 transition-all duration-300"
+                className="group relative flex flex-col items-center gap-1 py-1 transition-all duration-200"
               >
-                {/* Active Background Glow */}
-                {active && (
-                  <div className="absolute -inset-3 animate-pulse rounded-2xl bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-purple-500/20 blur-xl"></div>
-                )}
-
-                {/* Icon Container */}
+                {/* Icon Container - More Compact */}
                 <div
-                  className={`relative flex h-12 w-12 items-center justify-center rounded-2xl transition-all duration-300 ${
+                  className={`relative flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-200 ${
                     active
-                      ? 'bg-gradient-to-br from-purple-500 via-pink-500 to-purple-600 shadow-lg shadow-purple-500/50'
-                      : 'bg-white/5 group-hover:bg-white/10 group-active:scale-90'
+                      ? 'bg-gradient-to-br from-purple-500 to-pink-500 shadow-md shadow-purple-500/40'
+                      : 'bg-white/[0.03] group-hover:bg-white/[0.08] group-active:scale-90'
                   }`}
                 >
                   <Icon
-                    className={`h-6 w-6 transition-all duration-300 ${
+                    className={`h-5 w-5 transition-all duration-200 ${
                       active
                         ? 'text-white'
-                        : 'text-white/60 group-hover:text-white/90'
+                        : 'text-white/50 group-hover:text-white/80'
                     }`}
                   />
                 </div>
 
-                {/* Label */}
+                {/* Compact Label */}
                 <span
-                  className={`text-xs font-semibold transition-all duration-300 ${
+                  className={`text-[10px] font-medium transition-all duration-200 ${
                     active
-                      ? 'bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent'
-                      : 'text-white/60 group-hover:text-white/90'
+                      ? 'text-purple-400'
+                      : 'text-white/50 group-hover:text-white/80'
                   }`}
                 >
                   {item.label}
                 </span>
 
-                {/* Active Indicator */}
+                {/* Minimal Active Indicator */}
                 {active && (
-                  <div className="absolute -bottom-1 h-1 w-8 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 shadow-lg shadow-purple-500/50"></div>
+                  <div className="absolute -bottom-0.5 h-0.5 w-6 rounded-full bg-gradient-to-r from-purple-500 to-pink-500" />
                 )}
               </Link>
             );
