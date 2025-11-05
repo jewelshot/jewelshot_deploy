@@ -11,6 +11,8 @@ import dynamic from 'next/dynamic';
 import AuroraBackground from '@/components/atoms/AuroraBackground';
 import ErrorBoundary from '@/components/organisms/ErrorBoundary';
 import GalleryFallback from '@/components/molecules/GalleryFallback';
+import { useBreakpoint } from '@/hooks/useMediaQuery';
+import MobileGallery from '@/components/organisms/MobileGallery';
 
 // Dynamic imports for heavy components
 const GalleryContent = dynamic(
@@ -34,6 +36,14 @@ const Sidebar = dynamic(() => import('@/components/organisms/Sidebar'), {
 const SidebarToggle = dynamic(() => import('@/components/atoms/SidebarToggle'));
 
 export default function GalleryPage() {
+  const { isMobile } = useBreakpoint();
+
+  // Mobile: Show simplified mobile gallery
+  if (isMobile) {
+    return <MobileGallery />;
+  }
+
+  // Desktop: Full gallery with sidebar
   return (
     <>
       {/* Aurora Background */}

@@ -15,6 +15,7 @@ import { Upload, Sparkles, Download, X, Sliders, Camera } from 'lucide-react';
 import { useImageEdit } from '@/hooks/useImageEdit';
 import { logger } from '@/lib/logger';
 import { presetPrompts } from '@/lib/preset-prompts';
+import MobileNav from '@/components/molecules/MobileNav';
 
 const STORAGE_KEY = 'jewelshot_mobile_image';
 
@@ -392,7 +393,7 @@ export function MobileStudio() {
 
       {/* Floating Action Buttons (when image is loaded) */}
       {image && !isEditing && (
-        <div className="absolute bottom-24 left-1/2 z-20 -translate-x-1/2">
+        <div className="absolute bottom-28 left-1/2 z-20 -translate-x-1/2">
           <div className="flex gap-4">
             {/* Upload New */}
             <button
@@ -544,6 +545,9 @@ export function MobileStudio() {
           </div>
         </div>
       )}
+
+      {/* Bottom Navigation */}
+      <MobileNav />
     </div>
   );
 }
