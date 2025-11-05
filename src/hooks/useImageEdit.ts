@@ -55,8 +55,14 @@ export function useImageEdit(options?: UseImageEditOptions) {
         setProgress('Securing image...');
 
         try {
+          // Get the first image URL from FAL.ai response
+          const originalUrl = output.images[0]?.url;
+          if (!originalUrl) {
+            throw new Error('No image URL in response');
+          }
+
           // Returns: /api/images/{id} (our own domain)
-          const customUrl = await proxyImageToSupabase(output.url);
+          const customUrl = await proxyImageToSupabase(originalUrl);
 
           // Convert relative URL to absolute for better compatibility
           const absoluteUrl = customUrl.startsWith('http')
@@ -68,7 +74,12 @@ export function useImageEdit(options?: UseImageEditOptions) {
           // Replace external URL with our custom URL
           const securedOutput: FalOutput = {
             ...output,
-            url: absoluteUrl,
+            images: [
+              {
+                ...output.images[0],
+                url: absoluteUrl,
+              },
+            ],
           };
 
           setResult(securedOutput);

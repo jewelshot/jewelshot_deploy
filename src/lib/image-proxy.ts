@@ -73,7 +73,8 @@ export async function proxyImageToSupabase(
     }
 
     // 5. Save metadata to database
-    const { data: imageRecord, error: dbError } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: imageRecord, error: dbError } = await (supabase as any)
       .from('generated_images')
       .insert([
         {
@@ -92,8 +93,11 @@ export async function proxyImageToSupabase(
       throw dbError;
     }
 
+    // Type assertion for imageRecord
+    const typedRecord = imageRecord as { id: string };
+
     // 6. Return custom URL (completely hides Supabase and FAL.ai)
-    const customUrl = `/api/images/${imageRecord.id}`;
+    const customUrl = `/api/images/${typedRecord.id}`;
     logger.info('Image proxied successfully');
 
     return customUrl;
