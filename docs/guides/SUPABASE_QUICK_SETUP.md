@@ -3,19 +3,22 @@
 ## 1️⃣ SUPABASE PROJECT OLUŞTUR
 
 ### Adım 1: Supabase'e Git
+
 1. 🌐 https://supabase.com adresine git
 2. "Start your project" → Sign in with GitHub
 3. "New Project" butonuna tık
 
 ### Adım 2: Project Ayarları
+
 ```
 Name: jewelshot
 Database Password: [GÜVENLİ BİR ŞİFRE - KAYDET!]
-Region: Europe West (Frankfurt) 
+Region: Europe West (Frankfurt)
          ↑ Türkiye'ye en yakın
 ```
 
 ### Adım 3: Project Oluşturulmasını Bekle
+
 ⏳ 2-3 dakika sürer...
 
 ---
@@ -23,6 +26,7 @@ Region: Europe West (Frankfurt)
 ## 2️⃣ DATABASE TABLES OLUŞTUR
 
 ### SQL Editor'ü Aç
+
 1. Sol menüden **SQL Editor** seç
 2. "New query" butonuna tık
 3. Aşağıdaki SQL'i yapıştır:
@@ -120,10 +124,12 @@ CREATE OR REPLACE TRIGGER on_auth_user_created
 ## 3️⃣ STORAGE BUCKET OLUŞTUR
 
 ### Adım 1: Storage'a Git
+
 1. Sol menüden **Storage** seç
 2. "Create a new bucket" butonuna tık
 
 ### Adım 2: Bucket Ayarları
+
 ```
 Name: images
 Public bucket: ✅ (checked)
@@ -134,22 +140,25 @@ Allowed MIME types: image/jpeg, image/png, image/webp
 3. "Create bucket" butonuna tık
 
 ### Adım 3: Bucket Policies (RLS)
+
 1. `images` bucket'ına tıkla
 2. "Policies" tab'ına git
 3. "Add policy" → Template'lerden seç:
 
 **Policy 1: Upload (INSERT)**
+
 ```sql
 -- Users can upload to own folder
 CREATE POLICY "Users can upload images"
 ON storage.objects FOR INSERT
 WITH CHECK (
-  bucket_id = 'images' 
+  bucket_id = 'images'
   AND auth.uid()::text = (storage.foldername(name))[1]
 );
 ```
 
 **Policy 2: View (SELECT)**
+
 ```sql
 -- Anyone can view public images
 CREATE POLICY "Public images are viewable"
@@ -158,6 +167,7 @@ USING (bucket_id = 'images');
 ```
 
 **Policy 3: Delete**
+
 ```sql
 -- Users can delete own images
 CREATE POLICY "Users can delete own images"
@@ -173,10 +183,12 @@ USING (
 ## 4️⃣ API KEYS'Leri AL
 
 ### Adım 1: Settings'e Git
+
 1. Sol menüden **Project Settings** (⚙️ icon)
 2. **API** sekmesine tıkla
 
 ### Adım 2: Keys'leri Kopyala
+
 ```bash
 # Project URL
 NEXT_PUBLIC_SUPABASE_URL=https://xxxxxxxxx.supabase.co
@@ -192,17 +204,20 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ## 5️⃣ EMAIL AUTH'U AKTİFLEŞTİR
 
 ### Adım 1: Authentication Settings
+
 1. Sol menüden **Authentication** seç
 2. **Providers** tab'ına git
 3. **Email** provider'ını bul
 
 ### Adım 2: Email Settings
+
 ```
 Enable Email provider: ✅
 Confirm email: ✅ (recommended)
 ```
 
 ### Adım 3: Email Templates (Opsiyonel)
+
 1. **Email Templates** tab'ına git
 2. Signup, Reset Password template'lerini customize edebilirsin
 
@@ -242,6 +257,7 @@ npm run dev
 ```
 
 ### Test Checklist:
+
 1. ✅ http://localhost:3000/auth/signup → Signup form açılıyor mu?
 2. ✅ Yeni bir hesap oluştur
 3. ✅ Email confirmation (inbox'ını kontrol et)
@@ -254,14 +270,17 @@ npm run dev
 ## 8️⃣ SUPABASE DASHBOARD KONTROL
 
 ### Profiles Table
-1. **Table Editor** → `profiles` 
+
+1. **Table Editor** → `profiles`
 2. Yeni oluşturduğun user'ı göreceksin
 
-### Images Table  
+### Images Table
+
 1. **Table Editor** → `images`
 2. Upload ettiğin image'leri göreceksin
 
 ### Storage Bucket
+
 1. **Storage** → `images`
 2. Upload ettiğin dosyaları göreceksin
 
@@ -270,12 +289,14 @@ npm run dev
 ## ✅ TAMAMLANDI!
 
 Supabase setup'ı bitti! Artık:
+
 - ✅ Authentication çalışıyor
 - ✅ Database tables hazır
 - ✅ Storage bucket aktif
 - ✅ RLS policies ayarlandı
 
 ### 🚀 SIRADA:
+
 1. GitHub'a push
 2. Vercel'e deploy
 3. Vercel'de environment variables ekle
@@ -286,14 +307,17 @@ Supabase setup'ı bitti! Artık:
 ## 🆘 SORUN YAŞARSAN
 
 ### "Email not confirmed" hatası
+
 - Supabase → Authentication → Users
 - User'ı bul → "..." menu → "Confirm email"
 
-### "RLS policy violation" hatası  
+### "RLS policy violation" hatası
+
 - SQL query'leri tekrar çalıştır
 - Policies doğru user_id kontrolü yapıyor mu kontrol et
 
 ### Images upload olmuyor
+
 - Storage bucket'ın **public** olduğundan emin ol
 - RLS policies'i kontrol et
 

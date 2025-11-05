@@ -5,6 +5,7 @@
 ### 1️⃣ DATABASE TABLES (1 dakika)
 
 **Supabase Dashboard:**
+
 - Sol menü: **SQL Editor**
 - **New query**
 - Dosyayı aç: `supabase_sql_setup.sql`
@@ -17,6 +18,7 @@
 ### 2️⃣ STORAGE BUCKET (30 saniye)
 
 **Dashboard → Storage:**
+
 1. **"Create a new bucket"**
 2. Ayarlar:
    - Name: `images`
@@ -32,6 +34,7 @@
 **2 YOL VAR - BİRİNİ SEÇ:**
 
 #### 🚀 YOL 1: TEK SQL (EN HIZLI)
+
 1. **SQL Editor** → **New query**
 2. Dosyayı aç: `supabase_storage_policies.sql`
 3. Tüm içeriği kopyala → yapıştır
@@ -39,11 +42,12 @@
 5. ✅ Bitti!
 
 #### 🖱️ YOL 2: UI'DAN TEMPLATE (DAHA KOLAY)
+
 1. **Storage** → `images` bucket → **Policies** tab
 2. **"New Policy"** → **"Get started quickly"**
 3. Template seç:
    - ✅ **"Allow public read access"** (SELECT)
-   - ✅ **"Allow logged in users to upload"** (INSERT)  
+   - ✅ **"Allow logged in users to upload"** (INSERT)
    - ✅ **"Allow users to delete their own files"** (DELETE)
 4. Her birini **"Review"** → **"Save policy"**
 
@@ -52,6 +56,7 @@
 ### 4️⃣ EMAIL AUTH (10 saniye)
 
 **Dashboard → Authentication → Providers:**
+
 - **Email** provider'ı bul
 - Toggle switch: **ON** ✅
 - **Save**
@@ -66,6 +71,7 @@ npm run dev
 ```
 
 **Browser'da test:**
+
 1. http://localhost:3000/auth/signup
 2. Yeni hesap oluştur
 3. Email'ini confirm et
@@ -78,6 +84,7 @@ npm run dev
 ## ✅ HIZLI KONTROL
 
 ### Dashboard'da Kontrol Et:
+
 - **Table Editor** → `profiles` → User var mı?
 - **Table Editor** → `images` → Image var mı?
 - **Storage** → `images` bucket → File var mı?
@@ -99,7 +106,8 @@ npm run dev
 
 **Toplam süre:** ~5 dakika
 
-**Sırada:** 
+**Sırada:**
+
 - GitHub'a push
 - Vercel'e deploy
 - Production test

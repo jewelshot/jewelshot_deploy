@@ -163,26 +163,32 @@ NEXT_PUBLIC_SITE_URL=https://jewelshot.com
 ### Build Fails
 
 **Error: Missing environment variables**
+
 - Solution: Double-check all env vars in Vercel dashboard
 
 **Error: TypeScript errors**
+
 - Solution: Run `npm run build` locally first
 - Fix all TypeScript errors before deploying
 
 ### Supabase Connection Issues
 
 **Error: "Invalid API key"**
+
 - Solution: Make sure you copied the `anon` key, not `service_role`
 
 **Error: "Row Level Security policy violation"**
+
 - Solution: Check RLS policies in Supabase
 
 ### FAL.AI Issues
 
 **Error: "FAL.AI API key not configured"**
+
 - Solution: Make sure `FAL_AI_API_KEY` is set in Vercel (not `NEXT_PUBLIC_`)
 
 **Error: "Rate limit exceeded"**
+
 - Solution: Check your FAL.AI usage dashboard
 
 ---
@@ -213,9 +219,10 @@ NEXT_PUBLIC_SITE_URL=https://jewelshot.com
 
 ## 🎉 SUCCESS!
 
-Your Jewelshot app is now live! 
+Your Jewelshot app is now live!
 
 **Next Steps:**
+
 - Test all features thoroughly
 - Monitor error logs for first 24h
 - Collect user feedback
@@ -224,6 +231,7 @@ Your Jewelshot app is now live!
 ---
 
 **Need Help?**
+
 - Vercel Docs: https://vercel.com/docs
 - Supabase Docs: https://supabase.com/docs
 - FAL.AI Docs: https://fal.ai/docs
