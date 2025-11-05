@@ -8,6 +8,7 @@
 ## 📊 PHASE 1: BUNDLE ANALYSIS - COMPLETE
 
 ### Current Bundle Sizes
+
 ```
 Top Chunks (Production .next/static/chunks/):
 220KB - 58e77fc17acbf1e7.js (React/Next.js core)
@@ -24,6 +25,7 @@ Estimated First Load: ~400-500KB
 ```
 
 ### Issues Identified
+
 1. ❌ **No lazy loading** - All components eager load
 2. ❌ **Canvas.tsx** - Large component in main bundle
 3. ❌ **Modals** - EditPanel, CropModal eager loaded
@@ -35,6 +37,7 @@ Estimated First Load: ~400-500KB
 ## 🎯 OPTIMIZATION TARGETS
 
 ### High Priority (Phase 2)
+
 - [ ] Lazy load EditPanel.tsx (~40KB)
 - [ ] Lazy load CropModal.tsx (~30KB)
 - [ ] Lazy load KeyboardShortcutsModal.tsx (~20KB)
@@ -44,6 +47,7 @@ Estimated First Load: ~400-500KB
 **Expected Savings: 150KB+**
 
 ### Medium Priority (Phase 3)
+
 - [ ] Code split /gallery route
 - [ ] Code split /auth routes
 - [ ] Dynamic import image filters
@@ -52,6 +56,7 @@ Estimated First Load: ~400-500KB
 **Expected Savings: 80KB+**
 
 ### Low Priority (Phase 4-5)
+
 - [ ] Replace 3 <img> with next/image
 - [ ] Remove unused imports (67 warnings)
 - [ ] Remove unused Lucide icons
@@ -63,27 +68,24 @@ Estimated First Load: ~400-500KB
 
 ## 📈 TARGET METRICS
 
-| Metric | Current | Target | Status |
-|--------|---------|--------|--------|
-| First Load | ~450KB | < 300KB | 🔴 |
-| Total Bundle | ~976KB | < 600KB | 🔴 |
-| LCP | Unknown | < 2.5s | ⚪ |
-| FCP | Unknown | < 1.8s | ⚪ |
-| TTI | Unknown | < 3.8s | ⚪ |
-| Lighthouse | Unknown | > 90/100 | ⚪ |
+| Metric       | Current | Target   | Status |
+| ------------ | ------- | -------- | ------ |
+| First Load   | ~450KB  | < 300KB  | 🔴     |
+| Total Bundle | ~976KB  | < 600KB  | 🔴     |
+| LCP          | Unknown | < 2.5s   | ⚪     |
+| FCP          | Unknown | < 1.8s   | ⚪     |
+| TTI          | Unknown | < 3.8s   | ⚪     |
+| Lighthouse   | Unknown | > 90/100 | ⚪     |
 
 ---
 
 ## 🔄 NEXT STEPS
 
 **Phase 2:** Lazy Loading - Critical Components (IN PROGRESS)
+
 - Start with modals (EditPanel, CropModal, KeyboardShortcuts)
 - Then GalleryContent
 - Then AIEditManager
 
 **Estimated Time:** 45-60 minutes  
 **Expected Impact:** 150KB+ reduction
-
-
-
-

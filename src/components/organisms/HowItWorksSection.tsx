@@ -127,12 +127,3 @@ export function HowItWorksSection() {
     </section>
   );
 }
-
-
-
-
-
-
-
-
-

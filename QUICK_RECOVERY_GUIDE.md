@@ -9,6 +9,7 @@
 ### Step 1: DON'T PANIC 🧘
 
 You have:
+
 - ✅ 7 days of continuous PITR (Point-in-Time Recovery)
 - ✅ 7 days of daily snapshots
 - ✅ 30 days of weekly backups
@@ -124,6 +125,7 @@ https://github.com/jewelshot/jewelshot_deploy/issues
 ## 📊 BACKUP STATUS DASHBOARD
 
 Check backup health:
+
 ```
 1. Go to: https://supabase.com/dashboard/project/fhfpyqlnazmulhroyyzz
 2. Settings → Database → Backups
@@ -153,7 +155,3 @@ After any recovery:
 **RTO:** < 1 hour  
 **RPO:** < 5 minutes  
 **Confidence Level:** 🟢 HIGH
-
-
-
-

@@ -160,18 +160,11 @@ export const applyFilters = async (
   });
 };
 
-export default {
+const imageFilters = {
   applyBrightness,
   applyContrast,
   applyExposure,
   applyFilters,
 };
 
-
-
-
-
-
-
-
-
+export default imageFilters;

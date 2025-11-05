@@ -14,7 +14,9 @@ export interface RateLimitErrorState {
 }
 
 export function useRateLimitError() {
-  const [errorState, setErrorState] = useState<RateLimitErrorState | null>(null);
+  const [errorState, setErrorState] = useState<RateLimitErrorState | null>(
+    null
+  );
 
   // Countdown timer
   useEffect(() => {
@@ -36,6 +38,7 @@ export function useRateLimitError() {
     }, 1000);
 
     return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errorState?.timeRemaining]);
 
   const setRateLimitError = useCallback(
@@ -62,7 +65,3 @@ export function useRateLimitError() {
     isRateLimited: errorState?.isRateLimited || false,
   };
 }
-
-
-
-

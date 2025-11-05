@@ -41,12 +41,3 @@ export function TabList({ tabs, activeTab, onTabChange }: TabListProps) {
 }
 
 export default TabList;
-
-
-
-
-
-
-
-
-

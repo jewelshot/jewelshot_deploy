@@ -10,6 +10,7 @@
 ### 1.1 Sentry'de DSN'i Bul
 
 **Option A: Yeni Sentry Projesi Oluştur**
+
 ```
 1. https://sentry.io/signup/ → Ücretsiz hesap aç
 2. "Create Project" tıkla
@@ -21,6 +22,7 @@
 ```
 
 **Option B: Mevcut Projeden Al**
+
 ```
 1. https://sentry.io → Login
 2. Sol menüden projeyi seç
@@ -40,11 +42,11 @@
 
    Name:  NEXT_PUBLIC_SENTRY_DSN
    Value: [Az önce kopyaladığın DSN]
-   
+
    Environments: ✅ Production
-                 ✅ Preview  
+                 ✅ Preview
                  ✅ Development
-                 
+
 6. "Save" tıkla
 ```
 
@@ -133,6 +135,7 @@ git push origin main
 ### Monitoring Kontrol
 
 **Sentry**:
+
 ```
 1. https://sentry.io → Issues
 2. Henüz hata görmezsin (çünkü yeni deploy!)
@@ -143,6 +146,7 @@ git push origin main
 ```
 
 **Analytics**:
+
 ```
 1. Vercel Dashboard → Analytics
 2. İlk pageview'ı sen oluştur:
@@ -152,6 +156,7 @@ git push origin main
 ```
 
 **Speed Insights**:
+
 ```
 1. Vercel Dashboard → Speed Insights
 2. İlk metrikler için birkaç saat gerekir
@@ -179,16 +184,19 @@ git push origin main
 ## 📊 Şimdi Ne Olacak?
 
 ### İlk Saat
+
 - Site'yi kullan, test et
 - Arkadaşlarına göster
 - İlk kullanıcıları davet et
 
 ### İlk Gün
+
 - Sentry'de hata var mı kontrol et
 - Analytics'te trafik nasıl bak
 - Feedback topla
 
 ### İlk Hafta
+
 - Kullanıcı davranışlarını analiz et
 - Performance metriklerini incele
 - İyileştirme planı yap
@@ -198,17 +206,20 @@ git push origin main
 ## 🆘 Sorun mu Var?
 
 ### "Sentry DSN bulamıyorum"
+
 ```
 https://sentry.io/settings/YOUR_ORG/projects/jewelshot/keys/
 ```
 
 ### "Analytics enable butonu yok"
+
 ```
 Vercel'de doğru projede misin?
 "jewelshot-final" → Analytics tab
 ```
 
 ### "Deploy başlamadı"
+
 ```bash
 # Git status kontrol et
 git status
@@ -221,6 +232,7 @@ git push origin main --force
 ```
 
 ### "Build hatası aldım"
+
 ```bash
 # Local'de test et
 npm run build
@@ -255,10 +267,10 @@ git push origin main
 ---
 
 **Son kontrol**:
+
 - [ ] Sentry hesabım var / oluşturdum
 - [ ] Vercel'de login'im
 - [ ] Terminal açık
 - [ ] Git güncel
 
 ✅ **Hepsi tamam?** → **BAŞLA!** 🚀
-

@@ -105,12 +105,3 @@ export function createScopedLogger(scope: string) {
     debug: (...args: unknown[]) => logger.debug(`[${scope}]`, ...args),
   };
 }
-
-
-
-
-
-
-
-
-

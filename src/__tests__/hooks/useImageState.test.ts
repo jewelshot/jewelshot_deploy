@@ -194,12 +194,3 @@ describe('useImageState', () => {
     });
   });
 });
-
-
-
-
-
-
-
-
-

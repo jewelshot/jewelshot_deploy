@@ -2,20 +2,12 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
 import { Mail, ArrowLeft } from 'lucide-react';
 import { AuthCard } from '@/components/molecules/AuthCard';
 import { AuthInput } from '@/components/atoms/AuthInput';
 import { PrimaryButton } from '@/components/atoms/PrimaryButton';
 import { createClient } from '@/lib/supabase/client';
-
-const AuroraBackground = dynamic(
-  () =>
-    import('@/components/atoms/AuroraBackground').then(
-      (mod) => mod.AuroraBackground
-    ),
-  { ssr: false }
-);
+import { AuroraBackground } from '@/components/atoms/AuroraBackground';
 
 export default function ResetPasswordPage() {
   const router = useRouter();

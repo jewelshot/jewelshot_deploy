@@ -67,12 +67,3 @@ export function FeatureCard({
     </div>
   );
 }
-
-
-
-
-
-
-
-
-

@@ -1,80 +1,15 @@
 'use client';
 
-import dynamic from 'next/dynamic';
-
-// Dynamically import sections for better performance
-const AuroraBackground = dynamic(
-  () =>
-    import('@/components/atoms/AuroraBackground').then(
-      (mod) => mod.AuroraBackground
-    ),
-  { ssr: false }
-);
-
-const HeroSection = dynamic(
-  () =>
-    import('@/components/organisms/HeroSection').then((mod) => mod.HeroSection),
-  { ssr: false }
-);
-
-const FeaturesSection = dynamic(
-  () =>
-    import('@/components/organisms/FeaturesSection').then(
-      (mod) => mod.FeaturesSection
-    ),
-  { ssr: false }
-);
-
-const HowItWorksSection = dynamic(
-  () =>
-    import('@/components/organisms/HowItWorksSection').then(
-      (mod) => mod.HowItWorksSection
-    ),
-  { ssr: false }
-);
-
-const CTASection = dynamic(
-  () =>
-    import('@/components/organisms/CTASection').then((mod) => mod.CTASection),
-  { ssr: false }
-);
-
-const StatsSection = dynamic(
-  () =>
-    import('@/components/organisms/StatsSection').then(
-      (mod) => mod.StatsSection
-    ),
-  { ssr: false }
-);
-
-const LogoCloudSection = dynamic(
-  () =>
-    import('@/components/organisms/LogoCloudSection').then(
-      (mod) => mod.LogoCloudSection
-    ),
-  { ssr: false }
-);
-
-const TestimonialsSection = dynamic(
-  () =>
-    import('@/components/organisms/TestimonialsSection').then(
-      (mod) => mod.TestimonialsSection
-    ),
-  { ssr: false }
-);
-
-const PricingSection = dynamic(
-  () =>
-    import('@/components/organisms/PricingSection').then(
-      (mod) => mod.PricingSection
-    ),
-  { ssr: false }
-);
-
-const Navbar = dynamic(
-  () => import('@/components/organisms/Navbar').then((mod) => mod.Navbar),
-  { ssr: false }
-);
+import { AuroraBackground } from '@/components/atoms/AuroraBackground';
+import { HeroSection } from '@/components/organisms/HeroSection';
+import { FeaturesSection } from '@/components/organisms/FeaturesSection';
+import { HowItWorksSection } from '@/components/organisms/HowItWorksSection';
+import { CTASection } from '@/components/organisms/CTASection';
+import { StatsSection } from '@/components/organisms/StatsSection';
+import { LogoCloudSection } from '@/components/organisms/LogoCloudSection';
+import { TestimonialsSection } from '@/components/organisms/TestimonialsSection';
+import { PricingSection } from '@/components/organisms/PricingSection';
+import { Navbar } from '@/components/organisms/Navbar';
 
 /**
  * Landing Page - Enterprise-grade landing page for Jewelshot
@@ -82,9 +17,9 @@ const Navbar = dynamic(
  */
 export default function LandingPage() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#0a0a0a]">
+    <div className="relative min-h-screen bg-[#0a0a0a]">
       {/* Aurora Background */}
-      <div className="fixed inset-0 z-0">
+      <div className="fixed inset-0 z-0 overflow-hidden">
         <AuroraBackground />
       </div>
 

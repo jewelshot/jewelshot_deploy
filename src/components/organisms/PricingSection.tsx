@@ -88,9 +88,9 @@ export function PricingSection() {
           {plans.map((plan, index) => (
             <div
               key={plan.name}
-              className="group relative"
+              className="animate-in fade-in slide-in-from-bottom-4 group relative"
               style={{
-                animation: `fadeInUp 600ms cubic-bezier(0.4, 0, 0.2, 1) ${index * 100}ms backwards`,
+                animationDelay: `${index * 100}ms`,
               }}
             >
               {/* Popular Badge */}
@@ -109,7 +109,7 @@ export function PricingSection() {
               <div
                 className={`relative h-full overflow-hidden rounded-2xl border p-8 backdrop-blur-xl transition-all duration-300 ${
                   plan.popular
-                    ? 'border-purple-500/30 bg-white/10 scale-105'
+                    ? 'scale-105 border-purple-500/30 bg-white/10'
                     : 'border-white/10 bg-white/5 hover:border-purple-500/20 hover:bg-white/10'
                 }`}
               >
@@ -132,7 +132,7 @@ export function PricingSection() {
                 {/* CTA Button */}
                 <PrimaryButton
                   href="/auth/signup"
-                  className="w-full mb-8"
+                  className="mb-8 w-full"
                   size="lg"
                   variant={plan.popular ? 'primary' : 'secondary'}
                 >
@@ -170,20 +170,6 @@ export function PricingSection() {
       {/* Background decoration */}
       <div className="absolute left-0 top-1/2 h-96 w-96 -translate-y-1/2 rounded-full bg-purple-500/5 blur-3xl" />
       <div className="absolute right-0 top-1/2 h-96 w-96 -translate-y-1/2 rounded-full bg-purple-500/5 blur-3xl" />
-
-      <style jsx>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </section>
   );
 }
-

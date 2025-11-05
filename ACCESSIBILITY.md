@@ -328,12 +328,3 @@ Impact: +80% accessibility
 **Time invested:** ~1.5 hours  
 **Accessibility improvement:** 20% → 85% (+65 percentage points)  
 **Users helped:** Millions worldwide! ♿
-
-
-
-
-
-
-
-
-

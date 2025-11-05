@@ -37,6 +37,7 @@
 **Location:** `src/components/molecules/RateLimitIndicator.tsx`
 
 **Features:**
+
 - Real-time remaining requests display (X/5)
 - Color-coded status:
   - 🟢 Green: 3-5 requests
@@ -48,6 +49,7 @@
 - Optional detailed stats (total, blocked, reset time)
 
 **Usage:**
+
 ```tsx
 <RateLimitIndicator />
 <RateLimitIndicator showDetails />
@@ -58,6 +60,7 @@
 **Location:** `src/components/molecules/RateLimitError.tsx`
 
 **Features:**
+
 - Large, clear error message
 - Animated countdown timer
 - Circular progress indicator
@@ -65,20 +68,23 @@
 - Compact mode for inline errors
 
 **Usage:**
+
 ```tsx
 <RateLimitError
   message="Too many requests. Please wait before trying again."
   retryAfter={30000} // 30 seconds in ms
   onRetry={() => handleRetry()}
-/>
+/>;
 
-{/* Compact mode */}
+{
+  /* Compact mode */
+}
 <RateLimitError
   message="Rate limit exceeded"
   retryAfter={15000}
   onRetry={handleRetry}
   compact
-/>
+/>;
 ```
 
 ### 3️⃣ RateLimitBadge (Inline Indicator)
@@ -86,6 +92,7 @@
 **Location:** `src/components/atoms/RateLimitBadge.tsx`
 
 **Features:**
+
 - Minimal inline display (2/5)
 - Color-coded dot indicator
 - Real-time updates
@@ -93,6 +100,7 @@
 - Pulse animation when 0
 
 **Usage:**
+
 ```tsx
 <RateLimitBadge />
 ```
@@ -102,12 +110,14 @@
 **Location:** `src/hooks/useRateLimitError.ts`
 
 **Features:**
+
 - Manages rate limit error state
 - Automatic countdown
 - Auto-clear when countdown ends
 - Provides retry logic
 
 **Usage:**
+
 ```tsx
 const { errorState, setRateLimitError, clearError, isRateLimited } =
   useRateLimitError();
@@ -116,13 +126,15 @@ const { errorState, setRateLimitError, clearError, isRateLimited } =
 setRateLimitError('Too many requests', 30);
 
 // In JSX:
-{errorState && (
-  <RateLimitError
-    message={errorState.message}
-    retryAfter={errorState.timeRemaining * 1000}
-    onRetry={handleRetry}
-  />
-)}
+{
+  errorState && (
+    <RateLimitError
+      message={errorState.message}
+      retryAfter={errorState.timeRemaining * 1000}
+      onRetry={handleRetry}
+    />
+  );
+}
 ```
 
 ---
@@ -133,7 +145,7 @@ setRateLimitError('Too many requests', 30);
 
 ```tsx
 // src/app/studio/page.tsx
-<div className="fixed z-30 top-20 right-4">
+<div className="fixed right-4 top-20 z-30">
   <RateLimitIndicator />
 </div>
 ```
@@ -156,12 +168,12 @@ Future enhancement: Show `RateLimitError` in canvas when AI requests fail due to
 
 ### Colors
 
-| Status | Color | Use Case |
-|--------|-------|----------|
-| 🟢 Green | `green-400/500` | 3-5 requests available |
-| 🟡 Yellow | `yellow-400/500` | 2 requests (warning) |
-| 🟠 Amber | `amber-400/500` | 1 request (caution) |
-| 🔴 Red | `red-400/500` | 0 requests (blocked) |
+| Status    | Color            | Use Case               |
+| --------- | ---------------- | ---------------------- |
+| 🟢 Green  | `green-400/500`  | 3-5 requests available |
+| 🟡 Yellow | `yellow-400/500` | 2 requests (warning)   |
+| 🟠 Amber  | `amber-400/500`  | 1 request (caution)    |
+| 🔴 Red    | `red-400/500`    | 0 requests (blocked)   |
 
 ### Animations
 
@@ -292,7 +304,3 @@ Future enhancement: Show `RateLimitError` in canvas when AI requests fail due to
 **Status:** ✅ Production Ready
 
 **Next Steps:** Deploy to production and monitor user feedback
-
-
-
-

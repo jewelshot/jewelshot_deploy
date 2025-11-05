@@ -21,12 +21,10 @@ This document outlines our backup strategy, recovery procedures, and disaster re
    - Gallery images metadata
    - Rate limit data
    - User preferences
-   
 2. **Storage** (Supabase Storage)
    - Original uploaded images
    - AI-generated images
    - User profile images
-   
 3. **Configuration**
    - Environment variables (manual backup)
    - RLS policies (via SQL scripts)
@@ -46,19 +44,19 @@ This document outlines our backup strategy, recovery procedures, and disaster re
 
 ### Automated Backups (Supabase)
 
-| Backup Type | Frequency | Retention | Notes |
-|-------------|-----------|-----------|-------|
-| **Point-in-Time Recovery (PITR)** | Continuous | 7 days | Supabase Pro plan |
-| **Daily Snapshots** | Daily at 00:00 UTC | 7 days | Automated by Supabase |
-| **Weekly Full Backup** | Weekly (Sunday) | 30 days | Automated by Supabase |
+| Backup Type                       | Frequency          | Retention | Notes                 |
+| --------------------------------- | ------------------ | --------- | --------------------- |
+| **Point-in-Time Recovery (PITR)** | Continuous         | 7 days    | Supabase Pro plan     |
+| **Daily Snapshots**               | Daily at 00:00 UTC | 7 days    | Automated by Supabase |
+| **Weekly Full Backup**            | Weekly (Sunday)    | 30 days   | Automated by Supabase |
 
 ### Manual Backups
 
-| Type | When | By Whom |
-|------|------|---------|
+| Type           | When                  | By Whom  |
+| -------------- | --------------------- | -------- |
 | Pre-deployment | Before major releases | Dev Team |
-| Pre-migration | Before schema changes | Dev Team |
-| On-demand | As needed | Admin |
+| Pre-migration  | Before schema changes | Dev Team |
+| On-demand      | As needed             | Admin    |
 
 ---
 
@@ -84,9 +82,9 @@ Status: https://supabase.com/dashboard/project/[PROJECT_ID]/settings/database
 
 ### RTO & RPO Targets
 
-| Metric | Target | Current |
-|--------|--------|---------|
-| **RTO** (Recovery Time Objective) | < 1 hour | ~30 minutes |
+| Metric                             | Target      | Current          |
+| ---------------------------------- | ----------- | ---------------- |
+| **RTO** (Recovery Time Objective)  | < 1 hour    | ~30 minutes      |
 | **RPO** (Recovery Point Objective) | < 5 minutes | ~1 minute (PITR) |
 
 ### Disaster Scenarios & Response
@@ -96,6 +94,7 @@ Status: https://supabase.com/dashboard/project/[PROJECT_ID]/settings/database
 **Symptoms:** User reports missing data
 
 **Recovery Steps:**
+
 ```bash
 # 1. Identify the affected data and timestamp
 # 2. Use Supabase PITR to restore to before deletion
@@ -115,6 +114,7 @@ Settings → Database → Backups → Point-in-Time Recovery
 **Symptoms:** Database errors, connection issues
 
 **Recovery Steps:**
+
 ```bash
 # 1. Immediately switch to read-only mode
 # 2. Restore from latest daily snapshot
@@ -136,6 +136,7 @@ Settings → Database → Backups → Daily Snapshots
 **Symptoms:** Missing images, upload errors
 
 **Recovery Steps:**
+
 ```bash
 # 1. Identify affected bucket
 # 2. Restore from Supabase Storage backup
@@ -154,6 +155,7 @@ Storage → Buckets → [bucket_name] → Restore from backup
 **Symptoms:** Supabase project unavailable
 
 **Recovery Steps:**
+
 ```bash
 # 1. Create new Supabase project
 # 2. Restore database from latest backup
@@ -241,6 +243,7 @@ cp next.config.ts backups/next.config_$(date +%Y%m%d).ts
 3. **Duration:** ~1 hour
 
 **Steps:**
+
 ```bash
 # 1. Create test Supabase project
 # 2. Restore latest backup
@@ -258,11 +261,11 @@ cp next.config.ts backups/next.config_$(date +%Y%m%d).ts
 
 ## 📱 EMERGENCY CONTACTS
 
-| Role | Contact | Availability |
-|------|---------|--------------|
-| Primary Admin | [Your Email] | 24/7 |
+| Role             | Contact                      | Availability    |
+| ---------------- | ---------------------------- | --------------- |
+| Primary Admin    | [Your Email]                 | 24/7            |
 | Supabase Support | https://supabase.com/support | 24/7 (Pro plan) |
-| Vercel Support | https://vercel.com/support | 24/7 |
+| Vercel Support   | https://vercel.com/support   | 24/7            |
 
 ---
 
@@ -276,25 +279,21 @@ cp next.config.ts backups/next.config_$(date +%Y%m%d).ts
 
 ## ✅ BACKUP VERIFICATION LOG
 
-| Date | Type | Status | Verified By | Notes |
-|------|------|--------|-------------|-------|
-| 2025-11-04 | Initial Setup | ✅ Pass | System | Automated backups configured |
-| | | | | |
-| | | | | |
+| Date       | Type          | Status  | Verified By | Notes                        |
+| ---------- | ------------- | ------- | ----------- | ---------------------------- |
+| 2025-11-04 | Initial Setup | ✅ Pass | System      | Automated backups configured |
+|            |               |         |             |                              |
+|            |               |         |             |                              |
 
 ---
 
 ## 🔄 DOCUMENT CHANGELOG
 
-| Date | Changes | By |
-|------|---------|-----|
+| Date       | Changes                                  | By       |
+| ---------- | ---------------------------------------- | -------- |
 | 2025-11-04 | Initial backup strategy document created | Dev Team |
-| | | |
+|            |                                          |          |
 
 ---
 
 **Next Review:** December 4, 2025
-
-
-
-

@@ -32,9 +32,9 @@ export function LogoCloudSection() {
           {brands.map((brand, index) => (
             <div
               key={brand.name}
-              className="flex items-center justify-center"
+              className="animate-in fade-in flex items-center justify-center"
               style={{
-                animation: `fadeIn 600ms cubic-bezier(0.4, 0, 0.2, 1) ${index * 80}ms backwards`,
+                animationDelay: `${index * 80}ms`,
               }}
             >
               <div className="group relative">
@@ -63,18 +63,6 @@ export function LogoCloudSection() {
       {/* Gradient fade edges */}
       <div className="absolute left-0 top-0 h-full w-32 bg-gradient-to-r from-[#0a0a0a] to-transparent" />
       <div className="absolute right-0 top-0 h-full w-32 bg-gradient-to-l from-[#0a0a0a] to-transparent" />
-
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-      `}</style>
     </section>
   );
 }
-

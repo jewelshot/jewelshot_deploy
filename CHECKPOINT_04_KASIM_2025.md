@@ -10,6 +10,7 @@
 ## 📊 PROJE DURUMU
 
 ### ✅ Ne Çalışıyor
+
 - ✅ Authentication (Supabase)
 - ✅ Image upload & processing
 - ✅ AI generation (FAL.AI)
@@ -22,6 +23,7 @@
 - ✅ Email verification
 
 ### 📈 Metrikler
+
 ```
 Kod Kalitesi:       5.9/10  🟡
 Kapsam:             3.8/10  🔴
@@ -33,6 +35,7 @@ Production Ready:   78%     🟡
 ```
 
 ### 🔧 Teknik Detaylar
+
 ```
 Next.js:            16.0.0
 React:              19.2.0
@@ -43,6 +46,7 @@ FAL.AI Client:      v1.7.0
 ```
 
 ### 📦 Son Commit
+
 ```bash
 git log --oneline -1
 # d0990f8 feat: production-ready improvements (5 critical fixes)
@@ -53,18 +57,22 @@ git log --oneline -1
 ## 🎯 PLANLANAN REFACTORING
 
 ### 1. Canvas.tsx Refactor
+
 - **Şu An:** 1,106 satır, 25 hook, 9 useEffect
 - **Hedef:** 5 parça, her biri ~200 satır
 
 ### 2. TypeScript Strict Mode
+
 - **Şu An:** strict: false, 16 adet "as any"
 - **Hedef:** strict: true, type-safe
 
 ### 3. Performance Optimization
+
 - **Şu An:** No lazy loading, ~500KB bundle
 - **Hedef:** Lazy loading, code splitting, <300KB
 
 ### 4. Test Coverage
+
 - **Şu An:** 191✅ | 54❌ | 3⏭️ (77% success)
 - **Hedef:** 95%+ success rate
 
@@ -84,6 +92,7 @@ git log --oneline -1
 ## 🔄 RESTORE NASIL YAPILIR?
 
 ### Opsiyon 1: Git Tag (En Kolay)
+
 ```bash
 # Bu commit'e dön
 git checkout pre-refactoring-checkpoint
@@ -96,6 +105,7 @@ git push origin restore-from-checkpoint
 ```
 
 ### Opsiyon 2: Git Reset (Dikkatli!)
+
 ```bash
 # Hard reset (UYARI: uncommitted changes silinir!)
 git reset --hard d0990f8
@@ -105,6 +115,7 @@ git push --force origin main
 ```
 
 ### Opsiyon 3: Revert (Güvenli)
+
 ```bash
 # Yeni commit ile geri al
 git revert <bad-commit-hash>..HEAD
@@ -159,6 +170,7 @@ SENTRY_AUTH_TOKEN=<your-token>
 ## 📝 NOTLAR
 
 ### Çalışan Özellikler
+
 1. **Auth Flow:** Email/password signup → email verification → login
 2. **Studio Flow:** Upload → Edit (filters/transform) → AI generate → Save to gallery
 3. **Gallery Flow:** View images → Re-edit → Delete
@@ -166,6 +178,7 @@ SENTRY_AUTH_TOKEN=<your-token>
 5. **Image Optimization:** Client-side compression before upload
 
 ### Kritik Dosyalar (DOKUNMA!)
+
 - `src/lib/supabase/client.ts` - Supabase browser client
 - `src/lib/supabase/server.ts` - Supabase server client
 - `src/lib/ai/fal-client.ts` - FAL.AI integration
@@ -174,6 +187,7 @@ SENTRY_AUTH_TOKEN=<your-token>
 - `src/app/api/ai/edit/route.ts` - AI edit API
 
 ### Supabase Tables (Şema)
+
 ```sql
 -- profiles (user metadata)
 -- images (gallery images)
@@ -194,12 +208,14 @@ SENTRY_AUTH_TOKEN=<your-token>
 ## ⚠️ UYARI
 
 **BU CHECKPOINT'TEN SONRAKİ DEĞİŞİKLİKLER:**
+
 - Canvas.tsx yapısı değişecek
 - TypeScript strict mode açılacak
 - Lazy loading eklenecek
 - Import'lar temizlenecek
 
 **EĞER BİR ŞEY BOZULURSA:**
+
 1. Bu dosyayı oku
 2. Git tag'e dön: `git checkout pre-refactoring-checkpoint`
 3. Checklist'i kontrol et
@@ -209,10 +225,6 @@ SENTRY_AUTH_TOKEN=<your-token>
 
 **CHECKPOINT OLUŞTURAN:** AI Assistant (Claude)  
 **SON ÇALIŞAN COMMIT:** d0990f8  
-**SON TEST:** Build ✅ | Tests 77% ✅ | Deploy ✅  
+**SON TEST:** Build ✅ | Tests 77% ✅ | Deploy ✅
 
 **🔒 BU DOSYAYI SİLME!** 🔒
-
-
-
-

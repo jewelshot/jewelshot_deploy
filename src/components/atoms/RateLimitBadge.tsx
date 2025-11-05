@@ -57,7 +57,3 @@ export function RateLimitBadge({ className = '' }: RateLimitBadgeProps) {
 }
 
 export default RateLimitBadge;
-
-
-
-

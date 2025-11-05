@@ -60,9 +60,9 @@ export function TestimonialsSection() {
           {testimonials.map((testimonial, index) => (
             <div
               key={testimonial.name}
-              className="group relative"
+              className="animate-in fade-in slide-in-from-bottom-4 group relative"
               style={{
-                animation: `fadeInUp 600ms cubic-bezier(0.4, 0, 0.2, 1) ${index * 100}ms backwards`,
+                animationDelay: `${index * 100}ms`,
               }}
             >
               {/* Card */}
@@ -81,7 +81,7 @@ export function TestimonialsSection() {
                 </div>
 
                 {/* Content */}
-                <p className="mb-6 text-white/80 leading-relaxed">
+                <p className="mb-6 leading-relaxed text-white/80">
                   &ldquo;{testimonial.content}&rdquo;
                 </p>
 
@@ -121,20 +121,6 @@ export function TestimonialsSection() {
       {/* Background decoration */}
       <div className="absolute left-1/4 top-1/4 h-96 w-96 rounded-full bg-purple-500/5 blur-3xl" />
       <div className="absolute bottom-1/4 right-1/4 h-96 w-96 rounded-full bg-purple-500/5 blur-3xl" />
-
-      <style jsx>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </section>
   );
 }
-

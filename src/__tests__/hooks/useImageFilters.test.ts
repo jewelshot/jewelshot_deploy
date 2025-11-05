@@ -385,12 +385,3 @@ describe('useImageFilters', () => {
     });
   });
 });
-
-
-
-
-
-
-
-
-

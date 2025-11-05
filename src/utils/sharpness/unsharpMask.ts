@@ -186,12 +186,3 @@ export function applyFastSharpen(
 
   return output;
 }
-
-
-
-
-
-
-
-
-

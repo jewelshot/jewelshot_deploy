@@ -103,12 +103,3 @@ export function ColorsPanel({ onColorChange }: ColorsPanelProps) {
 }
 
 export default ColorsPanel;
-
-
-
-
-
-
-
-
-

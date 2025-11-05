@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Menu, X, Sparkles } from 'lucide-react';
 import { PrimaryButton } from '@/components/atoms/PrimaryButton';
 
@@ -30,21 +31,21 @@ export function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? 'bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-white/10'
+          ? 'border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-xl'
           : 'bg-transparent'
       }`}
     >
       <div className="mx-auto max-w-7xl px-6">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <a href="/" className="flex items-center gap-2 group">
+          <Link href="/" className="group flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 transition-transform group-hover:scale-110">
               <Sparkles className="h-5 w-5 text-white" />
             </div>
             <span className="text-xl font-bold text-white">Jewelshot</span>
-          </a>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden items-center gap-8 md:flex">
@@ -117,4 +118,3 @@ export function Navbar() {
     </nav>
   );
 }
-

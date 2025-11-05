@@ -70,12 +70,3 @@ export function GalleryGrid({
 }
 
 export default GalleryGrid;
-
-
-
-
-
-
-
-
-

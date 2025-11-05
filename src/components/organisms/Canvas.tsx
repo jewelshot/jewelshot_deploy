@@ -145,10 +145,10 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
               style: 'AI Enhanced',
             }
           );
-          
+
           // Dispatch custom event for gallery sync
           window.dispatchEvent(new Event('gallery-updated'));
-          
+
           logger.info('✅ AI-generated image auto-saved to gallery');
           showToast('Saved to gallery!', 'success');
         } catch (error) {
@@ -693,7 +693,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     },
   };
 
-// NEW CANVAS.TSX RETURN STATEMENT (after line 698)
+  // NEW CANVAS.TSX RETURN STATEMENT (after line 698)
 
   return (
     <>
@@ -803,7 +803,6 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
           REFACTORED: AI Edit Manager - AI Generation Logic
           ================================================================= */}
       <AIEditManager
-        uploadedImage={uploadedImage}
         fileName={fileName}
         onImageUpdate={setUploadedImage}
         onOriginalImageSet={setOriginalImage}
@@ -887,4 +886,3 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
 }
 
 export default Canvas;
-

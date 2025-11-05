@@ -29,12 +29,3 @@ export function Avatar({ content, size = 'md' }: AvatarProps) {
 }
 
 export default Avatar;
-
-
-
-
-
-
-
-
-

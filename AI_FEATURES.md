@@ -327,12 +327,3 @@ npm run test
 **Status:** ✅ Production-Ready
 
 **Enjoy AI-powered image generation!** 🎉
-
-
-
-
-
-
-
-
-

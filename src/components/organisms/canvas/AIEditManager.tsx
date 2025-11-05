@@ -2,15 +2,15 @@
  * =============================================================================
  * AI EDIT MANAGER - AI Generation Logic
  * =============================================================================
- * 
+ *
  * Handles:
  * - AI image generation/editing (via useImageEdit hook)
  * - Auto-save to gallery after successful generation
  * - AI edit event listeners (from AIEditControl)
  * - Success/error handling
- * 
+ *
  * This is an invisible component (no UI rendering)
- * 
+ *
  * Extracted from Canvas.tsx (1,130 lines → maintainable components)
  */
 
@@ -28,9 +28,8 @@ const logger = createScopedLogger('AIEditManager');
  */
 export interface AIEditManagerProps {
   // Image state
-  uploadedImage: string | null;
   fileName: string;
-  
+
   // Callbacks
   onImageUpdate: (imageUrl: string) => void;
   onOriginalImageSet: (imageUrl: string) => void;
@@ -41,12 +40,11 @@ export interface AIEditManagerProps {
 
 /**
  * AIEditManager: Manages AI generation logic
- * 
+ *
  * This component doesn't render anything (return null)
  * It only manages AI generation state and side effects
  */
 export default function AIEditManager({
-  uploadedImage,
   fileName,
   onImageUpdate,
   onOriginalImageSet,
@@ -54,7 +52,6 @@ export default function AIEditManager({
   onSuccess,
   onError,
 }: AIEditManagerProps) {
-  
   // AI Edit hook with auto-save
   const { edit: editWithAI } = useImageEdit({
     onSuccess: async (result) => {
@@ -74,10 +71,10 @@ export default function AIEditManager({
               style: 'AI Enhanced',
             }
           );
-          
+
           // Dispatch custom event for gallery sync
           window.dispatchEvent(new Event('gallery-updated'));
-          
+
           logger.info('✅ AI-generated image auto-saved to gallery');
           onSuccess('Saved to gallery!');
         } catch (error) {
@@ -115,7 +112,7 @@ export default function AIEditManager({
       'ai-edit-generate',
       handleAIEditGenerate as EventListener
     );
-    
+
     return () => {
       window.removeEventListener(
         'ai-edit-generate',
@@ -127,7 +124,3 @@ export default function AIEditManager({
   // This component doesn't render anything
   return null;
 }
-
-
-
-

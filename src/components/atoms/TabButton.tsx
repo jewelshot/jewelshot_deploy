@@ -36,12 +36,3 @@ export function TabButton({ label, active, onClick }: TabButtonProps) {
 }
 
 export default TabButton;
-
-
-
-
-
-
-
-
-

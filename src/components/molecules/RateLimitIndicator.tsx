@@ -42,8 +42,10 @@ export function RateLimitIndicator({
   // Determine status color
   const getStatusColor = () => {
     if (remaining === 0) return 'text-red-400 border-red-500/30 bg-red-500/10';
-    if (remaining <= 1) return 'text-amber-400 border-amber-500/30 bg-amber-500/10';
-    if (remaining <= 2) return 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10';
+    if (remaining <= 1)
+      return 'text-amber-400 border-amber-500/30 bg-amber-500/10';
+    if (remaining <= 2)
+      return 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10';
     return 'text-green-400 border-green-500/30 bg-green-500/10';
   };
 
@@ -69,9 +71,9 @@ export function RateLimitIndicator({
         <div className="flex-shrink-0">{getStatusIcon()}</div>
 
         {/* Main Content */}
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           {/* Label & Count */}
-          <div className="flex items-baseline justify-between gap-2 mb-1">
+          <div className="mb-1 flex items-baseline justify-between gap-2">
             <span className="text-xs font-medium opacity-80">AI Requests</span>
             <span className="text-sm font-bold tabular-nums">
               {remaining} / {total}
@@ -79,7 +81,7 @@ export function RateLimitIndicator({
           </div>
 
           {/* Progress Bar */}
-          <div className="h-1.5 bg-black/30 rounded-full overflow-hidden">
+          <div className="h-1.5 overflow-hidden rounded-full bg-black/30">
             <div
               className={`h-full transition-all duration-500 ${getProgressBarColor()}`}
               style={{ width: `${percentage}%` }}
@@ -88,7 +90,7 @@ export function RateLimitIndicator({
 
           {/* Reset Timer */}
           {timeUntilReset > 0 && (
-            <div className="text-[10px] font-medium opacity-60 mt-1">
+            <div className="mt-1 text-[10px] font-medium opacity-60">
               Resets in {formatWaitTime(Math.ceil(timeUntilReset / 1000))}
             </div>
           )}
@@ -97,14 +99,16 @@ export function RateLimitIndicator({
 
       {/* Detailed Stats (Optional) */}
       {showDetails && (
-        <div className="border-t border-current/10 px-3 py-2 text-[10px] space-y-1 opacity-70">
+        <div className="border-current/10 space-y-1 border-t px-3 py-2 text-[10px] opacity-70">
           <div className="flex justify-between">
             <span>Total Requests:</span>
             <span className="font-mono">{stats.totalRequests}</span>
           </div>
           <div className="flex justify-between">
             <span>Blocked:</span>
-            <span className="font-mono text-red-400">{stats.blockedRequests}</span>
+            <span className="font-mono text-red-400">
+              {stats.blockedRequests}
+            </span>
           </div>
           <div className="flex justify-between">
             <span>Reset At:</span>
@@ -119,7 +123,3 @@ export function RateLimitIndicator({
 }
 
 export default RateLimitIndicator;
-
-
-
-

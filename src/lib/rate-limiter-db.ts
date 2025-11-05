@@ -1,6 +1,6 @@
 /**
  * Persistent Rate Limiter (Supabase)
- * 
+ *
  * Server-side rate limiting with database persistence
  * Replaces in-memory Map with Supabase table
  */
@@ -33,9 +33,11 @@ export async function checkRateLimit(
   try {
     // Use service role key to bypass RLS (if available)
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    
+
     if (!serviceRoleKey) {
-      logger.warn('SUPABASE_SERVICE_ROLE_KEY not set, falling back to in-memory rate limiting');
+      logger.warn(
+        'SUPABASE_SERVICE_ROLE_KEY not set, falling back to in-memory rate limiting'
+      );
       // Fallback to allowing request (or throw error)
       return { allowed: true, remaining: config.maxRequests };
     }
@@ -72,19 +74,17 @@ export async function checkRateLimit(
     // No existing record OR window expired
     if (!existing || new Date(existing.window_start) < windowStart) {
       // Create new record or reset
-      const { error: upsertError } = await supabase
-        .from('rate_limits')
-        .upsert(
-          {
-            user_id: userId,
-            endpoint: config.endpoint,
-            request_count: 1,
-            window_start: now.toISOString(),
-          },
-          {
-            onConflict: 'user_id,endpoint',
-          }
-        );
+      const { error: upsertError } = await supabase.from('rate_limits').upsert(
+        {
+          user_id: userId,
+          endpoint: config.endpoint,
+          request_count: 1,
+          window_start: now.toISOString(),
+        },
+        {
+          onConflict: 'user_id,endpoint',
+        }
+      );
 
       if (upsertError) {
         logger.error('Rate limit upsert error:', upsertError);
@@ -105,9 +105,13 @@ export async function checkRateLimit(
       const windowEnd = new Date(
         new Date(existing.window_start).getTime() + config.windowMs
       );
-      const retryAfter = Math.ceil((windowEnd.getTime() - now.getTime()) / 1000);
+      const retryAfter = Math.ceil(
+        (windowEnd.getTime() - now.getTime()) / 1000
+      );
 
-      logger.warn(`Rate limit exceeded for user ${userId} on ${config.endpoint}`);
+      logger.warn(
+        `Rate limit exceeded for user ${userId} on ${config.endpoint}`
+      );
 
       return {
         allowed: false,
@@ -147,7 +151,7 @@ export async function checkRateLimit(
 export async function cleanupRateLimits(): Promise<void> {
   try {
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    
+
     if (!serviceRoleKey) {
       logger.warn('SUPABASE_SERVICE_ROLE_KEY not set, skipping cleanup');
       return;
@@ -174,7 +178,3 @@ export async function cleanupRateLimits(): Promise<void> {
     logger.error('Cleanup error:', error);
   }
 }
-
-
-
-

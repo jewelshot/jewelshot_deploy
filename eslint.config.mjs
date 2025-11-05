@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     'out/**',
     'build/**',
     'next-env.d.ts',
+    // E2E tests (Playwright uses require() which is forbidden in ESLint)
+    'e2e/**',
+    '**/*.spec.ts',
+    '**/*.e2e.ts',
   ]),
 ]);
 

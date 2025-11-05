@@ -7,31 +7,37 @@ This project uses **Playwright** for end-to-end (E2E) testing. Tests cover criti
 ## 🚀 Quick Start
 
 ### Run All E2E Tests
+
 ```bash
 npm run test:e2e
 ```
 
 ### Run Tests with UI Mode (Interactive)
+
 ```bash
 npm run test:e2e:ui
 ```
 
 ### Run Tests in Headed Mode (See Browser)
+
 ```bash
 npm run test:e2e:headed
 ```
 
 ### Debug Tests
+
 ```bash
 npm run test:e2e:debug
 ```
 
 ### View Test Report
+
 ```bash
 npm run test:e2e:report
 ```
 
 ### Run All Tests (Unit + E2E)
+
 ```bash
 npm run test:all
 ```
@@ -51,6 +57,7 @@ e2e/
 ## ✅ Test Coverage
 
 ### 1. Authentication Tests (`auth.spec.ts`)
+
 - **Landing page**: Verify page loads with navigation elements
 - **Signup flow**:
   - Navigate to signup page
@@ -68,6 +75,7 @@ e2e/
 **Total**: 14 tests
 
 ### 2. Studio Tests (`studio.spec.ts`)
+
 - **Page load**: Studio loads with all UI elements
 - **Sidebar navigation**: Working links to gallery
 - **Image upload**:
@@ -87,6 +95,7 @@ e2e/
 **Total**: 15 tests
 
 ### 3. Gallery Tests (`gallery.spec.ts`)
+
 - **Page load**: Gallery loads successfully
 - **Empty state**: Show message for new users
 - **Navigation**: Back to studio
@@ -104,6 +113,7 @@ e2e/
 **Total**: 11 tests
 
 ### 4. Rate Limiting Tests (`rate-limiting.spec.ts`)
+
 - **Indicator**:
   - Display on studio page
   - Show correct initial quota (5/5)
@@ -131,16 +141,19 @@ e2e/
 ## 🎯 Running Specific Tests
 
 ### Run Single Test File
+
 ```bash
 npx playwright test auth.spec.ts
 ```
 
 ### Run Specific Test by Name
+
 ```bash
 npx playwright test -g "should successfully login"
 ```
 
 ### Run Tests in Specific Browser
+
 ```bash
 npx playwright test --project=chromium
 npx playwright test --project=firefox
@@ -162,18 +175,22 @@ E2E tests are configured in `playwright.config.ts`:
 ## 🧪 Test Data
 
 ### Test Users
+
 Tests create unique users per run to avoid conflicts:
+
 - **Auth tests**: `test-${Date.now()}@example.com`
 - **Studio tests**: `test-studio-${Date.now()}@example.com`
 - **Gallery tests**: `test-gallery-${Date.now()}@example.com`
 - **Rate limiting tests**: `test-ratelimit-${Date.now()}@example.com`
 
 ### Test Images
+
 Tests use a **1x1 pixel PNG** (base64 encoded) for fast uploads without external dependencies.
 
 ## 📊 CI Integration
 
 E2E tests run automatically on:
+
 - **Push** to `main` or `develop` branches
 - **Pull requests** to `main` or `develop`
 - **Manual trigger** via GitHub Actions
@@ -190,6 +207,7 @@ See `.github/workflows/e2e-tests.yml`:
 ### Required Secrets
 
 Configure these in GitHub repository settings:
+
 ```
 NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -199,32 +217,40 @@ FAL_AI_API_KEY
 ## 🐛 Debugging Tests
 
 ### 1. Use Playwright UI Mode
+
 ```bash
 npm run test:e2e:ui
 ```
+
 - Interactive test runner
 - Time travel debugging
 - Step-by-step execution
 
 ### 2. Use Debug Mode
+
 ```bash
 npm run test:e2e:debug
 ```
+
 - Opens Playwright Inspector
 - Set breakpoints
 - Inspect selectors
 
 ### 3. Run in Headed Mode
+
 ```bash
 npm run test:e2e:headed
 ```
+
 - See browser actions in real-time
 - Useful for understanding failures
 
 ### 4. Check Test Results
+
 ```bash
 npm run test:e2e:report
 ```
+
 - Opens HTML report
 - Screenshots & videos of failures
 - Full trace viewer
@@ -232,6 +258,7 @@ npm run test:e2e:report
 ## 📝 Writing New Tests
 
 ### Basic Test Structure
+
 ```typescript
 import { test, expect } from '@playwright/test';
 
@@ -244,10 +271,10 @@ test.describe('Feature Name', () => {
   test('should do something', async ({ page }) => {
     // 1. Arrange
     await page.goto('/some-page');
-    
+
     // 2. Act
     await page.getByRole('button', { name: /click me/i }).click();
-    
+
     // 3. Assert
     await expect(page.locator('text=Success')).toBeVisible();
   });
@@ -257,45 +284,50 @@ test.describe('Feature Name', () => {
 ### Best Practices
 
 1. **Use semantic locators**:
+
    ```typescript
    // Good
-   page.getByRole('button', { name: /sign in/i })
-   page.getByPlaceholder(/email/i)
-   
+   page.getByRole('button', { name: /sign in/i });
+   page.getByPlaceholder(/email/i);
+
    // Avoid
-   page.locator('#btn-123')
+   page.locator('#btn-123');
    ```
 
 2. **Wait for state, not time**:
+
    ```typescript
    // Good
    await expect(page.locator('.loading')).toBeVisible();
    await expect(page.locator('.loading')).not.toBeVisible();
-   
+
    // Avoid
    await page.waitForTimeout(5000);
    ```
 
 3. **Use unique test data**:
+
    ```typescript
    const testEmail = `test-${Date.now()}@example.com`;
    ```
 
 4. **Clean up after tests**:
+
    ```typescript
    test.afterEach(async ({ page }) => {
-    // Delete test data
-    await cleanup();
+     // Delete test data
+     await cleanup();
    });
    ```
 
 5. **Group related tests**:
+
    ```typescript
    test.describe('Login Flow', () => {
      test.describe('Success Cases', () => {
        // ...
      });
-     
+
      test.describe('Error Cases', () => {
        // ...
      });
@@ -305,7 +337,9 @@ test.describe('Feature Name', () => {
 ## 🔍 Common Issues
 
 ### Issue: "Test timeout"
+
 **Solution**: Increase timeout in test or config
+
 ```typescript
 test('slow test', async ({ page }) => {
   test.setTimeout(120000); // 2 minutes
@@ -314,20 +348,26 @@ test('slow test', async ({ page }) => {
 ```
 
 ### Issue: "Element not found"
+
 **Solution**: Wait for element or check selector
+
 ```typescript
 await page.waitForSelector('.my-element', { state: 'visible' });
 ```
 
 ### Issue: "Tests pass locally but fail in CI"
+
 **Solution**: Check for:
+
 - Environment variables
 - Race conditions (add proper waits)
 - Viewport size differences
 - Network latency
 
 ### Issue: "Flaky tests"
+
 **Solution**:
+
 - Avoid `waitForTimeout()`
 - Use `waitForLoadState('networkidle')`
 - Add retry logic
@@ -336,6 +376,7 @@ await page.waitForSelector('.my-element', { state: 'visible' });
 ## 📈 Test Metrics
 
 ### Current Status
+
 - ✅ **54 E2E tests** covering critical flows
 - ✅ **100% pass rate** on main branch
 - ✅ **CI/CD integrated** with GitHub Actions
@@ -343,6 +384,7 @@ await page.waitForSelector('.my-element', { state: 'visible' });
 - ✅ **Auto-generated reports** with artifacts
 
 ### Coverage Areas
+
 - ✅ Authentication (signup, login, protected routes)
 - ✅ Image upload & compression
 - ✅ Canvas interactions (zoom, view modes)
@@ -360,6 +402,7 @@ await page.waitForSelector('.my-element', { state: 'visible' });
 ## 🤝 Contributing
 
 When adding new features:
+
 1. Write E2E tests covering the happy path
 2. Add error case tests
 3. Run tests locally before pushing
@@ -369,4 +412,3 @@ When adding new features:
 ---
 
 **Happy Testing! 🎉**
-

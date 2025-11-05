@@ -66,12 +66,3 @@ export function useImageState(): ImageState {
     resetImageState,
   };
 }
-
-
-
-
-
-
-
-
-

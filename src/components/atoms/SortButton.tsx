@@ -99,12 +99,3 @@ export function SortButton({ value, onChange }: SortButtonProps) {
 }
 
 export default SortButton;
-
-
-
-
-
-
-
-
-

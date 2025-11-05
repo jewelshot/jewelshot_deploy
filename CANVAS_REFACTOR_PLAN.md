@@ -1,6 +1,7 @@
 # 🎯 Canvas.tsx Refactor Plan
 
 ## Current State
+
 - **File:** `src/components/organisms/Canvas.tsx`
 - **Lines:** 1,130
 - **Hooks Used:** 20+
@@ -101,9 +102,11 @@ Canvas.tsx (Main Orchestrator - 250 lines)
 ### Breakdown
 
 #### 1. **Canvas.tsx** (Main Orchestrator - 250 lines)
+
 **Responsibility:** High-level coordination, layout, state orchestration
 
 **Contains:**
+
 - Imports & setup
 - Main state (via hooks)
 - Top-level event handlers
@@ -111,6 +114,7 @@ Canvas.tsx (Main Orchestrator - 250 lines)
 - Child component composition
 
 **Props it passes down:**
+
 ```typescript
 // To CanvasCore
 coreProps = {
@@ -127,16 +131,21 @@ coreProps = {
   background,
   cropRatio,
   // ... etc
-}
+};
 
 // To CanvasControls
 controlsProps = {
-  scale, setScale,
-  onZoomIn, onZoomOut, onResetZoom,
-  onRotateLeft, onRotateRight,
-  onFlipH, onFlipV,
+  scale,
+  setScale,
+  onZoomIn,
+  onZoomOut,
+  onResetZoom,
+  onRotateLeft,
+  onRotateRight,
+  onFlipH,
+  onFlipV,
   // ... etc
-}
+};
 
 // To AIEditManager
 aiProps = {
@@ -145,7 +154,7 @@ aiProps = {
   onAIEditComplete,
   onAIEditError,
   // ... etc
-}
+};
 
 // To CanvasModals
 modalsProps = {
@@ -155,15 +164,17 @@ modalsProps = {
   onCropCancel,
   showShortcutsModal,
   // ... etc
-}
+};
 ```
 
 ---
 
 #### 2. **CanvasCore.tsx** (Rendering Engine - 200 lines)
+
 **Responsibility:** Image rendering, filters, transforms
 
 **Contains:**
+
 - Canvas ref
 - Image rendering logic
 - Filter application
@@ -171,6 +182,7 @@ modalsProps = {
 - View mode rendering (original/edited/comparison)
 
 **Props:**
+
 ```typescript
 interface CanvasCoreProps {
   uploadedImage: string | null;
@@ -190,6 +202,7 @@ interface CanvasCoreProps {
 ```
 
 **Extracted Components:**
+
 - `ImageViewer` (already exists)
 - `LoadingState` (already exists)
 - `AILoadingOverlay` (already exists)
@@ -197,9 +210,11 @@ interface CanvasCoreProps {
 ---
 
 #### 3. **CanvasControls.tsx** (UI Controls - 200 lines)
+
 **Responsibility:** All UI controls (zoom, rotate, etc.)
 
 **Contains:**
+
 - Zoom controls
 - Rotation controls
 - Flip controls
@@ -209,6 +224,7 @@ interface CanvasCoreProps {
 - Keyboard shortcuts setup
 
 **Props:**
+
 ```typescript
 interface CanvasControlsProps {
   // Zoom
@@ -216,26 +232,26 @@ interface CanvasControlsProps {
   onZoomIn: () => void;
   onZoomOut: () => void;
   onResetZoom: () => void;
-  
+
   // Transform
   transform: Transform;
   onRotateLeft: () => void;
   onRotateRight: () => void;
   onFlipH: () => void;
   onFlipV: () => void;
-  
+
   // Background
   background: string;
   onBackgroundChange: (bg: string) => void;
-  
+
   // View mode
   viewMode: ViewMode;
   onViewModeChange: (mode: ViewMode) => void;
-  
+
   // UI visibility
   isFullscreen: boolean;
   uiVisible: boolean;
-  
+
   // Actions
   onSave: () => void;
   onDownload: () => void;
@@ -245,6 +261,7 @@ interface CanvasControlsProps {
 ```
 
 **Extracted Components:**
+
 - `ZoomControls` (already exists)
 - `ActionControls` (already exists)
 - `BackgroundSelector` (already exists)
@@ -255,9 +272,11 @@ interface CanvasControlsProps {
 ---
 
 #### 4. **AIEditManager.tsx** (AI Logic - 200 lines)
+
 **Responsibility:** AI generation, editing, preset handling
 
 **Contains:**
+
 - useImageEdit hook
 - Preset generation logic
 - AI success/error handlers
@@ -265,6 +284,7 @@ interface CanvasControlsProps {
 - AI edit event listeners
 
 **Props:**
+
 ```typescript
 interface AIEditManagerProps {
   uploadedImage: string | null;
@@ -278,6 +298,7 @@ interface AIEditManagerProps {
 ```
 
 **Internal Logic:**
+
 - `useImageEdit()` hook
 - `editWithAI()` function
 - Auto-save after successful generation
@@ -286,9 +307,11 @@ interface AIEditManagerProps {
 ---
 
 #### 5. **CanvasModals.tsx** (Modals & Overlays - 200 lines)
+
 **Responsibility:** All modals, overlays, dialogs
 
 **Contains:**
+
 - Crop modal
 - Keyboard shortcuts modal
 - Fullscreen logic
@@ -296,6 +319,7 @@ interface AIEditManagerProps {
 - Empty state
 
 **Props:**
+
 ```typescript
 interface CanvasModalsProps {
   // Crop
@@ -304,15 +328,15 @@ interface CanvasModalsProps {
   uploadedImage: string | null;
   onCropApply: (croppedImage: string) => void;
   onCropCancel: () => void;
-  
+
   // Keyboard shortcuts
   showShortcutsModal: boolean;
   onCloseShortcuts: () => void;
-  
+
   // Fullscreen
   isFullscreen: boolean;
   onToggleFullscreen: () => void;
-  
+
   // Empty state
   hasImage: boolean;
   onFileSelect: (file: File) => void;
@@ -320,6 +344,7 @@ interface CanvasModalsProps {
 ```
 
 **Extracted Components:**
+
 - `CropModal` (already exists)
 - `KeyboardShortcutsModal` (already exists)
 - `EmptyState` (already exists)
@@ -330,6 +355,7 @@ interface CanvasModalsProps {
 ## Implementation Steps
 
 ### Phase 1: Create New Components (No Breaking Changes)
+
 1. ✅ Create `CanvasCore.tsx` (copy relevant code)
 2. ✅ Create `CanvasControls.tsx` (copy relevant code)
 3. ✅ Create `AIEditManager.tsx` (copy relevant code)
@@ -337,12 +363,14 @@ interface CanvasModalsProps {
 5. ✅ Ensure each compiles independently
 
 ### Phase 2: Update Canvas.tsx to Use New Components
+
 1. ✅ Import new components
 2. ✅ Replace JSX sections with new components
 3. ✅ Pass props correctly
 4. ✅ Test thoroughly
 
 ### Phase 3: Cleanup
+
 1. ✅ Remove unused code from Canvas.tsx
 2. ✅ Add proper TypeScript types
 3. ✅ Add JSDoc comments
@@ -354,17 +382,20 @@ interface CanvasModalsProps {
 ## Safety Measures
 
 ### Before Starting:
+
 - ✅ Create git checkpoint (already done: `pre-refactoring-checkpoint`)
 - ✅ Run all tests (check current state)
 - ✅ Take note of all props/state
 
 ### During Refactor:
+
 - ✅ Build after each file creation
 - ✅ No changes to hook logic (just move code)
 - ✅ Preserve all prop names
 - ✅ Keep all event handlers
 
 ### After Refactor:
+
 - ✅ Full build
 - ✅ Run all tests
 - ✅ Manual UI testing
@@ -375,16 +406,19 @@ interface CanvasModalsProps {
 ## Risk Assessment
 
 ### Low Risk:
+
 - Moving JSX to new components
 - Extracting props interfaces
 - Adding TypeScript types
 
 ### Medium Risk:
+
 - Callback prop drilling
 - State synchronization
 - Event handler references
 
 ### High Risk:
+
 - Changing hook dependencies
 - Modifying useEffect logic
 - Breaking memoization
@@ -394,6 +428,7 @@ interface CanvasModalsProps {
 ## Expected Benefits
 
 ### Before:
+
 ```
 Canvas.tsx: 1,130 lines
 - Maintainability: 2/10
@@ -402,6 +437,7 @@ Canvas.tsx: 1,130 lines
 ```
 
 ### After:
+
 ```
 Canvas.tsx: ~250 lines (Orchestrator)
 CanvasCore.tsx: ~200 lines (Rendering)
@@ -427,7 +463,3 @@ Total: ~1,050 lines (80 lines saved from cleanup)
 - **Testing:** 1 hour
 
 **Total:** ~6-7 hours (1 work day)
-
-
-
-

@@ -84,12 +84,3 @@ export function GalleryFallback({ error, resetError }: GalleryFallbackProps) {
 }
 
 export default GalleryFallback;
-
-
-
-
-
-
-
-
-

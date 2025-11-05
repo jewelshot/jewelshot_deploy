@@ -2,10 +2,10 @@
  * ============================================================================
  * GLOBAL RATE LIMITER - Protects FAL.AI API from rate limit bans
  * ============================================================================
- * 
+ *
  * Ensures the entire application doesn't exceed FAL.AI rate limits,
  * regardless of how many users are making requests.
- * 
+ *
  * Current Implementation: In-memory (single instance)
  * Future: Redis-based for multi-instance support
  */
@@ -104,7 +104,7 @@ export function getGlobalRateLimitStatus(): {
  */
 export function getEstimatedWaitTime(): number {
   const status = getGlobalRateLimitStatus();
-  
+
   if (status.remaining > 0) {
     return 0; // No wait
   }
@@ -112,10 +112,6 @@ export function getEstimatedWaitTime(): number {
   // Estimate: Each AI request takes ~30s average
   const AVG_REQUEST_TIME = 30 * 1000;
   const queueDepth = Math.max(0, status.current - status.limit);
-  
+
   return Math.ceil((queueDepth * AVG_REQUEST_TIME) / GLOBAL_AI_LIMIT);
 }
-
-
-
-

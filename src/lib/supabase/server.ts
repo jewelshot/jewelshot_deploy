@@ -32,12 +32,3 @@ export async function createClient() {
     }
   );
 }
-
-
-
-
-
-
-
-
-

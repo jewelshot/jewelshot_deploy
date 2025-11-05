@@ -74,12 +74,3 @@ export function CanvasFallback({ error, resetError }: CanvasFallbackProps) {
 }
 
 export default CanvasFallback;
-
-
-
-
-
-
-
-
-

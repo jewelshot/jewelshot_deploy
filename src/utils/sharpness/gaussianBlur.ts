@@ -108,12 +108,3 @@ export function applyBoxBlur(imageData: ImageData, radius: number): ImageData {
 
   return output;
 }
-
-
-
-
-
-
-
-
-

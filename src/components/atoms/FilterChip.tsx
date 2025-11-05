@@ -26,12 +26,3 @@ export function FilterChip({ label, active, onClick, icon }: FilterChipProps) {
 }
 
 export default FilterChip;
-
-
-
-
-
-
-
-
-

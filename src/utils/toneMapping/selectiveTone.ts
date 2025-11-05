@@ -214,12 +214,3 @@ export function calculateOptimalFeather(adjustment: number): number {
     return 0.4;
   }
 }
-
-
-
-
-
-
-
-
-

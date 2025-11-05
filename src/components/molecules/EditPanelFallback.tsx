@@ -56,12 +56,3 @@ export function EditPanelFallback({ error, onClose }: EditPanelFallbackProps) {
 }
 
 export default EditPanelFallback;
-
-
-
-
-
-
-
-
-

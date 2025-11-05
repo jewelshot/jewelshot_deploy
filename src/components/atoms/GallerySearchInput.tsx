@@ -67,12 +67,3 @@ export function GallerySearchInput({
 }
 
 export default GallerySearchInput;
-
-
-
-
-
-
-
-
-

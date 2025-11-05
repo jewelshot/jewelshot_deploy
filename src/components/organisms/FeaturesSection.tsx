@@ -83,12 +83,3 @@ export function FeaturesSection() {
     </section>
   );
 }
-
-
-
-
-
-
-
-
-

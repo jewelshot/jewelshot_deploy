@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 
 /**
  * Web Vitals API Endpoint
- * 
+ *
  * Receives Core Web Vitals metrics from the client
  * Logs them for monitoring and analysis
- * 
+ *
  * In production, you can forward these to your analytics service:
  * - Sentry (performance monitoring)
  * - DataDog
@@ -56,10 +56,8 @@ export async function POST(request: NextRequest) {
         },
       });
       */
-
       // Example: Send to custom analytics
       // await analytics.track('web-vital', metric);
-
       // Example: Store in database for analysis
       // await db.webVitals.create({ data: metric });
     }
@@ -67,7 +65,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
     console.error('[Web Vitals API] Error:', error);
-    
+
     // Don't break the client if analytics fail
     return NextResponse.json(
       { error: 'Failed to process metric' },
@@ -80,4 +78,3 @@ export async function POST(request: NextRequest) {
 export async function OPTIONS() {
   return NextResponse.json({}, { status: 200 });
 }
-

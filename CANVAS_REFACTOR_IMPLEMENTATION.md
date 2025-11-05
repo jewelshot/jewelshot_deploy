@@ -22,9 +22,10 @@
 ## ✅ Completed: CanvasCore.tsx
 
 ### What Was Done:
+
 1. **Created:** `src/components/organisms/canvas/CanvasCore.tsx`
 2. **Exported Types:** Position, Transform, AdjustFilters, ColorFilters, FilterEffects
-3. **Functionality:** 
+3. **Functionality:**
    - Single image view
    - Side-by-side comparison view
    - Filter & transform rendering
@@ -33,23 +34,24 @@
    - Smart padding calculations
 
 ### Props Interface:
+
 ```typescript
 interface CanvasCoreProps {
   // Image state
   uploadedImage: string | null;
   originalImage: string | null;
   isLoading: boolean;
-  
+
   // AI state
   isAIEditing: boolean;
   isAIImageLoading: boolean;
   aiProgress: string;
-  
+
   // View mode
   viewMode: 'normal' | 'sideBySide';
   activeImage: 'left' | 'right';
   onActiveImageChange: (side: 'left' | 'right') => void;
-  
+
   // Transform & filters
   scale: number;
   position: { x: number; y: number };
@@ -59,18 +61,18 @@ interface CanvasCoreProps {
   adjustFilters: AdjustFilters;
   colorFilters: ColorFilters;
   filterEffects: FilterEffects;
-  
+
   // Background & UI
   background: 'none' | 'black' | 'gray' | 'white' | 'alpha';
   canvasControlsVisible: boolean;
   isPromptExpanded: boolean;
-  
+
   // Sidebar state
   leftOpen: boolean;
   rightOpen: boolean;
   topOpen: boolean;
   bottomOpen: boolean;
-  
+
   // Event handlers
   onImageLoad: () => void;
   onImageError: () => void;
@@ -83,27 +85,30 @@ interface CanvasCoreProps {
 ## ⏳ TODO: Phase 1.2 - CanvasControls.tsx
 
 ### Responsibility:
+
 All UI controls (zoom, rotate, background, view mode, actions)
 
 ### What to Extract from Canvas.tsx:
+
 - Lines ~900-1050: ZoomControls, ActionControls, TopLeftControls, BottomRightControls
 - Keyboard shortcuts setup (lines 400-616)
 - Background selector logic
 - View mode selector logic
 
 ### Props Interface:
+
 ```typescript
 interface CanvasControlsProps {
   // Image state (for conditional rendering)
   hasImage: boolean;
   fileName: string;
-  
+
   // Zoom controls
   scale: number;
   onZoomIn: () => void;
   onZoomOut: () => void;
   onResetZoom: () => void;
-  
+
   // Transform controls
   transform: Transform;
   onRotateLeft: () => void;
@@ -111,15 +116,15 @@ interface CanvasControlsProps {
   onFlipH: () => void;
   onFlipV: () => void;
   onResetTransform: () => void;
-  
+
   // Background selector
   background: string;
   onBackgroundChange: (bg: string) => void;
-  
+
   // View mode
   viewMode: 'normal' | 'sideBySide';
   onViewModeChange: (mode: 'normal' | 'sideBySide') => void;
-  
+
   // Actions
   onSave: () => void;
   onDownload: () => void;
@@ -127,13 +132,13 @@ interface CanvasControlsProps {
   onShare: () => void;
   onUndo: () => void;
   onRedo: () => void;
-  
+
   // UI visibility
   isFullscreen: boolean;
   controlsVisible: boolean;
   onToggleUI: () => void;
   onToggleShortcuts: () => void;
-  
+
   // Sidebars
   leftOpen: boolean;
   rightOpen: boolean;
@@ -143,6 +148,7 @@ interface CanvasControlsProps {
 ```
 
 ### Component Structure:
+
 ```typescript
 'use client';
 
@@ -164,7 +170,7 @@ export default function CanvasControls({ ...props }: CanvasControlsProps) {
         onClose={props.onReset}
         visible={props.controlsVisible}
       />
-      
+
       {/* Zoom controls (bottom-left) */}
       <ZoomControls
         scale={props.scale}
@@ -173,7 +179,7 @@ export default function CanvasControls({ ...props }: CanvasControlsProps) {
         onResetZoom={props.onResetZoom}
         visible={props.controlsVisible}
       />
-      
+
       {/* Action controls (top-right) */}
       <ActionControls
         onSave={props.onSave}
@@ -189,7 +195,7 @@ export default function CanvasControls({ ...props }: CanvasControlsProps) {
         onResetTransform={props.onResetTransform}
         visible={props.controlsVisible}
       />
-      
+
       {/* Bottom-right controls */}
       <BottomRightControls
         onToggleUI={props.onToggleUI}
@@ -197,21 +203,21 @@ export default function CanvasControls({ ...props }: CanvasControlsProps) {
         isFullscreen={props.isFullscreen}
         visible={props.controlsVisible}
       />
-      
+
       {/* Background selector */}
       <BackgroundSelector
         background={props.background}
         onBackgroundChange={props.onBackgroundChange}
         visible={props.controlsVisible}
       />
-      
+
       {/* View mode selector */}
       <ViewModeSelector
         viewMode={props.viewMode}
         onViewModeChange={props.onViewModeChange}
         visible={props.controlsVisible}
       />
-      
+
       {/* UI toggle button */}
       <UIToggleButton
         visible={!props.controlsVisible}
@@ -227,25 +233,28 @@ export default function CanvasControls({ ...props }: CanvasControlsProps) {
 ## ⏳ TODO: Phase 1.3 - AIEditManager.tsx
 
 ### Responsibility:
+
 AI generation, editing, preset handling, auto-save
 
 ### What to Extract from Canvas.tsx:
+
 - Lines 136-180: useImageEdit hook setup
 - Lines 154-180: Preset generation handler
 - Lines 619-645: AI edit event listeners
 - Auto-save logic (already implemented in onSuccess)
 
 ### Props Interface:
+
 ```typescript
 interface AIEditManagerProps {
   // Image state
   uploadedImage: string | null;
   fileName: string;
-  
+
   // AI state
   isAIEditing: boolean;
   aiProgress: string;
-  
+
   // Callbacks
   onImageUpdate: (imageUrl: string) => void;
   onOriginalImageSet: (imageUrl: string) => void;
@@ -256,6 +265,7 @@ interface AIEditManagerProps {
 ```
 
 ### Component Structure:
+
 ```typescript
 'use client';
 
@@ -275,7 +285,6 @@ export default function AIEditManager({
   onSuccess,
   onError,
 }: AIEditManagerProps) {
-  
   // AI Edit hook with auto-save
   const { edit: editWithAI } = useImageEdit({
     onSuccess: async (result) => {
@@ -293,7 +302,7 @@ export default function AIEditManager({
             'ai-edited',
             { style: 'AI Enhanced' }
           );
-          
+
           window.dispatchEvent(new Event('gallery-updated'));
           logger.info('✅ AI-generated image auto-saved to gallery');
           onSuccess('Saved to gallery!');
@@ -323,9 +332,15 @@ export default function AIEditManager({
       }
     };
 
-    window.addEventListener('ai-edit-generate', handleAIEditGenerate as EventListener);
+    window.addEventListener(
+      'ai-edit-generate',
+      handleAIEditGenerate as EventListener
+    );
     return () => {
-      window.removeEventListener('ai-edit-generate', handleAIEditGenerate as EventListener);
+      window.removeEventListener(
+        'ai-edit-generate',
+        handleAIEditGenerate as EventListener
+      );
     };
   }, [editWithAI, onOriginalImageSet]);
 
@@ -339,15 +354,18 @@ export default function AIEditManager({
 ## ⏳ TODO: Phase 1.4 - CanvasModals.tsx
 
 ### Responsibility:
+
 All modals, overlays, dialogs (crop modal, keyboard shortcuts, etc.)
 
 ### What to Extract from Canvas.tsx:
+
 - Crop modal (lines ~850-900)
 - Keyboard shortcuts modal
 - Fullscreen logic
 - Edit panel (might stay in Canvas.tsx - it's a sidebar panel)
 
 ### Props Interface:
+
 ```typescript
 interface CanvasModalsProps {
   // Crop modal
@@ -356,11 +374,11 @@ interface CanvasModalsProps {
   uploadedImage: string | null;
   onCropApply: (croppedImage: string) => void;
   onCropCancel: () => void;
-  
+
   // Keyboard shortcuts modal
   showKeyboardHelp: boolean;
   onCloseKeyboardHelp: () => void;
-  
+
   // Edit panel (optional - might stay in main Canvas)
   isEditPanelOpen: boolean;
   onEditPanelClose: () => void;
@@ -375,6 +393,7 @@ interface CanvasModalsProps {
 ```
 
 ### Component Structure:
+
 ```typescript
 'use client';
 
@@ -424,11 +443,13 @@ export default function CanvasModals({ ...props }: CanvasModalsProps) {
 ## ⏳ TODO: Phase 2 - Update Canvas.tsx
 
 ### Goal:
+
 Replace JSX sections with new components, reduce from 1,130 → ~250 lines
 
 ### Step-by-Step:
 
 #### 2.1: Import New Components
+
 ```typescript
 // Add to top of Canvas.tsx
 import CanvasCore from './canvas/CanvasCore';
@@ -438,7 +459,9 @@ import CanvasModals from './canvas/CanvasModals';
 ```
 
 #### 2.2: Replace Rendering Section (lines 706-850)
+
 **Before:**
+
 ```typescript
 return (
   <>
@@ -467,6 +490,7 @@ return (
 ```
 
 **After:**
+
 ```typescript
 return (
   <>
@@ -586,6 +610,7 @@ return (
 ```
 
 #### 2.3: Cleanup
+
 - Remove now-unused JSX sections
 - Keep all hooks (they're fine)
 - Keep all event handlers
@@ -596,6 +621,7 @@ return (
 ## ⏳ TODO: Phase 3 - Cleanup & Test
 
 ### 3.1: Code Cleanup
+
 ```bash
 # Remove unused imports
 # Add JSDoc comments
@@ -604,18 +630,21 @@ npm run lint -- --fix
 ```
 
 ### 3.2: Type Check
+
 ```bash
 npm run build
 # Should compile without errors
 ```
 
 ### 3.3: Run Tests
+
 ```bash
 npm run test
 # Fix any broken tests
 ```
 
 ### 3.4: Manual Testing Checklist
+
 - [ ] Image upload works
 - [ ] Zoom/pan works
 - [ ] Rotate/flip works
@@ -631,6 +660,7 @@ npm run test
 - [ ] All sidebars work
 
 ### 3.5: Performance Check
+
 ```bash
 # Bundle size
 npm run build -- --analyze
@@ -642,6 +672,7 @@ npm run build -- --analyze
 ## 📊 Expected Results
 
 ### Before:
+
 ```
 Canvas.tsx: 1,130 lines
 - Maintainability: 2/10
@@ -651,6 +682,7 @@ Canvas.tsx: 1,130 lines
 ```
 
 ### After:
+
 ```
 Canvas.tsx: ~250 lines (Orchestrator)
 CanvasCore.tsx: 320 lines (Rendering)
@@ -671,6 +703,7 @@ Total: ~1,120 lines (10 lines saved from cleanup)
 ## 🚀 How to Continue
 
 ### Option 1: Continue Now (5-6 hours)
+
 ```bash
 # Create remaining components
 # Update Canvas.tsx
@@ -679,6 +712,7 @@ Total: ~1,120 lines (10 lines saved from cleanup)
 ```
 
 ### Option 2: Continue Later (Resume from checkpoint)
+
 ```bash
 # This commit is a safe checkpoint
 # All new code compiles
@@ -687,6 +721,7 @@ Total: ~1,120 lines (10 lines saved from cleanup)
 ```
 
 ### Option 3: Incremental (Do one component at a time)
+
 ```bash
 # Day 1: CanvasControls.tsx (done)
 # Day 2: AIEditManager.tsx
@@ -700,6 +735,7 @@ Total: ~1,120 lines (10 lines saved from cleanup)
 ## 🎯 Recommendation
 
 **Incremental approach (Option 3):**
+
 - ✅ Less risky
 - ✅ Easier to test each step
 - ✅ Can be reviewed gradually
@@ -722,7 +758,3 @@ This way, if something breaks, it's easy to identify and fix.
 ---
 
 **Status:** Ready to continue anytime! 🚀
-
-
-
-

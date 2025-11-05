@@ -200,12 +200,3 @@ function applyVerticalConvolution(
 
   return output;
 }
-
-
-
-
-
-
-
-
-
