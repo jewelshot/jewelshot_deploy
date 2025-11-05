@@ -27,7 +27,7 @@ export function MobileStudio({ onBack }: MobileStudioProps) {
   const { edit, isEditing } = useImageEdit({
     onSuccess: (result) => {
       if (result.images && result.images.length > 0) {
-        setImage(result.images[0]);
+        setImage(result.images[0].url);
         logger.info('[MobileStudio] AI edit successful');
       }
     },
