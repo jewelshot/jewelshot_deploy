@@ -57,11 +57,11 @@ const RateLimitIndicator = dynamic(
 );
 
 export default function StudioPage() {
-  const { isMobile } = useBreakpoint();
+  const { isMobile, isTablet, isDesktop } = useBreakpoint();
   const [showMobileStudio, setShowMobileStudio] = useState(false);
 
   // Initialize warning dismissed state from sessionStorage
-  const [warningDismissed, setWarningDismissed] = useState(() => {
+  const [warningDismissed] = useState(() => {
     if (typeof window !== 'undefined') {
       return (
         sessionStorage.getItem('mobile-studio-warning-dismissed') === 'true'
@@ -69,6 +69,17 @@ export default function StudioPage() {
     }
     return false;
   });
+
+  // Debug: Log breakpoint detection
+  useEffect(() => {
+    console.log('[Studio] Breakpoint detection:', {
+      isMobile,
+      isTablet,
+      isDesktop,
+      warningDismissed,
+      windowWidth: typeof window !== 'undefined' ? window.innerWidth : 'N/A',
+    });
+  }, [isMobile, isTablet, isDesktop, warningDismissed]);
 
   // Handle preset generation from RightSidebar
   const handleGenerateWithPreset = (prompt: string) => {

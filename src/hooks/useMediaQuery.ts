@@ -10,15 +10,16 @@
 import { useEffect, useState } from 'react';
 
 export function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState(false);
+  const [matches, setMatches] = useState(() => {
+    // On client-side, immediately check the media query
+    if (typeof window !== 'undefined') {
+      return window.matchMedia(query).matches;
+    }
+    return false;
+  });
 
   useEffect(() => {
     const media = window.matchMedia(query);
-
-    // Update initial value
-    if (matches !== media.matches) {
-      setMatches(media.matches);
-    }
 
     const listener = (event: MediaQueryListEvent) => {
       setMatches(event.matches);
@@ -34,8 +35,7 @@ export function useMediaQuery(query: string): boolean {
       media.addListener(listener);
       return () => media.removeListener(listener);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query]); // matches is intentionally not in deps to avoid infinite loop
+  }, [query]);
 
   return matches;
 }

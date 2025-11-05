@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import React from 'react';
 
 import { Inter } from 'next/font/google';
@@ -14,6 +14,14 @@ const inter = Inter({
   variable: '--font-inter',
   weight: ['300', '400', '500', '600', '700'],
 });
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: '#9333ea',
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(
