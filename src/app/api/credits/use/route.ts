@@ -61,16 +61,14 @@ export async function POST(request: NextRequest) {
     const newCredits = typedCreditData.credits_remaining - 1;
     const newUsed = (typedCreditData.credits_used || 0) + 1;
 
-    const updateData = {
-      credits_remaining: newCredits,
-      credits_used: newUsed,
-      last_generation_at: new Date().toISOString(),
-    };
-
-    const { error: updateError } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: updateError } = await (supabase as any)
       .from('user_credits')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .update(updateData as any)
+      .update({
+        credits_remaining: newCredits,
+        credits_used: newUsed,
+        last_generation_at: new Date().toISOString(),
+      })
       .eq('user_id', user.id);
 
     if (updateError) {
@@ -82,7 +80,8 @@ export async function POST(request: NextRequest) {
     }
 
     // ✅ 3. Transaction kaydı oluştur
-    const transactionData = [
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any).from('credit_transactions').insert([
       {
         user_id: user.id,
         amount: -1,
@@ -90,12 +89,7 @@ export async function POST(request: NextRequest) {
         description: description,
         metadata: metadata,
       },
-    ];
-
-    await supabase
-      .from('credit_transactions')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .insert(transactionData as any);
+    ]);
 
     return NextResponse.json({
       success: true,
