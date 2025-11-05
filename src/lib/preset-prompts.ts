@@ -85,7 +85,25 @@ OUTPUT: E-commerce ready. Tiffany catalog standard. Aspect ratio ${aspectRatio}.
           bracelet: 'Wrist reaching gesturing everyday actions',
         }[type] || 'Layered with outfit natural drape';
 
+      // Real-world size specifications for accurate scaling
+      const sizeSpecs =
+        {
+          ring: 'Ring band 2-3mm wide, face 8-12mm diameter typical engagement ring size',
+          necklace: 'Chain 16-20 inch length, pendant 10-25mm typical size',
+          earring: 'Stud 4-8mm diameter, drop/dangle 15-35mm length typical',
+          bracelet: 'Chain 7-8 inch length, links 3-8mm width typical size',
+        }[type] || 'Standard jewelry proportions relative to human body';
+
       return `Lifestyle editorial ${jewelryType} on ${genderText}. Natural everyday candid moment. Authentic relatable aesthetic.
+
+CRITICAL SIZE & SCALE - ACCURATE PROPORTIONS:
+SOURCE IMAGE: Close-up product photography enlarged for detail
+IMPORTANT: When compositing on model use LIFE-SIZE REAL-WORLD proportions
+${sizeSpecs}
+Scale DOWN from close-up to actual wearable jewelry size
+Jewelry must appear natural realistic proportional to human body
+NOT oversized NOT miniature ACTUAL life-size dimensions
+Reference human anatomy: finger width hand size neck circumference wrist diameter
 
 CRITICAL PRESERVATION - ZERO TOLERANCE:
 EXACT jewelry structure geometry shape form UNCHANGED pixel-perfect
@@ -244,7 +262,25 @@ OUTPUT: Editorial minimalist still life. Aspect ratio ${aspectRatio}. Soft paste
           bracelet: 'Wrist arm positioned showcase prominent display',
         }[type] || 'Positioned naturally on body clear prominent';
 
+      // Real-world size specifications for accurate scaling
+      const sizeSpecs =
+        {
+          ring: 'Ring band 2-3mm wide, face 8-12mm diameter typical engagement ring size',
+          necklace: 'Chain 16-20 inch length, pendant 10-25mm typical size',
+          earring: 'Stud 4-8mm diameter, drop/dangle 15-35mm length typical',
+          bracelet: 'Chain 7-8 inch length, links 3-8mm width typical size',
+        }[type] || 'Standard jewelry proportions relative to human body';
+
       return `Professional e-commerce model ${jewelryType} on ${genderText}. Clean commercial presentation. Product-focused.
+
+CRITICAL SIZE & SCALE - ACCURATE PROPORTIONS:
+SOURCE IMAGE: Close-up product photography enlarged for detail
+IMPORTANT: When compositing on model use LIFE-SIZE REAL-WORLD proportions
+${sizeSpecs}
+Scale DOWN from close-up to actual wearable jewelry size
+Jewelry must appear natural realistic proportional to human body
+NOT oversized NOT miniature ACTUAL life-size dimensions
+Reference human anatomy: finger width hand size neck circumference wrist diameter
 
 CRITICAL PRESERVATION - ZERO TOLERANCE:
 EXACT jewelry structure geometry shape form UNCHANGED pixel-perfect
@@ -386,7 +422,25 @@ OUTPUT: Macro craftsmanship showcase. Aspect ratio ${aspectRatio}. Extreme close
           bracelet: 'Wrist elevated elegant gesture refined',
         }[type] || 'Layered draped intentional sophisticated';
 
+      // Real-world size specifications for accurate scaling
+      const sizeSpecs =
+        {
+          ring: 'Ring band 2-3mm wide, face 8-12mm diameter typical engagement ring size',
+          necklace: 'Chain 16-20 inch length, pendant 10-25mm typical size',
+          earring: 'Stud 4-8mm diameter, drop/dangle 15-35mm length typical',
+          bracelet: 'Chain 7-8 inch length, links 3-8mm width typical size',
+        }[type] || 'Standard jewelry proportions relative to human body';
+
       return `Luxury high-fashion editorial ${jewelryType} on ${genderText}. Premium campaign. Aspirational prestige presentation.
+
+CRITICAL SIZE & SCALE - ACCURATE PROPORTIONS:
+SOURCE IMAGE: Close-up product photography enlarged for detail
+IMPORTANT: When compositing on model use LIFE-SIZE REAL-WORLD proportions
+${sizeSpecs}
+Scale DOWN from close-up to actual wearable jewelry size
+Jewelry must appear natural realistic proportional to human body
+NOT oversized NOT miniature ACTUAL life-size dimensions
+Reference human anatomy: finger width hand size neck circumference wrist diameter
 
 CRITICAL PRESERVATION - ZERO TOLERANCE:
 EXACT jewelry structure geometry shape form UNCHANGED pixel-perfect
