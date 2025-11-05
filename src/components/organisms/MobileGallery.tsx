@@ -99,30 +99,28 @@ export function MobileGallery() {
   if (loading) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-[#0a0a0a] via-[#1a0a2e] to-[#0a0a0a]">
-        {/* Aurora Background */}
+        {/* Subtle Aurora */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div
-            className="absolute -left-1/4 -top-1/4 h-96 w-96 animate-pulse rounded-full bg-purple-600/20 blur-[100px]"
+            className="absolute -left-1/4 -top-1/4 h-64 w-64 animate-pulse rounded-full bg-purple-600/15 blur-[80px]"
             style={{ animationDuration: '8s' }}
-          ></div>
+          />
           <div
-            className="absolute -right-1/4 top-1/3 h-96 w-96 animate-pulse rounded-full bg-pink-600/15 blur-[100px]"
+            className="absolute -right-1/4 top-1/3 h-64 w-64 animate-pulse rounded-full bg-pink-600/10 blur-[80px]"
             style={{ animationDuration: '10s', animationDelay: '2s' }}
-          ></div>
+          />
         </div>
 
-        {/* Loading Content */}
+        {/* Compact Loading */}
         <div className="relative text-center">
-          <div className="relative mx-auto mb-6 h-16 w-16">
+          <div className="relative mx-auto mb-4 h-12 w-12">
             {/* Spinning Ring */}
-            <div className="absolute inset-0 animate-spin rounded-full border-4 border-purple-500/20 border-t-purple-500"></div>
+            <div className="border-3 absolute inset-0 animate-spin rounded-full border-purple-500/20 border-t-purple-500" />
             {/* Inner Glow */}
-            <div className="absolute inset-0 animate-pulse rounded-full bg-purple-500/20 blur-xl"></div>
+            <div className="absolute inset-0 animate-pulse rounded-full bg-purple-500/15 blur-lg" />
           </div>
-          <p className="text-sm font-medium">
-            <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent">
-              Loading gallery...
-            </span>
+          <p className="text-xs font-medium text-purple-300">
+            Loading gallery...
           </p>
         </div>
       </div>
@@ -147,68 +145,60 @@ export function MobileGallery() {
         ></div>
       </div>
 
-      {/* Top Bar - Glassmorphic */}
-      <div className="relative z-10 m-3 overflow-hidden rounded-3xl border border-white/20 bg-gradient-to-r from-white/[0.08] via-white/[0.05] to-white/[0.08] p-4 shadow-2xl backdrop-blur-2xl">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 via-pink-500 to-purple-600 shadow-lg shadow-purple-500/30">
-              <Sparkles className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold">
-                <span className="bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
-                  Gallery
-                </span>
-              </h1>
-              <p className="text-xs text-white/50">
-                {images.length} {images.length === 1 ? 'image' : 'images'}
-              </p>
-            </div>
+      {/* Top Bar - Compact */}
+      <div className="relative z-10 m-2 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] p-3 shadow-xl backdrop-blur-xl">
+        <div className="flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 shadow-md shadow-purple-500/30">
+            <Sparkles className="h-4 w-4 text-white" />
+          </div>
+          <div>
+            <h1 className="text-base font-bold text-white">Gallery</h1>
+            <p className="text-[10px] text-white/40">
+              {images.length} {images.length === 1 ? 'image' : 'images'}
+            </p>
           </div>
         </div>
       </div>
 
       {/* Gallery Grid */}
-      <div className="relative flex-1 overflow-y-auto p-4 pb-20">
+      <div className="relative flex-1 overflow-y-auto p-3 pb-20">
         {images.length === 0 ? (
-          /* Empty State - Premium Glassmorphic Card */
-          <div className="flex h-full flex-col items-center justify-center p-6 text-center">
-            <div className="relative overflow-hidden rounded-3xl border border-white/20 bg-gradient-to-br from-white/[0.08] via-white/[0.03] to-white/[0.08] p-12 shadow-2xl backdrop-blur-2xl">
-              {/* Glow Effect */}
-              <div className="absolute -left-10 -top-10 h-32 w-32 animate-pulse rounded-full bg-purple-500/20 blur-3xl"></div>
+          /* Empty State - Compact Card */
+          <div className="flex h-full flex-col items-center justify-center p-4 text-center">
+            <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] p-8 shadow-xl backdrop-blur-xl">
+              {/* Subtle Glow */}
+              <div className="pointer-events-none absolute -left-8 -top-8 h-24 w-24 animate-pulse rounded-full bg-purple-500/15 blur-2xl" />
               <div
-                className="absolute -bottom-10 -right-10 h-32 w-32 animate-pulse rounded-full bg-pink-500/20 blur-3xl"
+                className="pointer-events-none absolute -bottom-8 -right-8 h-24 w-24 animate-pulse rounded-full bg-pink-500/15 blur-2xl"
                 style={{ animationDelay: '1s' }}
-              ></div>
+              />
 
               {/* Icon Container */}
-              <div className="relative mb-6 flex justify-center">
-                <div className="flex h-24 w-24 items-center justify-center rounded-3xl bg-gradient-to-br from-purple-500/30 via-pink-500/20 to-purple-500/30 shadow-xl shadow-purple-500/20 backdrop-blur-xl">
-                  <Search className="h-12 w-12 text-purple-300" />
+              <div className="relative mb-5 flex justify-center">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20">
+                  <Search className="h-8 w-8 text-purple-300" />
                 </div>
               </div>
 
               {/* Text */}
-              <h2 className="relative mb-2 text-2xl font-bold">
-                <span className="bg-gradient-to-r from-white via-purple-200 to-white bg-clip-text text-transparent">
-                  No Images Yet
-                </span>
+              <h2 className="relative mb-1.5 text-lg font-bold text-white">
+                No Images Yet
               </h2>
-              <p className="relative text-sm text-white/60">
+              <p className="relative text-xs text-white/50">
                 Generate your first AI-edited image in Studio!
               </p>
             </div>
           </div>
         ) : (
-          /* Image Grid - Premium Glassmorphic Cards */
-          <div className="relative grid grid-cols-2 gap-3">
+          /* Image Grid - Compact Cards */
+          <div className="relative grid grid-cols-2 gap-2">
             {images.map((image, index) => (
               <div
                 key={image.id}
                 onClick={() => setSelectedImage(image)}
-                className="group relative aspect-square overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 via-white/[0.02] to-white/5 backdrop-blur-xl transition-all hover:border-white/20 hover:shadow-lg active:scale-95"
+                className="group relative aspect-square overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-xl transition-all hover:border-white/20 active:scale-95"
                 style={{
-                  animation: `fadeInUp 0.3s ease-out ${index * 0.05}s backwards`,
+                  animation: `fadeInUp 0.25s ease-out ${index * 0.04}s backwards`,
                 }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -218,38 +208,38 @@ export function MobileGallery() {
                   className="h-full w-full object-cover"
                 />
 
-                {/* Gradient Overlay on Hover/Touch */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-purple-900/20 to-transparent opacity-0 transition-opacity group-active:opacity-100">
-                  <div className="absolute bottom-3 left-3 right-3 flex gap-2">
-                    {/* Download - Glassmorphic */}
+                {/* Overlay on Touch */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 transition-opacity group-active:opacity-100">
+                  <div className="absolute bottom-2 left-2 right-2 flex gap-1.5">
+                    {/* Download - Compact */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDownload(image);
                       }}
-                      className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/20 bg-white/10 backdrop-blur-xl transition-all hover:bg-white/20 active:scale-90"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/10 backdrop-blur-xl transition-all hover:bg-white/20 active:scale-90"
                       aria-label="Download"
                     >
-                      <Download className="h-4 w-4 text-white" />
+                      <Download className="h-3.5 w-3.5 text-white" />
                     </button>
 
-                    {/* Delete - Glassmorphic */}
+                    {/* Delete - Compact */}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDelete(image);
                       }}
-                      className="flex h-10 w-10 items-center justify-center rounded-xl border border-red-500/30 bg-red-500/10 backdrop-blur-xl transition-all hover:border-red-500/50 hover:bg-red-500/20 active:scale-90"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg border border-red-500/30 bg-red-500/10 backdrop-blur-xl transition-all hover:bg-red-500/20 active:scale-90"
                       aria-label="Delete"
                     >
-                      <Trash2 className="h-4 w-4 text-red-400" />
+                      <Trash2 className="h-3.5 w-3.5 text-red-400" />
                     </button>
                   </div>
                 </div>
 
-                {/* AI Badge - Premium Gradient */}
+                {/* AI Badge - Compact */}
                 {image.type === 'ai-edited' && (
-                  <div className="absolute right-2 top-2 rounded-xl border border-purple-400/30 bg-gradient-to-r from-purple-500/80 via-pink-500/80 to-purple-500/80 px-3 py-1.5 text-[10px] font-bold text-white shadow-lg shadow-purple-500/30 backdrop-blur-xl">
+                  <div className="absolute right-1.5 top-1.5 rounded-lg border border-purple-400/30 bg-gradient-to-r from-purple-500/80 to-pink-500/80 px-2 py-1 text-[9px] font-bold text-white shadow-md shadow-purple-500/20 backdrop-blur-xl">
                     AI
                   </div>
                 )}
@@ -259,75 +249,73 @@ export function MobileGallery() {
         )}
       </div>
 
-      {/* Image Detail Modal - Premium Glassmorphic */}
+      {/* Image Detail Modal - Compact */}
       {selectedImage && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xl"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-lg"
           onClick={() => setSelectedImage(null)}
         >
           <div
-            className="relative max-h-[85vh] max-w-[92vw] overflow-hidden rounded-3xl border border-white/20 bg-gradient-to-br from-white/[0.08] via-white/[0.03] to-white/[0.08] p-3 shadow-2xl backdrop-blur-2xl"
+            className="relative max-h-[85vh] max-w-[92vw] overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] p-2.5 shadow-xl backdrop-blur-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Aurora Glow */}
+            {/* Subtle Glow */}
             <div className="pointer-events-none absolute inset-0 overflow-hidden">
-              <div className="absolute -left-1/4 -top-1/4 h-64 w-64 animate-pulse rounded-full bg-purple-600/20 blur-[100px]"></div>
+              <div className="absolute -left-1/4 -top-1/4 h-48 w-48 animate-pulse rounded-full bg-purple-600/15 blur-[80px]" />
               <div
-                className="absolute -bottom-1/4 -right-1/4 h-64 w-64 animate-pulse rounded-full bg-pink-600/15 blur-[100px]"
+                className="absolute -bottom-1/4 -right-1/4 h-48 w-48 animate-pulse rounded-full bg-pink-600/10 blur-[80px]"
                 style={{ animationDelay: '1s' }}
-              ></div>
+              />
             </div>
 
             {/* Image Container */}
-            <div className="relative overflow-hidden rounded-2xl">
+            <div className="relative overflow-hidden rounded-xl">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={selectedImage.src}
                 alt={selectedImage.alt}
-                className="max-h-[70vh] max-w-full rounded-2xl object-contain"
+                className="max-h-[70vh] max-w-full rounded-xl object-contain"
               />
             </div>
 
-            {/* Actions - Glassmorphic */}
-            <div className="relative mt-3 flex gap-2">
-              {/* Download - Premium Gradient */}
+            {/* Actions - Compact */}
+            <div className="relative mt-2 flex gap-1.5">
+              {/* Download - Gradient */}
               <button
                 onClick={() => handleDownload(selectedImage)}
-                className="group relative flex-1 overflow-hidden rounded-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 p-[1px] shadow-xl shadow-purple-500/40 transition-all hover:shadow-2xl hover:shadow-purple-500/60 active:scale-95"
+                className="group relative flex-1 overflow-hidden rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 p-[1px] shadow-md shadow-purple-500/30 transition-all hover:shadow-lg hover:shadow-purple-500/50 active:scale-95"
               >
-                <div className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 px-5 py-3 font-bold text-white transition-all group-hover:from-purple-600 group-hover:via-pink-600 group-hover:to-purple-600">
-                  <Download className="h-5 w-5" />
+                <div className="flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-2.5 text-sm font-semibold text-white transition-all group-hover:from-purple-600 group-hover:to-pink-600">
+                  <Download className="h-4 w-4" />
                   Download
                 </div>
               </button>
 
-              {/* Delete - Glassmorphic */}
+              {/* Delete - Compact */}
               <button
                 onClick={() => {
                   handleDelete(selectedImage);
                   setSelectedImage(null);
                 }}
-                className="group relative flex-1 overflow-hidden rounded-2xl border border-red-500/30 bg-red-500/10 px-5 py-3 font-bold text-white backdrop-blur-xl transition-all hover:border-red-500/50 hover:bg-red-500/20 hover:shadow-lg hover:shadow-red-500/20 active:scale-95"
+                className="group relative flex-1 overflow-hidden rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2.5 text-sm font-semibold text-white backdrop-blur-xl transition-all hover:border-red-500/50 hover:bg-red-500/20 active:scale-95"
               >
-                <div className="flex items-center justify-center gap-2">
-                  <Trash2 className="h-5 w-5" />
+                <div className="flex items-center justify-center gap-1.5">
+                  <Trash2 className="h-4 w-4" />
                   Delete
                 </div>
               </button>
             </div>
 
-            {/* Prompt Info - Premium Glassmorphic */}
+            {/* Prompt Info - Compact */}
             {selectedImage.prompt && (
-              <div className="relative mt-3 overflow-hidden rounded-2xl border border-purple-400/20 bg-gradient-to-r from-purple-500/10 via-pink-500/5 to-purple-500/10 p-4 backdrop-blur-xl">
-                <div className="mb-1 flex items-center gap-2">
-                  <div className="h-1.5 w-1.5 rounded-full bg-purple-400 shadow-lg shadow-purple-500/50"></div>
-                  <p className="text-[10px] font-bold uppercase tracking-wider">
-                    <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
-                      AI Prompt
-                    </span>
+              <div className="relative mt-2 overflow-hidden rounded-xl border border-purple-400/20 bg-purple-500/10 p-3 backdrop-blur-xl">
+                <div className="mb-1 flex items-center gap-1.5">
+                  <div className="h-1 w-1 rounded-full bg-purple-400" />
+                  <p className="text-[9px] font-bold uppercase tracking-wide text-purple-400">
+                    AI Prompt
                   </p>
                 </div>
-                <p className="text-xs leading-relaxed text-white/80">
+                <p className="text-[11px] leading-relaxed text-white/70">
                   {selectedImage.prompt}
                 </p>
               </div>
