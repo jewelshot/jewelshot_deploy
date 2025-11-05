@@ -307,76 +307,123 @@ export function MobileStudio() {
         ) : (
           /* Image Display */
           <div className="flex h-full items-center justify-center p-4">
-            {/* Enhanced Progress Overlay */}
+            {/* Enhanced Interactive Progress Overlay */}
             {isEditing && (
-              <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/80 backdrop-blur-md">
-                <div className="mx-auto max-w-sm space-y-6 p-6 text-center">
-                  {/* Circular Progress */}
-                  <div className="relative mx-auto h-32 w-32">
-                    {/* Background Circle */}
-                    <svg className="h-full w-full -rotate-90 transform">
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-gradient-to-br from-black/90 via-purple-900/20 to-black/90 backdrop-blur-lg">
+                <div className="mx-auto max-w-sm space-y-8 p-6 text-center">
+                  {/* Animated Circular Progress with Glow */}
+                  <div className="relative mx-auto h-40 w-40">
+                    {/* Pulsing Glow Background */}
+                    <div className="absolute inset-0 animate-pulse rounded-full bg-purple-500/20 blur-xl"></div>
+
+                    {/* Rotating Gradient Ring */}
+                    <div
+                      className="absolute inset-0 animate-spin rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 opacity-30 blur-sm"
+                      style={{ animationDuration: '3s' }}
+                    ></div>
+
+                    {/* SVG Progress Circle */}
+                    <svg className="relative h-full w-full -rotate-90 transform">
+                      {/* Background Circle */}
                       <circle
-                        cx="64"
-                        cy="64"
-                        r="56"
-                        stroke="rgba(147, 51, 234, 0.2)"
-                        strokeWidth="8"
+                        cx="80"
+                        cy="80"
+                        r="70"
+                        stroke="rgba(147, 51, 234, 0.1)"
+                        strokeWidth="4"
                         fill="none"
                       />
-                      {/* Progress Circle */}
+                      {/* Gradient Progress Circle */}
+                      <defs>
+                        <linearGradient
+                          id="progressGradient"
+                          x1="0%"
+                          y1="0%"
+                          x2="100%"
+                          y2="100%"
+                        >
+                          <stop offset="0%" stopColor="#9333ea" />
+                          <stop offset="50%" stopColor="#ec4899" />
+                          <stop offset="100%" stopColor="#9333ea" />
+                        </linearGradient>
+                      </defs>
                       <circle
-                        cx="64"
-                        cy="64"
-                        r="56"
-                        stroke="#9333ea"
-                        strokeWidth="8"
+                        cx="80"
+                        cy="80"
+                        r="70"
+                        stroke="url(#progressGradient)"
+                        strokeWidth="6"
                         fill="none"
-                        strokeDasharray={`${2 * Math.PI * 56}`}
-                        strokeDashoffset={`${2 * Math.PI * 56 * (1 - getProgressPercentage() / 100)}`}
+                        strokeDasharray={`${2 * Math.PI * 70}`}
+                        strokeDashoffset={`${2 * Math.PI * 70 * (1 - getProgressPercentage() / 100)}`}
                         strokeLinecap="round"
-                        className="transition-all duration-500"
+                        className="transition-all duration-700 ease-out"
+                        style={{
+                          filter:
+                            'drop-shadow(0 0 8px rgba(147, 51, 234, 0.6))',
+                        }}
                       />
                     </svg>
-                    {/* Percentage */}
+
+                    {/* Percentage with Animation */}
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="text-center">
-                        <div className="text-3xl font-bold text-white">
-                          {getProgressPercentage()}%
+                        <div className="animate-pulse text-4xl font-bold text-white">
+                          {getProgressPercentage()}
+                          <span className="text-2xl text-purple-400">%</span>
                         </div>
                       </div>
                     </div>
+
+                    {/* Orbiting Sparkles */}
+                    <div
+                      className="absolute inset-0 animate-spin"
+                      style={{ animationDuration: '4s' }}
+                    >
+                      <div className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 rounded-full bg-purple-400 shadow-lg shadow-purple-500/50"></div>
+                    </div>
+                    <div
+                      className="absolute inset-0 animate-spin"
+                      style={{
+                        animationDuration: '5s',
+                        animationDirection: 'reverse',
+                      }}
+                    >
+                      <div className="absolute bottom-0 left-1/2 h-2 w-2 -translate-x-1/2 rounded-full bg-pink-400 shadow-lg shadow-pink-500/50"></div>
+                    </div>
                   </div>
 
-                  {/* Progress Messages */}
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-semibold text-white">
+                  {/* Progress Messages with Fade Animation */}
+                  <div className="animate-pulse space-y-3">
+                    <h3 className="bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-2xl font-bold text-transparent">
                       {getProgressMessage()}
                     </h3>
-                    <p className="text-sm text-white/70">
+                    <p className="text-sm font-medium text-white/80">
                       {progress || 'Processing your image...'}
                     </p>
                   </div>
 
-                  {/* Animated Dots */}
-                  <div className="flex items-center justify-center gap-2">
-                    <div
-                      className="h-2 w-2 animate-bounce rounded-full bg-purple-500"
-                      style={{ animationDelay: '0ms' }}
-                    ></div>
-                    <div
-                      className="h-2 w-2 animate-bounce rounded-full bg-purple-500"
-                      style={{ animationDelay: '150ms' }}
-                    ></div>
-                    <div
-                      className="h-2 w-2 animate-bounce rounded-full bg-purple-500"
-                      style={{ animationDelay: '300ms' }}
-                    ></div>
+                  {/* Wave Loading Animation */}
+                  <div className="flex items-center justify-center gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="h-1 w-1 animate-bounce rounded-full bg-gradient-to-t from-purple-500 to-pink-500"
+                        style={{
+                          animationDelay: `${i * 100}ms`,
+                          animationDuration: '1s',
+                        }}
+                      ></div>
+                    ))}
                   </div>
 
-                  {/* Tip */}
-                  <p className="text-xs text-white/50">
-                    💡 This may take 30-60 seconds
-                  </p>
+                  {/* Tip with Icon */}
+                  <div className="flex items-center justify-center gap-2 rounded-full border border-purple-500/30 bg-purple-500/10 px-4 py-2 backdrop-blur-sm">
+                    <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-purple-400"></div>
+                    <p className="text-xs font-medium text-purple-300">
+                      Creating magic... 30-60 seconds
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
@@ -404,13 +451,12 @@ export function MobileStudio() {
               <Upload className="h-6 w-6" />
             </button>
 
-            {/* AI Styles */}
+            {/* Styles */}
             <button
               onClick={() => setShowStyleSheet(true)}
               className="flex h-14 items-center gap-2 rounded-full bg-purple-500 px-6 font-medium text-white shadow-lg transition-all hover:bg-purple-600 active:scale-95"
             >
-              <Sparkles className="h-5 w-5" />
-              AI Styles
+              Styles
             </button>
 
             {/* Filters */}
@@ -441,9 +487,7 @@ export function MobileStudio() {
             </div>
 
             {/* Header */}
-            <h3 className="mb-4 text-xl font-bold text-white">
-              Choose AI Style
-            </h3>
+            <h3 className="mb-4 text-xl font-bold text-white">Choose Style</h3>
 
             {/* Styles Grid */}
             <div className="grid grid-cols-2 gap-3">
