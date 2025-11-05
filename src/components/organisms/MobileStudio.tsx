@@ -95,22 +95,16 @@ export function MobileStudio({ onBack }: MobileStudioProps) {
 
       {/* Top Bar */}
       <div className="relative z-10 flex items-center justify-between border-b border-white/10 bg-black/50 p-4 backdrop-blur-xl">
-        <button
-          onClick={onBack}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
-        >
-          <X className="h-5 w-5" />
-        </button>
-
         <h1 className="flex items-center gap-2 text-lg font-semibold text-white">
           <Sparkles className="h-5 w-5 text-purple-400" />
-          Mobile Studio
+          Jewelshot Studio
         </h1>
 
         {image && (
           <button
             onClick={handleDownload}
             className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-500 text-white transition-all hover:bg-purple-600 active:scale-95"
+            aria-label="Download image"
           >
             <Download className="h-5 w-5" />
           </button>

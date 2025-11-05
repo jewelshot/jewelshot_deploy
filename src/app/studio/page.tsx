@@ -8,13 +8,12 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import AuroraBackground from '@/components/atoms/AuroraBackground';
 import ErrorBoundary from '@/components/organisms/ErrorBoundary';
 import CanvasFallback from '@/components/molecules/CanvasFallback';
 import { useBreakpoint } from '@/hooks/useMediaQuery';
-import MobileStudioWarning from '@/components/organisms/MobileStudioWarning';
 import MobileStudio from '@/components/organisms/MobileStudio';
 
 // Dynamic imports for heavy components
@@ -58,17 +57,6 @@ const RateLimitIndicator = dynamic(
 
 export default function StudioPage() {
   const { isMobile, isTablet, isDesktop } = useBreakpoint();
-  const [showMobileStudio, setShowMobileStudio] = useState(false);
-
-  // Initialize warning dismissed state from sessionStorage
-  const [warningDismissed] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return (
-        sessionStorage.getItem('mobile-studio-warning-dismissed') === 'true'
-      );
-    }
-    return false;
-  });
 
   // Debug: Log breakpoint detection
   useEffect(() => {
@@ -76,10 +64,9 @@ export default function StudioPage() {
       isMobile,
       isTablet,
       isDesktop,
-      warningDismissed,
       windowWidth: typeof window !== 'undefined' ? window.innerWidth : 'N/A',
     });
-  }, [isMobile, isTablet, isDesktop, warningDismissed]);
+  }, [isMobile, isTablet, isDesktop]);
 
   // Handle preset generation from RightSidebar
   const handleGenerateWithPreset = (prompt: string) => {
@@ -92,18 +79,9 @@ export default function StudioPage() {
     }
   };
 
-  // Mobile: Show warning or simplified studio
-  if (isMobile && !warningDismissed) {
-    return (
-      <MobileStudioWarning
-        onTryMobileVersion={() => setShowMobileStudio(true)}
-      />
-    );
-  }
-
-  // Mobile: Simplified studio
-  if (isMobile && showMobileStudio) {
-    return <MobileStudio onBack={() => setShowMobileStudio(false)} />;
+  // Mobile: Show simplified studio directly
+  if (isMobile) {
+    return <MobileStudio onBack={() => (window.location.href = '/gallery')} />;
   }
 
   // Desktop: Full studio
