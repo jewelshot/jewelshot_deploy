@@ -84,7 +84,8 @@ export async function checkRateLimit(
       .or(userId ? `user_id.eq.${userId}` : `ip_address.eq.${ipAddress}`)
       .single();
 
-    const currentCount = existing?.request_count || 0;
+    const typedExisting = existing as { request_count: number } | null;
+    const currentCount = typedExisting?.request_count || 0;
 
     if (currentCount >= config.uniqueTokenPerInterval) {
       // Rate limited!
@@ -96,12 +97,14 @@ export async function checkRateLimit(
     }
 
     // Increment count
-    await supabase.rpc('increment_rate_limit', {
+    const rpcParams = {
       p_user_id: userId || null,
       p_ip_address: ipAddress,
       p_endpoint: endpoint,
       p_window_start: windowStart.toISOString(),
-    });
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await supabase.rpc('increment_rate_limit', rpcParams as any);
 
     return {
       allowed: true,
