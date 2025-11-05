@@ -94,6 +94,19 @@ OUTPUT: E-commerce ready. Tiffany catalog standard. Aspect ratio ${aspectRatio}.
           bracelet: 'Chain 7-8 inch length, links 3-8mm width typical size',
         }[type] || 'Standard jewelry proportions relative to human body';
 
+      // 3D placement and physical contact specifications
+      const placementSpecs =
+        {
+          ring: 'Ring WRAPPED AROUND finger 3D perspective band CURVES with finger curvature GRIPS finger snugly TOUCHES skin all around NO floating NO gaps HUGS finger natural worn position',
+          necklace:
+            'Chain RESTS ON skin follows neck contour pendant TOUCHES chest natural gravity drape NO floating chain CONTACTS collarbone decollete area',
+          earring:
+            'Earring POST THROUGH earlobe or HOOK OVER ear jewelry HANGS naturally from ear NO floating close to face natural worn position',
+          bracelet:
+            'Bracelet WRAPS AROUND wrist 3D perspective follows wrist curve TOUCHES skin natural worn position drapes with gravity',
+        }[type] ||
+        'Jewelry makes PHYSICAL CONTACT with body part natural worn position';
+
       return `Lifestyle editorial ${jewelryType} on ${genderText}. Natural everyday candid moment. Authentic relatable aesthetic.
 
 CRITICAL SIZE & SCALE - ACCURATE PROPORTIONS:
@@ -105,6 +118,14 @@ Jewelry must appear natural realistic proportional to human body
 NOT oversized NOT miniature ACTUAL life-size dimensions
 Reference human anatomy: finger width hand size neck circumference wrist diameter
 
+CRITICAL 3D PLACEMENT & PHYSICAL CONTACT - MANDATORY:
+${placementSpecs}
+Jewelry must show DEPTH and PERSPECTIVE wrapped around body part
+NO flat 2D appearance jewelry follows 3D curves of human anatomy
+DIRECT SKIN CONTACT no air gaps no floating appearance
+Natural wearing physics realistic gravity drape
+Band/chain WRAPS jewelry SITS ON jewelry HANGS FROM natural physics
+
 CRITICAL PRESERVATION - ZERO TOLERANCE:
 EXACT jewelry structure geometry shape form UNCHANGED pixel-perfect
 EXACT gemstone count size position cut NO additions NO removals NO moves
@@ -114,12 +135,18 @@ ONLY lighting context change JEWELRY DESIGN 100% UNTOUCHED
 
 STRICTLY FORBIDDEN - NEGATIVE PROMPT:
 distorted warped morphed jewelry shapes
-added removed moved gemstones
+added removed moved gemstones or decorative elements
+changed gemstone count or arrangement
+modified ring band thickness or curvature
+altered prong settings or metalwork
 blurry soft-focus product
-new jewelry on bare hands necks wrists ears
-design alterations modifications
+new jewelry appearing on body
+floating suspended hovering jewelry not touching skin
+flat 2D placement no depth perspective
+jewelry design alterations ANY modifications to original piece
 stiff forced poses
 harsh studio lighting sterile backgrounds
+oversized cartoonish jewelry proportions
 
 STYLE & COMPOSITION:
 Natural environment: cafe home outdoor urban setting
@@ -271,6 +298,19 @@ OUTPUT: Editorial minimalist still life. Aspect ratio ${aspectRatio}. Soft paste
           bracelet: 'Chain 7-8 inch length, links 3-8mm width typical size',
         }[type] || 'Standard jewelry proportions relative to human body';
 
+      // 3D placement and physical contact specifications
+      const placementSpecs =
+        {
+          ring: 'Ring WRAPPED AROUND finger 3D perspective band CURVES with finger curvature GRIPS finger snugly TOUCHES skin all around NO floating NO gaps HUGS finger natural worn position',
+          necklace:
+            'Chain RESTS ON skin follows neck contour pendant TOUCHES chest natural gravity drape NO floating chain CONTACTS collarbone decollete area',
+          earring:
+            'Earring POST THROUGH earlobe or HOOK OVER ear jewelry HANGS naturally from ear NO floating close to face natural worn position',
+          bracelet:
+            'Bracelet WRAPS AROUND wrist 3D perspective follows wrist curve TOUCHES skin natural worn position drapes with gravity',
+        }[type] ||
+        'Jewelry makes PHYSICAL CONTACT with body part natural worn position';
+
       return `Professional e-commerce model ${jewelryType} on ${genderText}. Clean commercial presentation. Product-focused.
 
 CRITICAL SIZE & SCALE - ACCURATE PROPORTIONS:
@@ -282,6 +322,14 @@ Jewelry must appear natural realistic proportional to human body
 NOT oversized NOT miniature ACTUAL life-size dimensions
 Reference human anatomy: finger width hand size neck circumference wrist diameter
 
+CRITICAL 3D PLACEMENT & PHYSICAL CONTACT - MANDATORY:
+${placementSpecs}
+Jewelry must show DEPTH and PERSPECTIVE wrapped around body part
+NO flat 2D appearance jewelry follows 3D curves of human anatomy
+DIRECT SKIN CONTACT no air gaps no floating appearance
+Natural wearing physics realistic gravity drape
+Band/chain WRAPS jewelry SITS ON jewelry HANGS FROM natural physics
+
 CRITICAL PRESERVATION - ZERO TOLERANCE:
 EXACT jewelry structure geometry shape form UNCHANGED pixel-perfect
 EXACT gemstone count size position cut NO additions NO removals NO moves
@@ -291,13 +339,19 @@ ONLY lighting positioning change JEWELRY DESIGN 100% UNTOUCHED
 
 STRICTLY FORBIDDEN - NEGATIVE PROMPT:
 distorted warped morphed jewelry shapes
-added removed moved gemstones
+added removed moved gemstones or decorative elements
+changed gemstone count or arrangement
+modified ring band thickness or curvature
+altered prong settings or metalwork
 blurry soft-focus product
-new jewelry on bare hands necks wrists ears
-design alterations modifications
+new jewelry appearing on body
+floating suspended hovering jewelry not touching skin
+flat 2D placement no depth perspective
+jewelry design alterations ANY modifications to original piece
 busy backgrounds distractions
 harsh lighting dramatic shadows
 unnatural forced poses
+oversized cartoonish jewelry proportions
 
 STYLE & COMPOSITION:
 Background: Neutral solid white/gray/beige RGB(245,245,245) seamless paper smooth
@@ -431,6 +485,19 @@ OUTPUT: Macro craftsmanship showcase. Aspect ratio ${aspectRatio}. Extreme close
           bracelet: 'Chain 7-8 inch length, links 3-8mm width typical size',
         }[type] || 'Standard jewelry proportions relative to human body';
 
+      // 3D placement and physical contact specifications
+      const placementSpecs =
+        {
+          ring: 'Ring WRAPPED AROUND finger 3D perspective band CURVES with finger curvature GRIPS finger snugly TOUCHES skin all around NO floating NO gaps HUGS finger natural worn position',
+          necklace:
+            'Chain RESTS ON skin follows neck contour pendant TOUCHES chest natural gravity drape NO floating chain CONTACTS collarbone decollete area',
+          earring:
+            'Earring POST THROUGH earlobe or HOOK OVER ear jewelry HANGS naturally from ear NO floating close to face natural worn position',
+          bracelet:
+            'Bracelet WRAPS AROUND wrist 3D perspective follows wrist curve TOUCHES skin natural worn position drapes with gravity',
+        }[type] ||
+        'Jewelry makes PHYSICAL CONTACT with body part natural worn position';
+
       return `Luxury high-fashion editorial ${jewelryType} on ${genderText}. Premium campaign. Aspirational prestige presentation.
 
 CRITICAL SIZE & SCALE - ACCURATE PROPORTIONS:
@@ -442,6 +509,14 @@ Jewelry must appear natural realistic proportional to human body
 NOT oversized NOT miniature ACTUAL life-size dimensions
 Reference human anatomy: finger width hand size neck circumference wrist diameter
 
+CRITICAL 3D PLACEMENT & PHYSICAL CONTACT - MANDATORY:
+${placementSpecs}
+Jewelry must show DEPTH and PERSPECTIVE wrapped around body part
+NO flat 2D appearance jewelry follows 3D curves of human anatomy
+DIRECT SKIN CONTACT no air gaps no floating appearance
+Natural wearing physics realistic gravity drape
+Band/chain WRAPS jewelry SITS ON jewelry HANGS FROM natural physics
+
 CRITICAL PRESERVATION - ZERO TOLERANCE:
 EXACT jewelry structure geometry shape form UNCHANGED pixel-perfect
 EXACT gemstone count size position cut NO additions NO removals NO moves
@@ -451,12 +526,18 @@ ONLY lighting styling background change JEWELRY DESIGN 100% UNTOUCHED
 
 STRICTLY FORBIDDEN - NEGATIVE PROMPT:
 distorted warped morphed jewelry shapes
-added removed moved gemstones
+added removed moved gemstones or decorative elements
+changed gemstone count or arrangement
+modified ring band thickness or curvature
+altered prong settings or metalwork
 blurry soft-focus product
-new jewelry on bare hands necks wrists ears
-design alterations modifications
+new jewelry appearing on body
+floating suspended hovering jewelry not touching skin
+flat 2D placement no depth perspective
+jewelry design alterations ANY modifications to original piece
 casual elements flat lighting
 cluttered backgrounds amateur styling overprocessing
+oversized cartoonish jewelry proportions
 
 STYLE & COMPOSITION:
 Sophisticated upscale environment elegant dramatic architectural
