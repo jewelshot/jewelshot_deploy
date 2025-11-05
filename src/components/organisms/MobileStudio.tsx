@@ -40,8 +40,10 @@ export function MobileStudio() {
     }
     return false;
   });
+  const [smoothProgress, setSmoothProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+  const progressTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const { edit, isEditing, progress } = useImageEdit({
     onSuccess: (result) => {
@@ -79,6 +81,46 @@ export function MobileStudio() {
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [hasUnsavedChanges, image]);
+
+  // Reset progress when editing starts or ends
+  useEffect(() => {
+    // Use setTimeout to avoid synchronous setState in effect
+    const timer = setTimeout(() => setSmoothProgress(0), 0);
+    return () => clearTimeout(timer);
+  }, [isEditing]);
+
+  // Smooth progress animation (0% → 95% over ~50 seconds, realistic for FAL.AI)
+  useEffect(() => {
+    if (!isEditing) {
+      return;
+    }
+
+    // Increment every 500ms
+    progressTimerRef.current = setInterval(() => {
+      setSmoothProgress((prev) => {
+        // Check if complete
+        if (progress.includes('complete') || progress.includes('success')) {
+          return 100;
+        }
+
+        // Slow progression to 95% over ~50 seconds (100 ticks * 500ms = 50s)
+        // Uses logarithmic curve for realistic feel
+        if (prev < 95) {
+          const increment = (95 - prev) * 0.02; // Slower as it approaches 95
+          return Math.min(prev + Math.max(increment, 0.5), 95);
+        }
+
+        return prev; // Stay at 95 until complete
+      });
+    }, 500);
+
+    return () => {
+      if (progressTimerRef.current) {
+        clearInterval(progressTimerRef.current);
+        progressTimerRef.current = null;
+      }
+    };
+  }, [isEditing, progress]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -135,39 +177,51 @@ export function MobileStudio() {
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!image) return;
 
-    const link = document.createElement('a');
-    link.href = image;
-    link.download = `jewelshot-${Date.now()}.jpg`;
-    link.click();
+    try {
+      // Fetch image as blob to force download (works with CORS and data URLs)
+      const response = await fetch(image);
+      const blob = await response.blob();
 
-    // Mark as saved after download
-    setHasUnsavedChanges(false);
-    logger.info('[MobileStudio] Image downloaded');
+      // Create blob URL
+      const blobUrl = URL.createObjectURL(blob);
+
+      // Create temporary link and trigger download
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = `jewelshot-${Date.now()}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+
+      // Cleanup
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
+
+      // Mark as saved after download
+      setHasUnsavedChanges(false);
+      logger.info('[MobileStudio] Image downloaded successfully');
+    } catch (error) {
+      logger.error('[MobileStudio] Download failed:', error);
+      alert('Failed to download image. Please try again.');
+    }
   };
 
-  // Simulate progress percentage for better UX
+  // Use smooth progress for realistic animation
   const getProgressPercentage = () => {
-    if (!isEditing) return 0;
-    if (progress.includes('complete') || progress.includes('success'))
-      return 100;
-    if (progress.includes('Uploading') || progress.includes('Initializing'))
-      return 15;
-    if (progress.includes('Processing') || progress.includes('Generating'))
-      return 45;
-    if (progress.includes('Finalizing') || progress.includes('Downloading'))
-      return 85;
-    return 30; // Default
+    return Math.round(smoothProgress);
   };
 
   const getProgressMessage = () => {
-    const percentage = getProgressPercentage();
-    if (percentage === 100) return 'Complete! ✨';
-    if (percentage > 80) return 'Almost there...';
-    if (percentage > 40) return 'Creating magic...';
-    if (percentage > 10) return 'Starting AI...';
+    const percentage = smoothProgress;
+    if (percentage >= 100) return 'Complete! ✨';
+    if (percentage > 90) return 'Almost there...';
+    if (percentage > 70) return 'Polishing details...';
+    if (percentage > 50) return 'Creating magic...';
+    if (percentage > 30) return 'AI is working...';
+    if (percentage > 10) return 'Processing image...';
+    if (percentage > 0) return 'Starting AI...';
     return 'Initializing...';
   };
 
@@ -309,7 +363,7 @@ export function MobileStudio() {
           <div className="flex h-full items-center justify-center p-4">
             {/* Enhanced Interactive Progress Overlay */}
             {isEditing && (
-              <div className="absolute inset-0 z-10 flex items-center justify-center bg-gradient-to-br from-black/90 via-purple-900/20 to-black/90 backdrop-blur-lg">
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/70">
                 <div className="mx-auto max-w-sm space-y-8 p-6 text-center">
                   {/* Animated Circular Progress with Glow */}
                   <div className="relative mx-auto h-40 w-40">
@@ -421,7 +475,9 @@ export function MobileStudio() {
                   <div className="flex items-center justify-center gap-2 rounded-full border border-purple-500/30 bg-purple-500/10 px-4 py-2 backdrop-blur-sm">
                     <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-purple-400"></div>
                     <p className="text-xs font-medium text-purple-300">
-                      Creating magic... 30-60 seconds
+                      {smoothProgress < 95
+                        ? `Estimated: ${Math.round((95 - smoothProgress) / 1.9)} seconds remaining`
+                        : 'Finalizing...'}
                     </p>
                   </div>
                 </div>

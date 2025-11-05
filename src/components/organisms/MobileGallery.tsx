@@ -43,12 +43,31 @@ export function MobileGallery() {
     }
   };
 
-  const handleDownload = (image: SavedImage) => {
-    const link = document.createElement('a');
-    link.href = image.src;
-    link.download = `jewelshot-${image.id}.jpg`;
-    link.click();
-    logger.info('[MobileGallery] Downloaded image:', image.id);
+  const handleDownload = async (image: SavedImage) => {
+    try {
+      // Fetch image as blob to force download (works with CORS and data URLs)
+      const response = await fetch(image.src);
+      const blob = await response.blob();
+
+      // Create blob URL
+      const blobUrl = URL.createObjectURL(blob);
+
+      // Create temporary link and trigger download
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = `jewelshot-${image.id}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+
+      // Cleanup
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
+
+      logger.info('[MobileGallery] Downloaded image:', image.id);
+    } catch (error) {
+      logger.error('[MobileGallery] Download failed:', error);
+      alert('Failed to download image. Please try again.');
+    }
   };
 
   const handleDelete = async (image: SavedImage) => {
