@@ -56,10 +56,15 @@ export function MobileStudio() {
 
         // Auto-save to gallery (Supabase)
         try {
-          await saveImageToGallery(newImage, `mobile-${Date.now()}.jpg`, {
-            prompt: result.prompt,
-            style: result.style,
-          });
+          await saveImageToGallery(
+            newImage,
+            `mobile-${Date.now()}.jpg`,
+            'ai-edited',
+            {
+              prompt: result.prompt,
+              style: result.style,
+            }
+          );
           logger.info('[MobileStudio] Image auto-saved to gallery');
 
           // Trigger gallery refresh event
