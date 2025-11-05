@@ -4,7 +4,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 // ============================================
 // 🔒 MAINTENANCE MODE CONFIGURATION
 // ============================================
-const MAINTENANCE_MODE = false; // ✅ true = site kapalı, false = site açık
+const MAINTENANCE_MODE = true; // ✅ true = site kapalı, false = site açık
 const MAINTENANCE_PASSWORD = 'jewelshot2024'; // 🔑 Geliştirici bypass şifresi
 
 export async function middleware(request: NextRequest) {
