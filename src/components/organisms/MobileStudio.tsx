@@ -56,9 +56,8 @@ export function MobileStudio({ onBack }: MobileStudioProps) {
 
     try {
       await edit({
-        imageUrl: image,
+        image_url: image,
         prompt: `Apply ${style} style to this jewelry image`,
-        style: style,
       });
     } catch (error) {
       logger.error('[MobileStudio] Style application failed:', error);
