@@ -68,18 +68,8 @@ export function MobileStudio() {
 
   // Fetch credits on mount
   useEffect(() => {
-    console.log('🚀 [DEBUG] Component mounted, fetching credits...');
     fetchCredits();
   }, [fetchCredits]);
-
-  // Debug: Log credit changes
-  useEffect(() => {
-    console.log('💰 [DEBUG] Credits updated:', {
-      credits,
-      creditsLoading,
-      timestamp: new Date().toISOString(),
-    });
-  }, [credits, creditsLoading]);
 
   const { edit, isEditing, progress } = useImageEdit({
     onSuccess: async (result) => {
@@ -88,6 +78,17 @@ export function MobileStudio() {
         setImage(newImage);
         setHasUnsavedChanges(true);
         logger.info('[MobileStudio] AI edit successful');
+
+        // ✅ REFRESH CREDITS AFTER SUCCESSFUL GENERATION
+        try {
+          await fetchCredits();
+          logger.info('[MobileStudio] Credits refreshed after generation');
+        } catch (creditError) {
+          logger.error(
+            '[MobileStudio] Failed to refresh credits:',
+            creditError
+          );
+        }
 
         // Auto-save to gallery (Supabase)
         try {
@@ -210,30 +211,19 @@ export function MobileStudio() {
     async (presetId: string) => {
       if (!image) return;
 
-      // DEBUG: Always log credit state
-      console.log('🔍 [DEBUG] Credit State:', {
-        credits,
-        creditsLoading,
-        timestamp: new Date().toISOString(),
-      });
-
       // Wait for credits to load
       if (creditsLoading) {
-        console.log('⏳ [DEBUG] Credits still loading...');
         logger.info('[MobileStudio] Credits still loading, please wait');
         return;
       }
 
       // Check credits BEFORE closing sheet
       if (credits < 1) {
-        console.log('❌ [DEBUG] Insufficient credits! Opening paywall');
         logger.warn('[MobileStudio] Insufficient credits:', credits);
         setShowStyleSheet(false);
         setShowNoCreditsModal(true);
         return;
       }
-
-      console.log('✅ [DEBUG] Credits OK, proceeding...');
 
       setShowStyleSheet(false);
 

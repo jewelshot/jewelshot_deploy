@@ -151,6 +151,14 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
         setUploadedImage(aiImageUrl);
         showToast('Image edited successfully!', 'success');
 
+        // ✅ REFRESH CREDITS AFTER SUCCESSFUL GENERATION
+        try {
+          await fetchCredits();
+          logger.info('✅ Credits refreshed after generation');
+        } catch (creditError) {
+          logger.error('Failed to refresh credits:', creditError);
+        }
+
         // 🎯 AUTO-SAVE to gallery
         try {
           await saveImageToGallery(
