@@ -26,6 +26,7 @@ import { presetPrompts } from '@/lib/preset-prompts';
 import { saveImageToGallery } from '@/lib/gallery-storage';
 import MobileNav from '@/components/molecules/MobileNav';
 import { CreditCounter } from '@/components/molecules/CreditCounter';
+import { NoCreditsModal } from '@/components/molecules/NoCreditsModal';
 import { useCreditStore } from '@/store/creditStore';
 
 const STORAGE_KEY = 'jewelshot_mobile_image';
@@ -52,6 +53,7 @@ export function MobileStudio() {
     return false;
   });
   const [smoothProgress, setSmoothProgress] = useState(0);
+  const [showNoCreditsModal, setShowNoCreditsModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const progressTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -198,36 +200,39 @@ export function MobileStudio() {
     async (presetId: string) => {
       if (!image) return;
 
-      // Just log credits, no blocking
-      logger.info(
-        '[MobileStudio] Credits:',
-        credits,
-        'Loading:',
-        creditsLoading
-      );
+      // Wait for credits to load
+      if (creditsLoading) {
+        logger.info('[MobileStudio] Credits still loading, please wait');
+        return;
+      }
+
+      // Check credits BEFORE closing sheet
+      if (credits < 1) {
+        logger.warn('[MobileStudio] Insufficient credits:', credits);
+        setShowStyleSheet(false);
+        setShowNoCreditsModal(true);
+        return;
+      }
 
       setShowStyleSheet(false);
 
       let creditDeducted = false;
 
       try {
-        // Use credit FIRST
+        // Deduct credit FIRST
         const success = await deductCredit({
           prompt: presetId,
           style: presetId,
         });
 
         if (!success) {
-          logger.warn(
-            '[MobileStudio] Credit deduction failed, continuing anyway'
-          );
-          // Continue anyway, no blocking
+          logger.error('[MobileStudio] Credit deduction failed');
+          setShowNoCreditsModal(true);
+          return; // STOP HERE!
         }
 
         creditDeducted = true;
-        logger.info(
-          '[MobileStudio] Credit deducted, proceeding with generation'
-        );
+        logger.info('[MobileStudio] Credit deducted successfully');
 
         // Use the same preset prompts as desktop Quick Mode
         const preset = presetPrompts[presetId];
@@ -910,6 +915,13 @@ export function MobileStudio() {
 
       {/* Bottom Navigation */}
       <MobileNav />
+
+      {/* No Credits Modal */}
+      <NoCreditsModal
+        isOpen={showNoCreditsModal}
+        onClose={() => setShowNoCreditsModal(false)}
+        creditsRemaining={credits}
+      />
     </div>
   );
 }
