@@ -26,7 +26,6 @@ import { presetPrompts } from '@/lib/preset-prompts';
 import { saveImageToGallery } from '@/lib/gallery-storage';
 import MobileNav from '@/components/molecules/MobileNav';
 import { CreditCounter } from '@/components/molecules/CreditCounter';
-import { NoCreditsModal } from '@/components/molecules/NoCreditsModal';
 import { useCreditStore } from '@/store/creditStore';
 
 const STORAGE_KEY = 'jewelshot_mobile_image';
@@ -53,7 +52,6 @@ export function MobileStudio() {
     return false;
   });
   const [smoothProgress, setSmoothProgress] = useState(0);
-  const [showNoCreditsModal, setShowNoCreditsModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const progressTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -78,17 +76,6 @@ export function MobileStudio() {
         setImage(newImage);
         setHasUnsavedChanges(true);
         logger.info('[MobileStudio] AI edit successful');
-
-        // ✅ REFRESH CREDITS AFTER SUCCESSFUL GENERATION
-        try {
-          await fetchCredits();
-          logger.info('[MobileStudio] Credits refreshed after generation');
-        } catch (creditError) {
-          logger.error(
-            '[MobileStudio] Failed to refresh credits:',
-            creditError
-          );
-        }
 
         // Auto-save to gallery (Supabase)
         try {
@@ -211,39 +198,25 @@ export function MobileStudio() {
     async (presetId: string) => {
       if (!image) return;
 
-      // Wait for credits to load
-      if (creditsLoading) {
-        logger.info('[MobileStudio] Credits still loading, please wait');
-        return;
-      }
-
-      // Check credits BEFORE closing sheet
-      if (credits < 1) {
-        logger.warn('[MobileStudio] Insufficient credits:', credits);
-        setShowStyleSheet(false);
-        setShowNoCreditsModal(true);
-        return;
-      }
-
       setShowStyleSheet(false);
 
       let creditDeducted = false;
 
       try {
-        // Deduct credit FIRST
+        // Try to deduct credit (but don't block if it fails)
         const success = await deductCredit({
           prompt: presetId,
           style: presetId,
         });
 
-        if (!success) {
-          logger.error('[MobileStudio] Credit deduction failed');
-          setShowNoCreditsModal(true);
-          return; // STOP HERE!
+        if (success) {
+          creditDeducted = true;
+          logger.info('[MobileStudio] Credit deducted successfully');
+        } else {
+          logger.warn(
+            '[MobileStudio] Credit deduction failed, continuing anyway'
+          );
         }
-
-        creditDeducted = true;
-        logger.info('[MobileStudio] Credit deducted successfully');
 
         // Use the same preset prompts as desktop Quick Mode
         const preset = presetPrompts[presetId];
@@ -926,13 +899,6 @@ export function MobileStudio() {
 
       {/* Bottom Navigation */}
       <MobileNav />
-
-      {/* No Credits Modal */}
-      <NoCreditsModal
-        isOpen={showNoCreditsModal}
-        onClose={() => setShowNoCreditsModal(false)}
-        creditsRemaining={credits}
-      />
     </div>
   );
 }

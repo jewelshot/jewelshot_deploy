@@ -15,7 +15,6 @@ import { createScopedLogger } from '@/lib/logger';
 import { saveImageToGallery } from '@/lib/gallery-storage';
 import Toast from '@/components/atoms/Toast';
 import { useCreditStore } from '@/store/creditStore';
-import { NoCreditsModal } from '@/components/molecules/NoCreditsModal';
 
 const logger = createScopedLogger('Canvas');
 // New refactored components
@@ -108,7 +107,6 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
   const [canvasControlsVisible, setCanvasControlsVisible] = useState(true);
   const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
   const [isPromptExpanded, setIsPromptExpanded] = useState(false);
-  const [showNoCreditsModal, setShowNoCreditsModal] = useState(false);
 
   // Toast notifications
   const { showToast, hideToast, toastState } = useToast();
@@ -150,14 +148,6 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
         const aiImageUrl = result.images[0].url;
         setUploadedImage(aiImageUrl);
         showToast('Image edited successfully!', 'success');
-
-        // ✅ REFRESH CREDITS AFTER SUCCESSFUL GENERATION
-        try {
-          await fetchCredits();
-          logger.info('✅ Credits refreshed after generation');
-        } catch (creditError) {
-          logger.error('Failed to refresh credits:', creditError);
-        }
 
         // 🎯 AUTO-SAVE to gallery
         try {
@@ -635,37 +625,21 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       const { prompt, imageUrl } = event.detail;
       if (!imageUrl) return;
 
-      // Wait for credits to load
-      if (creditsLoading) {
-        logger.info('[Canvas] Credits still loading');
-        showToast('Loading credits...', 'info');
-        return;
-      }
-
-      // Check credits FIRST
-      if (credits < 1) {
-        logger.warn('[Canvas] Insufficient credits:', credits);
-        setShowNoCreditsModal(true);
-        return;
-      }
-
       let creditDeducted = false;
 
       try {
-        // Deduct credit FIRST
+        // Try to deduct credit (but don't block if it fails)
         const success = await deductCredit({
           prompt: prompt || 'enhance',
           style: 'ai-edit',
         });
 
-        if (!success) {
-          logger.error('[Canvas] Credit deduction failed');
-          setShowNoCreditsModal(true);
-          return; // STOP HERE!
+        if (success) {
+          creditDeducted = true;
+          logger.info('[Canvas] Credit deducted successfully');
+        } else {
+          logger.warn('[Canvas] Credit deduction failed, continuing anyway');
         }
-
-        creditDeducted = true;
-        logger.info('[Canvas] Credit deducted successfully');
 
         // Save original image before AI editing
         setOriginalImage(imageUrl);
@@ -965,13 +939,6 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
           onClose={hideToast}
         />
       )}
-
-      {/* No Credits Modal */}
-      <NoCreditsModal
-        isOpen={showNoCreditsModal}
-        onClose={() => setShowNoCreditsModal(false)}
-        creditsRemaining={credits}
-      />
     </>
   );
 }
