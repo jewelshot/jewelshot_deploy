@@ -1,5 +1,7 @@
 'use client';
 
+import Image from 'next/image';
+
 interface SelectiveCardProps {
   id: string;
   name: string;
@@ -28,13 +30,15 @@ export function SelectiveCard({
     >
       {/* Image */}
       <div className="relative h-16 w-full overflow-hidden bg-black/20">
-        <img
+        <Image
           src={image}
           alt={name}
-          className="h-full w-full object-cover opacity-70 transition-all duration-500 group-hover:scale-110 group-hover:opacity-90"
+          fill
+          className="object-cover opacity-70 transition-all duration-500 group-hover:scale-110 group-hover:opacity-90"
           onError={(e) => {
             e.currentTarget.src = '/placeholder-selective.svg';
           }}
+          sizes="100px"
         />
         {/* Selected indicator */}
         {isSelected && (

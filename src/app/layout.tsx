@@ -8,6 +8,14 @@ import { ErrorBoundary } from '@/components/organisms/ErrorBoundary';
 import ToastContainer from '@/components/organisms/ToastContainer';
 import './globals.css';
 
+// Environment validation (only imported in production)
+if (process.env.NODE_ENV === 'production') {
+  // Dynamic import to avoid build-time checks
+  import('@/lib/env').then(({ validateEnvOrThrow }) => {
+    validateEnvOrThrow();
+  });
+}
+
 const inter = Inter({
   subsets: ['latin'],
   display: 'swap',

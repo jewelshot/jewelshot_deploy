@@ -101,7 +101,7 @@ describe('Canvas Component', () => {
     });
 
     it('should not show EditPanel initially', () => {
-      const { container } = render(<Canvas />);
+      render(<Canvas />);
 
       // EditPanel has "Edit Tools" text in header
       expect(screen.queryByText(/edit tools/i)).not.toBeInTheDocument();

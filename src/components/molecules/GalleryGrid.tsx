@@ -56,7 +56,6 @@ export function GalleryGrid({
       {images.map((image) => (
         <ImageCard
           key={image.id}
-          id={image.id}
           src={image.src}
           alt={image.alt}
           createdAt={image.createdAt}

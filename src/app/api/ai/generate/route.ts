@@ -27,8 +27,7 @@ fal.config({
 const RATE_LIMIT = 10; // 10 requests
 const RATE_WINDOW = 60 * 1000; // per minute
 
-// Fallback: In-memory rate limiting (if Supabase service_role not available)
-const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
+// Note: Rate limiting handled by checkRateLimit from rate-limiter-db
 
 export async function POST(request: NextRequest) {
   try {
@@ -68,12 +67,12 @@ export async function POST(request: NextRequest) {
     if (!canMakeGlobalAIRequest()) {
       const globalStatus = getGlobalRateLimitStatus();
       const waitSeconds = Math.ceil(globalStatus.resetIn / 1000);
-      
+
       logger.warn('Global AI rate limit reached', {
         userId: user.id,
         resetIn: waitSeconds,
       });
-      
+
       return NextResponse.json(
         {
           error: 'System busy',
@@ -93,7 +92,7 @@ export async function POST(request: NextRequest) {
 
     // 🛡️ USER RATE LIMITING (Per-user limits)
     const userId = user.id;
-    
+
     const rateLimit = await checkRateLimit(userId, {
       endpoint: '/api/ai/generate',
       maxRequests: RATE_LIMIT,
@@ -196,4 +195,3 @@ export async function OPTIONS(request: NextRequest) {
     },
   });
 }
-

@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 
 interface ImageCardProps {
-  id: string;
   src: string;
   alt?: string;
   createdAt?: Date;
@@ -13,7 +13,6 @@ interface ImageCardProps {
 }
 
 export function ImageCard({
-  id,
   src,
   alt = 'Gallery image',
   createdAt,
@@ -32,11 +31,13 @@ export function ImageCard({
     >
       {/* Image */}
       {!imageError ? (
-        <img
+        <Image
           src={src}
           alt={alt}
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          fill
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
           onError={() => setImageError(true)}
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
       ) : (
         <div className="flex h-full w-full items-center justify-center">

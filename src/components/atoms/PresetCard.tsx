@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 interface PresetCardProps {
   title: string;
@@ -18,10 +19,12 @@ export function PresetCard({ title, imagePath, onClick }: PresetCardProps) {
     >
       {/* Image Preview */}
       <div className="relative aspect-[5/7] w-full overflow-hidden">
-        <img
+        <Image
           src={imagePath}
           alt={title}
-          className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+          fill
+          className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+          sizes="200px"
         />
         {/* Overlay on hover */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
