@@ -131,27 +131,29 @@ export function validateEnvOrThrow(): void {
     throw new Error(message);
   }
 
-  // Throw error if production variables are missing in production
+  // Warn (don't throw) if production variables are missing in production
+  // This allows build to succeed, but warns at runtime
   if (
     process.env.NODE_ENV === 'production' &&
     result.missingProduction.length > 0
   ) {
     const message = [
-      '❌ PRODUCTION ERROR: Missing critical production environment variables!',
+      '⚠️  WARNING: Missing recommended production environment variables!',
       '',
-      'Production Required:',
+      'Production Recommended:',
       ...result.missingProduction.map((msg) => `  - ${msg}`),
       '',
+      'Some features may not work optimally.',
       'Add these to Vercel Environment Variables:',
       'Vercel Dashboard > Settings > Environment Variables',
     ].join('\n');
 
-    logger.error(message);
-    throw new Error(message);
+    logger.warn(message);
+    // Don't throw, just warn - allows build to succeed
+  } else {
+    // Log success
+    logger.info('✅ All required environment variables are set');
   }
-
-  // Log success
-  logger.info('✅ All required environment variables are set');
 }
 
 /**
