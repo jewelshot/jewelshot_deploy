@@ -97,8 +97,16 @@ export function validateEnv(): ValidationResult {
 /**
  * Validates environment and throws error if critical variables are missing
  * Call this during app initialization
+ *
+ * Note: Only validates in production runtime, skips during build
  */
 export function validateEnvOrThrow(): void {
+  // Skip validation during build process
+  if (process.env.NEXT_PHASE === 'phase-production-build') {
+    logger.debug('Skipping env validation during build');
+    return;
+  }
+
   const result = validateEnv();
 
   // Log missing optional variables (warnings)

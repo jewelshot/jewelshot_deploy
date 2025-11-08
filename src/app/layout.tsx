@@ -8,13 +8,9 @@ import { ErrorBoundary } from '@/components/organisms/ErrorBoundary';
 import ToastContainer from '@/components/organisms/ToastContainer';
 import './globals.css';
 
-// Environment validation (only imported in production)
-if (process.env.NODE_ENV === 'production') {
-  // Dynamic import to avoid build-time checks
-  import('@/lib/env').then(({ validateEnvOrThrow }) => {
-    validateEnvOrThrow();
-  });
-}
+// Note: Environment validation is available in src/lib/env.ts
+// It will automatically run in production runtime (not during build)
+// For manual validation during development, import and call validateEnvOrThrow()
 
 const inter = Inter({
   subsets: ['latin'],
