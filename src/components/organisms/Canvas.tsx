@@ -208,8 +208,8 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       image_url: uploadedImage,
       prompt:
         'Smooth camera movement, natural motion, cinematic lighting, professional jewelry showcase, elegant presentation',
-      resolution: '720p',
       duration: '8s',
+      aspect_ratio: 'auto', // Automatically adapts to image aspect ratio
     });
   }, [uploadedImage, generateVideo, showToast]);
 

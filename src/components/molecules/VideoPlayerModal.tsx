@@ -155,7 +155,7 @@ export function VideoPlayerModal({ videoUrl, onClose }: VideoPlayerModalProps) {
 
         {/* Info */}
         <p className="mt-4 text-center text-sm text-gray-400">
-          Video generated using Google Veo 3.1 • 720p • 8 seconds • Muted
+          Video generated using Google Veo 2 • 720p • Auto aspect ratio • Muted
         </p>
       </div>
     </div>

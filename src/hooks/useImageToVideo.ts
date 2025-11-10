@@ -1,7 +1,7 @@
 /**
  * useImageToVideo Hook
  *
- * Handles image-to-video conversion using Fal.ai Veo 3.1
+ * Handles image-to-video conversion using Fal.ai Veo 2
  */
 
 import { useState, useCallback } from 'react';
@@ -12,8 +12,8 @@ const logger = createScopedLogger('useImageToVideo');
 export interface VideoGenerationInput {
   image_url: string;
   prompt?: string;
-  duration?: '8s';
-  resolution?: '720p' | '1080p';
+  duration?: '5s' | '6s' | '7s' | '8s';
+  aspect_ratio?: 'auto' | 'auto_prefer_portrait' | '16:9' | '9:16';
 }
 
 export interface VideoOutput {
@@ -60,7 +60,7 @@ export function useImageToVideo(): UseImageToVideoResult {
             input.prompt ||
             'Smooth camera movement, natural motion, cinematic lighting, professional jewelry showcase',
           duration: input.duration || '8s',
-          resolution: input.resolution || '720p',
+          aspect_ratio: input.aspect_ratio || 'auto', // auto adapts to image aspect ratio
         }),
       });
 

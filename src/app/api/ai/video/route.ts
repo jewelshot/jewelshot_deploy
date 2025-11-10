@@ -1,7 +1,7 @@
 /**
  * Video Generation API Route
  *
- * Converts generated images to videos using Fal.ai Veo 3.1
+ * Converts generated images to videos using Fal.ai Veo 2
  * POST /api/ai/video
  */
 
@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json();
-    const { image_url, prompt, duration, resolution } = body;
+    const { image_url, prompt, duration, aspect_ratio } = body;
 
     // Validate required fields
     if (!image_url) {
@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
           ? 'relative'
           : 'data',
       duration: duration || '8s',
-      resolution: resolution || '720p',
+      aspect_ratio: aspect_ratio || 'auto',
       has_prompt: !!prompt,
     });
 
@@ -163,25 +163,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Call FAL.AI Veo 3.1 API (without audio)
+    // Call FAL.AI Veo 2 API (Image to Video)
     let result;
     try {
-      logger.info('[Video] Calling Fal.ai Veo 3.1 API', {
+      logger.info('[Video] Calling Fal.ai Veo 2 API', {
         image_url: uploadedUrl,
         prompt_length: prompt?.length || 0,
         duration: duration || '8s',
-        resolution: resolution || '720p',
+        aspect_ratio: aspect_ratio || 'auto',
       });
 
-      result = await fal.subscribe('fal-ai/veo3.1/reference-to-video', {
+      result = await fal.subscribe('fal-ai/veo2/image-to-video', {
         input: {
-          image_urls: [uploadedUrl],
+          image_url: uploadedUrl,
           prompt:
             prompt ||
             'Smooth camera movement, natural motion, cinematic lighting',
           duration: duration || '8s',
-          resolution: resolution || '720p',
-          generate_audio: false, // Always muted
+          aspect_ratio: aspect_ratio || 'auto', // auto, auto_prefer_portrait, 16:9, 9:16
         },
         logs: true,
         onQueueUpdate: (update) => {
