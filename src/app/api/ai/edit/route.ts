@@ -19,8 +19,20 @@ import {
 const logger = createScopedLogger('API:Edit');
 
 // Server-side FAL.AI initialization
+const FAL_KEY = process.env.FAL_AI_API_KEY || '';
+logger.info('[Edit] FAL_AI_API_KEY status:', {
+  exists: !!FAL_KEY,
+  length: FAL_KEY.length,
+  prefix: FAL_KEY.substring(0, 10),
+  format: FAL_KEY.includes(':')
+    ? 'UUID format'
+    : FAL_KEY.startsWith('fal_')
+      ? 'fal_ format'
+      : 'unknown',
+});
+
 fal.config({
-  credentials: process.env.FAL_AI_API_KEY || '',
+  credentials: FAL_KEY,
 });
 
 // Rate limiting configuration
@@ -246,22 +258,48 @@ export async function POST(request: NextRequest) {
     }
 
     // Upload image if needed
-    logger.debug('Processing image edit with prompt:', prompt);
+    logger.info('[Edit] Processing image edit', {
+      promptLength: prompt.length,
+      imageUrl: image_url.substring(0, 50),
+    });
     const uploadedUrl = await uploadIfNeeded(image_url);
+    logger.info('[Edit] Image prepared:', uploadedUrl.substring(0, 50));
 
     // Call FAL.AI Edit API
-    const result = await fal.subscribe('fal-ai/nano-banana/edit', {
-      input: {
-        prompt,
-        image_urls: [uploadedUrl],
-        num_images: num_images ?? 1,
-        output_format: output_format ?? 'jpeg',
-        aspect_ratio: aspect_ratio ?? '1:1',
-      },
-      logs: true,
-    });
+    logger.info('[Edit] Calling Fal.ai nano-banana/edit API...');
+    let result;
+    try {
+      result = await fal.subscribe('fal-ai/nano-banana/edit', {
+        input: {
+          prompt,
+          image_urls: [uploadedUrl],
+          num_images: num_images ?? 1,
+          output_format: output_format ?? 'jpeg',
+          aspect_ratio: aspect_ratio ?? '1:1',
+        },
+        logs: true,
+        onQueueUpdate: (update) => {
+          logger.info('[Edit] Queue update:', update.status);
+        },
+      });
+      logger.info('[Edit] Fal.ai request successful');
+    } catch (falError: unknown) {
+      const error = falError as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+      logger.error('[Edit] Fal.ai API error:', {
+        message: error?.message,
+        status: error?.status,
+        statusCode: error?.statusCode,
+        response: error?.response,
+        data: error?.data,
+        name: error?.name,
+        stack: error?.stack?.split('\n')[0],
+      });
+      throw new Error(
+        `Fal.ai API error: ${error?.message || error?.statusText || 'Unknown error'}`
+      );
+    }
 
-    logger.debug('Edit successful');
+    logger.info('[Edit] Edit successful');
 
     // Return result
     return NextResponse.json(result.data);

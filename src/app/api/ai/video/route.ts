@@ -14,8 +14,20 @@ import { cookies } from 'next/headers';
 const logger = createScopedLogger('API:Video');
 
 // Configure Fal.ai client with API key
+const FAL_KEY = process.env.FAL_AI_API_KEY || process.env.FAL_KEY || '';
+logger.info('[Video] FAL_AI_API_KEY status:', {
+  exists: !!FAL_KEY,
+  length: FAL_KEY.length,
+  prefix: FAL_KEY.substring(0, 10),
+  format: FAL_KEY.includes(':')
+    ? 'UUID format'
+    : FAL_KEY.startsWith('fal_')
+      ? 'fal_ format'
+      : 'unknown',
+});
+
 fal.config({
-  credentials: process.env.FAL_AI_API_KEY || process.env.FAL_KEY || '',
+  credentials: FAL_KEY,
 });
 
 /**
