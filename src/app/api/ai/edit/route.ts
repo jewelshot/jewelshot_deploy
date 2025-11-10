@@ -28,6 +28,7 @@ const RATE_LIMIT = 10; // 10 requests
 const RATE_WINDOW = 60 * 1000; // per minute
 
 // Fallback: In-memory rate limiting (if Supabase service_role not available)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
 
 /**
@@ -41,13 +42,19 @@ async function uploadIfNeeded(imageUrl: string): Promise<string> {
 
   // If it's a relative URL (e.g., /api/images/[id]), convert to absolute and fetch
   if (imageUrl.startsWith('/')) {
+    // Build proper base URL
     const baseUrl =
-      process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : 'http://localhost:3000';
+      process.env.NEXT_PUBLIC_SITE_URL ||
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
+      'http://localhost:3000';
+
     const absoluteUrl = `${baseUrl}${imageUrl}`;
 
-    logger.debug('Converting relative URL to absolute:', absoluteUrl);
+    logger.info('[Edit] Converting relative URL to absolute:', {
+      original: imageUrl,
+      absolute: absoluteUrl,
+      baseUrl,
+    });
 
     // Fetch the image from our own API
     const response = await fetch(absoluteUrl);

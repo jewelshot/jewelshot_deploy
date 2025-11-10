@@ -4,7 +4,7 @@
  * Displays generated video with download functionality
  */
 
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { X, Download, Play } from 'lucide-react';
 
 interface VideoPlayerModalProps {
@@ -14,13 +14,18 @@ interface VideoPlayerModalProps {
 
 export function VideoPlayerModal({ videoUrl, onClose }: VideoPlayerModalProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = React.useState(false);
-  const [videoError, setVideoError] = React.useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [videoError, setVideoError] = useState<string | null>(null);
 
   // Log video URL for debugging
-  React.useEffect(() => {
-    console.log('[VideoPlayerModal] Opening with URL:', videoUrl);
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      console.log('[VideoPlayerModal] Opening with URL:', videoUrl);
+    }
   }, [videoUrl]);
+
+  // Only render on client side (prevents hydration errors)
+  if (typeof window === 'undefined') return null;
 
   const handlePlayPause = () => {
     if (videoRef.current) {

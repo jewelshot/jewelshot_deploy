@@ -32,7 +32,8 @@ export function VideoGeneratingModal({
     return () => clearInterval(interval);
   }, [isVisible, error]);
 
-  if (!isVisible) return null;
+  // Only render on client side (prevents hydration errors)
+  if (!isVisible || typeof window === 'undefined') return null;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md">
