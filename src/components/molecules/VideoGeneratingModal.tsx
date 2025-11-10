@@ -17,10 +17,18 @@ export function VideoGeneratingModal({
   error,
 }: VideoGeneratingModalProps) {
   const [dots, setDots] = useState('');
+  const [isClient, setIsClient] = useState(false);
 
-  // Animate dots
+  // Mark as client-side on mount
   useEffect(() => {
-    if (!isVisible || error) return;
+    // This is intentional for hydration safety
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsClient(true);
+  }, []);
+
+  // Animate dots only on client
+  useEffect(() => {
+    if (!isVisible || error || !isClient) return;
 
     const interval = setInterval(() => {
       setDots((prev) => {
@@ -30,10 +38,10 @@ export function VideoGeneratingModal({
     }, 500);
 
     return () => clearInterval(interval);
-  }, [isVisible, error]);
+  }, [isVisible, error, isClient]);
 
   // Only render on client side (prevents hydration errors)
-  if (!isVisible || typeof window === 'undefined') return null;
+  if (!isVisible || !isClient) return null;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md">

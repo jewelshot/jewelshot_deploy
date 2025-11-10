@@ -16,16 +16,24 @@ export function VideoPlayerModal({ videoUrl, onClose }: VideoPlayerModalProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [videoError, setVideoError] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
 
-  // Log video URL for debugging
+  // Mark as client-side on mount
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    // This is intentional for hydration safety
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsClient(true);
+  }, []);
+
+  // Log video URL for debugging (only on client)
+  useEffect(() => {
+    if (isClient) {
       console.log('[VideoPlayerModal] Opening with URL:', videoUrl);
     }
-  }, [videoUrl]);
+  }, [videoUrl, isClient]);
 
   // Only render on client side (prevents hydration errors)
-  if (typeof window === 'undefined') return null;
+  if (!isClient) return null;
 
   const handlePlayPause = () => {
     if (videoRef.current) {
