@@ -202,7 +202,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     generateVideo({
       image_url: uploadedImage,
       prompt:
-        'Smooth camera movement, natural motion, cinematic lighting, professional jewelry showcase, elegant presentation',
+        'Professional model showcasing jewelry with natural hand movements, gently touching and highlighting the piece. Realistic gestures, subtle expressions, elegant body language. Natural lighting, cinematic quality, luxury commercial style.',
       duration: '8s',
       aspect_ratio: 'auto', // Automatically adapts to image aspect ratio
     });

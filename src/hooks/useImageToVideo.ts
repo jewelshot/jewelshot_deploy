@@ -58,7 +58,7 @@ export function useImageToVideo(): UseImageToVideoResult {
           image_url: input.image_url,
           prompt:
             input.prompt ||
-            'Smooth camera movement, natural motion, cinematic lighting, professional jewelry showcase',
+            'Professional model showcasing jewelry with natural hand movements, gently touching and highlighting the piece. Realistic gestures, subtle expressions, elegant body language. Natural lighting, cinematic quality, luxury commercial style.',
           duration: input.duration || '8s',
           aspect_ratio: input.aspect_ratio || 'auto', // auto adapts to image aspect ratio
         }),
@@ -70,11 +70,17 @@ export function useImageToVideo(): UseImageToVideoResult {
           errorData.details ||
           errorData.error ||
           `Server error: ${response.status} ${response.statusText}`;
-        logger.error('Video generation API error:', {
+        logger.error('Video generation API error - DETAILED:', {
           status: response.status,
           statusText: response.statusText,
-          errorData,
+          errorData: errorData,
+          debug: errorData.debug,
+          fullResponse: JSON.stringify(errorData),
         });
+
+        // Log the full error for debugging
+        console.error('[useImageToVideo] Full error response:', errorData);
+
         throw new Error(errorMessage);
       }
 

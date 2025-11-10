@@ -167,12 +167,14 @@ export async function POST(request: NextRequest) {
     let result;
     try {
       const finalPrompt =
-        prompt || 'Smooth camera movement, natural motion, cinematic lighting';
+        prompt ||
+        'Professional model showcasing jewelry with natural hand movements, gently touching and highlighting the piece. Realistic gestures, subtle expressions, elegant body language. Natural lighting, cinematic quality, luxury commercial style.';
       const finalDuration = duration || '8s';
       const finalAspectRatio = aspect_ratio || 'auto';
 
-      logger.info('[Video] Calling Fal.ai Veo 2 API', {
-        image_url: uploadedUrl,
+      logger.info('[Video] Preparing Fal.ai request', {
+        image_url_length: uploadedUrl.length,
+        image_url_start: uploadedUrl.substring(0, 50),
         prompt: finalPrompt,
         prompt_length: finalPrompt.length,
         duration: finalDuration,
@@ -183,6 +185,23 @@ export async function POST(request: NextRequest) {
       if (!finalPrompt || finalPrompt.trim().length === 0) {
         throw new Error('Prompt is required for video generation');
       }
+
+      // Test if image URL is accessible
+      try {
+        const imageTest = await fetch(uploadedUrl, { method: 'HEAD' });
+        logger.info('[Video] Image URL accessibility test:', {
+          url: uploadedUrl,
+          status: imageTest.status,
+          ok: imageTest.ok,
+        });
+      } catch (testError) {
+        logger.error('[Video] Image URL not accessible:', {
+          url: uploadedUrl,
+          error: testError,
+        });
+      }
+
+      logger.info('[Video] Calling Fal.ai Veo 2 API now...');
 
       result = await fal.subscribe('fal-ai/veo2/image-to-video', {
         input: {
@@ -207,16 +226,40 @@ export async function POST(request: NextRequest) {
         request_id: result.requestId,
         has_video: !!result.data?.video?.url,
       });
-    } catch (falError) {
-      logger.error('[Video] Fal.ai API error:', {
-        error: falError,
-        message: falError instanceof Error ? falError.message : 'Unknown error',
+    } catch (falError: unknown) {
+      const error = falError as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+      logger.error('[Video] Fal.ai API error - DETAILED:', {
+        error: error,
+        message: error?.message,
+        name: error?.name,
+        stack: error?.stack,
+        response: error?.response,
+        data: error?.data,
+        status: error?.status,
+        statusText: error?.statusText,
       });
+
+      // Try to extract more details from the error
+      let errorDetails = 'Unknown error';
+      if (falError instanceof Error) {
+        errorDetails = falError.message;
+      }
+      if (error?.response?.data) {
+        errorDetails = JSON.stringify(error.response.data);
+      }
+      if (error?.data) {
+        errorDetails = JSON.stringify(error.data);
+      }
+
       return NextResponse.json(
         {
           error: 'Video generation failed at Fal.ai',
-          details:
-            falError instanceof Error ? falError.message : 'Unknown error',
+          details: errorDetails,
+          debug: {
+            errorType: error?.constructor?.name,
+            hasResponse: !!error?.response,
+            hasData: !!error?.data,
+          },
         },
         { status: 422 }
       );
