@@ -173,7 +173,7 @@ export async function POST(request: NextRequest) {
     try {
       const finalPrompt =
         prompt ||
-        'Professional model showcasing jewelry with natural hand movements, gently touching and highlighting the piece. Realistic gestures, subtle expressions, elegant body language. Natural lighting, cinematic quality, luxury commercial style.';
+        'Elegant hand gently rotating and showcasing the ring with natural movements. Soft turns left and right to display the jewelry from different angles. Graceful gestures, natural lighting, cinematic quality.';
       const finalDuration = duration || '8s';
       const finalAspectRatio = aspect_ratio || 'auto';
 
