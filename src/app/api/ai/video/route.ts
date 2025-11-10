@@ -13,6 +13,11 @@ import { cookies } from 'next/headers';
 
 const logger = createScopedLogger('API:Video');
 
+// Configure Fal.ai client with API key
+fal.config({
+  credentials: process.env.FAL_AI_API_KEY || process.env.FAL_KEY || '',
+});
+
 /**
  * Upload image to FAL.AI storage if needed
  */
