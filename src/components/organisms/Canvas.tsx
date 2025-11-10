@@ -180,7 +180,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
 
   // Preset generation
   const handlePresetGeneration = useCallback(
-    (prompt: string) => {
+    (prompt: string, aspectRatio?: string) => {
       if (!uploadedImage) {
         showToast('Please upload an image first', 'warning');
         return;
@@ -190,6 +190,14 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       editWithAI({
         image_url: uploadedImage,
         prompt,
+        aspect_ratio: aspectRatio as
+          | '1:1'
+          | '4:5'
+          | '3:4'
+          | '2:3'
+          | '9:16'
+          | '16:9'
+          | undefined,
       });
     },
     [uploadedImage, editWithAI, showToast]
@@ -201,14 +209,20 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       // Store reference for external trigger
       (
         window as Window & {
-          __canvasPresetHandler?: (prompt: string) => void;
+          __canvasPresetHandler?: (
+            prompt: string,
+            aspectRatio?: string
+          ) => void;
         }
       ).__canvasPresetHandler = handlePresetGeneration;
     }
     return () => {
       delete (
         window as Window & {
-          __canvasPresetHandler?: (prompt: string) => void;
+          __canvasPresetHandler?: (
+            prompt: string,
+            aspectRatio?: string
+          ) => void;
         }
       ).__canvasPresetHandler;
     };

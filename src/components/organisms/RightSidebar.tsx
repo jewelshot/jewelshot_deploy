@@ -46,7 +46,7 @@ const aspectRatioOptions = [
 ];
 
 interface RightSidebarProps {
-  onGenerateWithPreset?: (prompt: string) => void;
+  onGenerateWithPreset?: (prompt: string, aspectRatio?: string) => void;
 }
 
 export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
@@ -99,9 +99,9 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
     // Close modal
     setConfirmModal(null);
 
-    // Trigger generation
+    // Trigger generation with aspect ratio
     if (onGenerateWithPreset) {
-      onGenerateWithPreset(prompt);
+      onGenerateWithPreset(prompt, aspectRatio);
     }
   };
 

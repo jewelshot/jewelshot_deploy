@@ -192,7 +192,7 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json();
-    const { prompt, image_url, num_images, output_format } = body;
+    const { prompt, image_url, num_images, output_format, aspect_ratio } = body;
 
     // Validate required fields
     if (!prompt || typeof prompt !== 'string') {
@@ -220,6 +220,7 @@ export async function POST(request: NextRequest) {
         image_urls: [uploadedUrl],
         num_images: num_images ?? 1,
         output_format: output_format ?? 'jpeg',
+        aspect_ratio: aspect_ratio ?? '1:1',
       },
       logs: true,
     });

@@ -61,13 +61,13 @@ export default function StudioPage() {
   // Breakpoint detection (no logging in production)
 
   // Handle preset generation from RightSidebar
-  const handleGenerateWithPreset = (prompt: string) => {
+  const handleGenerateWithPreset = (prompt: string, aspectRatio?: string) => {
     // Trigger Canvas generation via global handler
     const win = window as Window & {
-      __canvasPresetHandler?: (prompt: string) => void;
+      __canvasPresetHandler?: (prompt: string, aspectRatio?: string) => void;
     };
     if (win.__canvasPresetHandler) {
-      win.__canvasPresetHandler(prompt);
+      win.__canvasPresetHandler(prompt, aspectRatio);
     }
   };
 

@@ -11,15 +11,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import {
-  Upload,
-  Sparkles,
-  Download,
-  X,
-  Sliders,
-  Camera,
-  Share2,
-} from 'lucide-react';
+import { Upload, Sparkles, Download, X, Camera, Share2 } from 'lucide-react';
 import { useImageEdit } from '@/hooks/useImageEdit';
 import { logger } from '@/lib/logger';
 import { presetPrompts } from '@/lib/preset-prompts';
@@ -52,6 +44,7 @@ export function MobileStudio() {
     return false;
   });
   const [smoothProgress, setSmoothProgress] = useState(0);
+  const [aspectRatio, setAspectRatio] = useState<string>('9:16'); // Default mobile aspect
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const progressTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -197,14 +190,27 @@ export function MobileStudio() {
           return;
         }
 
-        // Build the full professional prompt
-        const prompt = preset.buildPrompt('ring', undefined, '9:16');
+        // Build the full professional prompt with selected aspect ratio
+        const prompt = preset.buildPrompt('ring', undefined, aspectRatio);
 
-        logger.info('[MobileStudio] Applying preset:', presetId);
+        logger.info(
+          '[MobileStudio] Applying preset:',
+          presetId,
+          'aspect:',
+          aspectRatio
+        );
 
         await edit({
           image_url: image,
           prompt,
+          aspect_ratio: aspectRatio as
+            | '1:1'
+            | '4:5'
+            | '3:4'
+            | '2:3'
+            | '9:16'
+            | '16:9'
+            | undefined,
         });
       } catch (error) {
         logger.error('[MobileStudio] Style application failed:', error);
@@ -239,7 +245,7 @@ export function MobileStudio() {
         }
       }
     },
-    [image, deductCredit, edit]
+    [image, deductCredit, edit, aspectRatio]
   );
 
   const handleDownload = () => {
@@ -395,6 +401,27 @@ export function MobileStudio() {
           </div>
         )}
       </div>
+
+      {/* Aspect Ratio Selector */}
+      {image && !isEditing && (
+        <div className="absolute bottom-32 left-1/2 z-10 -translate-x-1/2">
+          <div className="flex gap-1 rounded-xl border border-white/10 bg-gray-900/80 p-1 backdrop-blur-xl">
+            {['1:1', '4:5', '9:16', '16:9'].map((ratio) => (
+              <button
+                key={ratio}
+                onClick={() => setAspectRatio(ratio)}
+                className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+                  aspectRatio === ratio
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                {ratio}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Floating Action Buttons */}
       {image && !isEditing && (
