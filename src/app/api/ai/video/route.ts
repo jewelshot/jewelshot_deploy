@@ -24,31 +24,52 @@ async function uploadIfNeeded(imageUrl: string): Promise<string> {
 
   // If it's a relative URL (e.g., /api/images/[id]), convert to absolute and fetch
   if (imageUrl.startsWith('/')) {
+    // Build proper base URL
     const baseUrl =
-      process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : 'http://localhost:3000';
+      process.env.NEXT_PUBLIC_SITE_URL ||
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
+      'http://localhost:3000';
+
     const absoluteUrl = `${baseUrl}${imageUrl}`;
 
-    logger.debug('Converting relative URL to absolute:', absoluteUrl);
-
-    // Fetch the image from our own API
-    const response = await fetch(absoluteUrl);
-    if (!response.ok) {
-      throw new Error(
-        `Failed to fetch image from ${absoluteUrl}: ${response.statusText}`
-      );
-    }
-
-    const blob = await response.blob();
-    const file = new File([blob], 'image.jpg', {
-      type: blob.type || 'image/jpeg',
+    logger.info('[Video] Converting relative URL to absolute:', {
+      original: imageUrl,
+      absolute: absoluteUrl,
+      baseUrl,
     });
 
-    // Upload to fal.ai storage
-    const uploadedUrl = await fal.storage.upload(file);
-    logger.debug('Image uploaded to FAL.AI:', uploadedUrl);
-    return uploadedUrl;
+    try {
+      // Fetch the image from our own API
+      const response = await fetch(absoluteUrl);
+      if (!response.ok) {
+        logger.error('[Video] Failed to fetch image:', {
+          url: absoluteUrl,
+          status: response.status,
+          statusText: response.statusText,
+        });
+        throw new Error(
+          `Failed to fetch image from ${absoluteUrl}: ${response.statusText}`
+        );
+      }
+
+      const blob = await response.blob();
+      logger.info('[Video] Image fetched successfully:', {
+        size: blob.size,
+        type: blob.type,
+      });
+
+      const file = new File([blob], 'image.jpg', {
+        type: blob.type || 'image/jpeg',
+      });
+
+      // Upload to fal.ai storage
+      const uploadedUrl = await fal.storage.upload(file);
+      logger.info('[Video] Image uploaded to FAL.AI:', uploadedUrl);
+      return uploadedUrl;
+    } catch (error) {
+      logger.error('[Video] Error processing relative URL:', error);
+      throw error;
+    }
   }
 
   // If it's a data URI, upload it
@@ -100,70 +121,122 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json();
-    const { image_url, prompt, duration, resolution, generate_audio } = body;
+    const { image_url, prompt, duration, resolution } = body;
 
     // Validate required fields
     if (!image_url) {
-      logger.warn('Missing image_url in video request');
+      logger.warn('[Video] Missing image_url in video request');
       return NextResponse.json(
         { error: 'image_url is required' },
         { status: 400 }
       );
     }
 
-    if (!prompt) {
-      logger.warn('Missing prompt in video request');
+    logger.info('[Video] Starting video generation', {
+      user_id: user.id,
+      image_url_type: image_url.startsWith('http')
+        ? 'absolute'
+        : image_url.startsWith('/')
+          ? 'relative'
+          : 'data',
+      duration: duration || '8s',
+      resolution: resolution || '720p',
+      has_prompt: !!prompt,
+    });
+
+    // Upload image if needed
+    let uploadedUrl: string;
+    try {
+      uploadedUrl = await uploadIfNeeded(image_url);
+      logger.info('[Video] Image prepared for Fal.ai:', uploadedUrl);
+    } catch (uploadError) {
+      logger.error('[Video] Failed to prepare image:', uploadError);
       return NextResponse.json(
-        { error: 'prompt is required' },
+        {
+          error: 'Failed to prepare image for video generation',
+          details:
+            uploadError instanceof Error
+              ? uploadError.message
+              : 'Unknown error',
+        },
         { status: 400 }
       );
     }
 
-    logger.info('Starting video generation', {
-      user_id: user.id,
-      duration: duration || '8s',
-      resolution: resolution || '720p',
-      has_audio: generate_audio !== false,
-    });
-
-    // Upload image if needed
-    const uploadedUrl = await uploadIfNeeded(image_url);
-
     // Call FAL.AI Veo 3.1 API (without audio)
-    const result = await fal.subscribe('fal-ai/veo3.1/reference-to-video', {
-      input: {
-        image_urls: [uploadedUrl],
-        prompt:
-          prompt ||
-          'Smooth camera movement, natural motion, cinematic lighting',
+    let result;
+    try {
+      logger.info('[Video] Calling Fal.ai Veo 3.1 API', {
+        image_url: uploadedUrl,
+        prompt_length: prompt?.length || 0,
         duration: duration || '8s',
         resolution: resolution || '720p',
-        generate_audio: false, // Always muted
-      },
-      logs: true,
-      onQueueUpdate: (update) => {
-        if (update.status === 'IN_PROGRESS') {
-          logger.debug('Video generation progress:', update.logs);
-        }
-      },
-    });
+      });
 
-    logger.info('Video generated successfully', {
-      user_id: user.id,
-      request_id: result.requestId,
-    });
+      result = await fal.subscribe('fal-ai/veo3.1/reference-to-video', {
+        input: {
+          image_urls: [uploadedUrl],
+          prompt:
+            prompt ||
+            'Smooth camera movement, natural motion, cinematic lighting',
+          duration: duration || '8s',
+          resolution: resolution || '720p',
+          generate_audio: false, // Always muted
+        },
+        logs: true,
+        onQueueUpdate: (update) => {
+          if (update.status === 'IN_PROGRESS') {
+            logger.debug('[Video] Generation progress:', update.logs);
+          }
+        },
+      });
+
+      logger.info('[Video] Video generated successfully', {
+        user_id: user.id,
+        request_id: result.requestId,
+        has_video: !!result.data?.video?.url,
+      });
+    } catch (falError) {
+      logger.error('[Video] Fal.ai API error:', {
+        error: falError,
+        message: falError instanceof Error ? falError.message : 'Unknown error',
+      });
+      return NextResponse.json(
+        {
+          error: 'Video generation failed at Fal.ai',
+          details:
+            falError instanceof Error ? falError.message : 'Unknown error',
+        },
+        { status: 422 }
+      );
+    }
 
     // Save video to Supabase Storage
     const videoUrl = result.data.video?.url;
     if (videoUrl) {
       try {
+        logger.info('[Video] Downloading video from Fal.ai:', videoUrl);
+
         // Download video
         const videoResponse = await fetch(videoUrl);
+        if (!videoResponse.ok) {
+          throw new Error(
+            `Failed to download video: ${videoResponse.statusText}`
+          );
+        }
+
         const videoBlob = await videoResponse.blob();
+        logger.info('[Video] Video downloaded successfully:', {
+          size: videoBlob.size,
+          type: videoBlob.type,
+        });
+
         const videoBuffer = Buffer.from(await videoBlob.arrayBuffer());
 
         // Upload to Supabase Storage
         const fileName = `${user.id}/${Date.now()}-video.mp4`;
+        logger.info('[Video] Uploading video to Supabase:', fileName);
+
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('generations')
           .upload(fileName, videoBuffer, {
@@ -172,14 +245,22 @@ export async function POST(request: NextRequest) {
           });
 
         if (uploadError) {
-          logger.error('Failed to upload video to Supabase:', uploadError);
+          logger.error(
+            '[Video] Failed to upload video to Supabase:',
+            uploadError
+          );
         } else {
-          logger.info('Video uploaded to Supabase:', uploadData.path);
+          logger.info(
+            '[Video] Video uploaded to Supabase successfully:',
+            uploadData.path
+          );
 
           // Get public URL
           const { data: urlData } = supabase.storage
             .from('generations')
             .getPublicUrl(fileName);
+
+          logger.info('[Video] Returning Supabase public URL');
 
           // Return Supabase URL instead of Fal.ai URL
           return NextResponse.json({
@@ -191,15 +272,20 @@ export async function POST(request: NextRequest) {
           });
         }
       } catch (saveError) {
-        logger.error('Failed to save video to Supabase:', saveError);
+        logger.error('[Video] Failed to save video to Supabase:', {
+          error: saveError,
+          message:
+            saveError instanceof Error ? saveError.message : 'Unknown error',
+        });
         // Fallback to Fal.ai URL
       }
     }
 
     // Return video URL (fallback to Fal.ai if Supabase save failed)
+    logger.info('[Video] Returning Fal.ai URL as fallback');
     return NextResponse.json({
       success: true,
-      video: result.data,
+      video: result.data.video || result.data,
       requestId: result.requestId,
     });
   } catch (error) {

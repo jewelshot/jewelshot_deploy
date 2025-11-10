@@ -65,21 +65,33 @@ export function useImageToVideo(): UseImageToVideoResult {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.details || errorData.error || 'Video generation failed'
-        );
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage =
+          errorData.details ||
+          errorData.error ||
+          `Server error: ${response.status} ${response.statusText}`;
+        logger.error('Video generation API error:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorData,
+        });
+        throw new Error(errorMessage);
       }
 
       setProgress('Generating video... This may take a few minutes.');
 
       const result = await response.json();
+      logger.info('Video generation API response:', result);
 
       if (result.success && result.video?.url) {
         setVideoUrl(result.video.url);
         setProgress('Video generated successfully!');
-        logger.info('Video generation completed', result);
+        logger.info('Video generation completed successfully', {
+          videoUrl: result.video.url,
+          requestId: result.requestId,
+        });
       } else {
+        logger.error('Invalid video generation response:', result);
         throw new Error('Invalid response from video generation API');
       }
     } catch (err) {
