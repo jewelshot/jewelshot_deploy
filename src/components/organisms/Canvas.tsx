@@ -198,8 +198,11 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       return;
     }
 
-    logger.info('Starting video generation from image:', uploadedImage);
-    showToast('Generating video... This may take a few minutes.', 'info');
+    logger.info(
+      '[Canvas] Starting video generation from image:',
+      uploadedImage
+    );
+    showToast('🎬 Generating video... This may take a few minutes!', 'info');
 
     generateVideo({
       image_url: uploadedImage,
@@ -212,16 +215,20 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
 
   // Show video modal when generation completes
   useEffect(() => {
-    if (videoUrl) {
-      setShowVideoModal(true);
-      showToast('Video generated successfully!', 'success');
+    if (videoUrl && !showVideoModal) {
+      logger.info('[Canvas] Video generated, opening modal');
+      queueMicrotask(() => {
+        setShowVideoModal(true);
+        showToast('✅ Video generated successfully!', 'success');
+      });
     }
-  }, [videoUrl, showToast]);
+  }, [videoUrl, showVideoModal, showToast]);
 
   // Show error toast if video generation fails
   useEffect(() => {
     if (videoError) {
-      showToast(`Video generation failed: ${videoError}`, 'error');
+      logger.error('[Canvas] Video generation failed:', videoError);
+      showToast(`❌ Video generation failed: ${videoError}`, 'error');
     }
   }, [videoError, showToast]);
 

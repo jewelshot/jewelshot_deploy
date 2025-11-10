@@ -15,6 +15,12 @@ interface VideoPlayerModalProps {
 export function VideoPlayerModal({ videoUrl, onClose }: VideoPlayerModalProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = React.useState(false);
+  const [videoError, setVideoError] = React.useState<string | null>(null);
+
+  // Log video URL for debugging
+  React.useEffect(() => {
+    console.log('[VideoPlayerModal] Opening with URL:', videoUrl);
+  }, [videoUrl]);
 
   const handlePlayPause = () => {
     if (videoRef.current) {
@@ -25,6 +31,15 @@ export function VideoPlayerModal({ videoUrl, onClose }: VideoPlayerModalProps) {
       }
       setIsPlaying(!isPlaying);
     }
+  };
+
+  const handleVideoError = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+    const error = (e.target as HTMLVideoElement).error;
+    const errorMessage = error
+      ? `Video error: ${error.code} - ${error.message}`
+      : 'Unknown video error';
+    console.error('[VideoPlayerModal] Video error:', errorMessage);
+    setVideoError(errorMessage);
   };
 
   const handleDownload = async () => {
@@ -77,30 +92,64 @@ export function VideoPlayerModal({ videoUrl, onClose }: VideoPlayerModalProps) {
 
         {/* Video Player */}
         <div className="relative overflow-hidden rounded-xl bg-black">
-          <video
-            ref={videoRef}
-            src={videoUrl}
-            controls
-            autoPlay
-            loop
-            muted
-            className="h-auto w-full"
-            onPlay={() => setIsPlaying(true)}
-            onPause={() => setIsPlaying(false)}
-          >
-            Your browser does not support the video tag.
-          </video>
-
-          {/* Play/Pause Overlay (appears when video is paused) */}
-          {!isPlaying && (
-            <button
-              onClick={handlePlayPause}
-              className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm transition-opacity hover:bg-black/40"
-            >
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-purple-600/80 shadow-lg transition-transform hover:scale-110">
-                <Play className="h-10 w-10 text-white" />
+          {videoError ? (
+            /* Error State */
+            <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 p-8 text-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500/20">
+                <X className="h-8 w-8 text-red-500" />
               </div>
-            </button>
+              <div>
+                <h3 className="mb-2 text-lg font-semibold text-white">
+                  Video Load Error
+                </h3>
+                <p className="text-sm text-gray-400">{videoError}</p>
+                <p className="mt-2 text-xs text-gray-500">
+                  Video URL: {videoUrl}
+                </p>
+              </div>
+              <button
+                onClick={() => window.location.reload()}
+                className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700"
+              >
+                Reload Page
+              </button>
+            </div>
+          ) : (
+            /* Video Player */
+            <>
+              <video
+                ref={videoRef}
+                src={videoUrl}
+                controls
+                autoPlay
+                loop
+                muted
+                className="h-auto w-full"
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
+                onError={handleVideoError}
+                onLoadStart={() =>
+                  console.log('[VideoPlayerModal] Video loading started')
+                }
+                onLoadedData={() =>
+                  console.log('[VideoPlayerModal] Video loaded successfully')
+                }
+              >
+                Your browser does not support the video tag.
+              </video>
+
+              {/* Play/Pause Overlay (appears when video is paused) */}
+              {!isPlaying && (
+                <button
+                  onClick={handlePlayPause}
+                  className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm transition-opacity hover:bg-black/40"
+                >
+                  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-purple-600/80 shadow-lg transition-transform hover:scale-110">
+                    <Play className="h-10 w-10 text-white" />
+                  </div>
+                </button>
+              )}
+            </>
           )}
         </div>
 

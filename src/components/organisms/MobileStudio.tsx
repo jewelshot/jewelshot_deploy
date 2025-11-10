@@ -106,6 +106,7 @@ export function MobileStudio() {
     generateVideo,
     isGenerating: isGeneratingVideo,
     videoUrl,
+    error: videoError,
     reset: resetVideo,
   } = useImageToVideo();
 
@@ -115,10 +116,12 @@ export function MobileStudio() {
   const handleGenerateVideo = useCallback(() => {
     if (!image) {
       logger.warn('[MobileStudio] No image to convert to video');
+      alert('No image to convert to video');
       return;
     }
 
     logger.info('[MobileStudio] Starting video generation');
+    alert('🎬 Generating video... This may take a few minutes. Please wait!');
 
     generateVideo({
       image_url: image,
@@ -132,12 +135,22 @@ export function MobileStudio() {
   // Show video modal when generation completes
   useEffect(() => {
     if (videoUrl && !showVideoModal) {
+      logger.info('[MobileStudio] Video generated, opening modal');
+      alert('✅ Video generated successfully!');
       // Use queueMicrotask to defer setState and avoid cascading renders
       queueMicrotask(() => {
         setShowVideoModal(true);
       });
     }
   }, [videoUrl, showVideoModal]);
+
+  // Show error alert if video generation fails
+  useEffect(() => {
+    if (videoError) {
+      logger.error('[MobileStudio] Video generation failed:', videoError);
+      alert(`❌ Video generation failed: ${videoError}`);
+    }
+  }, [videoError]);
 
   // Smooth progress animation
   useEffect(() => {
@@ -518,11 +531,17 @@ export function MobileStudio() {
               <button
                 onClick={handleGenerateVideo}
                 disabled={isGeneratingVideo}
-                className="group flex h-11 w-11 items-center justify-center rounded-xl border border-purple-500/50 bg-gradient-to-r from-purple-600/30 to-pink-600/30 shadow-md shadow-purple-500/20 backdrop-blur-xl transition-all hover:border-purple-500/70 hover:from-purple-600/40 hover:to-pink-600/40 hover:shadow-lg hover:shadow-purple-500/30 active:scale-90 disabled:cursor-not-allowed disabled:opacity-40"
+                className="group relative flex h-11 w-11 items-center justify-center rounded-xl border border-purple-500/50 bg-gradient-to-r from-purple-600/30 to-pink-600/30 shadow-md shadow-purple-500/20 backdrop-blur-xl transition-all hover:border-purple-500/70 hover:from-purple-600/40 hover:to-pink-600/40 hover:shadow-lg hover:shadow-purple-500/30 active:scale-90 disabled:cursor-not-allowed disabled:opacity-40"
                 aria-label="Generate Video"
-                title="Convert to Video"
+                title={
+                  isGeneratingVideo ? 'Generating video...' : 'Convert to Video'
+                }
               >
-                <Video className="h-5 w-5 text-purple-300 transition-colors group-hover:text-purple-200" />
+                {isGeneratingVideo ? (
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-purple-300 border-t-transparent" />
+                ) : (
+                  <Video className="h-5 w-5 text-purple-300 transition-colors group-hover:text-purple-200" />
+                )}
               </button>
             </div>
           </div>

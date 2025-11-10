@@ -19,16 +19,14 @@ export function VideoButton({ onClick, disabled = false }: VideoButtonProps) {
       onClick={onClick}
       disabled={disabled}
       className="group relative flex h-8 w-8 items-center justify-center rounded-md transition-all duration-200 hover:bg-purple-600/10 disabled:cursor-not-allowed disabled:opacity-40"
-      title="Generate Video"
+      title={disabled ? 'Generating video...' : 'Generate Video'}
       aria-label="Generate Video from Image"
     >
-      <Video
-        className={`h-4 w-4 transition-all duration-200 ${
-          disabled
-            ? 'text-purple-400/40'
-            : 'text-purple-400 group-hover:scale-110 group-hover:text-purple-300'
-        }`}
-      />
+      {disabled ? (
+        <div className="h-4 w-4 animate-spin rounded-full border-2 border-purple-400 border-t-transparent" />
+      ) : (
+        <Video className="h-4 w-4 text-purple-400 transition-all duration-200 group-hover:scale-110 group-hover:text-purple-300" />
+      )}
     </button>
   );
 }
