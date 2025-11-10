@@ -17,6 +17,7 @@ import { saveImageToGallery } from '@/lib/gallery-storage';
 import Toast from '@/components/atoms/Toast';
 import { useCreditStore } from '@/store/creditStore';
 import { VideoPlayerModal } from '@/components/molecules/VideoPlayerModal';
+import { VideoGeneratingModal } from '@/components/molecules/VideoGeneratingModal';
 
 const logger = createScopedLogger('Canvas');
 // New refactored components
@@ -114,12 +115,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
   const { showToast, hideToast, toastState } = useToast();
 
   // Credit store
-  const {
-    credits,
-    loading: creditsLoading,
-    deductCredit,
-    fetchCredits,
-  } = useCreditStore();
+  const { deductCredit, fetchCredits } = useCreditStore();
 
   // Fetch credits on mount
   useEffect(() => {
@@ -202,7 +198,6 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       '[Canvas] Starting video generation from image:',
       uploadedImage
     );
-    showToast('🎬 Generating video... This may take a few minutes!', 'info');
 
     generateVideo({
       image_url: uploadedImage,
@@ -999,6 +994,9 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
         }}
         isLoading={isLoading}
       />
+
+      {/* Video Generating Modal */}
+      <VideoGeneratingModal isVisible={isGeneratingVideo} error={videoError} />
 
       {/* Video Player Modal */}
       {showVideoModal && videoUrl && (

@@ -166,26 +166,38 @@ export async function POST(request: NextRequest) {
     // Call FAL.AI Veo 2 API (Image to Video)
     let result;
     try {
+      const finalPrompt =
+        prompt || 'Smooth camera movement, natural motion, cinematic lighting';
+      const finalDuration = duration || '8s';
+      const finalAspectRatio = aspect_ratio || 'auto';
+
       logger.info('[Video] Calling Fal.ai Veo 2 API', {
         image_url: uploadedUrl,
-        prompt_length: prompt?.length || 0,
-        duration: duration || '8s',
-        aspect_ratio: aspect_ratio || 'auto',
+        prompt: finalPrompt,
+        prompt_length: finalPrompt.length,
+        duration: finalDuration,
+        aspect_ratio: finalAspectRatio,
       });
+
+      // Validate prompt is provided
+      if (!finalPrompt || finalPrompt.trim().length === 0) {
+        throw new Error('Prompt is required for video generation');
+      }
 
       result = await fal.subscribe('fal-ai/veo2/image-to-video', {
         input: {
+          prompt: finalPrompt,
           image_url: uploadedUrl,
-          prompt:
-            prompt ||
-            'Smooth camera movement, natural motion, cinematic lighting',
-          duration: duration || '8s',
-          aspect_ratio: aspect_ratio || 'auto', // auto, auto_prefer_portrait, 16:9, 9:16
+          aspect_ratio: finalAspectRatio,
+          duration: finalDuration,
         },
         logs: true,
         onQueueUpdate: (update) => {
           if (update.status === 'IN_PROGRESS') {
-            logger.debug('[Video] Generation progress:', update.logs);
+            logger.info('[Video] Generation progress:', {
+              status: update.status,
+              logs: update.logs?.map((l) => l.message).join(', '),
+            });
           }
         },
       });

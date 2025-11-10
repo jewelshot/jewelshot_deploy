@@ -29,6 +29,7 @@ import MobileNav from '@/components/molecules/MobileNav';
 import { CreditCounter } from '@/components/molecules/CreditCounter';
 import { useCreditStore } from '@/store/creditStore';
 import { VideoPlayerModal } from '@/components/molecules/VideoPlayerModal';
+import { VideoGeneratingModal } from '@/components/molecules/VideoGeneratingModal';
 
 const STORAGE_KEY = 'jewelshot_mobile_image';
 
@@ -116,12 +117,10 @@ export function MobileStudio() {
   const handleGenerateVideo = useCallback(() => {
     if (!image) {
       logger.warn('[MobileStudio] No image to convert to video');
-      alert('No image to convert to video');
       return;
     }
 
     logger.info('[MobileStudio] Starting video generation');
-    alert('🎬 Generating video... This may take a few minutes. Please wait!');
 
     generateVideo({
       image_url: image,
@@ -136,7 +135,6 @@ export function MobileStudio() {
   useEffect(() => {
     if (videoUrl && !showVideoModal) {
       logger.info('[MobileStudio] Video generated, opening modal');
-      alert('✅ Video generated successfully!');
       // Use queueMicrotask to defer setState and avoid cascading renders
       queueMicrotask(() => {
         setShowVideoModal(true);
@@ -144,11 +142,11 @@ export function MobileStudio() {
     }
   }, [videoUrl, showVideoModal]);
 
-  // Show error alert if video generation fails
+  // Show error message if video generation fails
   useEffect(() => {
     if (videoError) {
       logger.error('[MobileStudio] Video generation failed:', videoError);
-      alert(`❌ Video generation failed: ${videoError}`);
+      // Error will be shown in the modal automatically
     }
   }, [videoError]);
 
@@ -674,6 +672,9 @@ export function MobileStudio() {
           </div>
         </div>
       )}
+
+      {/* Video Generating Modal */}
+      <VideoGeneratingModal isVisible={isGeneratingVideo} error={videoError} />
 
       {/* Video Player Modal */}
       {showVideoModal && videoUrl && (
