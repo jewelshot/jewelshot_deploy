@@ -370,7 +370,7 @@ export function MobileStudio() {
       </div>
 
       {/* Main Canvas Area */}
-      <div className="relative flex flex-1 items-center justify-center p-4 pb-24">
+      <div className="relative flex flex-1 items-center justify-center p-4 pb-48">
         {!image && !isEditing ? (
           /* Empty State */
           <div className="text-center">
@@ -443,7 +443,7 @@ export function MobileStudio() {
             <img
               src={image || ''}
               alt="Uploaded jewelry image for editing"
-              className="max-h-full max-w-full rounded-xl object-contain shadow-2xl"
+              className="max-h-[calc(100vh-20rem)] max-w-full rounded-xl object-contain shadow-2xl"
             />
           </div>
         )}
@@ -514,14 +514,15 @@ export function MobileStudio() {
                 <Share2 className="h-5 w-5 text-white/70 transition-colors group-hover:text-white" />
               </button>
 
-              {/* Video Generation */}
+              {/* Generate Video - 🎬 Purple button */}
               <button
                 onClick={handleGenerateVideo}
                 disabled={isGeneratingVideo}
-                className="group flex h-11 w-11 items-center justify-center rounded-xl border border-purple-500/30 bg-purple-600/20 backdrop-blur-xl transition-all hover:border-purple-500/50 hover:bg-purple-600/30 active:scale-90 disabled:cursor-not-allowed disabled:opacity-40"
+                className="group flex h-11 w-11 items-center justify-center rounded-xl border border-purple-500/50 bg-gradient-to-r from-purple-600/30 to-pink-600/30 shadow-md shadow-purple-500/20 backdrop-blur-xl transition-all hover:border-purple-500/70 hover:from-purple-600/40 hover:to-pink-600/40 hover:shadow-lg hover:shadow-purple-500/30 active:scale-90 disabled:cursor-not-allowed disabled:opacity-40"
                 aria-label="Generate Video"
+                title="Convert to Video"
               >
-                <Video className="h-5 w-5 text-purple-400 transition-colors group-hover:text-purple-300" />
+                <Video className="h-5 w-5 text-purple-300 transition-colors group-hover:text-purple-200" />
               </button>
             </div>
           </div>
