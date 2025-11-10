@@ -34,9 +34,38 @@ const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
  * Upload image to FAL.AI storage if needed
  */
 async function uploadIfNeeded(imageUrl: string): Promise<string> {
-  // If it's already a URL, return it
+  // If it's already an absolute URL, return it
   if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
     return imageUrl;
+  }
+
+  // If it's a relative URL (e.g., /api/images/[id]), convert to absolute and fetch
+  if (imageUrl.startsWith('/')) {
+    const baseUrl =
+      process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : 'http://localhost:3000';
+    const absoluteUrl = `${baseUrl}${imageUrl}`;
+
+    logger.debug('Converting relative URL to absolute:', absoluteUrl);
+
+    // Fetch the image from our own API
+    const response = await fetch(absoluteUrl);
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch image from ${absoluteUrl}: ${response.statusText}`
+      );
+    }
+
+    const blob = await response.blob();
+    const file = new File([blob], 'image.jpg', {
+      type: blob.type || 'image/jpeg',
+    });
+
+    // Upload to fal.ai storage
+    const uploadedUrl = await fal.storage.upload(file);
+    logger.debug('Image uploaded to FAL.AI:', uploadedUrl);
+    return uploadedUrl;
   }
 
   // If it's a data URI, upload it

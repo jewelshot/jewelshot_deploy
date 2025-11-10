@@ -474,11 +474,11 @@ export function MobileStudio() {
       {/* Upload Options Bottom Sheet */}
       {showUploadOptions && (
         <div
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm"
           onClick={() => setShowUploadOptions(false)}
         >
           <div
-            className="animate-slide-up fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl border-t border-white/10 bg-gray-900 p-6 shadow-2xl"
+            className="animate-slide-up fixed bottom-0 left-0 right-0 z-[70] rounded-t-3xl border-t border-white/10 bg-gray-900 p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mx-auto mb-4 h-1 w-12 rounded-full bg-white/20" />
@@ -512,11 +512,11 @@ export function MobileStudio() {
       {/* Style Selection Bottom Sheet */}
       {showStyleSheet && (
         <div
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm"
           onClick={() => setShowStyleSheet(false)}
         >
           <div
-            className="animate-slide-up fixed bottom-0 left-0 right-0 z-50 max-h-[80vh] overflow-y-auto rounded-t-3xl border-t border-white/10 bg-gray-900 p-6 shadow-2xl"
+            className="animate-slide-up fixed bottom-0 left-0 right-0 z-[70] max-h-[80vh] overflow-y-auto rounded-t-3xl border-t border-white/10 bg-gray-900 p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mx-auto mb-4 h-1 w-12 rounded-full bg-white/20" />
@@ -532,40 +532,40 @@ export function MobileStudio() {
             <div className="grid grid-cols-2 gap-3">
               {[
                 {
-                  id: 'elegant',
-                  name: 'Elegant',
-                  desc: 'Sophisticated & refined',
-                  gradient: 'linear-gradient(135deg, #667EEA 0%, #764BA2 100%)',
+                  id: 'e-commerce',
+                  name: 'White Background',
+                  desc: 'Clean product shot',
+                  gradient: 'linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%)',
+                },
+                {
+                  id: 'still-life',
+                  name: 'Still Life',
+                  desc: 'Minimal aesthetic',
+                  gradient: 'linear-gradient(135deg, #FFF0F5 0%, #FFE4E1 100%)',
+                },
+                {
+                  id: 'on-model',
+                  name: 'On Model',
+                  desc: 'Professional studio',
+                  gradient: 'linear-gradient(135deg, #E0E0E0 0%, #BDBDBD 100%)',
+                },
+                {
+                  id: 'lifestyle',
+                  name: 'Lifestyle',
+                  desc: 'Natural everyday',
+                  gradient: 'linear-gradient(135deg, #FFE5B4 0%, #FFA07A 100%)',
                 },
                 {
                   id: 'luxury',
                   name: 'Luxury',
-                  desc: 'Premium gold tones',
-                  gradient: 'linear-gradient(135deg, #FFD89B 0%, #19547B 100%)',
+                  desc: 'High-end editorial',
+                  gradient: 'linear-gradient(135deg, #1A1A1A 0%, #4A4A4A 100%)',
                 },
                 {
-                  id: 'modern',
-                  name: 'Modern',
-                  desc: 'Clean & contemporary',
-                  gradient: 'linear-gradient(135deg, #4FACFE 0%, #00F2FE 100%)',
-                },
-                {
-                  id: 'vintage',
-                  name: 'Vintage',
-                  desc: 'Classic timeless',
-                  gradient: 'linear-gradient(135deg, #FA709A 0%, #FEE140 100%)',
-                },
-                {
-                  id: 'dramatic',
-                  name: 'Dramatic',
-                  desc: 'High contrast bold',
-                  gradient: 'linear-gradient(135deg, #F093FB 0%, #F5576C 100%)',
-                },
-                {
-                  id: 'natural',
-                  name: 'Natural',
-                  desc: 'Soft authentic',
-                  gradient: 'linear-gradient(135deg, #30CFD0 0%, #330867 100%)',
+                  id: 'close-up',
+                  name: 'Close Up',
+                  desc: 'Detail showcase',
+                  gradient: 'linear-gradient(135deg, #C9ADA7 0%, #9A8C98 100%)',
                 },
               ].map((style) => (
                 <button
