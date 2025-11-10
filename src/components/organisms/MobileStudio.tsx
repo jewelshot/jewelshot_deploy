@@ -11,14 +11,24 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Upload, Sparkles, Download, X, Camera, Share2 } from 'lucide-react';
+import {
+  Upload,
+  Sparkles,
+  Download,
+  X,
+  Camera,
+  Share2,
+  Video,
+} from 'lucide-react';
 import { useImageEdit } from '@/hooks/useImageEdit';
+import { useImageToVideo } from '@/hooks/useImageToVideo';
 import { logger } from '@/lib/logger';
 import { presetPrompts } from '@/lib/preset-prompts';
 import { saveImageToGallery } from '@/lib/gallery-storage';
 import MobileNav from '@/components/molecules/MobileNav';
 import { CreditCounter } from '@/components/molecules/CreditCounter';
 import { useCreditStore } from '@/store/creditStore';
+import { VideoPlayerModal } from '@/components/molecules/VideoPlayerModal';
 
 const STORAGE_KEY = 'jewelshot_mobile_image';
 
@@ -90,6 +100,44 @@ export function MobileStudio() {
       alert(`Edit failed: ${error.message}`);
     },
   });
+
+  // Video Generation
+  const {
+    generateVideo,
+    isGenerating: isGeneratingVideo,
+    videoUrl,
+    reset: resetVideo,
+  } = useImageToVideo();
+
+  const [showVideoModal, setShowVideoModal] = useState(false);
+
+  // Handle video generation
+  const handleGenerateVideo = useCallback(() => {
+    if (!image) {
+      logger.warn('[MobileStudio] No image to convert to video');
+      return;
+    }
+
+    logger.info('[MobileStudio] Starting video generation');
+
+    generateVideo({
+      image_url: image,
+      prompt:
+        'Smooth camera movement, natural motion, cinematic lighting, professional jewelry showcase, elegant presentation',
+      resolution: '720p',
+      duration: '8s',
+    });
+  }, [image, generateVideo]);
+
+  // Show video modal when generation completes
+  useEffect(() => {
+    if (videoUrl && !showVideoModal) {
+      // Use queueMicrotask to defer setState and avoid cascading renders
+      queueMicrotask(() => {
+        setShowVideoModal(true);
+      });
+    }
+  }, [videoUrl, showVideoModal]);
 
   // Smooth progress animation
   useEffect(() => {
@@ -292,20 +340,6 @@ export function MobileStudio() {
     }
   };
 
-  const handleClear = () => {
-    if (hasUnsavedChanges) {
-      const confirmed = confirm(
-        'Are you sure you want to clear this image? This action cannot be undone.'
-      );
-      if (!confirmed) return;
-    }
-
-    setImage(null);
-    setHasUnsavedChanges(false);
-    localStorage.removeItem(STORAGE_KEY);
-    logger.info('[MobileStudio] Image cleared');
-  };
-
   return (
     <div className="relative flex min-h-screen flex-col bg-gradient-to-b from-gray-950 via-gray-900 to-black">
       {/* Hidden file inputs */}
@@ -392,6 +426,19 @@ export function MobileStudio() {
               </div>
             )}
 
+            {/* Close Button */}
+            <button
+              onClick={() => {
+                setImage(null);
+                setHasUnsavedChanges(false);
+                localStorage.removeItem(STORAGE_KEY);
+              }}
+              className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/50 text-white/90 backdrop-blur-sm transition-all hover:bg-black/70 hover:text-white active:scale-90"
+              aria-label="Close image"
+            >
+              <X className="h-4 w-4" />
+            </button>
+
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={image || ''}
@@ -465,6 +512,16 @@ export function MobileStudio() {
                 aria-label="Share"
               >
                 <Share2 className="h-5 w-5 text-white/70 transition-colors group-hover:text-white" />
+              </button>
+
+              {/* Video Generation */}
+              <button
+                onClick={handleGenerateVideo}
+                disabled={isGeneratingVideo}
+                className="group flex h-11 w-11 items-center justify-center rounded-xl border border-purple-500/30 bg-purple-600/20 backdrop-blur-xl transition-all hover:border-purple-500/50 hover:bg-purple-600/30 active:scale-90 disabled:cursor-not-allowed disabled:opacity-40"
+                aria-label="Generate Video"
+              >
+                <Video className="h-5 w-5 text-purple-400 transition-colors group-hover:text-purple-300" />
               </button>
             </div>
           </div>
@@ -596,6 +653,17 @@ export function MobileStudio() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Video Player Modal */}
+      {showVideoModal && videoUrl && (
+        <VideoPlayerModal
+          videoUrl={videoUrl}
+          onClose={() => {
+            setShowVideoModal(false);
+            resetVideo();
+          }}
+        />
       )}
 
       {/* Bottom Navigation */}

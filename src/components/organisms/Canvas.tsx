@@ -10,11 +10,13 @@ import { useCanvasUI } from '@/hooks/useCanvasUI';
 import { useToast } from '@/hooks/useToast';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useImageEdit } from '@/hooks/useImageEdit';
+import { useImageToVideo } from '@/hooks/useImageToVideo';
 import { useCanvasHandlers } from '@/hooks/useCanvasHandlers';
 import { createScopedLogger } from '@/lib/logger';
 import { saveImageToGallery } from '@/lib/gallery-storage';
 import Toast from '@/components/atoms/Toast';
 import { useCreditStore } from '@/store/creditStore';
+import { VideoPlayerModal } from '@/components/molecules/VideoPlayerModal';
 
 const logger = createScopedLogger('Canvas');
 // New refactored components
@@ -177,6 +179,51 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       showToast(error.message || 'Failed to edit image', 'error');
     },
   });
+
+  // Video Generation
+  const {
+    generateVideo,
+    isGenerating: isGeneratingVideo,
+    videoUrl,
+    error: videoError,
+    reset: resetVideo,
+  } = useImageToVideo();
+
+  const [showVideoModal, setShowVideoModal] = useState(false);
+
+  // Handle video generation
+  const handleGenerateVideo = useCallback(() => {
+    if (!uploadedImage) {
+      showToast('No image to convert to video', 'warning');
+      return;
+    }
+
+    logger.info('Starting video generation from image:', uploadedImage);
+    showToast('Generating video... This may take a few minutes.', 'info');
+
+    generateVideo({
+      image_url: uploadedImage,
+      prompt:
+        'Smooth camera movement, natural motion, cinematic lighting, professional jewelry showcase, elegant presentation',
+      resolution: '720p',
+      duration: '8s',
+    });
+  }, [uploadedImage, generateVideo, showToast]);
+
+  // Show video modal when generation completes
+  useEffect(() => {
+    if (videoUrl) {
+      setShowVideoModal(true);
+      showToast('Video generated successfully!', 'success');
+    }
+  }, [videoUrl, showToast]);
+
+  // Show error toast if video generation fails
+  useEffect(() => {
+    if (videoError) {
+      showToast(`Video generation failed: ${videoError}`, 'error');
+    }
+  }, [videoError, showToast]);
 
   // Preset generation
   const handlePresetGeneration = useCallback(
@@ -695,7 +742,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
         }
       }
     },
-    [credits, creditsLoading, deductCredit, editWithAI, showToast]
+    [deductCredit, editWithAI, showToast]
   );
 
   useEffect(() => {
@@ -849,7 +896,6 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
           controlsVisible={canvasControlsVisible}
           isFullscreen={isFullscreen}
           isEditPanelOpen={isEditPanelOpen}
-          isPromptExpanded={isPromptExpanded}
           background={background}
           onZoomIn={handleZoomIn}
           onZoomOut={handleZoomOut}
@@ -868,6 +914,8 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
           onAIError={(error) => showToast(error.message, 'error')}
           onPromptExpandedChange={setIsPromptExpanded}
           currentImageUrl={uploadedImage || ''}
+          onGenerateVideo={handleGenerateVideo}
+          isGeneratingVideo={isGeneratingVideo}
         />
       )}
 
@@ -944,6 +992,17 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
         }}
         isLoading={isLoading}
       />
+
+      {/* Video Player Modal */}
+      {showVideoModal && videoUrl && (
+        <VideoPlayerModal
+          videoUrl={videoUrl}
+          onClose={() => {
+            setShowVideoModal(false);
+            resetVideo();
+          }}
+        />
+      )}
 
       {/* Toast Notifications (managed by useToast hook) */}
       {toastState.visible && (
