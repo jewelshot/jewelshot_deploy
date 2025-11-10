@@ -516,71 +516,83 @@ export function MobileStudio() {
           onClick={() => setShowStyleSheet(false)}
         >
           <div
-            className="animate-slide-up fixed bottom-0 left-0 right-0 z-[70] max-h-[80vh] overflow-y-auto rounded-t-3xl border-t border-white/10 bg-gray-900 p-6 shadow-2xl"
+            className="animate-slide-up fixed bottom-0 left-0 right-0 z-[70] flex max-h-[80vh] flex-col rounded-t-3xl border-t border-white/10 bg-gray-900 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="mx-auto mb-4 h-1 w-12 rounded-full bg-white/20" />
-            <div className="mb-6 flex items-center justify-between">
-              <h3 className="text-lg font-bold text-white">Choose Style</h3>
-              <button
-                onClick={() => setShowStyleSheet(false)}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-white/5 text-gray-400 transition-colors hover:bg-white/10 hover:text-white"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                {
-                  id: 'e-commerce',
-                  name: 'White Background',
-                  desc: 'Clean product shot',
-                  gradient: 'linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 100%)',
-                },
-                {
-                  id: 'still-life',
-                  name: 'Still Life',
-                  desc: 'Minimal aesthetic',
-                  gradient: 'linear-gradient(135deg, #FFF0F5 0%, #FFE4E1 100%)',
-                },
-                {
-                  id: 'on-model',
-                  name: 'On Model',
-                  desc: 'Professional studio',
-                  gradient: 'linear-gradient(135deg, #E0E0E0 0%, #BDBDBD 100%)',
-                },
-                {
-                  id: 'lifestyle',
-                  name: 'Lifestyle',
-                  desc: 'Natural everyday',
-                  gradient: 'linear-gradient(135deg, #FFE5B4 0%, #FFA07A 100%)',
-                },
-                {
-                  id: 'luxury',
-                  name: 'Luxury',
-                  desc: 'High-end editorial',
-                  gradient: 'linear-gradient(135deg, #1A1A1A 0%, #4A4A4A 100%)',
-                },
-                {
-                  id: 'close-up',
-                  name: 'Close Up',
-                  desc: 'Detail showcase',
-                  gradient: 'linear-gradient(135deg, #C9ADA7 0%, #9A8C98 100%)',
-                },
-              ].map((style) => (
+            {/* Header - Sticky */}
+            <div className="flex-shrink-0 border-b border-white/5 px-6 pb-4 pt-6">
+              <div className="mx-auto mb-4 h-1 w-12 rounded-full bg-white/20" />
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-white">Choose Style</h3>
                 <button
-                  key={style.id}
-                  onClick={() => handleStyleApply(style.id)}
-                  className="group overflow-hidden rounded-xl border border-white/10 bg-white/5 p-3 text-left transition-all hover:border-purple-500/50 hover:bg-white/10 active:scale-95"
+                  onClick={() => setShowStyleSheet(false)}
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-white/5 text-gray-400 transition-colors hover:bg-white/10 hover:text-white"
                 >
-                  <div
-                    className="mb-2 h-16 rounded-lg"
-                    style={{ background: style.gradient }}
-                  />
-                  <h4 className="font-semibold text-white">{style.name}</h4>
-                  <p className="text-xs text-gray-400">{style.desc}</p>
+                  <X className="h-5 w-5" />
                 </button>
-              ))}
+              </div>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto px-6 py-4">
+              <div className="grid grid-cols-2 gap-3 pb-6">
+                {[
+                  {
+                    id: 'e-commerce',
+                    name: 'White Background',
+                    imagePath: '/presets/e-commerce.webp',
+                  },
+                  {
+                    id: 'still-life',
+                    name: 'Still Life',
+                    imagePath: '/presets/still-life.webp',
+                  },
+                  {
+                    id: 'on-model',
+                    name: 'On Model',
+                    imagePath: '/presets/on-model.webp',
+                  },
+                  {
+                    id: 'lifestyle',
+                    name: 'Lifestyle',
+                    imagePath: '/presets/lifestyle.webp',
+                  },
+                  {
+                    id: 'luxury',
+                    name: 'Luxury',
+                    imagePath: '/presets/luxury.webp',
+                  },
+                  {
+                    id: 'close-up',
+                    name: 'Close Up',
+                    imagePath: '/presets/close-up.webp',
+                  },
+                ].map((style) => (
+                  <button
+                    key={style.id}
+                    onClick={() => handleStyleApply(style.id)}
+                    className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 transition-all hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/20 active:scale-95"
+                  >
+                    {/* Image Preview */}
+                    <div className="relative aspect-[4/5] w-full overflow-hidden">
+                      <img
+                        src={style.imagePath}
+                        alt={style.name}
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
+                      {/* Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-40" />
+                    </div>
+
+                    {/* Title Overlay */}
+                    <div className="absolute bottom-0 left-0 right-0 p-3">
+                      <h4 className="text-sm font-semibold text-white drop-shadow-lg">
+                        {style.name}
+                      </h4>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
