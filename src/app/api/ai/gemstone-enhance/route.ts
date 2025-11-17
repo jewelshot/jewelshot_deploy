@@ -169,30 +169,38 @@ export async function POST(request: NextRequest) {
     }
 
     // Gemstone Enhancement Prompt (JSON format, under 1800 chars)
+    // UPDATED: Enhanced diamond facet replacement and realism
     const gemstonePrompt = JSON.stringify({
-      task: 'gemstone jewelry quality enhancement ultra-detailed clarity',
+      task: 'gemstone enhancement replace poor-quality with real gemstones',
       preserve_critical:
-        '⛔ JEWELRY STRUCTURE 100% FROZEN ⛔ EXACT: gemstone-count|positions|sizes|cuts|facet-patterns setting-prongs|bezels|design metal-structure|proportions engravings|details ALL-UNCHANGED ⚠️ 0.01% change = FAIL ⚠️',
-      enhance_targets: {
-        diamonds:
-          'whiter brighter D-E-F color-grade crisp ice-white brilliant-cut facets ultra-sharp razor-clear sparkle fire scintillation maximum',
-        colored_gems:
-          'vivid saturated rich natural hues clarity transparency depth color-purity enhanced brilliance luster radiance',
-        all_stones:
-          'crystal-clear flawless clarity internal-reflections facet-definition cutting-precision polished-perfection光泽',
-      },
-      technical: {
+        '⛔ STRUCTURE FROZEN ⛔ EXACT: gemstone-count|positions|sizes|cuts setting-prongs|bezels metal-design ALL-UNCHANGED ⚠️ 0.01% = FAIL ⚠️',
+      diamond_enhancement: {
+        replace: 'poor-facets bad-cuts cloudy-diamonds → REAL perfect diamonds',
+        facets:
+          '58-facet brilliant-cut SHARP defined edges crisp meets razor-precise symmetry',
         clarity:
-          'FL-IF flawless internally-flawless eye-clean ultra-transparent',
-        cut: 'ideal excellent proportions symmetry polish facet-alignment precise',
-        color_diamonds: 'D-E-F colorless icy-white pure brilliant',
-        color_gems: 'vivid intense saturated pure natural authentic',
-        finish: 'mirror-polish high-luster reflective brilliant',
+          'FL-IF flawless NO-inclusions crystal-clear transparent ice-white',
+        color: 'D-E-F colorless PURE white brilliant icy',
+        cut: 'IDEAL excellent proportions perfect angles light-return maximum',
+        fire: 'rainbow-dispersion spectral-colors prismatic brilliant scintillation',
+        sparkle: 'intense bright sharp contrast on-off flashes dynamic',
+        realism: 'natural real genuine authentic NOT-synthetic photorealistic',
+      },
+      colored_gems: {
+        quality: 'vivid saturated rich deep pure natural transparent',
+        clarity: 'eye-clean crystal-clear NO-cloudiness flawless',
+        luster: 'brilliant radiant reflective mirror-finish',
+      },
+      facet_requirements: {
+        edges: 'sharp defined crisp NOT-blurry NOT-soft',
+        surfaces: 'flat perfect reflective mirror-like',
+        meets: 'precise exact symmetrical aligned',
+        polish: 'flawless smooth glass-like perfection',
       },
       forbidden:
-        '❌ FAIL: added|removed|moved gemstones altered-count changed-sizes modified-cuts new-facet-patterns altered-settings design-modifications structure-changes distorted-gems synthetic-look oversaturated unnatural-color cloudy-stones',
-      lighting: 'studio 5500K neutral accurate gemological grading-light',
-      quality: 'ultra-sharp 300DPI macro-detail professional gemological',
+        '❌ FAIL: added|removed|moved stones altered-count changed-sizes blurry-facets soft-edges synthetic-look fake-appearance cloudy unnatural oversaturated',
+      light: 'studio 5500K neutral gemological accurate',
+      output: 'ultra-sharp 300DPI macro real-gemstone photorealistic',
     });
 
     logger.info('[GemstoneEnhance] Prompt length:', gemstonePrompt.length);

@@ -14,6 +14,7 @@ import { useImageUpscale } from '@/hooks/useImageUpscale';
 import { useRemoveBackground } from '@/hooks/useRemoveBackground';
 import { useGemstoneEnhance } from '@/hooks/useGemstoneEnhance';
 import { useMetalRecolor, MetalType } from '@/hooks/useMetalRecolor';
+import { useMetalPolish } from '@/hooks/useMetalPolish';
 import { useCameraControl } from '@/hooks/useCameraControl';
 import { useCanvasHandlers } from '@/hooks/useCanvasHandlers';
 import { createScopedLogger } from '@/lib/logger';
@@ -222,6 +223,14 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     recoloredImageUrl: metalRecoloredImageUrl,
     error: metalRecolorError,
   } = useMetalRecolor();
+
+  // Metal Polish
+  const {
+    polishMetal,
+    isPolishing: isPolishingMetal,
+    polishedImageUrl: metalPolishedImageUrl,
+    error: metalPolishError,
+  } = useMetalPolish();
 
   // Camera Control (Rotate Left/Right, Close-Up)
   const { applyCamera, error: cameraError } = useCameraControl();
@@ -724,6 +733,68 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       toastManager.error(`❌ Metal recolor failed: ${metalRecolorError}`);
     }
   }, [metalRecolorError]);
+
+  // Handle metal polish
+  const handleMetalPolish = useCallback(async () => {
+    if (!uploadedImage) {
+      toastManager.warning('No image to polish');
+      return;
+    }
+
+    logger.info('[Canvas] Starting metal polish:', uploadedImage);
+
+    // Store original image for comparison
+    if (!originalImage) {
+      setOriginalImage(uploadedImage);
+    }
+
+    // Convert blob URL to data URI if needed
+    let imageUrl = uploadedImage;
+    if (uploadedImage.startsWith('blob:')) {
+      logger.info('[Canvas] Converting blob URL to data URI for metal polish');
+      try {
+        const response = await fetch(uploadedImage);
+        const blob = await response.blob();
+        imageUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        logger.info('[Canvas] Blob converted to data URI successfully');
+      } catch (error) {
+        logger.error('[Canvas] Failed to convert blob to data URI:', error);
+        toastManager.error('Failed to prepare image for processing');
+        return;
+      }
+    }
+
+    polishMetal({
+      image_url: imageUrl,
+    });
+  }, [uploadedImage, originalImage, polishMetal, setOriginalImage]);
+
+  // Update canvas with polished image and enable comparison
+  useEffect(() => {
+    if (metalPolishedImageUrl) {
+      logger.info('[Canvas] Metal polished, updating canvas');
+      queueMicrotask(() => {
+        setUploadedImage(metalPolishedImageUrl);
+        setViewMode('side-by-side'); // Enable comparison view
+        toastManager.success(
+          '✅ Metal polished to perfection! Compare with original.'
+        );
+      });
+    }
+  }, [metalPolishedImageUrl, setUploadedImage, setViewMode]);
+
+  // Show error toast if metal polish fails
+  useEffect(() => {
+    if (metalPolishError) {
+      logger.error('[Canvas] Metal polish failed:', metalPolishError);
+      toastManager.error(`❌ Metal polish failed: ${metalPolishError}`);
+    }
+  }, [metalPolishError]);
 
   // Preset generation
   const handlePresetGeneration = useCallback(
@@ -1474,6 +1545,8 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
           isEnhancingGemstones={isEnhancingGemstones}
           onMetalRecolor={handleMetalRecolor}
           isRecoloringMetal={isRecoloringMetal}
+          onMetalPolish={handleMetalPolish}
+          isPolishingMetal={isPolishingMetal}
           hasActiveImage={!!uploadedImage}
           isRightSidebarOpen={rightOpen}
           isTopBarOpen={topOpen}

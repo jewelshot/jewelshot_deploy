@@ -5,7 +5,7 @@
  * Matches Canvas UI design system exactly
  * Dynamic positioning based on sidebar states
  *
- * 7 Essential Buttons:
+ * 8 Essential Buttons:
  * 1. Upscale (2x quality) - Purple
  * 2. Remove BG (transparent) - Blue
  * 3. Rotate Left (-30°) - Green
@@ -13,6 +13,7 @@
  * 5. Close-Up (zoom details) - Orange
  * 6. Gemstone (enhance clarity) - Pink
  * 7. Metal Recolor (change metal) - Gold
+ * 8. Metal Polish (mirror finish) - Silver
  */
 
 'use client';
@@ -26,6 +27,7 @@ import {
   ZoomIn,
   Gem,
   Palette,
+  Sparkles,
   Loader2,
 } from 'lucide-react';
 import { MetalColorPicker } from './MetalColorPicker';
@@ -60,6 +62,10 @@ interface QuickActionsBarProps {
   onMetalRecolor: (metalType: MetalType) => void;
   /** Whether metal recolor is in progress */
   isRecoloringMetal?: boolean;
+  /** Callback when metal polish button is clicked */
+  onMetalPolish: () => void;
+  /** Whether metal polish is in progress */
+  isPolishingMetal?: boolean;
   /** Whether there's an active image to process */
   hasActiveImage: boolean;
   /** Whether right sidebar is open (for positioning) */
@@ -85,6 +91,8 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
   isEnhancingGemstones = false,
   onMetalRecolor,
   isRecoloringMetal = false,
+  onMetalPolish,
+  isPolishingMetal = false,
   hasActiveImage,
   isRightSidebarOpen,
   isTopBarOpen,
@@ -124,6 +132,8 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
       'border border-[rgba(249,115,22,0.3)] bg-[rgba(249,115,22,0.1)] text-orange-300 hover:border-[rgba(249,115,22,0.6)] hover:bg-[rgba(249,115,22,0.2)] hover:text-orange-200',
     pink: 'border border-[rgba(236,72,153,0.3)] bg-[rgba(236,72,153,0.1)] text-pink-300 hover:border-[rgba(236,72,153,0.6)] hover:bg-[rgba(236,72,153,0.2)] hover:text-pink-200',
     gold: 'border border-[rgba(218,165,32,0.3)] bg-[rgba(218,165,32,0.1)] text-yellow-300 hover:border-[rgba(218,165,32,0.6)] hover:bg-[rgba(218,165,32,0.2)] hover:text-yellow-200',
+    silver:
+      'border border-[rgba(192,192,192,0.3)] bg-[rgba(192,192,192,0.1)] text-gray-300 hover:border-[rgba(192,192,192,0.6)] hover:bg-[rgba(192,192,192,0.2)] hover:text-gray-200',
   };
 
   return (
@@ -277,6 +287,26 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
           ) : (
             <Palette className="h-3.5 w-3.5" />
+          )}
+        </button>
+
+        {/* Metal Polish Button */}
+        <button
+          onClick={onMetalPolish}
+          disabled={!hasActiveImage || isPolishingMetal}
+          className={getButtonClass(
+            hasActiveImage,
+            isPolishingMetal,
+            colors.silver
+          )}
+          title={
+            isPolishingMetal ? 'Polishing Metal...' : 'Polish Metal Surface'
+          }
+        >
+          {isPolishingMetal ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Sparkles className="h-3.5 w-3.5" />
           )}
         </button>
       </div>
