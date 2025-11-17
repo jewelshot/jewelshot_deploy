@@ -34,6 +34,7 @@ import {
   Video,
   Loader2,
 } from 'lucide-react';
+import { Tooltip } from '@/components/atoms/Tooltip';
 import { MetalColorPicker } from './MetalColorPicker';
 import { MetalType } from '@/hooks/useMetalRecolor';
 
@@ -111,7 +112,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
   isGeneratingTurntable = false,
   hasActiveImage,
   isRightSidebarOpen,
-  isTopBarOpen,
+  isTopBarOpen, // eslint-disable-line @typescript-eslint/no-unused-vars
   controlsVisible,
 }) => {
   // State for metal color picker
@@ -157,12 +158,14 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
 
   return (
     <div
-      className="fixed z-20 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
+      className="fixed z-20 transition-all duration-300 ease-[cubic-bezier(0.4,0.0,0.2,1)]"
       style={{
-        top: isTopBarOpen ? '140px' : '90px', // Below zoom controls
+        top: '50%',
+        transform: controlsVisible
+          ? 'translateY(-50%) translateX(0)'
+          : 'translateY(-50%) translateX(30px)',
         right: isRightSidebarOpen ? '276px' : '16px',
         opacity: controlsVisible ? 1 : 0,
-        transform: controlsVisible ? 'translateX(0)' : 'translateX(30px)',
         pointerEvents: controlsVisible ? 'auto' : 'none',
       }}
     >
@@ -190,191 +193,210 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
         </button>
 
         {/* Remove Background Button */}
-        <button
-          onClick={onRemoveBackground}
-          disabled={!hasActiveImage || isRemovingBackground}
-          className={getButtonClass(
-            hasActiveImage,
-            isRemovingBackground,
-            colors.blue
-          )}
-          title={
-            isRemovingBackground
-              ? 'Removing Background...'
-              : 'Remove Background'
+        <Tooltip
+          content={
+            isRemovingBackground ? 'Removing BG...' : 'Remove Background'
           }
+          side="left"
         >
-          {isRemovingBackground ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          ) : (
-            <Scissors className="h-3.5 w-3.5" />
-          )}
-        </button>
+          <button
+            onClick={onRemoveBackground}
+            disabled={!hasActiveImage || isRemovingBackground}
+            className={getButtonClass(
+              hasActiveImage,
+              isRemovingBackground,
+              colors.blue
+            )}
+          >
+            {isRemovingBackground ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Scissors className="h-3.5 w-3.5" />
+            )}
+          </button>
+        </Tooltip>
 
         {/* Divider */}
         <div className="h-px w-full bg-[rgba(139,92,246,0.2)]" />
 
         {/* Rotate Left Button */}
-        <button
-          onClick={onRotateLeft}
-          disabled={!hasActiveImage || isRotatingLeft}
-          className={getButtonClass(
-            hasActiveImage,
-            isRotatingLeft,
-            colors.green
-          )}
-          title={isRotatingLeft ? 'Rotating...' : 'Rotate Left (-30°)'}
+        <Tooltip
+          content={isRotatingLeft ? 'Rotating...' : 'Rotate Left'}
+          side="left"
         >
-          {isRotatingLeft ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          ) : (
-            <RotateCcw className="h-3.5 w-3.5" />
-          )}
-        </button>
+          <button
+            onClick={onRotateLeft}
+            disabled={!hasActiveImage || isRotatingLeft}
+            className={getButtonClass(
+              hasActiveImage,
+              isRotatingLeft,
+              colors.green
+            )}
+          >
+            {isRotatingLeft ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <RotateCcw className="h-3.5 w-3.5" />
+            )}
+          </button>
+        </Tooltip>
 
         {/* Rotate Right Button */}
-        <button
-          onClick={onRotateRight}
-          disabled={!hasActiveImage || isRotatingRight}
-          className={getButtonClass(
-            hasActiveImage,
-            isRotatingRight,
-            colors.green
-          )}
-          title={isRotatingRight ? 'Rotating...' : 'Rotate Right (+30°)'}
+        <Tooltip
+          content={isRotatingRight ? 'Rotating...' : 'Rotate Right'}
+          side="left"
         >
-          {isRotatingRight ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          ) : (
-            <RotateCw className="h-3.5 w-3.5" />
-          )}
-        </button>
+          <button
+            onClick={onRotateRight}
+            disabled={!hasActiveImage || isRotatingRight}
+            className={getButtonClass(
+              hasActiveImage,
+              isRotatingRight,
+              colors.green
+            )}
+          >
+            {isRotatingRight ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <RotateCw className="h-3.5 w-3.5" />
+            )}
+          </button>
+        </Tooltip>
 
         {/* Close-Up Button */}
-        <button
-          onClick={onCloseUp}
-          disabled={!hasActiveImage || isClosingUp}
-          className={getButtonClass(hasActiveImage, isClosingUp, colors.orange)}
-          title={isClosingUp ? 'Creating Close-Up...' : 'Close-Up View'}
-        >
-          {isClosingUp ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          ) : (
-            <ZoomIn className="h-3.5 w-3.5" />
-          )}
-        </button>
+        <Tooltip content={isClosingUp ? 'Creating...' : 'Close-Up'} side="left">
+          <button
+            onClick={onCloseUp}
+            disabled={!hasActiveImage || isClosingUp}
+            className={getButtonClass(
+              hasActiveImage,
+              isClosingUp,
+              colors.orange
+            )}
+          >
+            {isClosingUp ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <ZoomIn className="h-3.5 w-3.5" />
+            )}
+          </button>
+        </Tooltip>
 
         {/* Divider */}
         <div className="h-px w-full bg-[rgba(139,92,246,0.2)]" />
 
         {/* Gemstone Enhancement Button */}
-        <button
-          onClick={onGemstoneEnhance}
-          disabled={!hasActiveImage || isEnhancingGemstones}
-          className={getButtonClass(
-            hasActiveImage,
-            isEnhancingGemstones,
-            colors.pink
-          )}
-          title={
-            isEnhancingGemstones
-              ? 'Enhancing Gemstones...'
-              : 'Enhance Gemstone Quality'
-          }
+        <Tooltip
+          content={isEnhancingGemstones ? 'Enhancing...' : 'Enhance Gemstones'}
+          side="left"
         >
-          {isEnhancingGemstones ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          ) : (
-            <Gem className="h-3.5 w-3.5" />
-          )}
-        </button>
+          <button
+            onClick={onGemstoneEnhance}
+            disabled={!hasActiveImage || isEnhancingGemstones}
+            className={getButtonClass(
+              hasActiveImage,
+              isEnhancingGemstones,
+              colors.pink
+            )}
+          >
+            {isEnhancingGemstones ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Gem className="h-3.5 w-3.5" />
+            )}
+          </button>
+        </Tooltip>
 
         {/* Metal Recolor Button */}
-        <button
-          onClick={() => setIsMetalPickerOpen(!isMetalPickerOpen)}
-          disabled={!hasActiveImage || isRecoloringMetal}
-          className={getButtonClass(
-            hasActiveImage,
-            isRecoloringMetal,
-            colors.gold
-          )}
-          title={
-            isRecoloringMetal ? 'Recoloring Metal...' : 'Change Metal Color'
-          }
+        <Tooltip
+          content={isRecoloringMetal ? 'Recoloring...' : 'Metal Color'}
+          side="left"
         >
-          {isRecoloringMetal ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          ) : (
-            <Palette className="h-3.5 w-3.5" />
-          )}
-        </button>
+          <button
+            onClick={() => setIsMetalPickerOpen(!isMetalPickerOpen)}
+            disabled={!hasActiveImage || isRecoloringMetal}
+            className={getButtonClass(
+              hasActiveImage,
+              isRecoloringMetal,
+              colors.gold
+            )}
+          >
+            {isRecoloringMetal ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Palette className="h-3.5 w-3.5" />
+            )}
+          </button>
+        </Tooltip>
 
         {/* Metal Polish Button */}
-        <button
-          onClick={onMetalPolish}
-          disabled={!hasActiveImage || isPolishingMetal}
-          className={getButtonClass(
-            hasActiveImage,
-            isPolishingMetal,
-            colors.silver
-          )}
-          title={
-            isPolishingMetal ? 'Polishing Metal...' : 'Polish Metal Surface'
-          }
+        <Tooltip
+          content={isPolishingMetal ? 'Polishing...' : 'Metal Polish'}
+          side="left"
         >
-          {isPolishingMetal ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          ) : (
-            <Sparkles className="h-3.5 w-3.5" />
-          )}
-        </button>
+          <button
+            onClick={onMetalPolish}
+            disabled={!hasActiveImage || isPolishingMetal}
+            className={getButtonClass(
+              hasActiveImage,
+              isPolishingMetal,
+              colors.silver
+            )}
+          >
+            {isPolishingMetal ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Sparkles className="h-3.5 w-3.5" />
+            )}
+          </button>
+        </Tooltip>
 
         {/* Divider */}
         <div className="h-px w-full bg-[rgba(139,92,246,0.2)]" />
 
         {/* Natural Light Button */}
-        <button
-          onClick={onNaturalLight}
-          disabled={!hasActiveImage || isEnhancingLight}
-          className={getButtonClass(
-            hasActiveImage,
-            isEnhancingLight,
-            colors.amber
-          )}
-          title={
-            isEnhancingLight
-              ? 'Adding Natural Light...'
-              : 'Add Natural Light & Reflections'
-          }
+        <Tooltip
+          content={isEnhancingLight ? 'Adding Light...' : 'Natural Light'}
+          side="left"
         >
-          {isEnhancingLight ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          ) : (
-            <Sun className="h-3.5 w-3.5" />
-          )}
-        </button>
+          <button
+            onClick={onNaturalLight}
+            disabled={!hasActiveImage || isEnhancingLight}
+            className={getButtonClass(
+              hasActiveImage,
+              isEnhancingLight,
+              colors.amber
+            )}
+          >
+            {isEnhancingLight ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Sun className="h-3.5 w-3.5" />
+            )}
+          </button>
+        </Tooltip>
 
         {/* 360° Turntable Video Button */}
-        <button
-          onClick={onTurntableVideo}
-          disabled={!hasActiveImage || isGeneratingTurntable}
-          className={getButtonClass(
-            hasActiveImage,
-            isGeneratingTurntable,
-            colors.cyan
-          )}
-          title={
-            isGeneratingTurntable
-              ? 'Generating 360° Video...'
-              : 'Create 360° Turntable Video'
-          }
+        <Tooltip
+          content={isGeneratingTurntable ? 'Generating...' : '360° Video'}
+          side="left"
         >
-          {isGeneratingTurntable ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          ) : (
-            <Video className="h-3.5 w-3.5" />
-          )}
-        </button>
+          <button
+            onClick={onTurntableVideo}
+            disabled={!hasActiveImage || isGeneratingTurntable}
+            className={getButtonClass(
+              hasActiveImage,
+              isGeneratingTurntable,
+              colors.cyan
+            )}
+          >
+            {isGeneratingTurntable ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Video className="h-3.5 w-3.5" />
+            )}
+          </button>
+        </Tooltip>
       </div>
 
       {/* Metal Color Picker (slides out to the left) */}

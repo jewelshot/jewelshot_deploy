@@ -143,44 +143,43 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Metal Polish Prompt (JSON format, under 1800 chars)
-    // Focus on reflections, luster, mirror finish, professional quality
+    // Metal Polish Prompt (JSON, under 1800 chars) - ULTRA STRONG MIRROR EFFECT
     const polishPrompt = JSON.stringify({
-      task: 'jewelry metal surface polishing ultra-premium mirror-finish',
-      preserve_critical:
-        '⛔ JEWELRY DESIGN FROZEN ⛔ EXACT: gemstones|settings|structure|proportions|engravings|details ALL-UNCHANGED ⚠️ ONLY metal-surface enhanced ⚠️',
-      metal_enhancement: {
-        surface: 'mirror-finish high-polish glass-smooth flawless unblemished',
-        reflections:
-          'sharp clear defined environmental-reflections light-sources VISIBLE realistic accurate',
-        luster: 'brilliant radiant luminous metallic-sheen maximum-brilliance',
-        finish: 'professional jeweler-quality premium-polish perfection',
-        quality:
-          'studio-grade gallery-quality museum-level pristine immaculate',
+      task: 'EXTREME jewelry metal-polishing ULTRA-mirror professional STUNNING',
+      preserve: '⛔ gemstones|design|structure FROZEN ⛔ ONLY metal-surface',
+      surface: {
+        finish:
+          'ULTRA mirror glass-smooth liquid-metal FLAWLESS chrome perfection',
+        quality: 'MAXIMUM reflectivity mirror-like specular pristine PERFECT',
+        polish: 'EXTREME high-polish jeweler museum showroom PREMIUM',
+        smooth: 'glass-smooth razor-sharp FLAWLESS zero-imperfections',
       },
-      reflection_details: {
-        type: 'specular mirror-like crisp accurate',
-        clarity: 'sharp defined NOT-blurry NOT-soft crystal-clear',
-        light: 'catch-light highlights bright-spots reflective-areas visible',
-        environment: 'subtle-reflections studio-lights ambient-glow natural',
+      reflections: {
+        type: 'ULTRA-SHARP mirror specular CLEAR crisp razor-precise',
+        visible:
+          'BRIGHT prominent VISIBLE OBVIOUS NOTICEABLE CLEAR STRONG intense',
+        environment:
+          'VISIBLE studio-lights reflections surroundings SHARP CLEAR',
+        quality: 'crystal-clear pristine NOT-blurry SHARP BRIGHT prominent',
+        depth: '3D volumetric layered dimensional complex rich realistic',
       },
-      surface_requirements: {
-        smoothness: 'glass-smooth NO-scratches NO-marks pristine',
-        uniformity: 'even consistent uniform-polish NO-patches',
-        depth: 'rich dimensional layered complex NOT-flat',
-        realism: 'photorealistic authentic genuine professional',
+      metallic: {
+        luster: 'MAXIMUM brilliance radiant LUMINOUS SHINING BLAZING BRIGHT',
+        sheen: 'STRONG metallic VISIBLE-glow polished reflective MIRROR-BRIGHT',
+        shine: 'HIGH-GLOSS ultra-bright BRILLIANT DAZZLING LUSTROUS',
+        contrast: 'SHARP highlights shadows depth dimension CLEAR',
       },
-      lighting_interaction: {
-        highlights: 'bright sharp defined specular-highlights crisp',
-        midtones: 'smooth-gradients soft-transitions natural',
-        shadows: 'subtle-darkening form-definition dimensional',
-        overall: 'balanced-exposure natural studio-lighting 5500K',
+      light: {
+        catch: 'STRONG catch-lights BRIGHT-spots white-highlights CLEAR',
+        bounce: 'visible light-bounce environmental ambient realistic',
+        depth: 'dimensional shadows highlights mid-tones contrast rich',
       },
-      forbidden:
-        '❌ FAIL: altered-design added|removed-gemstones changed-structure plastic-look fake-shiny oversaturated unnatural blurry-reflections flat-2D scratched-surface dull-finish',
-      technical: 'ultra-sharp 300DPI macro-detail professional photography',
-      output:
-        'mirror-polished metallic-perfection photorealistic studio-quality',
+      effect:
+        'DRAMATIC before-after VISIBLE-change OBVIOUS STRONG transformation',
+      mood: 'jeweler studio gallery showroom luxury premium WOW',
+      avoid: '❌ unchanged boring no-change weak dull flat blurry soft plastic',
+      result:
+        'STUNNING mirror-finish DRAMATIC ultra-reflective WOW professional',
     });
 
     logger.info('[MetalPolish] Prompt length:', polishPrompt.length);

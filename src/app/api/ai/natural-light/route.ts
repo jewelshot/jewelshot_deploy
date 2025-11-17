@@ -140,38 +140,37 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Natural Light Prompt (JSON, under 1800 chars) - OPTIMIZED
+    // Natural Light Prompt (JSON, under 1800 chars) - STRONG VISIBLE EFFECT
     const naturalLightPrompt = JSON.stringify({
-      task: 'natural light reflections jewelry photography',
-      preserve:
-        '⛔ PRODUCT FROZEN ⛔ gemstones|metal|design|structure UNCHANGED ⚠️ ONLY lighting ⚠️',
-      natural_light: {
-        type: 'soft natural subtle realistic NOT-artificial',
-        quality: 'gentle delicate understated refined elegant',
-        setup: 'studio 45deg three-point 5500K neutral daylight',
-        intensity: 'moderate balanced even NOT-harsh',
+      task: 'DRAMATIC natural-light jewelry STRONG-enhancement professional studio',
+      preserve: '⛔ gemstones|metal|design FROZEN ⛔ ONLY lighting',
+      light: {
+        type: 'STRONG daylight golden-hour DRAMATIC CLEAR VISIBLE BRIGHT',
+        setup: 'studio three-point softbox 5500K POWERFUL balanced',
+        level: 'BRIGHT noticeable impactful CLEAR OBVIOUS enhancement',
+        angle: '45deg side-light depth shadows dimension volumetric contrast',
       },
       gemstone: {
-        brilliance: 'natural subtle-fire gentle-scintillation realistic',
-        facets: 'soft-light delicate-flashes NOT-extreme',
-        catch: 'tiny-highlights natural-pattern authentic',
-        realism: 'REAL-diamond physics-accurate natural',
+        fire: 'STRONG scintillation rainbow VISIBLE-sparkle BRIGHT CLEAR',
+        facets: 'sharp INTENSE-flashes VISIBLE CLEAR PROMINENT',
+        highlights: 'PROMINENT white-sparkle NOTICEABLE BRIGHT sharp',
+        result: 'ENHANCED diamond-like BRILLIANT LUMINOUS stunning',
       },
-      surface: {
-        metal: 'soft-environmental subtle-ambient gentle-sheen',
-        finish: 'natural-luster realistic NOT-overpolished',
-        highlights: 'delicate soft-catch gradual-falloff',
-        depth: 'dimensional realistic-metallic authentic',
+      metal: {
+        reflect:
+          'STRONG environmental VISIBLE-highlights CLEAR METALLIC BRIGHT',
+        quality: 'BRIGHT reflective mirror sharp-catches VISIBLE PROMINENT',
+        depth: '3D volumetric shadows highlights CONTRAST DRAMATIC',
+        finish: 'VISIBLE-sheen ENHANCED BRIGHT premium',
       },
       ground: {
-        condition: 'IF dark-bg THEN show-subtle-reflections',
-        light: 'tiny-colored-glows soft-spills gentle-projections',
-        bounce: 'subtle-ambient soft-glow-underneath',
-        quality: 'understated natural NOT-obvious',
+        if_dark: 'ADD visible-glow colored-reflections shadows depth',
+        effect: 'VISIBLE gem-glow soft-halo WARM CLEAR',
       },
-      forbidden:
-        '❌ altered-product fake-reflections artificial-glare overexposed CGI synthetic glittery plastic harsh blown-out flat',
-      output: 'photorealistic natural-lighting subtle-reflections professional',
+      boost: 'INCREASE contrast depth shadows highlights clarity DRAMATIC',
+      mood: 'professional commercial luxury PREMIUM STUNNING',
+      avoid: '❌ unchanged boring flat no-change weak invisible dull',
+      result: 'DRAMATIC VISIBLE transformation STUNNING OBVIOUS',
     });
 
     logger.info('[NaturalLight] Prompt length:', naturalLightPrompt.length);

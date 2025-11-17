@@ -1,47 +1,118 @@
 /**
  * Tooltip Component
  *
- * Simple tooltip for displaying helpful information on hover
+ * Simple tooltip for hover states
+ * Matches Canvas UI design system
  */
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 interface TooltipProps {
   content: string;
-  placement?: 'top' | 'bottom' | 'left' | 'right';
   children: React.ReactNode;
+  side?: 'top' | 'bottom' | 'left' | 'right';
+  delayMs?: number;
 }
 
-export const Tooltip: React.FC<TooltipProps> = ({
+export function Tooltip({
   content,
-  placement = 'top',
   children,
-}) => {
+  side = 'left',
+  delayMs = 300,
+}: TooltipProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const placementClasses = {
-    top: 'bottom-full left-1/2 -translate-x-1/2 mb-2',
-    bottom: 'top-full left-1/2 -translate-x-1/2 mt-2',
-    left: 'right-full top-1/2 -translate-y-1/2 mr-2',
-    right: 'left-full top-1/2 -translate-y-1/2 ml-2',
+  useEffect(() => {
+    if (isVisible && triggerRef.current && tooltipRef.current) {
+      const triggerRect = triggerRef.current.getBoundingClientRect();
+      const tooltipRect = tooltipRef.current.getBoundingClientRect();
+
+      let top = 0;
+      let left = 0;
+
+      switch (side) {
+        case 'top':
+          top = triggerRect.top - tooltipRect.height - 8;
+          left =
+            triggerRect.left + triggerRect.width / 2 - tooltipRect.width / 2;
+          break;
+        case 'bottom':
+          top = triggerRect.bottom + 8;
+          left =
+            triggerRect.left + triggerRect.width / 2 - tooltipRect.width / 2;
+          break;
+        case 'left':
+          top =
+            triggerRect.top + triggerRect.height / 2 - tooltipRect.height / 2;
+          left = triggerRect.left - tooltipRect.width - 8;
+          break;
+        case 'right':
+          top =
+            triggerRect.top + triggerRect.height / 2 - tooltipRect.height / 2;
+          left = triggerRect.right + 8;
+          break;
+      }
+
+      // This is intentional for tooltip positioning
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setPosition({ top, left });
+    }
+  }, [isVisible, side]);
+
+  const handleMouseEnter = () => {
+    timeoutRef.current = setTimeout(() => {
+      setIsVisible(true);
+    }, delayMs);
   };
 
+  const handleMouseLeave = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    setIsVisible(false);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
-    <div
-      className="relative inline-block"
-      onMouseEnter={() => setIsVisible(true)}
-      onMouseLeave={() => setIsVisible(false)}
-    >
-      {children}
+    <>
+      <div
+        ref={triggerRef}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        className="inline-block"
+      >
+        {children}
+      </div>
+
       {isVisible && (
         <div
-          className={`pointer-events-none absolute z-50 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs font-medium text-white shadow-lg dark:bg-gray-700 ${placementClasses[placement]} `}
+          ref={tooltipRef}
+          className="animate-in fade-in-0 zoom-in-95 pointer-events-none fixed z-[9999] duration-200"
+          style={{
+            top: `${position.top}px`,
+            left: `${position.left}px`,
+          }}
         >
-          {content}
+          <div className="rounded-md border border-[rgba(139,92,246,0.3)] bg-[rgba(10,10,10,0.95)] px-3 py-1.5 backdrop-blur-sm">
+            <p className="whitespace-nowrap text-xs font-medium text-white/90">
+              {content}
+            </p>
+          </div>
         </div>
       )}
-    </div>
+    </>
   );
-};
+}
