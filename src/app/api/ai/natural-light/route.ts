@@ -122,26 +122,6 @@ export async function POST(request: NextRequest) {
 
     logger.info('[NaturalLight] User authenticated:', user.id);
 
-    // Check credits
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('credits')
-      .eq('id', user.id)
-      .single();
-
-    if (!profile || profile.credits < 1) {
-      logger.warn('[NaturalLight] Insufficient credits:', profile?.credits);
-      return NextResponse.json(
-        {
-          error: 'Insufficient credits',
-          details: 'Natural light enhancement requires 1 credit',
-        },
-        { status: 402 }
-      );
-    }
-
-    logger.info('[NaturalLight] Credits available:', profile.credits);
-
     // Upload image
     let uploadedUrl: string;
     try {
@@ -273,21 +253,6 @@ export async function POST(request: NextRequest) {
     const enhancedImage = result.data.images[0];
     logger.info('[NaturalLight] Enhanced successfully:', enhancedImage.url);
 
-    // Deduct credit
-    const { error: deductError } = await supabase
-      .from('profiles')
-      .update({ credits: profile.credits - 1 })
-      .eq('id', user.id);
-
-    if (deductError) {
-      logger.error('[NaturalLight] Failed to deduct credit:', deductError);
-    } else {
-      logger.info(
-        '[NaturalLight] Credit deducted. Remaining:',
-        profile.credits - 1
-      );
-    }
-
     // Return result
     return NextResponse.json({
       success: true,
@@ -297,7 +262,6 @@ export async function POST(request: NextRequest) {
         height: (enhancedImage as any).height, // eslint-disable-line @typescript-eslint/no-explicit-any
         content_type: enhancedImage.content_type,
       },
-      credits_remaining: profile.credits - 1,
     });
   } catch (error) {
     logger.error('[NaturalLight] Unexpected error:', error);

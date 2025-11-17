@@ -122,26 +122,6 @@ export async function POST(request: NextRequest) {
 
     logger.info('[TurntableVideo] User authenticated:', user.id);
 
-    // Check credits (5 credits for video)
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('credits')
-      .eq('id', user.id)
-      .single();
-
-    if (!profile || profile.credits < 5) {
-      logger.warn('[TurntableVideo] Insufficient credits:', profile?.credits);
-      return NextResponse.json(
-        {
-          error: 'Insufficient credits',
-          details: '360° turntable video requires 5 credits',
-        },
-        { status: 402 }
-      );
-    }
-
-    logger.info('[TurntableVideo] Credits available:', profile.credits);
-
     // Upload image
     let uploadedUrl: string;
     try {
@@ -217,21 +197,6 @@ export async function POST(request: NextRequest) {
     const videoUrl = result.data.video.url;
     logger.info('[TurntableVideo] Video generated successfully:', videoUrl);
 
-    // Deduct credits (5 for video)
-    const { error: deductError } = await supabase
-      .from('profiles')
-      .update({ credits: profile.credits - 5 })
-      .eq('id', user.id);
-
-    if (deductError) {
-      logger.error('[TurntableVideo] Failed to deduct credits:', deductError);
-    } else {
-      logger.info(
-        '[TurntableVideo] Credits deducted. Remaining:',
-        profile.credits - 5
-      );
-    }
-
     // Return result
     return NextResponse.json({
       success: true,
@@ -239,7 +204,6 @@ export async function POST(request: NextRequest) {
         url: videoUrl,
         content_type: 'video/mp4',
       },
-      credits_remaining: profile.credits - 5,
     });
   } catch (error) {
     logger.error('[TurntableVideo] Unexpected error:', error);

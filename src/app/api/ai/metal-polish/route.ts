@@ -125,26 +125,6 @@ export async function POST(request: NextRequest) {
 
     logger.info('[MetalPolish] User authenticated:', user.id);
 
-    // Check credits
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('credits')
-      .eq('id', user.id)
-      .single();
-
-    if (!profile || profile.credits < 1) {
-      logger.warn('[MetalPolish] Insufficient credits:', profile?.credits);
-      return NextResponse.json(
-        {
-          error: 'Insufficient credits',
-          details: 'Metal polish requires 1 credit',
-        },
-        { status: 402 }
-      );
-    }
-
-    logger.info('[MetalPolish] Credits available:', profile.credits);
-
     // Upload image if needed
     let uploadedUrl: string;
     try {
@@ -271,22 +251,6 @@ export async function POST(request: NextRequest) {
       polishedImage.url
     );
 
-    // Deduct credit
-    const { error: deductError } = await supabase
-      .from('profiles')
-      .update({ credits: profile.credits - 1 })
-      .eq('id', user.id);
-
-    if (deductError) {
-      logger.error('[MetalPolish] Failed to deduct credit:', deductError);
-      // Don't fail the request if credit deduction fails
-    } else {
-      logger.info(
-        '[MetalPolish] Credit deducted. Remaining:',
-        profile.credits - 1
-      );
-    }
-
     // Return result
     return NextResponse.json({
       success: true,
@@ -296,7 +260,6 @@ export async function POST(request: NextRequest) {
         height: (polishedImage as any).height, // eslint-disable-line @typescript-eslint/no-explicit-any
         content_type: polishedImage.content_type,
       },
-      credits_remaining: profile.credits - 1,
     });
   } catch (error) {
     logger.error('[MetalPolish] Unexpected error:', error);
