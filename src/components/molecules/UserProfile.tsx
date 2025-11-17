@@ -14,6 +14,7 @@ import Avatar from '@/components/atoms/Avatar';
 import OnlineIndicator from '@/components/atoms/OnlineIndicator';
 import UserInfo from '@/components/atoms/UserInfo';
 import { useCreditStore } from '@/store/creditStore';
+import { aiRateLimiter } from '@/lib/rate-limiter';
 import { createScopedLogger } from '@/lib/logger';
 
 const logger = createScopedLogger('UserProfile');
@@ -29,6 +30,9 @@ export function UserProfile() {
   } | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [aiRequests, setAiRequests] = useState(() =>
+    aiRateLimiter.getRemainingRequests()
+  );
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -50,6 +54,22 @@ export function UserProfile() {
 
     fetchUser();
     fetchCredits(); // 🎯 Fetch credits on mount
+
+    // Update AI requests count every 2 seconds
+    const interval = setInterval(() => {
+      setAiRequests(aiRateLimiter.getRemainingRequests());
+    }, 2000);
+
+    // Listen for rate limit changes
+    const handleStorageChange = () => {
+      setAiRequests(aiRateLimiter.getRemainingRequests());
+    };
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, [fetchCredits]);
 
   const handleLogout = async () => {
@@ -98,26 +118,48 @@ export function UserProfile() {
         <div className="flex-1">
           <UserInfo name={user.name} status={user.email} />
 
-          {/* 💎 Credits Display - Integrated Below User Info */}
-          <div className="mt-1.5 flex items-center gap-1.5">
-            <div className="text-[10px] font-medium text-white/40">
-              Credits:
+          {/* 💎 Credits & AI Requests Display - Integrated Below User Info */}
+          <div className="mt-1.5 flex items-center gap-3">
+            {/* Credits */}
+            <div className="flex items-center gap-1.5">
+              <div className="text-[10px] font-medium text-white/40">
+                Credits:
+              </div>
+              {creditsLoading ? (
+                <div className="h-3 w-8 animate-pulse rounded bg-white/10" />
+              ) : (
+                <div
+                  className={`text-xs font-bold ${
+                    credits === 0
+                      ? 'text-red-400'
+                      : credits <= 3
+                        ? 'text-yellow-400'
+                        : 'bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent'
+                  }`}
+                >
+                  {credits}
+                </div>
+              )}
             </div>
-            {creditsLoading ? (
-              <div className="h-3 w-8 animate-pulse rounded bg-white/10" />
-            ) : (
+
+            {/* Divider */}
+            <div className="h-3 w-px bg-white/10" />
+
+            {/* AI Requests */}
+            <div className="flex items-center gap-1.5">
+              <div className="text-[10px] font-medium text-white/40">AI:</div>
               <div
-                className={`text-xs font-bold ${
-                  credits === 0
+                className={`text-xs font-bold tabular-nums ${
+                  aiRequests === 0
                     ? 'text-red-400'
-                    : credits <= 3
+                    : aiRequests <= 2
                       ? 'text-yellow-400'
-                      : 'bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent'
+                      : 'text-green-400'
                 }`}
               >
-                {credits}
+                {aiRequests}/5
               </div>
-            )}
+            </div>
           </div>
         </div>
 
