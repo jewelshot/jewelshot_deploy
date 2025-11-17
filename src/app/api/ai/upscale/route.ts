@@ -34,6 +34,16 @@ fal.config({
  * Upload image to FAL.AI storage if needed
  */
 async function uploadIfNeeded(imageUrl: string): Promise<string> {
+  // Blob URLs should be converted to data URIs on client-side before reaching here
+  if (imageUrl.startsWith('blob:')) {
+    logger.error(
+      '[Upscale] Blob URL detected on server-side (should not happen)'
+    );
+    throw new Error(
+      'Blob URLs cannot be processed on server. Please convert to data URI first.'
+    );
+  }
+
   // If it's already an absolute URL, return it
   if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
     return imageUrl;

@@ -254,7 +254,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
   }, [videoError]);
 
   // Handle image upscale
-  const handleUpscale = useCallback(() => {
+  const handleUpscale = useCallback(async () => {
     if (!uploadedImage) {
       toastManager.warning('No image to upscale');
       return;
@@ -267,8 +267,29 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       setOriginalImage(uploadedImage);
     }
 
+    // Convert blob URL to data URI if needed
+    let imageUrl = uploadedImage;
+    if (uploadedImage.startsWith('blob:')) {
+      logger.info('[Canvas] Converting blob URL to data URI for upscale');
+      try {
+        const response = await fetch(uploadedImage);
+        const blob = await response.blob();
+        imageUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        logger.info('[Canvas] Blob converted to data URI successfully');
+      } catch (error) {
+        logger.error('[Canvas] Failed to convert blob to data URI:', error);
+        toastManager.error('Failed to prepare image for upscaling');
+        return;
+      }
+    }
+
     upscaleImage({
-      image_url: uploadedImage,
+      image_url: imageUrl,
       upscale_mode: 'factor',
       upscale_factor: 2, // 2x upscale
       output_format: 'jpg',
@@ -298,7 +319,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
   }, [upscaleError]);
 
   // Handle remove background
-  const handleRemoveBackground = useCallback(() => {
+  const handleRemoveBackground = useCallback(async () => {
     if (!uploadedImage) {
       toastManager.warning('No image to process');
       return;
@@ -311,8 +332,31 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       setOriginalImage(uploadedImage);
     }
 
+    // Convert blob URL to data URI if needed
+    let imageUrl = uploadedImage;
+    if (uploadedImage.startsWith('blob:')) {
+      logger.info(
+        '[Canvas] Converting blob URL to data URI for background removal'
+      );
+      try {
+        const response = await fetch(uploadedImage);
+        const blob = await response.blob();
+        imageUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        logger.info('[Canvas] Blob converted to data URI successfully');
+      } catch (error) {
+        logger.error('[Canvas] Failed to convert blob to data URI:', error);
+        toastManager.error('Failed to prepare image for processing');
+        return;
+      }
+    }
+
     removeBackground({
-      image_url: uploadedImage,
+      image_url: imageUrl,
       crop_to_bbox: false, // Keep original dimensions
     });
   }, [uploadedImage, originalImage, removeBackground, setOriginalImage]);
