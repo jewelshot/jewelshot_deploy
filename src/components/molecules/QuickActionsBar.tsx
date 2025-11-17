@@ -5,7 +5,7 @@
  * Matches Canvas UI design system exactly
  * Dynamic positioning based on sidebar states
  *
- * 8 Essential Buttons:
+ * 10 Essential Buttons:
  * 1. Upscale (2x quality) - Purple
  * 2. Remove BG (transparent) - Blue
  * 3. Rotate Left (-30°) - Green
@@ -14,6 +14,8 @@
  * 6. Gemstone (enhance clarity) - Pink
  * 7. Metal Recolor (change metal) - Gold
  * 8. Metal Polish (mirror finish) - Silver
+ * 9. Natural Light (realistic reflections) - Amber
+ * 10. 360° Video (turntable) - Cyan
  */
 
 'use client';
@@ -28,6 +30,8 @@ import {
   Gem,
   Palette,
   Sparkles,
+  Sun,
+  Video,
   Loader2,
 } from 'lucide-react';
 import { MetalColorPicker } from './MetalColorPicker';
@@ -66,6 +70,14 @@ interface QuickActionsBarProps {
   onMetalPolish: () => void;
   /** Whether metal polish is in progress */
   isPolishingMetal?: boolean;
+  /** Callback when natural light button is clicked */
+  onNaturalLight: () => void;
+  /** Whether natural light enhancement is in progress */
+  isEnhancingLight?: boolean;
+  /** Callback when turntable video button is clicked */
+  onTurntableVideo: () => void;
+  /** Whether turntable video generation is in progress */
+  isGeneratingTurntable?: boolean;
   /** Whether there's an active image to process */
   hasActiveImage: boolean;
   /** Whether right sidebar is open (for positioning) */
@@ -93,6 +105,10 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
   isRecoloringMetal = false,
   onMetalPolish,
   isPolishingMetal = false,
+  onNaturalLight,
+  isEnhancingLight = false,
+  onTurntableVideo,
+  isGeneratingTurntable = false,
   hasActiveImage,
   isRightSidebarOpen,
   isTopBarOpen,
@@ -134,6 +150,9 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
     gold: 'border border-[rgba(218,165,32,0.3)] bg-[rgba(218,165,32,0.1)] text-yellow-300 hover:border-[rgba(218,165,32,0.6)] hover:bg-[rgba(218,165,32,0.2)] hover:text-yellow-200',
     silver:
       'border border-[rgba(192,192,192,0.3)] bg-[rgba(192,192,192,0.1)] text-gray-300 hover:border-[rgba(192,192,192,0.6)] hover:bg-[rgba(192,192,192,0.2)] hover:text-gray-200',
+    amber:
+      'border border-[rgba(245,158,11,0.3)] bg-[rgba(245,158,11,0.1)] text-amber-300 hover:border-[rgba(245,158,11,0.6)] hover:bg-[rgba(245,158,11,0.2)] hover:text-amber-200',
+    cyan: 'border border-[rgba(6,182,212,0.3)] bg-[rgba(6,182,212,0.1)] text-cyan-300 hover:border-[rgba(6,182,212,0.6)] hover:bg-[rgba(6,182,212,0.2)] hover:text-cyan-200',
   };
 
   return (
@@ -307,6 +326,53 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
           ) : (
             <Sparkles className="h-3.5 w-3.5" />
+          )}
+        </button>
+
+        {/* Divider */}
+        <div className="h-px w-full bg-[rgba(139,92,246,0.2)]" />
+
+        {/* Natural Light Button */}
+        <button
+          onClick={onNaturalLight}
+          disabled={!hasActiveImage || isEnhancingLight}
+          className={getButtonClass(
+            hasActiveImage,
+            isEnhancingLight,
+            colors.amber
+          )}
+          title={
+            isEnhancingLight
+              ? 'Adding Natural Light...'
+              : 'Add Natural Light & Reflections'
+          }
+        >
+          {isEnhancingLight ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Sun className="h-3.5 w-3.5" />
+          )}
+        </button>
+
+        {/* 360° Turntable Video Button */}
+        <button
+          onClick={onTurntableVideo}
+          disabled={!hasActiveImage || isGeneratingTurntable}
+          className={getButtonClass(
+            hasActiveImage,
+            isGeneratingTurntable,
+            colors.cyan
+          )}
+          title={
+            isGeneratingTurntable
+              ? 'Generating 360° Video...'
+              : 'Create 360° Turntable Video'
+          }
+        >
+          {isGeneratingTurntable ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Video className="h-3.5 w-3.5" />
           )}
         </button>
       </div>

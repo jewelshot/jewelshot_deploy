@@ -15,6 +15,8 @@ import { useRemoveBackground } from '@/hooks/useRemoveBackground';
 import { useGemstoneEnhance } from '@/hooks/useGemstoneEnhance';
 import { useMetalRecolor, MetalType } from '@/hooks/useMetalRecolor';
 import { useMetalPolish } from '@/hooks/useMetalPolish';
+import { useNaturalLight } from '@/hooks/useNaturalLight';
+import { useTurntableVideo } from '@/hooks/useTurntableVideo';
 import { useCameraControl } from '@/hooks/useCameraControl';
 import { useCanvasHandlers } from '@/hooks/useCanvasHandlers';
 import { createScopedLogger } from '@/lib/logger';
@@ -191,6 +193,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
   } = useImageToVideo();
 
   const [showVideoModal, setShowVideoModal] = useState(false);
+  const [currentVideoUrl, setCurrentVideoUrl] = useState<string | null>(null);
 
   // Image Upscale
   const {
@@ -231,6 +234,22 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     polishedImageUrl: metalPolishedImageUrl,
     error: metalPolishError,
   } = useMetalPolish();
+
+  // Natural Light & Reflections
+  const {
+    enhanceLight,
+    isEnhancing: isEnhancingLight,
+    enhancedImageUrl: lightEnhancedImageUrl,
+    error: naturalLightError,
+  } = useNaturalLight();
+
+  // 360° Turntable Video
+  const {
+    generateVideo: generateTurntableVideo,
+    isGenerating: isGeneratingTurntable,
+    videoUrl: turntableVideoUrl,
+    error: turntableVideoError,
+  } = useTurntableVideo();
 
   // Camera Control (Rotate Left/Right, Close-Up)
   const { applyCamera, error: cameraError } = useCameraControl();
@@ -795,6 +814,124 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       toastManager.error(`❌ Metal polish failed: ${metalPolishError}`);
     }
   }, [metalPolishError]);
+
+  // Handle natural light enhancement
+  const handleNaturalLight = useCallback(async () => {
+    if (!uploadedImage) {
+      toastManager.warning('No image to enhance');
+      return;
+    }
+
+    logger.info('[Canvas] Starting natural light enhancement:', uploadedImage);
+
+    // Store original image for comparison
+    if (!originalImage) {
+      setOriginalImage(uploadedImage);
+    }
+
+    // Convert blob URL to data URI if needed
+    let imageUrl = uploadedImage;
+    if (uploadedImage.startsWith('blob:')) {
+      logger.info('[Canvas] Converting blob URL to data URI for natural light');
+      try {
+        const response = await fetch(uploadedImage);
+        const blob = await response.blob();
+        imageUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        logger.info('[Canvas] Blob converted to data URI successfully');
+      } catch (error) {
+        logger.error('[Canvas] Failed to convert blob to data URI:', error);
+        toastManager.error('Failed to prepare image for processing');
+        return;
+      }
+    }
+
+    enhanceLight({
+      image_url: imageUrl,
+    });
+  }, [uploadedImage, originalImage, enhanceLight, setOriginalImage]);
+
+  // Update canvas with light-enhanced image and enable comparison
+  useEffect(() => {
+    if (lightEnhancedImageUrl) {
+      logger.info('[Canvas] Natural light enhanced, updating canvas');
+      queueMicrotask(() => {
+        setUploadedImage(lightEnhancedImageUrl);
+        setViewMode('side-by-side');
+        toastManager.success(
+          '✅ Natural lighting added! Compare with original.'
+        );
+      });
+    }
+  }, [lightEnhancedImageUrl, setUploadedImage, setViewMode]);
+
+  // Show error toast if natural light fails
+  useEffect(() => {
+    if (naturalLightError) {
+      logger.error('[Canvas] Natural light failed:', naturalLightError);
+      toastManager.error(`❌ Natural light failed: ${naturalLightError}`);
+    }
+  }, [naturalLightError]);
+
+  // Handle 360° turntable video generation
+  const handleTurntableVideo = useCallback(async () => {
+    if (!uploadedImage) {
+      toastManager.warning('No image to create video from');
+      return;
+    }
+
+    logger.info('[Canvas] Starting turntable video generation:', uploadedImage);
+
+    // Convert blob URL to data URI if needed
+    let imageUrl = uploadedImage;
+    if (uploadedImage.startsWith('blob:')) {
+      logger.info(
+        '[Canvas] Converting blob URL to data URI for turntable video'
+      );
+      try {
+        const response = await fetch(uploadedImage);
+        const blob = await response.blob();
+        imageUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        logger.info('[Canvas] Blob converted to data URI successfully');
+      } catch (error) {
+        logger.error('[Canvas] Failed to convert blob to data URI:', error);
+        toastManager.error('Failed to prepare image for video generation');
+        return;
+      }
+    }
+
+    generateTurntableVideo({
+      image_url: imageUrl,
+    });
+  }, [uploadedImage, generateTurntableVideo]);
+
+  // Show turntable video when ready
+  useEffect(() => {
+    if (turntableVideoUrl) {
+      logger.info('[Canvas] Turntable video ready:', turntableVideoUrl);
+      // Open video in modal (reuse existing VideoPlayerModal)
+      setCurrentVideoUrl(turntableVideoUrl);
+      setShowVideoModal(true);
+      toastManager.success('✅ 360° turntable video ready!');
+    }
+  }, [turntableVideoUrl]);
+
+  // Show error toast if turntable video fails
+  useEffect(() => {
+    if (turntableVideoError) {
+      logger.error('[Canvas] Turntable video failed:', turntableVideoError);
+      toastManager.error(`❌ Turntable video failed: ${turntableVideoError}`);
+    }
+  }, [turntableVideoError]);
 
   // Preset generation
   const handlePresetGeneration = useCallback(
@@ -1547,6 +1684,10 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
           isRecoloringMetal={isRecoloringMetal}
           onMetalPolish={handleMetalPolish}
           isPolishingMetal={isPolishingMetal}
+          onNaturalLight={handleNaturalLight}
+          isEnhancingLight={isEnhancingLight}
+          onTurntableVideo={handleTurntableVideo}
+          isGeneratingTurntable={isGeneratingTurntable}
           hasActiveImage={!!uploadedImage}
           isRightSidebarOpen={rightOpen}
           isTopBarOpen={topOpen}
@@ -1620,12 +1761,13 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       <VideoGeneratingModal isVisible={isGeneratingVideo} error={videoError} />
 
       {/* Video Player Modal */}
-      {showVideoModal && videoUrl && (
+      {showVideoModal && (videoUrl || currentVideoUrl) && (
         <VideoPlayerModal
-          videoUrl={videoUrl}
+          videoUrl={currentVideoUrl || videoUrl || ''}
           onClose={() => {
             setShowVideoModal(false);
-            resetVideo();
+            setCurrentVideoUrl(null);
+            if (videoUrl) resetVideo();
           }}
         />
       )}
