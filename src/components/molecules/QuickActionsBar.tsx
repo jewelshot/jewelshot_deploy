@@ -5,18 +5,19 @@
  * Matches Canvas UI design system exactly
  * Dynamic positioning based on sidebar states
  *
- * 6 Essential Buttons:
+ * 7 Essential Buttons:
  * 1. Upscale (2x quality) - Purple
  * 2. Remove BG (transparent) - Blue
  * 3. Rotate Left (-30°) - Green
  * 4. Rotate Right (+30°) - Green
  * 5. Close-Up (zoom details) - Orange
  * 6. Gemstone (enhance clarity) - Pink
+ * 7. Metal Recolor (change metal) - Gold
  */
 
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   ArrowUp,
   Scissors,
@@ -24,8 +25,11 @@ import {
   RotateCw,
   ZoomIn,
   Gem,
+  Palette,
   Loader2,
 } from 'lucide-react';
+import { MetalColorPicker } from './MetalColorPicker';
+import { MetalType } from '@/hooks/useMetalRecolor';
 
 interface QuickActionsBarProps {
   /** Callback when upscale button is clicked */
@@ -52,6 +56,10 @@ interface QuickActionsBarProps {
   onGemstoneEnhance: () => void;
   /** Whether gemstone enhancement is in progress */
   isEnhancingGemstones?: boolean;
+  /** Callback when metal recolor is selected */
+  onMetalRecolor: (metalType: MetalType) => void;
+  /** Whether metal recolor is in progress */
+  isRecoloringMetal?: boolean;
   /** Whether there's an active image to process */
   hasActiveImage: boolean;
   /** Whether right sidebar is open (for positioning) */
@@ -75,11 +83,21 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
   isClosingUp = false,
   onGemstoneEnhance,
   isEnhancingGemstones = false,
+  onMetalRecolor,
+  isRecoloringMetal = false,
   hasActiveImage,
   isRightSidebarOpen,
   isTopBarOpen,
   controlsVisible,
 }) => {
+  // State for metal color picker
+  const [isMetalPickerOpen, setIsMetalPickerOpen] = useState(false);
+
+  // Handle metal color selection
+  const handleMetalSelect = (metalType: MetalType) => {
+    onMetalRecolor(metalType);
+    setIsMetalPickerOpen(false); // Close picker after selection
+  };
   // Button base classes matching Canvas UI
   const buttonBaseClass =
     'relative flex h-7 w-7 items-center justify-center rounded-md transition-all';
@@ -105,6 +123,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
     orange:
       'border border-[rgba(249,115,22,0.3)] bg-[rgba(249,115,22,0.1)] text-orange-300 hover:border-[rgba(249,115,22,0.6)] hover:bg-[rgba(249,115,22,0.2)] hover:text-orange-200',
     pink: 'border border-[rgba(236,72,153,0.3)] bg-[rgba(236,72,153,0.1)] text-pink-300 hover:border-[rgba(236,72,153,0.6)] hover:bg-[rgba(236,72,153,0.2)] hover:text-pink-200',
+    gold: 'border border-[rgba(218,165,32,0.3)] bg-[rgba(218,165,32,0.1)] text-yellow-300 hover:border-[rgba(218,165,32,0.6)] hover:bg-[rgba(218,165,32,0.2)] hover:text-yellow-200',
   };
 
   return (
@@ -240,7 +259,34 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
             <Gem className="h-3.5 w-3.5" />
           )}
         </button>
+
+        {/* Metal Recolor Button */}
+        <button
+          onClick={() => setIsMetalPickerOpen(!isMetalPickerOpen)}
+          disabled={!hasActiveImage || isRecoloringMetal}
+          className={getButtonClass(
+            hasActiveImage,
+            isRecoloringMetal,
+            colors.gold
+          )}
+          title={
+            isRecoloringMetal ? 'Recoloring Metal...' : 'Change Metal Color'
+          }
+        >
+          {isRecoloringMetal ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Palette className="h-3.5 w-3.5" />
+          )}
+        </button>
       </div>
+
+      {/* Metal Color Picker (slides out to the left) */}
+      <MetalColorPicker
+        isOpen={isMetalPickerOpen && hasActiveImage && !isRecoloringMetal}
+        onSelect={handleMetalSelect}
+        disabled={isRecoloringMetal}
+      />
     </div>
   );
 };
