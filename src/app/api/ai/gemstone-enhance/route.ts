@@ -212,13 +212,12 @@ export async function POST(request: NextRequest) {
 
       result = await fal.subscribe('fal-ai/nano-banana/edit', {
         input: {
-          image_url: uploadedUrl,
+          image_urls: [uploadedUrl], // Nano-Banana expects array
           prompt: gemstonePrompt,
-          image_guidance_scale: 1.8, // Higher for stronger preservation
-          text_guidance_scale: 7.5,
-          num_inference_steps: 50, // More steps for quality
+          guidance_scale: 7.5, // Balance between prompt and image
+          num_steps: 50, // More steps for quality
           seed: Math.floor(Math.random() * 1000000),
-        },
+        } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
         logs: true,
         onQueueUpdate: (update) => {
           if (update.status === 'IN_PROGRESS') {
@@ -296,8 +295,10 @@ export async function POST(request: NextRequest) {
             success: true,
             image: {
               url: urlData.publicUrl,
-              width: result.data.images[0].width,
-              height: result.data.images[0].height,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              width: (result.data.images[0] as any)?.width,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              height: (result.data.images[0] as any)?.height,
             },
             requestId: result.requestId,
           });
