@@ -1,72 +1,56 @@
 /**
  * useCameraControl Hook
  *
- * Handles camera angle control using Qwen Multiple Angles
+ * Manages camera control operations (rotation, close-up)
+ * Returns single image URL directly - no gallery modal
  */
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { createScopedLogger } from '@/lib/logger';
 
 const logger = createScopedLogger('useCameraControl');
 
-export type CameraOperation = 'rotate' | 'closeup' | 'top_view' | 'wide_angle';
+export type CameraOperation = 'rotate_left' | 'rotate_right' | 'closeup';
 export type CameraStyle = 'product' | 'lifestyle';
 
-export interface CameraControlInput {
-  image_url: string;
-  operation: CameraOperation;
-  style?: CameraStyle;
-}
-
-export interface CameraControlImage {
+interface CameraControlResult {
   url: string;
   width?: number;
   height?: number;
-  angle?: number; // For rotate operation
 }
 
-interface UseCameraControlResult {
-  applyCamera: (input: CameraControlInput) => Promise<void>;
-  isProcessing: boolean;
-  progress: string;
-  resultImages: CameraControlImage[];
-  operation: CameraOperation | null;
-  error: string | null;
-  reset: () => void;
+interface CameraControlResponse {
+  success: boolean;
+  image?: CameraControlResult;
+  operation: string;
+  requestId: string;
+  error?: string;
+  details?: string;
 }
 
-export function useCameraControl(): UseCameraControlResult {
+export function useCameraControl() {
   const [isProcessing, setIsProcessing] = useState(false);
-  const [progress, setProgress] = useState('');
-  const [resultImages, setResultImages] = useState<CameraControlImage[]>([]);
+  const [resultImage, setResultImage] = useState<CameraControlResult | null>(
+    null
+  );
   const [operation, setOperation] = useState<CameraOperation | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const applyCamera = useCallback(async (input: CameraControlInput) => {
+  const applyCamera = async (
+    imageUrl: string,
+    cameraOperation: CameraOperation,
+    style: CameraStyle = 'product'
+  ) => {
     setIsProcessing(true);
-    setProgress('Preparing camera control...');
     setError(null);
-    setResultImages([]);
-    setOperation(input.operation);
+    setOperation(cameraOperation);
+    setResultImage(null);
 
     try {
-      logger.info('Starting camera control', input);
-
-      // Set operation-specific progress message
-      switch (input.operation) {
-        case 'rotate':
-          setProgress('Generating 3 rotation angles...');
-          break;
-        case 'closeup':
-          setProgress('Creating close-up view...');
-          break;
-        case 'top_view':
-          setProgress('Generating top view...');
-          break;
-        case 'wide_angle':
-          setProgress('Creating wide angle view...');
-          break;
-      }
+      logger.info('[CameraControl] Starting operation:', {
+        cameraOperation,
+        style,
+      });
 
       const response = await fetch('/api/ai/camera-control', {
         method: 'POST',
@@ -74,72 +58,52 @@ export function useCameraControl(): UseCameraControlResult {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          image_url: input.image_url,
-          operation: input.operation,
-          style: input.style || 'product',
+          image_url: imageUrl,
+          operation: cameraOperation,
+          style,
         }),
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        const errorMessage =
-          errorData.details ||
-          errorData.error ||
-          `Server error: ${response.status} ${response.statusText}`;
-        logger.error('Camera control API error - DETAILED:', {
-          status: response.status,
-          statusText: response.statusText,
-          errorData: errorData,
-          debug: errorData.debug,
-          fullResponse: JSON.stringify(errorData),
-        });
-
-        console.error('[useCameraControl] Full error response:', errorData);
-
-        throw new Error(errorMessage);
+        throw new Error(errorData.error || `API error: ${response.status}`);
       }
 
-      setProgress('Processing complete...');
+      const data: CameraControlResponse = await response.json();
 
-      const result = await response.json();
-      logger.info('Camera control API response:', result);
-
-      if (result.success && result.images && result.images.length > 0) {
-        setResultImages(result.images);
-        setProgress('Camera control applied successfully!');
-        logger.info('Camera control completed successfully', {
-          operation: result.operation,
-          numImages: result.images.length,
-          requestId: result.requestId,
-        });
-      } else {
-        logger.error('Invalid camera control response:', result);
-        throw new Error('Invalid response from camera control API');
+      if (!data.success || !data.image) {
+        throw new Error(data.error || 'No image generated');
       }
+
+      logger.info('[CameraControl] Operation completed:', {
+        operation: data.operation,
+        has_image: !!data.image,
+      });
+
+      setResultImage(data.image);
+      return data.image;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      logger.error('Camera control failed:', err);
+      logger.error('[CameraControl] Operation failed:', err);
+      const errorMessage =
+        err instanceof Error ? err.message : 'Camera control failed';
       setError(errorMessage);
-      setProgress('');
-      setResultImages([]);
+      throw err;
     } finally {
       setIsProcessing(false);
     }
-  }, []);
+  };
 
-  const reset = useCallback(() => {
-    setIsProcessing(false);
-    setProgress('');
-    setResultImages([]);
+  const reset = () => {
+    setResultImage(null);
     setOperation(null);
     setError(null);
-  }, []);
+    setIsProcessing(false);
+  };
 
   return {
     applyCamera,
     isProcessing,
-    progress,
-    resultImages,
+    resultImage,
     operation,
     error,
     reset,

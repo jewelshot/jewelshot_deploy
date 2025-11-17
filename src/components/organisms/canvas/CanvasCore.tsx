@@ -2,14 +2,14 @@
  * =============================================================================
  * CANVAS CORE - Image Rendering Engine
  * =============================================================================
- * 
+ *
  * Handles:
  * - Image rendering (single view & side-by-side comparison)
  * - Filter & transform application
  * - Zoom & pan
  * - Loading & empty states
  * - Padding calculations
- * 
+ *
  * Extracted from Canvas.tsx (1,130 lines → maintainable components)
  */
 
@@ -21,7 +21,11 @@ import EmptyState from '@/components/molecules/EmptyState';
 import LoadingState from '@/components/atoms/LoadingState';
 import AILoadingOverlay from '@/components/atoms/AILoadingOverlay';
 import type { Transform } from '@/hooks/useImageTransform';
-import type { AdjustFilters, ColorFilters, FilterEffects } from '@/hooks/useImageFilters';
+import type {
+  AdjustFilters,
+  ColorFilters,
+  FilterEffects,
+} from '@/hooks/useImageFilters';
 
 /**
  * Props for CanvasCore component
@@ -31,23 +35,23 @@ export interface CanvasCoreProps {
   uploadedImage: string | null;
   originalImage: string | null;
   isLoading: boolean;
-  
+
   // AI state
   isAIEditing: boolean;
   isAIImageLoading: boolean;
   aiProgress: string;
-  
+
   // View mode
   viewMode: 'normal' | 'side-by-side';
   activeImage: 'left' | 'right';
   onActiveImageChange: (side: 'left' | 'right') => void;
-  
+
   // Transform & filters (normal view)
   scale: number;
   position: { x: number; y: number };
   onScaleChange: Dispatch<SetStateAction<number>>;
   onPositionChange: Dispatch<SetStateAction<{ x: number; y: number }>>;
-  
+
   // Side-by-side specific scales & positions
   leftImageScale: number;
   leftImagePosition: { x: number; y: number };
@@ -57,23 +61,16 @@ export interface CanvasCoreProps {
   rightImagePosition: { x: number; y: number };
   onRightImageScaleChange: (scale: number) => void;
   onRightImagePositionChange: (pos: { x: number; y: number }) => void;
-  
+
   transform: Transform;
   adjustFilters: AdjustFilters;
   colorFilters: ColorFilters;
   filterEffects: FilterEffects;
-  
+
   // Background & UI
   background: 'none' | 'black' | 'gray' | 'white' | 'alpha';
   canvasControlsVisible: boolean;
-  isPromptExpanded: boolean;
-  
-  // Sidebar state (for padding calculations)
-  leftOpen: boolean;
-  rightOpen: boolean;
-  topOpen: boolean;
-  bottomOpen: boolean;
-  
+
   // Layout positions (from Canvas.tsx)
   leftPos: number;
   rightPos: number;
@@ -81,7 +78,7 @@ export interface CanvasCoreProps {
   bottomPos: number;
   imagePadding: { top: number; bottom: number; left: number; right: number };
   backgroundStyles: Record<string, React.CSSProperties>;
-  
+
   // Event handlers
   onImageLoad: () => void;
   onImageError: () => void;
@@ -119,11 +116,6 @@ export default function CanvasCore({
   filterEffects,
   background,
   canvasControlsVisible,
-  isPromptExpanded,
-  leftOpen,
-  rightOpen,
-  topOpen,
-  bottomOpen,
   leftPos,
   rightPos,
   topPos,
@@ -135,7 +127,7 @@ export default function CanvasCore({
   onUploadClick,
 }: CanvasCoreProps) {
   // All calculations done in parent Canvas.tsx - props passed directly
-  
+
   return (
     <div
       className="fixed z-10 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
@@ -228,11 +220,15 @@ export default function CanvasCore({
                     <ImageViewer
                       src={originalImage}
                       alt="Original"
-                      scale={scale}
-                      position={position}
-                      onScaleChange={onScaleChange}
-                      onPositionChange={onPositionChange}
-                      transform={{ rotation: 0, flipHorizontal: false, flipVertical: false }}
+                      scale={leftImageScale}
+                      position={leftImagePosition}
+                      onScaleChange={onLeftImageScaleChange}
+                      onPositionChange={onLeftImagePositionChange}
+                      transform={{
+                        rotation: 0,
+                        flipHorizontal: false,
+                        flipVertical: false,
+                      }}
                       adjustFilters={{}}
                       colorFilters={{}}
                       filterEffects={{}}
@@ -272,10 +268,10 @@ export default function CanvasCore({
                   <ImageViewer
                     src={uploadedImage}
                     alt="Edited"
-                    scale={scale}
-                    position={position}
-                    onScaleChange={onScaleChange}
-                    onPositionChange={onPositionChange}
+                    scale={rightImageScale}
+                    position={rightImagePosition}
+                    onScaleChange={onRightImageScaleChange}
+                    onPositionChange={onRightImagePositionChange}
                     transform={transform}
                     adjustFilters={adjustFilters}
                     colorFilters={colorFilters}
@@ -299,4 +295,3 @@ export default function CanvasCore({
     </div>
   );
 }
-

@@ -22,7 +22,6 @@ import { useCreditStore } from '@/store/creditStore';
 import { VideoPlayerModal } from '@/components/molecules/VideoPlayerModal';
 import { VideoGeneratingModal } from '@/components/molecules/VideoGeneratingModal';
 import { QuickActionsBar } from '@/components/molecules/QuickActionsBar';
-import { CameraControlModal } from '@/components/molecules/CameraControlModal';
 
 const logger = createScopedLogger('Canvas');
 // New refactored components
@@ -208,20 +207,13 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     error: removeBgError,
   } = useRemoveBackground();
 
-  // Camera Control (Rotate, Close-Up, Perspective)
-  const {
-    applyCamera,
-    isProcessing: isCameraProcessing,
-    resultImages: cameraResultImages,
-    operation: cameraOperation,
-    error: cameraError,
-    reset: resetCamera,
-  } = useCameraControl();
+  // Camera Control (Rotate Left/Right, Close-Up)
+  const { applyCamera, error: cameraError } = useCameraControl();
 
-  const [showCameraModal, setShowCameraModal] = useState(false);
-  const [perspectiveMode, setPerspectiveMode] = useState<
-    'top_view' | 'wide_angle'
-  >('top_view');
+  // Track individual camera operations
+  const [isRotatingLeft, setIsRotatingLeft] = useState(false);
+  const [isRotatingRight, setIsRotatingRight] = useState(false);
+  const [isClosingUp, setIsClosingUp] = useState(false);
 
   // Handle video generation
   const handleGenerateVideo = useCallback(() => {
@@ -357,34 +349,92 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     }
   }, [removeBgError, showToast]);
 
-  // Handle rotate view
-  const handleRotateView = useCallback(() => {
+  // Handle rotate left
+  const handleRotateLeft = useCallback(async () => {
     if (!uploadedImage) {
       showToast('No image to rotate', 'warning');
       return;
     }
 
-    logger.info('[Canvas] Starting rotate view:', uploadedImage);
+    setIsRotatingLeft(true);
+    logger.info('[Canvas] Starting rotate left:', uploadedImage);
 
     // Store original image for comparison
     if (!originalImage) {
       setOriginalImage(uploadedImage);
     }
 
-    applyCamera({
-      image_url: uploadedImage,
-      operation: 'rotate',
-      style: 'product', // Default to product style
-    });
-  }, [uploadedImage, originalImage, applyCamera, showToast, setOriginalImage]);
+    try {
+      const result = await applyCamera(uploadedImage, 'rotate_left', 'product');
+      if (result?.url) {
+        setUploadedImage(result.url);
+        setViewMode('side-by-side');
+        showToast('✅ Rotated left', 'success');
+      }
+    } catch (err) {
+      logger.error('[Canvas] Rotate left failed:', err);
+    } finally {
+      setIsRotatingLeft(false);
+    }
+  }, [
+    uploadedImage,
+    originalImage,
+    applyCamera,
+    showToast,
+    setOriginalImage,
+    setUploadedImage,
+    setViewMode,
+  ]);
+
+  // Handle rotate right
+  const handleRotateRight = useCallback(async () => {
+    if (!uploadedImage) {
+      showToast('No image to rotate', 'warning');
+      return;
+    }
+
+    setIsRotatingRight(true);
+    logger.info('[Canvas] Starting rotate right:', uploadedImage);
+
+    // Store original image for comparison
+    if (!originalImage) {
+      setOriginalImage(uploadedImage);
+    }
+
+    try {
+      const result = await applyCamera(
+        uploadedImage,
+        'rotate_right',
+        'product'
+      );
+      if (result?.url) {
+        setUploadedImage(result.url);
+        setViewMode('side-by-side');
+        showToast('✅ Rotated right', 'success');
+      }
+    } catch (err) {
+      logger.error('[Canvas] Rotate right failed:', err);
+    } finally {
+      setIsRotatingRight(false);
+    }
+  }, [
+    uploadedImage,
+    originalImage,
+    applyCamera,
+    showToast,
+    setOriginalImage,
+    setUploadedImage,
+    setViewMode,
+  ]);
 
   // Handle close-up
-  const handleCloseUp = useCallback(() => {
+  const handleCloseUp = useCallback(async () => {
     if (!uploadedImage) {
       showToast('No image for close-up', 'warning');
       return;
     }
 
+    setIsClosingUp(true);
     logger.info('[Canvas] Starting close-up:', uploadedImage);
 
     // Store original image for comparison
@@ -392,67 +442,27 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       setOriginalImage(uploadedImage);
     }
 
-    applyCamera({
-      image_url: uploadedImage,
-      operation: 'closeup',
-      style: 'product',
-    });
-  }, [uploadedImage, originalImage, applyCamera, showToast, setOriginalImage]);
-
-  // Handle perspective (toggle between top_view and wide_angle)
-  const handlePerspective = useCallback(() => {
-    if (!uploadedImage) {
-      showToast('No image for perspective change', 'warning');
-      return;
+    try {
+      const result = await applyCamera(uploadedImage, 'closeup', 'product');
+      if (result?.url) {
+        setUploadedImage(result.url);
+        setViewMode('side-by-side');
+        showToast('✅ Close-up created', 'success');
+      }
+    } catch (err) {
+      logger.error('[Canvas] Close-up failed:', err);
+    } finally {
+      setIsClosingUp(false);
     }
-
-    logger.info('[Canvas] Starting perspective:', perspectiveMode);
-
-    // Store original image for comparison
-    if (!originalImage) {
-      setOriginalImage(uploadedImage);
-    }
-
-    applyCamera({
-      image_url: uploadedImage,
-      operation: perspectiveMode,
-      style: 'product',
-    });
-
-    // Toggle mode for next time
-    setPerspectiveMode((prev) =>
-      prev === 'top_view' ? 'wide_angle' : 'top_view'
-    );
   }, [
     uploadedImage,
     originalImage,
-    perspectiveMode,
     applyCamera,
     showToast,
     setOriginalImage,
+    setUploadedImage,
+    setViewMode,
   ]);
-
-  // Show camera control modal when results are ready
-  useEffect(() => {
-    if (cameraResultImages.length > 0 && !showCameraModal) {
-      logger.info('[Canvas] Camera results ready, opening modal');
-      queueMicrotask(() => {
-        setShowCameraModal(true);
-      });
-    }
-  }, [cameraResultImages, showCameraModal]);
-
-  // Handle camera result selection
-  const handleCameraSelect = useCallback(
-    (imageUrl: string) => {
-      logger.info('[Canvas] Camera result selected:', imageUrl);
-      setUploadedImage(imageUrl);
-      setViewMode('side-by-side'); // Enable comparison view
-      showToast('✅ Camera angle applied! Compare with original.', 'success');
-      resetCamera();
-    },
-    [setUploadedImage, setViewMode, showToast, resetCamera]
-  );
 
   // Show error toast if camera control fails
   useEffect(() => {
@@ -1093,11 +1103,6 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
         filterEffects={filterEffects}
         background={background}
         canvasControlsVisible={canvasControlsVisible}
-        isPromptExpanded={isPromptExpanded}
-        leftOpen={leftOpen}
-        rightOpen={rightOpen}
-        topOpen={topOpen}
-        bottomOpen={bottomOpen}
         leftPos={leftPos}
         rightPos={rightPos}
         topPos={topPos}
@@ -1173,20 +1178,16 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
           ================================================================= */}
       {uploadedImage && canvasControlsVisible && (
         <QuickActionsBar
-          isRightSidebarExpanded={rightOpen}
           onUpscale={handleUpscale}
           isUpscaling={isUpscaling}
           onRemoveBackground={handleRemoveBackground}
           isRemovingBackground={isRemovingBackground}
-          onRotateView={handleRotateView}
-          isRotating={isCameraProcessing && cameraOperation === 'rotate'}
+          onRotateLeft={handleRotateLeft}
+          isRotatingLeft={isRotatingLeft}
+          onRotateRight={handleRotateRight}
+          isRotatingRight={isRotatingRight}
           onCloseUp={handleCloseUp}
-          isClosingUp={isCameraProcessing && cameraOperation === 'closeup'}
-          onPerspective={handlePerspective}
-          isPerspectiveProcessing={
-            isCameraProcessing &&
-            (cameraOperation === 'top_view' || cameraOperation === 'wide_angle')
-          }
+          isClosingUp={isClosingUp}
           hasActiveImage={!!uploadedImage}
         />
       )}
@@ -1263,20 +1264,6 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
           onClose={() => {
             setShowVideoModal(false);
             resetVideo();
-          }}
-        />
-      )}
-
-      {/* Camera Control Modal */}
-      {showCameraModal && cameraResultImages.length > 0 && (
-        <CameraControlModal
-          isVisible={showCameraModal}
-          images={cameraResultImages}
-          operation={cameraOperation}
-          onSelect={handleCameraSelect}
-          onClose={() => {
-            setShowCameraModal(false);
-            resetCamera();
           }}
         />
       )}

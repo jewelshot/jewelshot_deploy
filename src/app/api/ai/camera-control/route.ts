@@ -283,85 +283,32 @@ export async function POST(request: NextRequest) {
       };
     }
 
-    // Call FAL.AI Qwen Multiple Angles API
+    // Call FAL.AI Qwen Multiple Angles API (SINGLE result per operation)
     let result;
     try {
-      logger.info('[CameraControl] Calling Fal.ai Qwen API with params:', {
+      logger.info('[CameraControl] Calling Fal.ai Qwen API:', {
         operation,
         style,
-        num_images: params.num_images,
-        has_rotate: !!params.rotate_right_left,
+        rotate_angle: params.rotate_right_left,
         has_move_forward: !!params.move_forward,
-        has_vertical_angle: !!params.vertical_angle,
-        has_wide_angle: !!params.wide_angle_lens,
       });
 
-      // For rotate, we need to generate multiple angles
-      if (operation === 'rotate') {
-        const preset =
-          style === 'lifestyle'
-            ? PRESETS.rotate_lifestyle
-            : PRESETS.rotate_product;
-
-        const allImages = [];
-
-        // Generate images for each angle
-        for (const angle of preset.angles) {
-          logger.info(`[CameraControl] Generating angle: ${angle}°`);
-
-          const angleResult = await fal.subscribe(
-            'fal-ai/qwen-image-edit-plus-lora-gallery/multiple-angles',
-            {
-              input: {
-                ...params,
-                rotate_right_left: angle,
-                num_images: 1,
-              } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
-              logs: true,
-              onQueueUpdate: (update) => {
-                if (update.status === 'IN_PROGRESS') {
-                  logger.info(
-                    `[CameraControl] Progress (${angle}°):`,
-                    update.logs?.map((l) => l.message).join(', ')
-                  );
-                }
-              },
+      // Single image generation for ALL operations (no multi-angle loops)
+      result = await fal.subscribe(
+        'fal-ai/qwen-image-edit-plus-lora-gallery/multiple-angles',
+        {
+          input: params as any, // eslint-disable-line @typescript-eslint/no-explicit-any
+          logs: true,
+          onQueueUpdate: (update) => {
+            if (update.status === 'IN_PROGRESS') {
+              logger.info('[CameraControl] Progress:', {
+                status: update.status,
+                logs: update.logs?.map((l) => l.message).join(', '),
+              });
             }
-          );
-
-          if (angleResult.data?.images?.[0]) {
-            allImages.push({
-              ...angleResult.data.images[0],
-              angle,
-            });
-          }
-        }
-
-        result = {
-          data: {
-            images: allImages,
-            seed: allImages[0]?.seed,
           },
-          requestId: 'multi-angle-request',
-        };
-      } else {
-        // Single image generation for other operations
-        result = await fal.subscribe(
-          'fal-ai/qwen-image-edit-plus-lora-gallery/multiple-angles',
-          {
-            input: params as any, // eslint-disable-line @typescript-eslint/no-explicit-any
-            logs: true,
-            onQueueUpdate: (update) => {
-              if (update.status === 'IN_PROGRESS') {
-                logger.info('[CameraControl] Progress:', {
-                  status: update.status,
-                  logs: update.logs?.map((l) => l.message).join(', '),
-                });
-              }
-            },
-          }
-        );
-      }
+        }
+      );
 
       logger.info('[CameraControl] Camera control completed successfully', {
         user_id: user.id,
@@ -406,76 +353,76 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Save all generated images to Supabase Storage
-    const savedImages = [];
-
-    for (const [index, image] of (result.data.images || []).entries()) {
-      const imageUrl = image.url;
-      if (imageUrl) {
-        try {
-          logger.info(
-            `[CameraControl] Downloading image ${index + 1} from Fal.ai:`,
-            imageUrl
-          );
-
-          const imageResponse = await fetch(imageUrl);
-          if (!imageResponse.ok) {
-            throw new Error(
-              `Failed to download image: ${imageResponse.statusText}`
-            );
-          }
-
-          const imageBlob = await imageResponse.blob();
-          const imageBuffer = Buffer.from(await imageBlob.arrayBuffer());
-
-          // Create descriptive filename
-          const angleLabel = image.angle ? `_${image.angle}deg` : '';
-          const fileName = `${user.id}/${Date.now()}-${operation}${angleLabel}.jpg`;
-
-          logger.info(
-            `[CameraControl] Uploading image ${index + 1} to Supabase:`,
-            fileName
-          );
-
-          const { error: uploadError } = await supabase.storage
-            .from('generations')
-            .upload(fileName, imageBuffer, {
-              contentType: 'image/jpeg',
-              upsert: false,
-            });
-
-          if (uploadError) {
-            logger.error(
-              '[CameraControl] Failed to upload image to Supabase:',
-              uploadError
-            );
-          } else {
-            const { data: urlData } = supabase.storage
-              .from('generations')
-              .getPublicUrl(fileName);
-
-            savedImages.push({
-              url: urlData.publicUrl,
-              width: image.width,
-              height: image.height,
-              angle: image.angle,
-            });
-          }
-        } catch (saveError) {
-          logger.error('[CameraControl] Failed to save image:', saveError);
-          // Continue with other images
-        }
-      }
+    // Save SINGLE generated image to Supabase Storage
+    const firstImage = result.data.images?.[0];
+    if (!firstImage?.url) {
+      logger.error('[CameraControl] No image in result');
+      return NextResponse.json(
+        { error: 'No image generated' },
+        { status: 500 }
+      );
     }
 
-    // Return saved images or fallback to Fal.ai URLs
-    return NextResponse.json({
-      success: true,
-      images: savedImages.length > 0 ? savedImages : result.data.images || [],
-      operation,
-      style,
-      requestId: result.requestId,
-    });
+    try {
+      logger.info(
+        '[CameraControl] Downloading image from Fal.ai:',
+        firstImage.url
+      );
+
+      const imageResponse = await fetch(firstImage.url);
+      if (!imageResponse.ok) {
+        throw new Error(
+          `Failed to download image: ${imageResponse.statusText}`
+        );
+      }
+
+      const imageBlob = await imageResponse.blob();
+      const imageBuffer = Buffer.from(await imageBlob.arrayBuffer());
+
+      // Create descriptive filename
+      const fileName = `${user.id}/${Date.now()}-${operation}.jpg`;
+      logger.info('[CameraControl] Uploading image to Supabase:', fileName);
+
+      const { error: uploadError } = await supabase.storage
+        .from('generations')
+        .upload(fileName, imageBuffer, {
+          contentType: 'image/jpeg',
+          upsert: false,
+        });
+
+      if (uploadError) {
+        logger.error('[CameraControl] Upload failed:', uploadError);
+        throw uploadError;
+      }
+
+      const { data: urlData } = supabase.storage
+        .from('generations')
+        .getPublicUrl(fileName);
+
+      logger.info('[CameraControl] Returning Supabase URL');
+
+      // Return SINGLE image URL
+      return NextResponse.json({
+        success: true,
+        image: {
+          url: urlData.publicUrl,
+          width: firstImage.width,
+          height: firstImage.height,
+        },
+        operation,
+        requestId: result.requestId,
+      });
+    } catch (saveError) {
+      logger.error('[CameraControl] Failed to save image:', saveError);
+
+      // Fallback to Fal.ai URL
+      return NextResponse.json({
+        success: true,
+        image: firstImage,
+        operation,
+        requestId: result.requestId,
+      });
+    }
   } catch (error) {
     logger.error('Camera control failed:', error);
     return NextResponse.json(
