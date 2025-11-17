@@ -1277,6 +1277,8 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
           message={toastState.message}
           type={toastState.type}
           onClose={hideToast}
+          isTopBarOpen={topOpen}
+          isRightSidebarOpen={rightOpen}
         />
       )}
     </>

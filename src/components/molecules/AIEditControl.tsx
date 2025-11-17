@@ -79,7 +79,8 @@ export function AIEditControl({
             : 'pointer-events-none -translate-y-2 scale-95 opacity-0'
         }`}
       >
-        <div className="space-y-2">
+        {/* Scrollable container with max-height */}
+        <div className="max-h-[400px] space-y-2 overflow-y-auto">
           {/* Prompt Input */}
           <AIPromptInput
             value={prompt}

@@ -59,7 +59,7 @@ export function PresetConfirmModal({
     : `This will generate a professional ${jewelryType} photo using AI. The process may take 10-30 seconds.`;
 
   const modalContent = (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
       {/* Backdrop */}
       <div
         className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-200 ease-in-out ${
