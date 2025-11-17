@@ -476,6 +476,43 @@ OUTPUT: Editorial minimalist still life. Aspect ratio ${aspectRatio}. Soft paste
       const genderText = gender ? `${gender}` : 'model';
       const type = jewelryType.toLowerCase();
 
+      // Special handling for Women Necklace - Ultra Close-Up
+      if (type === 'necklace' && genderText.toLowerCase() === 'women') {
+        return JSON.stringify({
+          subject: 'necklace on woman decollete chest area ultra close-up',
+          preservation: {
+            critical:
+              'EXACT jewelry UNCHANGED - gemstones setting chain pendant ALL preserved pixel-perfect',
+            forbidden:
+              'NO alterations NO added/removed gemstones NO design changes',
+          },
+          framing: {
+            crop: 'chest decollete neck area ONLY - face OUT OF FRAME above crop line',
+            distance: 'extreme close-up macro 30-50cm distance',
+            fill: 'jewelry fills 55-65% frame ultra-prominent detailed visible',
+            angle:
+              'straight front centered decollete natural necklace placement',
+          },
+          placement: {
+            physics:
+              'chain RESTS ON skin follows neck curve pendant TOUCHES chest natural drape',
+            position:
+              'necklace centered decollete flat against skin 3D depth contact',
+            scale:
+              'chain 16-20inch pendant 10-25mm LIFE-SIZE proportions realistic',
+          },
+          lighting:
+            'soft front 45deg key 5500K neutral even flattering NO harsh shadows clean',
+          background:
+            'neutral beige/cream/white RGB(245,242,238) seamless minimal',
+          focus: 'f/4 jewelry ultra-sharp skin smooth background soft bokeh',
+          style: 'clean commercial e-commerce product-hero ultra-detailed',
+          forbidden:
+            'NO face visible NO eyes NO facial features NO wide shots NO floating jewelry NO flat 2D NO altered design NO blurry product',
+          aspect: aspectRatio,
+        });
+      }
+
       const placement =
         {
           ring: 'Hand elegant pose fingers extended naturally prominent',
