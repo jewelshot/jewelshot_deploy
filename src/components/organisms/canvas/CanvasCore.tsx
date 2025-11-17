@@ -55,12 +55,14 @@ export interface CanvasCoreProps {
   // Side-by-side specific scales & positions
   leftImageScale: number;
   leftImagePosition: { x: number; y: number };
-  onLeftImageScaleChange: (scale: number) => void;
-  onLeftImagePositionChange: (pos: { x: number; y: number }) => void;
+  onLeftImageScaleChange: Dispatch<SetStateAction<number>>;
+  onLeftImagePositionChange: Dispatch<SetStateAction<{ x: number; y: number }>>;
   rightImageScale: number;
   rightImagePosition: { x: number; y: number };
-  onRightImageScaleChange: (scale: number) => void;
-  onRightImagePositionChange: (pos: { x: number; y: number }) => void;
+  onRightImageScaleChange: Dispatch<SetStateAction<number>>;
+  onRightImagePositionChange: Dispatch<
+    SetStateAction<{ x: number; y: number }>
+  >;
 
   transform: Transform;
   adjustFilters: AdjustFilters;
