@@ -63,7 +63,7 @@ export function BottomBar() {
     >
       {/* Center: Notifications */}
       <div className="flex w-full items-center justify-center gap-2">
-        {latestToast ? (
+        {latestToast && (
           <div
             className={`animate-in fade-in slide-in-from-right-2 flex items-center gap-2 rounded-lg border px-3 py-1.5 backdrop-blur-sm transition-all duration-300 ${colorMap[latestToast.type]}`}
           >
@@ -85,13 +85,6 @@ export function BottomBar() {
             >
               <X className="h-3 w-3" />
             </button>
-          </div>
-        ) : (
-          <div className="flex items-center gap-1.5 rounded-lg border border-white/5 bg-white/5 px-3 py-1.5 backdrop-blur-sm">
-            <Bell className="h-3.5 w-3.5 text-white/40" />
-            <span className="text-[11px] font-medium text-white/40">
-              Notifications appear here
-            </span>
           </div>
         )}
       </div>
