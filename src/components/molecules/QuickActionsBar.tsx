@@ -8,7 +8,7 @@
 'use client';
 
 import React from 'react';
-import { ArrowUpIcon } from '@heroicons/react/24/outline';
+import { ArrowUpIcon, ScissorsIcon } from '@heroicons/react/24/outline';
 import { Tooltip } from '@/components/atoms/Tooltip';
 
 interface QuickActionsBarProps {
@@ -18,6 +18,10 @@ interface QuickActionsBarProps {
   onUpscale: () => void;
   /** Whether upscale operation is in progress */
   isUpscaling?: boolean;
+  /** Callback when remove background button is clicked */
+  onRemoveBackground: () => void;
+  /** Whether remove background operation is in progress */
+  isRemovingBackground?: boolean;
   /** Whether there's an active image to process */
   hasActiveImage: boolean;
 }
@@ -26,6 +30,8 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
   isRightSidebarExpanded,
   onUpscale,
   isUpscaling = false,
+  onRemoveBackground,
+  isRemovingBackground = false,
   hasActiveImage,
 }) => {
   return (
@@ -73,6 +79,33 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
         </button>
       </Tooltip>
 
+      {/* Remove Background Button */}
+      <Tooltip content="Remove Background" placement="left">
+        <button
+          onClick={onRemoveBackground}
+          disabled={!hasActiveImage || isRemovingBackground}
+          className={`group relative flex h-12 w-12 items-center justify-center rounded-lg transition-all duration-200 ${
+            hasActiveImage && !isRemovingBackground
+              ? 'cursor-pointer bg-blue-500 text-white shadow-md hover:bg-blue-600 hover:shadow-lg'
+              : 'cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-700'
+          } ${isRemovingBackground ? 'animate-pulse' : ''} `}
+          title={
+            !hasActiveImage
+              ? 'No active image'
+              : isRemovingBackground
+                ? 'Removing background...'
+                : 'Remove image background'
+          }
+        >
+          {isRemovingBackground ? (
+            // Spinner animation
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+          ) : (
+            <ScissorsIcon className="h-5 w-5" />
+          )}
+        </button>
+      </Tooltip>
+
       {/* Future Actions - Placeholder buttons */}
       {/* 
       <Tooltip content="Enhance Details" placement="left">
@@ -81,15 +114,6 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
           className="w-12 h-12 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-400 cursor-not-allowed opacity-50"
         >
           <SparklesIcon className="w-5 h-5" />
-        </button>
-      </Tooltip>
-
-      <Tooltip content="Remove Background" placement="left">
-        <button
-          disabled
-          className="w-12 h-12 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-400 cursor-not-allowed opacity-50"
-        >
-          <ScissorsIcon className="w-5 h-5" />
         </button>
       </Tooltip>
       */}

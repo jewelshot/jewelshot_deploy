@@ -12,6 +12,7 @@ import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useImageEdit } from '@/hooks/useImageEdit';
 import { useImageToVideo } from '@/hooks/useImageToVideo';
 import { useImageUpscale } from '@/hooks/useImageUpscale';
+import { useRemoveBackground } from '@/hooks/useRemoveBackground';
 import { useCanvasHandlers } from '@/hooks/useCanvasHandlers';
 import { createScopedLogger } from '@/lib/logger';
 import { saveImageToGallery } from '@/lib/gallery-storage';
@@ -198,6 +199,15 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     reset: resetUpscale,
   } = useImageUpscale();
 
+  // Remove Background
+  const {
+    removeBackground,
+    isProcessing: isRemovingBackground,
+    processedImageUrl: removedBgImageUrl,
+    error: removeBgError,
+    reset: resetRemoveBg,
+  } = useRemoveBackground();
+
   // Handle video generation
   const handleGenerateVideo = useCallback(() => {
     if (!uploadedImage) {
@@ -282,6 +292,55 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       showToast(`❌ Upscale failed: ${upscaleError}`, 'error');
     }
   }, [upscaleError, showToast]);
+
+  // Handle remove background
+  const handleRemoveBackground = useCallback(() => {
+    if (!uploadedImage) {
+      showToast('No image to process', 'warning');
+      return;
+    }
+
+    logger.info('[Canvas] Starting background removal:', uploadedImage);
+
+    // Store original image for comparison
+    if (!originalImage) {
+      setOriginalImage(uploadedImage);
+    }
+
+    removeBackground({
+      image_url: uploadedImage,
+      crop_to_bbox: false, // Keep original dimensions
+    });
+  }, [
+    uploadedImage,
+    originalImage,
+    removeBackground,
+    showToast,
+    setOriginalImage,
+  ]);
+
+  // Update canvas with background-removed image and enable comparison
+  useEffect(() => {
+    if (removedBgImageUrl) {
+      logger.info('[Canvas] Background removed, updating canvas');
+      queueMicrotask(() => {
+        setUploadedImage(removedBgImageUrl);
+        setViewMode('side-by-side'); // Enable comparison view
+        showToast(
+          '✅ Background removed successfully! Compare with original.',
+          'success'
+        );
+      });
+    }
+  }, [removedBgImageUrl, setUploadedImage, setViewMode, showToast]);
+
+  // Show error toast if remove background fails
+  useEffect(() => {
+    if (removeBgError) {
+      logger.error('[Canvas] Background removal failed:', removeBgError);
+      showToast(`❌ Remove background failed: ${removeBgError}`, 'error');
+    }
+  }, [removeBgError, showToast]);
 
   // Preset generation
   const handlePresetGeneration = useCallback(
@@ -990,13 +1049,15 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       />
 
       {/* ===================================================================
-          Quick Actions Bar - Image Operations (Upscale, Enhance, etc.)
+          Quick Actions Bar - Image Operations (Upscale, Remove BG, etc.)
           ================================================================= */}
       {uploadedImage && canvasControlsVisible && (
         <QuickActionsBar
           isRightSidebarExpanded={rightOpen}
           onUpscale={handleUpscale}
           isUpscaling={isUpscaling}
+          onRemoveBackground={handleRemoveBackground}
+          isRemovingBackground={isRemovingBackground}
           hasActiveImage={!!uploadedImage}
         />
       )}
