@@ -138,22 +138,24 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
     return `${buttonBaseClass} cursor-pointer ${colorClass}`;
   };
 
-  // Color classes for each button (matching Canvas theme)
+  // Color classes for each button
+  // Default: Neutral gray (matching Canvas UI controllers)
+  // Hover: Colored (purple, blue, green, etc.)
   const colors = {
     purple:
-      'border border-[rgba(168,85,247,0.3)] bg-[rgba(168,85,247,0.1)] text-purple-300 hover:border-[rgba(168,85,247,0.6)] hover:bg-[rgba(168,85,247,0.2)] hover:text-purple-200',
-    blue: 'border border-[rgba(59,130,246,0.3)] bg-[rgba(59,130,246,0.1)] text-blue-300 hover:border-[rgba(59,130,246,0.6)] hover:bg-[rgba(59,130,246,0.2)] hover:text-blue-200',
+      'border border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] text-white/60 hover:border-[rgba(168,85,247,0.6)] hover:bg-[rgba(168,85,247,0.2)] hover:text-purple-200',
+    blue: 'border border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] text-white/60 hover:border-[rgba(59,130,246,0.6)] hover:bg-[rgba(59,130,246,0.2)] hover:text-blue-200',
     green:
-      'border border-[rgba(34,197,94,0.3)] bg-[rgba(34,197,94,0.1)] text-green-300 hover:border-[rgba(34,197,94,0.6)] hover:bg-[rgba(34,197,94,0.2)] hover:text-green-200',
+      'border border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] text-white/60 hover:border-[rgba(34,197,94,0.6)] hover:bg-[rgba(34,197,94,0.2)] hover:text-green-200',
     orange:
-      'border border-[rgba(249,115,22,0.3)] bg-[rgba(249,115,22,0.1)] text-orange-300 hover:border-[rgba(249,115,22,0.6)] hover:bg-[rgba(249,115,22,0.2)] hover:text-orange-200',
-    pink: 'border border-[rgba(236,72,153,0.3)] bg-[rgba(236,72,153,0.1)] text-pink-300 hover:border-[rgba(236,72,153,0.6)] hover:bg-[rgba(236,72,153,0.2)] hover:text-pink-200',
-    gold: 'border border-[rgba(218,165,32,0.3)] bg-[rgba(218,165,32,0.1)] text-yellow-300 hover:border-[rgba(218,165,32,0.6)] hover:bg-[rgba(218,165,32,0.2)] hover:text-yellow-200',
+      'border border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] text-white/60 hover:border-[rgba(249,115,22,0.6)] hover:bg-[rgba(249,115,22,0.2)] hover:text-orange-200',
+    pink: 'border border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] text-white/60 hover:border-[rgba(236,72,153,0.6)] hover:bg-[rgba(236,72,153,0.2)] hover:text-pink-200',
+    gold: 'border border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] text-white/60 hover:border-[rgba(218,165,32,0.6)] hover:bg-[rgba(218,165,32,0.2)] hover:text-yellow-200',
     silver:
-      'border border-[rgba(192,192,192,0.3)] bg-[rgba(192,192,192,0.1)] text-gray-300 hover:border-[rgba(192,192,192,0.6)] hover:bg-[rgba(192,192,192,0.2)] hover:text-gray-200',
+      'border border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] text-white/60 hover:border-[rgba(192,192,192,0.6)] hover:bg-[rgba(192,192,192,0.2)] hover:text-gray-200',
     amber:
-      'border border-[rgba(245,158,11,0.3)] bg-[rgba(245,158,11,0.1)] text-amber-300 hover:border-[rgba(245,158,11,0.6)] hover:bg-[rgba(245,158,11,0.2)] hover:text-amber-200',
-    cyan: 'border border-[rgba(6,182,212,0.3)] bg-[rgba(6,182,212,0.1)] text-cyan-300 hover:border-[rgba(6,182,212,0.6)] hover:bg-[rgba(6,182,212,0.2)] hover:text-cyan-200',
+      'border border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] text-white/60 hover:border-[rgba(245,158,11,0.6)] hover:bg-[rgba(245,158,11,0.2)] hover:text-amber-200',
+    cyan: 'border border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] text-white/60 hover:border-[rgba(6,182,212,0.6)] hover:bg-[rgba(6,182,212,0.2)] hover:text-cyan-200',
   };
 
   return (
