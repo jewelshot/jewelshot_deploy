@@ -125,9 +125,9 @@ export function MobileStudio() {
     generateVideo({
       image_url: image,
       prompt:
-        'Elegant hand gently rotating and showcasing the ring with natural movements. Soft turns left and right to display the jewelry from different angles. Graceful gestures, natural lighting, cinematic quality.',
+        'Hand gently rotating ring, showcasing from different angles with natural movements.',
       duration: '8s',
-      aspect_ratio: 'auto', // Automatically adapts to image aspect ratio
+      resolution: '720p', // 720p quality, aspect ratio auto-detected from image
     });
   }, [image, generateVideo]);
 

@@ -12,8 +12,8 @@ const logger = createScopedLogger('useImageToVideo');
 export interface VideoGenerationInput {
   image_url: string;
   prompt?: string;
-  duration?: '5s' | '6s' | '7s' | '8s';
-  aspect_ratio?: 'auto' | 'auto_prefer_portrait' | '16:9' | '9:16';
+  duration?: '8s';
+  resolution?: '720p' | '1080p';
 }
 
 export interface VideoOutput {
@@ -58,9 +58,9 @@ export function useImageToVideo(): UseImageToVideoResult {
           image_url: input.image_url,
           prompt:
             input.prompt ||
-            'Elegant hand gently rotating and showcasing the ring with natural movements. Soft turns left and right to display the jewelry from different angles. Graceful gestures, natural lighting, cinematic quality.',
+            'Hand gently rotating ring, showcasing from different angles with natural movements.',
           duration: input.duration || '8s',
-          aspect_ratio: input.aspect_ratio || 'auto', // auto adapts to image aspect ratio
+          resolution: input.resolution || '720p',
         }),
       });
 

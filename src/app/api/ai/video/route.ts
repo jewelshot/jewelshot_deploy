@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json();
-    const { image_url, prompt, duration, aspect_ratio } = body;
+    const { image_url, prompt, duration, resolution } = body;
 
     // Validate required fields
     if (!image_url) {
@@ -157,7 +157,7 @@ export async function POST(request: NextRequest) {
           ? 'relative'
           : 'data',
       duration: duration || '8s',
-      aspect_ratio: aspect_ratio || 'auto',
+      resolution: resolution || '720p',
       has_prompt: !!prompt,
     });
 
@@ -180,14 +180,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Call FAL.AI Veo 2 API (Image to Video)
+    // Call FAL.AI Veo 3.1 API (Reference to Video)
     let result;
     try {
       const finalPrompt =
         prompt ||
-        'Elegant hand gently rotating and showcasing the ring with natural movements. Soft turns left and right to display the jewelry from different angles. Graceful gestures, natural lighting, cinematic quality.';
+        'Hand gently rotating ring, showcasing from different angles with natural movements.';
       const finalDuration = duration || '8s';
-      const finalAspectRatio = aspect_ratio || 'auto';
+      const finalResolution = resolution || '720p';
 
       logger.info('[Video] Preparing Fal.ai request', {
         image_url_length: uploadedUrl.length,
@@ -195,7 +195,7 @@ export async function POST(request: NextRequest) {
         prompt: finalPrompt,
         prompt_length: finalPrompt.length,
         duration: finalDuration,
-        aspect_ratio: finalAspectRatio,
+        resolution: finalResolution,
       });
 
       // Validate prompt is provided
@@ -218,14 +218,15 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      logger.info('[Video] Calling Fal.ai Veo 2 API now...');
+      logger.info('[Video] Calling Fal.ai Veo 3.1 API now...');
 
-      result = await fal.subscribe('fal-ai/veo2/image-to-video', {
+      result = await fal.subscribe('fal-ai/veo3.1/reference-to-video', {
         input: {
+          image_urls: [uploadedUrl], // ✅ ARRAY format - Veo 3.1 requirement
           prompt: finalPrompt,
-          image_url: uploadedUrl,
-          aspect_ratio: finalAspectRatio,
           duration: finalDuration,
+          resolution: finalResolution,
+          generate_audio: false, // ✅ Sessiz video
         },
         logs: true,
         onQueueUpdate: (update) => {
