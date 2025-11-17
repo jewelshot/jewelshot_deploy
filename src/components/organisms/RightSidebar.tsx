@@ -66,17 +66,12 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
     requiresModel: boolean;
   } | null>(null);
 
-  // Modes are disabled until both gender and jewelry are selected
-  const areModesDisabled = !gender || !jewelryType;
-
-  // Handle preset selection
+  // Handle preset selection (no restrictions - always allow)
   const handlePresetSelect = (presetId: string) => {
-    if (!jewelryType) return;
-
     const preset = presetPrompts[presetId];
     if (!preset) return;
 
-    // Show confirmation modal
+    // Show confirmation modal (jewelry selection can happen in modal if needed)
     setConfirmModal({
       show: true,
       presetName: preset.name,
@@ -86,12 +81,21 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
   };
 
   // Handle generation confirmation
-  const handleConfirmGeneration = () => {
-    if (!confirmModal || !jewelryType) return;
+  const handleConfirmGeneration = (selectedJewelryType?: string) => {
+    if (!confirmModal) return;
+
+    // Use provided jewelry type or fallback to state
+    const finalJewelryType = selectedJewelryType || jewelryType;
+
+    if (!finalJewelryType) {
+      // This shouldn't happen if modal handles it correctly
+      console.error('[RightSidebar] No jewelry type provided');
+      return;
+    }
 
     const preset = presetPrompts[confirmModal.presetId];
     const prompt = preset.buildPrompt(
-      jewelryType,
+      finalJewelryType,
       gender || undefined,
       aspectRatio
     );
@@ -153,46 +157,35 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
         {/* Divider */}
         <div className="my-2 h-px bg-white/5" />
 
-        {/* Mode Tabs - Ultra Compact */}
+        {/* Mode Tabs - Ultra Compact - Always Active */}
         <div className="mb-2">
-          <div
-            className={`flex gap-0.5 rounded-md border p-0.5 transition-all duration-300 ${areModesDisabled ? 'border-white/5 bg-white/[0.01]' : 'border-white/10 bg-white/[0.02]'}`}
-          >
+          <div className="flex gap-0.5 rounded-md border border-white/10 bg-white/[0.02] p-0.5 transition-all duration-300">
             <button
               onClick={() => setActiveMode('quick')}
-              disabled={areModesDisabled}
               className={`flex-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-all duration-200 ${
-                activeMode === 'quick' && !areModesDisabled
+                activeMode === 'quick'
                   ? 'bg-purple-500/20 text-purple-300'
-                  : areModesDisabled
-                    ? 'cursor-not-allowed text-white/20'
-                    : 'text-white/60 hover:text-white'
+                  : 'text-white/60 hover:text-white'
               }`}
             >
               Quick
             </button>
             <button
               onClick={() => setActiveMode('selective')}
-              disabled={areModesDisabled}
               className={`flex-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-all duration-200 ${
-                activeMode === 'selective' && !areModesDisabled
+                activeMode === 'selective'
                   ? 'bg-purple-500/20 text-purple-300'
-                  : areModesDisabled
-                    ? 'cursor-not-allowed text-white/20'
-                    : 'text-white/60 hover:text-white'
+                  : 'text-white/60 hover:text-white'
               }`}
             >
               Select
             </button>
             <button
               onClick={() => setActiveMode('advanced')}
-              disabled={areModesDisabled}
               className={`flex-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-all duration-200 ${
-                activeMode === 'advanced' && !areModesDisabled
+                activeMode === 'advanced'
                   ? 'bg-purple-500/20 text-purple-300'
-                  : areModesDisabled
-                    ? 'cursor-not-allowed text-white/20'
-                    : 'text-white/60 hover:text-white'
+                  : 'text-white/60 hover:text-white'
               }`}
             >
               Adv
@@ -200,10 +193,8 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
           </div>
         </div>
 
-        {/* Mode Content */}
-        <div
-          className={`flex-1 overflow-y-auto transition-all duration-300 ${areModesDisabled ? 'pointer-events-none opacity-30 blur-sm' : 'opacity-100'}`}
-        >
+        {/* Mode Content - Always Active */}
+        <div className="flex-1 overflow-y-auto transition-all duration-300">
           {activeMode === 'quick' && (
             <QuickModeContent onPresetSelect={handlePresetSelect} />
           )}
@@ -229,7 +220,7 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
         {confirmModal?.show && (
           <PresetConfirmModal
             presetName={confirmModal.presetName}
-            jewelryType={jewelryType || ''}
+            jewelryType={jewelryType}
             requiresModel={confirmModal.requiresModel}
             gender={gender || undefined}
             onConfirm={handleConfirmGeneration}
