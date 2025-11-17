@@ -307,19 +307,31 @@ export function EditPanel({
             />
 
             {/* Tab Content - Hidden in bar mode */}
+            {/* 🎯 CRITICAL FIX: Keep all tabs mounted (hidden with display:none) to preserve state! */}
             {!isBarMode && (
               <div className="max-h-[500px] overflow-y-auto">
-                {activeTab === 'crop' && (
+                {/* Crop Tab */}
+                <div
+                  style={{ display: activeTab === 'crop' ? 'block' : 'none' }}
+                >
                   <CropPanel
                     onCropRatioChange={onCropRatioChange || (() => {})}
                   />
-                )}
+                </div>
 
-                {activeTab === 'transform' && (
+                {/* Transform Tab */}
+                <div
+                  style={{
+                    display: activeTab === 'transform' ? 'block' : 'none',
+                  }}
+                >
                   <TransformPanel onTransformChange={onTransformChange} />
-                )}
+                </div>
 
-                {activeTab === 'adjust' && (
+                {/* Adjust Tab */}
+                <div
+                  style={{ display: activeTab === 'adjust' ? 'block' : 'none' }}
+                >
                   <AdjustPanel
                     onAdjustChange={(adjust) => {
                       if (onAdjustChange) {
@@ -338,15 +350,23 @@ export function EditPanel({
                       }
                     }}
                   />
-                )}
+                </div>
 
-                {activeTab === 'colors' && (
+                {/* Colors Tab */}
+                <div
+                  style={{ display: activeTab === 'colors' ? 'block' : 'none' }}
+                >
                   <ColorsPanel onColorChange={onColorChange} />
-                )}
+                </div>
 
-                {activeTab === 'filters' && (
+                {/* Filters Tab */}
+                <div
+                  style={{
+                    display: activeTab === 'filters' ? 'block' : 'none',
+                  }}
+                >
                   <FiltersPanel onFilterChange={onFilterChange} />
-                )}
+                </div>
               </div>
             )}
           </div>

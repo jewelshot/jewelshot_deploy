@@ -8,6 +8,12 @@ import { useDehaze } from '@/hooks/useDehaze';
 import { useVignette } from '@/hooks/useVignette';
 import { useGrain } from '@/hooks/useGrain';
 import AILoadingOverlay from '@/components/atoms/AILoadingOverlay';
+import {
+  clampAdjustFilters,
+  clampColorFilters,
+  clampFilterEffects,
+  detectExtremeFilters,
+} from '@/lib/filter-clamping';
 
 interface ImageViewerProps {
   src: string;
@@ -71,6 +77,7 @@ export function ImageViewer({
   aiProgress = 'AI Processing...',
   onImageLoad,
   onImageError,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   controlsVisible = true,
 }: ImageViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -80,55 +87,114 @@ export function ImageViewer({
   const startPosRef = useRef({ x: 0, y: 0 });
   const zoomTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // 🎯 CRITICAL: Clamp filter values to safe ranges (prevents canvas rendering failures)
+  const safeAdjustFilters = useMemo(
+    () =>
+      clampAdjustFilters({
+        brightness: adjustFilters.brightness || 0,
+        contrast: adjustFilters.contrast || 0,
+        exposure: adjustFilters.exposure || 0,
+        highlights: adjustFilters.highlights || 0,
+        shadows: adjustFilters.shadows || 0,
+        whites: adjustFilters.whites || 0,
+        blacks: adjustFilters.blacks || 0,
+        clarity: adjustFilters.clarity || 0,
+        sharpness: adjustFilters.sharpness || 0,
+        dehaze: adjustFilters.dehaze || 0,
+      }),
+    [adjustFilters]
+  );
+
+  const safeColorFilters = useMemo(
+    () =>
+      clampColorFilters({
+        temperature: colorFilters.temperature || 0,
+        tint: colorFilters.tint || 0,
+        saturation: colorFilters.saturation || 0,
+        vibrance: colorFilters.vibrance || 0,
+      }),
+    [colorFilters]
+  );
+
+  const safeFilterEffects = useMemo(
+    () =>
+      clampFilterEffects({
+        vignetteAmount: filterEffects.vignetteAmount || 0,
+        vignetteSize: filterEffects.vignetteSize || 50,
+        vignetteFeather: filterEffects.vignetteFeather || 50,
+        grainAmount: filterEffects.grainAmount || 0,
+        grainSize: filterEffects.grainSize || 50,
+        fadeAmount: filterEffects.fadeAmount || 0,
+      }),
+    [filterEffects]
+  );
+
+  // 🎯 Detect extreme filter combinations (warn user if too many extreme values)
+  const extremeWarning = useMemo(
+    () =>
+      detectExtremeFilters(
+        safeAdjustFilters,
+        safeColorFilters,
+        safeFilterEffects
+      ),
+    [safeAdjustFilters, safeColorFilters, safeFilterEffects]
+  );
+
+  // Log extreme filter warning (once per change)
+  useEffect(() => {
+    if (extremeWarning) {
+      console.warn('⚠️ EXTREME FILTERS DETECTED:', extremeWarning);
+    }
+  }, [extremeWarning]);
+
   // Processing pipeline (order matters):
   // 1. Dehaze (atmospheric correction first)
   const { processedSrc: dehazedSrc } = useDehaze({
     originalSrc: src,
-    dehaze: adjustFilters.dehaze || 0,
-    enabled: (adjustFilters.dehaze || 0) !== 0,
+    dehaze: safeAdjustFilters.dehaze,
+    enabled: safeAdjustFilters.dehaze !== 0,
     highQuality: false, // Fast mode for real-time performance
   });
 
   // 2. Selective tone adjustment (highlights & shadows after dehaze)
   const { processedSrc: toneMappedSrc } = useSelectiveTone({
     originalSrc: dehazedSrc,
-    highlights: adjustFilters.highlights || 0,
-    shadows: adjustFilters.shadows || 0,
+    highlights: safeAdjustFilters.highlights,
+    shadows: safeAdjustFilters.shadows,
     enabled:
-      (adjustFilters.highlights || 0) !== 0 ||
-      (adjustFilters.shadows || 0) !== 0,
+      safeAdjustFilters.highlights !== 0 || safeAdjustFilters.shadows !== 0,
   });
 
   // 3. Clarity (local contrast enhancement after tone mapping)
   const { processedSrc: clarifiedSrc } = useClarity({
     originalSrc: toneMappedSrc,
-    clarity: adjustFilters.clarity || 0,
-    enabled: (adjustFilters.clarity || 0) !== 0,
+    clarity: safeAdjustFilters.clarity,
+    enabled: safeAdjustFilters.clarity !== 0,
     highQuality: false, // Fast mode for real-time performance
   });
 
   // 4. Sharpening (applied last for maximum detail)
   const { processedSrc: sharpenedSrc } = useImageSharpening({
     originalSrc: clarifiedSrc,
-    sharpness: adjustFilters.sharpness || 0,
-    enabled: (adjustFilters.sharpness || 0) !== 0,
+    sharpness: safeAdjustFilters.sharpness,
+    enabled: safeAdjustFilters.sharpness !== 0,
   });
 
   // 5. Vignette (artistic effect after all adjustments)
   const { processedSrc: vignettedSrc } = useVignette({
     originalSrc: sharpenedSrc,
-    amount: filterEffects.vignetteAmount || 0,
-    size: filterEffects.vignetteSize || 50,
-    feather: filterEffects.vignetteFeather || 50,
-    enabled: (filterEffects.vignetteAmount || 0) !== 0,
+    amount: safeFilterEffects.vignetteAmount,
+    size: safeFilterEffects.vignetteSize,
+    feather: safeFilterEffects.vignetteFeather,
+    enabled: safeFilterEffects.vignetteAmount !== 0,
   });
 
   // 6. Grain (film texture as final touch)
   const { processedSrc: finalProcessedSrc } = useGrain({
     originalSrc: vignettedSrc,
-    amount: filterEffects.grainAmount || 0,
-    size: filterEffects.grainSize || 50,
-    enabled: (filterEffects.grainAmount || 0) > 0,
+    amount: safeFilterEffects.grainAmount,
+    size: safeFilterEffects.grainSize,
+    enabled: safeFilterEffects.grainAmount > 0,
   });
 
   // Build CSS filter string from adjust values (memoized for performance)
@@ -138,31 +204,34 @@ export function ImageViewer({
     // Brightness: Linear transformation
     // -100 → 0 (completely dark), 0 → 1 (normal), +100 → 2 (double brightness)
     if (
-      adjustFilters.brightness !== undefined &&
-      adjustFilters.brightness !== 0
+      safeAdjustFilters.brightness !== undefined &&
+      safeAdjustFilters.brightness !== 0
     ) {
-      const brightness = (adjustFilters.brightness + 100) / 100;
+      const brightness = (safeAdjustFilters.brightness + 100) / 100;
       filters.push(`brightness(${brightness.toFixed(3)})`);
     }
 
     // Contrast: Exponential curve for more natural feel
     // -100 → 0 (flat gray), 0 → 1 (normal), +100 → 2.5 (high contrast)
-    if (adjustFilters.contrast !== undefined && adjustFilters.contrast !== 0) {
+    if (
+      safeAdjustFilters.contrast !== undefined &&
+      safeAdjustFilters.contrast !== 0
+    ) {
       let contrast: number;
 
-      if (adjustFilters.contrast < 0) {
+      if (safeAdjustFilters.contrast < 0) {
         // Negative: Smooth reduction (0 to 1)
         // At -100: 0 (completely flat)
         // At -50: 0.5 (half contrast)
         // At 0: 1 (normal)
-        contrast = 1 + adjustFilters.contrast / 100;
+        contrast = 1 + safeAdjustFilters.contrast / 100;
       } else {
         // Positive: Exponential increase (1 to 2.5)
         // At 0: 1 (normal)
         // At 50: 1.5 (moderate boost)
         // At 100: 2.5 (strong boost)
         // Using power curve: 1 + (value^1.2 / 100) * 1.5
-        const normalized = adjustFilters.contrast / 100; // 0 to 1
+        const normalized = safeAdjustFilters.contrast / 100; // 0 to 1
         contrast = 1 + Math.pow(normalized, 1.2) * 1.5;
       }
 
@@ -172,9 +241,12 @@ export function ImageViewer({
     // Exposure: Camera EV stops simulation
     // Mimics real camera exposure behavior with tonal preservation
     // -100 → -2 EV stops (underexposed), 0 → 0 EV (normal), +100 → +2 EV (overexposed)
-    if (adjustFilters.exposure !== undefined && adjustFilters.exposure !== 0) {
+    if (
+      safeAdjustFilters.exposure !== undefined &&
+      safeAdjustFilters.exposure !== 0
+    ) {
       // Convert -100/+100 range to EV stops (-2 to +2)
-      const evStops = (adjustFilters.exposure / 100) * 2;
+      const evStops = (safeAdjustFilters.exposure / 100) * 2;
 
       // Calculate exposure multiplier using 2^EV formula
       // Each stop doubles (positive) or halves (negative) the light
@@ -186,18 +258,21 @@ export function ImageViewer({
       // Add subtle contrast compensation for more natural look
       // High exposure: slightly reduce contrast to prevent blown highlights
       // Low exposure: slightly increase contrast to maintain shadow detail
-      if (Math.abs(adjustFilters.exposure) > 30) {
+      if (Math.abs(safeAdjustFilters.exposure) > 30) {
         let contrastCompensation: number;
 
-        if (adjustFilters.exposure > 0) {
+        if (safeAdjustFilters.exposure > 0) {
           // Positive exposure: reduce contrast slightly (0.95 to 0.85)
           // At +50: 0.92, At +100: 0.85
-          const factor = Math.min(adjustFilters.exposure / 100, 1);
+          const factor = Math.min(safeAdjustFilters.exposure / 100, 1);
           contrastCompensation = 1 - factor * 0.15;
         } else {
           // Negative exposure: increase contrast slightly (1.0 to 1.15)
           // At -50: 1.075, At -100: 1.15
-          const factor = Math.min(Math.abs(adjustFilters.exposure) / 100, 1);
+          const factor = Math.min(
+            Math.abs(safeAdjustFilters.exposure) / 100,
+            1
+          );
           contrastCompensation = 1 + factor * 0.15;
         }
 
@@ -207,17 +282,17 @@ export function ImageViewer({
       // Add subtle saturation preservation
       // Extreme exposure changes can wash out or over-saturate colors
       // This helps maintain natural color intensity
-      if (Math.abs(adjustFilters.exposure) > 50) {
+      if (Math.abs(safeAdjustFilters.exposure) > 50) {
         let saturationCompensation: number;
 
-        if (adjustFilters.exposure > 0) {
+        if (safeAdjustFilters.exposure > 0) {
           // High exposure: slightly reduce saturation (0.95 to 0.90)
-          const factor = Math.min((adjustFilters.exposure - 50) / 50, 1);
+          const factor = Math.min((safeAdjustFilters.exposure - 50) / 50, 1);
           saturationCompensation = 1 - factor * 0.1;
         } else {
           // Low exposure: slightly increase saturation (1.0 to 1.10)
           const factor = Math.min(
-            (Math.abs(adjustFilters.exposure) - 50) / 50,
+            (Math.abs(safeAdjustFilters.exposure) - 50) / 50,
             1
           );
           saturationCompensation = 1 + factor * 0.1;
@@ -236,11 +311,14 @@ export function ImageViewer({
     // Whites: Extreme tonal adjustment for brightest areas (near-white tones)
     // More aggressive than highlights - targets the top 10% of tonal range
     // -100 → Strongly pull down whites (prevent clipping), 0 → Normal, +100 → Blow out whites
-    if (adjustFilters.whites !== undefined && adjustFilters.whites !== 0) {
+    if (
+      safeAdjustFilters.whites !== undefined &&
+      safeAdjustFilters.whites !== 0
+    ) {
       // Scale factor for smooth transitions
-      const scaleFactor = Math.abs(adjustFilters.whites) / 100;
+      const scaleFactor = Math.abs(safeAdjustFilters.whites) / 100;
 
-      if (adjustFilters.whites < 0) {
+      if (safeAdjustFilters.whites < 0) {
         // NEGATIVE: Pull down/Compress whites (recover extreme highlights)
         // Strategy: Aggressive brightness reduction + strong contrast increase
 
@@ -256,7 +334,7 @@ export function ImageViewer({
 
         // Saturation boost to restore color in recovered whites
         // At -50: 1.075, At -100: 1.15
-        if (Math.abs(adjustFilters.whites) > 20) {
+        if (Math.abs(safeAdjustFilters.whites) > 20) {
           const saturationBoost = 1 + scaleFactor * 0.15;
           filters.push(`saturate(${saturationBoost.toFixed(3)})`);
         }
@@ -276,7 +354,7 @@ export function ImageViewer({
 
         // Strong saturation reduction for blown-out white effect
         // At +50: 0.90, At +100: 0.80
-        if (adjustFilters.whites > 20) {
+        if (safeAdjustFilters.whites > 20) {
           const saturationReduction = 1 - scaleFactor * 0.2;
           filters.push(`saturate(${saturationReduction.toFixed(3)})`);
         }
@@ -286,11 +364,14 @@ export function ImageViewer({
     // Blacks: Extreme tonal adjustment for darkest areas (near-black tones)
     // More aggressive than shadows - targets the bottom 10% of tonal range
     // -100 → Strongly lift blacks (prevent crushing), 0 → Normal, +100 → Crush blacks
-    if (adjustFilters.blacks !== undefined && adjustFilters.blacks !== 0) {
+    if (
+      safeAdjustFilters.blacks !== undefined &&
+      safeAdjustFilters.blacks !== 0
+    ) {
       // Scale factor for smooth transitions
-      const scaleFactor = Math.abs(adjustFilters.blacks) / 100;
+      const scaleFactor = Math.abs(safeAdjustFilters.blacks) / 100;
 
-      if (adjustFilters.blacks < 0) {
+      if (safeAdjustFilters.blacks < 0) {
         // NEGATIVE: Lift/Open blacks (reveal extreme shadow detail)
         // Strategy: Strong brightness increase + aggressive contrast reduction
 
@@ -306,7 +387,7 @@ export function ImageViewer({
 
         // Strong saturation boost to maintain color in lifted blacks
         // At -50: 1.10, At -100: 1.20
-        if (Math.abs(adjustFilters.blacks) > 20) {
+        if (Math.abs(safeAdjustFilters.blacks) > 20) {
           const saturationBoost = 1 + scaleFactor * 0.2;
           filters.push(`saturate(${saturationBoost.toFixed(3)})`);
         }
@@ -326,7 +407,7 @@ export function ImageViewer({
 
         // Strong saturation reduction for crushed black effect
         // At +50: 0.925, At +100: 0.85
-        if (adjustFilters.blacks > 20) {
+        if (safeAdjustFilters.blacks > 20) {
           const saturationReduction = 1 - scaleFactor * 0.15;
           filters.push(`saturate(${saturationReduction.toFixed(3)})`);
         }
@@ -350,10 +431,10 @@ export function ImageViewer({
     // Unified algorithm for seamless transition across 0
     // -100 → Cool (Blue, ~3000K), 0 → Neutral (~5500K), +100 → Warm (Orange, ~10000K)
     if (
-      colorFilters.temperature !== undefined &&
-      colorFilters.temperature !== 0
+      safeColorFilters.temperature !== undefined &&
+      safeColorFilters.temperature !== 0
     ) {
-      const temp = colorFilters.temperature;
+      const temp = safeColorFilters.temperature;
       const normalized = temp / 100; // -1 to +1
 
       // Unified sepia-based approach for smooth transition
@@ -393,8 +474,8 @@ export function ImageViewer({
     // Tint: Green-Magenta color balance
     // Professional color grading control
     // -100 → Green tint, 0 → Neutral, +100 → Magenta/Pink tint
-    if (colorFilters.tint !== undefined && colorFilters.tint !== 0) {
-      const tint = colorFilters.tint;
+    if (safeColorFilters.tint !== undefined && safeColorFilters.tint !== 0) {
+      const tint = safeColorFilters.tint;
       const intensity = Math.abs(tint) / 100; // 0 to 1
 
       if (tint < 0) {
@@ -424,21 +505,21 @@ export function ImageViewer({
     // Affects all colors equally (simple but effective)
     // -100 → Grayscale (B&W), 0 → Normal, +100 → Hyper-saturated
     if (
-      colorFilters.saturation !== undefined &&
-      colorFilters.saturation !== 0
+      safeColorFilters.saturation !== undefined &&
+      safeColorFilters.saturation !== 0
     ) {
       // Linear mapping with slight curve for more control
       // At -100: 0 (grayscale), At 0: 1 (normal), At +100: 2.5 (vivid)
       let saturation: number;
 
-      if (colorFilters.saturation < 0) {
+      if (safeColorFilters.saturation < 0) {
         // Negative: Desaturate towards grayscale
         // Linear reduction: 1.0 to 0.0
-        saturation = 1 + colorFilters.saturation / 100;
+        saturation = 1 + safeColorFilters.saturation / 100;
       } else {
         // Positive: Boost saturation with power curve
         // Smoother increase for natural look
-        const normalized = colorFilters.saturation / 100; // 0 to 1
+        const normalized = safeColorFilters.saturation / 100; // 0 to 1
         saturation = 1 + Math.pow(normalized, 0.9) * 1.5;
       }
 
@@ -453,8 +534,11 @@ export function ImageViewer({
     // - Vibrance primarily affects muted colors (low saturation)
     // - Already vivid colors are protected from clipping
     // - Skin tones (reds/oranges) are preserved
-    if (colorFilters.vibrance !== undefined && colorFilters.vibrance !== 0) {
-      const vibrance = colorFilters.vibrance;
+    if (
+      safeColorFilters.vibrance !== undefined &&
+      safeColorFilters.vibrance !== 0
+    ) {
+      const vibrance = safeColorFilters.vibrance;
       const intensity = Math.abs(vibrance) / 100; // 0 to 1
 
       if (vibrance < 0) {
@@ -496,10 +580,10 @@ export function ImageViewer({
     // Vintage, washed-out film look
     // 0 → No fade (pure blacks), 100 → Full fade (no pure blacks)
     if (
-      filterEffects.fadeAmount !== undefined &&
-      filterEffects.fadeAmount > 0
+      safeFilterEffects.fadeAmount !== undefined &&
+      safeFilterEffects.fadeAmount > 0
     ) {
-      const fadeIntensity = filterEffects.fadeAmount / 100; // 0 to 1
+      const fadeIntensity = safeFilterEffects.fadeAmount / 100; // 0 to 1
 
       // Fade works by lifting black point while maintaining highlights
       // Strategy: Reduce contrast + increase brightness
@@ -527,7 +611,7 @@ export function ImageViewer({
     // Adds realistic film grain texture with adjustable size and intensity
 
     return filters.length > 0 ? filters.join(' ') : 'none';
-  }, [adjustFilters, colorFilters, filterEffects]);
+  }, [safeAdjustFilters, safeColorFilters, safeFilterEffects]);
 
   // Mouse drag
   useEffect(() => {

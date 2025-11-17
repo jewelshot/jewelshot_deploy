@@ -62,16 +62,16 @@ export function ColorsPanel({ onColorChange }: ColorsPanelProps) {
         <AdjustSlider
           label="Temperature"
           value={temperature}
-          min={-100}
-          max={100}
+          min={-75}
+          max={75}
           onChange={setTemperature}
         />
 
         <AdjustSlider
           label="Tint"
           value={tint}
-          min={-100}
-          max={100}
+          min={-75}
+          max={75}
           onChange={setTint}
         />
       </div>
@@ -85,16 +85,16 @@ export function ColorsPanel({ onColorChange }: ColorsPanelProps) {
         <AdjustSlider
           label="Saturation"
           value={saturation}
-          min={-100}
-          max={100}
+          min={-75}
+          max={75}
           onChange={setSaturation}
         />
 
         <AdjustSlider
           label="Vibrance"
           value={vibrance}
-          min={-100}
-          max={100}
+          min={-75}
+          max={75}
           onChange={setVibrance}
         />
       </div>

@@ -556,6 +556,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     colorFilters,
     filterEffects,
     transform,
+    resetFilters, // 🎯 CRITICAL: Pass resetFilters to handlers
     viewMode,
     activeImage,
     leftImageScale,

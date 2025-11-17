@@ -67,22 +67,22 @@ export function AdjustPanel({ onAdjustChange }: AdjustPanelProps) {
           <AdjustSlider
             label="Brightness"
             value={adjust.brightness}
-            min={-100}
-            max={100}
+            min={-75}
+            max={75}
             onChange={(v) => handleChange('brightness', v)}
           />
           <AdjustSlider
             label="Contrast"
             value={adjust.contrast}
-            min={-100}
-            max={100}
+            min={-75}
+            max={75}
             onChange={(v) => handleChange('contrast', v)}
           />
           <AdjustSlider
             label="Exposure"
             value={adjust.exposure}
-            min={-100}
-            max={100}
+            min={-75}
+            max={75}
             onChange={(v) => handleChange('exposure', v)}
           />
         </div>
@@ -100,29 +100,29 @@ export function AdjustPanel({ onAdjustChange }: AdjustPanelProps) {
           <AdjustSlider
             label="Highlights"
             value={adjust.highlights}
-            min={-100}
-            max={100}
+            min={-75}
+            max={75}
             onChange={(v) => handleChange('highlights', v)}
           />
           <AdjustSlider
             label="Shadows"
             value={adjust.shadows}
-            min={-100}
-            max={100}
+            min={-75}
+            max={75}
             onChange={(v) => handleChange('shadows', v)}
           />
           <AdjustSlider
             label="Whites"
             value={adjust.whites}
-            min={-100}
-            max={100}
+            min={-75}
+            max={75}
             onChange={(v) => handleChange('whites', v)}
           />
           <AdjustSlider
             label="Blacks"
             value={adjust.blacks}
-            min={-100}
-            max={100}
+            min={-75}
+            max={75}
             onChange={(v) => handleChange('blacks', v)}
           />
         </div>
@@ -140,22 +140,22 @@ export function AdjustPanel({ onAdjustChange }: AdjustPanelProps) {
           <AdjustSlider
             label="Clarity"
             value={adjust.clarity}
-            min={-100}
-            max={100}
+            min={-75}
+            max={75}
             onChange={(v) => handleChange('clarity', v)}
           />
           <AdjustSlider
             label="Sharpness"
             value={adjust.sharpness}
             min={0}
-            max={100}
+            max={75}
             onChange={(v) => handleChange('sharpness', v)}
           />
           <AdjustSlider
             label="Dehaze"
             value={adjust.dehaze}
-            min={-100}
-            max={100}
+            min={-75}
+            max={75}
             onChange={(v) => handleChange('dehaze', v)}
           />
         </div>

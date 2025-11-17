@@ -12,7 +12,11 @@ import { validateFile } from '@/lib/validators';
 import { rateLimiters } from '@/lib/rate-limiter';
 import { compressImage, shouldCompress } from '@/lib/image-compression';
 import { saveImageToGallery } from '@/lib/gallery-storage';
-import type { AdjustFilters, ColorFilters, FilterEffects } from './useImageFilters';
+import type {
+  AdjustFilters,
+  ColorFilters,
+  FilterEffects,
+} from './useImageFilters';
 import type { Transform } from './useImageTransform';
 
 const logger = createScopedLogger('CanvasHandlers');
@@ -50,6 +54,7 @@ interface UseCanvasHandlersProps {
   colorFilters: ColorFilters;
   filterEffects: FilterEffects;
   transform: Transform;
+  resetFilters: () => void; // 🎯 CRITICAL: Reset filters when new image loaded
 
   // View mode
   viewMode: 'normal' | 'side-by-side';
@@ -85,23 +90,24 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
     setIsLoading,
     setOriginalImage,
     resetImageState,
-    scale,
+    // scale, // unused in handlers
     setScale,
     setPosition,
     resetTransform,
-    isFullscreen,
+    // isFullscreen, // unused - passed for fullscreen state
     setIsFullscreen,
-    isCropMode,
+    // isCropMode, // unused - passed for crop mode state
     adjustFilters,
     colorFilters,
     filterEffects,
     transform,
+    resetFilters, // 🎯 CRITICAL: Reset filters when new image loaded
     viewMode,
     activeImage,
-    leftImageScale,
-    rightImageScale,
-    leftImagePosition,
-    rightImagePosition,
+    // leftImageScale, // unused in handlers
+    // rightImageScale, // unused in handlers
+    // leftImagePosition, // unused in handlers
+    // rightImagePosition, // unused in handlers
     setLeftImageScale,
     setRightImageScale,
     setLeftImagePosition,
@@ -187,7 +193,10 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
             setUploadedImage(result);
             // Save original image for comparison
             setOriginalImage(result);
+            // 🎯 CRITICAL FIX: Reset transform AND filters for new image!
             resetTransform();
+            resetFilters(); // ✅ Prevents old filters from applying to new images
+            logger.info('🔄 Filters reset for new image upload');
             // Auto-open right sidebar for AI generation setup
             openRight();
             logger.info('Image uploaded successfully, opening right sidebar');
@@ -239,6 +248,7 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
       setFileSize,
       setIsLoading,
       resetTransform,
+      resetFilters, // 🎯 Include resetFilters in dependencies
       resetImageState,
       fileInputRef,
       openRight,
@@ -250,6 +260,9 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
     resetImageState();
     // Reset transform
     resetTransform();
+    // 🎯 CRITICAL FIX: Reset filters when closing image
+    resetFilters(); // ✅ Clean slate for next image
+    logger.info('🔄 Filters reset on image close');
     // Reset original image (for comparison)
     setOriginalImage(null);
     // Reset file input so new images can be uploaded
@@ -258,7 +271,15 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
     }
     // Navigate to studio without query params
     router.replace('/studio', { scroll: false });
-  }, [resetImageState, resetTransform, setOriginalImage, fileInputRef, router]);
+    logger.info('Image closed');
+  }, [
+    resetImageState,
+    resetTransform,
+    resetFilters,
+    setOriginalImage,
+    fileInputRef,
+    router,
+  ]);
 
   // ============================================================================
   // ZOOM CONTROLS
@@ -319,10 +340,7 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
     // Check rate limit
     if (!rateLimiters.gallery.canMakeRequest()) {
       const remaining = rateLimiters.gallery.getRemainingRequests();
-      showToast(
-        `Too many saves. ${remaining} saves remaining.`,
-        'warning'
-      );
+      showToast(`Too many saves. ${remaining} saves remaining.`, 'warning');
       return;
     }
 
@@ -347,7 +365,10 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
       showToast('Image saved to gallery!', 'success');
     } catch (error) {
       logger.error('Failed to save image:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to save image to gallery';
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to save image to gallery';
       showToast(errorMessage, 'error');
     }
   }, [uploadedImage, fileName, originalImage, showToast]);
@@ -384,7 +405,10 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
           ctx.rotate((transform.rotation * Math.PI) / 180);
         }
 
-        ctx.scale(transform.flipHorizontal ? -1 : 1, transform.flipVertical ? -1 : 1);
+        ctx.scale(
+          transform.flipHorizontal ? -1 : 1,
+          transform.flipVertical ? -1 : 1
+        );
 
         // Apply filters
         const filters = [];
@@ -439,7 +463,7 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
     transform,
     adjustFilters,
     colorFilters,
-    filterEffects,
+    // filterEffects not used in download
     showToast,
   ]);
 
