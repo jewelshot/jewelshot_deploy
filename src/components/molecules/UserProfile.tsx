@@ -13,6 +13,7 @@ import { LogOut, ChevronDown } from 'lucide-react';
 import Avatar from '@/components/atoms/Avatar';
 import OnlineIndicator from '@/components/atoms/OnlineIndicator';
 import UserInfo from '@/components/atoms/UserInfo';
+import { useCreditStore } from '@/store/creditStore';
 import { createScopedLogger } from '@/lib/logger';
 
 const logger = createScopedLogger('UserProfile');
@@ -20,6 +21,7 @@ import { createClient } from '@/lib/supabase/client';
 
 export function UserProfile() {
   const router = useRouter();
+  const { credits, loading: creditsLoading, fetchCredits } = useCreditStore();
   const [user, setUser] = useState<{
     name: string;
     email: string;
@@ -47,7 +49,8 @@ export function UserProfile() {
     };
 
     fetchUser();
-  }, []);
+    fetchCredits(); // 🎯 Fetch credits on mount
+  }, [fetchCredits]);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -71,6 +74,7 @@ export function UserProfile() {
         <div className="flex-1 space-y-2">
           <div className="h-3 w-24 animate-pulse rounded bg-white/10" />
           <div className="h-2 w-32 animate-pulse rounded bg-white/10" />
+          <div className="mt-1.5 h-2 w-16 animate-pulse rounded bg-white/10" />
         </div>
       </div>
     );
@@ -90,8 +94,32 @@ export function UserProfile() {
           <OnlineIndicator online={true} />
         </div>
 
-        {/* User Info */}
-        <UserInfo name={user.name} status={user.email} />
+        {/* User Info & Credits */}
+        <div className="flex-1">
+          <UserInfo name={user.name} status={user.email} />
+
+          {/* 💎 Credits Display - Integrated Below User Info */}
+          <div className="mt-1.5 flex items-center gap-1.5">
+            <div className="text-[10px] font-medium text-white/40">
+              Credits:
+            </div>
+            {creditsLoading ? (
+              <div className="h-3 w-8 animate-pulse rounded bg-white/10" />
+            ) : (
+              <div
+                className={`text-xs font-bold ${
+                  credits === 0
+                    ? 'text-red-400'
+                    : credits <= 3
+                      ? 'text-yellow-400'
+                      : 'bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent'
+                }`}
+              >
+                {credits}
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* Dropdown Icon */}
         <ChevronDown
