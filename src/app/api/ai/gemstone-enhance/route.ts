@@ -1,0 +1,326 @@
+/**
+ * Gemstone Enhancement API Route
+ *
+ * Enhances gemstone quality using Fal.ai Nano-Banana
+ * POST /api/ai/gemstone-enhance
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { fal } from '@fal-ai/client';
+import { createScopedLogger } from '@/lib/logger';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
+
+const logger = createScopedLogger('API:GemstoneEnhance');
+
+// Configure Fal.ai client with API key
+const FAL_KEY = process.env.FAL_AI_API_KEY || process.env.FAL_KEY || '';
+logger.info('[GemstoneEnhance] FAL_AI_API_KEY status:', {
+  exists: !!FAL_KEY,
+  length: FAL_KEY.length,
+  prefix: FAL_KEY.substring(0, 10),
+});
+
+fal.config({
+  credentials: FAL_KEY,
+});
+
+/**
+ * Upload image to FAL.AI storage if needed
+ */
+async function uploadIfNeeded(imageUrl: string): Promise<string> {
+  // Blob URLs should be converted to data URIs on client-side before reaching here
+  if (imageUrl.startsWith('blob:')) {
+    logger.error(
+      '[GemstoneEnhance] Blob URL detected on server-side (should not happen)'
+    );
+    throw new Error(
+      'Blob URLs cannot be processed on server. Please convert to data URI first.'
+    );
+  }
+
+  // If it's already an absolute URL, return it
+  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+    return imageUrl;
+  }
+
+  // If it's a relative URL (e.g., /api/images/[id]), convert to absolute and fetch
+  if (imageUrl.startsWith('/')) {
+    const baseUrl =
+      process.env.NEXT_PUBLIC_SITE_URL ||
+      (process.env.VERCEL_URL
+        ? process.env.VERCEL_URL.startsWith('http')
+          ? process.env.VERCEL_URL
+          : `https://${process.env.VERCEL_URL}`
+        : null) ||
+      'http://localhost:3000';
+
+    const absoluteUrl = `${baseUrl}${imageUrl}`;
+
+    logger.info('[GemstoneEnhance] Converting relative URL to absolute:', {
+      original: imageUrl,
+      absolute: absoluteUrl,
+    });
+
+    try {
+      const response = await fetch(absoluteUrl);
+      if (!response.ok) {
+        logger.error('[GemstoneEnhance] Failed to fetch image:', {
+          url: absoluteUrl,
+          status: response.status,
+        });
+        throw new Error(`Failed to fetch image: ${response.statusText}`);
+      }
+
+      const blob = await response.blob();
+      const file = new File([blob], 'image.jpg', { type: blob.type });
+      const uploadedUrl = await fal.storage.upload(file);
+      logger.info('[GemstoneEnhance] Image uploaded to FAL.AI:', uploadedUrl);
+      return uploadedUrl;
+    } catch (error) {
+      logger.error('[GemstoneEnhance] Error processing relative URL:', error);
+      throw error;
+    }
+  }
+
+  // If it's a data URI, upload it
+  if (imageUrl.startsWith('data:')) {
+    const response = await fetch(imageUrl);
+    const blob = await response.blob();
+    const file = new File([blob], 'image.jpg', { type: blob.type });
+    const uploadedUrl = await fal.storage.upload(file);
+    logger.info('[GemstoneEnhance] Data URI uploaded to FAL.AI:', uploadedUrl);
+    return uploadedUrl;
+  }
+
+  throw new Error('Invalid image URL format');
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    // 🔒 AUTHENTICATION CHECK
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          },
+        },
+      }
+    );
+
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      logger.warn('Unauthorized gemstone enhance attempt');
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Parse request body
+    const body = await request.json();
+    const { image_url } = body;
+
+    // Validate required fields
+    if (!image_url) {
+      logger.warn('[GemstoneEnhance] Missing image_url');
+      return NextResponse.json(
+        { error: 'image_url is required' },
+        { status: 400 }
+      );
+    }
+
+    logger.info('[GemstoneEnhance] Starting gemstone enhancement', {
+      user_id: user.id,
+      image_url_type: image_url.startsWith('http')
+        ? 'absolute'
+        : image_url.startsWith('/')
+          ? 'relative'
+          : 'data',
+    });
+
+    // Upload image if needed
+    let uploadedUrl: string;
+    try {
+      uploadedUrl = await uploadIfNeeded(image_url);
+      logger.info('[GemstoneEnhance] Image prepared:', uploadedUrl);
+    } catch (uploadError) {
+      logger.error('[GemstoneEnhance] Failed to prepare image:', uploadError);
+      return NextResponse.json(
+        {
+          error: 'Failed to prepare image',
+          details:
+            uploadError instanceof Error
+              ? uploadError.message
+              : 'Unknown error',
+        },
+        { status: 400 }
+      );
+    }
+
+    // Gemstone Enhancement Prompt (JSON format, under 1800 chars)
+    const gemstonePrompt = JSON.stringify({
+      task: 'gemstone jewelry quality enhancement ultra-detailed clarity',
+      preserve_critical:
+        '⛔ JEWELRY STRUCTURE 100% FROZEN ⛔ EXACT: gemstone-count|positions|sizes|cuts|facet-patterns setting-prongs|bezels|design metal-structure|proportions engravings|details ALL-UNCHANGED ⚠️ 0.01% change = FAIL ⚠️',
+      enhance_targets: {
+        diamonds:
+          'whiter brighter D-E-F color-grade crisp ice-white brilliant-cut facets ultra-sharp razor-clear sparkle fire scintillation maximum',
+        colored_gems:
+          'vivid saturated rich natural hues clarity transparency depth color-purity enhanced brilliance luster radiance',
+        all_stones:
+          'crystal-clear flawless clarity internal-reflections facet-definition cutting-precision polished-perfection光泽',
+      },
+      technical: {
+        clarity:
+          'FL-IF flawless internally-flawless eye-clean ultra-transparent',
+        cut: 'ideal excellent proportions symmetry polish facet-alignment precise',
+        color_diamonds: 'D-E-F colorless icy-white pure brilliant',
+        color_gems: 'vivid intense saturated pure natural authentic',
+        finish: 'mirror-polish high-luster reflective brilliant',
+      },
+      forbidden:
+        '❌ FAIL: added|removed|moved gemstones altered-count changed-sizes modified-cuts new-facet-patterns altered-settings design-modifications structure-changes distorted-gems synthetic-look oversaturated unnatural-color cloudy-stones',
+      lighting: 'studio 5500K neutral accurate gemological grading-light',
+      quality: 'ultra-sharp 300DPI macro-detail professional gemological',
+    });
+
+    logger.info('[GemstoneEnhance] Prompt length:', gemstonePrompt.length);
+
+    if (gemstonePrompt.length > 1800) {
+      logger.error('[GemstoneEnhance] Prompt too long:', gemstonePrompt.length);
+      return NextResponse.json(
+        { error: 'Prompt exceeds 1800 character limit' },
+        { status: 400 }
+      );
+    }
+
+    // Call FAL.AI Nano-Banana API
+    let result;
+    try {
+      logger.info('[GemstoneEnhance] Calling Fal.ai Nano-Banana API...');
+
+      result = await fal.subscribe('fal-ai/nano-banana/edit', {
+        input: {
+          image_url: uploadedUrl,
+          prompt: gemstonePrompt,
+          image_guidance_scale: 1.8, // Higher for stronger preservation
+          text_guidance_scale: 7.5,
+          num_inference_steps: 50, // More steps for quality
+          seed: Math.floor(Math.random() * 1000000),
+        },
+        logs: true,
+        onQueueUpdate: (update) => {
+          if (update.status === 'IN_PROGRESS') {
+            logger.info('[GemstoneEnhance] Progress:', {
+              status: update.status,
+              logs: update.logs?.map((l) => l.message).join(', '),
+            });
+          }
+        },
+      });
+
+      logger.info('[GemstoneEnhance] Enhancement successful', {
+        user_id: user.id,
+        request_id: result.requestId,
+        has_image: !!result.data?.images?.[0]?.url,
+      });
+    } catch (falError: unknown) {
+      const error = falError as { message?: string; data?: unknown };
+      logger.error('[GemstoneEnhance] Fal.ai API error:', {
+        error: error,
+        message: error?.message,
+        data: error?.data,
+      });
+
+      return NextResponse.json(
+        {
+          error: 'Gemstone enhancement failed at Fal.ai',
+          details: error?.message || 'Unknown error',
+        },
+        { status: 422 }
+      );
+    }
+
+    // Save enhanced image to Supabase Storage
+    const imageUrl = result.data.images?.[0]?.url;
+    if (imageUrl) {
+      try {
+        logger.info('[GemstoneEnhance] Downloading enhanced image:', imageUrl);
+
+        const imageResponse = await fetch(imageUrl);
+        if (!imageResponse.ok) {
+          throw new Error(`Failed to download: ${imageResponse.statusText}`);
+        }
+
+        const imageBlob = await imageResponse.blob();
+        const imageBuffer = Buffer.from(await imageBlob.arrayBuffer());
+
+        // Upload to Supabase
+        const fileName = `${user.id}/${Date.now()}-gemstone-enhanced.jpg`;
+        logger.info('[GemstoneEnhance] Uploading to Supabase:', fileName);
+
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('generations')
+          .upload(fileName, imageBuffer, {
+            contentType: 'image/jpeg',
+            upsert: false,
+          });
+
+        if (uploadError) {
+          logger.error(
+            '[GemstoneEnhance] Supabase upload failed:',
+            uploadError
+          );
+        } else {
+          logger.info(
+            '[GemstoneEnhance] Uploaded successfully:',
+            uploadData.path
+          );
+
+          const { data: urlData } = supabase.storage
+            .from('generations')
+            .getPublicUrl(fileName);
+
+          return NextResponse.json({
+            success: true,
+            image: {
+              url: urlData.publicUrl,
+              width: result.data.images[0].width,
+              height: result.data.images[0].height,
+            },
+            requestId: result.requestId,
+          });
+        }
+      } catch (saveError) {
+        logger.error('[GemstoneEnhance] Failed to save:', saveError);
+      }
+    }
+
+    // Return Fal.ai URL as fallback
+    return NextResponse.json({
+      success: true,
+      image: result.data.images[0],
+      requestId: result.requestId,
+    });
+  } catch (error) {
+    logger.error('Gemstone enhancement failed:', error);
+    return NextResponse.json(
+      {
+        error: 'Gemstone enhancement failed',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 }
+    );
+  }
+}

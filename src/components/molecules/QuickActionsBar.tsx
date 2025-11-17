@@ -5,12 +5,13 @@
  * Matches Canvas UI design system exactly
  * Dynamic positioning based on sidebar states
  *
- * 5 Essential Buttons:
+ * 6 Essential Buttons:
  * 1. Upscale (2x quality) - Purple
  * 2. Remove BG (transparent) - Blue
  * 3. Rotate Left (-30°) - Green
  * 4. Rotate Right (+30°) - Green
  * 5. Close-Up (zoom details) - Orange
+ * 6. Gemstone (enhance clarity) - Pink
  */
 
 'use client';
@@ -22,6 +23,7 @@ import {
   RotateCcw,
   RotateCw,
   ZoomIn,
+  Gem,
   Loader2,
 } from 'lucide-react';
 
@@ -46,6 +48,10 @@ interface QuickActionsBarProps {
   onCloseUp: () => void;
   /** Whether close-up operation is in progress */
   isClosingUp?: boolean;
+  /** Callback when gemstone enhance button is clicked */
+  onGemstoneEnhance: () => void;
+  /** Whether gemstone enhancement is in progress */
+  isEnhancingGemstones?: boolean;
   /** Whether there's an active image to process */
   hasActiveImage: boolean;
   /** Whether right sidebar is open (for positioning) */
@@ -67,6 +73,8 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
   isRotatingRight = false,
   onCloseUp,
   isClosingUp = false,
+  onGemstoneEnhance,
+  isEnhancingGemstones = false,
   hasActiveImage,
   isRightSidebarOpen,
   isTopBarOpen,
@@ -96,6 +104,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
       'border border-[rgba(34,197,94,0.3)] bg-[rgba(34,197,94,0.1)] text-green-300 hover:border-[rgba(34,197,94,0.6)] hover:bg-[rgba(34,197,94,0.2)] hover:text-green-200',
     orange:
       'border border-[rgba(249,115,22,0.3)] bg-[rgba(249,115,22,0.1)] text-orange-300 hover:border-[rgba(249,115,22,0.6)] hover:bg-[rgba(249,115,22,0.2)] hover:text-orange-200',
+    pink: 'border border-[rgba(236,72,153,0.3)] bg-[rgba(236,72,153,0.1)] text-pink-300 hover:border-[rgba(236,72,153,0.6)] hover:bg-[rgba(236,72,153,0.2)] hover:text-pink-200',
   };
 
   return (
@@ -204,6 +213,31 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
           ) : (
             <ZoomIn className="h-3.5 w-3.5" />
+          )}
+        </button>
+
+        {/* Divider */}
+        <div className="h-px w-full bg-[rgba(139,92,246,0.2)]" />
+
+        {/* Gemstone Enhancement Button */}
+        <button
+          onClick={onGemstoneEnhance}
+          disabled={!hasActiveImage || isEnhancingGemstones}
+          className={getButtonClass(
+            hasActiveImage,
+            isEnhancingGemstones,
+            colors.pink
+          )}
+          title={
+            isEnhancingGemstones
+              ? 'Enhancing Gemstones...'
+              : 'Enhance Gemstone Quality'
+          }
+        >
+          {isEnhancingGemstones ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Gem className="h-3.5 w-3.5" />
           )}
         </button>
       </div>

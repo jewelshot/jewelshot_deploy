@@ -12,6 +12,7 @@ import { useImageEdit } from '@/hooks/useImageEdit';
 import { useImageToVideo } from '@/hooks/useImageToVideo';
 import { useImageUpscale } from '@/hooks/useImageUpscale';
 import { useRemoveBackground } from '@/hooks/useRemoveBackground';
+import { useGemstoneEnhance } from '@/hooks/useGemstoneEnhance';
 import { useCameraControl } from '@/hooks/useCameraControl';
 import { useCanvasHandlers } from '@/hooks/useCanvasHandlers';
 import { createScopedLogger } from '@/lib/logger';
@@ -204,6 +205,14 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     processedImageUrl: removedBgImageUrl,
     error: removeBgError,
   } = useRemoveBackground();
+
+  // Gemstone Enhancement
+  const {
+    enhanceGemstones,
+    isEnhancing: isEnhancingGemstones,
+    enhancedImageUrl: gemstoneEnhancedImageUrl,
+    error: gemstoneEnhanceError,
+  } = useGemstoneEnhance();
 
   // Camera Control (Rotate Left/Right, Close-Up)
   const { applyCamera, error: cameraError } = useCameraControl();
@@ -570,6 +579,73 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       toastManager.error(`❌ Camera control failed: ${cameraError}`);
     }
   }, [cameraError]);
+
+  // Handle gemstone enhancement
+  const handleGemstoneEnhance = useCallback(async () => {
+    if (!uploadedImage) {
+      toastManager.warning('No image to enhance');
+      return;
+    }
+
+    logger.info('[Canvas] Starting gemstone enhancement:', uploadedImage);
+
+    // Store original image for comparison
+    if (!originalImage) {
+      setOriginalImage(uploadedImage);
+    }
+
+    // Convert blob URL to data URI if needed
+    let imageUrl = uploadedImage;
+    if (uploadedImage.startsWith('blob:')) {
+      logger.info(
+        '[Canvas] Converting blob URL to data URI for gemstone enhancement'
+      );
+      try {
+        const response = await fetch(uploadedImage);
+        const blob = await response.blob();
+        imageUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        logger.info('[Canvas] Blob converted to data URI successfully');
+      } catch (error) {
+        logger.error('[Canvas] Failed to convert blob to data URI:', error);
+        toastManager.error('Failed to prepare image for processing');
+        return;
+      }
+    }
+
+    enhanceGemstones({
+      image_url: imageUrl,
+    });
+  }, [uploadedImage, originalImage, enhanceGemstones, setOriginalImage]);
+
+  // Update canvas with gemstone-enhanced image and enable comparison
+  useEffect(() => {
+    if (gemstoneEnhancedImageUrl) {
+      logger.info('[Canvas] Gemstones enhanced, updating canvas');
+      queueMicrotask(() => {
+        setUploadedImage(gemstoneEnhancedImageUrl);
+        setViewMode('side-by-side'); // Enable comparison view
+        toastManager.success('✅ Gemstones enhanced! Compare with original.');
+      });
+    }
+  }, [gemstoneEnhancedImageUrl, setUploadedImage, setViewMode]);
+
+  // Show error toast if gemstone enhancement fails
+  useEffect(() => {
+    if (gemstoneEnhanceError) {
+      logger.error(
+        '[Canvas] Gemstone enhancement failed:',
+        gemstoneEnhanceError
+      );
+      toastManager.error(
+        `❌ Gemstone enhancement failed: ${gemstoneEnhanceError}`
+      );
+    }
+  }, [gemstoneEnhanceError]);
 
   // Preset generation
   const handlePresetGeneration = useCallback(
@@ -1316,6 +1392,8 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
           isRotatingRight={isRotatingRight}
           onCloseUp={handleCloseUp}
           isClosingUp={isClosingUp}
+          onGemstoneEnhance={handleGemstoneEnhance}
+          isEnhancingGemstones={isEnhancingGemstones}
           hasActiveImage={!!uploadedImage}
           isRightSidebarOpen={rightOpen}
           isTopBarOpen={topOpen}
