@@ -1189,6 +1189,9 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
           onCloseUp={handleCloseUp}
           isClosingUp={isClosingUp}
           hasActiveImage={!!uploadedImage}
+          isRightSidebarOpen={rightOpen}
+          isTopBarOpen={topOpen}
+          controlsVisible={canvasControlsVisible}
         />
       )}
 
