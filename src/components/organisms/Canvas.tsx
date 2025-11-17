@@ -398,8 +398,32 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       setOriginalImage(uploadedImage);
     }
 
+    // Convert blob URL to data URI if needed
+    let imageUrl = uploadedImage;
+    if (uploadedImage.startsWith('blob:')) {
+      logger.info(
+        '[Canvas] Converting blob URL to data URI for camera control'
+      );
+      try {
+        const response = await fetch(uploadedImage);
+        const blob = await response.blob();
+        imageUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        logger.info('[Canvas] Blob converted to data URI successfully');
+      } catch (error) {
+        logger.error('[Canvas] Failed to convert blob to data URI:', error);
+        toastManager.error('Failed to prepare image for processing');
+        setIsRotatingLeft(false);
+        return;
+      }
+    }
+
     try {
-      const result = await applyCamera(uploadedImage, 'rotate_left', 'product');
+      const result = await applyCamera(imageUrl, 'rotate_left', 'product');
       if (result?.url) {
         setUploadedImage(result.url);
         setViewMode('side-by-side');
@@ -434,12 +458,32 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       setOriginalImage(uploadedImage);
     }
 
-    try {
-      const result = await applyCamera(
-        uploadedImage,
-        'rotate_right',
-        'product'
+    // Convert blob URL to data URI if needed
+    let imageUrl = uploadedImage;
+    if (uploadedImage.startsWith('blob:')) {
+      logger.info(
+        '[Canvas] Converting blob URL to data URI for camera control'
       );
+      try {
+        const response = await fetch(uploadedImage);
+        const blob = await response.blob();
+        imageUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        logger.info('[Canvas] Blob converted to data URI successfully');
+      } catch (error) {
+        logger.error('[Canvas] Failed to convert blob to data URI:', error);
+        toastManager.error('Failed to prepare image for processing');
+        setIsRotatingRight(false);
+        return;
+      }
+    }
+
+    try {
+      const result = await applyCamera(imageUrl, 'rotate_right', 'product');
       if (result?.url) {
         setUploadedImage(result.url);
         setViewMode('side-by-side');
@@ -474,8 +518,32 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       setOriginalImage(uploadedImage);
     }
 
+    // Convert blob URL to data URI if needed
+    let imageUrl = uploadedImage;
+    if (uploadedImage.startsWith('blob:')) {
+      logger.info(
+        '[Canvas] Converting blob URL to data URI for camera control'
+      );
+      try {
+        const response = await fetch(uploadedImage);
+        const blob = await response.blob();
+        imageUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        logger.info('[Canvas] Blob converted to data URI successfully');
+      } catch (error) {
+        logger.error('[Canvas] Failed to convert blob to data URI:', error);
+        toastManager.error('Failed to prepare image for processing');
+        setIsClosingUp(false);
+        return;
+      }
+    }
+
     try {
-      const result = await applyCamera(uploadedImage, 'closeup', 'product');
+      const result = await applyCamera(imageUrl, 'closeup', 'product');
       if (result?.url) {
         setUploadedImage(result.url);
         setViewMode('side-by-side');
