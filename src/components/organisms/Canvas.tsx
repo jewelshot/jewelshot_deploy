@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/useToast';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useImageEdit } from '@/hooks/useImageEdit';
 import { useImageToVideo } from '@/hooks/useImageToVideo';
+import { useImageUpscale } from '@/hooks/useImageUpscale';
 import { useCanvasHandlers } from '@/hooks/useCanvasHandlers';
 import { createScopedLogger } from '@/lib/logger';
 import { saveImageToGallery } from '@/lib/gallery-storage';
@@ -18,6 +19,7 @@ import Toast from '@/components/atoms/Toast';
 import { useCreditStore } from '@/store/creditStore';
 import { VideoPlayerModal } from '@/components/molecules/VideoPlayerModal';
 import { VideoGeneratingModal } from '@/components/molecules/VideoGeneratingModal';
+import { QuickActionsBar } from '@/components/molecules/QuickActionsBar';
 
 const logger = createScopedLogger('Canvas');
 // New refactored components
@@ -187,6 +189,15 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
 
   const [showVideoModal, setShowVideoModal] = useState(false);
 
+  // Image Upscale
+  const {
+    upscaleImage,
+    isUpscaling,
+    upscaledImageUrl,
+    error: upscaleError,
+    reset: resetUpscale,
+  } = useImageUpscale();
+
   // Handle video generation
   const handleGenerateVideo = useCallback(() => {
     if (!uploadedImage) {
@@ -226,6 +237,51 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       showToast(`❌ Video generation failed: ${videoError}`, 'error');
     }
   }, [videoError, showToast]);
+
+  // Handle image upscale
+  const handleUpscale = useCallback(() => {
+    if (!uploadedImage) {
+      showToast('No image to upscale', 'warning');
+      return;
+    }
+
+    logger.info('[Canvas] Starting image upscale:', uploadedImage);
+
+    // Store original image for comparison
+    if (!originalImage) {
+      setOriginalImage(uploadedImage);
+    }
+
+    upscaleImage({
+      image_url: uploadedImage,
+      upscale_mode: 'factor',
+      upscale_factor: 2, // 2x upscale
+      output_format: 'jpg',
+    });
+  }, [uploadedImage, originalImage, upscaleImage, showToast, setOriginalImage]);
+
+  // Update canvas with upscaled image and enable comparison
+  useEffect(() => {
+    if (upscaledImageUrl) {
+      logger.info('[Canvas] Upscaled image ready, updating canvas');
+      queueMicrotask(() => {
+        setUploadedImage(upscaledImageUrl);
+        setViewMode('side-by-side'); // Enable comparison view
+        showToast(
+          '✅ Image upscaled successfully! Compare with original.',
+          'success'
+        );
+      });
+    }
+  }, [upscaledImageUrl, setUploadedImage, setViewMode, showToast]);
+
+  // Show error toast if upscale fails
+  useEffect(() => {
+    if (upscaleError) {
+      logger.error('[Canvas] Image upscale failed:', upscaleError);
+      showToast(`❌ Upscale failed: ${upscaleError}`, 'error');
+    }
+  }, [upscaleError, showToast]);
 
   // Preset generation
   const handlePresetGeneration = useCallback(
@@ -932,6 +988,18 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
         onSuccess={(msg) => showToast(msg, 'success')}
         onError={(msg) => showToast(msg, 'error')}
       />
+
+      {/* ===================================================================
+          Quick Actions Bar - Image Operations (Upscale, Enhance, etc.)
+          ================================================================= */}
+      {uploadedImage && canvasControlsVisible && (
+        <QuickActionsBar
+          isRightSidebarExpanded={rightOpen}
+          onUpscale={handleUpscale}
+          isUpscaling={isUpscaling}
+          hasActiveImage={!!uploadedImage}
+        />
+      )}
 
       {/* ===================================================================
           REFACTORED: Canvas Modals - All Modal Components
