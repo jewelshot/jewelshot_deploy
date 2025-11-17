@@ -61,8 +61,8 @@ export function BottomBar() {
         right: rightOpen ? '260px' : '0px',
       }}
     >
-      {/* Center: Notifications */}
-      <div className="flex w-full items-center justify-center gap-2">
+      {/* Right: Notifications */}
+      <div className="flex w-full items-center justify-end gap-2">
         {latestToast && (
           <div
             className={`animate-in fade-in slide-in-from-right-2 flex items-center gap-2 rounded-lg border px-3 py-1.5 backdrop-blur-sm transition-all duration-300 ${colorMap[latestToast.type]}`}
