@@ -232,15 +232,37 @@ export async function POST(request: NextRequest) {
 
       logger.info('[Upscale] Calling Fal.ai SeedVR2 API now...');
 
+      // Build input based on upscale_mode
+      // IMPORTANT: Only send upscale_factor for 'factor' mode OR target_resolution for 'target' mode, NOT BOTH!
+      const baseInput = {
+        image_url: uploadedUrl,
+        upscale_mode,
+        output_format,
+        noise_scale,
+      };
+
+      // Add mode-specific parameters
+      let apiInput: typeof baseInput & {
+        upscale_factor?: number;
+        target_resolution?: string;
+      };
+      if (upscale_mode === 'factor') {
+        apiInput = { ...baseInput, upscale_factor };
+        logger.info('[Upscale] Using factor mode with factor:', upscale_factor);
+      } else if (upscale_mode === 'target') {
+        apiInput = { ...baseInput, target_resolution };
+        logger.info(
+          '[Upscale] Using target mode with resolution:',
+          target_resolution
+        );
+      } else {
+        apiInput = { ...baseInput, upscale_factor }; // Default to factor mode
+      }
+
+      logger.info('[Upscale] Final API input:', apiInput);
+
       result = await fal.subscribe('fal-ai/seedvr/upscale/image', {
-        input: {
-          image_url: uploadedUrl,
-          upscale_mode,
-          upscale_factor,
-          target_resolution,
-          output_format,
-          noise_scale,
-        } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
+        input: apiInput,
         logs: true,
         onQueueUpdate: (update) => {
           if (update.status === 'IN_PROGRESS') {
