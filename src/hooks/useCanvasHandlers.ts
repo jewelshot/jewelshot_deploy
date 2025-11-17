@@ -12,6 +12,7 @@ import { validateFile } from '@/lib/validators';
 import { rateLimiters } from '@/lib/rate-limiter';
 import { compressImage, shouldCompress } from '@/lib/image-compression';
 import { saveImageToGallery } from '@/lib/gallery-storage';
+import { toastManager } from '@/lib/toast-manager';
 import type {
   AdjustFilters,
   ColorFilters,
@@ -68,12 +69,6 @@ interface UseCanvasHandlersProps {
   setLeftImagePosition: (pos: { x: number; y: number }) => void;
   setRightImagePosition: (pos: { x: number; y: number }) => void;
 
-  // Toast
-  showToast: (
-    message: string,
-    type: 'success' | 'error' | 'warning' | 'info'
-  ) => void;
-
   // Sidebar control
   openRight: () => void;
 }
@@ -112,7 +107,6 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
     setRightImageScale,
     setLeftImagePosition,
     setRightImagePosition,
-    showToast,
     openRight,
   } = props;
 
@@ -134,9 +128,8 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
       // Check rate limit
       if (!rateLimiters.upload.canMakeRequest()) {
         const remaining = rateLimiters.upload.getRemainingRequests();
-        showToast(
-          `Too many uploads. ${remaining} uploads remaining in this time window.`,
-          'warning'
+        toastManager.warning(
+          `Too many uploads. ${remaining} uploads remaining in this time window.`
         );
         return;
       }
@@ -151,7 +144,7 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
       });
 
       if (!validation.valid) {
-        showToast(validation.error || 'Invalid file', 'error');
+        toastManager.error(validation.error || 'Invalid file');
         return;
       }
 
@@ -164,7 +157,7 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
       // Compress image before processing (if needed)
       let processedFile = file;
       if (shouldCompress(file)) {
-        showToast('Optimizing image...', 'info');
+        toastManager.info('Optimizing image...');
         try {
           processedFile = await compressImage(file, {
             maxSizeMB: 2,
@@ -205,7 +198,7 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
           }
         } catch (error) {
           logger.error('Error processing image:', error);
-          showToast('Failed to load image. Please try again.', 'error');
+          toastManager.error('Failed to load image. Please try again.');
           resetImageState();
         } finally {
           setIsLoading(false);
@@ -215,7 +208,7 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
       // Error handler
       reader.onerror = () => {
         logger.error('FileReader error:', reader.error);
-        showToast('Failed to read file. The file may be corrupted.', 'error');
+        toastManager.error('Failed to read file. The file may be corrupted.');
         setIsLoading(false);
         resetImageState();
       };
@@ -230,7 +223,7 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
         reader.readAsDataURL(processedFile);
       } catch (error) {
         logger.error('Error reading file:', error);
-        showToast('Failed to read file. Please try again.', 'error');
+        toastManager.error('Failed to read file. Please try again.');
         setIsLoading(false);
         resetImageState();
       } finally {
@@ -241,7 +234,6 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
       }
     },
     [
-      showToast,
       setUploadedImage,
       setOriginalImage,
       setFileName,
@@ -340,7 +332,7 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
     // Check rate limit
     if (!rateLimiters.gallery.canMakeRequest()) {
       const remaining = rateLimiters.gallery.getRemainingRequests();
-      showToast(`Too many saves. ${remaining} saves remaining.`, 'warning');
+      toastManager.warning(`Too many saves. ${remaining} saves remaining.`);
       return;
     }
 
@@ -362,16 +354,16 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
       // Dispatch custom event for gallery sync
       window.dispatchEvent(new Event('gallery-updated'));
 
-      showToast('Image saved to gallery!', 'success');
+      toastManager.success('Image saved to gallery!');
     } catch (error) {
       logger.error('Failed to save image:', error);
       const errorMessage =
         error instanceof Error
           ? error.message
           : 'Failed to save image to gallery';
-      showToast(errorMessage, 'error');
+      toastManager.error(errorMessage);
     }
-  }, [uploadedImage, fileName, originalImage, showToast]);
+  }, [uploadedImage, fileName, originalImage]);
 
   const handleDownload = useCallback(async () => {
     if (!uploadedImage) return;
@@ -385,7 +377,7 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         if (!ctx) {
-          showToast('Failed to create canvas context', 'error');
+          toastManager.error('Failed to create canvas context');
           return;
         }
 
@@ -431,7 +423,7 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
         // Download
         canvas.toBlob((blob) => {
           if (!blob) {
-            showToast('Failed to create image blob', 'error');
+            toastManager.error('Failed to create image blob');
             return;
           }
 
@@ -444,18 +436,18 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
           document.body.removeChild(link);
           URL.revokeObjectURL(url);
 
-          showToast('Image downloaded successfully!', 'success');
+          toastManager.success('Image downloaded successfully!');
         }, 'image/jpeg');
       };
 
       img.onerror = () => {
-        showToast('Failed to load image for download', 'error');
+        toastManager.error('Failed to load image for download');
       };
 
       img.src = uploadedImage;
     } catch (error) {
       logger.error('Download error:', error);
-      showToast('Failed to download image', 'error');
+      toastManager.error('Failed to download image');
     }
   }, [
     uploadedImage,
@@ -464,7 +456,6 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
     adjustFilters,
     colorFilters,
     // filterEffects not used in download
-    showToast,
   ]);
 
   const handleDelete = useCallback(() => {
@@ -474,9 +465,9 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
       )
     ) {
       handleCloseImage();
-      showToast('Image deleted', 'info');
+      toastManager.info('Image deleted');
     }
-  }, [handleCloseImage, showToast]);
+  }, [handleCloseImage]);
 
   // ============================================================================
   // UI CONTROLS
@@ -493,9 +484,9 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
       }
     } catch (error) {
       logger.error('Fullscreen error:', error);
-      showToast('Failed to toggle fullscreen', 'error');
+      toastManager.error('Failed to toggle fullscreen');
     }
-  }, [setIsFullscreen, showToast]);
+  }, [setIsFullscreen]);
 
   return {
     // File operations
