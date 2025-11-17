@@ -19,12 +19,41 @@ export function GalleryContent() {
   const [sortValue, setSortValue] = useState<SortOption>('newest');
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Load images from localStorage
+  // Load images from localStorage (with prefetch support)
   useEffect(() => {
     const loadImages = async () => {
+      setIsLoading(true);
+
+      // Try to get from cache first (instant!)
+      const cached = sessionStorage.getItem('jewelshot_gallery_cache');
+      if (cached) {
+        try {
+          const cachedImages = JSON.parse(cached) as GalleryImage[];
+          // Restore Date objects
+          const restoredImages = cachedImages.map((img) => ({
+            ...img,
+            createdAt: img.createdAt
+              ? new Date(img.createdAt as string | number | Date)
+              : undefined,
+          }));
+          setImages(restoredImages);
+          setIsLoading(false);
+          logger.info('✅ Gallery loaded from cache (instant)');
+        } catch (error) {
+          logger.error('Failed to parse gallery cache:', error);
+        }
+      }
+
+      // Always fetch fresh data in background
       const saved = await getSavedImages();
       setImages(saved);
+      setIsLoading(false);
+
+      // Update cache for next time
+      sessionStorage.setItem('jewelshot_gallery_cache', JSON.stringify(saved));
+      logger.info('✅ Gallery cache updated');
     };
 
     loadImages();
@@ -137,13 +166,23 @@ export function GalleryContent() {
         onSortChange={setSortValue}
       />
 
+      {/* Loading State */}
+      {isLoading && images.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-20">
+          <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-purple-500 border-t-transparent"></div>
+          <p className="text-sm text-white/60">Loading gallery...</p>
+        </div>
+      )}
+
       {/* Grid */}
-      <GalleryGrid
-        images={filteredAndSortedImages}
-        onOpenInStudio={handleOpenInStudio}
-        onDownload={handleDownload}
-        onDelete={handleDelete}
-      />
+      {!isLoading || images.length > 0 ? (
+        <GalleryGrid
+          images={filteredAndSortedImages}
+          onOpenInStudio={handleOpenInStudio}
+          onDownload={handleDownload}
+          onDelete={handleDelete}
+        />
+      ) : null}
     </div>
   );
 }
