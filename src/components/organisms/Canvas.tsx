@@ -7,7 +7,6 @@ import { useImageState } from '@/hooks/useImageState';
 import { useImageTransform } from '@/hooks/useImageTransform';
 import { useImageFilters } from '@/hooks/useImageFilters';
 import { useCanvasUI } from '@/hooks/useCanvasUI';
-import { useToast } from '@/hooks/useToast';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useImageEdit } from '@/hooks/useImageEdit';
 import { useImageToVideo } from '@/hooks/useImageToVideo';
@@ -17,7 +16,7 @@ import { useCameraControl } from '@/hooks/useCameraControl';
 import { useCanvasHandlers } from '@/hooks/useCanvasHandlers';
 import { createScopedLogger } from '@/lib/logger';
 import { saveImageToGallery } from '@/lib/gallery-storage';
-import Toast from '@/components/atoms/Toast';
+import { toastManager } from '@/lib/toast-manager';
 import { useCreditStore } from '@/store/creditStore';
 import { VideoPlayerModal } from '@/components/molecules/VideoPlayerModal';
 import { VideoGeneratingModal } from '@/components/molecules/VideoGeneratingModal';
@@ -115,8 +114,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
   const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
   const [isPromptExpanded, setIsPromptExpanded] = useState(false);
 
-  // Toast notifications
-  const { showToast, hideToast, toastState } = useToast();
+  // Toast notifications - now handled by toastManager in BottomBar
 
   // Credit store
   const { deductCredit, fetchCredits } = useCreditStore();
@@ -149,7 +147,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
         setIsAIImageLoading(true); // Start loading overlay
         const aiImageUrl = result.images[0].url;
         setUploadedImage(aiImageUrl);
-        showToast('Image edited successfully!', 'success');
+        toastManager.success('Image edited successfully!');
 
         // 🎯 AUTO-SAVE to gallery
         try {
@@ -166,7 +164,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
           window.dispatchEvent(new Event('gallery-updated'));
 
           logger.info('✅ AI-generated image auto-saved to gallery');
-          showToast('Saved to gallery!', 'success');
+          toastManager.success('Saved to gallery!');
         } catch (error) {
           logger.error('Failed to auto-save to gallery:', error);
           // Don't show error toast - image generation was successful
@@ -176,7 +174,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     },
     onError: (error) => {
       setIsAIImageLoading(false); // Clear loading state on error
-      showToast(error.message || 'Failed to edit image', 'error');
+      toastManager.error(error.message || 'Failed to edit image');
     },
   });
 
@@ -218,7 +216,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
   // Handle video generation
   const handleGenerateVideo = useCallback(() => {
     if (!uploadedImage) {
-      showToast('No image to convert to video', 'warning');
+      toastManager.warning('No image to convert to video');
       return;
     }
 
@@ -234,7 +232,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       duration: '8s',
       resolution: '720p', // 720p quality, aspect ratio auto-detected from image
     });
-  }, [uploadedImage, generateVideo, showToast]);
+  }, [uploadedImage, generateVideo]);
 
   // Show video modal when generation completes
   useEffect(() => {
@@ -242,23 +240,23 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       logger.info('[Canvas] Video generated, opening modal');
       queueMicrotask(() => {
         setShowVideoModal(true);
-        showToast('✅ Video generated successfully!', 'success');
+        toastManager.success('✅ Video generated successfully!');
       });
     }
-  }, [videoUrl, showVideoModal, showToast]);
+  }, [videoUrl, showVideoModal]);
 
   // Show error toast if video generation fails
   useEffect(() => {
     if (videoError) {
       logger.error('[Canvas] Video generation failed:', videoError);
-      showToast(`❌ Video generation failed: ${videoError}`, 'error');
+      toastManager.error(`❌ Video generation failed: ${videoError}`);
     }
-  }, [videoError, showToast]);
+  }, [videoError]);
 
   // Handle image upscale
   const handleUpscale = useCallback(() => {
     if (!uploadedImage) {
-      showToast('No image to upscale', 'warning');
+      toastManager.warning('No image to upscale');
       return;
     }
 
@@ -275,7 +273,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       upscale_factor: 2, // 2x upscale
       output_format: 'jpg',
     });
-  }, [uploadedImage, originalImage, upscaleImage, showToast, setOriginalImage]);
+  }, [uploadedImage, originalImage, upscaleImage, setOriginalImage]);
 
   // Update canvas with upscaled image and enable comparison
   useEffect(() => {
@@ -284,26 +282,25 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       queueMicrotask(() => {
         setUploadedImage(upscaledImageUrl);
         setViewMode('side-by-side'); // Enable comparison view
-        showToast(
-          '✅ Image upscaled successfully! Compare with original.',
-          'success'
+        toastManager.success(
+          '✅ Image upscaled successfully! Compare with original.'
         );
       });
     }
-  }, [upscaledImageUrl, setUploadedImage, setViewMode, showToast]);
+  }, [upscaledImageUrl, setUploadedImage, setViewMode]);
 
   // Show error toast if upscale fails
   useEffect(() => {
     if (upscaleError) {
       logger.error('[Canvas] Image upscale failed:', upscaleError);
-      showToast(`❌ Upscale failed: ${upscaleError}`, 'error');
+      toastManager.error(`❌ Upscale failed: ${upscaleError}`);
     }
-  }, [upscaleError, showToast]);
+  }, [upscaleError]);
 
   // Handle remove background
   const handleRemoveBackground = useCallback(() => {
     if (!uploadedImage) {
-      showToast('No image to process', 'warning');
+      toastManager.warning('No image to process');
       return;
     }
 
@@ -318,13 +315,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       image_url: uploadedImage,
       crop_to_bbox: false, // Keep original dimensions
     });
-  }, [
-    uploadedImage,
-    originalImage,
-    removeBackground,
-    showToast,
-    setOriginalImage,
-  ]);
+  }, [uploadedImage, originalImage, removeBackground, setOriginalImage]);
 
   // Update canvas with background-removed image and enable comparison
   useEffect(() => {
@@ -333,26 +324,25 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       queueMicrotask(() => {
         setUploadedImage(removedBgImageUrl);
         setViewMode('side-by-side'); // Enable comparison view
-        showToast(
-          '✅ Background removed successfully! Compare with original.',
-          'success'
+        toastManager.success(
+          '✅ Background removed successfully! Compare with original.'
         );
       });
     }
-  }, [removedBgImageUrl, setUploadedImage, setViewMode, showToast]);
+  }, [removedBgImageUrl, setUploadedImage, setViewMode]);
 
   // Show error toast if remove background fails
   useEffect(() => {
     if (removeBgError) {
       logger.error('[Canvas] Background removal failed:', removeBgError);
-      showToast(`❌ Remove background failed: ${removeBgError}`, 'error');
+      toastManager.error(`❌ Remove background failed: ${removeBgError}`);
     }
-  }, [removeBgError, showToast]);
+  }, [removeBgError]);
 
   // Handle rotate left
   const handleRotateLeft = useCallback(async () => {
     if (!uploadedImage) {
-      showToast('No image to rotate', 'warning');
+      toastManager.warning('No image to rotate');
       return;
     }
 
@@ -369,7 +359,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       if (result?.url) {
         setUploadedImage(result.url);
         setViewMode('side-by-side');
-        showToast('✅ Rotated left', 'success');
+        toastManager.success('✅ Rotated left');
       }
     } catch (err) {
       logger.error('[Canvas] Rotate left failed:', err);
@@ -380,7 +370,6 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     uploadedImage,
     originalImage,
     applyCamera,
-    showToast,
     setOriginalImage,
     setUploadedImage,
     setViewMode,
@@ -389,7 +378,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
   // Handle rotate right
   const handleRotateRight = useCallback(async () => {
     if (!uploadedImage) {
-      showToast('No image to rotate', 'warning');
+      toastManager.warning('No image to rotate');
       return;
     }
 
@@ -410,7 +399,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       if (result?.url) {
         setUploadedImage(result.url);
         setViewMode('side-by-side');
-        showToast('✅ Rotated right', 'success');
+        toastManager.success('✅ Rotated right');
       }
     } catch (err) {
       logger.error('[Canvas] Rotate right failed:', err);
@@ -421,7 +410,6 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     uploadedImage,
     originalImage,
     applyCamera,
-    showToast,
     setOriginalImage,
     setUploadedImage,
     setViewMode,
@@ -430,7 +418,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
   // Handle close-up
   const handleCloseUp = useCallback(async () => {
     if (!uploadedImage) {
-      showToast('No image for close-up', 'warning');
+      toastManager.warning('No image for close-up');
       return;
     }
 
@@ -447,7 +435,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       if (result?.url) {
         setUploadedImage(result.url);
         setViewMode('side-by-side');
-        showToast('✅ Close-up created', 'success');
+        toastManager.success('✅ Close-up created');
       }
     } catch (err) {
       logger.error('[Canvas] Close-up failed:', err);
@@ -458,7 +446,6 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     uploadedImage,
     originalImage,
     applyCamera,
-    showToast,
     setOriginalImage,
     setUploadedImage,
     setViewMode,
@@ -468,15 +455,15 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
   useEffect(() => {
     if (cameraError) {
       logger.error('[Canvas] Camera control failed:', cameraError);
-      showToast(`❌ Camera control failed: ${cameraError}`, 'error');
+      toastManager.error(`❌ Camera control failed: ${cameraError}`);
     }
-  }, [cameraError, showToast]);
+  }, [cameraError]);
 
   // Preset generation
   const handlePresetGeneration = useCallback(
     (prompt: string, aspectRatio?: string) => {
       if (!uploadedImage) {
-        showToast('Please upload an image first', 'warning');
+        toastManager.warning('Please upload an image first');
         return;
       }
 
@@ -494,7 +481,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
           | undefined,
       });
     },
-    [uploadedImage, editWithAI, showToast]
+    [uploadedImage, editWithAI]
   );
 
   // Expose generation handler via callback
@@ -567,7 +554,6 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     setRightImageScale,
     setLeftImagePosition,
     setRightImagePosition,
-    showToast,
     openRight,
   });
 
@@ -598,10 +584,10 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
 
       // Only show error if it's not a blob URL issue (revoked)
       if (uploadedImage && !uploadedImage.startsWith('blob:')) {
-        showToast('Failed to load generated image', 'error');
+        toastManager.error('Failed to load generated image');
       }
     }, 500); // 500ms debounce
-  }, [uploadedImage, showToast]);
+  }, [uploadedImage]);
 
   // Sync comparison states when switching view modes
   useEffect(() => {
@@ -673,7 +659,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
           resetTransform();
           resetFilters();
 
-          showToast('Image loaded from gallery!', 'success');
+          toastManager.success('Image loaded from gallery!');
 
           // Clear query params
           router.replace('/studio', { scroll: false });
@@ -696,7 +682,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
                   resetTransform();
                   resetFilters();
 
-                  showToast('Image loaded from gallery!', 'success');
+                  toastManager.success('Image loaded from gallery!');
 
                   // Clear query params
                   router.replace('/studio', { scroll: false });
@@ -704,20 +690,20 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
               };
               reader.onerror = () => {
                 setIsLoading(false);
-                showToast('Failed to load image from gallery', 'error');
+                toastManager.error('Failed to load image from gallery');
                 router.replace('/studio', { scroll: false });
               };
               reader.readAsDataURL(blob);
             })
             .catch(() => {
               setIsLoading(false);
-              showToast('Failed to fetch image from gallery', 'error');
+              toastManager.error('Failed to fetch image from gallery');
               router.replace('/studio', { scroll: false });
             });
         }
       } catch (error) {
         logger.error('Failed to load image from gallery:', error);
-        showToast('Failed to load image from gallery', 'error');
+        toastManager.error('Failed to load image from gallery');
         setIsLoading(false);
         router.replace('/studio', { scroll: false });
       }
@@ -732,7 +718,6 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     setFileSize,
     resetTransform,
     resetFilters,
-    showToast,
   ]);
 
   // ============================================================================
@@ -982,7 +967,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
         });
       } catch (error) {
         logger.error('[Canvas] AI generation failed:', error);
-        showToast('Failed to generate image', 'error');
+        toastManager.error('Failed to generate image');
 
         // Refund credit if generation failed AFTER deduction
         if (creditDeducted) {
@@ -1004,14 +989,14 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
             // Refresh credits after refund
             const { fetchCredits } = useCreditStore.getState();
             await fetchCredits();
-            showToast('Credit refunded due to generation failure', 'info');
+            toastManager.info('Credit refunded due to generation failure');
           } catch (refundError) {
             logger.error('[Canvas] Failed to refund credit:', refundError);
           }
         }
       }
     },
-    [deductCredit, editWithAI, showToast]
+    [deductCredit, editWithAI]
   );
 
   useEffect(() => {
@@ -1184,7 +1169,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
           onBackgroundChange={setBackground}
           onViewModeChange={setViewMode}
           onImageEdited={(url) => setUploadedImage(url)}
-          onAIError={(error) => showToast(error.message, 'error')}
+          onAIError={(error) => toastManager.error(error.message)}
           onPromptExpandedChange={setIsPromptExpanded}
           currentImageUrl={uploadedImage || ''}
           onGenerateVideo={handleGenerateVideo}
@@ -1200,8 +1185,8 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
         onImageUpdate={setUploadedImage}
         onOriginalImageSet={setOriginalImage}
         onLoadingChange={setIsAIImageLoading}
-        onSuccess={(msg) => showToast(msg, 'success')}
-        onError={(msg) => showToast(msg, 'error')}
+        onSuccess={(msg) => toastManager.success(msg)}
+        onError={(msg) => toastManager.error(msg)}
       />
 
       {/* ===================================================================
@@ -1302,16 +1287,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
         />
       )}
 
-      {/* Toast Notifications (managed by useToast hook) */}
-      {toastState.visible && (
-        <Toast
-          message={toastState.message}
-          type={toastState.type}
-          onClose={hideToast}
-          isTopBarOpen={topOpen}
-          isRightSidebarOpen={rightOpen}
-        />
-      )}
+      {/* Toast Notifications - Now displayed in BottomBar */}
     </>
   );
 }

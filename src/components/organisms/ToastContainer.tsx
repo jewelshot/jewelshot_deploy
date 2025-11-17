@@ -144,23 +144,9 @@ export function ToastContainer() {
     };
   }, []);
 
-  if (toasts.length === 0) return null;
-
-  return (
-    <div className="pointer-events-none fixed bottom-20 right-4 z-40 flex flex-col-reverse gap-2">
-      {toasts.map((toast) => (
-        <div
-          key={toast.id}
-          className="animate-in fade-in slide-in-from-bottom-4 pointer-events-auto duration-300"
-        >
-          <ToastItem
-            toast={toast}
-            onDismiss={toastManager.dismiss.bind(toastManager)}
-          />
-        </div>
-      ))}
-    </div>
-  );
+  // Toasts are now displayed in BottomBar
+  // Keep this component for fallback or when BottomBar is not available
+  return null;
 }
 
 export default ToastContainer;
