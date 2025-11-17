@@ -230,7 +230,7 @@ export async function POST(request: NextRequest) {
           target_resolution,
           output_format,
           noise_scale,
-        },
+        } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
         logs: true,
         onQueueUpdate: (update) => {
           if (update.status === 'IN_PROGRESS') {
