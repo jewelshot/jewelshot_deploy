@@ -13,6 +13,7 @@ import { useImageToVideo } from '@/hooks/useImageToVideo';
 import { useImageUpscale } from '@/hooks/useImageUpscale';
 import { useRemoveBackground } from '@/hooks/useRemoveBackground';
 import { useGemstoneEnhance } from '@/hooks/useGemstoneEnhance';
+import { useMetalRecolor, MetalType } from '@/hooks/useMetalRecolor';
 import { useCameraControl } from '@/hooks/useCameraControl';
 import { useCanvasHandlers } from '@/hooks/useCanvasHandlers';
 import { createScopedLogger } from '@/lib/logger';
@@ -213,6 +214,14 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     enhancedImageUrl: gemstoneEnhancedImageUrl,
     error: gemstoneEnhanceError,
   } = useGemstoneEnhance();
+
+  // Metal Recolor
+  const {
+    recolorMetal,
+    isRecoloring: isRecoloringMetal,
+    recoloredImageUrl: metalRecoloredImageUrl,
+    error: metalRecolorError,
+  } = useMetalRecolor();
 
   // Camera Control (Rotate Left/Right, Close-Up)
   const { applyCamera, error: cameraError } = useCameraControl();
@@ -646,6 +655,75 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       );
     }
   }, [gemstoneEnhanceError]);
+
+  // Handle metal recolor
+  const handleMetalRecolor = useCallback(
+    async (metalType: MetalType) => {
+      if (!uploadedImage) {
+        toastManager.warning('No image to recolor');
+        return;
+      }
+
+      logger.info('[Canvas] Starting metal recolor:', {
+        uploadedImage,
+        metalType,
+      });
+
+      // Store original image for comparison
+      if (!originalImage) {
+        setOriginalImage(uploadedImage);
+      }
+
+      // Convert blob URL to data URI if needed
+      let imageUrl = uploadedImage;
+      if (uploadedImage.startsWith('blob:')) {
+        logger.info(
+          '[Canvas] Converting blob URL to data URI for metal recolor'
+        );
+        try {
+          const response = await fetch(uploadedImage);
+          const blob = await response.blob();
+          imageUrl = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+          logger.info('[Canvas] Blob converted to data URI successfully');
+        } catch (error) {
+          logger.error('[Canvas] Failed to convert blob to data URI:', error);
+          toastManager.error('Failed to prepare image for processing');
+          return;
+        }
+      }
+
+      recolorMetal({
+        image_url: imageUrl,
+        metal_type: metalType,
+      });
+    },
+    [uploadedImage, originalImage, recolorMetal, setOriginalImage]
+  );
+
+  // Update canvas with recolored image and enable comparison
+  useEffect(() => {
+    if (metalRecoloredImageUrl) {
+      logger.info('[Canvas] Metal recolored, updating canvas');
+      queueMicrotask(() => {
+        setUploadedImage(metalRecoloredImageUrl);
+        setViewMode('side-by-side'); // Enable comparison view
+        toastManager.success('✅ Metal color changed! Compare with original.');
+      });
+    }
+  }, [metalRecoloredImageUrl, setUploadedImage, setViewMode]);
+
+  // Show error toast if metal recolor fails
+  useEffect(() => {
+    if (metalRecolorError) {
+      logger.error('[Canvas] Metal recolor failed:', metalRecolorError);
+      toastManager.error(`❌ Metal recolor failed: ${metalRecolorError}`);
+    }
+  }, [metalRecolorError]);
 
   // Preset generation
   const handlePresetGeneration = useCallback(
@@ -1394,6 +1472,8 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
           isClosingUp={isClosingUp}
           onGemstoneEnhance={handleGemstoneEnhance}
           isEnhancingGemstones={isEnhancingGemstones}
+          onMetalRecolor={handleMetalRecolor}
+          isRecoloringMetal={isRecoloringMetal}
           hasActiveImage={!!uploadedImage}
           isRightSidebarOpen={rightOpen}
           isTopBarOpen={topOpen}
