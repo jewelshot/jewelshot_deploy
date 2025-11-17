@@ -575,11 +575,32 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     setIsAIImageLoading(false);
   }, []);
 
-  // Handle AI image load error
+  // Handle AI image load error (with debounce to prevent infinite loop)
+  const errorTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastErrorUrlRef = useRef<string>('');
+
   const handleAIImageError = useCallback(() => {
-    setIsAIImageLoading(false);
-    showToast('Failed to load generated image', 'error');
-  }, [showToast]);
+    // Prevent duplicate errors for the same URL (blob URL cleanup causes this)
+    if (uploadedImage && uploadedImage === lastErrorUrlRef.current) {
+      return; // Skip duplicate error for same URL
+    }
+
+    // Clear previous timeout
+    if (errorTimeoutRef.current) {
+      clearTimeout(errorTimeoutRef.current);
+    }
+
+    // Debounce error handling to prevent infinite loop
+    errorTimeoutRef.current = setTimeout(() => {
+      setIsAIImageLoading(false);
+      lastErrorUrlRef.current = uploadedImage || '';
+
+      // Only show error if it's not a blob URL issue (revoked)
+      if (uploadedImage && !uploadedImage.startsWith('blob:')) {
+        showToast('Failed to load generated image', 'error');
+      }
+    }, 500); // 500ms debounce
+  }, [uploadedImage, showToast]);
 
   // Sync comparison states when switching view modes
   useEffect(() => {
@@ -1009,6 +1030,15 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       setPosition({ x: 0, y: 0 });
     }
   }, [viewMode, uploadedImage, setScale, setPosition]);
+
+  // Cleanup on unmount - prevent memory leaks from error timeout
+  useEffect(() => {
+    return () => {
+      if (errorTimeoutRef.current) {
+        clearTimeout(errorTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const allBarsOpen = leftOpen && rightOpen && topOpen && bottomOpen;
 
