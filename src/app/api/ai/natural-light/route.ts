@@ -140,49 +140,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Natural Light Prompt (JSON, under 1800 chars)
+    // Natural Light Prompt (JSON, under 1800 chars) - OPTIMIZED
     const naturalLightPrompt = JSON.stringify({
-      task: 'natural realistic light reflections jewelry photography professional',
-      preserve_critical:
-        '⛔ PRODUCT FROZEN ⛔ EXACT: gemstones|metal|design|structure|proportions|engravings ALL-UNCHANGED ⚠️ ONLY lighting-reflections MAY change ⚠️',
+      task: 'natural light reflections jewelry photography',
+      preserve:
+        '⛔ PRODUCT FROZEN ⛔ gemstones|metal|design|structure UNCHANGED ⚠️ ONLY lighting ⚠️',
       natural_light: {
-        type: 'soft natural subtle realistic authentic NOT-artificial NOT-fake',
-        quality: 'gentle delicate understated refined elegant sophisticated',
-        direction: 'studio-setup 45-degree three-point-lighting professional',
-        temperature: '5500K neutral daylight accurate true-to-life',
-        intensity: 'moderate balanced even NOT-harsh NOT-overexposed',
+        type: 'soft natural subtle realistic NOT-artificial',
+        quality: 'gentle delicate understated refined elegant',
+        setup: 'studio 45deg three-point 5500K neutral daylight',
+        intensity: 'moderate balanced even NOT-harsh',
       },
-      gemstone_reflections: {
-        internal:
-          'natural-brilliance subtle-fire gentle-scintillation realistic-sparkle',
-        facets: 'soft-light-return delicate-flashes NOT-extreme NOT-glittery',
-        catch_light:
-          'tiny-pinpoint-highlights natural-eye-pattern authentic-gleam',
-        realism:
-          'REAL-diamond-behavior physics-accurate light-dispersion natural',
+      gemstone: {
+        brilliance: 'natural subtle-fire gentle-scintillation realistic',
+        facets: 'soft-light delicate-flashes NOT-extreme',
+        catch: 'tiny-highlights natural-pattern authentic',
+        realism: 'REAL-diamond physics-accurate natural',
       },
-      surface_reflections: {
-        metal:
-          'soft-environmental-reflections subtle-ambient-light gentle-sheen',
-        finish:
-          'natural-luster realistic-polish NOT-artificial NOT-overpolished',
-        highlights: 'delicate-bright-spots soft-catch-lights gradual-falloff',
-        depth: 'dimensional-layered realistic-metallic authentic-appearance',
+      surface: {
+        metal: 'soft-environmental subtle-ambient gentle-sheen',
+        finish: 'natural-luster realistic NOT-overpolished',
+        highlights: 'delicate soft-catch gradual-falloff',
+        depth: 'dimensional realistic-metallic authentic',
       },
-      ground_reflections: {
-        condition: 'IF dark-background THEN show-subtle-reflections-on-surface',
-        gemstone_light:
-          'tiny-colored-glows soft-light-spills gentle-projections',
-        metal_bounce: 'subtle-ambient-reflection soft-glow-underneath product',
-        quality: 'understated natural realistic NOT-obvious NOT-exaggerated',
-        size: 'small delicate proportional accurate physics-based',
+      ground: {
+        condition: 'IF dark-bg THEN show-subtle-reflections',
+        light: 'tiny-colored-glows soft-spills gentle-projections',
+        bounce: 'subtle-ambient soft-glow-underneath',
+        quality: 'understated natural NOT-obvious',
       },
       forbidden:
-        '❌ FAIL: altered-product fake-reflections artificial-glare overexposed-bright unrealistic-sparkle CGI-look synthetic-appearance glittery exaggerated plastic-shiny harsh-light blown-out flat-2D',
-      technical:
-        'natural-photography realistic-optics physics-accurate soft-lighting',
-      output:
-        'photorealistic natural-lighting subtle-reflections authentic professional',
+        '❌ altered-product fake-reflections artificial-glare overexposed CGI synthetic glittery plastic harsh blown-out flat',
+      output: 'photorealistic natural-lighting subtle-reflections professional',
     });
 
     logger.info('[NaturalLight] Prompt length:', naturalLightPrompt.length);
