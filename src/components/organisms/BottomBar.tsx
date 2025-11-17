@@ -19,18 +19,17 @@ export function BottomBar() {
     >
       {/* Left: AI Requests Tracker */}
       <div className="flex items-center gap-2">
-        <RateLimitIndicator className="w-[220px]" />
+        <RateLimitIndicator className="w-[200px]" />
       </div>
 
-      {/* Right: Notifications */}
+      {/* Right: Notification Info */}
       <div className="flex items-center gap-2">
-        <button
-          className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/60 transition-all hover:border-purple-500/30 hover:bg-white/10 hover:text-white"
-          aria-label="Notifications"
-        >
-          <Bell className="h-3.5 w-3.5" />
-          <span>Notifications</span>
-        </button>
+        <div className="flex items-center gap-1.5 rounded-lg border border-white/5 bg-white/5 px-3 py-1.5 backdrop-blur-sm">
+          <Bell className="h-3.5 w-3.5 text-white/40" />
+          <span className="text-[11px] font-medium text-white/40">
+            Notifications appear here
+          </span>
+        </div>
       </div>
     </footer>
   );

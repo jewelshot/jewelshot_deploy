@@ -72,10 +72,11 @@ export function Toast({
 
   return (
     <div
-      className={`animate-in slide-in-from-top-2 fixed z-50 flex max-w-sm items-start gap-3 rounded-lg border p-4 shadow-lg backdrop-blur-md transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)] ${colorMap[type]}`}
+      className={`fixed z-40 flex max-w-md items-start gap-3 rounded-lg border p-3 shadow-2xl backdrop-blur-xl transition-all ${colorMap[type]}`}
       style={{
-        top: isTopBarOpen ? '80px' : '16px',
+        bottom: '80px',
         right: isRightSidebarOpen ? '276px' : '16px',
+        animation: 'fadeInSlideUp 0.3s ease-out',
       }}
       role="alert"
     >
@@ -90,6 +91,19 @@ export function Toast({
       >
         <X className="h-4 w-4" />
       </button>
+
+      <style jsx>{`
+        @keyframes fadeInSlideUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }

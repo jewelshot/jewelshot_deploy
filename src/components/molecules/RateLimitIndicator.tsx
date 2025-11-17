@@ -64,9 +64,14 @@ export function RateLimitIndicator({
 
   return (
     <div
-      className={`rounded-lg border backdrop-blur-[8px] transition-all duration-300 ${getStatusColor()} ${className}`}
+      className={`group relative rounded-lg border backdrop-blur-xl transition-all duration-300 ${getStatusColor()} ${className}`}
     >
-      <div className="flex items-center gap-3 px-3 py-2">
+      {/* Shimmer effect on hover */}
+      <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100">
+        <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+      </div>
+
+      <div className="relative flex items-center gap-2.5 px-3 py-2">
         {/* Icon */}
         <div className="flex-shrink-0">{getStatusIcon()}</div>
 
@@ -74,14 +79,16 @@ export function RateLimitIndicator({
         <div className="min-w-0 flex-1">
           {/* Label & Count */}
           <div className="mb-1 flex items-baseline justify-between gap-2">
-            <span className="text-xs font-medium opacity-80">AI Requests</span>
-            <span className="text-sm font-bold tabular-nums">
-              {remaining} / {total}
+            <span className="text-[11px] font-medium opacity-70">
+              AI Requests
+            </span>
+            <span className="text-xs font-bold tabular-nums">
+              {remaining}/{total}
             </span>
           </div>
 
           {/* Progress Bar */}
-          <div className="h-1.5 overflow-hidden rounded-full bg-black/30">
+          <div className="h-1 overflow-hidden rounded-full bg-black/30">
             <div
               className={`h-full transition-all duration-500 ${getProgressBarColor()}`}
               style={{ width: `${percentage}%` }}
@@ -89,13 +96,24 @@ export function RateLimitIndicator({
           </div>
 
           {/* Reset Timer */}
-          {timeUntilReset > 0 && (
-            <div className="mt-1 text-[10px] font-medium opacity-60">
-              Resets in {formatWaitTime(Math.ceil(timeUntilReset / 1000))}
+          {timeUntilReset > 0 && remaining < total && (
+            <div className="mt-1 text-[9px] font-medium opacity-50">
+              Reset: {formatWaitTime(Math.ceil(timeUntilReset / 1000))}
             </div>
           )}
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes shimmer {
+          100% {
+            transform: translateX(100%);
+          }
+        }
+        .animate-shimmer {
+          animation: shimmer 2s infinite;
+        }
+      `}</style>
 
       {/* Detailed Stats (Optional) */}
       {showDetails && (

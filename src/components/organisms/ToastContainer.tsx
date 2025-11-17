@@ -68,8 +68,11 @@ function ToastItem({ toast, onDismiss }: ToastItemProps) {
 
   return (
     <div
-      className={`relative flex w-full max-w-sm items-start gap-3 overflow-hidden rounded-lg border p-4 shadow-2xl backdrop-blur-xl transition-all ${colorMap[toast.type]} animate-in slide-in-from-right-full duration-300`}
+      className={`relative flex w-full max-w-md items-start gap-3 overflow-hidden rounded-lg border p-3 shadow-2xl backdrop-blur-xl transition-all ${colorMap[toast.type]}`}
       role="alert"
+      style={{
+        animation: 'fadeInSlideUp 0.3s ease-out',
+      }}
     >
       {/* Progress bar (only for auto-dismissing toasts) */}
       {toast.duration > 0 && (
@@ -108,6 +111,19 @@ function ToastItem({ toast, onDismiss }: ToastItemProps) {
       >
         <X className="h-4 w-4" />
       </button>
+
+      <style jsx>{`
+        @keyframes fadeInSlideUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }
@@ -131,9 +147,12 @@ export function ToastContainer() {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="pointer-events-none fixed right-4 top-4 z-50 flex flex-col gap-3">
+    <div className="pointer-events-none fixed bottom-20 right-4 z-40 flex flex-col-reverse gap-2">
       {toasts.map((toast) => (
-        <div key={toast.id} className="pointer-events-auto">
+        <div
+          key={toast.id}
+          className="animate-in fade-in slide-in-from-bottom-4 pointer-events-auto duration-300"
+        >
           <ToastItem
             toast={toast}
             onDismiss={toastManager.dismiss.bind(toastManager)}
