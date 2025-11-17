@@ -479,37 +479,22 @@ OUTPUT: Editorial minimalist still life. Aspect ratio ${aspectRatio}. Soft paste
       // Special handling for Women Necklace - Ultra Close-Up
       if (type === 'necklace' && genderText.toLowerCase() === 'women') {
         return JSON.stringify({
-          subject: 'necklace on woman decollete chest area ultra close-up',
-          preservation: {
-            critical:
-              'EXACT jewelry UNCHANGED - gemstones setting chain pendant ALL preserved pixel-perfect',
-            forbidden:
-              'NO alterations NO added/removed gemstones NO design changes',
-          },
-          framing: {
-            crop: 'chest decollete neck area ONLY - face OUT OF FRAME above crop line',
-            distance: 'extreme close-up macro 30-50cm distance',
-            fill: 'jewelry fills 55-65% frame ultra-prominent detailed visible',
-            angle:
-              'straight front centered decollete natural necklace placement',
-          },
-          placement: {
-            physics:
-              'chain RESTS ON skin follows neck curve pendant TOUCHES chest natural drape',
-            position:
-              'necklace centered decollete flat against skin 3D depth contact',
-            scale:
-              'chain 16-20inch pendant 10-25mm LIFE-SIZE proportions realistic',
-          },
-          lighting:
-            'soft front 45deg key 5500K neutral even flattering NO harsh shadows clean',
-          background:
-            'neutral beige/cream/white RGB(245,242,238) seamless minimal',
-          focus: 'f/4 jewelry ultra-sharp skin smooth background soft bokeh',
-          style: 'clean commercial e-commerce product-hero ultra-detailed',
+          subject:
+            'necklace jewelry woman decollete EXTREME CLOSE-UP macro commercial',
+          preserve:
+            '⛔ JEWELRY 100% FROZEN UNCHANGED ⛔ EXACT: gemstone count|position|size|cut chain-links|thickness pendant-shape|dimensions metal-finish|texture setting-prongs|clasp engravings ALL-PIXEL-IDENTICAL ⚠️ 0.01% change = FAIL ⚠️ ONLY lighting|shadows|angle MAY change PRODUCT SACRED LOCKED',
+          closeup:
+            'ULTRA MACRO 25-40cm decollete-chest-only face-HEAD-OUT-FRAME cropped-above-shoulders necklace-DOMINATES-65-75%-frame HUGE-prominent frontal-centered product-HERO straight-0deg',
           forbidden:
-            'NO face visible NO eyes NO facial features NO wide shots NO floating jewelry NO flat 2D NO altered design NO blurry product',
-          aspect: aspectRatio,
+            '❌ FAIL: added|removed|moved|altered gemstones|chain|pendant|metal design-change structure-modification distortion warped blur soft-focus face-visible eyes-nose-mouth wide-shot jewelry-small floating flat-2D oversized miniature mannequin-look',
+          place:
+            'chain-ON-skin neck-curve pendant-TOUCH-chest 3D-wrap gravity-drape 16-20inch-chain 10-25mm-pendant LIFE-SIZE proportional NOT-oversized',
+          light:
+            'soft 45deg 5500K even flattering NO-harsh-shadows clean studio',
+          bg: 'neutral cream RGB(248,245,242) seamless minimal uncluttered',
+          tech: 'f/4-5.6 jewelry-ULTRA-SHARP 300DPI razor-focus skin-smooth bokeh-bg',
+          style: 'e-commerce catalog product-hero closeup commercial pristine',
+          out: `${aspectRatio} ultra-closeup jewelry-dominant professional`,
         });
       }
 
