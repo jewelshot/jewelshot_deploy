@@ -650,4 +650,64 @@ Quality: Pristine luxury editorial photography
 OUTPUT: Premium luxury editorial ready. Aspect ratio ${aspectRatio}. High-fashion campaign. Aspirational prestige.`;
     },
   },
+
+  'e-commerce-neck-closeup': {
+    name: 'E-Commerce Neck Close-Up',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '9:16'
+    ) => {
+      return JSON.stringify({
+        scene: 'professional e-commerce neck close-up product-focused commercial',
+        subject: {
+          type: 'fashion_jewelry_product',
+          focus: 'necklace_on_model_neck_only',
+          visible_area: 'neck_upper_chest_exclusively',
+          skin_tone: 'warm_natural',
+          clothing: 'tailored_blazer_olive_green',
+        },
+        framing: {
+          include: 'neck upper_chest collarbone_area_only',
+          exclude: 'NO-face NO-head NO-chin crop_at_neck_level',
+          vertical_range: 'from_upper_chest_to_lower_neck_area',
+          focus_zone: 'necklace_placement_area_exclusively',
+        },
+        necklace: {
+          style: 'minimalist_chain',
+          material: 'gold_toned',
+          chain_type: 'elongated_oval_links',
+          thickness: 'delicate_fine',
+          length: 'choker_to_short_length',
+          placement: 'sits_at_collarbone',
+        },
+        composition: {
+          shot: 'close_up_macro_neck_detail',
+          angle: 'straight_on_frontal',
+          framing: 'neck_chest_only_no_face',
+          dof: 'shallow_product_focus',
+          crop: 'tight_on_necklace_zone',
+        },
+        lighting: {
+          type: 'soft_natural_light',
+          direction: 'diffused_front',
+          mood: 'warm_elegant',
+          shadows: 'minimal_soft',
+        },
+        colors: {
+          primary: 'warm_beige_skin_tones',
+          secondary: 'olive_sage_green',
+          accent: 'gold_metallic',
+          mood: 'earthy_luxurious_minimal',
+        },
+        preservation:
+          '⛔ JEWELRY 100% FROZEN UNCHANGED ⛔ EXACT: chain-links|pendant|clasp|material ALL-PRESERVED',
+        style:
+          'minimalist elegant professional contemporary refined understated_luxury editorial clean_aesthetic timeless neck_focused_product_shot',
+        quality: 'ultra-sharp 300DPI e-commerce professional clean',
+        output: `${aspectRatio} neck-closeup jewelry-dominant e-commerce-ready`,
+      });
+    },
+  },
 };

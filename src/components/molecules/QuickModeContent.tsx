@@ -11,6 +11,11 @@ interface QuickModeContentProps {
 export function QuickModeContent({ onPresetSelect }: QuickModeContentProps) {
   const presets = [
     {
+      id: 'e-commerce-neck-closeup',
+      title: 'Neck Close-Up',
+      imagePath: '/presets/e-commerce.webp',
+    },
+    {
       id: 'e-commerce',
       title: 'White Background',
       imagePath: '/presets/e-commerce.webp',
