@@ -6,9 +6,11 @@ import dynamic from 'next/dynamic';
 import AuroraBackground from '@/components/atoms/AuroraBackground';
 import { BatchContent } from '@/components/organisms/BatchContent';
 import { BatchProcessingModal } from '@/components/organisms/BatchProcessingModal';
+import { BatchConfirmModal } from '@/components/molecules/BatchConfirmModal';
 import type { BatchImage } from '@/components/molecules/BatchImageGrid';
 import { saveBatchProject, type BatchProject } from '@/lib/batch-storage';
 import { useSidebarStore } from '@/store/sidebarStore';
+import { useCreditStore } from '@/store/creditStore';
 import { toast } from 'sonner';
 
 // Dynamic imports matching Studio page
@@ -35,17 +37,39 @@ const BottomBarToggle = dynamic(
 );
 
 /**
+ * Convert blob URL to base64 data URI
+ */
+async function blobUrlToDataUri(blobUrl: string): Promise<string> {
+  const response = await fetch(blobUrl);
+  const blob = await response.blob();
+  
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+/**
  * BatchPage - Batch processing page with Studio layout
  */
 export function BatchPage() {
   const router = useRouter();
   const { openRight } = useSidebarStore();
+  const { credits, deductCredit, fetchCredits } = useCreditStore();
   const [images, setImages] = useState<BatchImage[]>([]);
-  const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
+  const [batchPrompt, setBatchPrompt] = useState('');
   const [batchName, setBatchName] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  // Fetch credits on mount
+  useEffect(() => {
+    fetchCredits();
+  }, [fetchCredits]);
 
   // Auto-expand right sidebar when images are uploaded
   useEffect(() => {
@@ -101,29 +125,32 @@ export function BatchPage() {
   const handleClearAll = useCallback(() => {
     images.forEach((img) => URL.revokeObjectURL(img.preview));
     setImages([]);
+    setBatchPrompt('');
   }, [images]);
 
-  // Handle preset from RightSidebar
-  const handleGenerateWithPreset = useCallback(
-    (prompt: string, aspectRatio?: string) => {
-      if (images.length === 0) {
-        alert('Please upload images first');
-        return;
-      }
-      // Store preset info
-      setSelectedPreset(prompt);
-      // Auto-start batch
-      handleStartBatch();
-    },
-    [images]
-  );
+  // Handle generate from prompt control
+  const handleGenerate = useCallback((prompt: string) => {
+    if (images.length === 0) {
+      toast.error('Please upload images first');
+      return;
+    }
 
-  // Handle start batch
-  const handleStartBatch = useCallback(async () => {
-    if (!selectedPreset || images.length === 0) return;
+    // Check credits
+    if (credits < images.length) {
+      toast.error(`Insufficient credits. You need ${images.length} credits, but have ${credits}.`);
+      return;
+    }
 
+    setBatchPrompt(prompt);
+    setShowConfirmModal(true);
+  }, [images, credits]);
+
+  // Handle confirm batch processing
+  const handleConfirmBatch = useCallback(async () => {
+    setShowConfirmModal(false);
     setIsProcessing(true);
     setIsPaused(false);
+    setIsMinimized(false);
 
     // Process images one by one
     for (let i = 0; i < images.length; i++) {
@@ -132,7 +159,8 @@ export function BatchPage() {
         await new Promise((resolve) => setTimeout(resolve, 100));
       }
 
-      const imageId = images[i].id;
+      const image = images[i];
+      const imageId = image.id;
 
       // Set processing
       setImages((prev) =>
@@ -141,29 +169,64 @@ export function BatchPage() {
         )
       );
 
-      // Simulate progress
-      for (let progress = 0; progress <= 100; progress += 20) {
-        // Check for pause during progress
-        while (isPaused) {
-          await new Promise((resolve) => setTimeout(resolve, 100));
+      try {
+        // Convert blob URL to data URI
+        const imageDataUri = await blobUrlToDataUri(image.preview);
+
+        // Call AI edit API
+        const response = await fetch('/api/ai/edit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            imageUrl: imageDataUri,
+            prompt: batchPrompt || '',
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`API error: ${response.statusText}`);
         }
 
-        await new Promise((resolve) => setTimeout(resolve, 200));
+        const data = await response.json();
+
+        if (!data.success || !data.editedImageUrl) {
+          throw new Error(data.error || 'Failed to process image');
+        }
+
+        // Update to completed with result
         setImages((prev) =>
           prev.map((img) =>
-            img.id === imageId ? { ...img, progress } : img
+            img.id === imageId
+              ? {
+                  ...img,
+                  status: 'completed',
+                  progress: 100,
+                  result: data.editedImageUrl,
+                }
+              : img
           )
         );
-      }
 
-      // Set completed with result thumbnail
-      setImages((prev) =>
-        prev.map((img) =>
-          img.id === imageId
-            ? { ...img, status: 'completed', progress: 100, result: img.preview }
-            : img
-        )
-      );
+        toast.success(`${image.file.name} processed successfully`);
+      } catch (error) {
+        console.error(`Failed to process ${image.file.name}:`, error);
+        
+        // Mark as failed
+        setImages((prev) =>
+          prev.map((img) =>
+            img.id === imageId
+              ? {
+                  ...img,
+                  status: 'failed',
+                  progress: 0,
+                  error: error instanceof Error ? error.message : 'Processing failed',
+                }
+              : img
+          )
+        );
+
+        toast.error(`Failed to process ${image.file.name}`);
+      }
     }
 
     // Batch processing complete - save to Gallery
@@ -195,7 +258,7 @@ export function BatchPage() {
     }
 
     setIsProcessing(false);
-  }, [selectedPreset, images, isPaused, batchName]);
+  }, [images, batchPrompt, batchName, isPaused]);
 
   // Handle pause/resume
   const handleTogglePause = useCallback(() => {
@@ -207,14 +270,6 @@ export function BatchPage() {
     setIsProcessing(false);
     setIsPaused(false);
     setIsMinimized(false);
-    // Reset all processing images to pending
-    setImages((prev) =>
-      prev.map((img) =>
-        img.status === 'processing' || img.status === 'pending'
-          ? { ...img, status: 'pending', progress: 0 }
-          : img
-      )
-    );
   }, []);
 
   const processingStarted = images.some(
@@ -234,15 +289,17 @@ export function BatchPage() {
       <Sidebar />
       <SidebarToggle />
 
-      {/* Right Sidebar - Same as Studio */}
-      <RightSidebar onGenerateWithPreset={handleGenerateWithPreset} />
-      <RightSidebarToggle />
+      {/* Right Sidebar - Hidden for batch, using prompt control instead */}
+      <div className="hidden">
+        <RightSidebar onGenerateWithPreset={() => {}} />
+        <RightSidebarToggle />
+      </div>
 
       {/* Bottom Bar */}
       <BottomBar />
       <BottomBarToggle />
 
-      {/* Batch Content - Replaces Canvas */}
+      {/* Batch Content */}
       <BatchContent
         images={images}
         onFilesSelected={handleFilesSelected}
@@ -252,6 +309,17 @@ export function BatchPage() {
         batchName={batchName}
         onBatchNameChange={setBatchName}
         onImageClick={handleImageClick}
+        onGenerate={handleGenerate}
+        isProcessing={isProcessing}
+      />
+
+      {/* Batch Confirm Modal */}
+      <BatchConfirmModal
+        isOpen={showConfirmModal}
+        onConfirm={handleConfirmBatch}
+        onCancel={() => setShowConfirmModal(false)}
+        imageCount={images.length}
+        prompt={batchPrompt}
       />
 
       {/* Processing Modal */}
@@ -264,7 +332,7 @@ export function BatchPage() {
           onMaximize={() => setIsMinimized(false)}
           onTogglePause={handleTogglePause}
           onCancel={handleCancelBatch}
-          canCancel={isProcessing}
+          canCancel={!isProcessing || images.every(img => img.status !== 'processing')}
         />
       )}
     </>
