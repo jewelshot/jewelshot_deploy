@@ -59,7 +59,7 @@ export async function POST(
 
     // Parse request body
     const body = await request.json();
-    const { originalFilename, originalSize, resultUrl, status, errorMessage } = body;
+    const { originalFilename, originalSize, originalUrl, resultUrl, status, errorMessage } = body;
 
     if (!originalFilename || typeof originalFilename !== 'string') {
       return NextResponse.json(
@@ -88,6 +88,7 @@ export async function POST(
       user_id: user.id,
       original_filename: originalFilename,
       original_size: originalSize,
+      original_url: originalUrl || null, // For Before/After comparison
       result_url: resultUrl || null,
       status,
       error_message: errorMessage || null,

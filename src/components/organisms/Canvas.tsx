@@ -26,6 +26,11 @@ import { useCreditStore } from '@/store/creditStore';
 import { VideoPlayerModal } from '@/components/molecules/VideoPlayerModal';
 import { VideoGeneratingModal } from '@/components/molecules/VideoGeneratingModal';
 import { QuickActionsBar } from '@/components/molecules/QuickActionsBar';
+import { 
+  saveCanvasState, 
+  loadCanvasState, 
+  clearCanvasState 
+} from '@/lib/canvas-state-storage';
 
 const logger = createScopedLogger('Canvas');
 // New refactored components
@@ -1192,6 +1197,94 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     setFileSize,
     resetTransform,
     resetFilters,
+  ]);
+
+  // 🔄 STATE RESTORATION: Load saved canvas state on mount
+  useEffect(() => {
+    // Only restore if no imageUrl in query params (avoid conflict)
+    const imageUrl = searchParams.get('imageUrl');
+    if (imageUrl) return;
+
+    // Only restore if canvas is empty
+    if (uploadedImage) return;
+
+    const savedState = loadCanvasState();
+    if (!savedState) return;
+
+    logger.info('Restoring canvas state...', {
+      fileName: savedState.fileName,
+      hasOriginal: !!savedState.originalImage,
+    });
+
+    // Restore image
+    if (savedState.uploadedImage) {
+      setUploadedImage(savedState.uploadedImage);
+      setFileName(savedState.fileName);
+      setFileSize(savedState.fileSize);
+    }
+
+    // Restore original image (for side-by-side comparison)
+    if (savedState.originalImage) {
+      setOriginalImage(savedState.originalImage);
+    }
+
+    // Restore transforms
+    setScale(savedState.scale);
+    setPosition(savedState.position);
+    setTransform({
+      rotation: savedState.rotation,
+      flipHorizontal: savedState.flipHorizontal,
+      flipVertical: savedState.flipVertical,
+    });
+
+    // Restore filters
+    setAdjustFilters(savedState.adjustFilters);
+    setColorFilters(savedState.colorFilters);
+    setFilterEffects(savedState.filterEffects);
+
+    // Restore background
+    setBackground(savedState.background);
+
+    toastManager.success('Canvas state restored!');
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 💾 AUTO-SAVE: Save canvas state on changes (debounced)
+  useEffect(() => {
+    // Skip if no image
+    if (!uploadedImage) return;
+
+    // Debounce save (500ms delay)
+    const timeoutId = setTimeout(() => {
+      saveCanvasState({
+        uploadedImage,
+        originalImage,
+        fileName,
+        fileSize,
+        scale,
+        position,
+        rotation: transform.rotation,
+        flipHorizontal: transform.flipHorizontal,
+        flipVertical: transform.flipVertical,
+        adjustFilters,
+        colorFilters,
+        filterEffects,
+        background,
+      });
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [
+    uploadedImage,
+    originalImage,
+    fileName,
+    fileSize,
+    scale,
+    position,
+    transform,
+    adjustFilters,
+    colorFilters,
+    filterEffects,
+    background,
   ]);
 
   // ============================================================================

@@ -9,6 +9,7 @@ import { SortOption } from '@/components/atoms/SortButton';
 import { getSavedImages, deleteImageFromGallery } from '@/lib/gallery-storage';
 import { toast } from 'sonner';
 import { createScopedLogger } from '@/lib/logger';
+import { BeforeAfterModal } from '@/components/molecules/BeforeAfterModal';
 
 // Supabase batch project type
 interface BatchProject {
@@ -45,6 +46,10 @@ export function GalleryContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
+  
+  // Before/After Modal state
+  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Load images from localStorage (with prefetch support)
   useEffect(() => {
@@ -157,6 +162,11 @@ export function GalleryContent() {
 
     return sorted;
   }, [images, searchValue, activeFilter, sortValue]);
+
+  const handleView = (image: GalleryImage) => {
+    setSelectedImage(image);
+    setIsModalOpen(true);
+  };
 
   const handleOpenInStudio = (image: GalleryImage) => {
     // Pass image URL via query param to studio page
@@ -458,6 +468,7 @@ export function GalleryContent() {
           {!isLoading || images.length > 0 ? (
             <GalleryGrid
               images={filteredAndSortedImages}
+              onView={handleView}
               onOpenInStudio={handleOpenInStudio}
               onDownload={handleDownload}
               onDelete={handleDelete}
@@ -578,6 +589,24 @@ export function GalleryContent() {
             </div>
           )}
         </>
+      )}
+
+      {/* Before/After Modal */}
+      {selectedImage && (
+        <BeforeAfterModal
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedImage(null);
+          }}
+          originalUrl={selectedImage.originalUrl || null}
+          generatedUrl={selectedImage.src}
+          imageName={selectedImage.alt}
+          createdAt={selectedImage.createdAt}
+          prompt={selectedImage.prompt}
+          onOpenInStudio={() => handleOpenInStudio(selectedImage)}
+          onDownload={() => handleDownload(selectedImage)}
+        />
       )}
     </div>
   );

@@ -14,6 +14,7 @@ const logger = createScopedLogger('Gallery Storage');
 export interface SavedImage {
   id: string;
   src: string; // URL for Supabase, base64 for localStorage
+  originalUrl?: string; // Original image URL (for Before/After comparison)
   alt: string;
   createdAt: Date;
   type: 'ai-edited' | 'manual';
@@ -78,6 +79,7 @@ async function getSupabaseImages(): Promise<SavedImage[]> {
       (data as Image[])?.map((img) => ({
         id: img.id,
         src: img.generated_url || img.original_url,
+        originalUrl: img.original_url, // For Before/After comparison
         alt: img.name,
         createdAt: new Date(img.created_at),
         type: (img.style ? 'ai-edited' : 'manual') as 'ai-edited' | 'manual',

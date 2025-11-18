@@ -5,13 +5,16 @@ import ImageCard from '@/components/atoms/ImageCard';
 export interface GalleryImage {
   id: string;
   src: string;
+  originalUrl?: string; // For Before/After comparison
   alt?: string;
   createdAt?: Date;
   type?: 'ai-edited' | 'manual';
+  prompt?: string; // AI prompt
 }
 
 interface GalleryGridProps {
   images: GalleryImage[];
+  onView: (image: GalleryImage) => void; // Open Before/After modal
   onOpenInStudio: (image: GalleryImage) => void;
   onDownload?: (image: GalleryImage) => void;
   onDelete?: (image: GalleryImage) => void;
@@ -19,6 +22,7 @@ interface GalleryGridProps {
 
 export function GalleryGrid({
   images,
+  onView,
   onOpenInStudio,
   onDownload,
   onDelete,
@@ -57,8 +61,11 @@ export function GalleryGrid({
         <ImageCard
           key={image.id}
           src={image.src}
+          originalUrl={image.originalUrl}
           alt={image.alt}
           createdAt={image.createdAt}
+          prompt={image.prompt}
+          onView={() => onView(image)}
           onOpenInStudio={() => onOpenInStudio(image)}
           onDownload={onDownload ? () => onDownload(image) : undefined}
           onDelete={onDelete ? () => onDelete(image) : undefined}

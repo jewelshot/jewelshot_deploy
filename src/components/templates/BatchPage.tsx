@@ -10,6 +10,13 @@ import type { BatchImage } from '@/components/molecules/BatchImageGrid';
 import { useSidebarStore } from '@/store/sidebarStore';
 import { useCreditStore } from '@/store/creditStore';
 import { toast } from 'sonner';
+import {
+  saveBatchState,
+  loadBatchState,
+  clearBatchState,
+  fileToDataUri,
+  type BatchImageState,
+} from '@/lib/batch-state-storage';
 
 // Dynamic imports matching Studio page
 const Sidebar = dynamic(() => import('@/components/organisms/Sidebar'), {
@@ -50,6 +57,36 @@ async function blobUrlToDataUri(blobUrl: string): Promise<string> {
 }
 
 /**
+ * Upload original image to Supabase Storage
+ * Returns the public URL
+ */
+async function uploadOriginalToSupabase(
+  imageDataUri: string,
+  filename: string
+): Promise<string> {
+  try {
+    const response = await fetch('/api/batch/upload-original', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        imageDataUri,
+        filename,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to upload original image');
+    }
+
+    const data = await response.json();
+    return data.url;
+  } catch (error) {
+    console.error('[Batch] Failed to upload original:', error);
+    throw error;
+  }
+}
+
+/**
  * BatchPage - Batch processing page with Studio layout
  */
 export function BatchPage() {
@@ -65,14 +102,100 @@ export function BatchPage() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isCustomPrompt, setIsCustomPrompt] = useState(false); // Track if user typed custom prompt
 
-  // Note: State persistence removed due to blob URL invalidation on page reload
-  // Blob URLs (blob:http://...) are temporary and become invalid after page refresh
-  // Users should complete batch processing in one session
-
   // Fetch credits on mount
   useEffect(() => {
     fetchCredits();
   }, [fetchCredits]);
+
+  // 🔄 STATE RESTORATION: Load saved batch state on mount
+  useEffect(() => {
+    const savedState = loadBatchState();
+    if (!savedState) return;
+
+    // Skip if already processing (avoid conflicts)
+    if (isProcessing) return;
+
+    // Skip if already have images (avoid duplicates)
+    if (images.length > 0) return;
+
+    console.log('[Batch] Restoring batch state...', {
+      imageCount: savedState.images.length,
+      isProcessing: savedState.isProcessing,
+    });
+
+    // Convert BatchImageState back to BatchImage format
+    const restoredImages: BatchImage[] = savedState.images.map((img) => ({
+      id: img.id,
+      preview: img.preview, // Data URI from storage
+      file: null as any, // File object lost, but we have preview
+      status: img.status,
+      progress: img.progress,
+      result: img.result,
+      error: img.error,
+    }));
+
+    setImages(restoredImages);
+    setBatchPrompt(savedState.batchPrompt);
+    setBatchName(savedState.batchName);
+    setAspectRatio(savedState.aspectRatio);
+
+    toast.success(`Restored ${restoredImages.length} images from previous session`);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 💾 AUTO-SAVE: Save batch state on changes (debounced)
+  useEffect(() => {
+    // Skip if no images
+    if (images.length === 0) {
+      clearBatchState();
+      return;
+    }
+
+    // Debounce save (1000ms delay to avoid too frequent saves)
+    const timeoutId = setTimeout(async () => {
+      try {
+        // Convert BatchImage to BatchImageState (with data URIs)
+        const imagesToSave: BatchImageState[] = await Promise.all(
+          images.map(async (img) => {
+            let preview = img.preview;
+            
+            // Convert blob URLs to data URIs for persistence
+            if (preview.startsWith('blob:')) {
+              try {
+                preview = await blobUrlToDataUri(preview);
+              } catch (error) {
+                console.error('[Batch] Failed to convert blob to data URI:', error);
+              }
+            }
+
+            return {
+              id: img.id,
+              preview,
+              fileName: img.file?.name || 'untitled.jpg',
+              fileSize: img.file?.size || 0,
+              status: img.status,
+              progress: img.progress,
+              result: img.result,
+              error: img.error,
+            };
+          })
+        );
+
+        await saveBatchState({
+          images: imagesToSave,
+          batchPrompt,
+          batchName,
+          aspectRatio,
+          isProcessing,
+        });
+
+        console.log('[Batch] State auto-saved', { imageCount: imagesToSave.length });
+      } catch (error) {
+        console.error('[Batch] Failed to auto-save state:', error);
+      }
+    }, 1000);
+
+    return () => clearTimeout(timeoutId);
+  }, [images, batchPrompt, batchName, aspectRatio, isProcessing]);
 
   // Auto-expand right sidebar when images are uploaded
   useEffect(() => {
@@ -260,7 +383,17 @@ export function BatchPage() {
         // Convert blob URL to data URI
         const imageDataUri = await blobUrlToDataUri(image.preview);
 
-        // Retry logic: 3 attempts with exponential backoff
+        // 1. Upload original image to Supabase (for Before/After comparison)
+        let originalUrl: string | null = null;
+        try {
+          originalUrl = await uploadOriginalToSupabase(imageDataUri, image.file.name);
+          console.log('[Batch] Original uploaded:', originalUrl.substring(0, 50));
+        } catch (uploadError) {
+          console.error('[Batch] Failed to upload original, continuing anyway:', uploadError);
+          // Don't fail the whole batch, just skip original URL
+        }
+
+        // 2. Retry logic: 3 attempts with exponential backoff
         let lastError: Error | null = null;
         let response: Response | null = null;
 
@@ -366,7 +499,7 @@ export function BatchPage() {
           )
         );
 
-        // 2. Save completed image to Supabase
+        // 2. Save completed image to Supabase (with original URL for Before/After)
         if (batchProjectId) {
           try {
             await fetch(`/api/batch/${batchProjectId}/image`, {
@@ -375,6 +508,7 @@ export function BatchPage() {
               body: JSON.stringify({
                 originalFilename: image.file.name,
                 originalSize: image.file.size,
+                originalUrl: originalUrl, // For Before/After comparison
                 resultUrl: editedImageUrl,
                 status: 'completed',
               }),
@@ -408,7 +542,7 @@ export function BatchPage() {
           )
         );
 
-        // Save failed image to Supabase
+        // Save failed image to Supabase (with original URL if available)
         if (batchProjectId) {
           try {
             await fetch(`/api/batch/${batchProjectId}/image`, {
@@ -417,6 +551,7 @@ export function BatchPage() {
               body: JSON.stringify({
                 originalFilename: image.file.name,
                 originalSize: image.file.size,
+                originalUrl: originalUrl, // For Before/After comparison (even if failed)
                 status: 'failed',
                 errorMessage: `Failed after ${MAX_RETRIES} retries: ${errorMessage}`,
               }),
