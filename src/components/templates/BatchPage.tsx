@@ -231,6 +231,9 @@ export function BatchPage() {
         )
       );
 
+      // Retry configuration
+      const MAX_RETRIES = 3;
+      
       // Start progress simulation (40 seconds to reach ~95%)
       const progressInterval = setInterval(() => {
         setImages((prev) =>
@@ -247,36 +250,79 @@ export function BatchPage() {
       }, 1000); // Update every second
 
       try {
-        // TODO: Credit deduction should be handled by /api/ai/edit
-        // Currently that endpoint only checks credits, doesn't deduct them
-        
         // Convert blob URL to data URI
         const imageDataUri = await blobUrlToDataUri(image.preview);
 
-        // Call AI edit API
-        console.log('[Batch] Sending request:', {
-          imageSize: imageDataUri.length,
-          promptLength: currentBatchPrompt.length,
-          prompt: currentBatchPrompt.substring(0, 100),
-        });
+        // Retry logic: 3 attempts with exponential backoff
+        let lastError: Error | null = null;
+        let response: Response | null = null;
 
-        const response = await fetch('/api/ai/edit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            image_url: imageDataUri,
-            prompt: currentBatchPrompt,
-          }),
-        });
+        for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+          try {
+            console.log(`[Batch] Attempt ${attempt}/${MAX_RETRIES} for ${image.file.name}`, {
+              imageSize: imageDataUri.length,
+              promptLength: currentBatchPrompt.length,
+              prompt: currentBatchPrompt.substring(0, 100),
+            });
 
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          console.error('[Batch] API Error:', {
-            status: response.status,
-            statusText: response.statusText,
-            error: errorData,
+            response = await fetch('/api/ai/edit', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                image_url: imageDataUri,
+                prompt: currentBatchPrompt,
+              }),
+            });
+
+            // Success!
+            if (response.ok) {
+              if (attempt > 1) {
+                console.log(`[Batch] ✅ Succeeded on attempt ${attempt}`);
+              }
+              break;
+            }
+
+            // Error - check if we should retry
+            const errorData = await response.json().catch(() => ({}));
+            const statusCode = response.status;
+            
+            console.warn(`[Batch] Attempt ${attempt} failed:`, {
+              status: statusCode,
+              error: errorData,
+            });
+
+            // Retry on 500, 502, 503, 504 (server errors)
+            if (statusCode >= 500 && statusCode < 600 && attempt < MAX_RETRIES) {
+              const waitTime = Math.min(1000 * Math.pow(2, attempt - 1), 5000); // 1s, 2s, 4s (max 5s)
+              console.log(`[Batch] Retrying in ${waitTime}ms...`);
+              await new Promise(resolve => setTimeout(resolve, waitTime));
+              continue;
+            }
+
+            // Don't retry on 4xx errors (client errors)
+            lastError = new Error(errorData.message || errorData.error || `API error: ${response.statusText}`);
+            break;
+          } catch (fetchError) {
+            lastError = fetchError instanceof Error ? fetchError : new Error('Network error');
+            
+            // Retry on network errors
+            if (attempt < MAX_RETRIES) {
+              const waitTime = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+              console.log(`[Batch] Network error, retrying in ${waitTime}ms...`);
+              await new Promise(resolve => setTimeout(resolve, waitTime));
+              continue;
+            }
+          }
+        }
+
+        // Check final result
+        if (!response || !response.ok) {
+          console.error('[Batch] All attempts failed:', {
+            filename: image.file.name,
+            attempts: MAX_RETRIES,
+            lastError: lastError?.message,
           });
-          throw new Error(errorData.message || errorData.error || `API error: ${response.statusText}`);
+          throw lastError || new Error('Failed after all retries');
         }
 
         const data = await response.json();
@@ -331,9 +377,9 @@ export function BatchPage() {
           }
         }
 
-        toast.success(`${image.file.name} processed successfully`);
+        toast.success(`✅ ${image.file.name} completed`);
       } catch (error) {
-        console.error(`Failed to process ${image.file.name}:`, error);
+        console.error(`❌ Failed to process ${image.file.name} after ${MAX_RETRIES} attempts:`, error);
         
         // Stop progress simulation
         clearInterval(progressInterval);
@@ -363,7 +409,7 @@ export function BatchPage() {
                 originalFilename: image.file.name,
                 originalSize: image.file.size,
                 status: 'failed',
-                errorMessage,
+                errorMessage: `Failed after ${MAX_RETRIES} retries: ${errorMessage}`,
               }),
             });
             console.log('[Batch] Failed image saved to DB:', image.file.name);
@@ -372,7 +418,8 @@ export function BatchPage() {
           }
         }
 
-        toast.error(`Failed to process ${image.file.name}`);
+        // Don't show error toast immediately - continue processing
+        console.log(`[Batch] ⏭️ Skipping ${image.file.name}, continuing with next image...`);
       }
     }
 
@@ -380,10 +427,18 @@ export function BatchPage() {
     const completedCount = images.filter((img) => img.status === 'completed').length;
     const failedCount = images.filter((img) => img.status === 'failed').length;
     
-    toast.success(
-      `Batch complete! ${completedCount} successful, ${failedCount} failed.`,
-      { duration: 5000 }
-    );
+    // Show summary with retry info
+    if (failedCount > 0) {
+      toast.warning(
+        `🎯 Batch Complete!\n✅ ${completedCount} succeeded\n❌ ${failedCount} failed after retries`,
+        { duration: 6000 }
+      );
+    } else {
+      toast.success(
+        `🎉 All ${completedCount} images processed successfully!`,
+        { duration: 4000 }
+      );
+    }
     
     console.log('[Batch] Processing complete', {
       total: images.length,
