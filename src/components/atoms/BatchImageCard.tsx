@@ -76,32 +76,29 @@ export function BatchImageCard({
           </button>
         )}
 
-        {/* Status Icon - Only for non-completed */}
-        {status !== 'completed' && (
+        {/* Status Icon - Only for processing and failed */}
+        {(status === 'processing' || status === 'failed') && (
           <div className="absolute left-1 top-1 flex h-6 w-6 items-center justify-center rounded-md bg-black/60 backdrop-blur-sm">
             <span className="text-xs">{statusIcons[status]}</span>
-          </div>
-        )}
-
-        {/* Completed Badge - Bottom right corner */}
-        {status === 'completed' && (
-          <div className="absolute bottom-1 right-1 flex items-center gap-1 rounded-md bg-green-500/90 px-1.5 py-0.5 backdrop-blur-sm">
-            <Check className="h-3 w-3 text-white" />
-            <span className="text-[8px] font-medium text-white">
-              {formatSize(file.size)}
-            </span>
           </div>
         )}
       </div>
 
       {/* File Info - Always visible but different for pending/processing */}
       <div className="p-1.5">
-        <p
-          className="truncate text-[9px] text-white/60"
-          title={file.name}
-        >
-          {file.name}
-        </p>
+        <div className="flex items-center justify-between gap-1">
+          <p
+            className="truncate text-[9px] text-white/60"
+            title={file.name}
+          >
+            {file.name}
+          </p>
+          
+          {/* Green checkmark for completed */}
+          {status === 'completed' && (
+            <Check className="h-3 w-3 flex-shrink-0 text-green-500" />
+          )}
+        </div>
         
         {/* Mini Progress Bar - Only for processing */}
         {status === 'processing' && (
@@ -115,6 +112,11 @@ export function BatchImageCard({
         
         {/* File size for non-completed states */}
         {status !== 'completed' && (
+          <p className="text-[8px] text-white/40">{formatSize(file.size)}</p>
+        )}
+        
+        {/* File size for completed - below filename */}
+        {status === 'completed' && (
           <p className="text-[8px] text-white/40">{formatSize(file.size)}</p>
         )}
       </div>
