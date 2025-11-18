@@ -39,7 +39,7 @@ const BottomBarToggle = dynamic(
  */
 export function BatchPage() {
   const router = useRouter();
-  const { setRightOpen } = useSidebarStore();
+  const { openRight } = useSidebarStore();
   const [images, setImages] = useState<BatchImage[]>([]);
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
   const [batchName, setBatchName] = useState('');
@@ -50,9 +50,9 @@ export function BatchPage() {
   // Auto-expand right sidebar when images are uploaded
   useEffect(() => {
     if (images.length > 0) {
-      setRightOpen(true);
+      openRight();
     }
-  }, [images.length, setRightOpen]);
+  }, [images.length, openRight]);
 
   // Handle image click - Open in Studio
   const handleImageClick = useCallback(
