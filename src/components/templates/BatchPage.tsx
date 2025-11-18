@@ -53,8 +53,6 @@ async function blobUrlToDataUri(blobUrl: string): Promise<string> {
 /**
  * BatchPage - Batch processing page with Studio layout
  */
-const BATCH_STORAGE_KEY = 'jewelshot_batch_state';
-
 export function BatchPage() {
   const router = useRouter();
   const { openRight } = useSidebarStore();
@@ -66,36 +64,9 @@ export function BatchPage() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showPromptInModal, setShowPromptInModal] = useState(true); // Hide preset prompts
 
-  // Restore batch state from localStorage on mount
-  useEffect(() => {
-    const stored = localStorage.getItem(BATCH_STORAGE_KEY);
-    if (stored) {
-      try {
-        const state = JSON.parse(stored);
-        setImages(state.images || []);
-        setBatchPrompt(state.batchPrompt || '');
-        setBatchName(state.batchName || '');
-        setIsProcessing(state.isProcessing || false);
-      } catch (error) {
-        console.error('Failed to restore batch state:', error);
-      }
-    }
-  }, []);
-
-  // Save batch state to localStorage whenever it changes
-  useEffect(() => {
-    if (images.length > 0 || isProcessing) {
-      localStorage.setItem(
-        BATCH_STORAGE_KEY,
-        JSON.stringify({
-          images,
-          batchPrompt,
-          batchName,
-          isProcessing,
-        })
-      );
-    }
-  }, [images, batchPrompt, batchName, isProcessing]);
+  // Note: State persistence removed due to blob URL invalidation on page reload
+  // Blob URLs (blob:http://...) are temporary and become invalid after page refresh
+  // Users should complete batch processing in one session
 
   // Fetch credits on mount
   useEffect(() => {
@@ -234,13 +205,8 @@ export function BatchPage() {
       }, 1000); // Update every second
 
       try {
-        // Deduct credit for this image
-        const { deductCredit } = useCreditStore.getState();
-        const success = await deductCredit({ prompt: currentBatchPrompt });
-        if (!success) {
-          throw new Error('Failed to deduct credit - insufficient balance');
-        }
-        fetchCredits(); // Refresh credits
+        // TODO: Credit deduction should be handled by /api/ai/edit
+        // Currently that endpoint only checks credits, doesn't deduct them
         
         // Convert blob URL to data URI
         const imageDataUri = await blobUrlToDataUri(image.preview);
@@ -356,8 +322,8 @@ export function BatchPage() {
       }
     }
 
-    // Clear localStorage after successful batch
-    localStorage.removeItem(BATCH_STORAGE_KEY);
+    // Refresh credits after batch completes
+    fetchCredits();
     
     setIsProcessing(false);
   }, [images, batchPrompt, batchName, fetchCredits]);

@@ -301,6 +301,30 @@ export async function POST(request: NextRequest) {
 
     logger.info('[Edit] Edit successful');
 
+    // 💰 DEDUCT CREDIT (After successful AI operation)
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: deductError } = await (supabase as any).rpc('use_credit', {
+        p_user_id: userId,
+        p_description: 'AI Image Generation',
+        p_metadata: { prompt: prompt.substring(0, 100) },
+      });
+
+      if (deductError) {
+        logger.error('[Edit] Failed to deduct credit', {
+          userId,
+          error: deductError.message,
+        });
+        // Don't fail the request, just log the error
+        // User already got the image, we'll fix credits later
+      } else {
+        logger.info('[Edit] Credit deducted successfully', { userId });
+      }
+    } catch (deductError) {
+      logger.error('[Edit] Credit deduction error', { userId, deductError });
+      // Don't fail the request
+    }
+
     // Return result
     return NextResponse.json(result.data);
   } catch (error: unknown) {
