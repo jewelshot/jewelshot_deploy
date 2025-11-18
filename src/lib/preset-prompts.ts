@@ -486,7 +486,7 @@ OUTPUT: Editorial minimalist still life. Aspect ratio ${aspectRatio}. Soft paste
           closeup:
             'ULTRA MACRO 25-40cm decollete-chest-only face-HEAD-OUT-FRAME cropped-above-shoulders necklace-DOMINATES-65-75%-frame HUGE-prominent frontal-centered product-HERO straight-0deg',
           clothing:
-            'LIGHT casual V-neck open-collar blouse delicate thin-fabric nude cream beige light-pink subtle-pattern simple-daily-wear decollete-VISIBLE necklace-touches-SKIN NOT-fully-covered elegant-casual soft-drape minimal-details',
+            'LIGHT casual V-neck open-collar blouse delicate thin-fabric nude cream beige light-pink PLAIN solid-color simple-daily-wear decollete-VISIBLE necklace-touches-SKIN NOT-fully-covered elegant-casual soft-drape NO-pattern NO-print',
           forbidden:
             '❌ FAIL: added|removed|moved|altered gemstones|chain|pendant|metal design-change structure-modification distortion warped blur soft-focus face-visible eyes-nose-mouth wide-shot jewelry-small floating flat-2D oversized miniature mannequin-look naked-bare turtleneck high-collar fully-covered heavy-fabric',
           place:
