@@ -173,7 +173,7 @@ export function BatchPage() {
               fileName: img.file?.name || 'untitled.jpg',
               fileSize: img.file?.size || 0,
               status: img.status,
-              progress: img.progress,
+              progress: img.progress || 0, // Default to 0 if undefined
               result: img.result,
               error: img.error,
             };
