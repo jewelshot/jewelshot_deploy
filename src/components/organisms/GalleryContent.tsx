@@ -43,6 +43,8 @@ export function GalleryContent() {
   const [batchProjects, setBatchProjects] = useState<BatchProject[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState('');
 
   // Load images from localStorage (with prefetch support)
   useEffect(() => {
@@ -191,13 +193,117 @@ export function GalleryContent() {
   // Batch handlers
   const handleDownloadBatch = async (project: BatchProject) => {
     try {
-      toast.info('Preparing download...');
-      // TODO: Implement ZIP download from Supabase storage
-      logger.info('Download batch:', project.id);
-      toast.success('Download feature coming soon!');
+      toast.info('Creating ZIP archive...');
+      
+      // Dynamic import JSZip
+      const JSZip = (await import('jszip')).default;
+      const { saveAs } = await import('file-saver');
+      
+      const zip = new JSZip();
+      const folder = zip.folder(project.name);
+
+      if (!folder) {
+        throw new Error('Failed to create zip folder');
+      }
+
+      // Get all completed images
+      const completedImages = project.batch_images?.filter(
+        (img) => img.status === 'completed' && img.result_url
+      ) || [];
+
+      if (completedImages.length === 0) {
+        toast.error('No completed images to download');
+        return;
+      }
+
+      toast.info(`Downloading ${completedImages.length} images...`);
+
+      // Download and add each image to ZIP
+      let successCount = 0;
+      for (const image of completedImages) {
+        try {
+          const response = await fetch(image.result_url!);
+          if (!response.ok) {
+            logger.warn(`Failed to fetch image: ${image.original_filename}`);
+            continue;
+          }
+          
+          const blob = await response.blob();
+          const filename = image.original_filename.replace(/\.[^/.]+$/, '') + '_generated.jpg';
+          folder.file(filename, blob);
+          successCount++;
+        } catch (err) {
+          logger.error(`Failed to add ${image.original_filename} to zip:`, err);
+        }
+      }
+
+      if (successCount === 0) {
+        toast.error('Failed to download any images');
+        return;
+      }
+
+      // Add metadata
+      folder.file(
+        'metadata.json',
+        JSON.stringify(
+          {
+            project_name: project.name,
+            created_at: project.created_at,
+            total_images: project.total_images,
+            completed_images: project.completed_images,
+            exported_at: new Date().toISOString(),
+          },
+          null,
+          2
+        )
+      );
+
+      toast.info('Generating ZIP file...');
+      
+      // Generate ZIP
+      const content = await zip.generateAsync({ 
+        type: 'blob', 
+        compression: 'DEFLATE',
+        compressionOptions: { level: 6 }
+      });
+      
+      // Download
+      saveAs(content, `${project.name}.zip`);
+      toast.success(`Downloaded ${successCount} images!`);
     } catch (error) {
       logger.error('Failed to download batch:', error);
       toast.error('Failed to download batch');
+    }
+  };
+
+  const handleRenameBatch = async (projectId: string, newName: string) => {
+    if (!newName.trim()) {
+      toast.error('Name cannot be empty');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/batch/${projectId}/name`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newName.trim() }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to rename batch project');
+      }
+
+      // Update local state
+      setBatchProjects((prev) =>
+        prev.map((p) => (p.id === projectId ? { ...p, name: newName.trim() } : p))
+      );
+      
+      setEditingProjectId(null);
+      setEditingName('');
+      toast.success('Batch renamed');
+    } catch (error) {
+      logger.error('Failed to rename batch:', error);
+      toast.error('Failed to rename batch');
     }
   };
 
@@ -354,9 +460,43 @@ export function GalleryContent() {
 
                   {/* Info */}
                   <div className="p-4">
-                    <h3 className="mb-1 truncate text-sm font-medium text-white">
-                      {project.name}
-                    </h3>
+                    {editingProjectId === project.id ? (
+                      <input
+                        type="text"
+                        value={editingName}
+                        onChange={(e) => setEditingName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            handleRenameBatch(project.id, editingName);
+                          } else if (e.key === 'Escape') {
+                            setEditingProjectId(null);
+                            setEditingName('');
+                          }
+                        }}
+                        onBlur={() => {
+                          if (editingName.trim() && editingName !== project.name) {
+                            handleRenameBatch(project.id, editingName);
+                          } else {
+                            setEditingProjectId(null);
+                            setEditingName('');
+                          }
+                        }}
+                        autoFocus
+                        className="mb-1 w-full rounded bg-white/10 px-2 py-1 text-sm font-medium text-white outline-none ring-2 ring-purple-500"
+                      />
+                    ) : (
+                      <h3
+                        className="mb-1 cursor-pointer truncate text-sm font-medium text-white transition-colors hover:text-purple-400"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingProjectId(project.id);
+                          setEditingName(project.name);
+                        }}
+                        title="Click to rename"
+                      >
+                        {project.name}
+                      </h3>
+                    )}
                     <p className="text-xs text-white/40">
                       {new Date(project.created_at).toLocaleDateString()}
                     </p>
