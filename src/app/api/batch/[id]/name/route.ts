@@ -41,7 +41,8 @@ export async function PATCH(
     }
 
     // Update project name (RLS will ensure user owns it)
-    const { data: project, error: updateError } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: project, error: updateError } = await (supabase as any)
       .from('batch_projects')
       .update({ name: name.trim() })
       .eq('id', batchProjectId)

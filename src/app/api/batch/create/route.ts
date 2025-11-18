@@ -43,7 +43,8 @@ export async function POST(request: Request) {
     }
 
     // Create batch project
-    const { data: project, error: createError } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: project, error: createError } = await (supabase as any)
       .from('batch_projects')
       .insert({
         user_id: user.id,

@@ -36,7 +36,8 @@ export async function POST(
     const { id: batchProjectId } = await params;
 
     // Verify project ownership
-    const { data: project, error: projectError } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: project, error: projectError } = await (supabase as any)
       .from('batch_projects')
       .select('id, user_id')
       .eq('id', batchProjectId)
@@ -93,7 +94,8 @@ export async function POST(
       completed_at: status === 'completed' || status === 'failed' ? new Date().toISOString() : null,
     };
 
-    const { data: image, error: imageError } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: image, error: imageError } = await (supabase as any)
       .from('batch_images')
       .insert(imageData)
       .select()

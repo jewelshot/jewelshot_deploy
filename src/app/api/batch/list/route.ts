@@ -24,7 +24,8 @@ export async function GET() {
     }
 
     // Fetch batch projects with images
-    const { data: projects, error: projectsError } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: projects, error: projectsError } = await (supabase as any)
       .from('batch_projects')
       .select(`
         *,

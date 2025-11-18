@@ -29,7 +29,8 @@ export async function DELETE(
     const { id: batchProjectId } = await params;
 
     // Delete batch project (CASCADE will delete images)
-    const { error: deleteError } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: deleteError } = await (supabase as any)
       .from('batch_projects')
       .delete()
       .eq('id', batchProjectId)
