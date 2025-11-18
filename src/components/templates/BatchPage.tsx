@@ -203,6 +203,9 @@ export function BatchPage() {
     setShowConfirmModal(false);
     setIsProcessing(true);
 
+    // Capture current prompt (closure issue fix)
+    const currentBatchPrompt = batchPrompt || 'enhance the image quality and details';
+
     // Process images one by one
     for (let i = 0; i < images.length; i++) {
       const image = images[i];
@@ -233,7 +236,7 @@ export function BatchPage() {
       try {
         // Deduct credit for this image
         const { deductCredit } = useCreditStore.getState();
-        const success = await deductCredit({ prompt: batchPrompt });
+        const success = await deductCredit({ prompt: currentBatchPrompt });
         if (!success) {
           throw new Error('Failed to deduct credit - insufficient balance');
         }
@@ -243,17 +246,29 @@ export function BatchPage() {
         const imageDataUri = await blobUrlToDataUri(image.preview);
 
         // Call AI edit API
+        console.log('[Batch] Sending request:', {
+          imageSize: imageDataUri.length,
+          promptLength: currentBatchPrompt.length,
+          prompt: currentBatchPrompt.substring(0, 100),
+        });
+
         const response = await fetch('/api/ai/edit', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            image_url: imageDataUri, // ✅ API expects image_url (not imageUrl)
-            prompt: batchPrompt || '',
+            image_url: imageDataUri,
+            prompt: currentBatchPrompt,
           }),
         });
 
         if (!response.ok) {
-          throw new Error(`API error: ${response.statusText}`);
+          const errorData = await response.json().catch(() => ({}));
+          console.error('[Batch] API Error:', {
+            status: response.status,
+            statusText: response.statusText,
+            error: errorData,
+          });
+          throw new Error(errorData.message || errorData.error || `API error: ${response.statusText}`);
         }
 
         const data = await response.json();
