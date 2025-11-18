@@ -1,14 +1,17 @@
 'use client';
 
-import { X, Minimize2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { X, Minimize2, CheckCircle2, AlertCircle, Pause, Play } from 'lucide-react';
+import Image from 'next/image';
 import { BatchProgressBar } from '@/components/atoms/BatchProgressBar';
 import type { BatchImage } from '@/components/molecules/BatchImageGrid';
 
 interface BatchProcessingModalProps {
   images: BatchImage[];
   isMinimized: boolean;
+  isPaused: boolean;
   onMinimize: () => void;
   onMaximize: () => void;
+  onTogglePause: () => void;
   onCancel: () => void;
   canCancel: boolean;
 }
@@ -19,8 +22,10 @@ interface BatchProcessingModalProps {
 export function BatchProcessingModal({
   images,
   isMinimized,
+  isPaused,
   onMinimize,
   onMaximize,
+  onTogglePause,
   onCancel,
   canCancel,
 }: BatchProcessingModalProps) {
@@ -78,6 +83,25 @@ export function BatchProcessingModal({
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Pause/Resume Button */}
+            {!isComplete && canCancel && (
+              <button
+                onClick={onTogglePause}
+                className={`rounded-lg p-2 transition-colors ${
+                  isPaused
+                    ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
+                    : 'text-white/60 hover:bg-white/5 hover:text-white'
+                }`}
+                title={isPaused ? 'Resume' : 'Pause'}
+              >
+                {isPaused ? (
+                  <Play className="h-4 w-4" />
+                ) : (
+                  <Pause className="h-4 w-4" />
+                )}
+              </button>
+            )}
+
             <button
               onClick={onMinimize}
               className="rounded-lg p-2 text-white/60 transition-colors hover:bg-white/5 hover:text-white"
@@ -112,8 +136,21 @@ export function BatchProcessingModal({
                 key={image.id}
                 className="flex items-center gap-3 rounded-lg border border-white/5 bg-white/[0.02] p-3"
               >
-                {/* Status Icon */}
-                <div className="flex-shrink-0">{statusIcons[image.status]}</div>
+                {/* Thumbnail (for completed images) */}
+                {image.status === 'completed' && image.result ? (
+                  <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-md border border-white/10">
+                    <Image
+                      src={image.result}
+                      alt="Result"
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                  </div>
+                ) : (
+                  /* Status Icon */
+                  <div className="flex-shrink-0">{statusIcons[image.status]}</div>
+                )}
 
                 {/* File Info */}
                 <div className="min-w-0 flex-1">
