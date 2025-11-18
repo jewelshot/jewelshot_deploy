@@ -7,10 +7,25 @@ import GalleryToolbar from '@/components/molecules/GalleryToolbar';
 import GalleryGrid, { GalleryImage } from '@/components/molecules/GalleryGrid';
 import { SortOption } from '@/components/atoms/SortButton';
 import { getSavedImages, deleteImageFromGallery } from '@/lib/gallery-storage';
-import { getBatchProjects, deleteBatchProject, type BatchProject } from '@/lib/batch-storage';
-import { downloadBatchAsZip } from '@/lib/zip-utils';
 import { toast } from 'sonner';
 import { createScopedLogger } from '@/lib/logger';
+
+// Supabase batch project type
+interface BatchProject {
+  id: string;
+  name: string;
+  status: string;
+  total_images: number;
+  completed_images: number;
+  failed_images: number;
+  created_at: string;
+  batch_images?: Array<{
+    id: string;
+    original_filename: string;
+    result_url: string | null;
+    status: string;
+  }>;
+}
 
 const logger = createScopedLogger('Gallery');
 
@@ -77,23 +92,34 @@ export function GalleryContent() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, [refreshKey]);
 
-  // Load batch projects
+  // Load batch projects from Supabase
   useEffect(() => {
     const loadBatchProjects = async () => {
-      const projects = await getBatchProjects();
-      setBatchProjects(projects);
-      logger.info(`✅ Loaded ${projects.length} batch projects`);
+      try {
+        const response = await fetch('/api/batch/list');
+        if (!response.ok) {
+          throw new Error('Failed to fetch batch projects');
+        }
+        const data = await response.json();
+        setBatchProjects(data.projects || []);
+        logger.info(`✅ Loaded ${data.projects?.length || 0} batch projects from Supabase`);
+      } catch (error) {
+        logger.error('Failed to load batch projects:', error);
+        toast.error('Failed to load batch projects');
+      }
     };
 
     loadBatchProjects();
 
-    // Listen for batch project updates
-    const handleBatchUpdate = () => loadBatchProjects();
-    window.addEventListener('batch-projects-updated', handleBatchUpdate);
+    // Poll for updates every 5 seconds while on batches tab
+    const interval = activeTab === 'batches' 
+      ? setInterval(loadBatchProjects, 5000) 
+      : null;
 
-    return () =>
-      window.removeEventListener('batch-projects-updated', handleBatchUpdate);
-  }, []);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [activeTab]);
 
   // Filter and sort images
   const filteredAndSortedImages = useMemo(() => {
@@ -165,9 +191,10 @@ export function GalleryContent() {
   // Batch handlers
   const handleDownloadBatch = async (project: BatchProject) => {
     try {
-      toast.info('Creating ZIP archive...');
-      await downloadBatchAsZip(project);
-      toast.success('Batch downloaded!');
+      toast.info('Preparing download...');
+      // TODO: Implement ZIP download from Supabase storage
+      logger.info('Download batch:', project.id);
+      toast.success('Download feature coming soon!');
     } catch (error) {
       logger.error('Failed to download batch:', error);
       toast.error('Failed to download batch');
@@ -177,11 +204,20 @@ export function GalleryContent() {
   const handleDeleteBatch = async (project: BatchProject) => {
     if (
       confirm(
-        `Are you sure you want to delete "${project.name}"? This will remove all ${project.imageCount} images.`
+        `Are you sure you want to delete "${project.name}"? This will remove all ${project.total_images} images.`
       )
     ) {
       try {
-        await deleteBatchProject(project.id);
+        const response = await fetch(`/api/batch/${project.id}`, {
+          method: 'DELETE',
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to delete batch project');
+        }
+        
+        // Refresh batch list
+        setBatchProjects((prev) => prev.filter((p) => p.id !== project.id));
         toast.success('Batch deleted');
       } catch (error) {
         logger.error('Failed to delete batch:', error);
@@ -293,9 +329,9 @@ export function GalleryContent() {
                 >
                   {/* Thumbnail */}
                   <div className="relative aspect-square overflow-hidden bg-black/20">
-                    {project.thumbnail ? (
+                    {project.batch_images && project.batch_images.length > 0 && project.batch_images[0].result_url ? (
                       <img
-                        src={project.thumbnail}
+                        src={project.batch_images[0].result_url}
                         alt={project.name}
                         className="h-full w-full object-cover"
                       />
@@ -306,8 +342,14 @@ export function GalleryContent() {
                     )}
                     {/* Image count badge */}
                     <div className="absolute right-2 top-2 rounded-full bg-black/70 px-2 py-1 text-xs text-white backdrop-blur-sm">
-                      {project.imageCount} images
+                      {project.completed_images}/{project.total_images}
                     </div>
+                    {/* Status badge */}
+                    {project.status === 'processing' && (
+                      <div className="absolute left-2 top-2 rounded-full bg-blue-500/70 px-2 py-1 text-xs text-white backdrop-blur-sm">
+                        Processing...
+                      </div>
+                    )}
                   </div>
 
                   {/* Info */}
@@ -316,7 +358,7 @@ export function GalleryContent() {
                       {project.name}
                     </h3>
                     <p className="text-xs text-white/40">
-                      {new Date(project.createdAt).toLocaleDateString()}
+                      {new Date(project.created_at).toLocaleDateString()}
                     </p>
                   </div>
 
