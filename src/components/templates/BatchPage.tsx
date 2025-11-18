@@ -59,9 +59,11 @@ export function BatchPage() {
   const [images, setImages] = useState<BatchImage[]>([]);
   const [batchPrompt, setBatchPrompt] = useState('');
   const [batchName, setBatchName] = useState('');
+  const [presetName, setPresetName] = useState(''); // Store preset name (not prompt)
+  const [aspectRatio, setAspectRatio] = useState<string>(''); // Required aspect ratio
   const [isProcessing, setIsProcessing] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [showPromptInModal, setShowPromptInModal] = useState(true); // Hide preset prompts
+  const [isCustomPrompt, setIsCustomPrompt] = useState(false); // Track if user typed custom prompt
 
   // Note: State persistence removed due to blob URL invalidation on page reload
   // Blob URLs (blob:http://...) are temporary and become invalid after page refresh
@@ -127,12 +129,20 @@ export function BatchPage() {
     images.forEach((img) => URL.revokeObjectURL(img.preview));
     setImages([]);
     setBatchPrompt('');
+    setPresetName('');
+    setAspectRatio('');
   }, [images]);
 
   // Handle generate from prompt control (custom prompt - show in modal)
   const handleGenerate = useCallback((prompt: string) => {
     if (images.length === 0) {
       toast.error('Please upload images first');
+      return;
+    }
+
+    // Aspect ratio is required
+    if (!aspectRatio) {
+      toast.error('Please select an aspect ratio first');
       return;
     }
 
@@ -143,15 +153,22 @@ export function BatchPage() {
     }
 
     setBatchPrompt(prompt);
-    setShowPromptInModal(true); // Show custom prompt
+    setPresetName(''); // Clear preset name
+    setIsCustomPrompt(true); // Mark as custom prompt
     setShowConfirmModal(true);
-  }, [images, credits]);
+  }, [images, credits, aspectRatio]);
 
-  // Handle preset from RightSidebar (hide prompt in modal)
+  // Handle preset from RightSidebar (show preset name, not prompt)
   const handleGenerateWithPreset = useCallback(
-    (prompt: string, aspectRatio?: string) => {
+    (prompt: string, ratio?: string, name?: string) => {
       if (images.length === 0) {
         toast.error('Please upload images first');
+        return;
+      }
+
+      // Aspect ratio is required
+      if (!ratio && !aspectRatio) {
+        toast.error('Please select an aspect ratio first');
         return;
       }
 
@@ -161,11 +178,13 @@ export function BatchPage() {
         return;
       }
 
-      setBatchPrompt(prompt);
-      setShowPromptInModal(false); // Hide preset prompt
+      setBatchPrompt(prompt); // Store the actual prompt for API
+      setPresetName(name || 'Selected Preset'); // Store preset name for display
+      setIsCustomPrompt(false); // Mark as preset
+      if (ratio) setAspectRatio(ratio); // Use preset's aspect ratio if provided
       setShowConfirmModal(true);
     },
-    [images, credits]
+    [images, credits, aspectRatio]
   );
 
   // Handle confirm batch processing
@@ -271,6 +290,7 @@ export function BatchPage() {
               body: JSON.stringify({
                 image_url: imageDataUri,
                 prompt: currentBatchPrompt,
+                aspect_ratio: aspectRatio || '1:1', // Send aspect ratio to nano banana
               }),
             });
 
@@ -486,6 +506,8 @@ export function BatchPage() {
         onImageClick={handleImageClick}
         onGenerate={handleGenerate}
         isProcessing={isProcessing}
+        aspectRatio={aspectRatio}
+        onAspectRatioChange={setAspectRatio}
       />
 
       {/* Batch Confirm Modal */}
@@ -494,7 +516,9 @@ export function BatchPage() {
         onConfirm={handleConfirmBatch}
         onCancel={() => setShowConfirmModal(false)}
         imageCount={images.length}
-        prompt={showPromptInModal ? batchPrompt : undefined}
+        prompt={isCustomPrompt ? batchPrompt : undefined}
+        presetName={!isCustomPrompt ? presetName : undefined}
+        aspectRatio={aspectRatio}
       />
     </>
   );

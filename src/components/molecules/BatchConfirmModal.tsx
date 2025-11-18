@@ -8,6 +8,8 @@ interface BatchConfirmModalProps {
   onCancel: () => void;
   imageCount: number;
   prompt?: string;
+  presetName?: string; // If preset is used, show name instead of prompt
+  aspectRatio?: string; // Show selected aspect ratio
 }
 
 /**
@@ -19,8 +21,14 @@ export function BatchConfirmModal({
   onCancel,
   imageCount,
   prompt,
+  presetName,
+  aspectRatio,
 }: BatchConfirmModalProps) {
   if (!isOpen) return null;
+
+  // Determine what to show: preset name or custom prompt
+  const displayText = presetName || prompt;
+  const displayLabel = presetName ? 'Preset' : 'Prompt';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
@@ -70,10 +78,17 @@ export function BatchConfirmModal({
             </li>
           </ul>
 
-          {prompt && (
+          {displayText && (
             <div className="rounded-lg border border-purple-500/20 bg-purple-500/5 p-3">
-              <p className="mb-1 text-xs font-medium text-purple-400">Prompt:</p>
-              <p className="text-xs text-white/70">{prompt || 'Default enhancement'}</p>
+              <p className="mb-1 text-xs font-medium text-purple-400">{displayLabel}:</p>
+              <p className="text-xs text-white/70">{displayText}</p>
+            </div>
+          )}
+
+          {aspectRatio && (
+            <div className="rounded-lg border border-blue-500/20 bg-blue-500/5 p-3">
+              <p className="mb-1 text-xs font-medium text-blue-400">Aspect Ratio:</p>
+              <p className="text-xs text-white/70">{aspectRatio}</p>
             </div>
           )}
 

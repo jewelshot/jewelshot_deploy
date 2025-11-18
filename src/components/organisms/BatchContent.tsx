@@ -18,6 +18,8 @@ interface BatchContentProps {
   onImageClick?: (id: string, preview: string) => void;
   onGenerate?: (prompt: string) => void;
   isProcessing?: boolean;
+  aspectRatio?: string;
+  onAspectRatioChange?: (ratio: string) => void;
 }
 
 /**
@@ -35,8 +37,19 @@ export function BatchContent({
   onImageClick,
   onGenerate,
   isProcessing = false,
+  aspectRatio,
+  onAspectRatioChange,
 }: BatchContentProps) {
   const { leftOpen, rightOpen, topOpen, bottomOpen } = useSidebarStore();
+
+  // Nano Banana supported aspect ratios
+  const aspectRatios = [
+    { value: '1:1', label: 'Square (1:1)' },
+    { value: '16:9', label: 'Landscape (16:9)' },
+    { value: '9:16', label: 'Portrait (9:16)' },
+    { value: '4:3', label: 'Standard (4:3)' },
+    { value: '3:4', label: 'Portrait (3:4)' },
+  ];
 
   return (
     <>
@@ -60,16 +73,46 @@ export function BatchContent({
                 </p>
               </div>
 
-              {/* Batch Name Input */}
+              {/* Right Side Controls */}
               {images.length > 0 && (
-                <input
-                  type="text"
-                  value={batchName}
-                  onChange={(e) => onBatchNameChange?.(e.target.value)}
-                  placeholder="Batch name (optional)"
-                  className="rounded-lg border border-white/10 bg-white/[0.02] px-4 py-2 text-sm text-white placeholder:text-white/40 focus:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
-                  disabled={disabled}
-                />
+                <div className="flex items-center gap-3">
+                  {/* Aspect Ratio Selector */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs text-white/60">
+                      Aspect Ratio <span className="text-red-400">*</span>
+                    </label>
+                    <select
+                      value={aspectRatio}
+                      onChange={(e) => onAspectRatioChange?.(e.target.value)}
+                      className={`rounded-lg border px-4 py-2 text-sm text-white focus:outline-none focus:ring-1 ${
+                        aspectRatio
+                          ? 'border-white/10 bg-white/[0.02] focus:border-purple-500/50 focus:ring-purple-500/50'
+                          : 'border-red-500/50 bg-red-500/5 focus:border-red-500 focus:ring-red-500/50'
+                      }`}
+                      disabled={disabled}
+                    >
+                      <option value="">Select ratio...</option>
+                      {aspectRatios.map((ratio) => (
+                        <option key={ratio.value} value={ratio.value}>
+                          {ratio.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Batch Name Input */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs text-white/60">Batch Name</label>
+                    <input
+                      type="text"
+                      value={batchName}
+                      onChange={(e) => onBatchNameChange?.(e.target.value)}
+                      placeholder="Optional"
+                      className="rounded-lg border border-white/10 bg-white/[0.02] px-4 py-2 text-sm text-white placeholder:text-white/40 focus:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
+                      disabled={disabled}
+                    />
+                  </div>
+                </div>
               )}
             </div>
           </div>
