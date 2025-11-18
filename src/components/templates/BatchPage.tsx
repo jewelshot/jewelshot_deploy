@@ -189,7 +189,22 @@ export function BatchPage() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create batch project');
+        const errorData = await response.json().catch(() => ({}));
+        
+        // Check if it's a migration issue (500 error)
+        if (response.status === 500) {
+          console.error('[Batch] ❌ Database migration required!');
+          toast.error('⚠️ Database setup required! Redirecting...');
+          setIsProcessing(false);
+          
+          // Redirect to setup page after 2 seconds
+          setTimeout(() => {
+            window.location.href = '/setup';
+          }, 2000);
+          return;
+        }
+        
+        throw new Error(errorData.error || 'Failed to create batch project');
       }
 
       const data = await response.json();
