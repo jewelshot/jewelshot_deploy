@@ -10,6 +10,7 @@ import { getSavedImages, deleteImageFromGallery } from '@/lib/gallery-storage';
 import { toast } from 'sonner';
 import { createScopedLogger } from '@/lib/logger';
 import { BeforeAfterModal } from '@/components/molecules/BeforeAfterModal';
+import { BatchDetailModal } from '@/components/molecules/BatchDetailModal';
 
 // Supabase batch project type
 interface BatchProject {
@@ -23,8 +24,10 @@ interface BatchProject {
   batch_images?: Array<{
     id: string;
     original_filename: string;
+    original_url: string | null;
     result_url: string | null;
     status: string;
+    error_message?: string | null;
   }>;
 }
 
@@ -50,6 +53,10 @@ export function GalleryContent() {
   // Before/After Modal state
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Batch Detail Modal state
+  const [selectedBatchProject, setSelectedBatchProject] = useState<BatchProject | null>(null);
+  const [isBatchModalOpen, setIsBatchModalOpen] = useState(false);
 
   // Load images from localStorage (with prefetch support)
   useEffect(() => {
@@ -168,6 +175,22 @@ export function GalleryContent() {
     setIsModalOpen(true);
   };
 
+  const handleViewBatch = (project: BatchProject) => {
+    setSelectedBatchProject(project);
+    setIsBatchModalOpen(true);
+  };
+
+  const handleViewBatchImage = (image: { originalUrl: string | null; generatedUrl: string; name: string }) => {
+    // Convert to GalleryImage format for BeforeAfterModal
+    setSelectedImage({
+      id: 'batch-temp',
+      src: image.generatedUrl,
+      originalUrl: image.originalUrl || undefined,
+      alt: image.name,
+    });
+    setIsModalOpen(true);
+  };
+
   const handleOpenInStudio = (image: GalleryImage) => {
     // Pass image URL via query param to studio page
     const params = new URLSearchParams({
@@ -182,6 +205,16 @@ export function GalleryContent() {
     const link = document.createElement('a');
     link.href = image.src;
     link.download = `jewelshot-${image.id}.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleDownloadSingle = (imageUrl: string, filename: string) => {
+    // Download single image with custom filename
+    const link = document.createElement('a');
+    link.href = imageUrl;
+    link.download = filename;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -485,7 +518,8 @@ export function GalleryContent() {
               {batchProjects.map((project) => (
                 <div
                   key={project.id}
-                  className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/[0.02] transition-all hover:border-purple-500/50 hover:bg-white/[0.05]"
+                  onClick={() => handleViewBatch(project)}
+                  className="group relative cursor-pointer overflow-hidden rounded-xl border border-white/10 bg-white/[0.02] transition-all hover:border-purple-500/50 hover:bg-white/[0.05]"
                 >
                   {/* Thumbnail */}
                   <div className="relative aspect-square overflow-hidden bg-black/20">
@@ -556,13 +590,19 @@ export function GalleryContent() {
                   {/* Actions (visible on hover) */}
                   <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/80 opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
                     <button
-                      onClick={() => handleDownloadBatch(project)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDownloadBatch(project);
+                      }}
                       className="rounded-lg bg-purple-500/20 px-4 py-2 text-sm text-purple-400 transition-colors hover:bg-purple-500/30"
                     >
                       Download ZIP
                     </button>
                     <button
-                      onClick={() => handleDeleteBatch(project)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteBatch(project);
+                      }}
                       className="rounded-lg bg-red-500/20 px-4 py-2 text-sm text-red-400 transition-colors hover:bg-red-500/30"
                     >
                       Delete
@@ -606,6 +646,27 @@ export function GalleryContent() {
           prompt={selectedImage.prompt}
           onOpenInStudio={() => handleOpenInStudio(selectedImage)}
           onDownload={() => handleDownload(selectedImage)}
+        />
+      )}
+
+      {/* Batch Detail Modal */}
+      {selectedBatchProject && (
+        <BatchDetailModal
+          isOpen={isBatchModalOpen}
+          onClose={() => {
+            setIsBatchModalOpen(false);
+            setSelectedBatchProject(null);
+          }}
+          project={selectedBatchProject}
+          onViewImage={handleViewBatchImage}
+          onOpenInStudio={(imageUrl) => {
+            const params = new URLSearchParams({
+              imageUrl,
+              imageName: 'batch-image',
+            });
+            router.push(`/studio?${params.toString()}`);
+          }}
+          onDownloadImage={handleDownloadSingle}
         />
       )}
     </div>
