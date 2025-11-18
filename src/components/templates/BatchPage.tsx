@@ -6,6 +6,8 @@ import AuroraBackground from '@/components/atoms/AuroraBackground';
 import { BatchContent } from '@/components/organisms/BatchContent';
 import { BatchProcessingModal } from '@/components/organisms/BatchProcessingModal';
 import type { BatchImage } from '@/components/molecules/BatchImageGrid';
+import { saveBatchProject, type BatchProject } from '@/lib/batch-storage';
+import { toast } from 'sonner';
 
 // Dynamic imports matching Studio page
 const Sidebar = dynamic(() => import('@/components/organisms/Sidebar'), {
@@ -133,8 +135,36 @@ export function BatchPage() {
       );
     }
 
+    // Batch processing complete - save to Gallery
+    const completedImages = images.filter((img) => img.status === 'completed');
+    
+    if (completedImages.length > 0) {
+      try {
+        const batchProject: BatchProject = {
+          id: crypto.randomUUID(),
+          name: batchName || `Batch ${new Date().toLocaleDateString()}`,
+          createdAt: new Date(),
+          imageCount: completedImages.length,
+          thumbnail: completedImages[0].result,
+          images: completedImages.map((img) => ({
+            id: img.id,
+            originalFile: img.file.name,
+            originalPreview: img.preview,
+            result: img.result || img.preview,
+            status: 'completed',
+          })),
+        };
+
+        await saveBatchProject(batchProject);
+        toast.success(`Batch saved! ${completedImages.length} images processed.`);
+      } catch (error) {
+        console.error('Failed to save batch project:', error);
+        toast.error('Failed to save batch project');
+      }
+    }
+
     setIsProcessing(false);
-  }, [selectedPreset, images, isPaused]);
+  }, [selectedPreset, images, isPaused, batchName]);
 
   // Handle pause/resume
   const handleTogglePause = useCallback(() => {
@@ -188,6 +218,8 @@ export function BatchPage() {
         onRemoveImage={handleRemoveImage}
         onClearAll={handleClearAll}
         disabled={isProcessing}
+        batchName={batchName}
+        onBatchNameChange={setBatchName}
       />
 
       {/* Processing Modal */}

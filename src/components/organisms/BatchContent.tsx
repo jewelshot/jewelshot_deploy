@@ -12,6 +12,8 @@ interface BatchContentProps {
   onClearAll: () => void;
   maxFiles?: number;
   disabled?: boolean;
+  batchName?: string;
+  onBatchNameChange?: (name: string) => void;
 }
 
 /**
@@ -24,6 +26,8 @@ export function BatchContent({
   onClearAll,
   maxFiles = 50,
   disabled = false,
+  batchName,
+  onBatchNameChange,
 }: BatchContentProps) {
   const { leftOpen, rightOpen, topOpen, bottomOpen } = useSidebarStore();
 
@@ -40,10 +44,26 @@ export function BatchContent({
       <div className="flex h-full flex-col gap-4 overflow-y-auto p-6">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-bold text-white">Batch Processing</h1>
-          <p className="mt-1 text-sm text-white/60">
-            Upload and process multiple images at once
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-white">Batch Processing</h1>
+              <p className="mt-1 text-sm text-white/60">
+                Upload and process multiple images at once
+              </p>
+            </div>
+
+            {/* Batch Name Input */}
+            {images.length > 0 && (
+              <input
+                type="text"
+                value={batchName}
+                onChange={(e) => onBatchNameChange?.(e.target.value)}
+                placeholder="Batch name (optional)"
+                className="rounded-lg border border-white/10 bg-white/[0.02] px-4 py-2 text-sm text-white placeholder:text-white/40 focus:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
+                disabled={disabled}
+              />
+            )}
+          </div>
         </div>
 
         {/* Upload Zone */}
