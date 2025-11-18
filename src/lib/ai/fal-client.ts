@@ -47,6 +47,17 @@ export interface EditInput {
   image_url: string; // Single image URL or data URI
   num_images?: number;
   output_format?: 'jpeg' | 'png' | 'webp';
+  aspect_ratio?:
+    | '21:9'
+    | '1:1'
+    | '4:3'
+    | '3:2'
+    | '2:3'
+    | '5:4'
+    | '4:5'
+    | '3:4'
+    | '16:9'
+    | '9:16';
 }
 
 /**
@@ -75,12 +86,12 @@ const getApiBaseUrl = (): string => {
   if (process.env.NEXT_PUBLIC_API_URL) {
     return process.env.NEXT_PUBLIC_API_URL;
   }
-  
+
   // In browser, use current origin (works for production and dev)
   if (typeof window !== 'undefined') {
     return window.location.origin;
   }
-  
+
   // SSR fallback (should never happen in this client-side file)
   return 'http://localhost:3000';
 };
@@ -150,8 +161,10 @@ async function retry<T>(
       throw error;
     }
 
-    logger.warn(`Request failed, retrying in ${delay}ms... (${attempts - 1} attempts left)`);
-    
+    logger.warn(
+      `Request failed, retrying in ${delay}ms... (${attempts - 1} attempts left)`
+    );
+
     await new Promise((resolve) => setTimeout(resolve, delay));
     return retry(fn, attempts - 1, delay * 1.5); // Exponential backoff
   }
@@ -214,7 +227,7 @@ export async function generateImage(
       return result as FalOutput;
     } catch (error) {
       logger.error('❌ Generation failed:', error);
-      
+
       // Improve error message for user
       if (error instanceof Error) {
         if (error.message.includes('timeout')) {
@@ -233,7 +246,7 @@ export async function generateImage(
           );
         }
       }
-      
+
       throw error;
     }
   });
@@ -265,21 +278,19 @@ export async function editImage(
     try {
       if (onProgress) onProgress('EDITING', 'Processing with AI...');
 
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/ai/edit`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            prompt: input.prompt,
-            image_url: input.image_url,
-            num_images: input.num_images ?? 1,
-            output_format: input.output_format ?? 'jpeg',
-          }),
-        }
-      );
+      const response = await fetchWithTimeout(`${API_BASE_URL}/api/ai/edit`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: input.prompt,
+          image_url: input.image_url,
+          num_images: input.num_images ?? 1,
+          output_format: input.output_format ?? 'jpeg',
+          aspect_ratio: input.aspect_ratio ?? '1:1',
+        }),
+      });
 
       if (!response.ok) {
         const error = await response.json().catch(() => ({
@@ -296,7 +307,7 @@ export async function editImage(
       return result as FalOutput;
     } catch (error) {
       logger.error('❌ Edit failed:', error);
-      
+
       // Improve error message for user
       if (error instanceof Error) {
         if (error.message.includes('timeout')) {
@@ -315,7 +326,7 @@ export async function editImage(
           );
         }
       }
-      
+
       throw error;
     }
   });

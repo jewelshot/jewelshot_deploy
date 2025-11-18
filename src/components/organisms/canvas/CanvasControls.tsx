@@ -2,13 +2,13 @@
  * =============================================================================
  * CANVAS CONTROLS - UI Controls & Positioning
  * =============================================================================
- * 
+ *
  * Handles:
  * - All UI controls (zoom, actions, background, view mode)
  * - Control positioning based on sidebar states
  * - Control visibility animations
  * - AI Edit Control
- * 
+ *
  * Extracted from Canvas.tsx (1,130 lines → maintainable components)
  */
 
@@ -19,7 +19,9 @@ import TopLeftControls from '@/components/molecules/TopLeftControls';
 import ViewModeSelector from '@/components/atoms/ViewModeSelector';
 import ZoomControls from '@/components/molecules/ZoomControls';
 import ActionControls from '@/components/molecules/ActionControls';
-import BackgroundSelector, { type BackgroundType } from '@/components/molecules/BackgroundSelector';
+import BackgroundSelector, {
+  type BackgroundType,
+} from '@/components/molecules/BackgroundSelector';
 import UIToggleButton from '@/components/atoms/UIToggleButton';
 import AIEditControl from '@/components/molecules/AIEditControl';
 import BottomRightControls from '@/components/molecules/BottomRightControls';
@@ -32,65 +34,68 @@ export interface CanvasControlsProps {
   hasImage: boolean;
   fileName: string;
   fileSize: number;
-  
+
   // AI state
   isAIEditing: boolean;
   aiProgress: string;
-  
+
   // Zoom state
   scale: number;
   leftImageScale: number; // For side-by-side view
   rightImageScale: number; // For side-by-side view
-  
+
   // View mode
   viewMode: 'normal' | 'side-by-side';
   activeImage: 'left' | 'right';
   hasOriginalImage: boolean; // Show view mode selector only if original exists
-  
+
   // Sidebar states (for positioning)
   leftOpen: boolean;
   rightOpen: boolean;
   topOpen: boolean;
   bottomOpen: boolean;
   allBarsOpen: boolean;
-  
+
   // UI visibility
   controlsVisible: boolean;
   isFullscreen: boolean;
   isEditPanelOpen: boolean;
-  isPromptExpanded: boolean;
-  
+
   // Background
   background: BackgroundType;
-  
+
   // Event handlers - Zoom
   onZoomIn: () => void;
   onZoomOut: () => void;
   onFitScreen: () => void;
-  
+
   // Event handlers - Actions
   onToggleAllBars: () => void;
   onToggleFullscreen: () => void;
   onToggleUI: () => void;
   onToggleEditPanel: () => void;
-  
+
   // Event handlers - Image actions
   onCloseImage: () => void;
   onDelete: () => void;
   onSave: () => void;
   onDownload: () => void;
-  
+
   // Event handlers - Background & View
   onBackgroundChange: (bg: BackgroundType) => void;
   onViewModeChange: (mode: 'normal' | 'side-by-side') => void;
-  
+
   // Event handlers - AI Edit
   onImageEdited: (url: string) => void;
   onAIError: (error: { message: string }) => void;
   onPromptExpandedChange: (expanded: boolean) => void;
-  
+
   // Current image URL (for AI Edit)
   currentImageUrl: string;
+
+  // Video generation
+  onGenerateVideo?: () => void;
+  isGeneratingVideo?: boolean;
 }
 
 /**
@@ -116,7 +121,6 @@ export default function CanvasControls({
   controlsVisible,
   isFullscreen,
   isEditPanelOpen,
-  isPromptExpanded,
   background,
   onZoomIn,
   onZoomOut,
@@ -135,15 +139,19 @@ export default function CanvasControls({
   onAIError,
   onPromptExpandedChange,
   currentImageUrl,
+  onGenerateVideo,
+  isGeneratingVideo,
 }: CanvasControlsProps) {
-  
   // Don't render controls if no image
   if (!hasImage) return null;
 
   // Calculate scale for zoom controls (depends on view mode)
-  const displayScale = viewMode === 'side-by-side'
-    ? (activeImage === 'left' ? leftImageScale : rightImageScale)
-    : scale;
+  const displayScale =
+    viewMode === 'side-by-side'
+      ? activeImage === 'left'
+        ? leftImageScale
+        : rightImageScale
+      : scale;
 
   return (
     <>
@@ -271,7 +279,7 @@ export default function CanvasControls({
         />
       </div>
 
-      {/* Bottom Right Controls - Edit, Delete, Save, Download */}
+      {/* Bottom Right Controls - Edit, Delete, Save, Download, Video */}
       <div
         className="fixed z-20 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
         style={{
@@ -288,9 +296,10 @@ export default function CanvasControls({
           onDelete={onDelete}
           onSave={onSave}
           onDownload={onDownload}
+          onGenerateVideo={onGenerateVideo}
+          isGeneratingVideo={isGeneratingVideo}
         />
       </div>
     </>
   );
 }
-

@@ -8,6 +8,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { ChevronDown } from 'lucide-react';
 import { useSidebarStore } from '@/store/sidebarStore';
 import { ConfigurationAccordion } from '@/components/molecules/ConfigurationAccordion';
 import { QuickModeContent } from '@/components/molecules/QuickModeContent';
@@ -46,7 +47,7 @@ const aspectRatioOptions = [
 ];
 
 interface RightSidebarProps {
-  onGenerateWithPreset?: (prompt: string) => void;
+  onGenerateWithPreset?: (prompt: string, aspectRatio?: string) => void;
 }
 
 export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
@@ -57,6 +58,7 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
   const [jewelryType, setJewelryType] = useState<JewelryType>(null);
   const [aspectRatio, setAspectRatio] = useState<string>('9:16'); // Default: 9:16
   const [activeMode, setActiveMode] = useState<Mode>('quick');
+  const [isAspectRatioOpen, setIsAspectRatioOpen] = useState<boolean>(true); // Start open
 
   // Modal state
   const [confirmModal, setConfirmModal] = useState<{
@@ -66,17 +68,12 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
     requiresModel: boolean;
   } | null>(null);
 
-  // Modes are disabled until both gender and jewelry are selected
-  const areModesDisabled = !gender || !jewelryType;
-
-  // Handle preset selection
+  // Handle preset selection (no restrictions - always allow)
   const handlePresetSelect = (presetId: string) => {
-    if (!jewelryType) return;
-
     const preset = presetPrompts[presetId];
     if (!preset) return;
 
-    // Show confirmation modal
+    // Show confirmation modal (jewelry selection can happen in modal if needed)
     setConfirmModal({
       show: true,
       presetName: preset.name,
@@ -86,12 +83,21 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
   };
 
   // Handle generation confirmation
-  const handleConfirmGeneration = () => {
-    if (!confirmModal || !jewelryType) return;
+  const handleConfirmGeneration = (selectedJewelryType?: string) => {
+    if (!confirmModal) return;
+
+    // Use provided jewelry type or fallback to state
+    const finalJewelryType = selectedJewelryType || jewelryType;
+
+    if (!finalJewelryType) {
+      // This shouldn't happen if modal handles it correctly
+      console.error('[RightSidebar] No jewelry type provided');
+      return;
+    }
 
     const preset = presetPrompts[confirmModal.presetId];
     const prompt = preset.buildPrompt(
-      jewelryType,
+      finalJewelryType,
       gender || undefined,
       aspectRatio
     );
@@ -99,9 +105,9 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
     // Close modal
     setConfirmModal(null);
 
-    // Trigger generation
+    // Trigger generation with aspect ratio
     if (onGenerateWithPreset) {
-      onGenerateWithPreset(prompt);
+      onGenerateWithPreset(prompt, aspectRatio);
     }
   };
 
@@ -122,77 +128,90 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
           />
         </div>
 
-        {/* Aspect Ratio Selection */}
-        <div className="mb-2">
-          <div className="mb-1.5 flex items-center justify-between">
-            <span className="text-[9px] font-medium uppercase tracking-wide text-white/60">
-              Aspect Ratio
-            </span>
-            <span className="text-[9px] text-white/40">{aspectRatio}</span>
-          </div>
-          <div className="grid grid-cols-4 gap-1">
-            {aspectRatioOptions.map((option) => (
-              <button
-                key={option.value}
-                onClick={() => setAspectRatio(option.value)}
-                className={`rounded border px-1.5 py-1 text-[9px] font-medium transition-all duration-200 ${
-                  aspectRatio === option.value
-                    ? 'border-purple-500/50 bg-purple-500/20 text-purple-300'
-                    : 'border-white/10 bg-white/[0.02] text-white/60 hover:border-white/20 hover:bg-white/[0.05] hover:text-white'
+        {/* Aspect Ratio Selection - Accordion */}
+        <div className="mb-2 rounded-lg border border-white/10 bg-white/[0.02]">
+          {/* Header - Always visible */}
+          <button
+            onClick={() => setIsAspectRatioOpen(!isAspectRatioOpen)}
+            className="flex w-full items-center justify-between px-2.5 py-2 text-left transition-colors hover:bg-white/[0.05]"
+          >
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs">📐</span>
+              <span className="text-[11px] font-medium text-white/90">
+                Aspect Ratio
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[9px] text-white/40">{aspectRatio}</span>
+              <ChevronDown
+                className={`h-3.5 w-3.5 text-white/40 transition-transform duration-200 ${
+                  isAspectRatioOpen ? 'rotate-180' : ''
                 }`}
-              >
-                <div className="font-semibold">{option.label}</div>
-                <div className="text-[7px] text-white/40">
-                  {option.description}
-                </div>
-              </button>
-            ))}
-          </div>
+              />
+            </div>
+          </button>
+
+          {/* Content - Collapsible */}
+          {isAspectRatioOpen && (
+            <div className="border-t border-white/5 p-2">
+              <div className="grid grid-cols-4 gap-1">
+                {aspectRatioOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => {
+                      setAspectRatio(option.value);
+                      // Auto-minimize after selection
+                      setIsAspectRatioOpen(false);
+                    }}
+                    className={`rounded border px-1.5 py-1 text-[9px] font-medium transition-all duration-200 ${
+                      aspectRatio === option.value
+                        ? 'border-purple-500/50 bg-purple-500/20 text-purple-300'
+                        : 'border-white/10 bg-white/[0.02] text-white/60 hover:border-white/20 hover:bg-white/[0.05] hover:text-white'
+                    }`}
+                  >
+                    <div className="font-semibold">{option.label}</div>
+                    <div className="text-[7px] text-white/40">
+                      {option.description}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Divider */}
         <div className="my-2 h-px bg-white/5" />
 
-        {/* Mode Tabs - Ultra Compact */}
+        {/* Mode Tabs - Ultra Compact - Always Active */}
         <div className="mb-2">
-          <div
-            className={`flex gap-0.5 rounded-md border p-0.5 transition-all duration-300 ${areModesDisabled ? 'border-white/5 bg-white/[0.01]' : 'border-white/10 bg-white/[0.02]'}`}
-          >
+          <div className="flex gap-0.5 rounded-md border border-white/10 bg-white/[0.02] p-0.5 transition-all duration-300">
             <button
               onClick={() => setActiveMode('quick')}
-              disabled={areModesDisabled}
               className={`flex-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-all duration-200 ${
-                activeMode === 'quick' && !areModesDisabled
+                activeMode === 'quick'
                   ? 'bg-purple-500/20 text-purple-300'
-                  : areModesDisabled
-                    ? 'cursor-not-allowed text-white/20'
-                    : 'text-white/60 hover:text-white'
+                  : 'text-white/60 hover:text-white'
               }`}
             >
               Quick
             </button>
             <button
               onClick={() => setActiveMode('selective')}
-              disabled={areModesDisabled}
               className={`flex-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-all duration-200 ${
-                activeMode === 'selective' && !areModesDisabled
+                activeMode === 'selective'
                   ? 'bg-purple-500/20 text-purple-300'
-                  : areModesDisabled
-                    ? 'cursor-not-allowed text-white/20'
-                    : 'text-white/60 hover:text-white'
+                  : 'text-white/60 hover:text-white'
               }`}
             >
               Select
             </button>
             <button
               onClick={() => setActiveMode('advanced')}
-              disabled={areModesDisabled}
               className={`flex-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-all duration-200 ${
-                activeMode === 'advanced' && !areModesDisabled
+                activeMode === 'advanced'
                   ? 'bg-purple-500/20 text-purple-300'
-                  : areModesDisabled
-                    ? 'cursor-not-allowed text-white/20'
-                    : 'text-white/60 hover:text-white'
+                  : 'text-white/60 hover:text-white'
               }`}
             >
               Adv
@@ -200,10 +219,8 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
           </div>
         </div>
 
-        {/* Mode Content */}
-        <div
-          className={`flex-1 overflow-y-auto transition-all duration-300 ${areModesDisabled ? 'pointer-events-none opacity-30 blur-sm' : 'opacity-100'}`}
-        >
+        {/* Mode Content - Always Active */}
+        <div className="flex-1 overflow-y-auto transition-all duration-300">
           {activeMode === 'quick' && (
             <QuickModeContent onPresetSelect={handlePresetSelect} />
           )}
@@ -229,7 +246,7 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
         {confirmModal?.show && (
           <PresetConfirmModal
             presetName={confirmModal.presetName}
-            jewelryType={jewelryType || ''}
+            jewelryType={jewelryType}
             requiresModel={confirmModal.requiresModel}
             gender={gender || undefined}
             onConfirm={handleConfirmGeneration}

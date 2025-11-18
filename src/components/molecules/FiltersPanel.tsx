@@ -79,24 +79,24 @@ export function FiltersPanel({ onFilterChange }: FiltersPanelProps) {
         <AdjustSlider
           label="Amount"
           value={vignetteAmount}
-          min={-100}
-          max={100}
+          min={0}
+          max={75}
           onChange={setVignetteAmount}
         />
 
         <AdjustSlider
           label="Size"
           value={vignetteSize}
-          min={0}
-          max={100}
+          min={25}
+          max={75}
           onChange={setVignetteSize}
         />
 
         <AdjustSlider
           label="Feather"
           value={vignetteFeather}
-          min={0}
-          max={100}
+          min={25}
+          max={75}
           onChange={setVignetteFeather}
         />
       </div>
@@ -111,15 +111,15 @@ export function FiltersPanel({ onFilterChange }: FiltersPanelProps) {
           label="Amount"
           value={grainAmount}
           min={0}
-          max={100}
+          max={75}
           onChange={setGrainAmount}
         />
 
         <AdjustSlider
           label="Size"
           value={grainSize}
-          min={0}
-          max={100}
+          min={25}
+          max={75}
           onChange={setGrainSize}
         />
       </div>
@@ -134,7 +134,7 @@ export function FiltersPanel({ onFilterChange }: FiltersPanelProps) {
           label="Amount"
           value={fadeAmount}
           min={0}
-          max={100}
+          max={75}
           onChange={setFadeAmount}
         />
       </div>

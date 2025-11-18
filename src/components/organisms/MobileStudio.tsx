@@ -16,17 +16,20 @@ import {
   Sparkles,
   Download,
   X,
-  Sliders,
   Camera,
   Share2,
+  Video,
 } from 'lucide-react';
 import { useImageEdit } from '@/hooks/useImageEdit';
+import { useImageToVideo } from '@/hooks/useImageToVideo';
 import { logger } from '@/lib/logger';
 import { presetPrompts } from '@/lib/preset-prompts';
 import { saveImageToGallery } from '@/lib/gallery-storage';
 import MobileNav from '@/components/molecules/MobileNav';
 import { CreditCounter } from '@/components/molecules/CreditCounter';
 import { useCreditStore } from '@/store/creditStore';
+import { VideoPlayerModal } from '@/components/molecules/VideoPlayerModal';
+import { VideoGeneratingModal } from '@/components/molecules/VideoGeneratingModal';
 
 const STORAGE_KEY = 'jewelshot_mobile_image';
 
@@ -52,17 +55,13 @@ export function MobileStudio() {
     return false;
   });
   const [smoothProgress, setSmoothProgress] = useState(0);
+  const [aspectRatio, setAspectRatio] = useState<string>('9:16'); // Default mobile aspect
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const progressTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Credit store
-  const {
-    credits,
-    loading: creditsLoading,
-    deductCredit,
-    fetchCredits,
-  } = useCreditStore();
+  const { deductCredit, fetchCredits } = useCreditStore();
 
   // Fetch credits on mount
   useEffect(() => {
@@ -83,8 +82,6 @@ export function MobileStudio() {
             newImage,
             `mobile-${Date.now()}.jpg`,
             'ai-edited'
-            // Note: prompt and style metadata not available from FalOutput
-            // Could be added in future if needed
           );
           logger.info('[MobileStudio] Image auto-saved to gallery');
 
@@ -105,59 +102,77 @@ export function MobileStudio() {
     },
   });
 
-  // Save image to localStorage whenever it changes
-  useEffect(() => {
-    if (image) {
-      localStorage.setItem(STORAGE_KEY, image);
-      logger.info('[MobileStudio] Image saved to storage');
-    }
-  }, [image]);
+  // Video Generation
+  const {
+    generateVideo,
+    isGenerating: isGeneratingVideo,
+    videoUrl,
+    error: videoError,
+    reset: resetVideo,
+  } = useImageToVideo();
 
-  // Warn before leaving if there are unsaved changes
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges && image) {
-        e.preventDefault();
-        e.returnValue = '';
-        return '';
-      }
-    };
+  const [showVideoModal, setShowVideoModal] = useState(false);
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [hasUnsavedChanges, image]);
-
-  // Reset progress when editing starts or ends
-  useEffect(() => {
-    // Use setTimeout to avoid synchronous setState in effect
-    const timer = setTimeout(() => setSmoothProgress(0), 0);
-    return () => clearTimeout(timer);
-  }, [isEditing]);
-
-  // Smooth progress animation (0% → 95% over ~50 seconds, realistic for FAL.AI)
-  useEffect(() => {
-    if (!isEditing) {
+  // Handle video generation
+  const handleGenerateVideo = useCallback(() => {
+    if (!image) {
+      logger.warn('[MobileStudio] No image to convert to video');
       return;
     }
 
-    // Increment every 500ms
-    progressTimerRef.current = setInterval(() => {
-      setSmoothProgress((prev) => {
-        // Check if complete
-        if (progress.includes('complete') || progress.includes('success')) {
-          return 100;
-        }
+    logger.info('[MobileStudio] Starting video generation');
 
-        // Slow progression to 95% over ~50 seconds (100 ticks * 500ms = 50s)
-        // Uses logarithmic curve for realistic feel
-        if (prev < 95) {
-          const increment = (95 - prev) * 0.02; // Slower as it approaches 95
-          return Math.min(prev + Math.max(increment, 0.5), 95);
-        }
+    generateVideo({
+      image_url: image,
+      prompt:
+        'Hand gently rotating ring, showcasing from different angles with natural movements.',
+      duration: '8s',
+      resolution: '720p', // 720p quality, aspect ratio auto-detected from image
+    });
+  }, [image, generateVideo]);
 
-        return prev; // Stay at 95 until complete
+  // Show video modal when generation completes
+  useEffect(() => {
+    if (videoUrl && !showVideoModal) {
+      logger.info('[MobileStudio] Video generated, opening modal');
+      // Use queueMicrotask to defer setState and avoid cascading renders
+      queueMicrotask(() => {
+        setShowVideoModal(true);
       });
-    }, 500);
+    }
+  }, [videoUrl, showVideoModal]);
+
+  // Show error message if video generation fails
+  useEffect(() => {
+    if (videoError) {
+      logger.error('[MobileStudio] Video generation failed:', videoError);
+      // Error will be shown in the modal automatically
+    }
+  }, [videoError]);
+
+  // Smooth progress animation
+  useEffect(() => {
+    if (!isEditing) {
+      if (progressTimerRef.current) {
+        clearInterval(progressTimerRef.current);
+        progressTimerRef.current = null;
+      }
+      return;
+    }
+
+    const progressNum = parseFloat(progress) || 0;
+    const targetProgress = Math.min(progressNum, 95);
+    const diff = targetProgress - smoothProgress;
+
+    if (diff > 0) {
+      const increment = diff / 10;
+      progressTimerRef.current = setInterval(() => {
+        setSmoothProgress((prev) => {
+          const next = prev + increment;
+          return next >= targetProgress ? targetProgress : next;
+        });
+      }, 50);
+    }
 
     return () => {
       if (progressTimerRef.current) {
@@ -165,33 +180,30 @@ export function MobileStudio() {
         progressTimerRef.current = null;
       }
     };
-  }, [isEditing, progress]);
+  }, [isEditing, progress, smoothProgress]);
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Reset progress when editing completes
+  useEffect(() => {
+    if (!isEditing) {
+      const timer = setTimeout(() => setSmoothProgress(0), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isEditing]);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = (event) => {
-      const result = event.target?.result as string;
-      setImage(result);
+      const dataUrl = event.target?.result as string;
+      setImage(dataUrl);
+      localStorage.setItem(STORAGE_KEY, dataUrl);
       setHasUnsavedChanges(true);
+      setShowUploadOptions(false);
+      logger.info('[MobileStudio] File uploaded successfully');
     };
     reader.readAsDataURL(file);
-  };
-
-  const handleClearImage = () => {
-    if (hasUnsavedChanges) {
-      const confirmed = confirm(
-        'You have unsaved changes. Are you sure you want to clear the image?'
-      );
-      if (!confirmed) return;
-    }
-
-    setImage(null);
-    setHasUnsavedChanges(false);
-    localStorage.removeItem(STORAGE_KEY);
-    logger.info('[MobileStudio] Image cleared');
   };
 
   const handleStyleApply = useCallback(
@@ -237,15 +249,27 @@ export function MobileStudio() {
           return;
         }
 
-        // Build the full professional prompt
-        // Default to 'ring' as jewelry type, '9:16' aspect ratio for mobile
-        const prompt = preset.buildPrompt('ring', undefined, '9:16');
+        // Build the full professional prompt with selected aspect ratio
+        const prompt = preset.buildPrompt('ring', undefined, aspectRatio);
 
-        logger.info('[MobileStudio] Applying preset:', presetId);
+        logger.info(
+          '[MobileStudio] Applying preset:',
+          presetId,
+          'aspect:',
+          aspectRatio
+        );
 
         await edit({
           image_url: image,
           prompt,
+          aspect_ratio: aspectRatio as
+            | '1:1'
+            | '4:5'
+            | '3:4'
+            | '2:3'
+            | '9:16'
+            | '16:9'
+            | undefined,
         });
       } catch (error) {
         logger.error('[MobileStudio] Style application failed:', error);
@@ -269,7 +293,6 @@ export function MobileStudio() {
                 },
               }),
             });
-            // Refresh credits after refund
             const { fetchCredits } = useCreditStore.getState();
             await fetchCredits();
           } catch (refundError) {
@@ -281,445 +304,190 @@ export function MobileStudio() {
         }
       }
     },
-    [image, credits, creditsLoading, deductCredit, edit]
+    [image, deductCredit, edit, aspectRatio]
   );
 
-  const handleDownload = async () => {
+  const handleDownload = () => {
     if (!image) return;
 
-    try {
-      // Fetch image as blob to force download (works with CORS and data URLs)
-      const response = await fetch(image);
-      const blob = await response.blob();
-
-      // Create blob URL
-      const blobUrl = URL.createObjectURL(blob);
-
-      // Create temporary link and trigger download
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = `jewelshot-${Date.now()}.jpg`;
-      document.body.appendChild(link);
-      link.click();
-
-      // Cleanup
-      document.body.removeChild(link);
-      URL.revokeObjectURL(blobUrl);
-
-      // Mark as saved after download
-      setHasUnsavedChanges(false);
-      logger.info('[MobileStudio] Image downloaded successfully');
-    } catch (error) {
-      logger.error('[MobileStudio] Download failed:', error);
-      alert('Failed to download image. Please try again.');
-    }
+    const link = document.createElement('a');
+    link.href = image;
+    link.download = `jewelshot-${Date.now()}.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    logger.info('[MobileStudio] Image downloaded');
   };
 
   const handleShare = async () => {
     if (!image) return;
 
     try {
-      // Check if Web Share API is supported
-      if (!navigator.share) {
-        logger.warn(
-          '[MobileStudio] Web Share API not supported, falling back to download'
-        );
-        alert(
-          'Sharing is not supported on this device. The image will be downloaded instead.'
-        );
-        await handleDownload();
-        return;
-      }
-
-      // Fetch image as blob
+      // Convert data URL to blob
       const response = await fetch(image);
       const blob = await response.blob();
+      const file = new File([blob], 'jewelshot.jpg', { type: 'image/jpeg' });
 
-      // Create File object for sharing
-      const file = new File([blob], `jewelshot-${Date.now()}.jpg`, {
-        type: 'image/jpeg',
-      });
-
-      // Check if files can be shared
-      if (navigator.canShare && !navigator.canShare({ files: [file] })) {
-        logger.warn(
-          '[MobileStudio] File sharing not supported, falling back to download'
-        );
-        alert(
-          'File sharing is not supported on this device. The image will be downloaded instead.'
-        );
-        await handleDownload();
-        return;
-      }
-
-      // Share via native share sheet
-      await navigator.share({
-        files: [file],
-        title: 'Jewelshot AI-Edited Image',
-        text: 'Check out this image I created with Jewelshot!',
-      });
-
-      logger.info('[MobileStudio] Image shared successfully');
-      setHasUnsavedChanges(false); // Mark as saved after sharing
-    } catch (error) {
-      // User cancelled or error occurred
-      if (error instanceof Error && error.name === 'AbortError') {
-        logger.info('[MobileStudio] Share cancelled by user');
+      if (navigator.share && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: 'JewelShot Creation',
+          text: 'Check out my AI-edited jewelry photo!',
+        });
+        logger.info('[MobileStudio] Image shared via Web Share API');
       } else {
-        logger.error('[MobileStudio] Share failed:', error);
-        alert('Failed to share image. Please try again.');
+        // Fallback: Copy to clipboard
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            'image/jpeg': blob,
+          }),
+        ]);
+        alert('Image copied to clipboard!');
+        logger.info('[MobileStudio] Image copied to clipboard');
       }
+    } catch (error) {
+      logger.error('[MobileStudio] Share failed:', error);
+      alert('Unable to share image. Please try downloading instead.');
     }
   };
 
-  // Use smooth progress for realistic animation
-  const getProgressPercentage = () => {
-    return Math.round(smoothProgress);
-  };
-
-  const getProgressMessage = () => {
-    const percentage = smoothProgress;
-    if (percentage >= 100) return 'Complete! ✨';
-    if (percentage > 90) return 'Almost there...';
-    if (percentage > 70) return 'Polishing details...';
-    if (percentage > 50) return 'Creating magic...';
-    if (percentage > 30) return 'AI is working...';
-    if (percentage > 10) return 'Processing image...';
-    if (percentage > 0) return 'Starting AI...';
-    return 'Initializing...';
-  };
-
-  // Use same presets as desktop Quick Mode
-  const styles = [
-    {
-      id: 'e-commerce',
-      name: 'White Background',
-      emoji: '⚪',
-      description: 'E-commerce catalog',
-    },
-    {
-      id: 'still-life',
-      name: 'Still Life',
-      emoji: '🌸',
-      description: 'Minimalist pastel',
-    },
-    {
-      id: 'on-model',
-      name: 'On Model',
-      emoji: '👤',
-      description: 'Product focused',
-    },
-    {
-      id: 'lifestyle',
-      name: 'Lifestyle',
-      emoji: '☕',
-      description: 'Natural everyday',
-    },
-    {
-      id: 'luxury',
-      name: 'Luxury',
-      emoji: '💎',
-      description: 'High-fashion editorial',
-    },
-    {
-      id: 'close-up',
-      name: 'Close Up',
-      emoji: '🔍',
-      description: 'Macro detail',
-    },
-  ];
-
   return (
-    <div className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-gradient-to-br from-[#0a0a0a] via-[#1a0a2e] to-[#0a0a0a]">
-      {/* Aurora Background Effect */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div
-          className="absolute -left-1/4 -top-1/4 h-96 w-96 animate-pulse rounded-full bg-purple-600/20 blur-[100px]"
-          style={{ animationDuration: '8s' }}
-        ></div>
-        <div
-          className="absolute -right-1/4 top-1/3 h-96 w-96 animate-pulse rounded-full bg-pink-600/15 blur-[100px]"
-          style={{ animationDuration: '10s', animationDelay: '2s' }}
-        ></div>
-        <div
-          className="absolute -bottom-1/4 left-1/3 h-96 w-96 animate-pulse rounded-full bg-blue-600/10 blur-[100px]"
-          style={{ animationDuration: '12s', animationDelay: '4s' }}
-        ></div>
-      </div>
-
+    <div className="relative flex min-h-screen flex-col bg-gradient-to-b from-gray-950 via-gray-900 to-black">
       {/* Hidden file inputs */}
-      {/* Gallery picker */}
       <input
         ref={fileInputRef}
         type="file"
         accept="image/*"
-        onChange={handleFileSelect}
+        onChange={handleFileUpload}
         className="hidden"
       />
-      {/* Camera capture - ALWAYS rear camera */}
       <input
         ref={cameraInputRef}
         type="file"
         accept="image/*"
         capture="environment"
-        onChange={handleFileSelect}
+        onChange={handleFileUpload}
         className="hidden"
-        aria-label="Take photo with rear camera"
       />
 
-      {/* Top Bar - Compact */}
-      <div className="relative z-10 m-2 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] p-3 shadow-xl backdrop-blur-xl">
-        <div className="flex items-center justify-between">
-          <h1 className="flex items-center gap-2 text-base font-bold">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 shadow-md shadow-purple-500/30">
-              <Sparkles className="h-4 w-4 text-white" />
-            </div>
-            <span className="text-white">Studio</span>
+      {/* Top Bar */}
+      <div className="sticky top-0 z-30 border-b border-white/5 bg-gray-950/80 backdrop-blur-xl">
+        <div className="flex items-center justify-between px-4 py-3">
+          <h1 className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-lg font-bold text-transparent">
+            Studio
           </h1>
-
-          <div className="flex items-center gap-1.5">
-            {/* Credit Counter */}
-            <CreditCounter variant="mobile" />
-
-            {image && (
-              <>
-                {/* Share Button - Compact */}
-                <button
-                  onClick={handleShare}
-                  disabled={isEditing}
-                  className="group flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-blue-500/10 backdrop-blur-xl transition-all hover:border-blue-400/30 hover:bg-blue-500/20 active:scale-90 disabled:opacity-50"
-                  aria-label="Share image"
-                >
-                  <Share2 className="h-4 w-4 text-blue-300 transition-colors group-hover:text-white" />
-                </button>
-
-                {/* Download Button - Compact */}
-                <button
-                  onClick={handleDownload}
-                  disabled={isEditing}
-                  className="group flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-purple-500/10 backdrop-blur-xl transition-all hover:border-purple-400/30 hover:bg-purple-500/20 active:scale-90 disabled:opacity-50"
-                  aria-label="Download image"
-                >
-                  <Download className="h-4 w-4 text-purple-300 transition-colors group-hover:text-white" />
-                </button>
-
-                {/* Clear Button - Compact */}
-                <button
-                  onClick={handleClearImage}
-                  disabled={isEditing}
-                  className="group flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 backdrop-blur-xl transition-all hover:border-red-400/30 hover:bg-red-500/10 active:scale-90 disabled:opacity-50"
-                  aria-label="Clear image"
-                >
-                  <X className="h-4 w-4 text-white/50 transition-colors group-hover:text-red-400" />
-                </button>
-              </>
-            )}
-          </div>
+          <CreditCounter />
         </div>
       </div>
 
-      {/* Canvas Area */}
-      <div className="relative flex-1 overflow-hidden">
-        {!image ? (
-          // Upload State - Compact Card
-          <div className="flex h-full flex-col items-center justify-center p-4">
-            {/* Main Card */}
-            <div className="relative w-full max-w-xs overflow-hidden rounded-2xl border border-white/10 bg-white/[0.05] p-6 shadow-xl backdrop-blur-xl">
-              {/* Subtle Glow */}
-              <div className="pointer-events-none absolute -left-8 -top-8 h-24 w-24 animate-pulse rounded-full bg-purple-500/15 blur-2xl" />
-              <div
-                className="pointer-events-none absolute -bottom-8 -right-8 h-24 w-24 animate-pulse rounded-full bg-pink-500/15 blur-2xl"
-                style={{ animationDelay: '1s' }}
-              />
-
-              {/* Icon Container */}
-              <div className="relative mb-5 flex justify-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 shadow-lg shadow-purple-500/10 backdrop-blur-xl">
-                  <Camera className="h-8 w-8 text-purple-300" />
-                </div>
-              </div>
-
-              {/* Text */}
-              <h2 className="relative mb-1.5 text-center text-lg font-bold text-white">
-                Add Your Photo
-              </h2>
-
-              <p className="relative mb-6 text-center text-xs text-white/50">
-                Take a photo or choose from your gallery
+      {/* Main Canvas Area */}
+      <div className="relative flex flex-1 items-center justify-center p-4 pb-48">
+        {!image && !isEditing ? (
+          /* Empty State */
+          <div className="text-center">
+            <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-pink-600 shadow-lg shadow-purple-500/30">
+              <Sparkles className="h-12 w-12 text-white" />
+            </div>
+            <h2 className="mb-2 text-2xl font-bold text-white">Create Magic</h2>
+            <p className="mb-8 text-gray-400">
+              Upload a jewelry photo to begin
+            </p>
+            <div className="space-y-3">
+              <button
+                onClick={() => cameraInputRef.current?.click()}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-3 font-semibold text-white shadow-lg shadow-purple-500/30 transition-all active:scale-95"
+              >
+                <Camera className="h-5 w-5" />
+                Take Photo
+              </button>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-6 py-3 font-semibold text-white transition-all active:scale-95"
+              >
+                <Upload className="h-5 w-5" />
+                Upload from Gallery
+              </button>
+            </div>
+          </div>
+        ) : isEditing ? (
+          /* Loading State */
+          <div className="w-full max-w-sm">
+            <div className="mb-6 text-center">
+              <div className="mx-auto mb-4 h-16 w-16 animate-pulse rounded-full bg-gradient-to-r from-purple-600 to-pink-600 shadow-lg shadow-purple-500/50" />
+              <p className="text-lg font-medium text-white">
+                Applying AI magic...
               </p>
-
-              {/* Action Buttons */}
-              <div className="relative flex w-full flex-col gap-2">
-                {/* Take Photo (Camera) - Gradient */}
-                <button
-                  onClick={() => cameraInputRef.current?.click()}
-                  className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 p-[1px] transition-all hover:shadow-md hover:shadow-purple-500/40 active:scale-95"
-                >
-                  <div className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 text-sm font-medium text-white transition-all group-hover:from-purple-600 group-hover:to-pink-600">
-                    <Camera className="h-4 w-4" />
-                    Take Photo
-                  </div>
-                </button>
-
-                {/* Choose from Gallery - Glassmorphic */}
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-medium text-white backdrop-blur-xl transition-all hover:border-white/20 hover:bg-white/10 active:scale-95"
-                >
-                  <div className="flex items-center justify-center gap-2">
-                    <Upload className="h-4 w-4" />
-                    Choose from Gallery
-                  </div>
-                </button>
-              </div>
+              <p className="text-sm text-gray-400">
+                {Math.round(smoothProgress)}%
+              </p>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-gray-800">
+              <div
+                className="h-full bg-gradient-to-r from-purple-600 to-pink-600 transition-all duration-300"
+                style={{ width: `${smoothProgress}%` }}
+              />
             </div>
           </div>
         ) : (
           /* Image Display */
-          <div className="flex h-full items-center justify-center p-4">
-            {/* Enhanced Interactive Progress Overlay */}
-            {isEditing && (
-              <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/70">
-                <div className="mx-auto max-w-sm space-y-8 p-6 text-center">
-                  {/* Animated Circular Progress with Glow */}
-                  <div className="relative mx-auto h-40 w-40">
-                    {/* Pulsing Glow Background */}
-                    <div className="absolute inset-0 animate-pulse rounded-full bg-purple-500/20 blur-xl"></div>
-
-                    {/* Rotating Gradient Ring */}
-                    <div
-                      className="absolute inset-0 animate-spin rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 opacity-30 blur-sm"
-                      style={{ animationDuration: '3s' }}
-                    ></div>
-
-                    {/* SVG Progress Circle */}
-                    <svg className="relative h-full w-full -rotate-90 transform">
-                      {/* Background Circle */}
-                      <circle
-                        cx="80"
-                        cy="80"
-                        r="70"
-                        stroke="rgba(147, 51, 234, 0.1)"
-                        strokeWidth="4"
-                        fill="none"
-                      />
-                      {/* Gradient Progress Circle */}
-                      <defs>
-                        <linearGradient
-                          id="progressGradient"
-                          x1="0%"
-                          y1="0%"
-                          x2="100%"
-                          y2="100%"
-                        >
-                          <stop offset="0%" stopColor="#9333ea" />
-                          <stop offset="50%" stopColor="#ec4899" />
-                          <stop offset="100%" stopColor="#9333ea" />
-                        </linearGradient>
-                      </defs>
-                      <circle
-                        cx="80"
-                        cy="80"
-                        r="70"
-                        stroke="url(#progressGradient)"
-                        strokeWidth="6"
-                        fill="none"
-                        strokeDasharray={`${2 * Math.PI * 70}`}
-                        strokeDashoffset={`${2 * Math.PI * 70 * (1 - getProgressPercentage() / 100)}`}
-                        strokeLinecap="round"
-                        className="transition-all duration-700 ease-out"
-                        style={{
-                          filter:
-                            'drop-shadow(0 0 8px rgba(147, 51, 234, 0.6))',
-                        }}
-                      />
-                    </svg>
-
-                    {/* Percentage with Animation */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-center">
-                        <div className="animate-pulse text-4xl font-bold text-white">
-                          {getProgressPercentage()}
-                          <span className="text-2xl text-purple-400">%</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Orbiting Sparkles */}
-                    <div
-                      className="absolute inset-0 animate-spin"
-                      style={{ animationDuration: '4s' }}
-                    >
-                      <div className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 rounded-full bg-purple-400 shadow-lg shadow-purple-500/50"></div>
-                    </div>
-                    <div
-                      className="absolute inset-0 animate-spin"
-                      style={{
-                        animationDuration: '5s',
-                        animationDirection: 'reverse',
-                      }}
-                    >
-                      <div className="absolute bottom-0 left-1/2 h-2 w-2 -translate-x-1/2 rounded-full bg-pink-400 shadow-lg shadow-pink-500/50"></div>
-                    </div>
-                  </div>
-
-                  {/* Progress Messages with Fade Animation */}
-                  <div className="animate-pulse space-y-3">
-                    <h3 className="bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-2xl font-bold text-transparent">
-                      {getProgressMessage()}
-                    </h3>
-                    <p className="text-sm font-medium text-white/80">
-                      {progress || 'Processing your image...'}
-                    </p>
-                  </div>
-
-                  {/* Wave Loading Animation */}
-                  <div className="flex items-center justify-center gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="h-1 w-1 animate-bounce rounded-full bg-gradient-to-t from-purple-500 to-pink-500"
-                        style={{
-                          animationDelay: `${i * 100}ms`,
-                          animationDuration: '1s',
-                        }}
-                      ></div>
-                    ))}
-                  </div>
-
-                  {/* Tip with Icon */}
-                  <div className="flex items-center justify-center gap-2 rounded-full border border-purple-500/30 bg-purple-500/10 px-4 py-2 backdrop-blur-sm">
-                    <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-purple-400"></div>
-                    <p className="text-xs font-medium text-purple-300">
-                      {smoothProgress < 95
-                        ? `Estimated: ${Math.round((95 - smoothProgress) / 1.9)} seconds remaining`
-                        : 'Finalizing...'}
-                    </p>
-                  </div>
-                </div>
+          <div className="relative w-full max-w-2xl">
+            {hasUnsavedChanges && (
+              <div className="absolute left-4 top-4 z-10 rounded-lg bg-yellow-500/20 px-3 py-1.5 text-xs font-medium text-yellow-200 backdrop-blur-sm">
+                Unsaved changes
               </div>
             )}
 
+            {/* Close Button */}
+            <button
+              onClick={() => {
+                setImage(null);
+                setHasUnsavedChanges(false);
+                localStorage.removeItem(STORAGE_KEY);
+              }}
+              className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/50 text-white/90 backdrop-blur-sm transition-all hover:bg-black/70 hover:text-white active:scale-90"
+              aria-label="Close image"
+            >
+              <X className="h-4 w-4" />
+            </button>
+
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={image}
+              src={image || ''}
               alt="Uploaded jewelry image for editing"
-              className="max-h-full max-w-full rounded-xl object-contain shadow-2xl"
+              className="max-h-[calc(100vh-20rem)] max-w-full rounded-xl object-contain shadow-2xl"
             />
           </div>
         )}
       </div>
 
-      {/* Floating Action Buttons - Compact */}
+      {/* Aspect Ratio Selector */}
+      {image && !isEditing && (
+        <div className="absolute bottom-32 left-1/2 z-10 -translate-x-1/2">
+          <div className="flex gap-1 rounded-xl border border-white/10 bg-gray-900/80 p-1 backdrop-blur-xl">
+            {['1:1', '4:5', '9:16', '16:9'].map((ratio) => (
+              <button
+                key={ratio}
+                onClick={() => setAspectRatio(ratio)}
+                className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all ${
+                  aspectRatio === ratio
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                {ratio}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Floating Action Buttons */}
       {image && !isEditing && (
         <div className="absolute bottom-20 left-1/2 z-20 -translate-x-1/2">
           <div className="relative">
-            {/* Subtle Background Glow */}
-            <div className="pointer-events-none absolute inset-0 -z-10 animate-pulse rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 blur-xl" />
-
             {/* Compact Buttons */}
             <div className="flex gap-2">
-              {/* Upload New - Compact */}
+              {/* Upload New */}
               <button
                 onClick={() => setShowUploadOptions(true)}
                 className="group flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.08] backdrop-blur-xl transition-all hover:border-white/20 hover:bg-white/[0.12] active:scale-90"
@@ -728,7 +496,7 @@ export function MobileStudio() {
                 <Upload className="h-5 w-5 text-white/70 transition-colors group-hover:text-white" />
               </button>
 
-              {/* Styles - Gradient */}
+              {/* Styles */}
               <button
                 onClick={() => setShowStyleSheet(true)}
                 className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 p-[1px] shadow-md shadow-purple-500/30 transition-all hover:shadow-lg hover:shadow-purple-500/50 active:scale-90"
@@ -739,162 +507,184 @@ export function MobileStudio() {
                 </div>
               </button>
 
-              {/* Filters - Compact */}
+              {/* Download */}
               <button
-                onClick={() => alert('Filters coming soon!')}
+                onClick={handleDownload}
                 className="group flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.08] backdrop-blur-xl transition-all hover:border-white/20 hover:bg-white/[0.12] active:scale-90"
-                aria-label="Filters"
+                aria-label="Download"
               >
-                <Sliders className="h-5 w-5 text-white/70 transition-colors group-hover:text-white" />
+                <Download className="h-5 w-5 text-white/70 transition-colors group-hover:text-white" />
+              </button>
+
+              {/* Share */}
+              <button
+                onClick={handleShare}
+                className="group flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.08] backdrop-blur-xl transition-all hover:border-white/20 hover:bg-white/[0.12] active:scale-90"
+                aria-label="Share"
+              >
+                <Share2 className="h-5 w-5 text-white/70 transition-colors group-hover:text-white" />
+              </button>
+
+              {/* Generate Video - 🎬 Purple button */}
+              <button
+                onClick={handleGenerateVideo}
+                disabled={isGeneratingVideo}
+                className="group relative flex h-11 w-11 items-center justify-center rounded-xl border border-purple-500/50 bg-gradient-to-r from-purple-600/30 to-pink-600/30 shadow-md shadow-purple-500/20 backdrop-blur-xl transition-all hover:border-purple-500/70 hover:from-purple-600/40 hover:to-pink-600/40 hover:shadow-lg hover:shadow-purple-500/30 active:scale-90 disabled:cursor-not-allowed disabled:opacity-40"
+                aria-label="Generate Video"
+                title={
+                  isGeneratingVideo ? 'Generating video...' : 'Convert to Video'
+                }
+              >
+                {isGeneratingVideo ? (
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-purple-300 border-t-transparent" />
+                ) : (
+                  <Video className="h-5 w-5 text-purple-300 transition-colors group-hover:text-purple-200" />
+                )}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Bottom Sheet - AI Styles - Compact */}
-      {showStyleSheet && (
-        <div
-          className="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm"
-          onClick={() => setShowStyleSheet(false)}
-        >
-          <div
-            className="absolute bottom-0 left-0 right-0 max-h-[75vh] overflow-y-auto rounded-t-3xl border-t border-white/10 bg-white/[0.08] p-4 shadow-xl backdrop-blur-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Subtle Glow */}
-            <div className="pointer-events-none absolute -top-16 left-0 right-0 h-32 bg-gradient-to-b from-purple-500/5 to-transparent" />
-
-            {/* Handle */}
-            <div className="relative mb-4 flex justify-center">
-              <div className="h-1 w-12 rounded-full bg-white/30" />
-            </div>
-
-            {/* Header */}
-            <h3 className="relative mb-4 text-center text-lg font-bold text-white">
-              Choose Style
-            </h3>
-
-            {/* Styles Grid - Compact Cards */}
-            <div className="relative grid grid-cols-2 gap-2">
-              {styles.map((style, index) => (
-                <button
-                  key={style.id}
-                  onClick={() => handleStyleApply(style.id)}
-                  disabled={isEditing}
-                  className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/[0.05] p-3 text-center backdrop-blur-xl transition-all hover:border-purple-400/30 hover:bg-white/[0.08] active:scale-95 disabled:opacity-50"
-                  style={{
-                    animation: `fadeInUp 0.25s ease-out ${index * 0.04}s backwards`,
-                  }}
-                >
-                  {/* Content */}
-                  <div className="relative">
-                    <div className="mb-1.5 text-3xl">{style.emoji}</div>
-                    <div className="mb-0.5 text-sm font-semibold text-white">
-                      {style.name}
-                    </div>
-                    <div className="text-[10px] text-white/40">
-                      {style.description}
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-
-            {/* Cancel - Compact */}
-            <button
-              onClick={() => setShowStyleSheet(false)}
-              className="relative mt-4 w-full overflow-hidden rounded-xl border border-white/10 bg-white/5 py-3 text-sm font-medium text-white backdrop-blur-xl transition-all hover:border-white/20 hover:bg-white/10 active:scale-95"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Bottom Sheet - Upload Options - Compact */}
+      {/* Upload Options Bottom Sheet */}
       {showUploadOptions && (
         <div
-          className="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm"
+          className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm"
           onClick={() => setShowUploadOptions(false)}
         >
           <div
-            className="absolute bottom-0 left-0 right-0 rounded-t-3xl border-t border-white/10 bg-white/[0.08] p-4 shadow-xl backdrop-blur-2xl"
+            className="animate-slide-up fixed bottom-0 left-0 right-0 z-[70] rounded-t-3xl border-t border-white/10 bg-gray-900 p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Subtle Glow */}
-            <div className="pointer-events-none absolute -top-16 left-0 right-0 h-32 bg-gradient-to-b from-purple-500/5 to-transparent" />
-
-            {/* Handle */}
-            <div className="relative mb-4 flex justify-center">
-              <div className="h-1 w-12 rounded-full bg-white/30" />
-            </div>
-
-            {/* Header */}
-            <h3 className="relative mb-4 text-center text-lg font-bold text-white">
-              Add New Photo
-            </h3>
-
-            {/* Options - Compact Cards */}
-            <div className="relative space-y-2">
-              {/* Take Photo - Compact */}
+            <div className="mx-auto mb-4 h-1 w-12 rounded-full bg-white/20" />
+            <h3 className="mb-4 text-lg font-bold text-white">Add Image</h3>
+            <div className="space-y-3">
               <button
                 onClick={() => {
-                  setShowUploadOptions(false);
                   cameraInputRef.current?.click();
+                  setShowUploadOptions(false);
                 }}
-                className="group relative flex w-full items-center gap-3 overflow-hidden rounded-xl border border-white/10 bg-white/[0.05] p-3 backdrop-blur-xl transition-all hover:border-purple-400/30 hover:bg-white/[0.08] active:scale-95"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-3 font-semibold text-white shadow-lg shadow-purple-500/30 transition-all active:scale-95"
               >
-                {/* Icon Container */}
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20">
-                  <Camera className="h-5 w-5 text-purple-300" />
-                </div>
-
-                {/* Text */}
-                <div className="flex-1 text-left">
-                  <div className="text-sm font-semibold text-white">
-                    Take Photo
-                  </div>
-                  <div className="text-[11px] text-white/40">
-                    Use your camera to capture
-                  </div>
-                </div>
+                <Camera className="h-5 w-5" />
+                Take Photo
               </button>
-
-              {/* Choose from Gallery - Compact */}
               <button
                 onClick={() => {
-                  setShowUploadOptions(false);
                   fileInputRef.current?.click();
+                  setShowUploadOptions(false);
                 }}
-                className="group relative flex w-full items-center gap-3 overflow-hidden rounded-xl border border-white/10 bg-white/[0.05] p-3 backdrop-blur-xl transition-all hover:border-blue-400/30 hover:bg-white/[0.08] active:scale-95"
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-6 py-3 font-semibold text-white transition-all active:scale-95"
               >
-                {/* Icon Container */}
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20">
-                  <Upload className="h-5 w-5 text-blue-300" />
-                </div>
-
-                {/* Text */}
-                <div className="flex-1 text-left">
-                  <div className="text-sm font-semibold text-white">
-                    Choose from Gallery
-                  </div>
-                  <div className="text-[11px] text-white/40">
-                    Select from your photos
-                  </div>
-                </div>
+                <Upload className="h-5 w-5" />
+                Upload from Gallery
               </button>
             </div>
-
-            {/* Cancel - Compact */}
-            <button
-              onClick={() => setShowUploadOptions(false)}
-              className="relative mt-4 w-full overflow-hidden rounded-xl border border-white/10 bg-white/5 py-3 text-sm font-medium text-white backdrop-blur-xl transition-all hover:border-white/20 hover:bg-white/10 active:scale-95"
-            >
-              Cancel
-            </button>
           </div>
         </div>
+      )}
+
+      {/* Style Selection Bottom Sheet */}
+      {showStyleSheet && (
+        <div
+          className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm"
+          onClick={() => setShowStyleSheet(false)}
+        >
+          <div
+            className="animate-slide-up fixed bottom-0 left-0 right-0 z-[70] flex max-h-[80vh] flex-col rounded-t-3xl border-t border-white/10 bg-gray-900 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header - Sticky */}
+            <div className="flex-shrink-0 border-b border-white/5 px-6 pb-4 pt-6">
+              <div className="mx-auto mb-4 h-1 w-12 rounded-full bg-white/20" />
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-white">Choose Style</h3>
+                <button
+                  onClick={() => setShowStyleSheet(false)}
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-white/5 text-gray-400 transition-colors hover:bg-white/10 hover:text-white"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto px-6 py-4">
+              <div className="grid grid-cols-2 gap-3 pb-6">
+                {[
+                  {
+                    id: 'e-commerce',
+                    name: 'White Background',
+                    imagePath: '/presets/e-commerce.webp',
+                  },
+                  {
+                    id: 'still-life',
+                    name: 'Still Life',
+                    imagePath: '/presets/still-life.webp',
+                  },
+                  {
+                    id: 'on-model',
+                    name: 'On Model',
+                    imagePath: '/presets/on-model.webp',
+                  },
+                  {
+                    id: 'lifestyle',
+                    name: 'Lifestyle',
+                    imagePath: '/presets/lifestyle.webp',
+                  },
+                  {
+                    id: 'luxury',
+                    name: 'Luxury',
+                    imagePath: '/presets/luxury.webp',
+                  },
+                  {
+                    id: 'close-up',
+                    name: 'Close Up',
+                    imagePath: '/presets/close-up.webp',
+                  },
+                ].map((style) => (
+                  <button
+                    key={style.id}
+                    onClick={() => handleStyleApply(style.id)}
+                    className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 transition-all hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/20 active:scale-95"
+                  >
+                    {/* Image Preview */}
+                    <div className="relative aspect-[4/5] w-full overflow-hidden">
+                      <img
+                        src={style.imagePath}
+                        alt={style.name}
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
+                      {/* Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-40" />
+                    </div>
+
+                    {/* Title Overlay */}
+                    <div className="absolute bottom-0 left-0 right-0 p-3">
+                      <h4 className="text-sm font-semibold text-white drop-shadow-lg">
+                        {style.name}
+                      </h4>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Video Generating Modal */}
+      <VideoGeneratingModal isVisible={isGeneratingVideo} error={videoError} />
+
+      {/* Video Player Modal */}
+      {showVideoModal && videoUrl && (
+        <VideoPlayerModal
+          videoUrl={videoUrl}
+          onClose={() => {
+            setShowVideoModal(false);
+            resetVideo();
+          }}
+        />
       )}
 
       {/* Bottom Navigation */}

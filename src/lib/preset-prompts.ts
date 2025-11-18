@@ -15,6 +15,176 @@ export interface PresetPrompt {
 }
 
 export const presetPrompts: Record<string, PresetPrompt> = {
+  elegant: {
+    name: 'Elegant',
+    requiresModel: false,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '9:16'
+    ) => {
+      return JSON.stringify({
+        main_subject: `${jewelryType} jewelry product photography`,
+        style: 'elegant sophisticated refined high-end editorial',
+        preservation: {
+          critical:
+            'EXACT jewelry design UNCHANGED - geometry shape gemstones setting engravings PRESERVED',
+          forbidden:
+            'NO added/removed/moved gemstones NO distortion NO design alterations',
+        },
+        background:
+          'soft cream ivory gradient seamless RGB(250,248,245) to RGB(245,240,235) elegant minimal',
+        lighting:
+          'soft studio 3-point setup 5500K neutral gentle shadows lustrous metal sparkle gemstones',
+        composition: `${jewelryType} centered 60% frame three-quarter view showing depth dimension elegant presentation`,
+        camera: `f/5.6 sharp focus clean composition editorial ${aspectRatio}`,
+        mood: 'sophisticated refined timeless elegant luxury understated',
+        quality: 'ultra-sharp 300dpi pristine catalog-grade professional',
+      });
+    },
+  },
+
+  luxury: {
+    name: 'Luxury',
+    requiresModel: false,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '9:16'
+    ) => {
+      return JSON.stringify({
+        main_subject: `${jewelryType} luxury jewelry editorial photography`,
+        style: 'high-end luxury prestige dramatic premium designer',
+        preservation: {
+          critical:
+            'EXACT jewelry design UNCHANGED - all gemstones setting proportions PRESERVED pixel-perfect',
+          forbidden:
+            'NO modifications NO additions NO removals NO gemstone changes',
+        },
+        background:
+          'rich deep black dramatic RGB(18,16,20) to navy RGB(25,30,45) luxurious depth',
+        lighting:
+          'dramatic chiaroscuro key light 45-degree rim light edge definition 4800K warm gold reflections',
+        composition: `${jewelryType} hero centered 55% frame dynamic angle dramatic shadows bold presence`,
+        camera: `f/4 selective focus cinematic depth editorial ${aspectRatio}`,
+        mood: 'luxurious dramatic powerful prestigious exclusive aspirational',
+        quality: 'ultra-sharp 300dpi premium editorial magazine-grade',
+      });
+    },
+  },
+
+  modern: {
+    name: 'Modern',
+    requiresModel: false,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '9:16'
+    ) => {
+      return JSON.stringify({
+        main_subject: `${jewelryType} contemporary jewelry photography`,
+        style: 'clean modern minimalist architectural contemporary',
+        preservation: {
+          critical:
+            'EXACT jewelry UNCHANGED - structure gemstones details FROZEN',
+          forbidden: 'NO alterations NO additions NO removals',
+        },
+        background:
+          'cool cyan gradient RGB(220,235,245) to RGB(235,245,255) fresh clean modern',
+        lighting:
+          'bright even 6000K cool daylight soft shadows high-key clean crisp',
+        composition: `${jewelryType} centered 65% frame geometric clean lines modern aesthetic negative space`,
+        camera: `f/8 edge-to-edge sharpness contemporary ${aspectRatio}`,
+        mood: 'fresh contemporary clean innovative modern trustworthy',
+        quality: 'ultra-sharp 300dpi pristine commercial-grade',
+      });
+    },
+  },
+
+  vintage: {
+    name: 'Vintage',
+    requiresModel: false,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '9:16'
+    ) => {
+      return JSON.stringify({
+        main_subject: `${jewelryType} vintage-inspired jewelry photography`,
+        style: 'classic timeless vintage heirloom traditional romantic',
+        preservation: {
+          critical:
+            'EXACT jewelry PRESERVED - all details gemstones structure UNCHANGED',
+          forbidden: 'NO design changes NO gemstone modifications',
+        },
+        background:
+          'warm antique cream RGB(245,235,220) to sepia RGB(240,230,210) nostalgic soft',
+        lighting:
+          'soft diffused 4500K warm amber gentle glow vintage film aesthetic subtle vignette',
+        composition: `${jewelryType} centered 60% frame classic angle timeless presentation romantic mood`,
+        camera: `f/5.6 soft focus edges sharp center vintage ${aspectRatio}`,
+        mood: 'romantic nostalgic timeless classic elegant heirloom',
+        quality: 'sharp 300dpi vintage-inspired film aesthetic professional',
+      });
+    },
+  },
+
+  dramatic: {
+    name: 'Dramatic',
+    requiresModel: false,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '9:16'
+    ) => {
+      return JSON.stringify({
+        main_subject: `${jewelryType} dramatic jewelry photography`,
+        style: 'bold dramatic high-contrast striking powerful theatrical',
+        preservation: {
+          critical:
+            'EXACT jewelry UNCHANGED - gemstones structure setting ALL preserved',
+          forbidden: 'NO alterations NO additions NO removals',
+        },
+        background:
+          'dramatic black to burgundy RGB(10,8,12) to RGB(40,15,25) intense moody',
+        lighting:
+          'high contrast single key 30-degree hard light deep shadows 3800K dramatic rim light',
+        composition: `${jewelryType} dynamic 50% frame bold angle strong shadows dramatic presence theatrical`,
+        camera: `f/2.8 shallow depth dramatic bokeh striking ${aspectRatio}`,
+        mood: 'dramatic intense powerful bold striking theatrical',
+        quality: 'ultra-sharp 300dpi high-contrast editorial professional',
+      });
+    },
+  },
+
+  natural: {
+    name: 'Natural',
+    requiresModel: false,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '9:16'
+    ) => {
+      return JSON.stringify({
+        main_subject: `${jewelryType} natural organic jewelry photography`,
+        style: 'natural organic authentic soft gentle lifestyle',
+        preservation: {
+          critical:
+            'EXACT jewelry UNCHANGED - all elements preserved perfectly',
+          forbidden: 'NO modifications NO additions NO removals',
+        },
+        background:
+          'natural beige linen RGB(240,238,230) to warm sand RGB(235,230,220) organic texture',
+        lighting:
+          'soft natural window light 5200K ambient wrap-around gentle authentic daylight feel',
+        composition: `${jewelryType} natural placement 55% frame organic angle soft shadows authentic presentation`,
+        camera: `f/4 natural depth organic feel lifestyle ${aspectRatio}`,
+        mood: 'natural authentic organic gentle warm approachable',
+        quality: 'sharp 300dpi natural organic lifestyle professional',
+      });
+    },
+  },
+
   'e-commerce': {
     name: 'White Background',
     requiresModel: false,
@@ -306,6 +476,41 @@ OUTPUT: Editorial minimalist still life. Aspect ratio ${aspectRatio}. Soft paste
       const genderText = gender ? `${gender}` : 'model';
       const type = jewelryType.toLowerCase();
 
+      // Special handling for Women Necklace - Ultra Close-Up
+      if (type === 'necklace' && genderText.toLowerCase() === 'women') {
+        return JSON.stringify({
+          scene:
+            'professional on-model necklace photography product-focused commercial',
+          preserve:
+            '⛔ JEWELRY 100% FROZEN UNCHANGED ⛔ EXACT: gemstone count|position|size|cut chain-links|thickness pendant-shape|dimensions metal-finish|texture setting-prongs|clasp engravings ALL-PIXEL-IDENTICAL ⚠️ 0.01% change = FAIL ⚠️',
+          camera: 'FRONTAL straight-on eye-level fixed stable macro-lens',
+          frame:
+            'EXTREME CLOSE-UP chest-neck ONLY face-STRICTLY-FORBIDDEN cropped-at-chin-line cropped-above-chest jewelry-dominant-70-80%',
+          face_rule:
+            'ABSOLUTE: NO-face NO-eyes NO-nose NO-mouth NO-chin NO-jawline ONLY-neck-chest STRICTLY-enforced',
+          focus:
+            'f/2.8-f/4 RAZOR-SHARP jewelry-zone crisp-details micro-details background-bokeh',
+          skin: 'NATURAL visible-pores texture slight-imperfections warm-tone realistic authentic neck-collarbones-visible',
+          clothing:
+            'olive sage khaki blazer open-collar V-neck relaxed-fit matte-fabric casual-elegant',
+          neckline:
+            'WIDE-OPEN deep-V full-neck-exposed jewelry-centered unobstructed clear',
+          jewelry_zone:
+            'neck-center chest-upper natural-drape touches-skin perfectly-visible',
+          light:
+            'SOFT diffused 4500-5000K warm natural even gentle-shadows flattering',
+          colors: 'warm earth olive sage cream skin harmonious muted',
+          bg: 'soft-blur neutral warm minimal clean',
+          skin_tone: 'natural warm medium olive realistic',
+          forbidden:
+            '❌ CRITICAL: face-ANY-part head eyes nose mouth chin jawline added|removed|moved|altered gemstones design-change harsh-light cold-tones patterns high-collar jewelry-changes',
+          tech: 'ULTRA-SHARP 300DPI professional crisp macro',
+          place:
+            'jewelry-placement-zone-centered skin-contact maintained natural-drape',
+          out: `${aspectRatio} ultra-closeup jewelry-dominant professional`,
+        });
+      }
+
       const placement =
         {
           ring: 'Hand elegant pose fingers extended naturally prominent',
@@ -506,148 +711,64 @@ OUTPUT: Macro craftsmanship showcase. Aspect ratio ${aspectRatio}. Extreme close
     },
   },
 
-  luxury: {
-    name: 'Luxury',
+  'e-commerce-neck-closeup': {
+    name: 'E-Commerce Neck Close-Up',
     requiresModel: true,
     buildPrompt: (
       jewelryType: string,
       gender?: string,
       aspectRatio: string = '9:16'
     ) => {
-      const genderText = gender ? `${gender}` : 'model';
-      const type = jewelryType.toLowerCase();
-
-      const placement =
-        {
-          ring: 'Hand elegant architectural fingers jewelry hero',
-          necklace: 'Neck decollete statement centered dramatic',
-          earring: 'Profile three-quarter face jewelry prominent',
-          bracelet: 'Wrist elevated elegant gesture refined',
-        }[type] || 'Layered draped intentional sophisticated';
-
-      // Real-world size specifications for accurate scaling
-      const sizeSpecs =
-        {
-          ring: 'Ring band 2-3mm wide, face 8-12mm diameter typical engagement ring size',
-          necklace: 'Chain 16-20 inch length, pendant 10-25mm typical size',
-          earring: 'Stud 4-8mm diameter, drop/dangle 15-35mm length typical',
-          bracelet: 'Chain 7-8 inch length, links 3-8mm width typical size',
-        }[type] || 'Standard jewelry proportions relative to human body';
-
-      // 3D placement and physical contact specifications
-      const placementSpecs =
-        {
-          ring: 'Ring WRAPPED AROUND finger 3D perspective band CURVES with finger curvature GRIPS finger snugly TOUCHES skin all around NO floating NO gaps HUGS finger natural worn position',
-          necklace:
-            'Chain RESTS ON skin follows neck contour pendant TOUCHES chest natural gravity drape NO floating chain CONTACTS collarbone decollete area',
-          earring:
-            'Earring POST THROUGH earlobe or HOOK OVER ear jewelry HANGS naturally from ear NO floating close to face natural worn position',
-          bracelet:
-            'Bracelet WRAPS AROUND wrist 3D perspective follows wrist curve TOUCHES skin natural worn position drapes with gravity',
-        }[type] ||
-        'Jewelry makes PHYSICAL CONTACT with body part natural worn position';
-
-      return `Luxury high-fashion editorial ${jewelryType} on ${genderText}. Premium campaign. Aspirational prestige presentation.
-
-CRITICAL SIZE & SCALE - ACCURATE PROPORTIONS:
-SOURCE IMAGE: Close-up product photography enlarged for detail
-IMPORTANT: When compositing on model use LIFE-SIZE REAL-WORLD proportions
-${sizeSpecs}
-Scale DOWN from close-up to actual wearable jewelry size
-Jewelry must appear natural realistic proportional to human body
-NOT oversized NOT miniature ACTUAL life-size dimensions
-Reference human anatomy: finger width hand size neck circumference wrist diameter
-
-CRITICAL 3D PLACEMENT & PHYSICAL CONTACT - MANDATORY:
-${placementSpecs}
-Jewelry must show DEPTH and PERSPECTIVE wrapped around body part
-NO flat 2D appearance jewelry follows 3D curves of human anatomy
-DIRECT SKIN CONTACT no air gaps no floating appearance
-Natural wearing physics realistic gravity drape
-Band/chain WRAPS jewelry SITS ON jewelry HANGS FROM natural physics
-
-CRITICAL PRESERVATION - ABSOLUTE ZERO TOLERANCE - HIGHEST PRIORITY:
-⛔ JEWELRY DESIGN MUST REMAIN 100% PIXEL-IDENTICAL ⛔
-EXACT jewelry structure: geometry shape form dimensions COMPLETELY UNCHANGED
-EXACT gemstone count: SAME NUMBER of stones NO additions NO removals ZERO changes
-EXACT gemstone position: EXACT same placement arrangement pattern FROZEN
-EXACT gemstone size: SAME dimensions proportions LOCKED
-EXACT setting details: prongs bezels channels metalwork UNTOUCHED
-EXACT engravings: patterns textures inscriptions PRESERVED
-EXACT proportions: ALL ratios dimensions measurements MAINTAINED
-EXACT materials: metal finish texture appearance CONSISTENT
-⚠️ IF JEWELRY CHANGES EVEN 0.1% THE IMAGE IS FAILED ⚠️
-ONLY lighting styling background atmosphere MAY change
-JEWELRY ITSELF = SACRED UNTOUCHABLE FROZEN LOCKED
-
-STRICTLY FORBIDDEN - NEGATIVE PROMPT - INSTANT REJECTION:
-❌ distorted warped melted deformed jewelry shapes
-❌ added extra new gemstones decorative elements
-❌ removed missing gemstones parts
-❌ moved repositioned gemstones from original
-❌ changed gemstone count number arrangement
-❌ modified ring band thickness width curvature
-❌ altered prong settings bezels channels
-❌ transformed jewelry structure design
-❌ blurry soft-focus unclear product details
-❌ new jewelry appearing on body parts
-❌ floating suspended hovering jewelry not touching skin
-❌ flat 2D cardboard cutout placement
-❌ jewelry design alterations modifications
-❌ oversized gigantic cartoonish jewelry
-❌ miniature tiny doll-sized jewelry
-❌ stiff rigid forced awkward poses
-❌ mannequin statue lifeless poses
-❌ casual elements flat lighting
-❌ cluttered backgrounds amateur styling
-❌ overprocessing artificial editing
-❌ unnatural hand positions finger poses
-❌ wide distant far away shots
-❌ jewelry too small in frame
-
-STYLE & COMPOSITION - CLOSER DRAMATIC FRAMING:
-Sophisticated upscale environment elegant dramatic architectural
-Background: Deep rich blacks RGB(15,15,15) jewel tones monochromatic
-Model: ${genderText} editorial high-fashion designer evening wear dramatic makeup sleek hair
-Jewelry placement: ${placement} hero statement intentional styling
-Camera: CLOSER dramatic framing jewelry fills 40-50% of frame prominent detailed
-Framing: Medium-close editorial composition NOT wide NOT distant jewelry hero dominant
-Distance: 1-2 meters to model focused on jewelry and face/hand area
-Aesthetic: Vogue Harpers Bazaar high-fashion exclusive
-
-MODEL POSE - NATURAL POWERFUL:
-Body: Confident powerful elegant natural sophisticated positioning
-Hands: Graceful dramatic gestures NOT stiff NOT forced elegant movement
-Face: Confident serene mysterious powerful expression natural
-Posture: Poised statuesque authentic editorial positioning
-Energy: Effortless powerful sophisticated refined cinematic
-Movement: Minimal intentional dramatic natural flow
-
-LIGHTING - TECHNICAL SPECS:
-Dramatic directional chiaroscuro: strong key light sculpting defined
-Fill light: Minimal controlled shadows preserved depth
-Rim light: Strong separation edge definition from darkness
-Color temp: Cool 5800K or warm 4200K intentional mood
-Quality: Crisp dramatic high contrast dimensional
-Effect: Powerful sophisticated cinematic
-
-COLOR & MOOD:
-Palette: Rich deep blacks jewel tones controlled saturation
-Contrast: High dramatic separation bold visual impact
-Mood: Sophisticated powerful exclusive aspirational
-Emotion: Confidence luxury desire prestige timeless
-Pose: Confident powerful elegant statuesque serene mysterious
-
-FOCUS & SHARPNESS - MANDATORY:
-PRIMARY FOCUS: Jewelry product ultra-sharp f/2.8-f/4 aperture
-Depth of field: Jewelry razor-sharp dramatic bokeh background
-Resolution: Ultra-high 300 DPI+ luxury editorial grade
-Sharpness: Pin-sharp crystal clear every detail
-Post-processing: Refined color grading editorial finish
-Model: Editorial styling jewelry hero
-Quality: Pristine luxury editorial photography
-
-OUTPUT: Premium luxury editorial ready. Aspect ratio ${aspectRatio}. High-fashion campaign. Aspirational prestige.`;
+      return JSON.stringify({
+        scene:
+          'professional e-commerce neck close-up product-focused commercial',
+        subject: {
+          type: 'fashion_jewelry_product',
+          focus: 'necklace_on_model_neck_only',
+          visible_area: 'neck_upper_chest_exclusively',
+          skin_tone: 'warm_natural',
+          clothing: 'tailored_blazer_olive_green',
+        },
+        framing: {
+          include: 'neck upper_chest collarbone_area_only',
+          exclude: 'NO-face NO-head NO-chin crop_at_neck_level',
+          vertical_range: 'from_upper_chest_to_lower_neck_area',
+          focus_zone: 'necklace_placement_area_exclusively',
+        },
+        necklace: {
+          style: 'minimalist_chain',
+          material: 'gold_toned',
+          chain_type: 'elongated_oval_links',
+          thickness: 'delicate_fine',
+          length: 'choker_to_short_length',
+          placement: 'sits_at_collarbone',
+        },
+        composition: {
+          shot: 'close_up_macro_neck_detail',
+          angle: 'straight_on_frontal',
+          framing: 'neck_chest_only_no_face',
+          dof: 'shallow_product_focus',
+          crop: 'tight_on_necklace_zone',
+        },
+        lighting: {
+          type: 'soft_natural_light',
+          direction: 'diffused_front',
+          mood: 'warm_elegant',
+          shadows: 'minimal_soft',
+        },
+        colors: {
+          primary: 'warm_beige_skin_tones',
+          secondary: 'olive_sage_green',
+          accent: 'gold_metallic',
+          mood: 'earthy_luxurious_minimal',
+        },
+        preservation:
+          '⛔ JEWELRY 100% FROZEN UNCHANGED ⛔ EXACT: chain-links|pendant|clasp|material ALL-PRESERVED',
+        style:
+          'minimalist elegant professional contemporary refined understated_luxury editorial clean_aesthetic timeless neck_focused_product_shot',
+        quality: 'ultra-sharp 300DPI e-commerce professional clean',
+        output: `${aspectRatio} neck-closeup jewelry-dominant e-commerce-ready`,
+      });
     },
   },
 
@@ -660,7 +781,8 @@ OUTPUT: Premium luxury editorial ready. Aspect ratio ${aspectRatio}. High-fashio
       aspectRatio: string = '9:16'
     ) => {
       return JSON.stringify({
-        scene: 'professional e-commerce neck close-up product-focused commercial',
+        scene:
+          'professional e-commerce neck close-up product-focused commercial',
         subject: {
           type: 'fashion_jewelry_product',
           focus: 'necklace_on_model_neck_only',

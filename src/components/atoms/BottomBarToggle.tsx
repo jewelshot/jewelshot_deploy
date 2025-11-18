@@ -18,7 +18,7 @@ export function BottomBarToggle() {
           : 'rounded-t-md border-b-0 border-t'
       }`}
       style={{
-        bottom: bottomOpen ? '28px' : '0px',
+        bottom: bottomOpen ? '44px' : '0px',
         left: `calc(${leftPos}px + (100vw - ${leftPos}px - ${rightPos}px) / 2)`,
       }}
       aria-label={bottomOpen ? 'Close bottom bar' : 'Open bottom bar'}

@@ -25,13 +25,7 @@ export function ConfigurationAccordion({
 
   return (
     <div className="relative">
-      <div
-        className={`flex items-center gap-2 rounded-lg border p-2 transition-all duration-300 ${
-          isComplete
-            ? 'border-white/10 bg-white/[0.02]'
-            : 'animate-glow-pulse border-purple-500/60 bg-white/[0.02]'
-        }`}
-      >
+      <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.02] p-2 transition-all duration-300">
         {/* Gender Selection */}
         <div className="flex-1">
           <SelectionDropdown

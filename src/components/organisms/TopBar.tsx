@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { useSidebarStore } from '@/store/sidebarStore';
-import { CreditCounter } from '@/components/molecules/CreditCounter';
 
 export function TopBar() {
   const { topOpen, leftOpen, rightOpen } = useSidebarStore();
@@ -21,8 +20,8 @@ export function TopBar() {
         <span className="text-lg font-bold text-white">Jewelshot</span>
       </div>
 
-      {/* Credit Counter */}
-      <CreditCounter variant="desktop" />
+      {/* Credits now in User Profile (Sidebar) */}
+      <div />
     </header>
   );
 }

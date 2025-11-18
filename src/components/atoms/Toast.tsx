@@ -10,6 +10,9 @@ interface ToastProps {
   type?: ToastType;
   duration?: number;
   onClose: () => void;
+  // Smart positioning props
+  isTopBarOpen?: boolean;
+  isRightSidebarOpen?: boolean;
 }
 
 const iconMap = {
@@ -36,7 +39,8 @@ const iconColorMap = {
 /**
  * Toast Notification Component
  *
- * Displays temporary notification messages with auto-dismiss
+ * Smart positioned notification system that adapts to sidebar states
+ * Ensures toasts never overlap with UI bars
  *
  * @example
  * ```tsx
@@ -44,6 +48,8 @@ const iconColorMap = {
  *   message="File uploaded successfully!"
  *   type="success"
  *   onClose={() => setShowToast(false)}
+ *   isTopBarOpen={topOpen}
+ *   isRightSidebarOpen={rightOpen}
  * />
  * ```
  */
@@ -52,6 +58,8 @@ export function Toast({
   type = 'info',
   duration = 4000,
   onClose,
+  isTopBarOpen = false,
+  isRightSidebarOpen = false,
 }: ToastProps) {
   const Icon = iconMap[type];
 
@@ -64,7 +72,12 @@ export function Toast({
 
   return (
     <div
-      className={`animate-in slide-in-from-top-2 fixed right-4 top-4 z-[9999] flex max-w-sm items-start gap-3 rounded-lg border p-4 shadow-lg backdrop-blur-md ${colorMap[type]}`}
+      className={`fixed z-40 flex max-w-md items-start gap-3 rounded-lg border p-3 shadow-2xl backdrop-blur-xl transition-all ${colorMap[type]}`}
+      style={{
+        bottom: '80px',
+        right: isRightSidebarOpen ? '276px' : '16px',
+        animation: 'fadeInSlideUp 0.3s ease-out',
+      }}
       role="alert"
     >
       <Icon className={`h-5 w-5 flex-shrink-0 ${iconColorMap[type]}`} />
@@ -78,6 +91,19 @@ export function Toast({
       >
         <X className="h-4 w-4" />
       </button>
+
+      <style jsx>{`
+        @keyframes fadeInSlideUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }

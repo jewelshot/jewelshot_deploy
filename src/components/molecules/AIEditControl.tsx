@@ -5,7 +5,6 @@ import AIPromptInput from '@/components/atoms/AIPromptInput';
 import AIGenerateButton from '@/components/atoms/AIGenerateButton';
 import AIToggleButton from '@/components/atoms/AIToggleButton';
 import QuickPromptButton from '@/components/atoms/QuickPromptButton';
-import RateLimitBadge from '@/components/atoms/RateLimitBadge';
 import { validatePrompt } from '@/lib/validators';
 import { toastManager } from '@/lib/toast-manager';
 import jewelryPrompts from '@/data/jewelryPrompts.json';
@@ -79,7 +78,8 @@ export function AIEditControl({
             : 'pointer-events-none -translate-y-2 scale-95 opacity-0'
         }`}
       >
-        <div className="space-y-2">
+        {/* Scrollable container with max-height */}
+        <div className="max-h-[400px] space-y-2 overflow-y-auto">
           {/* Prompt Input */}
           <AIPromptInput
             value={prompt}
@@ -120,8 +120,7 @@ export function AIEditControl({
           {/* Divider */}
           <div className="h-5 w-px bg-[rgba(139,92,246,0.3)]" />
 
-          {/* Rate Limit Badge */}
-          <RateLimitBadge />
+          {/* Rate Limit Badge - Moved to Bottom Bar */}
 
           {/* Generate Button */}
           <AIGenerateButton

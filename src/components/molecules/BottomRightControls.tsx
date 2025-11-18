@@ -4,6 +4,7 @@ import EditButton from '@/components/atoms/EditButton';
 import DeleteButton from '@/components/atoms/DeleteButton';
 import SaveButton from '@/components/atoms/SaveButton';
 import DownloadButton from '@/components/atoms/DownloadButton';
+import VideoButton from '@/components/atoms/VideoButton';
 
 interface BottomRightControlsProps {
   /**
@@ -26,6 +27,14 @@ interface BottomRightControlsProps {
    * Download handler
    */
   onDownload: () => void;
+  /**
+   * Video generation handler (optional)
+   */
+  onGenerateVideo?: () => void;
+  /**
+   * Whether video generation is in progress
+   */
+  isGeneratingVideo?: boolean;
 }
 
 export function BottomRightControls({
@@ -34,6 +43,8 @@ export function BottomRightControls({
   onDelete,
   onSave,
   onDownload,
+  onGenerateVideo,
+  isGeneratingVideo = false,
 }: BottomRightControlsProps) {
   return (
     <div className="flex items-center gap-1.5 rounded-lg border border-[rgba(139,92,246,0.2)] bg-[rgba(10,10,10,0.8)] p-1.5 backdrop-blur-[16px]">
@@ -41,6 +52,12 @@ export function BottomRightControls({
       <div className="h-5 w-px bg-[rgba(139,92,246,0.2)]" />
       <SaveButton onClick={onSave} />
       <DownloadButton onClick={onDownload} />
+      {onGenerateVideo && (
+        <>
+          <div className="h-5 w-px bg-[rgba(139,92,246,0.2)]" />
+          <VideoButton onClick={onGenerateVideo} disabled={isGeneratingVideo} />
+        </>
+      )}
       <div className="h-5 w-px bg-[rgba(139,92,246,0.2)]" />
       <DeleteButton onClick={onDelete} />
     </div>

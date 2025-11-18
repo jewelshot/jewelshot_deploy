@@ -7,14 +7,25 @@ import { useImageState } from '@/hooks/useImageState';
 import { useImageTransform } from '@/hooks/useImageTransform';
 import { useImageFilters } from '@/hooks/useImageFilters';
 import { useCanvasUI } from '@/hooks/useCanvasUI';
-import { useToast } from '@/hooks/useToast';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useImageEdit } from '@/hooks/useImageEdit';
+import { useImageToVideo } from '@/hooks/useImageToVideo';
+import { useImageUpscale } from '@/hooks/useImageUpscale';
+import { useRemoveBackground } from '@/hooks/useRemoveBackground';
+import { useGemstoneEnhance } from '@/hooks/useGemstoneEnhance';
+import { useMetalRecolor, MetalType } from '@/hooks/useMetalRecolor';
+import { useMetalPolish } from '@/hooks/useMetalPolish';
+import { useNaturalLight } from '@/hooks/useNaturalLight';
+import { useTurntableVideo } from '@/hooks/useTurntableVideo';
+import { useCameraControl } from '@/hooks/useCameraControl';
 import { useCanvasHandlers } from '@/hooks/useCanvasHandlers';
 import { createScopedLogger } from '@/lib/logger';
 import { saveImageToGallery } from '@/lib/gallery-storage';
-import Toast from '@/components/atoms/Toast';
+import { toastManager } from '@/lib/toast-manager';
 import { useCreditStore } from '@/store/creditStore';
+import { VideoPlayerModal } from '@/components/molecules/VideoPlayerModal';
+import { VideoGeneratingModal } from '@/components/molecules/VideoGeneratingModal';
+import { QuickActionsBar } from '@/components/molecules/QuickActionsBar';
 
 const logger = createScopedLogger('Canvas');
 // New refactored components
@@ -108,16 +119,10 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
   const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
   const [isPromptExpanded, setIsPromptExpanded] = useState(false);
 
-  // Toast notifications
-  const { showToast, hideToast, toastState } = useToast();
+  // Toast notifications - now handled by toastManager in BottomBar
 
   // Credit store
-  const {
-    credits,
-    loading: creditsLoading,
-    deductCredit,
-    fetchCredits,
-  } = useCreditStore();
+  const { deductCredit, fetchCredits } = useCreditStore();
 
   // Fetch credits on mount
   useEffect(() => {
@@ -147,7 +152,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
         setIsAIImageLoading(true); // Start loading overlay
         const aiImageUrl = result.images[0].url;
         setUploadedImage(aiImageUrl);
-        showToast('Image edited successfully!', 'success');
+        toastManager.success('Image edited successfully!');
 
         // 🎯 AUTO-SAVE to gallery
         try {
@@ -164,7 +169,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
           window.dispatchEvent(new Event('gallery-updated'));
 
           logger.info('✅ AI-generated image auto-saved to gallery');
-          showToast('Saved to gallery!', 'success');
+          toastManager.success('Saved to gallery!');
         } catch (error) {
           logger.error('Failed to auto-save to gallery:', error);
           // Don't show error toast - image generation was successful
@@ -174,15 +179,765 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     },
     onError: (error) => {
       setIsAIImageLoading(false); // Clear loading state on error
-      showToast(error.message || 'Failed to edit image', 'error');
+      toastManager.error(error.message || 'Failed to edit image');
     },
   });
 
+  // Video Generation
+  const {
+    generateVideo,
+    isGenerating: isGeneratingVideo,
+    videoUrl,
+    error: videoError,
+    reset: resetVideo,
+  } = useImageToVideo();
+
+  const [showVideoModal, setShowVideoModal] = useState(false);
+  const [currentVideoUrl, setCurrentVideoUrl] = useState<string | null>(null);
+
+  // Image Upscale
+  const {
+    upscaleImage,
+    isUpscaling,
+    upscaledImageUrl,
+    error: upscaleError,
+  } = useImageUpscale();
+
+  // Remove Background
+  const {
+    removeBackground,
+    isProcessing: isRemovingBackground,
+    processedImageUrl: removedBgImageUrl,
+    error: removeBgError,
+  } = useRemoveBackground();
+
+  // Gemstone Enhancement
+  const {
+    enhanceGemstones,
+    isEnhancing: isEnhancingGemstones,
+    enhancedImageUrl: gemstoneEnhancedImageUrl,
+    error: gemstoneEnhanceError,
+  } = useGemstoneEnhance();
+
+  // Metal Recolor
+  const {
+    recolorMetal,
+    isRecoloring: isRecoloringMetal,
+    recoloredImageUrl: metalRecoloredImageUrl,
+    error: metalRecolorError,
+  } = useMetalRecolor();
+
+  // Metal Polish
+  const {
+    polishMetal,
+    isPolishing: isPolishingMetal,
+    polishedImageUrl: metalPolishedImageUrl,
+    error: metalPolishError,
+  } = useMetalPolish();
+
+  // Natural Light & Reflections
+  const {
+    enhanceLight,
+    isEnhancing: isEnhancingLight,
+    enhancedImageUrl: lightEnhancedImageUrl,
+    error: naturalLightError,
+  } = useNaturalLight();
+
+  // 360° Turntable Video
+  const {
+    generateVideo: generateTurntableVideo,
+    isGenerating: isGeneratingTurntable,
+    videoUrl: turntableVideoUrl,
+    error: turntableVideoError,
+  } = useTurntableVideo();
+
+  // Camera Control (Rotate Left/Right, Close-Up)
+  const { applyCamera, error: cameraError } = useCameraControl();
+
+  // Track individual camera operations
+  const [isRotatingLeft, setIsRotatingLeft] = useState(false);
+  const [isRotatingRight, setIsRotatingRight] = useState(false);
+  const [isClosingUp, setIsClosingUp] = useState(false);
+
+  // Handle video generation
+  const handleGenerateVideo = useCallback(() => {
+    if (!uploadedImage) {
+      toastManager.warning('No image to convert to video');
+      return;
+    }
+
+    logger.info(
+      '[Canvas] Starting video generation from image:',
+      uploadedImage
+    );
+
+    generateVideo({
+      image_url: uploadedImage,
+      prompt:
+        'Hand gently rotating ring, showcasing from different angles with natural movements.',
+      duration: '8s',
+      resolution: '720p', // 720p quality, aspect ratio auto-detected from image
+    });
+  }, [uploadedImage, generateVideo]);
+
+  // Show video modal when generation completes
+  useEffect(() => {
+    if (videoUrl && !showVideoModal) {
+      logger.info('[Canvas] Video generated, opening modal');
+      queueMicrotask(() => {
+        setShowVideoModal(true);
+        toastManager.success('✅ Video generated successfully!');
+      });
+    }
+  }, [videoUrl, showVideoModal]);
+
+  // Show error toast if video generation fails
+  useEffect(() => {
+    if (videoError) {
+      logger.error('[Canvas] Video generation failed:', videoError);
+      toastManager.error(`❌ Video generation failed: ${videoError}`);
+    }
+  }, [videoError]);
+
+  // Handle image upscale
+  const handleUpscale = useCallback(async () => {
+    if (!uploadedImage) {
+      toastManager.warning('No image to upscale');
+      return;
+    }
+
+    logger.info('[Canvas] Starting image upscale:', uploadedImage);
+
+    // Store original image for comparison
+    if (!originalImage) {
+      setOriginalImage(uploadedImage);
+    }
+
+    // Convert blob URL to data URI if needed
+    let imageUrl = uploadedImage;
+    if (uploadedImage.startsWith('blob:')) {
+      logger.info('[Canvas] Converting blob URL to data URI for upscale');
+      try {
+        const response = await fetch(uploadedImage);
+        const blob = await response.blob();
+        imageUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        logger.info('[Canvas] Blob converted to data URI successfully');
+      } catch (error) {
+        logger.error('[Canvas] Failed to convert blob to data URI:', error);
+        toastManager.error('Failed to prepare image for upscaling');
+        return;
+      }
+    }
+
+    upscaleImage({
+      image_url: imageUrl,
+      upscale_mode: 'factor',
+      upscale_factor: 2, // 2x upscale
+      output_format: 'jpg',
+    });
+  }, [uploadedImage, originalImage, upscaleImage, setOriginalImage]);
+
+  // Update canvas with upscaled image and enable comparison
+  useEffect(() => {
+    if (upscaledImageUrl) {
+      logger.info('[Canvas] Upscaled image ready, updating canvas');
+      queueMicrotask(() => {
+        setUploadedImage(upscaledImageUrl);
+        setViewMode('side-by-side'); // Enable comparison view
+        toastManager.success(
+          '✅ Image upscaled successfully! Compare with original.'
+        );
+      });
+    }
+  }, [upscaledImageUrl, setUploadedImage, setViewMode]);
+
+  // Show error toast if upscale fails
+  useEffect(() => {
+    if (upscaleError) {
+      logger.error('[Canvas] Image upscale failed:', upscaleError);
+      toastManager.error(`❌ Upscale failed: ${upscaleError}`);
+    }
+  }, [upscaleError]);
+
+  // Handle remove background
+  const handleRemoveBackground = useCallback(async () => {
+    if (!uploadedImage) {
+      toastManager.warning('No image to process');
+      return;
+    }
+
+    logger.info('[Canvas] Starting background removal:', uploadedImage);
+
+    // Store original image for comparison
+    if (!originalImage) {
+      setOriginalImage(uploadedImage);
+    }
+
+    // Convert blob URL to data URI if needed
+    let imageUrl = uploadedImage;
+    if (uploadedImage.startsWith('blob:')) {
+      logger.info(
+        '[Canvas] Converting blob URL to data URI for background removal'
+      );
+      try {
+        const response = await fetch(uploadedImage);
+        const blob = await response.blob();
+        imageUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        logger.info('[Canvas] Blob converted to data URI successfully');
+      } catch (error) {
+        logger.error('[Canvas] Failed to convert blob to data URI:', error);
+        toastManager.error('Failed to prepare image for processing');
+        return;
+      }
+    }
+
+    removeBackground({
+      image_url: imageUrl,
+      crop_to_bbox: false, // Keep original dimensions
+    });
+  }, [uploadedImage, originalImage, removeBackground, setOriginalImage]);
+
+  // Update canvas with background-removed image and enable comparison
+  useEffect(() => {
+    if (removedBgImageUrl) {
+      logger.info('[Canvas] Background removed, updating canvas');
+      queueMicrotask(() => {
+        setUploadedImage(removedBgImageUrl);
+        setViewMode('side-by-side'); // Enable comparison view
+        toastManager.success(
+          '✅ Background removed successfully! Compare with original.'
+        );
+      });
+    }
+  }, [removedBgImageUrl, setUploadedImage, setViewMode]);
+
+  // Show error toast if remove background fails
+  useEffect(() => {
+    if (removeBgError) {
+      logger.error('[Canvas] Background removal failed:', removeBgError);
+      toastManager.error(`❌ Remove background failed: ${removeBgError}`);
+    }
+  }, [removeBgError]);
+
+  // Handle rotate left
+  const handleRotateLeft = useCallback(async () => {
+    if (!uploadedImage) {
+      toastManager.warning('No image to rotate');
+      return;
+    }
+
+    setIsRotatingLeft(true);
+    logger.info('[Canvas] Starting rotate left:', uploadedImage);
+
+    // Store original image for comparison
+    if (!originalImage) {
+      setOriginalImage(uploadedImage);
+    }
+
+    // Convert blob URL to data URI if needed
+    let imageUrl = uploadedImage;
+    if (uploadedImage.startsWith('blob:')) {
+      logger.info(
+        '[Canvas] Converting blob URL to data URI for camera control'
+      );
+      try {
+        const response = await fetch(uploadedImage);
+        const blob = await response.blob();
+        imageUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        logger.info('[Canvas] Blob converted to data URI successfully');
+      } catch (error) {
+        logger.error('[Canvas] Failed to convert blob to data URI:', error);
+        toastManager.error('Failed to prepare image for processing');
+        setIsRotatingLeft(false);
+        return;
+      }
+    }
+
+    try {
+      const result = await applyCamera(imageUrl, 'rotate_left', 'product');
+      if (result?.url) {
+        setUploadedImage(result.url);
+        setViewMode('side-by-side');
+        toastManager.success('✅ Rotated left');
+      }
+    } catch (err) {
+      logger.error('[Canvas] Rotate left failed:', err);
+    } finally {
+      setIsRotatingLeft(false);
+    }
+  }, [
+    uploadedImage,
+    originalImage,
+    applyCamera,
+    setOriginalImage,
+    setUploadedImage,
+    setViewMode,
+  ]);
+
+  // Handle rotate right
+  const handleRotateRight = useCallback(async () => {
+    if (!uploadedImage) {
+      toastManager.warning('No image to rotate');
+      return;
+    }
+
+    setIsRotatingRight(true);
+    logger.info('[Canvas] Starting rotate right:', uploadedImage);
+
+    // Store original image for comparison
+    if (!originalImage) {
+      setOriginalImage(uploadedImage);
+    }
+
+    // Convert blob URL to data URI if needed
+    let imageUrl = uploadedImage;
+    if (uploadedImage.startsWith('blob:')) {
+      logger.info(
+        '[Canvas] Converting blob URL to data URI for camera control'
+      );
+      try {
+        const response = await fetch(uploadedImage);
+        const blob = await response.blob();
+        imageUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        logger.info('[Canvas] Blob converted to data URI successfully');
+      } catch (error) {
+        logger.error('[Canvas] Failed to convert blob to data URI:', error);
+        toastManager.error('Failed to prepare image for processing');
+        setIsRotatingRight(false);
+        return;
+      }
+    }
+
+    try {
+      const result = await applyCamera(imageUrl, 'rotate_right', 'product');
+      if (result?.url) {
+        setUploadedImage(result.url);
+        setViewMode('side-by-side');
+        toastManager.success('✅ Rotated right');
+      }
+    } catch (err) {
+      logger.error('[Canvas] Rotate right failed:', err);
+    } finally {
+      setIsRotatingRight(false);
+    }
+  }, [
+    uploadedImage,
+    originalImage,
+    applyCamera,
+    setOriginalImage,
+    setUploadedImage,
+    setViewMode,
+  ]);
+
+  // Handle close-up
+  const handleCloseUp = useCallback(async () => {
+    if (!uploadedImage) {
+      toastManager.warning('No image for close-up');
+      return;
+    }
+
+    setIsClosingUp(true);
+    logger.info('[Canvas] Starting close-up:', uploadedImage);
+
+    // Store original image for comparison
+    if (!originalImage) {
+      setOriginalImage(uploadedImage);
+    }
+
+    // Convert blob URL to data URI if needed
+    let imageUrl = uploadedImage;
+    if (uploadedImage.startsWith('blob:')) {
+      logger.info(
+        '[Canvas] Converting blob URL to data URI for camera control'
+      );
+      try {
+        const response = await fetch(uploadedImage);
+        const blob = await response.blob();
+        imageUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        logger.info('[Canvas] Blob converted to data URI successfully');
+      } catch (error) {
+        logger.error('[Canvas] Failed to convert blob to data URI:', error);
+        toastManager.error('Failed to prepare image for processing');
+        setIsClosingUp(false);
+        return;
+      }
+    }
+
+    try {
+      const result = await applyCamera(imageUrl, 'closeup', 'product');
+      if (result?.url) {
+        setUploadedImage(result.url);
+        setViewMode('side-by-side');
+        toastManager.success('✅ Close-up created');
+      }
+    } catch (err) {
+      logger.error('[Canvas] Close-up failed:', err);
+    } finally {
+      setIsClosingUp(false);
+    }
+  }, [
+    uploadedImage,
+    originalImage,
+    applyCamera,
+    setOriginalImage,
+    setUploadedImage,
+    setViewMode,
+  ]);
+
+  // Show error toast if camera control fails
+  useEffect(() => {
+    if (cameraError) {
+      logger.error('[Canvas] Camera control failed:', cameraError);
+      toastManager.error(`❌ Camera control failed: ${cameraError}`);
+    }
+  }, [cameraError]);
+
+  // Handle gemstone enhancement
+  const handleGemstoneEnhance = useCallback(async () => {
+    if (!uploadedImage) {
+      toastManager.warning('No image to enhance');
+      return;
+    }
+
+    logger.info('[Canvas] Starting gemstone enhancement:', uploadedImage);
+
+    // Store original image for comparison
+    if (!originalImage) {
+      setOriginalImage(uploadedImage);
+    }
+
+    // Convert blob URL to data URI if needed
+    let imageUrl = uploadedImage;
+    if (uploadedImage.startsWith('blob:')) {
+      logger.info(
+        '[Canvas] Converting blob URL to data URI for gemstone enhancement'
+      );
+      try {
+        const response = await fetch(uploadedImage);
+        const blob = await response.blob();
+        imageUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        logger.info('[Canvas] Blob converted to data URI successfully');
+      } catch (error) {
+        logger.error('[Canvas] Failed to convert blob to data URI:', error);
+        toastManager.error('Failed to prepare image for processing');
+        return;
+      }
+    }
+
+    enhanceGemstones({
+      image_url: imageUrl,
+    });
+  }, [uploadedImage, originalImage, enhanceGemstones, setOriginalImage]);
+
+  // Update canvas with gemstone-enhanced image and enable comparison
+  useEffect(() => {
+    if (gemstoneEnhancedImageUrl) {
+      logger.info('[Canvas] Gemstones enhanced, updating canvas');
+      queueMicrotask(() => {
+        setUploadedImage(gemstoneEnhancedImageUrl);
+        setViewMode('side-by-side'); // Enable comparison view
+        toastManager.success('✅ Gemstones enhanced! Compare with original.');
+      });
+    }
+  }, [gemstoneEnhancedImageUrl, setUploadedImage, setViewMode]);
+
+  // Show error toast if gemstone enhancement fails
+  useEffect(() => {
+    if (gemstoneEnhanceError) {
+      logger.error(
+        '[Canvas] Gemstone enhancement failed:',
+        gemstoneEnhanceError
+      );
+      toastManager.error(
+        `❌ Gemstone enhancement failed: ${gemstoneEnhanceError}`
+      );
+    }
+  }, [gemstoneEnhanceError]);
+
+  // Handle metal recolor
+  const handleMetalRecolor = useCallback(
+    async (metalType: MetalType) => {
+      if (!uploadedImage) {
+        toastManager.warning('No image to recolor');
+        return;
+      }
+
+      logger.info('[Canvas] Starting metal recolor:', {
+        uploadedImage,
+        metalType,
+      });
+
+      // Store original image for comparison
+      if (!originalImage) {
+        setOriginalImage(uploadedImage);
+      }
+
+      // Convert blob URL to data URI if needed
+      let imageUrl = uploadedImage;
+      if (uploadedImage.startsWith('blob:')) {
+        logger.info(
+          '[Canvas] Converting blob URL to data URI for metal recolor'
+        );
+        try {
+          const response = await fetch(uploadedImage);
+          const blob = await response.blob();
+          imageUrl = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+          logger.info('[Canvas] Blob converted to data URI successfully');
+        } catch (error) {
+          logger.error('[Canvas] Failed to convert blob to data URI:', error);
+          toastManager.error('Failed to prepare image for processing');
+          return;
+        }
+      }
+
+      recolorMetal({
+        image_url: imageUrl,
+        metal_type: metalType,
+      });
+    },
+    [uploadedImage, originalImage, recolorMetal, setOriginalImage]
+  );
+
+  // Update canvas with recolored image and enable comparison
+  useEffect(() => {
+    if (metalRecoloredImageUrl) {
+      logger.info('[Canvas] Metal recolored, updating canvas');
+      queueMicrotask(() => {
+        setUploadedImage(metalRecoloredImageUrl);
+        setViewMode('side-by-side'); // Enable comparison view
+        toastManager.success('✅ Metal color changed! Compare with original.');
+      });
+    }
+  }, [metalRecoloredImageUrl, setUploadedImage, setViewMode]);
+
+  // Show error toast if metal recolor fails
+  useEffect(() => {
+    if (metalRecolorError) {
+      logger.error('[Canvas] Metal recolor failed:', metalRecolorError);
+      toastManager.error(`❌ Metal recolor failed: ${metalRecolorError}`);
+    }
+  }, [metalRecolorError]);
+
+  // Handle metal polish
+  const handleMetalPolish = useCallback(async () => {
+    if (!uploadedImage) {
+      toastManager.warning('No image to polish');
+      return;
+    }
+
+    logger.info('[Canvas] Starting metal polish:', uploadedImage);
+
+    // Store original image for comparison
+    if (!originalImage) {
+      setOriginalImage(uploadedImage);
+    }
+
+    // Convert blob URL to data URI if needed
+    let imageUrl = uploadedImage;
+    if (uploadedImage.startsWith('blob:')) {
+      logger.info('[Canvas] Converting blob URL to data URI for metal polish');
+      try {
+        const response = await fetch(uploadedImage);
+        const blob = await response.blob();
+        imageUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        logger.info('[Canvas] Blob converted to data URI successfully');
+      } catch (error) {
+        logger.error('[Canvas] Failed to convert blob to data URI:', error);
+        toastManager.error('Failed to prepare image for processing');
+        return;
+      }
+    }
+
+    polishMetal({
+      image_url: imageUrl,
+    });
+  }, [uploadedImage, originalImage, polishMetal, setOriginalImage]);
+
+  // Update canvas with polished image and enable comparison
+  useEffect(() => {
+    if (metalPolishedImageUrl) {
+      logger.info('[Canvas] Metal polished, updating canvas');
+      queueMicrotask(() => {
+        setUploadedImage(metalPolishedImageUrl);
+        setViewMode('side-by-side'); // Enable comparison view
+        toastManager.success(
+          '✅ Metal polished to perfection! Compare with original.'
+        );
+      });
+    }
+  }, [metalPolishedImageUrl, setUploadedImage, setViewMode]);
+
+  // Show error toast if metal polish fails
+  useEffect(() => {
+    if (metalPolishError) {
+      logger.error('[Canvas] Metal polish failed:', metalPolishError);
+      toastManager.error(`❌ Metal polish failed: ${metalPolishError}`);
+    }
+  }, [metalPolishError]);
+
+  // Handle natural light enhancement
+  const handleNaturalLight = useCallback(async () => {
+    if (!uploadedImage) {
+      toastManager.warning('No image to enhance');
+      return;
+    }
+
+    logger.info('[Canvas] Starting natural light enhancement:', uploadedImage);
+
+    // Store original image for comparison
+    if (!originalImage) {
+      setOriginalImage(uploadedImage);
+    }
+
+    // Convert blob URL to data URI if needed
+    let imageUrl = uploadedImage;
+    if (uploadedImage.startsWith('blob:')) {
+      logger.info('[Canvas] Converting blob URL to data URI for natural light');
+      try {
+        const response = await fetch(uploadedImage);
+        const blob = await response.blob();
+        imageUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        logger.info('[Canvas] Blob converted to data URI successfully');
+      } catch (error) {
+        logger.error('[Canvas] Failed to convert blob to data URI:', error);
+        toastManager.error('Failed to prepare image for processing');
+        return;
+      }
+    }
+
+    enhanceLight({
+      image_url: imageUrl,
+    });
+  }, [uploadedImage, originalImage, enhanceLight, setOriginalImage]);
+
+  // Update canvas with light-enhanced image and enable comparison
+  useEffect(() => {
+    if (lightEnhancedImageUrl) {
+      logger.info('[Canvas] Natural light enhanced, updating canvas');
+      queueMicrotask(() => {
+        setUploadedImage(lightEnhancedImageUrl);
+        setViewMode('side-by-side');
+        toastManager.success(
+          '✅ Natural lighting added! Compare with original.'
+        );
+      });
+    }
+  }, [lightEnhancedImageUrl, setUploadedImage, setViewMode]);
+
+  // Show error toast if natural light fails
+  useEffect(() => {
+    if (naturalLightError) {
+      logger.error('[Canvas] Natural light failed:', naturalLightError);
+      toastManager.error(`❌ Natural light failed: ${naturalLightError}`);
+    }
+  }, [naturalLightError]);
+
+  // Handle 360° turntable video generation
+  const handleTurntableVideo = useCallback(async () => {
+    if (!uploadedImage) {
+      toastManager.warning('No image to create video from');
+      return;
+    }
+
+    logger.info('[Canvas] Starting turntable video generation:', uploadedImage);
+
+    // Convert blob URL to data URI if needed
+    let imageUrl = uploadedImage;
+    if (uploadedImage.startsWith('blob:')) {
+      logger.info(
+        '[Canvas] Converting blob URL to data URI for turntable video'
+      );
+      try {
+        const response = await fetch(uploadedImage);
+        const blob = await response.blob();
+        imageUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        logger.info('[Canvas] Blob converted to data URI successfully');
+      } catch (error) {
+        logger.error('[Canvas] Failed to convert blob to data URI:', error);
+        toastManager.error('Failed to prepare image for video generation');
+        return;
+      }
+    }
+
+    generateTurntableVideo({
+      image_url: imageUrl,
+    });
+  }, [uploadedImage, generateTurntableVideo]);
+
+  // Show turntable video when ready
+  useEffect(() => {
+    if (turntableVideoUrl) {
+      logger.info('[Canvas] Turntable video ready:', turntableVideoUrl);
+      // Open video in modal (reuse existing VideoPlayerModal)
+      setCurrentVideoUrl(turntableVideoUrl);
+      setShowVideoModal(true);
+      toastManager.success('✅ 360° turntable video ready!');
+    }
+  }, [turntableVideoUrl]);
+
+  // Show error toast if turntable video fails
+  useEffect(() => {
+    if (turntableVideoError) {
+      logger.error('[Canvas] Turntable video failed:', turntableVideoError);
+      toastManager.error(`❌ Turntable video failed: ${turntableVideoError}`);
+    }
+  }, [turntableVideoError]);
+
   // Preset generation
   const handlePresetGeneration = useCallback(
-    (prompt: string) => {
+    (prompt: string, aspectRatio?: string) => {
       if (!uploadedImage) {
-        showToast('Please upload an image first', 'warning');
+        toastManager.warning('Please upload an image first');
         return;
       }
 
@@ -190,9 +945,17 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       editWithAI({
         image_url: uploadedImage,
         prompt,
+        aspect_ratio: aspectRatio as
+          | '1:1'
+          | '4:5'
+          | '3:4'
+          | '2:3'
+          | '9:16'
+          | '16:9'
+          | undefined,
       });
     },
-    [uploadedImage, editWithAI, showToast]
+    [uploadedImage, editWithAI]
   );
 
   // Expose generation handler via callback
@@ -201,14 +964,20 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       // Store reference for external trigger
       (
         window as Window & {
-          __canvasPresetHandler?: (prompt: string) => void;
+          __canvasPresetHandler?: (
+            prompt: string,
+            aspectRatio?: string
+          ) => void;
         }
       ).__canvasPresetHandler = handlePresetGeneration;
     }
     return () => {
       delete (
         window as Window & {
-          __canvasPresetHandler?: (prompt: string) => void;
+          __canvasPresetHandler?: (
+            prompt: string,
+            aspectRatio?: string
+          ) => void;
         }
       ).__canvasPresetHandler;
     };
@@ -248,6 +1017,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     colorFilters,
     filterEffects,
     transform,
+    resetFilters, // 🎯 CRITICAL: Pass resetFilters to handlers
     viewMode,
     activeImage,
     leftImageScale,
@@ -258,7 +1028,6 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     setRightImageScale,
     setLeftImagePosition,
     setRightImagePosition,
-    showToast,
     openRight,
   });
 
@@ -267,11 +1036,32 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     setIsAIImageLoading(false);
   }, []);
 
-  // Handle AI image load error
+  // Handle AI image load error (with debounce to prevent infinite loop)
+  const errorTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastErrorUrlRef = useRef<string>('');
+
   const handleAIImageError = useCallback(() => {
-    setIsAIImageLoading(false);
-    showToast('Failed to load generated image', 'error');
-  }, [showToast]);
+    // Prevent duplicate errors for the same URL (blob URL cleanup causes this)
+    if (uploadedImage && uploadedImage === lastErrorUrlRef.current) {
+      return; // Skip duplicate error for same URL
+    }
+
+    // Clear previous timeout
+    if (errorTimeoutRef.current) {
+      clearTimeout(errorTimeoutRef.current);
+    }
+
+    // Debounce error handling to prevent infinite loop
+    errorTimeoutRef.current = setTimeout(() => {
+      setIsAIImageLoading(false);
+      lastErrorUrlRef.current = uploadedImage || '';
+
+      // Only show error if it's not a blob URL issue (revoked)
+      if (uploadedImage && !uploadedImage.startsWith('blob:')) {
+        toastManager.error('Failed to load generated image');
+      }
+    }, 500); // 500ms debounce
+  }, [uploadedImage]);
 
   // Sync comparison states when switching view modes
   useEffect(() => {
@@ -343,7 +1133,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
           resetTransform();
           resetFilters();
 
-          showToast('Image loaded from gallery!', 'success');
+          toastManager.success('Image loaded from gallery!');
 
           // Clear query params
           router.replace('/studio', { scroll: false });
@@ -366,7 +1156,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
                   resetTransform();
                   resetFilters();
 
-                  showToast('Image loaded from gallery!', 'success');
+                  toastManager.success('Image loaded from gallery!');
 
                   // Clear query params
                   router.replace('/studio', { scroll: false });
@@ -374,20 +1164,20 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
               };
               reader.onerror = () => {
                 setIsLoading(false);
-                showToast('Failed to load image from gallery', 'error');
+                toastManager.error('Failed to load image from gallery');
                 router.replace('/studio', { scroll: false });
               };
               reader.readAsDataURL(blob);
             })
             .catch(() => {
               setIsLoading(false);
-              showToast('Failed to fetch image from gallery', 'error');
+              toastManager.error('Failed to fetch image from gallery');
               router.replace('/studio', { scroll: false });
             });
         }
       } catch (error) {
         logger.error('Failed to load image from gallery:', error);
-        showToast('Failed to load image from gallery', 'error');
+        toastManager.error('Failed to load image from gallery');
         setIsLoading(false);
         router.replace('/studio', { scroll: false });
       }
@@ -402,7 +1192,6 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     setFileSize,
     resetTransform,
     resetFilters,
-    showToast,
   ]);
 
   // ============================================================================
@@ -652,7 +1441,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
         });
       } catch (error) {
         logger.error('[Canvas] AI generation failed:', error);
-        showToast('Failed to generate image', 'error');
+        toastManager.error('Failed to generate image');
 
         // Refund credit if generation failed AFTER deduction
         if (creditDeducted) {
@@ -674,14 +1463,14 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
             // Refresh credits after refund
             const { fetchCredits } = useCreditStore.getState();
             await fetchCredits();
-            showToast('Credit refunded due to generation failure', 'info');
+            toastManager.info('Credit refunded due to generation failure');
           } catch (refundError) {
             logger.error('[Canvas] Failed to refund credit:', refundError);
           }
         }
       }
     },
-    [credits, creditsLoading, deductCredit, editWithAI, showToast]
+    [deductCredit, editWithAI]
   );
 
   useEffect(() => {
@@ -701,6 +1490,15 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       setPosition({ x: 0, y: 0 });
     }
   }, [viewMode, uploadedImage, setScale, setPosition]);
+
+  // Cleanup on unmount - prevent memory leaks from error timeout
+  useEffect(() => {
+    return () => {
+      if (errorTimeoutRef.current) {
+        clearTimeout(errorTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const allBarsOpen = leftOpen && rightOpen && topOpen && bottomOpen;
 
@@ -795,11 +1593,6 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
         filterEffects={filterEffects}
         background={background}
         canvasControlsVisible={canvasControlsVisible}
-        isPromptExpanded={isPromptExpanded}
-        leftOpen={leftOpen}
-        rightOpen={rightOpen}
-        topOpen={topOpen}
-        bottomOpen={bottomOpen}
         leftPos={leftPos}
         rightPos={rightPos}
         topPos={topPos}
@@ -835,7 +1628,6 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
           controlsVisible={canvasControlsVisible}
           isFullscreen={isFullscreen}
           isEditPanelOpen={isEditPanelOpen}
-          isPromptExpanded={isPromptExpanded}
           background={background}
           onZoomIn={handleZoomIn}
           onZoomOut={handleZoomOut}
@@ -851,9 +1643,11 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
           onBackgroundChange={setBackground}
           onViewModeChange={setViewMode}
           onImageEdited={(url) => setUploadedImage(url)}
-          onAIError={(error) => showToast(error.message, 'error')}
+          onAIError={(error) => toastManager.error(error.message)}
           onPromptExpandedChange={setIsPromptExpanded}
           currentImageUrl={uploadedImage || ''}
+          onGenerateVideo={handleGenerateVideo}
+          isGeneratingVideo={isGeneratingVideo}
         />
       )}
 
@@ -865,9 +1659,41 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
         onImageUpdate={setUploadedImage}
         onOriginalImageSet={setOriginalImage}
         onLoadingChange={setIsAIImageLoading}
-        onSuccess={(msg) => showToast(msg, 'success')}
-        onError={(msg) => showToast(msg, 'error')}
+        onSuccess={(msg) => toastManager.success(msg)}
+        onError={(msg) => toastManager.error(msg)}
       />
+
+      {/* ===================================================================
+          Quick Actions Bar - All Image Operations
+          ================================================================= */}
+      {uploadedImage && canvasControlsVisible && (
+        <QuickActionsBar
+          onUpscale={handleUpscale}
+          isUpscaling={isUpscaling}
+          onRemoveBackground={handleRemoveBackground}
+          isRemovingBackground={isRemovingBackground}
+          onRotateLeft={handleRotateLeft}
+          isRotatingLeft={isRotatingLeft}
+          onRotateRight={handleRotateRight}
+          isRotatingRight={isRotatingRight}
+          onCloseUp={handleCloseUp}
+          isClosingUp={isClosingUp}
+          onGemstoneEnhance={handleGemstoneEnhance}
+          isEnhancingGemstones={isEnhancingGemstones}
+          onMetalRecolor={handleMetalRecolor}
+          isRecoloringMetal={isRecoloringMetal}
+          onMetalPolish={handleMetalPolish}
+          isPolishingMetal={isPolishingMetal}
+          onNaturalLight={handleNaturalLight}
+          isEnhancingLight={isEnhancingLight}
+          onTurntableVideo={handleTurntableVideo}
+          isGeneratingTurntable={isGeneratingTurntable}
+          hasActiveImage={!!uploadedImage}
+          isRightSidebarOpen={rightOpen}
+          isTopBarOpen={topOpen}
+          controlsVisible={canvasControlsVisible}
+        />
+      )}
 
       {/* ===================================================================
           REFACTORED: Canvas Modals - All Modal Components
@@ -931,14 +1757,22 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
         isLoading={isLoading}
       />
 
-      {/* Toast Notifications (managed by useToast hook) */}
-      {toastState.visible && (
-        <Toast
-          message={toastState.message}
-          type={toastState.type}
-          onClose={hideToast}
+      {/* Video Generating Modal */}
+      <VideoGeneratingModal isVisible={isGeneratingVideo} error={videoError} />
+
+      {/* Video Player Modal */}
+      {showVideoModal && (videoUrl || currentVideoUrl) && (
+        <VideoPlayerModal
+          videoUrl={currentVideoUrl || videoUrl || ''}
+          onClose={() => {
+            setShowVideoModal(false);
+            setCurrentVideoUrl(null);
+            if (videoUrl) resetVideo();
+          }}
         />
       )}
+
+      {/* Toast Notifications - Now displayed in BottomBar */}
     </>
   );
 }
