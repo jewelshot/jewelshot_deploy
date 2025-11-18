@@ -15,6 +15,7 @@ interface BatchImageGridProps {
   images: BatchImage[];
   onRemove: (id: string) => void;
   onClearAll: () => void;
+  onImageClick?: (id: string, preview: string) => void;
 }
 
 /**
@@ -24,6 +25,7 @@ export function BatchImageGrid({
   images,
   onRemove,
   onClearAll,
+  onImageClick,
 }: BatchImageGridProps) {
   if (images.length === 0) {
     return (
@@ -65,6 +67,7 @@ export function BatchImageGrid({
             status={image.status}
             progress={image.progress}
             onRemove={onRemove}
+            onClick={onImageClick}
           />
         ))}
       </div>

@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import AuroraBackground from '@/components/atoms/AuroraBackground';
 import { BatchContent } from '@/components/organisms/BatchContent';
 import { BatchProcessingModal } from '@/components/organisms/BatchProcessingModal';
 import type { BatchImage } from '@/components/molecules/BatchImageGrid';
 import { saveBatchProject, type BatchProject } from '@/lib/batch-storage';
+import { useSidebarStore } from '@/store/sidebarStore';
 import { toast } from 'sonner';
 
 // Dynamic imports matching Studio page
@@ -36,12 +38,41 @@ const BottomBarToggle = dynamic(
  * BatchPage - Batch processing page with Studio layout
  */
 export function BatchPage() {
+  const router = useRouter();
+  const { setRightOpen } = useSidebarStore();
   const [images, setImages] = useState<BatchImage[]>([]);
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
   const [batchName, setBatchName] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+
+  // Auto-expand right sidebar when images are uploaded
+  useEffect(() => {
+    if (images.length > 0) {
+      setRightOpen(true);
+    }
+  }, [images.length, setRightOpen]);
+
+  // Handle image click - Open in Studio
+  const handleImageClick = useCallback(
+    (id: string, preview: string) => {
+      const image = images.find((img) => img.id === id);
+      if (!image) return;
+
+      // Use result if available, otherwise use preview
+      const imageUrl = image.result || preview;
+      const imageName = image.file.name;
+
+      const params = new URLSearchParams({
+        imageUrl,
+        imageName,
+      });
+
+      router.push(`/studio?${params.toString()}`);
+    },
+    [images, router]
+  );
 
   // Handle file selection
   const handleFilesSelected = useCallback((files: File[]) => {
@@ -220,6 +251,7 @@ export function BatchPage() {
         disabled={isProcessing}
         batchName={batchName}
         onBatchNameChange={setBatchName}
+        onImageClick={handleImageClick}
       />
 
       {/* Processing Modal */}

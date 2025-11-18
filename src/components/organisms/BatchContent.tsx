@@ -14,6 +14,7 @@ interface BatchContentProps {
   disabled?: boolean;
   batchName?: string;
   onBatchNameChange?: (name: string) => void;
+  onImageClick?: (id: string, preview: string) => void;
 }
 
 /**
@@ -28,6 +29,7 @@ export function BatchContent({
   disabled = false,
   batchName,
   onBatchNameChange,
+  onImageClick,
 }: BatchContentProps) {
   const { leftOpen, rightOpen, topOpen, bottomOpen } = useSidebarStore();
 
@@ -80,6 +82,7 @@ export function BatchContent({
             images={images}
             onRemove={onRemoveImage}
             onClearAll={onClearAll}
+            onImageClick={onImageClick}
           />
         </div>
       </div>

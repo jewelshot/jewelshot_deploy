@@ -1,4 +1,4 @@
-import { X } from 'lucide-react';
+import { X, Check } from 'lucide-react';
 import Image from 'next/image';
 
 interface BatchImageCardProps {
@@ -8,6 +8,7 @@ interface BatchImageCardProps {
   status: 'pending' | 'processing' | 'completed' | 'failed';
   progress?: number;
   onRemove: (id: string) => void;
+  onClick?: (id: string, preview: string) => void;
 }
 
 /**
@@ -20,6 +21,7 @@ export function BatchImageCard({
   status,
   progress = 0,
   onRemove,
+  onClick,
 }: BatchImageCardProps) {
   const statusColors = {
     pending: 'border-white/10',
@@ -41,9 +43,14 @@ export function BatchImageCard({
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
+  const isClickable = status === 'completed';
+
   return (
     <div
-      className={`group relative overflow-hidden rounded-lg border ${statusColors[status]} bg-white/[0.02] transition-all duration-200`}
+      className={`group relative overflow-hidden rounded-lg border ${statusColors[status]} bg-white/[0.02] transition-all duration-200 ${
+        isClickable ? 'cursor-pointer hover:border-green-500/70 hover:bg-green-500/10' : ''
+      }`}
+      onClick={() => isClickable && onClick?.(id, preview)}
     >
       {/* Preview Image */}
       <div className="relative aspect-square w-full overflow-hidden bg-black/20">
@@ -55,10 +62,13 @@ export function BatchImageCard({
           unoptimized
         />
 
-        {/* Remove Button */}
+        {/* Remove Button - Only for pending */}
         {status === 'pending' && (
           <button
-            onClick={() => onRemove(id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove(id);
+            }}
             className="absolute right-1 top-1 rounded-md bg-black/60 p-1 opacity-0 backdrop-blur-sm transition-opacity hover:bg-black/80 group-hover:opacity-100"
             aria-label="Remove image"
           >
@@ -66,23 +76,25 @@ export function BatchImageCard({
           </button>
         )}
 
-        {/* Status Icon */}
-        <div className="absolute left-1 top-1 flex h-6 w-6 items-center justify-center rounded-md bg-black/60 backdrop-blur-sm">
-          <span className="text-xs">{statusIcons[status]}</span>
-        </div>
+        {/* Status Icon - Only for non-completed */}
+        {status !== 'completed' && (
+          <div className="absolute left-1 top-1 flex h-6 w-6 items-center justify-center rounded-md bg-black/60 backdrop-blur-sm">
+            <span className="text-xs">{statusIcons[status]}</span>
+          </div>
+        )}
 
-        {/* Processing Progress */}
-        {status === 'processing' && (
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/40">
-            <div
-              className="h-full bg-blue-500 transition-all duration-300"
-              style={{ width: `${progress}%` }}
-            />
+        {/* Completed Badge - Bottom right corner */}
+        {status === 'completed' && (
+          <div className="absolute bottom-1 right-1 flex items-center gap-1 rounded-md bg-green-500/90 px-1.5 py-0.5 backdrop-blur-sm">
+            <Check className="h-3 w-3 text-white" />
+            <span className="text-[8px] font-medium text-white">
+              {formatSize(file.size)}
+            </span>
           </div>
         )}
       </div>
 
-      {/* File Info */}
+      {/* File Info - Always visible but different for pending/processing */}
       <div className="p-1.5">
         <p
           className="truncate text-[9px] text-white/60"
@@ -90,7 +102,21 @@ export function BatchImageCard({
         >
           {file.name}
         </p>
-        <p className="text-[8px] text-white/40">{formatSize(file.size)}</p>
+        
+        {/* Mini Progress Bar - Only for processing */}
+        {status === 'processing' && (
+          <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-white/10">
+            <div
+              className="h-full bg-green-500 transition-all duration-300"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        )}
+        
+        {/* File size for non-completed states */}
+        {status !== 'completed' && (
+          <p className="text-[8px] text-white/40">{formatSize(file.size)}</p>
+        )}
       </div>
     </div>
   );
