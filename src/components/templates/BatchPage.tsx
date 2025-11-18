@@ -7,7 +7,6 @@ import AuroraBackground from '@/components/atoms/AuroraBackground';
 import { BatchContent } from '@/components/organisms/BatchContent';
 import { BatchConfirmModal } from '@/components/molecules/BatchConfirmModal';
 import type { BatchImage } from '@/components/molecules/BatchImageGrid';
-import { saveBatchProject, type BatchProject } from '@/lib/batch-storage';
 import { useSidebarStore } from '@/store/sidebarStore';
 import { useCreditStore } from '@/store/creditStore';
 import { toast } from 'sonner';
@@ -177,6 +176,34 @@ export function BatchPage() {
     // Capture current prompt (closure issue fix)
     const currentBatchPrompt = batchPrompt || 'enhance the image quality and details';
 
+    // 1. Create batch project in Supabase
+    let batchProjectId: string | null = null;
+    try {
+      const response = await fetch('/api/batch/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: batchName || `Batch ${new Date().toLocaleString()}`,
+          totalImages: images.length,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create batch project');
+      }
+
+      const data = await response.json();
+      batchProjectId = data.project.id;
+      
+      toast.success('Batch project created! Processing images...');
+      console.log('[Batch] Project created:', batchProjectId);
+    } catch (error) {
+      console.error('[Batch] Failed to create project:', error);
+      toast.error('Failed to create batch project');
+      setIsProcessing(false);
+      return;
+    }
+
     // Process images one by one
     for (let i = 0; i < images.length; i++) {
       const image = images[i];
@@ -269,6 +296,26 @@ export function BatchPage() {
           )
         );
 
+        // 2. Save completed image to Supabase
+        if (batchProjectId) {
+          try {
+            await fetch(`/api/batch/${batchProjectId}/image`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                originalFilename: image.file.name,
+                originalSize: image.file.size,
+                resultUrl: editedImageUrl,
+                status: 'completed',
+              }),
+            });
+            console.log('[Batch] Image saved to DB:', image.file.name);
+          } catch (dbError) {
+            console.error('[Batch] Failed to save image to DB:', dbError);
+            // Don't fail the whole batch, just log it
+          }
+        }
+
         toast.success(`${image.file.name} processed successfully`);
       } catch (error) {
         console.error(`Failed to process ${image.file.name}:`, error);
@@ -277,6 +324,7 @@ export function BatchPage() {
         clearInterval(progressInterval);
 
         // Mark as failed
+        const errorMessage = error instanceof Error ? error.message : 'Processing failed';
         setImages((prev) =>
           prev.map((img) =>
             img.id === imageId
@@ -284,43 +332,50 @@ export function BatchPage() {
                   ...img,
                   status: 'failed',
                   progress: 0,
-                  error: error instanceof Error ? error.message : 'Processing failed',
+                  error: errorMessage,
                 }
               : img
           )
         );
 
+        // Save failed image to Supabase
+        if (batchProjectId) {
+          try {
+            await fetch(`/api/batch/${batchProjectId}/image`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                originalFilename: image.file.name,
+                originalSize: image.file.size,
+                status: 'failed',
+                errorMessage,
+              }),
+            });
+            console.log('[Batch] Failed image saved to DB:', image.file.name);
+          } catch (dbError) {
+            console.error('[Batch] Failed to save failed image to DB:', dbError);
+          }
+        }
+
         toast.error(`Failed to process ${image.file.name}`);
       }
     }
 
-    // Batch processing complete - save to Gallery
-    const completedImages = images.filter((img) => img.status === 'completed');
+    // Batch processing complete
+    const completedCount = images.filter((img) => img.status === 'completed').length;
+    const failedCount = images.filter((img) => img.status === 'failed').length;
     
-    if (completedImages.length > 0) {
-      try {
-        const batchProject: BatchProject = {
-          id: crypto.randomUUID(),
-          name: batchName || `Batch ${new Date().toLocaleDateString()}`,
-          createdAt: new Date(),
-          imageCount: completedImages.length,
-          thumbnail: completedImages[0].result,
-          images: completedImages.map((img) => ({
-            id: img.id,
-            originalFile: img.file.name,
-            originalPreview: img.preview,
-            result: img.result || img.preview,
-            status: 'completed',
-          })),
-        };
-
-        await saveBatchProject(batchProject);
-        toast.success(`Batch saved! ${completedImages.length} images processed.`);
-      } catch (error) {
-        console.error('Failed to save batch project:', error);
-        toast.error('Failed to save batch project');
-      }
-    }
+    toast.success(
+      `Batch complete! ${completedCount} successful, ${failedCount} failed.`,
+      { duration: 5000 }
+    );
+    
+    console.log('[Batch] Processing complete', {
+      total: images.length,
+      completed: completedCount,
+      failed: failedCount,
+      projectId: batchProjectId,
+    });
 
     // Refresh credits after batch completes
     fetchCredits();
