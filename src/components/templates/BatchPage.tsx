@@ -9,6 +9,7 @@ import { BatchProcessingModal } from '@/components/organisms/BatchProcessingModa
 import { BatchConfirmModal } from '@/components/molecules/BatchConfirmModal';
 import type { BatchImage } from '@/components/molecules/BatchImageGrid';
 import { saveBatchProject, type BatchProject } from '@/lib/batch-storage';
+import { useSidebarStore } from '@/store/sidebarStore';
 import { useCreditStore } from '@/store/creditStore';
 import { toast } from 'sonner';
 
@@ -55,6 +56,7 @@ async function blobUrlToDataUri(blobUrl: string): Promise<string> {
  */
 export function BatchPage() {
   const router = useRouter();
+  const { openRight } = useSidebarStore();
   const { credits, fetchCredits } = useCreditStore();
   const [images, setImages] = useState<BatchImage[]>([]);
   const [batchPrompt, setBatchPrompt] = useState('');
@@ -68,6 +70,13 @@ export function BatchPage() {
   useEffect(() => {
     fetchCredits();
   }, [fetchCredits]);
+
+  // Auto-expand right sidebar when images are uploaded
+  useEffect(() => {
+    if (images.length > 0) {
+      openRight();
+    }
+  }, [images.length, openRight]);
 
   // Handle image click - Open in Studio
   const handleImageClick = useCallback(
@@ -119,7 +128,7 @@ export function BatchPage() {
     setBatchPrompt('');
   }, [images]);
 
-  // Handle generate from prompt control
+  // Handle generate from prompt control OR preset from RightSidebar
   const handleGenerate = useCallback((prompt: string) => {
     if (images.length === 0) {
       toast.error('Please upload images first');
@@ -135,6 +144,14 @@ export function BatchPage() {
     setBatchPrompt(prompt);
     setShowConfirmModal(true);
   }, [images, credits]);
+
+  // Handle preset from RightSidebar
+  const handleGenerateWithPreset = useCallback(
+    (prompt: string, aspectRatio?: string) => {
+      handleGenerate(prompt);
+    },
+    [handleGenerate]
+  );
 
   // Handle confirm batch processing
   const handleConfirmBatch = useCallback(async () => {
@@ -280,11 +297,9 @@ export function BatchPage() {
       <Sidebar />
       <SidebarToggle />
 
-      {/* Right Sidebar - Hidden for batch, using prompt control instead */}
-      <div className="hidden">
-        <RightSidebar onGenerateWithPreset={() => {}} />
-        <RightSidebarToggle />
-      </div>
+      {/* Right Sidebar - Preset selection */}
+      <RightSidebar onGenerateWithPreset={handleGenerateWithPreset} />
+      <RightSidebarToggle />
 
       {/* Bottom Bar */}
       <BottomBar />
