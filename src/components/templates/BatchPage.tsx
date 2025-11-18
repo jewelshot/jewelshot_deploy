@@ -233,9 +233,9 @@ export function BatchPage() {
       try {
         // Deduct credit for this image
         const { deductCredit } = useCreditStore.getState();
-        const deductResult = await deductCredit(1, 'AI Batch Generation');
-        if (!deductResult.success) {
-          throw new Error(deductResult.error || 'Failed to deduct credit');
+        const success = await deductCredit({ prompt: batchPrompt });
+        if (!success) {
+          throw new Error('Failed to deduct credit - insufficient balance');
         }
         fetchCredits(); // Refresh credits
         
