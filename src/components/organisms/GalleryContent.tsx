@@ -332,6 +332,49 @@ export function GalleryContent() {
     }
   };
 
+  const handleStartRename = (project: BatchProject) => {
+    setEditingProjectId(project.id);
+    setEditingName(project.name);
+  };
+
+  const handleCancelRename = () => {
+    setEditingProjectId(null);
+    setEditingName('');
+  };
+
+  const handleSaveRename = async (projectId: string) => {
+    if (!editingName.trim()) {
+      toast.error('Name cannot be empty');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/batch/${projectId}/name`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: editingName.trim() }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to rename batch project');
+      }
+
+      // Update local state
+      setBatchProjects((prev) =>
+        prev.map((p) =>
+          p.id === projectId ? { ...p, name: editingName.trim() } : p
+        )
+      );
+
+      toast.success('Batch renamed');
+      setEditingProjectId(null);
+      setEditingName('');
+    } catch (error) {
+      logger.error('Failed to rename batch:', error);
+      toast.error('Failed to rename batch');
+    }
+  };
+
   return (
     <div
       className="fixed z-10 flex h-full flex-col gap-6 overflow-y-auto p-6 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
@@ -467,18 +510,16 @@ export function GalleryContent() {
                         onChange={(e) => setEditingName(e.target.value)}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
-                            handleRenameBatch(project.id, editingName);
+                            handleSaveRename(project.id);
                           } else if (e.key === 'Escape') {
-                            setEditingProjectId(null);
-                            setEditingName('');
+                            handleCancelRename();
                           }
                         }}
                         onBlur={() => {
                           if (editingName.trim() && editingName !== project.name) {
-                            handleRenameBatch(project.id, editingName);
+                            handleSaveRename(project.id);
                           } else {
-                            setEditingProjectId(null);
-                            setEditingName('');
+                            handleCancelRename();
                           }
                         }}
                         autoFocus
@@ -489,8 +530,7 @@ export function GalleryContent() {
                         className="mb-1 cursor-pointer truncate text-sm font-medium text-white transition-colors hover:text-purple-400"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setEditingProjectId(project.id);
-                          setEditingName(project.name);
+                          handleStartRename(project);
                         }}
                         title="Click to rename"
                       >
