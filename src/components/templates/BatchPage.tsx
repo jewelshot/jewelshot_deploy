@@ -379,12 +379,14 @@ export function BatchPage() {
         );
       }, 1000); // Update every second
 
+      // Track original URL at higher scope (needed for both success and fail cases)
+      let originalUrl: string | null = null;
+
       try {
         // Convert blob URL to data URI
         const imageDataUri = await blobUrlToDataUri(image.preview);
 
         // 1. Upload original image to Supabase (for Before/After comparison)
-        let originalUrl: string | null = null;
         try {
           originalUrl = await uploadOriginalToSupabase(imageDataUri, image.file.name);
           console.log('[Batch] Original uploaded:', originalUrl.substring(0, 50));
