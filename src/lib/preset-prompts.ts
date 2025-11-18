@@ -485,10 +485,12 @@ OUTPUT: Editorial minimalist still life. Aspect ratio ${aspectRatio}. Soft paste
             '⛔ JEWELRY 100% FROZEN UNCHANGED ⛔ EXACT: gemstone count|position|size|cut chain-links|thickness pendant-shape|dimensions metal-finish|texture setting-prongs|clasp engravings ALL-PIXEL-IDENTICAL ⚠️ 0.01% change = FAIL ⚠️ ONLY lighting|shadows|angle MAY change PRODUCT SACRED LOCKED',
           closeup:
             'ULTRA MACRO 25-40cm decollete-chest-only face-HEAD-OUT-FRAME cropped-above-shoulders necklace-DOMINATES-65-75%-frame HUGE-prominent frontal-centered product-HERO straight-0deg',
+          clothing:
+            'LIGHT casual V-neck open-collar blouse delicate thin-fabric nude cream beige light-pink subtle-pattern simple-daily-wear decollete-VISIBLE necklace-touches-SKIN NOT-fully-covered elegant-casual soft-drape minimal-details',
           forbidden:
-            '❌ FAIL: added|removed|moved|altered gemstones|chain|pendant|metal design-change structure-modification distortion warped blur soft-focus face-visible eyes-nose-mouth wide-shot jewelry-small floating flat-2D oversized miniature mannequin-look',
+            '❌ FAIL: added|removed|moved|altered gemstones|chain|pendant|metal design-change structure-modification distortion warped blur soft-focus face-visible eyes-nose-mouth wide-shot jewelry-small floating flat-2D oversized miniature mannequin-look naked-bare turtleneck high-collar fully-covered heavy-fabric',
           place:
-            'chain-ON-skin neck-curve pendant-TOUCH-chest 3D-wrap gravity-drape 16-20inch-chain 10-25mm-pendant LIFE-SIZE proportional NOT-oversized',
+            'chain-ON-skin neck-curve pendant-TOUCH-chest decollete-exposed 3D-wrap gravity-drape 16-20inch-chain 10-25mm-pendant LIFE-SIZE proportional NOT-oversized',
           light:
             'soft 45deg 5500K even flattering NO-harsh-shadows clean studio',
           bg: 'neutral cream RGB(248,245,242) seamless minimal uncluttered',
