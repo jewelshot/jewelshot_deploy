@@ -280,6 +280,12 @@ export function BatchPage() {
 
         const editedImageUrl = data.images[0].url;
 
+        console.log('[Batch] Image completed:', {
+          filename: image.file.name,
+          originalPreview: image.preview.substring(0, 50),
+          generatedUrl: editedImageUrl.substring(0, 50),
+        });
+
         // Stop progress simulation
         clearInterval(progressInterval);
 

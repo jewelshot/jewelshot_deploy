@@ -23,6 +23,15 @@ export function BatchImageCard({
   onRemove,
   onClick,
 }: BatchImageCardProps) {
+  // Debug: Log when thumbnail updates
+  if (status === 'completed') {
+    console.log('[BatchImageCard] Completed image:', {
+      filename: file.name,
+      preview: preview.substring(0, 50),
+      isGenerated: preview.startsWith('https://'),
+    });
+  }
+
   const statusColors = {
     pending: 'border-white/10',
     processing: 'border-blue-500/50 bg-blue-500/5',
@@ -55,6 +64,7 @@ export function BatchImageCard({
       {/* Preview Image */}
       <div className="relative aspect-square w-full overflow-hidden bg-black/20">
         <Image
+          key={preview}
           src={preview}
           alt={file.name}
           fill
