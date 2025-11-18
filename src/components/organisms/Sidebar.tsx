@@ -23,6 +23,7 @@ import {
   Home,
   Palette,
   Image,
+  Layers,
 } from 'lucide-react';
 
 // Tools section (Coming Soon - All tools are integrated in Studio)
@@ -81,6 +82,12 @@ export function Sidebar() {
       icon: Palette,
       label: 'Studio',
       href: '/studio',
+      badge: { variant: 'new' as const },
+    },
+    {
+      icon: Layers,
+      label: 'Batch',
+      href: '/batch',
       badge: { variant: 'new' as const },
     },
     {
