@@ -49,7 +49,10 @@ export async function POST(
       );
     }
 
-    if (project.user_id !== user.id) {
+    // Type assertion for project data
+    const typedProject = project as { id: string; user_id: string };
+
+    if (typedProject.user_id !== user.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
