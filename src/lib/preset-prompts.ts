@@ -479,23 +479,34 @@ OUTPUT: Editorial minimalist still life. Aspect ratio ${aspectRatio}. Soft paste
       // Special handling for Women Necklace - Ultra Close-Up
       if (type === 'necklace' && genderText.toLowerCase() === 'women') {
         return JSON.stringify({
-          subject:
-            'necklace jewelry woman decollete EXTREME CLOSE-UP macro commercial',
+          scene:
+            'professional on-model necklace photography product-focused commercial',
           preserve:
-            '⛔ JEWELRY 100% FROZEN UNCHANGED ⛔ EXACT: gemstone count|position|size|cut chain-links|thickness pendant-shape|dimensions metal-finish|texture setting-prongs|clasp engravings ALL-PIXEL-IDENTICAL ⚠️ 0.01% change = FAIL ⚠️ ONLY lighting|shadows|angle MAY change PRODUCT SACRED LOCKED',
-          closeup:
-            'ULTRA MACRO 25-40cm decollete-chest-only face-HEAD-OUT-FRAME cropped-above-shoulders necklace-DOMINATES-65-75%-frame HUGE-prominent frontal-centered product-HERO straight-0deg',
+            '⛔ JEWELRY 100% FROZEN UNCHANGED ⛔ EXACT: gemstone count|position|size|cut chain-links|thickness pendant-shape|dimensions metal-finish|texture setting-prongs|clasp engravings ALL-PIXEL-IDENTICAL ⚠️ 0.01% change = FAIL ⚠️',
+          camera: 'FRONTAL straight-on eye-level fixed stable macro-lens',
+          frame:
+            'EXTREME CLOSE-UP chest-neck ONLY face-STRICTLY-FORBIDDEN cropped-at-chin-line cropped-above-chest jewelry-dominant-70-80%',
+          face_rule:
+            'ABSOLUTE: NO-face NO-eyes NO-nose NO-mouth NO-chin NO-jawline ONLY-neck-chest STRICTLY-enforced',
+          focus:
+            'f/2.8-f/4 RAZOR-SHARP jewelry-zone crisp-details micro-details background-bokeh',
+          skin: 'NATURAL visible-pores texture slight-imperfections warm-tone realistic authentic neck-collarbones-visible',
           clothing:
-            'LIGHT casual V-neck open-collar blouse delicate thin-fabric nude cream beige light-pink PLAIN solid-color simple-daily-wear decollete-VISIBLE necklace-touches-SKIN NOT-fully-covered elegant-casual soft-drape NO-pattern NO-print',
-          forbidden:
-            '❌ FAIL: added|removed|moved|altered gemstones|chain|pendant|metal design-change structure-modification distortion warped blur soft-focus face-visible eyes-nose-mouth wide-shot jewelry-small floating flat-2D oversized miniature mannequin-look naked-bare turtleneck high-collar fully-covered heavy-fabric',
-          place:
-            'chain-ON-skin neck-curve pendant-TOUCH-chest decollete-exposed 3D-wrap gravity-drape 16-20inch-chain 10-25mm-pendant LIFE-SIZE proportional NOT-oversized',
+            'olive sage khaki blazer open-collar V-neck relaxed-fit matte-fabric casual-elegant',
+          neckline:
+            'WIDE-OPEN deep-V full-neck-exposed jewelry-centered unobstructed clear',
+          jewelry_zone:
+            'neck-center chest-upper natural-drape touches-skin perfectly-visible',
           light:
-            'soft 45deg 5500K even flattering NO-harsh-shadows clean studio',
-          bg: 'neutral cream RGB(248,245,242) seamless minimal uncluttered',
-          tech: 'f/4-5.6 jewelry-ULTRA-SHARP 300DPI razor-focus skin-smooth bokeh-bg',
-          style: 'e-commerce catalog product-hero closeup commercial pristine',
+            'SOFT diffused 4500-5000K warm natural even gentle-shadows flattering',
+          colors: 'warm earth olive sage cream skin harmonious muted',
+          bg: 'soft-blur neutral warm minimal clean',
+          skin_tone: 'natural warm medium olive realistic',
+          forbidden:
+            '❌ CRITICAL: face-ANY-part head eyes nose mouth chin jawline added|removed|moved|altered gemstones design-change harsh-light cold-tones patterns high-collar jewelry-changes',
+          tech: 'ULTRA-SHARP 300DPI professional crisp macro',
+          place:
+            'jewelry-placement-zone-centered skin-contact maintained natural-drape',
           out: `${aspectRatio} ultra-closeup jewelry-dominant professional`,
         });
       }
