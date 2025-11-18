@@ -186,7 +186,7 @@ export function BatchPage() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            imageUrl: imageDataUri,
+            image_url: imageDataUri, // ✅ API expects image_url (not imageUrl)
             prompt: batchPrompt || '',
           }),
         });
@@ -197,9 +197,12 @@ export function BatchPage() {
 
         const data = await response.json();
 
-        if (!data.success || !data.editedImageUrl) {
-          throw new Error(data.error || 'Failed to process image');
+        // FAL.AI returns: { images: [{ url, width, height }] }
+        if (!data.images || !Array.isArray(data.images) || data.images.length === 0) {
+          throw new Error(data.error || 'No images returned from API');
         }
+
+        const editedImageUrl = data.images[0].url;
 
         // Update to completed with result
         setImages((prev) =>
@@ -209,7 +212,7 @@ export function BatchPage() {
                   ...img,
                   status: 'completed',
                   progress: 100,
-                  result: data.editedImageUrl,
+                  result: editedImageUrl,
                 }
               : img
           )
