@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import AuroraBackground from '@/components/atoms/AuroraBackground';
 import { BatchContent } from '@/components/organisms/BatchContent';
-import { BatchProcessingModal } from '@/components/organisms/BatchProcessingModal';
 import { BatchConfirmModal } from '@/components/molecules/BatchConfirmModal';
 import type { BatchImage } from '@/components/molecules/BatchImageGrid';
 import { saveBatchProject, type BatchProject } from '@/lib/batch-storage';
@@ -54,6 +53,8 @@ async function blobUrlToDataUri(blobUrl: string): Promise<string> {
 /**
  * BatchPage - Batch processing page with Studio layout
  */
+const BATCH_STORAGE_KEY = 'jewelshot_batch_state';
+
 export function BatchPage() {
   const router = useRouter();
   const { openRight } = useSidebarStore();
@@ -62,9 +63,39 @@ export function BatchPage() {
   const [batchPrompt, setBatchPrompt] = useState('');
   const [batchName, setBatchName] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showPromptInModal, setShowPromptInModal] = useState(true); // Hide preset prompts
+
+  // Restore batch state from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem(BATCH_STORAGE_KEY);
+    if (stored) {
+      try {
+        const state = JSON.parse(stored);
+        setImages(state.images || []);
+        setBatchPrompt(state.batchPrompt || '');
+        setBatchName(state.batchName || '');
+        setIsProcessing(state.isProcessing || false);
+      } catch (error) {
+        console.error('Failed to restore batch state:', error);
+      }
+    }
+  }, []);
+
+  // Save batch state to localStorage whenever it changes
+  useEffect(() => {
+    if (images.length > 0 || isProcessing) {
+      localStorage.setItem(
+        BATCH_STORAGE_KEY,
+        JSON.stringify({
+          images,
+          batchPrompt,
+          batchName,
+          isProcessing,
+        })
+      );
+    }
+  }, [images, batchPrompt, batchName, isProcessing]);
 
   // Fetch credits on mount
   useEffect(() => {
@@ -128,7 +159,7 @@ export function BatchPage() {
     setBatchPrompt('');
   }, [images]);
 
-  // Handle generate from prompt control OR preset from RightSidebar
+  // Handle generate from prompt control (custom prompt - show in modal)
   const handleGenerate = useCallback((prompt: string) => {
     if (images.length === 0) {
       toast.error('Please upload images first');
@@ -142,31 +173,38 @@ export function BatchPage() {
     }
 
     setBatchPrompt(prompt);
+    setShowPromptInModal(true); // Show custom prompt
     setShowConfirmModal(true);
   }, [images, credits]);
 
-  // Handle preset from RightSidebar
+  // Handle preset from RightSidebar (hide prompt in modal)
   const handleGenerateWithPreset = useCallback(
     (prompt: string, aspectRatio?: string) => {
-      handleGenerate(prompt);
+      if (images.length === 0) {
+        toast.error('Please upload images first');
+        return;
+      }
+
+      // Check credits
+      if (credits < images.length) {
+        toast.error(`Insufficient credits. You need ${images.length} credits, but have ${credits}.`);
+        return;
+      }
+
+      setBatchPrompt(prompt);
+      setShowPromptInModal(false); // Hide preset prompt
+      setShowConfirmModal(true);
     },
-    [handleGenerate]
+    [images, credits]
   );
 
   // Handle confirm batch processing
   const handleConfirmBatch = useCallback(async () => {
     setShowConfirmModal(false);
     setIsProcessing(true);
-    setIsPaused(false);
-    setIsMinimized(false);
 
     // Process images one by one
     for (let i = 0; i < images.length; i++) {
-      // Check for pause
-      while (isPaused) {
-        await new Promise((resolve) => setTimeout(resolve, 100));
-      }
-
       const image = images[i];
       const imageId = image.id;
 
@@ -177,7 +215,30 @@ export function BatchPage() {
         )
       );
 
+      // Start progress simulation (40 seconds to reach ~95%)
+      const progressInterval = setInterval(() => {
+        setImages((prev) =>
+          prev.map((img) => {
+            if (img.id === imageId && img.status === 'processing') {
+              const currentProgress = img.progress || 0;
+              // Increment by ~2.4% each second to reach 95% in ~40s
+              const newProgress = Math.min(currentProgress + 2.4, 95);
+              return { ...img, progress: newProgress };
+            }
+            return img;
+          })
+        );
+      }, 1000); // Update every second
+
       try {
+        // Deduct credit for this image
+        const { deductCredit } = useCreditStore.getState();
+        const deductResult = await deductCredit(1, 'AI Batch Generation');
+        if (!deductResult.success) {
+          throw new Error(deductResult.error || 'Failed to deduct credit');
+        }
+        fetchCredits(); // Refresh credits
+        
         // Convert blob URL to data URI
         const imageDataUri = await blobUrlToDataUri(image.preview);
 
@@ -204,7 +265,10 @@ export function BatchPage() {
 
         const editedImageUrl = data.images[0].url;
 
-        // Update to completed with result
+        // Stop progress simulation
+        clearInterval(progressInterval);
+
+        // Update to completed with result (progress = 100%)
         setImages((prev) =>
           prev.map((img) =>
             img.id === imageId
@@ -222,6 +286,9 @@ export function BatchPage() {
       } catch (error) {
         console.error(`Failed to process ${image.file.name}:`, error);
         
+        // Stop progress simulation
+        clearInterval(progressInterval);
+
         // Mark as failed
         setImages((prev) =>
           prev.map((img) =>
@@ -268,24 +335,11 @@ export function BatchPage() {
       }
     }
 
+    // Clear localStorage after successful batch
+    localStorage.removeItem(BATCH_STORAGE_KEY);
+    
     setIsProcessing(false);
-  }, [images, batchPrompt, batchName, isPaused]);
-
-  // Handle pause/resume
-  const handleTogglePause = useCallback(() => {
-    setIsPaused((prev) => !prev);
-  }, []);
-
-  // Handle cancel batch
-  const handleCancelBatch = useCallback(() => {
-    setIsProcessing(false);
-    setIsPaused(false);
-    setIsMinimized(false);
-  }, []);
-
-  const processingStarted = images.some(
-    (img) => img.status === 'processing' || img.status === 'completed'
-  );
+  }, [images, batchPrompt, batchName, fetchCredits]);
 
   return (
     <>
@@ -328,22 +382,8 @@ export function BatchPage() {
         onConfirm={handleConfirmBatch}
         onCancel={() => setShowConfirmModal(false)}
         imageCount={images.length}
-        prompt={batchPrompt}
+        prompt={showPromptInModal ? batchPrompt : undefined}
       />
-
-      {/* Processing Modal */}
-      {processingStarted && (
-        <BatchProcessingModal
-          images={images}
-          isMinimized={isMinimized}
-          isPaused={isPaused}
-          onMinimize={() => setIsMinimized(true)}
-          onMaximize={() => setIsMinimized(false)}
-          onTogglePause={handleTogglePause}
-          onCancel={handleCancelBatch}
-          canCancel={!isProcessing || images.every(img => img.status !== 'processing')}
-        />
-      )}
     </>
   );
 }

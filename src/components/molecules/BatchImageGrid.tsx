@@ -63,7 +63,7 @@ export function BatchImageGrid({
             key={image.id}
             id={image.id}
             file={image.file}
-            preview={image.preview}
+            preview={image.result || image.preview}
             status={image.status}
             progress={image.progress}
             onRemove={onRemove}

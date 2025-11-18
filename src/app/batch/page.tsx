@@ -13,3 +13,4 @@ export default function Batch() {
   return <BatchPage />;
 }
 
+
