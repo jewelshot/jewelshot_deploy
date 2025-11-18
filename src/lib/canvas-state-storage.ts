@@ -6,6 +6,11 @@
  */
 
 import { createScopedLogger } from './logger';
+import type { 
+  AdjustFilters, 
+  ColorFilters, 
+  FilterEffects 
+} from '@/hooks/useImageFilters';
 
 const logger = createScopedLogger('CanvasState');
 
@@ -26,9 +31,9 @@ export interface CanvasState {
   flipHorizontal: boolean;
   flipVertical: boolean;
   // Filters
-  adjustFilters: Record<string, number>;
-  colorFilters: Record<string, number>;
-  filterEffects: Record<string, boolean>;
+  adjustFilters: AdjustFilters;
+  colorFilters: ColorFilters;
+  filterEffects: FilterEffects;
   // Background
   background: string;
 }
@@ -57,9 +62,32 @@ export function saveCanvasState(state: Partial<CanvasState>): void {
       rotation: state.rotation || 0,
       flipHorizontal: state.flipHorizontal || false,
       flipVertical: state.flipVertical || false,
-      adjustFilters: state.adjustFilters || {},
-      colorFilters: state.colorFilters || {},
-      filterEffects: state.filterEffects || {},
+      adjustFilters: state.adjustFilters || {
+        brightness: 0,
+        contrast: 0,
+        exposure: 0,
+        highlights: 0,
+        shadows: 0,
+        whites: 0,
+        blacks: 0,
+        clarity: 0,
+        sharpness: 0,
+        dehaze: 0,
+      },
+      colorFilters: state.colorFilters || {
+        temperature: 0,
+        tint: 0,
+        saturation: 0,
+        vibrance: 0,
+      },
+      filterEffects: state.filterEffects || {
+        vignetteAmount: 0,
+        vignetteSize: 50,
+        vignetteFeather: 50,
+        grainAmount: 0,
+        grainSize: 1,
+        fadeAmount: 0,
+      },
       background: state.background || 'gradient',
     };
 
