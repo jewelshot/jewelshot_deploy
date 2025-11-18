@@ -11,6 +11,7 @@ import type {
   ColorFilters, 
   FilterEffects 
 } from '@/hooks/useImageFilters';
+import type { BackgroundType } from '@/components/molecules/BackgroundSelector';
 
 const logger = createScopedLogger('CanvasState');
 
@@ -35,7 +36,7 @@ export interface CanvasState {
   colorFilters: ColorFilters;
   filterEffects: FilterEffects;
   // Background
-  background: string;
+  background: BackgroundType;
 }
 
 /**
@@ -88,7 +89,7 @@ export function saveCanvasState(state: Partial<CanvasState>): void {
         grainSize: 1,
         fadeAmount: 0,
       },
-      background: state.background || 'gradient',
+      background: state.background || 'gray', // Default background
     };
 
     localStorage.setItem(CANVAS_STATE_KEY, JSON.stringify(fullState));
