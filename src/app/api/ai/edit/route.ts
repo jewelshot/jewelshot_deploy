@@ -266,7 +266,10 @@ export async function POST(request: NextRequest) {
     logger.info('[Edit] Image prepared:', uploadedUrl.substring(0, 50));
 
     // Call FAL.AI Edit API
-    logger.info('[Edit] Calling Fal.ai nano-banana/edit API...');
+    logger.info('[Edit] Calling Fal.ai nano-banana/edit API...', {
+      aspectRatio: aspect_ratio || 'auto',
+      prompt: prompt.substring(0, 50),
+    });
     let result;
     try {
       result = await fal.subscribe('fal-ai/nano-banana/edit', {
@@ -275,7 +278,7 @@ export async function POST(request: NextRequest) {
           image_urls: [uploadedUrl],
           num_images: num_images ?? 1,
           output_format: output_format ?? 'jpeg',
-          aspect_ratio: aspect_ratio ?? '1:1',
+          aspect_ratio: aspect_ratio || 'auto', // Use 'auto' as default (Nano Banana default)
         },
         logs: true,
         onQueueUpdate: (update) => {

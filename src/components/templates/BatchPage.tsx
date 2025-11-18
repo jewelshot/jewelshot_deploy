@@ -60,7 +60,7 @@ export function BatchPage() {
   const [batchPrompt, setBatchPrompt] = useState('');
   const [batchName, setBatchName] = useState('');
   const [presetName, setPresetName] = useState(''); // Store preset name (not prompt)
-  const [aspectRatio, setAspectRatio] = useState<string>(''); // Required aspect ratio
+  const [aspectRatio, setAspectRatio] = useState<string>('auto'); // Default to 'auto' (Nano Banana recommended)
   const [isProcessing, setIsProcessing] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isCustomPrompt, setIsCustomPrompt] = useState(false); // Track if user typed custom prompt
@@ -130,19 +130,13 @@ export function BatchPage() {
     setImages([]);
     setBatchPrompt('');
     setPresetName('');
-    setAspectRatio('');
+    // Keep aspect ratio selection (user preference)
   }, [images]);
 
   // Handle generate from prompt control (custom prompt - show in modal)
   const handleGenerate = useCallback((prompt: string) => {
     if (images.length === 0) {
       toast.error('Please upload images first');
-      return;
-    }
-
-    // Aspect ratio is required
-    if (!aspectRatio) {
-      toast.error('Please select an aspect ratio first');
       return;
     }
 
@@ -156,19 +150,13 @@ export function BatchPage() {
     setPresetName(''); // Clear preset name
     setIsCustomPrompt(true); // Mark as custom prompt
     setShowConfirmModal(true);
-  }, [images, credits, aspectRatio]);
+  }, [images, credits]);
 
   // Handle preset from RightSidebar (show preset name, not prompt)
   const handleGenerateWithPreset = useCallback(
     (prompt: string, ratio?: string, name?: string) => {
       if (images.length === 0) {
         toast.error('Please upload images first');
-        return;
-      }
-
-      // Aspect ratio is required
-      if (!ratio && !aspectRatio) {
-        toast.error('Please select an aspect ratio first');
         return;
       }
 
@@ -184,7 +172,7 @@ export function BatchPage() {
       if (ratio) setAspectRatio(ratio); // Use preset's aspect ratio if provided
       setShowConfirmModal(true);
     },
-    [images, credits, aspectRatio]
+    [images, credits]
   );
 
   // Handle confirm batch processing
@@ -282,6 +270,7 @@ export function BatchPage() {
               imageSize: imageDataUri.length,
               promptLength: currentBatchPrompt.length,
               prompt: currentBatchPrompt.substring(0, 100),
+              aspectRatio: aspectRatio || 'auto',
             });
 
             response = await fetch('/api/ai/edit', {
@@ -290,7 +279,7 @@ export function BatchPage() {
               body: JSON.stringify({
                 image_url: imageDataUri,
                 prompt: currentBatchPrompt,
-                aspect_ratio: aspectRatio || '1:1', // Send aspect ratio to nano banana
+                aspect_ratio: aspectRatio || 'auto', // Send aspect ratio to nano banana (default: auto)
               }),
             });
 

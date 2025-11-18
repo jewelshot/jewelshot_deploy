@@ -42,13 +42,17 @@ export function BatchContent({
 }: BatchContentProps) {
   const { leftOpen, rightOpen, topOpen, bottomOpen } = useSidebarStore();
 
-  // Nano Banana supported aspect ratios
+  // Nano Banana supported aspect ratios (from official API guide)
   const aspectRatios = [
+    { value: 'auto', label: 'Auto (Recommended)' },
     { value: '1:1', label: 'Square (1:1)' },
-    { value: '16:9', label: 'Landscape (16:9)' },
-    { value: '9:16', label: 'Portrait (9:16)' },
+    { value: '16:9', label: 'Landscape Wide (16:9)' },
+    { value: '9:16', label: 'Portrait Tall (9:16)' },
+    { value: '21:9', label: 'Ultrawide (21:9)' },
     { value: '4:3', label: 'Standard (4:3)' },
     { value: '3:4', label: 'Portrait (3:4)' },
+    { value: '3:2', label: 'Classic (3:2)' },
+    { value: '2:3', label: 'Portrait Classic (2:3)' },
   ];
 
   return (
@@ -79,19 +83,14 @@ export function BatchContent({
                   {/* Aspect Ratio Selector */}
                   <div className="flex flex-col gap-1">
                     <label className="text-xs text-white/60">
-                      Aspect Ratio <span className="text-red-400">*</span>
+                      Aspect Ratio
                     </label>
                     <select
                       value={aspectRatio}
                       onChange={(e) => onAspectRatioChange?.(e.target.value)}
-                      className={`rounded-lg border px-4 py-2 text-sm text-white focus:outline-none focus:ring-1 ${
-                        aspectRatio
-                          ? 'border-white/10 bg-white/[0.02] focus:border-purple-500/50 focus:ring-purple-500/50'
-                          : 'border-red-500/50 bg-red-500/5 focus:border-red-500 focus:ring-red-500/50'
-                      }`}
+                      className="rounded-lg border border-white/10 bg-white/[0.02] px-4 py-2 text-sm text-white focus:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
                       disabled={disabled}
                     >
-                      <option value="">Select ratio...</option>
                       {aspectRatios.map((ratio) => (
                         <option key={ratio.value} value={ratio.value}>
                           {ratio.label}

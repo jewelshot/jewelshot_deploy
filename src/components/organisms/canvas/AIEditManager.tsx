@@ -93,7 +93,7 @@ export default function AIEditManager({
   // Listen for AI edit generation events from AIEditControl
   useEffect(() => {
     const handleAIEditGenerate = (event: CustomEvent) => {
-      const { prompt, imageUrl } = event.detail;
+      const { prompt, imageUrl, aspectRatio } = event.detail;
       if (imageUrl) {
         // Save original image before AI editing
         onOriginalImageSet(imageUrl);
@@ -104,6 +104,7 @@ export default function AIEditManager({
           image_url: imageUrl,
           num_images: 1,
           output_format: 'jpeg',
+          aspect_ratio: aspectRatio || 'auto', // Use aspect ratio from event or default to 'auto'
         });
       }
     };

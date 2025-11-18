@@ -27,6 +27,7 @@ export function AIEditControl({
 }: AIEditControlProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [prompt, setPrompt] = useState('');
+  const [aspectRatio, setAspectRatio] = useState('auto'); // Default to 'auto' (Nano Banana recommended)
 
   // Auto-collapse expanded area when AI starts processing
   const shouldShowExpanded = isExpanded && !isEditing;
@@ -51,7 +52,11 @@ export function AIEditControl({
     }
 
     const event = new CustomEvent('ai-edit-generate', {
-      detail: { prompt: trimmedPrompt || '', imageUrl: currentImageUrl },
+      detail: { 
+        prompt: trimmedPrompt || '', 
+        imageUrl: currentImageUrl,
+        aspectRatio: aspectRatio || 'auto', // Include aspect ratio
+      },
     });
     window.dispatchEvent(event);
   };
@@ -61,12 +66,29 @@ export function AIEditControl({
 
     // Directly trigger generation without showing prompt in textarea
     const event = new CustomEvent('ai-edit-generate', {
-      detail: { prompt: promptText, imageUrl: currentImageUrl },
+      detail: { 
+        prompt: promptText, 
+        imageUrl: currentImageUrl,
+        aspectRatio: aspectRatio || 'auto', // Include aspect ratio
+      },
     });
     window.dispatchEvent(event);
   };
 
   if (!visible) return null;
+
+  // Nano Banana supported aspect ratios (from official API guide)
+  const aspectRatios = [
+    { value: 'auto', label: 'Auto (Recommended)' },
+    { value: '1:1', label: 'Square (1:1)' },
+    { value: '16:9', label: 'Landscape Wide (16:9)' },
+    { value: '9:16', label: 'Portrait Tall (9:16)' },
+    { value: '21:9', label: 'Ultrawide (21:9)' },
+    { value: '4:3', label: 'Standard (4:3)' },
+    { value: '3:4', label: 'Portrait (3:4)' },
+    { value: '3:2', label: 'Classic (3:2)' },
+    { value: '2:3', label: 'Portrait Classic (2:3)' },
+  ];
 
   return (
     <div className="flex flex-col items-center gap-2">
@@ -80,6 +102,25 @@ export function AIEditControl({
       >
         {/* Scrollable container with max-height */}
         <div className="max-h-[400px] space-y-2 overflow-y-auto">
+          {/* Aspect Ratio Selector */}
+          <div className="w-full">
+            <label className="mb-1 block text-xs text-white/60">
+              Aspect Ratio
+            </label>
+            <select
+              value={aspectRatio}
+              onChange={(e) => setAspectRatio(e.target.value)}
+              className="w-full rounded-lg border border-white/10 bg-white/[0.02] px-4 py-2 text-sm text-white focus:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
+              disabled={isEditing}
+            >
+              {aspectRatios.map((ratio) => (
+                <option key={ratio.value} value={ratio.value}>
+                  {ratio.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* Prompt Input */}
           <AIPromptInput
             value={prompt}
