@@ -88,9 +88,37 @@ export function GalleryContent() {
       setImages(saved);
       setIsLoading(false);
 
-      // Update cache for next time
-      sessionStorage.setItem('jewelshot_gallery_cache', JSON.stringify(saved));
-      logger.info('✅ Gallery cache updated');
+      // Update cache for next time (with size limit to prevent QuotaExceededError)
+      try {
+        // Limit cache to first 50 images (oldest pruned)
+        const cacheData = saved.slice(0, 50);
+        const cacheString = JSON.stringify(cacheData);
+        const sizeInMB = new Blob([cacheString]).size / 1024 / 1024;
+
+        // Only cache if under 5MB (sessionStorage limit)
+        if (sizeInMB < 5) {
+          sessionStorage.setItem('jewelshot_gallery_cache', cacheString);
+          logger.info('✅ Gallery cache updated', {
+            imageCount: cacheData.length,
+            sizeMB: sizeInMB.toFixed(2),
+          });
+        } else {
+          logger.warn('⚠️ Gallery cache too large, skipping', {
+            sizeMB: sizeInMB.toFixed(2),
+          });
+          sessionStorage.removeItem('jewelshot_gallery_cache');
+        }
+      } catch (error) {
+        if (
+          error instanceof DOMException &&
+          error.name === 'QuotaExceededError'
+        ) {
+          logger.error('❌ sessionStorage quota exceeded, clearing cache');
+          sessionStorage.removeItem('jewelshot_gallery_cache');
+        } else {
+          logger.error('Failed to update gallery cache:', error);
+        }
+      }
     };
 
     loadImages();

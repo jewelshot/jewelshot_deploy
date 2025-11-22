@@ -19,6 +19,7 @@ import { useNaturalLight } from '@/hooks/useNaturalLight';
 import { useTurntableVideo } from '@/hooks/useTurntableVideo';
 import { useCameraControl } from '@/hooks/useCameraControl';
 import { useCanvasHandlers } from '@/hooks/useCanvasHandlers';
+import { useCanvasHistory } from '@/hooks/useCanvasHistory';
 import { createScopedLogger } from '@/lib/logger';
 import { saveImageToGallery } from '@/lib/gallery-storage';
 import { toastManager } from '@/lib/toast-manager';
@@ -110,6 +111,16 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     setIsCropMode,
     resetCropState,
   } = useCanvasUI();
+
+  // Canvas History for Undo/Redo/Reset
+  const {
+    pushHistory,
+    undo,
+    redo,
+    reset: resetHistory,
+    canUndo,
+    canRedo,
+  } = useCanvasHistory();
 
   // Canvas-specific UI state (not extracted)
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -1036,6 +1047,151 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
     openRight,
   });
 
+  // ===================================================================
+  // CANVAS HISTORY - Undo/Redo/Reset Handlers
+  // ===================================================================
+
+  /**
+   * Handle Undo - Restore previous canvas state
+   */
+  const handleUndo = useCallback(() => {
+    const previousState = undo();
+    if (!previousState) {
+      logger.warn('Cannot undo: No previous state');
+      return;
+    }
+
+    logger.info('⬅️ Undoing to previous state');
+
+    // Restore all canvas state
+    setUploadedImage(previousState.uploadedImage);
+    setScale(previousState.scale);
+    setPosition(previousState.position);
+    setTransform({
+      rotation: previousState.rotation,
+      flipHorizontal: previousState.flipHorizontal,
+      flipVertical: previousState.flipVertical,
+    });
+    setAdjustFilters(previousState.adjustFilters);
+    setColorFilters(previousState.colorFilters);
+    setFilterEffects(previousState.filterEffects);
+    setBackground(previousState.background as 'gray' | 'white' | 'black');
+
+    toastManager.success('Undone');
+  }, [
+    undo,
+    setUploadedImage,
+    setScale,
+    setPosition,
+    setTransform,
+    setAdjustFilters,
+    setColorFilters,
+    setFilterEffects,
+    setBackground,
+  ]);
+
+  /**
+   * Handle Redo - Restore next canvas state
+   */
+  const handleRedo = useCallback(() => {
+    const nextState = redo();
+    if (!nextState) {
+      logger.warn('Cannot redo: No next state');
+      return;
+    }
+
+    logger.info('➡️ Redoing to next state');
+
+    // Restore all canvas state
+    setUploadedImage(nextState.uploadedImage);
+    setScale(nextState.scale);
+    setPosition(nextState.position);
+    setTransform({
+      rotation: nextState.rotation,
+      flipHorizontal: nextState.flipHorizontal,
+      flipVertical: nextState.flipVertical,
+    });
+    setAdjustFilters(nextState.adjustFilters);
+    setColorFilters(nextState.colorFilters);
+    setFilterEffects(nextState.filterEffects);
+    setBackground(nextState.background as 'gray' | 'white' | 'black');
+
+    toastManager.success('Redone');
+  }, [
+    redo,
+    setUploadedImage,
+    setScale,
+    setPosition,
+    setTransform,
+    setAdjustFilters,
+    setColorFilters,
+    setFilterEffects,
+    setBackground,
+  ]);
+
+  /**
+   * Handle Reset - Clear entire canvas history and state
+   */
+  const handleReset = useCallback(() => {
+    logger.info('🔄 Resetting canvas history');
+
+    resetHistory();
+    resetFilters();
+    resetTransform();
+    resetCropState();
+    setScale(1);
+    setPosition({ x: 0, y: 0 });
+    setBackground('gray');
+
+    toastManager.success('Canvas reset');
+  }, [
+    resetHistory,
+    resetFilters,
+    resetTransform,
+    resetCropState,
+    setScale,
+    setPosition,
+    setBackground,
+  ]);
+
+  /**
+   * 📚 AUTO-SAVE CANVAS STATE TO HISTORY
+   * Push to history on every significant change (debounced 500ms)
+   */
+  useEffect(() => {
+    // Don't push if no image uploaded
+    if (!uploadedImage) return;
+
+    // Debounce to avoid excessive history pushes
+    const timeoutId = setTimeout(() => {
+      pushHistory({
+        uploadedImage,
+        scale,
+        position,
+        rotation: transform.rotation,
+        flipHorizontal: transform.flipHorizontal,
+        flipVertical: transform.flipVertical,
+        adjustFilters,
+        colorFilters,
+        filterEffects,
+        background,
+        timestamp: Date.now(),
+      });
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [
+    uploadedImage,
+    scale,
+    position,
+    transform,
+    adjustFilters,
+    colorFilters,
+    filterEffects,
+    background,
+    pushHistory,
+  ]);
+
   // Handle AI image load complete
   const handleAIImageLoad = useCallback(() => {
     setIsAIImageLoading(false);
@@ -1848,6 +2004,11 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
           });
         }}
         isLoading={isLoading}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
+        onReset={handleReset}
+        canUndo={canUndo}
+        canRedo={canRedo}
       />
 
       {/* Video Generating Modal */}

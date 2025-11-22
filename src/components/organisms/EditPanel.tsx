@@ -7,6 +7,9 @@ import {
   Minus,
   RectangleHorizontal,
   Maximize2,
+  Undo2,
+  Redo2,
+  RotateCcw,
 } from 'lucide-react';
 import TabList from '@/components/molecules/TabList';
 import CropPanel from '@/components/molecules/CropPanel';
@@ -73,6 +76,26 @@ interface EditPanelProps {
    * Filter change handler
    */
   onFilterChange?: (filters: FilterEffects) => void;
+  /**
+   * Undo handler
+   */
+  onUndo?: () => void;
+  /**
+   * Redo handler
+   */
+  onRedo?: () => void;
+  /**
+   * Reset handler
+   */
+  onReset?: () => void;
+  /**
+   * Can undo state
+   */
+  canUndo?: boolean;
+  /**
+   * Can redo state
+   */
+  canRedo?: boolean;
 }
 
 const tabs = [
@@ -97,6 +120,11 @@ export function EditPanel({
   onAdjustChange,
   onColorChange,
   onFilterChange,
+  onUndo,
+  onRedo,
+  onReset,
+  canUndo = false,
+  canRedo = false,
 }: EditPanelProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState(initialPosition);
@@ -245,6 +273,60 @@ export function EditPanel({
           </div>
 
           <div className="pointer-events-auto flex items-center gap-1">
+            {/* Undo Button */}
+            {onUndo && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onUndo();
+                }}
+                disabled={!canUndo}
+                className="flex h-6 w-6 items-center justify-center rounded-md text-white/60 transition-all hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white/60"
+                aria-label="Undo"
+                title="Undo (Ctrl+Z)"
+              >
+                <Undo2 className="h-3.5 w-3.5" />
+              </button>
+            )}
+
+            {/* Redo Button */}
+            {onRedo && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRedo();
+                }}
+                disabled={!canRedo}
+                className="flex h-6 w-6 items-center justify-center rounded-md text-white/60 transition-all hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-white/60"
+                aria-label="Redo"
+                title="Redo (Ctrl+Shift+Z)"
+              >
+                <Redo2 className="h-3.5 w-3.5" />
+              </button>
+            )}
+
+            {/* Reset Button */}
+            {onReset && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (confirm('Reset all changes? This cannot be undone.')) {
+                    onReset();
+                  }
+                }}
+                className="flex h-6 w-6 items-center justify-center rounded-md text-white/60 transition-all hover:bg-white/10 hover:text-white"
+                aria-label="Reset"
+                title="Reset All Changes"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+              </button>
+            )}
+
+            {/* Divider */}
+            {(onUndo || onRedo || onReset) && (
+              <div className="mx-1 h-4 w-px bg-white/20" />
+            )}
+
             {/* Bar Mode Toggle */}
             <button
               onClick={(e) => {

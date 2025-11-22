@@ -215,3 +215,5 @@ export function BatchDetailModal({
 
 export default BatchDetailModal;
 
+
+

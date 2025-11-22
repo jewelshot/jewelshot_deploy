@@ -67,6 +67,13 @@ export interface CanvasModalsProps {
   
   // Loading state (for edit panel)
   isLoading: boolean;
+
+  // History controls
+  onUndo?: () => void;
+  onRedo?: () => void;
+  onReset?: () => void;
+  canUndo?: boolean;
+  canRedo?: boolean;
 }
 
 /**
@@ -94,6 +101,11 @@ export default function CanvasModals({
   filterEffects,
   onFilterEffectsChange,
   isLoading,
+  onUndo,
+  onRedo,
+  onReset,
+  canUndo,
+  canRedo,
 }: CanvasModalsProps) {
   
   return (
@@ -166,6 +178,11 @@ export default function CanvasModals({
               fadeAmount: filterData.fadeAmount || 0,
             });
           }}
+          onUndo={onUndo}
+          onRedo={onRedo}
+          onReset={onReset}
+          canUndo={canUndo}
+          canRedo={canRedo}
         />
       )}
     </>
