@@ -1063,19 +1063,39 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
 
     logger.info('⬅️ Undoing to previous state');
 
-    // Restore all canvas state
-    setUploadedImage(previousState.uploadedImage);
-    setScale(previousState.scale);
-    setPosition(previousState.position);
-    setTransform({
-      rotation: previousState.rotation,
-      flipHorizontal: previousState.flipHorizontal,
-      flipVertical: previousState.flipVertical,
-    });
-    setAdjustFilters(previousState.adjustFilters);
-    setColorFilters(previousState.colorFilters);
-    setFilterEffects(previousState.filterEffects);
-    setBackground(previousState.background as 'gray' | 'white' | 'black');
+    // Restore all canvas state (with null safety)
+    if (previousState.uploadedImage !== undefined) {
+      setUploadedImage(previousState.uploadedImage);
+    }
+    if (previousState.scale !== undefined) {
+      setScale(previousState.scale);
+    }
+    if (previousState.position !== undefined) {
+      setPosition(previousState.position);
+    }
+    if (
+      previousState.rotation !== undefined &&
+      previousState.flipHorizontal !== undefined &&
+      previousState.flipVertical !== undefined
+    ) {
+      setTransform({
+        rotation: previousState.rotation,
+        flipHorizontal: previousState.flipHorizontal,
+        flipVertical: previousState.flipVertical,
+      });
+    }
+    if (previousState.adjustFilters) {
+      setAdjustFilters(previousState.adjustFilters);
+    }
+    if (previousState.colorFilters) {
+      setColorFilters(previousState.colorFilters);
+    }
+    if (previousState.filterEffects) {
+      setFilterEffects(previousState.filterEffects);
+    }
+    if (previousState.background) {
+      setBackground(previousState.background as 'gray' | 'white' | 'black');
+    }
 
     toastManager.success('Undone');
   }, [
@@ -1102,19 +1122,39 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
 
     logger.info('➡️ Redoing to next state');
 
-    // Restore all canvas state
-    setUploadedImage(nextState.uploadedImage);
-    setScale(nextState.scale);
-    setPosition(nextState.position);
-    setTransform({
-      rotation: nextState.rotation,
-      flipHorizontal: nextState.flipHorizontal,
-      flipVertical: nextState.flipVertical,
-    });
-    setAdjustFilters(nextState.adjustFilters);
-    setColorFilters(nextState.colorFilters);
-    setFilterEffects(nextState.filterEffects);
-    setBackground(nextState.background as 'gray' | 'white' | 'black');
+    // Restore all canvas state (with null safety)
+    if (nextState.uploadedImage !== undefined) {
+      setUploadedImage(nextState.uploadedImage);
+    }
+    if (nextState.scale !== undefined) {
+      setScale(nextState.scale);
+    }
+    if (nextState.position !== undefined) {
+      setPosition(nextState.position);
+    }
+    if (
+      nextState.rotation !== undefined &&
+      nextState.flipHorizontal !== undefined &&
+      nextState.flipVertical !== undefined
+    ) {
+      setTransform({
+        rotation: nextState.rotation,
+        flipHorizontal: nextState.flipHorizontal,
+        flipVertical: nextState.flipVertical,
+      });
+    }
+    if (nextState.adjustFilters) {
+      setAdjustFilters(nextState.adjustFilters);
+    }
+    if (nextState.colorFilters) {
+      setColorFilters(nextState.colorFilters);
+    }
+    if (nextState.filterEffects) {
+      setFilterEffects(nextState.filterEffects);
+    }
+    if (nextState.background) {
+      setBackground(nextState.background as 'gray' | 'white' | 'black');
+    }
 
     toastManager.success('Redone');
   }, [
@@ -1159,8 +1199,10 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
    * Push to history on every significant change (debounced 500ms)
    */
   useEffect(() => {
-    // Don't push if no image uploaded
-    if (!uploadedImage) return;
+    // Don't push if no image uploaded or filters not initialized
+    if (!uploadedImage || !adjustFilters || !colorFilters || !filterEffects) {
+      return;
+    }
 
     // Debounce to avoid excessive history pushes
     const timeoutId = setTimeout(() => {
