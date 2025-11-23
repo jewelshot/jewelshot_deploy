@@ -41,25 +41,15 @@ export async function GET() {
         // Ama eğer trigger çalışmadıysa, manuel kontrol et
         // RPC'yi dummy call ile tetikleyebiliriz (use_credit otomatik user oluşturur)
         try {
-          const { error: rpcError } = await (
-            supabase as {
-              rpc: (
-                name: string,
-                params: {
-                  p_user_id: string;
-                  p_description: string;
-                  p_metadata: Record<string, unknown>;
-                }
-              ) => Promise<{
-                data: unknown;
-                error: { message?: string } | null;
-              }>;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { error: rpcError } = await (supabase as any).rpc(
+            'use_credit',
+            {
+              p_user_id: user.id,
+              p_description: 'Initial credit check (auto-creation)',
+              p_metadata: { source: 'credit-check-fallback' },
             }
-          ).rpc('use_credit', {
-            p_user_id: user.id,
-            p_description: 'Initial credit check (auto-creation)',
-            p_metadata: { source: 'credit-check-fallback' },
-          });
+          );
 
           if (rpcError && rpcError.message?.includes('Insufficient')) {
             // User oluşturuldu ama 0 kredi - bu normal değil, trigger çalışmamış
