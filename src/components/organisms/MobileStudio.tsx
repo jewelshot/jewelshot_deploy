@@ -61,7 +61,7 @@ export function MobileStudio() {
   const progressTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Credit store
-  const { deductCredit, fetchCredits } = useCreditStore();
+  const { fetchCredits } = useCreditStore();
 
   // Fetch credits on mount
   useEffect(() => {
@@ -206,46 +206,18 @@ export function MobileStudio() {
     reader.readAsDataURL(file);
   };
 
+  // ✅ NO client-side credit deduction - API routes handle it automatically
   const handleStyleApply = useCallback(
     async (presetId: string) => {
       if (!image) return;
 
       setShowStyleSheet(false);
 
-      let creditDeducted = false;
-
       try {
-        // Try to deduct credit (but don't block if it fails)
-        const success = await deductCredit({
-          prompt: presetId,
-          style: presetId,
-        });
-
-        if (success) {
-          creditDeducted = true;
-          logger.info('[MobileStudio] Credit deducted successfully');
-        } else {
-          logger.warn(
-            '[MobileStudio] Credit deduction failed, continuing anyway'
-          );
-        }
-
         // Use the same preset prompts as desktop Quick Mode
         const preset = presetPrompts[presetId];
         if (!preset) {
           logger.error('[MobileStudio] Unknown preset:', presetId);
-          // Refund credit if preset invalid
-          logger.warn('[MobileStudio] Refunding credit due to invalid preset');
-          await fetch('/api/credits/add', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              amount: 1,
-              type: 'refund',
-              description: 'Refund: Invalid preset',
-              metadata: { presetId },
-            }),
-          });
           return;
         }
 
@@ -259,6 +231,7 @@ export function MobileStudio() {
           aspectRatio
         );
 
+        // Call AI API - credit check & deduction happens server-side
         await edit({
           image_url: image,
           prompt,
@@ -273,38 +246,10 @@ export function MobileStudio() {
         });
       } catch (error) {
         logger.error('[MobileStudio] Style application failed:', error);
-
-        // Refund credit if generation failed AFTER deduction
-        if (creditDeducted) {
-          logger.warn(
-            '[MobileStudio] Refunding credit due to generation failure'
-          );
-          try {
-            await fetch('/api/credits/add', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                amount: 1,
-                type: 'refund',
-                description: 'Refund: Generation failed',
-                metadata: {
-                  error: error instanceof Error ? error.message : 'Unknown',
-                  presetId,
-                },
-              }),
-            });
-            const { fetchCredits } = useCreditStore.getState();
-            await fetchCredits();
-          } catch (refundError) {
-            logger.error(
-              '[MobileStudio] Failed to refund credit:',
-              refundError
-            );
-          }
-        }
+        // Error already handled by edit hook
       }
     },
-    [image, deductCredit, edit, aspectRatio]
+    [image, edit, aspectRatio]
   );
 
   const handleDownload = () => {

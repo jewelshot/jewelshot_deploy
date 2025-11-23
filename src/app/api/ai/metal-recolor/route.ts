@@ -134,6 +134,43 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const userId = user.id;
+
+    // 💳 CREDIT CHECK (Before expensive AI operation)
+    const { data: creditData, error: creditError } = await supabase
+      .from('user_credits')
+      .select('credits_remaining')
+      .eq('user_id', userId)
+      .single();
+
+    if (creditError || !creditData) {
+      logger.error('[MetalRecolor] Failed to check credits', {
+        userId,
+        error: creditError?.message,
+      });
+      return NextResponse.json(
+        { error: 'Failed to check credits' },
+        { status: 500 }
+      );
+    }
+
+    const typedCreditData = creditData as { credits_remaining: number };
+
+    if (typedCreditData.credits_remaining < 1) {
+      logger.warn('[MetalRecolor] Insufficient credits', {
+        userId,
+        remaining: typedCreditData.credits_remaining,
+      });
+      return NextResponse.json(
+        {
+          error: 'Insufficient credits',
+          message: 'You need at least 1 credit to recolor metal.',
+          credits: typedCreditData.credits_remaining,
+        },
+        { status: 402 } // Payment Required
+      );
+    }
+
     // Parse request
     const body = await request.json();
     const { image_url, metal_type } = body;
@@ -237,6 +274,38 @@ export async function POST(request: NextRequest) {
         metal_type,
         request_id: result.requestId,
       });
+
+      // 💰 DEDUCT CREDIT (After successful AI operation)
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error: deductError } = await (supabase as any).rpc(
+          'use_credit',
+          {
+            p_user_id: userId,
+            p_description: 'AI Metal Recolor',
+            p_metadata: {
+              operation: 'metal-recolor',
+              metal_type,
+            },
+          }
+        );
+
+        if (deductError) {
+          logger.error('[MetalRecolor] Failed to deduct credit', {
+            userId,
+            error: deductError.message,
+          });
+        } else {
+          logger.info('[MetalRecolor] Credit deducted successfully', {
+            userId,
+          });
+        }
+      } catch (deductError) {
+        logger.error('[MetalRecolor] Credit deduction error', {
+          userId,
+          deductError,
+        });
+      }
     } catch (falError: unknown) {
       const error = falError as { message?: string };
       logger.error('[MetalRecolor] Fal.ai error:', error);

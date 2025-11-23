@@ -27,11 +27,7 @@ import { useCreditStore } from '@/store/creditStore';
 import { VideoPlayerModal } from '@/components/molecules/VideoPlayerModal';
 import { VideoGeneratingModal } from '@/components/molecules/VideoGeneratingModal';
 import { QuickActionsBar } from '@/components/molecules/QuickActionsBar';
-import { 
-  saveCanvasState, 
-  loadCanvasState, 
-  clearCanvasState 
-} from '@/lib/canvas-state-storage';
+import { saveCanvasState, loadCanvasState } from '@/lib/canvas-state-storage';
 
 const logger = createScopedLogger('Canvas');
 // New refactored components
@@ -138,7 +134,7 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
   // Toast notifications - now handled by toastManager in BottomBar
 
   // Credit store
-  const { deductCredit, fetchCredits } = useCreditStore();
+  const { fetchCredits } = useCreditStore();
 
   // Fetch credits on mount
   useEffect(() => {
@@ -1700,30 +1696,17 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
   ]);
 
   // Listen for AI edit generation events from AIEditControl
+  // ✅ NO client-side credit deduction - API routes handle it automatically
   const handleAIEditGenerate = useCallback(
     async (event: CustomEvent) => {
       const { prompt, imageUrl } = event.detail;
       if (!imageUrl) return;
 
-      let creditDeducted = false;
-
       try {
-        // Try to deduct credit (but don't block if it fails)
-        const success = await deductCredit({
-          prompt: prompt || 'enhance',
-          style: 'ai-edit',
-        });
-
-        if (success) {
-          creditDeducted = true;
-          logger.info('[Canvas] Credit deducted successfully');
-        } else {
-          logger.warn('[Canvas] Credit deduction failed, continuing anyway');
-        }
-
         // Save original image before AI editing
         setOriginalImage(imageUrl);
 
+        // Call AI API - credit check & deduction happens server-side
         editWithAI({
           prompt: prompt || 'enhance the image quality and lighting',
           image_url: imageUrl,
@@ -1733,35 +1716,9 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
       } catch (error) {
         logger.error('[Canvas] AI generation failed:', error);
         toastManager.error('Failed to generate image');
-
-        // Refund credit if generation failed AFTER deduction
-        if (creditDeducted) {
-          logger.warn('[Canvas] Refunding credit due to generation failure');
-          try {
-            await fetch('/api/credits/add', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                amount: 1,
-                type: 'refund',
-                description: 'Refund: AI generation failed',
-                metadata: {
-                  error: error instanceof Error ? error.message : 'Unknown',
-                  prompt: prompt || 'enhance',
-                },
-              }),
-            });
-            // Refresh credits after refund
-            const { fetchCredits } = useCreditStore.getState();
-            await fetchCredits();
-            toastManager.info('Credit refunded due to generation failure');
-          } catch (refundError) {
-            logger.error('[Canvas] Failed to refund credit:', refundError);
-          }
-        }
       }
     },
-    [deductCredit, editWithAI]
+    [editWithAI]
   );
 
   useEffect(() => {

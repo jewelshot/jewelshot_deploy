@@ -11,15 +11,11 @@ interface CreditState {
 
   // Actions
   fetchCredits: () => Promise<void>;
-  deductCredit: (metadata?: {
-    prompt?: string;
-    style?: string;
-  }) => Promise<boolean>;
   addCredits: (amount: number, type?: string) => Promise<boolean>;
   reset: () => void;
 }
 
-export const useCreditStore = create<CreditState>((set, get) => ({
+export const useCreditStore = create<CreditState>((set) => ({
   credits: 0,
   used: 0,
   totalPurchased: 0,
@@ -58,55 +54,9 @@ export const useCreditStore = create<CreditState>((set, get) => ({
     }
   },
 
-  /**
-   * Credit kullanır (AI generation öncesi)
-   * @returns true = başarılı, false = yetersiz credit
-   */
-  deductCredit: async (metadata = {}) => {
-    const { credits } = get();
-
-    // Client-side check
-    if (credits < 1) {
-      logger.warn('[CreditStore] Insufficient credits');
-      set({ error: 'Insufficient credits' });
-      return false;
-    }
-
-    set({ loading: true, error: null });
-
-    try {
-      const response = await fetch('/api/credits/use', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          description: 'AI Generation',
-          metadata,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Failed to use credit');
-      }
-
-      // Update local state
-      set((state) => ({
-        credits: data.credits,
-        used: state.used + 1,
-        loading: false,
-      }));
-
-      logger.info('[CreditStore] Credit used, remaining:', data.credits);
-      return true;
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
-      logger.error('[CreditStore] Use error:', error);
-      set({ error: errorMessage, loading: false });
-      return false;
-    }
-  },
+  // ❌ REMOVED: deductCredit() - Credit deduction now happens server-side in API routes
+  // All AI endpoints (/api/ai/*) automatically check and deduct credits
+  // Frontend only needs to call fetchCredits() to display updated balance
 
   /**
    * Credit ekler (satın alma sonrası)

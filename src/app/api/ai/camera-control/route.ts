@@ -181,6 +181,43 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const userId = user.id;
+
+    // 💳 CREDIT CHECK (Before expensive AI operation)
+    const { data: creditData, error: creditError } = await supabase
+      .from('user_credits')
+      .select('credits_remaining')
+      .eq('user_id', userId)
+      .single();
+
+    if (creditError || !creditData) {
+      logger.error('[CameraControl] Failed to check credits', {
+        userId,
+        error: creditError?.message,
+      });
+      return NextResponse.json(
+        { error: 'Failed to check credits' },
+        { status: 500 }
+      );
+    }
+
+    const typedCreditData = creditData as { credits_remaining: number };
+
+    if (typedCreditData.credits_remaining < 1) {
+      logger.warn('[CameraControl] Insufficient credits', {
+        userId,
+        remaining: typedCreditData.credits_remaining,
+      });
+      return NextResponse.json(
+        {
+          error: 'Insufficient credits',
+          message: 'You need at least 1 credit for camera control.',
+          credits: typedCreditData.credits_remaining,
+        },
+        { status: 402 } // Payment Required
+      );
+    }
+
     // Parse request body
     const body = await request.json();
     const {
@@ -315,6 +352,39 @@ export async function POST(request: NextRequest) {
         request_id: result.requestId,
         num_images: result.data?.images?.length || 0,
       });
+
+      // 💰 DEDUCT CREDIT (After successful AI operation)
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error: deductError } = await (supabase as any).rpc(
+          'use_credit',
+          {
+            p_user_id: userId,
+            p_description: 'AI Camera Control',
+            p_metadata: {
+              operation: 'camera-control',
+              camera_operation: operation,
+              style,
+            },
+          }
+        );
+
+        if (deductError) {
+          logger.error('[CameraControl] Failed to deduct credit', {
+            userId,
+            error: deductError.message,
+          });
+        } else {
+          logger.info('[CameraControl] Credit deducted successfully', {
+            userId,
+          });
+        }
+      } catch (deductError) {
+        logger.error('[CameraControl] Credit deduction error', {
+          userId,
+          deductError,
+        });
+      }
     } catch (falError: unknown) {
       const error = falError as any; // eslint-disable-line @typescript-eslint/no-explicit-any
       logger.error('[CameraControl] Fal.ai API error - DETAILED:', {

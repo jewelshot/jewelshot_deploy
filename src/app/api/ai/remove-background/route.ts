@@ -140,6 +140,43 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const userId = user.id;
+
+    // 💳 CREDIT CHECK (Before expensive AI operation)
+    const { data: creditData, error: creditError } = await supabase
+      .from('user_credits')
+      .select('credits_remaining')
+      .eq('user_id', userId)
+      .single();
+
+    if (creditError || !creditData) {
+      logger.error('[RemoveBackground] Failed to check credits', {
+        userId,
+        error: creditError?.message,
+      });
+      return NextResponse.json(
+        { error: 'Failed to check credits' },
+        { status: 500 }
+      );
+    }
+
+    const typedCreditData = creditData as { credits_remaining: number };
+
+    if (typedCreditData.credits_remaining < 1) {
+      logger.warn('[RemoveBackground] Insufficient credits', {
+        userId,
+        remaining: typedCreditData.credits_remaining,
+      });
+      return NextResponse.json(
+        {
+          error: 'Insufficient credits',
+          message: 'You need at least 1 credit to remove background.',
+          credits: typedCreditData.credits_remaining,
+        },
+        { status: 402 } // Payment Required
+      );
+    }
+
     // Parse request body
     const body = await request.json();
     const { image_url, crop_to_bbox = false } = body;
@@ -229,6 +266,39 @@ export async function POST(request: NextRequest) {
         request_id: result.requestId,
         has_image: !!result.data?.image?.url,
       });
+
+      // 💰 DEDUCT CREDIT (After successful AI operation)
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error: deductError } = await (supabase as any).rpc(
+          'use_credit',
+          {
+            p_user_id: userId,
+            p_description: 'AI Background Removal',
+            p_metadata: {
+              operation: 'remove-background',
+              crop_to_bbox,
+            },
+          }
+        );
+
+        if (deductError) {
+          logger.error('[RemoveBackground] Failed to deduct credit', {
+            userId,
+            error: deductError.message,
+          });
+          // Don't fail the request, just log the error
+        } else {
+          logger.info('[RemoveBackground] Credit deducted successfully', {
+            userId,
+          });
+        }
+      } catch (deductError) {
+        logger.error('[RemoveBackground] Credit deduction error', {
+          userId,
+          deductError,
+        });
+      }
     } catch (falError: unknown) {
       const error = falError as any; // eslint-disable-line @typescript-eslint/no-explicit-any
       logger.error('[RemoveBackground] Fal.ai API error - DETAILED:', {

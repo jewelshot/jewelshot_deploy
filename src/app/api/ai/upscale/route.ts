@@ -150,6 +150,43 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const userId = user.id;
+
+    // 💳 CREDIT CHECK (Before expensive AI operation)
+    const { data: creditData, error: creditError } = await supabase
+      .from('user_credits')
+      .select('credits_remaining')
+      .eq('user_id', userId)
+      .single();
+
+    if (creditError || !creditData) {
+      logger.error('[Upscale] Failed to check credits', {
+        userId,
+        error: creditError?.message,
+      });
+      return NextResponse.json(
+        { error: 'Failed to check credits' },
+        { status: 500 }
+      );
+    }
+
+    const typedCreditData = creditData as { credits_remaining: number };
+
+    if (typedCreditData.credits_remaining < 1) {
+      logger.warn('[Upscale] Insufficient credits', {
+        userId,
+        remaining: typedCreditData.credits_remaining,
+      });
+      return NextResponse.json(
+        {
+          error: 'Insufficient credits',
+          message: 'You need at least 1 credit to upscale images.',
+          credits: typedCreditData.credits_remaining,
+        },
+        { status: 402 } // Payment Required
+      );
+    }
+
     // Parse request body
     const body = await request.json();
     const {
@@ -317,6 +354,37 @@ export async function POST(request: NextRequest) {
         },
         { status: 422 }
       );
+    }
+
+    logger.info('[Upscale] Upscale successful');
+
+    // 💰 DEDUCT CREDIT (After successful AI operation)
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: deductError } = await (supabase as any).rpc('use_credit', {
+        p_user_id: userId,
+        p_description: 'AI Image Upscale',
+        p_metadata: {
+          operation: 'upscale',
+          upscale_mode,
+          upscale_factor,
+          target_resolution,
+        },
+      });
+
+      if (deductError) {
+        logger.error('[Upscale] Failed to deduct credit', {
+          userId,
+          error: deductError.message,
+        });
+        // Don't fail the request, just log the error
+        // User already got the image, we'll fix credits later
+      } else {
+        logger.info('[Upscale] Credit deducted successfully', { userId });
+      }
+    } catch (deductError) {
+      logger.error('[Upscale] Credit deduction error', { userId, deductError });
+      // Don't fail the request
     }
 
     // Save upscaled image to Supabase Storage

@@ -123,7 +123,43 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    logger.info('[MetalPolish] User authenticated:', user.id);
+    const userId = user.id;
+    logger.info('[MetalPolish] User authenticated:', userId);
+
+    // 💳 CREDIT CHECK (Before expensive AI operation)
+    const { data: creditData, error: creditError } = await supabase
+      .from('user_credits')
+      .select('credits_remaining')
+      .eq('user_id', userId)
+      .single();
+
+    if (creditError || !creditData) {
+      logger.error('[MetalPolish] Failed to check credits', {
+        userId,
+        error: creditError?.message,
+      });
+      return NextResponse.json(
+        { error: 'Failed to check credits' },
+        { status: 500 }
+      );
+    }
+
+    const typedCreditData = creditData as { credits_remaining: number };
+
+    if (typedCreditData.credits_remaining < 1) {
+      logger.warn('[MetalPolish] Insufficient credits', {
+        userId,
+        remaining: typedCreditData.credits_remaining,
+      });
+      return NextResponse.json(
+        {
+          error: 'Insufficient credits',
+          message: 'You need at least 1 credit to polish metal.',
+          credits: typedCreditData.credits_remaining,
+        },
+        { status: 402 } // Payment Required
+      );
+    }
 
     // Upload image if needed
     let uploadedUrl: string;
@@ -220,6 +256,35 @@ export async function POST(request: NextRequest) {
       });
 
       logger.info('[MetalPolish] Fal.ai response received');
+
+      // 💰 DEDUCT CREDIT (After successful AI operation)
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error: deductError } = await (supabase as any).rpc(
+          'use_credit',
+          {
+            p_user_id: userId,
+            p_description: 'AI Metal Polish',
+            p_metadata: {
+              operation: 'metal-polish',
+            },
+          }
+        );
+
+        if (deductError) {
+          logger.error('[MetalPolish] Failed to deduct credit', {
+            userId,
+            error: deductError.message,
+          });
+        } else {
+          logger.info('[MetalPolish] Credit deducted successfully', { userId });
+        }
+      } catch (deductError) {
+        logger.error('[MetalPolish] Credit deduction error', {
+          userId,
+          deductError,
+        });
+      }
     } catch (falError) {
       logger.error('[MetalPolish] Fal.ai API error:', falError);
       return NextResponse.json(
