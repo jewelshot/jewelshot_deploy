@@ -58,7 +58,7 @@ export function BeforeAfterModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-xl transition-opacity duration-300"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 backdrop-blur-xl transition-opacity duration-300"
       onClick={onClose}
     >
       <div
@@ -155,7 +155,7 @@ export function BeforeAfterModal({
                 onOpenInStudio();
                 onClose();
               }}
-              className="flex items-center gap-2 rounded-lg bg-purple-500/90 px-4 py-2.5 text-sm font-medium text-white shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:bg-purple-500 hover:shadow-purple-500/50"
+              className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-purple-500/30 backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:from-purple-500 hover:to-indigo-500 hover:shadow-purple-500/50"
             >
               <Palette className="h-4 w-4" />
               Open in Studio

@@ -51,7 +51,7 @@ export function BatchDetailModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/90 p-4 backdrop-blur-xl transition-opacity duration-300"
+      className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-black/90 p-4 backdrop-blur-xl transition-opacity duration-300"
       onClick={onClose}
     >
       <div
@@ -169,7 +169,7 @@ export function BatchDetailModal({
                             name: image.original_filename,
                           })
                         }
-                        className="rounded-lg bg-purple-500/90 p-2.5 text-white shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-110 hover:bg-purple-500 hover:shadow-purple-500/50"
+                        className="rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 p-2.5 text-white shadow-lg shadow-purple-500/30 backdrop-blur-sm transition-all duration-200 hover:scale-110 hover:from-purple-500 hover:to-indigo-500 hover:shadow-purple-500/50"
                         title="View Comparison"
                       >
                         <Eye className="h-4 w-4" />
@@ -179,7 +179,7 @@ export function BatchDetailModal({
                       <>
                         <button
                           onClick={() => onOpenInStudio(image.result_url!)}
-                          className="rounded-lg bg-purple-500/90 p-2.5 text-white shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-110 hover:bg-purple-500 hover:shadow-purple-500/50"
+                          className="rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 p-2.5 text-white shadow-lg shadow-purple-500/30 backdrop-blur-sm transition-all duration-200 hover:scale-110 hover:from-purple-500 hover:to-indigo-500 hover:shadow-purple-500/50"
                           title="Open in Studio"
                         >
                           <Palette className="h-4 w-4" />

@@ -1314,6 +1314,8 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
   useEffect(() => {
     const imageUrl = searchParams.get('imageUrl');
     const imageName = searchParams.get('imageName');
+    const originalUrl = searchParams.get('originalUrl');
+    const compareMode = searchParams.get('compareMode') === 'true';
 
     if (imageUrl && !uploadedImage) {
       try {
@@ -1332,7 +1334,14 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
           resetTransform();
           resetFilters();
 
-          toastManager.success('Image loaded from gallery!');
+          // If compare mode with original image, set it up
+          if (compareMode && originalUrl) {
+            setOriginalImage(originalUrl);
+            setViewMode('side-by-side');
+            toastManager.success('Compare mode activated!');
+          } else {
+            toastManager.success('Image loaded from gallery!');
+          }
 
           // Clear query params
           router.replace('/studio', { scroll: false });
@@ -1355,7 +1364,14 @@ export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
                   resetTransform();
                   resetFilters();
 
-                  toastManager.success('Image loaded from gallery!');
+                  // If compare mode with original image, set it up
+                  if (compareMode && originalUrl) {
+                    setOriginalImage(originalUrl);
+                    setViewMode('side-by-side');
+                    toastManager.success('Compare mode activated!');
+                  } else {
+                    toastManager.success('Image loaded from gallery!');
+                  }
 
                   // Clear query params
                   router.replace('/studio', { scroll: false });

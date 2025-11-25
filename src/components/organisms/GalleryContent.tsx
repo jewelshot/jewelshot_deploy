@@ -289,11 +289,18 @@ export function GalleryContent() {
   };
 
   const handleOpenInStudio = (image: GalleryImage) => {
-    // Pass image URL via query param to studio page
+    // Pass image URL(s) via query params to studio page
     const params = new URLSearchParams({
       imageUrl: image.src,
       imageName: image.alt || 'gallery-image',
     });
+
+    // If there's an original URL, add it for compare mode
+    if (image.originalUrl) {
+      params.set('originalUrl', image.originalUrl);
+      params.set('compareMode', 'true');
+    }
+
     router.push(`/studio?${params.toString()}`);
   };
 
