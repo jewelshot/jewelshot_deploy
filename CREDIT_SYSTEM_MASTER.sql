@@ -358,3 +358,4 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- Her AI isteği otomatik olarak kredi düşürecek.
 -- ============================================================================
 
+

@@ -19,12 +19,7 @@ import { useSidebarStore } from '@/store/sidebarStore';
 import SidebarLogo from '@/components/molecules/SidebarLogo';
 import NavigationItem from '@/components/molecules/NavigationItem';
 import UserProfile from '@/components/molecules/UserProfile';
-import {
-  Home,
-  Palette,
-  Image,
-  Layers,
-} from 'lucide-react';
+import { Home, Palette, Image, Layers, Library } from 'lucide-react';
 
 // Tools section (Coming Soon - All tools are integrated in Studio)
 const toolsItems: never[] = [
@@ -47,10 +42,12 @@ export function Sidebar() {
   useEffect(() => {
     const updateCount = () => {
       if (typeof window !== 'undefined') {
-        import('@/lib/gallery-storage').then(async ({ getGalleryImageCount }) => {
-          const count = await getGalleryImageCount();
-          setGalleryCount(count);
-        });
+        import('@/lib/gallery-storage').then(
+          async ({ getGalleryImageCount }) => {
+            const count = await getGalleryImageCount();
+            setGalleryCount(count);
+          }
+        );
       }
     };
 
@@ -98,6 +95,12 @@ export function Sidebar() {
         galleryCount > 0
           ? { variant: 'count' as const, count: galleryCount }
           : undefined,
+    },
+    {
+      icon: Library,
+      label: 'Library',
+      href: '/library',
+      badge: { variant: 'new' as const },
     },
     // Removed: Projects page not yet implemented
     // {
