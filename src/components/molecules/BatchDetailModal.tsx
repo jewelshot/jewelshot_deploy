@@ -34,7 +34,11 @@ interface BatchDetailModalProps {
     generatedUrl: string;
     name: string;
   }) => void;
-  onOpenInStudio: (imageUrl: string) => void;
+  onOpenInStudio: (image: {
+    imageUrl: string;
+    originalUrl?: string | null;
+    name: string;
+  }) => void;
   onDownloadImage: (imageUrl: string, filename: string) => void;
 }
 
@@ -187,9 +191,19 @@ export function BatchDetailModal({
                     {image.result_url && (
                       <>
                         <button
-                          onClick={() => onOpenInStudio(image.result_url!)}
+                          onClick={() =>
+                            onOpenInStudio({
+                              imageUrl: image.result_url!,
+                              originalUrl: image.original_url,
+                              name: image.original_filename,
+                            })
+                          }
                           className="rounded-lg bg-white/10 p-2.5 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
-                          title="Open in Studio"
+                          title={
+                            image.original_url
+                              ? 'Compare in Studio'
+                              : 'Open in Studio'
+                          }
                         >
                           <Palette className="h-4 w-4" />
                         </button>

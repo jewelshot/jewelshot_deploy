@@ -27,19 +27,22 @@ export async function GET() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: projects, error: projectsError } = await (supabase as any)
       .from('batch_projects')
-      .select(`
+      .select(
+        `
         *,
         batch_images (
           id,
           original_filename,
           original_size,
+          original_url,
           result_url,
           status,
           error_message,
           created_at,
           completed_at
         )
-      `)
+      `
+      )
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
@@ -73,4 +76,3 @@ export async function GET() {
     );
   }
 }
-

@@ -821,14 +821,22 @@ export function GalleryContent() {
                 >
                   {/* Thumbnail */}
                   <div className="relative aspect-square overflow-hidden bg-black/20">
-                    {project.batch_images &&
-                    project.batch_images.length > 0 &&
-                    project.batch_images[0].result_url ? (
-                      <img
-                        src={project.batch_images[0].result_url}
-                        alt={project.name}
-                        className="h-full w-full object-cover"
-                      />
+                    {project.batch_images && project.batch_images.length > 0 ? (
+                      project.batch_images[0].result_url ||
+                      project.batch_images[0].original_url ? (
+                        <img
+                          src={
+                            project.batch_images[0].result_url ||
+                            project.batch_images[0].original_url!
+                          }
+                          alt={project.name}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center">
+                          <Folder className="h-16 w-16 text-white/20" />
+                        </div>
+                      )
                     ) : (
                       <div className="flex h-full w-full items-center justify-center">
                         <Folder className="h-16 w-16 text-white/20" />
@@ -944,11 +952,18 @@ export function GalleryContent() {
           }}
           project={selectedBatchProject}
           onViewImage={handleViewBatchImage}
-          onOpenInStudio={(imageUrl) => {
+          onOpenInStudio={(image) => {
             const params = new URLSearchParams({
-              imageUrl,
-              imageName: 'batch-image',
+              imageUrl: image.imageUrl,
+              imageName: image.name,
             });
+
+            // Add originalUrl for compare mode if it exists
+            if (image.originalUrl) {
+              params.set('originalUrl', image.originalUrl);
+              params.set('compareMode', 'true');
+            }
+
             router.push(`/studio?${params.toString()}`);
           }}
           onDownloadImage={handleDownloadSingle}
