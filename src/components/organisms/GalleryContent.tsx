@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Folder } from 'lucide-react';
+import { Folder, Star } from 'lucide-react';
 import GalleryToolbar from '@/components/molecules/GalleryToolbar';
 import GalleryGrid, { GalleryImage } from '@/components/molecules/GalleryGrid';
 import { SortOption } from '@/components/atoms/SortButton';
@@ -13,6 +13,7 @@ import { BeforeAfterModal } from '@/components/molecules/BeforeAfterModal';
 import { BatchDetailModal } from '@/components/molecules/BatchDetailModal';
 import { ImageMetadataModal } from '@/components/molecules/ImageMetadataModal';
 import { useImageMetadataStore } from '@/store/imageMetadataStore';
+import { useSidebarStore } from '@/store/sidebarStore';
 
 // Supabase batch project type
 interface BatchProject {
@@ -35,10 +36,11 @@ interface BatchProject {
 
 const logger = createScopedLogger('Gallery');
 
-type GalleryTab = 'images' | 'batches';
+type GalleryTab = 'images' | 'batches' | 'favorites';
 
 export function GalleryContent() {
   const router = useRouter();
+  const { leftOpen } = useSidebarStore();
   const [activeTab, setActiveTab] = useState<GalleryTab>('images');
   const [searchValue, setSearchValue] = useState('');
   const [activeFilter, setActiveFilter] = useState<
@@ -495,10 +497,10 @@ export function GalleryContent() {
     <div
       className="fixed z-10 flex h-full flex-col gap-6 overflow-y-auto p-6 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
       style={{
-        left: '260px',
-        right: 0,
-        top: 0,
-        bottom: 0,
+        left: leftOpen ? '260px' : '16px',
+        right: '16px',
+        top: '16px',
+        bottom: '16px',
       }}
     >
       {/* Header */}
@@ -523,6 +525,25 @@ export function GalleryContent() {
         >
           All Images
           {activeTab === 'images' && (
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-500" />
+          )}
+        </button>
+        <button
+          onClick={() => setActiveTab('favorites')}
+          className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === 'favorites'
+              ? 'text-purple-400'
+              : 'text-white/60 hover:text-white/80'
+          }`}
+        >
+          <Star className="h-4 w-4" />
+          Favorites
+          {useImageMetadataStore.getState().favorites.length > 0 && (
+            <span className="rounded-full bg-yellow-500/20 px-2 py-0.5 text-xs text-yellow-400">
+              {useImageMetadataStore.getState().favorites.length}
+            </span>
+          )}
+          {activeTab === 'favorites' && (
             <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-500" />
           )}
         </button>
