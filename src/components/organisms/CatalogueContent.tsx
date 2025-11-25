@@ -62,6 +62,7 @@ export default function CatalogueContent() {
   const {
     settings,
     setPageFormat,
+    setPageLayout,
     setImagesPerPage,
     toggleMetadataField,
     setMargin,
@@ -244,29 +245,62 @@ export default function CatalogueContent() {
           </p>
         </div>
 
-        {/* Tab Switcher */}
-        <div className="flex gap-2 rounded-lg bg-white/5 p-1">
+        {/* Actions */}
+        <div className="flex items-center gap-3">
+          {/* Tab Switcher */}
+          <div className="flex gap-2 rounded-lg bg-white/5 p-1">
+            <button
+              onClick={() => setActiveTab('setup')}
+              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                activeTab === 'setup'
+                  ? 'bg-white/10 text-white'
+                  : 'text-white/60 hover:text-white/80'
+              }`}
+            >
+              <Settings className="h-4 w-4" />
+              Setup
+            </button>
+            <button
+              onClick={() => setActiveTab('preview')}
+              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                activeTab === 'preview'
+                  ? 'bg-white/10 text-white'
+                  : 'text-white/60 hover:text-white/80'
+              }`}
+            >
+              <Eye className="h-4 w-4" />
+              Preview
+            </button>
+          </div>
+
+          {/* Settings Button */}
           <button
-            onClick={() => setActiveTab('setup')}
-            className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-              activeTab === 'setup'
-                ? 'bg-white/10 text-white'
-                : 'text-white/60 hover:text-white/80'
-            }`}
+            onClick={() => setIsSettingsModalOpen(true)}
+            className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white transition-colors hover:border-white/30 hover:bg-white/10"
+            title="PDF Settings"
           >
             <Settings className="h-4 w-4" />
-            Setup
+            Settings
           </button>
+
+          {/* Export Button */}
           <button
-            onClick={() => setActiveTab('preview')}
-            className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-              activeTab === 'preview'
-                ? 'bg-white/10 text-white'
-                : 'text-white/60 hover:text-white/80'
-            }`}
+            onClick={handleExportPDF}
+            disabled={isGeneratingPDF || favoriteItems.length === 0}
+            className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-50"
+            title="Export PDF"
           >
-            <Eye className="h-4 w-4" />
-            Preview
+            {isGeneratingPDF ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Exporting...
+              </>
+            ) : (
+              <>
+                <Download className="h-4 w-4" />
+                Export PDF
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -331,34 +365,6 @@ export default function CatalogueContent() {
                   Drag and drop images to reorder them in the catalogue
                 </p>
               </div>
-
-              {/* Settings Button */}
-              <button
-                onClick={() => setIsSettingsModalOpen(true)}
-                className="flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-6 py-4 text-sm font-medium text-white transition-colors hover:border-white/30 hover:bg-white/10"
-              >
-                <Settings className="h-5 w-5" />
-                PDF Settings
-              </button>
-
-              {/* Export Button */}
-              <button
-                onClick={handleExportPDF}
-                disabled={isGeneratingPDF}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-white/10 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {isGeneratingPDF ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Generating PDF...
-                  </>
-                ) : (
-                  <>
-                    <Download className="h-4 w-4" />
-                    Export PDF
-                  </>
-                )}
-              </button>
             </div>
           ) : (
             <div className="flex h-full items-center justify-center">

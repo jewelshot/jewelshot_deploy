@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: 'transparent',
     borderRadius: 4,
   },
   image: {
@@ -130,21 +130,36 @@ export const CataloguePDF: React.FC<CataloguePDFProps> = ({
   const contentWidth = pageWidth - left - right;
   const contentHeight = pageHeight - top - bottom;
 
-  // Calculate grid layout
+  // Calculate layout based on page layout type
   const imagesPerPage = settings.imagesPerPage;
-  const cols =
-    imagesPerPage === 1
-      ? 1
-      : imagesPerPage === 2
-        ? 2
-        : imagesPerPage === 4
+  let cols = 2;
+  let rows = 2;
+
+  // Calculate cols and rows based on layout and images per page
+  if (settings.pageLayout === 'list') {
+    // List layout: 1 column, multiple rows
+    cols = 1;
+    rows = imagesPerPage;
+  } else if (settings.pageLayout === 'magazine') {
+    // Magazine layout: asymmetric, featured layout
+    cols = imagesPerPage === 1 ? 1 : imagesPerPage <= 4 ? 2 : 3;
+    rows = Math.ceil(imagesPerPage / cols);
+  } else {
+    // Grid layout: balanced grid
+    cols =
+      imagesPerPage === 1
+        ? 1
+        : imagesPerPage === 2
           ? 2
-          : imagesPerPage === 6
-            ? 3
-            : imagesPerPage === 8
-              ? 4
-              : 4;
-  const rows = Math.ceil(imagesPerPage / cols);
+          : imagesPerPage === 4
+            ? 2
+            : imagesPerPage === 6
+              ? 3
+              : imagesPerPage === 8
+                ? 4
+                : 4;
+    rows = Math.ceil(imagesPerPage / cols);
+  }
 
   const itemWidth = contentWidth / cols;
   const itemHeight = contentHeight / rows;
@@ -231,6 +246,23 @@ export const CataloguePDF: React.FC<CataloguePDFProps> = ({
                       const value =
                         item.metadata?.[field.key as keyof ImageMetadata];
                       if (!value) return null;
+
+                      // For fileName, show value without label
+                      if (field.key === 'fileName') {
+                        return (
+                          <Text
+                            key={field.key}
+                            style={[
+                              styles.metadataRow,
+                              { fontWeight: 'bold', fontSize: 10 },
+                            ]}
+                          >
+                            {String(value)}
+                          </Text>
+                        );
+                      }
+
+                      // For other fields, show label: value
                       return (
                         <Text key={field.key} style={styles.metadataRow}>
                           <Text style={styles.metadataLabel}>
