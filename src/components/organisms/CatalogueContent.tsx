@@ -15,9 +15,10 @@ import { useSidebarStore } from '@/store/sidebarStore';
 import { useImageMetadataStore } from '@/store/imageMetadataStore';
 import { useCatalogueStore } from '@/store/catalogueStore';
 import { createScopedLogger } from '@/lib/logger';
-import type { ImageMetadata } from '@/types/image-metadata';
+import type { ImageMetadata, FavoriteImage } from '@/types/image-metadata';
 import { CatalogueSettingsModal } from '@/components/molecules/CatalogueSettingsModal';
 import { ImageMetadataModal } from '@/components/molecules/ImageMetadataModal';
+import { getSavedImages } from '@/lib/gallery-storage';
 import {
   DndContext,
   closestCenter,
@@ -52,8 +53,38 @@ const logger = createScopedLogger('Catalogue');
 export default function CatalogueContent() {
   const { leftOpen, rightOpen, topOpen, bottomOpen } = useSidebarStore();
   
-  // SIMPLE: Just get favorites from store - no sync, no complications
-  const { favorites, metadata } = useImageMetadataStore();
+  // BYPASS ZUSTAND - Read directly from localStorage
+  const [favorites, setFavorites] = useState<FavoriteImage[]>([]);
+  const [metadata, setMetadata] = useState<Record<string, ImageMetadata>>({});
+  
+  // Load from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('jewelshot-image-metadata');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        console.log('📦 RAW LOCALSTORAGE:', parsed);
+        
+        const stateFavorites = parsed?.state?.favorites || [];
+        const stateMetadata = parsed?.state?.metadata || {};
+        
+        console.log('⭐ FAVORITES COUNT:', stateFavorites.length);
+        console.log('📝 METADATA COUNT:', Object.keys(stateMetadata).length);
+        
+        setFavorites(stateFavorites);
+        setMetadata(stateMetadata);
+        
+        logger.info('✅ LOADED FROM LOCALSTORAGE:', {
+          favorites: stateFavorites.length,
+          metadata: Object.keys(stateMetadata).length,
+        });
+      } else {
+        logger.warn('⚠️ No localStorage data found');
+      }
+    } catch (error) {
+      logger.error('❌ Failed to load from localStorage:', error);
+    }
+  }, []);
   
   const {
     settings,
