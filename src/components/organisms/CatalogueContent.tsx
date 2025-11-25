@@ -183,17 +183,35 @@ export default function CatalogueContent() {
     loadImageUrls();
   }, [favorites, metadata]);
 
-  // Sync from Supabase on mount
+  // Sync from Supabase on mount (optional - fallback to localStorage)
   useEffect(() => {
     const syncData = async () => {
       try {
         setIsLoading(true);
-        logger.info('🔄 Starting Supabase sync...');
-        await syncFromSupabase();
-        logger.info('✅ Synced favorites from Supabase on catalogue mount');
+
+        // First show what we have from localStorage
+        logger.info(
+          '📦 Current favorites from localStorage:',
+          favorites.length
+        );
+
+        // Try to sync from Supabase (optional)
+        try {
+          logger.info('🔄 Attempting Supabase sync...');
+          await syncFromSupabase();
+          logger.info('✅ Supabase sync completed');
+        } catch (syncError) {
+          // Sync failed, but that's okay - we'll use localStorage
+          logger.warn(
+            '⚠️ Supabase sync failed, using localStorage data:',
+            syncError
+          );
+          console.warn(
+            'Using localStorage favorites. To enable Supabase sync, run the migration in CATALOG_FIX_INSTRUCTIONS.md'
+          );
+        }
       } catch (error) {
-        logger.error('❌ Failed to sync from Supabase:', error);
-        console.error('Supabase sync error details:', error);
+        logger.error('❌ Error during initialization:', error);
       } finally {
         setIsLoading(false);
       }

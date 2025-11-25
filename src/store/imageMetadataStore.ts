@@ -261,21 +261,42 @@ export const useImageMetadataStore = create<ImageMetadataState>()(
           );
           console.log('Favorites from Supabase:', favoritesFromSupabase);
 
-          // Merge with local state (Supabase is source of truth)
-          set({
-            metadata: metadataFromSupabase,
-            favorites: favoritesFromSupabase,
-          });
+          // Only update if we got data from Supabase
+          // If Supabase returns empty but we have local data, keep local data
+          const state = get();
+          const hasLocalFavorites = state.favorites.length > 0;
+          const hasSupabaseFavorites = favoritesFromSupabase.length > 0;
 
-          logger.info(
-            '✅ Synced from Supabase successfully - Metadata:',
-            Object.keys(metadataFromSupabase).length,
-            'Favorites:',
-            favoritesFromSupabase.length
-          );
+          if (hasSupabaseFavorites || !hasLocalFavorites) {
+            // Update with Supabase data
+            set({
+              metadata:
+                Object.keys(metadataFromSupabase).length > 0
+                  ? metadataFromSupabase
+                  : state.metadata,
+              favorites: favoritesFromSupabase,
+            });
+            logger.info(
+              '✅ Synced from Supabase - Metadata:',
+              Object.keys(metadataFromSupabase).length,
+              'Favorites:',
+              favoritesFromSupabase.length
+            );
+          } else {
+            // Keep local data if Supabase is empty
+            logger.warn(
+              '⚠️ Supabase returned no favorites, keeping local data:',
+              state.favorites.length,
+              'favorites'
+            );
+            logger.info(
+              '💡 Tip: Run the migration in CATALOG_FIX_INSTRUCTIONS.md to enable Supabase sync'
+            );
+          }
         } catch (error) {
           logger.error('❌ Failed to sync from Supabase:', error);
           console.error('Supabase sync error details:', error);
+          // Don't update state on error - keep local data
         }
       },
 
