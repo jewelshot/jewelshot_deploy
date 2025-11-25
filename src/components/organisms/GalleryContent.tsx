@@ -11,6 +11,8 @@ import { toast } from 'sonner';
 import { createScopedLogger } from '@/lib/logger';
 import { BeforeAfterModal } from '@/components/molecules/BeforeAfterModal';
 import { BatchDetailModal } from '@/components/molecules/BatchDetailModal';
+import { ImageMetadataModal } from '@/components/molecules/ImageMetadataModal';
+import { useImageMetadataStore } from '@/store/imageMetadataStore';
 
 // Supabase batch project type
 interface BatchProject {
@@ -49,14 +51,29 @@ export function GalleryContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
-  
+
   // Before/After Modal state
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   // Batch Detail Modal state
-  const [selectedBatchProject, setSelectedBatchProject] = useState<BatchProject | null>(null);
+  const [selectedBatchProject, setSelectedBatchProject] =
+    useState<BatchProject | null>(null);
   const [isBatchModalOpen, setIsBatchModalOpen] = useState(false);
+
+  // Metadata Modal state
+  const [metadataModalImage, setMetadataModalImage] =
+    useState<GalleryImage | null>(null);
+  const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false);
+
+  // Metadata store
+  const {
+    addToFavorites,
+    removeFromFavorites,
+    isFavorite,
+    getFavoriteOrder,
+    hasMetadata,
+  } = useImageMetadataStore();
 
   // Load images from localStorage (with prefetch support)
   useEffect(() => {
@@ -144,7 +161,9 @@ export function GalleryContent() {
         }
         const data = await response.json();
         setBatchProjects(data.projects || []);
-        logger.info(`✅ Loaded ${data.projects?.length || 0} batch projects from Supabase`);
+        logger.info(
+          `✅ Loaded ${data.projects?.length || 0} batch projects from Supabase`
+        );
       } catch (error) {
         logger.error('Failed to load batch projects:', error);
         toast.error('Failed to load batch projects');
@@ -154,9 +173,8 @@ export function GalleryContent() {
     loadBatchProjects();
 
     // Poll for updates every 5 seconds while on batches tab
-    const interval = activeTab === 'batches' 
-      ? setInterval(loadBatchProjects, 5000) 
-      : null;
+    const interval =
+      activeTab === 'batches' ? setInterval(loadBatchProjects, 5000) : null;
 
     return () => {
       if (interval) clearInterval(interval);
@@ -203,12 +221,35 @@ export function GalleryContent() {
     setIsModalOpen(true);
   };
 
+  const handleToggleFavorite = (image: GalleryImage) => {
+    if (isFavorite(image.id)) {
+      removeFromFavorites(image.id);
+      toast.success('Removed from favorites');
+    } else {
+      const success = addToFavorites(image.id);
+      if (success) {
+        toast.success('Added to favorites');
+      } else {
+        toast.error('Cannot add more favorites');
+      }
+    }
+  };
+
+  const handleEditMetadata = (image: GalleryImage) => {
+    setMetadataModalImage(image);
+    setIsMetadataModalOpen(true);
+  };
+
   const handleViewBatch = (project: BatchProject) => {
     setSelectedBatchProject(project);
     setIsBatchModalOpen(true);
   };
 
-  const handleViewBatchImage = (image: { originalUrl: string | null; generatedUrl: string; name: string }) => {
+  const handleViewBatchImage = (image: {
+    originalUrl: string | null;
+    generatedUrl: string;
+    name: string;
+  }) => {
     // Convert to GalleryImage format for BeforeAfterModal
     setSelectedImage({
       id: 'batch-temp',
@@ -265,11 +306,11 @@ export function GalleryContent() {
   const handleDownloadBatch = async (project: BatchProject) => {
     try {
       toast.info('Creating ZIP archive...');
-      
+
       // Dynamic import JSZip
       const JSZip = (await import('jszip')).default;
       const { saveAs } = await import('file-saver');
-      
+
       const zip = new JSZip();
       const folder = zip.folder(project.name);
 
@@ -278,9 +319,10 @@ export function GalleryContent() {
       }
 
       // Get all completed images
-      const completedImages = project.batch_images?.filter(
-        (img) => img.status === 'completed' && img.result_url
-      ) || [];
+      const completedImages =
+        project.batch_images?.filter(
+          (img) => img.status === 'completed' && img.result_url
+        ) || [];
 
       if (completedImages.length === 0) {
         toast.error('No completed images to download');
@@ -298,9 +340,10 @@ export function GalleryContent() {
             logger.warn(`Failed to fetch image: ${image.original_filename}`);
             continue;
           }
-          
+
           const blob = await response.blob();
-          const filename = image.original_filename.replace(/\.[^/.]+$/, '') + '_generated.jpg';
+          const filename =
+            image.original_filename.replace(/\.[^/.]+$/, '') + '_generated.jpg';
           folder.file(filename, blob);
           successCount++;
         } catch (err) {
@@ -330,14 +373,14 @@ export function GalleryContent() {
       );
 
       toast.info('Generating ZIP file...');
-      
+
       // Generate ZIP
-      const content = await zip.generateAsync({ 
-        type: 'blob', 
+      const content = await zip.generateAsync({
+        type: 'blob',
         compression: 'DEFLATE',
-        compressionOptions: { level: 6 }
+        compressionOptions: { level: 6 },
       });
-      
+
       // Download
       saveAs(content, `${project.name}.zip`);
       toast.success(`Downloaded ${successCount} images!`);
@@ -366,9 +409,11 @@ export function GalleryContent() {
 
       // Update local state
       setBatchProjects((prev) =>
-        prev.map((p) => (p.id === projectId ? { ...p, name: newName.trim() } : p))
+        prev.map((p) =>
+          p.id === projectId ? { ...p, name: newName.trim() } : p
+        )
       );
-      
+
       setEditingProjectId(null);
       setEditingName('');
       toast.success('Batch renamed');
@@ -388,11 +433,11 @@ export function GalleryContent() {
         const response = await fetch(`/api/batch/${project.id}`, {
           method: 'DELETE',
         });
-        
+
         if (!response.ok) {
           throw new Error('Failed to delete batch project');
         }
-        
+
         // Refresh batch list
         setBatchProjects((prev) => prev.filter((p) => p.id !== project.id));
         toast.success('Batch deleted');
@@ -533,6 +578,11 @@ export function GalleryContent() {
               onOpenInStudio={handleOpenInStudio}
               onDownload={handleDownload}
               onDelete={handleDelete}
+              onToggleFavorite={handleToggleFavorite}
+              onEditMetadata={handleEditMetadata}
+              isFavorite={isFavorite}
+              getFavoriteOrder={getFavoriteOrder}
+              hasMetadata={hasMetadata}
             />
           ) : null}
         </>
@@ -551,7 +601,9 @@ export function GalleryContent() {
                 >
                   {/* Thumbnail */}
                   <div className="relative aspect-square overflow-hidden bg-black/20">
-                    {project.batch_images && project.batch_images.length > 0 && project.batch_images[0].result_url ? (
+                    {project.batch_images &&
+                    project.batch_images.length > 0 &&
+                    project.batch_images[0].result_url ? (
                       <img
                         src={project.batch_images[0].result_url}
                         alt={project.name}
@@ -589,7 +641,10 @@ export function GalleryContent() {
                           }
                         }}
                         onBlur={() => {
-                          if (editingName.trim() && editingName !== project.name) {
+                          if (
+                            editingName.trim() &&
+                            editingName !== project.name
+                          ) {
                             handleSaveRename(project.id);
                           } else {
                             handleCancelRename();
@@ -695,6 +750,20 @@ export function GalleryContent() {
             router.push(`/studio?${params.toString()}`);
           }}
           onDownloadImage={handleDownloadSingle}
+        />
+      )}
+
+      {/* Image Metadata Modal */}
+      {metadataModalImage && (
+        <ImageMetadataModal
+          isOpen={isMetadataModalOpen}
+          onClose={() => {
+            setIsMetadataModalOpen(false);
+            setMetadataModalImage(null);
+          }}
+          imageId={metadataModalImage.id}
+          imageSrc={metadataModalImage.src}
+          currentFileName={metadataModalImage.alt}
         />
       )}
     </div>

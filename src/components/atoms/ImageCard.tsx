@@ -2,29 +2,42 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { Star, Edit3 } from 'lucide-react';
 
 interface ImageCardProps {
+  id: string; // Image ID for metadata/favorites
   src: string;
   originalUrl?: string; // For Before/After modal
   alt?: string;
   createdAt?: Date;
   prompt?: string; // AI prompt for modal
+  isFavorite?: boolean;
+  favoriteOrder?: number;
+  hasMetadata?: boolean;
   onView?: () => void; // Open Before/After modal
   onOpenInStudio?: () => void;
   onDownload?: () => void;
   onDelete?: () => void;
+  onToggleFavorite?: () => void;
+  onEditMetadata?: () => void;
 }
 
 export function ImageCard({
+  id,
   src,
   originalUrl,
   alt = 'Gallery image',
   createdAt,
   prompt,
+  isFavorite = false,
+  favoriteOrder = 0,
+  hasMetadata = false,
   onView,
   onOpenInStudio,
   onDownload,
   onDelete,
+  onToggleFavorite,
+  onEditMetadata,
 }: ImageCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -166,6 +179,61 @@ export function ImageCard({
             </button>
           )}
         </div>
+      </div>
+
+      {/* Top-Left Badges */}
+      <div className="absolute left-2 top-2 flex gap-2">
+        {/* Favorite Badge */}
+        {isFavorite && favoriteOrder > 0 && (
+          <div className="flex items-center gap-1 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 px-2 py-1 shadow-lg ring-2 ring-white/20">
+            <Star className="h-3 w-3 fill-white text-white" />
+            <span className="text-xs font-bold text-white">
+              {favoriteOrder}
+            </span>
+          </div>
+        )}
+
+        {/* Metadata Badge */}
+        {hasMetadata && (
+          <div className="flex items-center gap-1 rounded-full bg-purple-500/90 px-2 py-1 shadow-lg ring-2 ring-white/20">
+            <Edit3 className="h-3 w-3 text-white" />
+          </div>
+        )}
+      </div>
+
+      {/* Top-Right Action Buttons */}
+      <div className="absolute right-2 top-2 flex gap-2">
+        {/* Favorite Toggle */}
+        {onToggleFavorite && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleFavorite();
+            }}
+            className={`rounded-full p-1.5 shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-110 ${
+              isFavorite
+                ? 'bg-yellow-500/90 text-white'
+                : 'bg-black/60 text-white/60 hover:bg-black/80 hover:text-yellow-500'
+            }`}
+            title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+          >
+            <Star className={`h-4 w-4 ${isFavorite ? 'fill-white' : ''}`} />
+          </button>
+        )}
+
+        {/* Edit Metadata */}
+        {onEditMetadata && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onEditMetadata();
+            }}
+            className="rounded-full bg-black/60 p-1.5 text-white/80 shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-110 hover:bg-purple-500/90 hover:text-white"
+            title="Edit metadata"
+          >
+            <Edit3 className="h-4 w-4" />
+          </button>
+        )}
       </div>
 
       {/* Date Badge */}

@@ -18,6 +18,11 @@ interface GalleryGridProps {
   onOpenInStudio: (image: GalleryImage) => void;
   onDownload?: (image: GalleryImage) => void;
   onDelete?: (image: GalleryImage) => void;
+  onToggleFavorite?: (image: GalleryImage) => void;
+  onEditMetadata?: (image: GalleryImage) => void;
+  isFavorite?: (imageId: string) => boolean;
+  getFavoriteOrder?: (imageId: string) => number;
+  hasMetadata?: (imageId: string) => boolean;
 }
 
 export function GalleryGrid({
@@ -26,6 +31,11 @@ export function GalleryGrid({
   onOpenInStudio,
   onDownload,
   onDelete,
+  onToggleFavorite,
+  onEditMetadata,
+  isFavorite,
+  getFavoriteOrder,
+  hasMetadata,
 }: GalleryGridProps) {
   if (images.length === 0) {
     return (
@@ -60,15 +70,25 @@ export function GalleryGrid({
       {images.map((image) => (
         <ImageCard
           key={image.id}
+          id={image.id}
           src={image.src}
           originalUrl={image.originalUrl}
           alt={image.alt}
           createdAt={image.createdAt}
           prompt={image.prompt}
+          isFavorite={isFavorite ? isFavorite(image.id) : false}
+          favoriteOrder={getFavoriteOrder ? getFavoriteOrder(image.id) : 0}
+          hasMetadata={hasMetadata ? hasMetadata(image.id) : false}
           onView={() => onView(image)}
           onOpenInStudio={() => onOpenInStudio(image)}
           onDownload={onDownload ? () => onDownload(image) : undefined}
           onDelete={onDelete ? () => onDelete(image) : undefined}
+          onToggleFavorite={
+            onToggleFavorite ? () => onToggleFavorite(image) : undefined
+          }
+          onEditMetadata={
+            onEditMetadata ? () => onEditMetadata(image) : undefined
+          }
         />
       ))}
     </div>
