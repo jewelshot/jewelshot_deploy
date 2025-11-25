@@ -179,7 +179,7 @@ export function BatchDetailModal({
                           })
                         }
                         className="rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 p-2.5 text-white shadow-lg shadow-purple-500/30 backdrop-blur-sm transition-all duration-200 hover:scale-110 hover:from-purple-500 hover:to-indigo-500 hover:shadow-purple-500/50"
-                        title="View Comparison"
+                        title="Compare in Studio"
                       >
                         <Eye className="h-4 w-4" />
                       </button>

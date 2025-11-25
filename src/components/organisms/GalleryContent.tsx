@@ -9,7 +9,6 @@ import { SortOption } from '@/components/atoms/SortButton';
 import { getSavedImages, deleteImageFromGallery } from '@/lib/gallery-storage';
 import { toast } from 'sonner';
 import { createScopedLogger } from '@/lib/logger';
-import { BeforeAfterModal } from '@/components/molecules/BeforeAfterModal';
 import { BatchDetailModal } from '@/components/molecules/BatchDetailModal';
 import { ImageMetadataModal } from '@/components/molecules/ImageMetadataModal';
 import { useImageMetadataStore } from '@/store/imageMetadataStore';
@@ -57,10 +56,6 @@ export function GalleryContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
-
-  // Before/After Modal state
-  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Batch Detail Modal state
   const [selectedBatchProject, setSelectedBatchProject] =
@@ -245,8 +240,8 @@ export function GalleryContent() {
   }, [images]);
 
   const handleView = (image: GalleryImage) => {
-    setSelectedImage(image);
-    setIsModalOpen(true);
+    // Redirect directly to Studio in compare mode
+    handleOpenInStudio(image);
   };
 
   const handleToggleFavorite = (image: GalleryImage) => {
@@ -278,14 +273,14 @@ export function GalleryContent() {
     generatedUrl: string;
     name: string;
   }) => {
-    // Convert to GalleryImage format for BeforeAfterModal
-    setSelectedImage({
+    // Redirect directly to Studio in compare mode
+    const galleryImage: GalleryImage = {
       id: 'batch-temp',
       src: image.generatedUrl,
       originalUrl: image.originalUrl || undefined,
       alt: image.name,
-    });
-    setIsModalOpen(true);
+    };
+    handleOpenInStudio(galleryImage);
   };
 
   const handleOpenInStudio = (image: GalleryImage) => {
@@ -830,24 +825,6 @@ export function GalleryContent() {
             </div>
           )}
         </>
-      )}
-
-      {/* Before/After Modal */}
-      {selectedImage && (
-        <BeforeAfterModal
-          isOpen={isModalOpen}
-          onClose={() => {
-            setIsModalOpen(false);
-            setSelectedImage(null);
-          }}
-          originalUrl={selectedImage.originalUrl || null}
-          generatedUrl={selectedImage.src}
-          imageName={selectedImage.alt}
-          createdAt={selectedImage.createdAt}
-          prompt={selectedImage.prompt}
-          onOpenInStudio={() => handleOpenInStudio(selectedImage)}
-          onDownload={() => handleDownload(selectedImage)}
-        />
       )}
 
       {/* Batch Detail Modal */}

@@ -82,25 +82,25 @@ export function ImageCard({
           isHovered ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        {/* View Button (Before/After Modal) */}
+        {/* View in Studio Button (with Compare Mode if original exists) */}
         {onView && (
           <button
             onClick={onView}
-            className="flex items-center gap-2 rounded-lg bg-purple-500/90 px-4 py-2 text-sm font-medium text-white shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:bg-purple-500 hover:shadow-purple-500/50"
+            className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-purple-500/30 backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:from-purple-500 hover:to-indigo-500 hover:shadow-purple-500/50"
           >
-            <Eye className="h-4 w-4" />
-            {originalUrl ? 'Comparison' : 'View'}
+            <Palette className="h-4 w-4" />
+            {originalUrl ? 'Compare in Studio' : 'Open in Studio'}
           </button>
         )}
 
-        {/* Open in Studio Button */}
-        {onOpenInStudio && (
+        {/* Alternative Studio Button (if onView is not provided) */}
+        {!onView && onOpenInStudio && (
           <button
             onClick={onOpenInStudio}
-            className="flex items-center gap-2 rounded-lg bg-purple-500/90 px-4 py-2 text-sm font-medium text-white shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:bg-purple-500 hover:shadow-purple-500/50"
+            className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-purple-500/30 backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:from-purple-500 hover:to-indigo-500 hover:shadow-purple-500/50"
           >
             <Palette className="h-4 w-4" />
-            Studio
+            Open in Studio
           </button>
         )}
 
