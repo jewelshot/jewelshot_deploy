@@ -2,6 +2,7 @@
 
 import React, { useEffect } from 'react';
 import Image from 'next/image';
+import { X, Palette, Download, Info } from 'lucide-react';
 
 interface BeforeAfterModalProps {
   isOpen: boolean;
@@ -57,11 +58,11 @@ export function BeforeAfterModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-xl transition-opacity duration-300"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-7xl rounded-2xl border border-white/10 bg-[rgba(10,10,10,0.95)] p-4 md:p-6 shadow-2xl"
+        className="animate-in fade-in zoom-in-95 relative w-full max-w-7xl rounded-2xl border border-white/10 bg-[#0A0A0F] p-4 shadow-2xl shadow-purple-500/10 backdrop-blur-sm duration-300 md:p-6"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -80,41 +81,32 @@ export function BeforeAfterModal({
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="rounded-lg bg-white/5 p-2 text-white/60 transition-all hover:bg-white/10 hover:text-white"
+            className="rounded-full bg-white/5 p-2 text-white/60 shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-110 hover:bg-white/10 hover:text-white"
+            title="Close (Esc)"
           >
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+            <X className="h-6 w-6" />
           </button>
         </div>
 
         {/* Images Section - Side by Side on Desktop, Stacked on Mobile */}
-        <div className="flex flex-col md:flex-row gap-4 mb-4">
+        <div className="mb-4 flex flex-col gap-4 md:flex-row">
           {/* Before Image (Original) */}
           {originalUrl ? (
             <div className="flex-1">
               <div className="mb-2 flex items-center gap-2">
-                <span className="text-sm font-medium text-white/80">Original</span>
+                <span className="text-sm font-medium text-white/80">
+                  Original
+                </span>
                 <span className="rounded-full bg-purple-500/20 px-2 py-0.5 text-xs text-purple-300">
                   Before
                 </span>
               </div>
-              <div className="relative aspect-square w-full overflow-hidden rounded-lg border border-white/10 bg-black">
+              <div className="group relative aspect-square w-full overflow-hidden rounded-lg border border-white/10 bg-black shadow-lg transition-all duration-300 hover:border-purple-500/30 hover:shadow-purple-500/20">
                 <Image
                   src={originalUrl}
                   alt="Original"
                   fill
-                  className="object-contain"
+                  className="object-contain transition-transform duration-300 group-hover:scale-105"
                   sizes="(max-width: 768px) 100vw, 50vw"
                 />
               </div>
@@ -133,12 +125,12 @@ export function BeforeAfterModal({
                 </span>
               )}
             </div>
-            <div className="relative aspect-square w-full overflow-hidden rounded-lg border border-white/10 bg-black">
+            <div className="group relative aspect-square w-full overflow-hidden rounded-lg border border-white/10 bg-black shadow-lg transition-all duration-300 hover:border-green-500/30 hover:shadow-green-500/20">
               <Image
                 src={generatedUrl}
                 alt="Generated"
                 fill
-                className="object-contain"
+                className="object-contain transition-transform duration-300 group-hover:scale-105"
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
             </div>
@@ -147,35 +139,25 @@ export function BeforeAfterModal({
 
         {/* Prompt Display */}
         {prompt && (
-          <div className="mb-4 rounded-lg border border-white/10 bg-white/5 p-3">
-            <p className="text-xs text-white/60 mb-1">Prompt:</p>
-            <p className="text-sm text-white/90">{prompt}</p>
+          <div className="mb-4 rounded-lg border border-purple-500/20 bg-gradient-to-br from-purple-500/10 to-transparent p-3 shadow-lg backdrop-blur-sm">
+            <p className="mb-1 text-xs font-medium text-purple-300">
+              AI Prompt:
+            </p>
+            <p className="text-sm leading-relaxed text-white/90">{prompt}</p>
           </div>
         )}
 
         {/* Action Buttons */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-3">
           {onOpenInStudio && (
             <button
               onClick={() => {
                 onOpenInStudio();
                 onClose();
               }}
-              className="flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-purple-700"
+              className="flex items-center gap-2 rounded-lg bg-purple-500/90 px-4 py-2.5 text-sm font-medium text-white shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:bg-purple-500 hover:shadow-purple-500/50"
             >
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                />
-              </svg>
+              <Palette className="h-4 w-4" />
               Open in Studio
             </button>
           )}
@@ -183,40 +165,16 @@ export function BeforeAfterModal({
           {onDownload && (
             <button
               onClick={onDownload}
-              className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-white/20"
+              className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2.5 text-sm font-medium text-white shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:bg-white/20 hover:shadow-white/25"
             >
-              <svg
-                className="h-4 w-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                />
-              </svg>
+              <Download className="h-4 w-4" />
               Download
             </button>
           )}
 
           {!originalUrl && (
-            <div className="text-sm text-white/50 ml-auto flex items-center">
-              <svg
-                className="h-4 w-4 mr-1"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
+            <div className="ml-auto flex items-center text-sm text-white/50">
+              <Info className="mr-1.5 h-4 w-4" />
               Original image not available
             </div>
           )}
@@ -227,4 +185,3 @@ export function BeforeAfterModal({
 }
 
 export default BeforeAfterModal;
-
