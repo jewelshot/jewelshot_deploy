@@ -9,11 +9,29 @@ import {
   Check,
   Upload,
   X,
+  GripVertical,
 } from 'lucide-react';
 import { useSidebarStore } from '@/store/sidebarStore';
 import { useImageMetadataStore } from '@/store/imageMetadataStore';
 import { useCatalogueStore } from '@/store/catalogueStore';
 import { createScopedLogger } from '@/lib/logger';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  rectSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 const logger = createScopedLogger('Catalogue');
 
@@ -30,13 +48,22 @@ export default function CatalogueContent() {
     setContactInfo,
     setFrontCover,
     setBackCover,
+    setImageOrder,
   } = useCatalogueStore();
 
   const [activeTab, setActiveTab] = useState<'setup' | 'preview'>('setup');
 
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
   // Get favorite images with metadata
   const favoriteItems = useMemo(() => {
-    return favorites
+    const items = favorites
       .map((fav) => {
         const imageMetadata = metadata[fav.imageId];
         return {
@@ -46,7 +73,42 @@ export default function CatalogueContent() {
         };
       })
       .sort((a, b) => a.order - b.order);
-  }, [favorites, metadata]);
+
+    // Apply custom order if exists
+    if (settings.imageOrder.length > 0) {
+      return settings.imageOrder
+        .map((id) => items.find((item) => item.imageId === id))
+        .filter(Boolean) as typeof items;
+    }
+
+    return items;
+  }, [favorites, metadata, settings.imageOrder]);
+
+  // Initialize image order when favorites change
+  useEffect(() => {
+    if (favoriteItems.length > 0 && settings.imageOrder.length === 0) {
+      setImageOrder(favoriteItems.map((item) => item.imageId));
+    }
+  }, [favoriteItems.length, settings.imageOrder.length, setImageOrder]);
+
+  // Handle drag end
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = favoriteItems.findIndex(
+        (item) => item.imageId === active.id
+      );
+      const newIndex = favoriteItems.findIndex(
+        (item) => item.imageId === over.id
+      );
+
+      const newOrder = arrayMove(favoriteItems, oldIndex, newIndex).map(
+        (item) => item.imageId
+      );
+      setImageOrder(newOrder);
+    }
+  };
 
   useEffect(() => {
     logger.info('Catalogue loaded with favorites:', favoriteItems.length);
@@ -132,23 +194,28 @@ export default function CatalogueContent() {
                 <h3 className="mb-4 text-lg font-semibold text-white">
                   Selected Images ({favoriteItems.length})
                 </h3>
-                <div className="grid grid-cols-4 gap-4">
-                  {favoriteItems.map((item) => (
-                    <div
-                      key={item.imageId}
-                      className="aspect-square rounded-lg border border-white/10 bg-white/5 p-2"
-                    >
-                      <div className="flex h-full items-center justify-center">
-                        <FileText className="h-8 w-8 text-white/40" />
-                      </div>
-                      <p className="mt-2 text-center text-xs text-white/60">
-                        #{item.order}
-                      </p>
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={favoriteItems.map((item) => item.imageId)}
+                    strategy={rectSortingStrategy}
+                  >
+                    <div className="grid grid-cols-4 gap-4">
+                      {favoriteItems.map((item, index) => (
+                        <SortableImageCard
+                          key={item.imageId}
+                          item={item}
+                          index={index}
+                        />
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </SortableContext>
+                </DndContext>
                 <p className="mt-4 text-xs text-white/40">
-                  Tip: Reorder images in the Gallery Favorites tab
+                  Drag and drop images to reorder them in the catalogue
                 </p>
               </div>
 
@@ -408,6 +475,66 @@ export default function CatalogueContent() {
         <div className="flex h-full items-center justify-center">
           <p className="text-white/60">Preview mode coming soon...</p>
         </div>
+      )}
+    </div>
+  );
+}
+
+// Sortable Image Card Component
+interface SortableImageCardProps {
+  item: {
+    imageId: string;
+    order: number;
+    metadata?: {
+      fileName?: string;
+    };
+  };
+  index: number;
+}
+
+function SortableImageCard({ item, index }: SortableImageCardProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: item.imageId });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="group relative aspect-square cursor-move rounded-lg border border-white/10 bg-white/5 p-2 transition-all hover:border-white/30 hover:bg-white/10"
+      {...attributes}
+      {...listeners}
+    >
+      {/* Drag Handle */}
+      <div className="absolute right-2 top-2 rounded bg-black/50 p-1 opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
+        <GripVertical className="h-3 w-3 text-white" />
+      </div>
+
+      {/* Order Badge */}
+      <div className="absolute left-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white/10 text-xs font-semibold text-white backdrop-blur-sm">
+        {index + 1}
+      </div>
+
+      <div className="flex h-full items-center justify-center">
+        <FileText className="h-8 w-8 text-white/40" />
+      </div>
+
+      {/* Metadata Indicator */}
+      {item.metadata?.fileName && (
+        <p className="mt-2 truncate text-center text-xs text-white/60">
+          {item.metadata.fileName}
+        </p>
       )}
     </div>
   );
