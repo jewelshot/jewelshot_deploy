@@ -142,19 +142,40 @@ export default function CatalogueContent() {
     })
   );
 
-  // Load image URLs from gallery
+  // Load image URLs from gallery - WITH CACHE
   useEffect(() => {
     const loadUrls = async () => {
+      const startTime = performance.now();
+      
       if (favorites.length === 0) {
         setImagesWithUrls([]);
         return;
       }
 
-      const { getSavedImages } = await import('@/lib/gallery-storage');
-      const galleryImages = await getSavedImages();
+      // Try cache first (sessionStorage for speed)
+      const cacheKey = 'catalogue-gallery-cache';
+      const cached = sessionStorage.getItem(cacheKey);
+      let galleryImages;
+      
+      if (cached) {
+        console.log('🚀 CACHE HIT - Loading from sessionStorage');
+        galleryImages = JSON.parse(cached);
+      } else {
+        console.log('🔄 CACHE MISS - Fetching from gallery...');
+        const { getSavedImages } = await import('@/lib/gallery-storage');
+        galleryImages = await getSavedImages();
+        
+        // Cache for session
+        try {
+          sessionStorage.setItem(cacheKey, JSON.stringify(galleryImages));
+          console.log('💾 Cached to sessionStorage');
+        } catch (e) {
+          console.warn('⚠️ Failed to cache (quota?)');
+        }
+      }
 
       const withUrls = favorites.map((fav) => {
-        const galleryImage = galleryImages.find((img) => img.id === fav.imageId);
+        const galleryImage = galleryImages.find((img: any) => img.id === fav.imageId);
         return {
           imageId: fav.imageId,
           imageUrl: galleryImage?.src,
@@ -165,8 +186,10 @@ export default function CatalogueContent() {
 
       setImagesWithUrls(withUrls.sort((a, b) => a.order - b.order));
       
+      const endTime = performance.now();
+      const loadTime = (endTime - startTime).toFixed(0);
+      console.log(`⚡ Loaded ${withUrls.length} images in ${loadTime}ms`);
       logger.info('✅ Loaded favorites:', withUrls.length);
-      console.log('Favorites:', withUrls);
     };
 
     loadUrls();
