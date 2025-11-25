@@ -150,24 +150,24 @@ export function BatchDetailModal({
                   {/* Status Badge */}
                   <div className="absolute right-2 top-2">
                     {image.status === 'completed' && (
-                      <div className="rounded-full bg-green-500/80 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                      <div className="rounded-full bg-white/20 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
                         ✓ Done
                       </div>
                     )}
                     {image.status === 'failed' && (
-                      <div className="rounded-full bg-red-500/80 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                      <div className="rounded-full bg-white/20 px-2 py-1 text-xs font-medium text-white/60 backdrop-blur-sm">
                         ✗ Failed
                       </div>
                     )}
                     {image.status === 'processing' && (
-                      <div className="rounded-full bg-blue-500/80 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                      <div className="rounded-full bg-white/20 px-2 py-1 text-xs font-medium text-white/60 backdrop-blur-sm">
                         ⋯ Processing
                       </div>
                     )}
                   </div>
 
                   {/* Hover Actions */}
-                  <div className="absolute inset-0 flex items-center justify-center gap-2 bg-gradient-to-t from-black/90 via-black/70 to-black/50 opacity-0 backdrop-blur-md transition-all duration-300 group-hover:opacity-100">
+                  <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/70 opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100">
                     {image.original_url && (
                       <button
                         onClick={() =>
@@ -178,7 +178,7 @@ export function BatchDetailModal({
                             name: image.original_filename,
                           })
                         }
-                        className="rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 p-2.5 text-white shadow-lg shadow-purple-500/30 backdrop-blur-sm transition-all duration-200 hover:scale-110 hover:from-purple-500 hover:to-indigo-500 hover:shadow-purple-500/50"
+                        className="rounded-lg bg-white/10 p-2.5 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
                         title="Compare in Studio"
                       >
                         <Eye className="h-4 w-4" />
@@ -188,7 +188,7 @@ export function BatchDetailModal({
                       <>
                         <button
                           onClick={() => onOpenInStudio(image.result_url!)}
-                          className="rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 p-2.5 text-white shadow-lg shadow-purple-500/30 backdrop-blur-sm transition-all duration-200 hover:scale-110 hover:from-purple-500 hover:to-indigo-500 hover:shadow-purple-500/50"
+                          className="rounded-lg bg-white/10 p-2.5 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
                           title="Open in Studio"
                         >
                           <Palette className="h-4 w-4" />
@@ -200,7 +200,7 @@ export function BatchDetailModal({
                               image.original_filename
                             )
                           }
-                          className="rounded-lg bg-white/10 p-2.5 text-white shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-110 hover:bg-white/20 hover:shadow-white/25"
+                          className="rounded-lg bg-white/10 p-2.5 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
                           title="Download"
                         >
                           <Download className="h-4 w-4" />

@@ -78,7 +78,7 @@ export function ImageCard({
 
       {/* Overlay with Actions */}
       <div
-        className={`absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-t from-black/90 via-black/70 to-black/50 backdrop-blur-md transition-all duration-300 ${
+        className={`absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/70 backdrop-blur-sm transition-opacity duration-300 ${
           isHovered ? 'opacity-100' : 'opacity-0'
         }`}
       >
@@ -86,7 +86,7 @@ export function ImageCard({
         {onView && (
           <button
             onClick={onView}
-            className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-purple-500/30 backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:from-purple-500 hover:to-indigo-500 hover:shadow-purple-500/50"
+            className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/20"
           >
             <Palette className="h-4 w-4" />
             {originalUrl ? 'Compare in Studio' : 'Open in Studio'}
@@ -97,7 +97,7 @@ export function ImageCard({
         {!onView && onOpenInStudio && (
           <button
             onClick={onOpenInStudio}
-            className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-purple-500/30 backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:from-purple-500 hover:to-indigo-500 hover:shadow-purple-500/50"
+            className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/20"
           >
             <Palette className="h-4 w-4" />
             Open in Studio
@@ -109,7 +109,7 @@ export function ImageCard({
           {onDownload && (
             <button
               onClick={onDownload}
-              className="rounded-lg bg-white/10 p-2.5 text-white shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-110 hover:bg-white/20 hover:shadow-white/25"
+              className="rounded-lg bg-white/10 p-2.5 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
               title="Download"
             >
               <Download className="h-4 w-4" />
@@ -118,7 +118,7 @@ export function ImageCard({
           {onDelete && (
             <button
               onClick={onDelete}
-              className="rounded-lg bg-red-500/20 p-2.5 text-red-400 shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-110 hover:bg-red-500/30 hover:shadow-red-500/25"
+              className="rounded-lg bg-white/10 p-2.5 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
               title="Delete"
             >
               <Trash2 className="h-4 w-4" />
@@ -131,7 +131,7 @@ export function ImageCard({
       <div className="absolute left-2 top-2 flex gap-2">
         {/* Favorite Badge */}
         {isFavorite && favoriteOrder > 0 && (
-          <div className="flex items-center gap-1 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 px-2 py-1 shadow-lg ring-2 ring-white/20">
+          <div className="flex items-center gap-1 rounded-full bg-white/20 px-2 py-1 backdrop-blur-sm">
             <Star className="h-3 w-3 fill-white text-white" />
             <span className="text-xs font-bold text-white">
               {favoriteOrder}
@@ -141,7 +141,7 @@ export function ImageCard({
 
         {/* Metadata Badge */}
         {hasMetadata && (
-          <div className="flex items-center gap-1 rounded-full bg-purple-500/90 px-2 py-1 shadow-lg ring-2 ring-white/20">
+          <div className="flex items-center gap-1 rounded-full bg-white/20 px-2 py-1 backdrop-blur-sm">
             <Edit3 className="h-3 w-3 text-white" />
           </div>
         )}
@@ -156,10 +156,10 @@ export function ImageCard({
               e.stopPropagation();
               onToggleFavorite();
             }}
-            className={`rounded-full p-1.5 shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-110 ${
+            className={`rounded-full p-1.5 backdrop-blur-sm transition-colors ${
               isFavorite
-                ? 'bg-yellow-500/90 text-white'
-                : 'bg-black/60 text-white/60 hover:bg-black/80 hover:text-yellow-500'
+                ? 'bg-white/30 text-white'
+                : 'bg-black/60 text-white/60 hover:bg-white/20 hover:text-white'
             }`}
             title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
           >
@@ -174,7 +174,7 @@ export function ImageCard({
               e.stopPropagation();
               onEditMetadata();
             }}
-            className="rounded-full bg-black/60 p-1.5 text-white/80 shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-110 hover:bg-purple-500/90 hover:text-white"
+            className="rounded-full bg-black/60 p-1.5 text-white/80 backdrop-blur-sm transition-colors hover:bg-white/20 hover:text-white"
             title="Edit metadata"
           >
             <Edit3 className="h-4 w-4" />
