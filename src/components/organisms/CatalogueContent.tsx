@@ -56,6 +56,7 @@ export default function CatalogueContent() {
   // BYPASS ZUSTAND - Read directly from localStorage
   const [favorites, setFavorites] = useState<FavoriteImage[]>([]);
   const [metadata, setMetadata] = useState<Record<string, ImageMetadata>>({});
+  const [isLoadingFavorites, setIsLoadingFavorites] = useState(true); // Loading state
   
   // DEBUG: Show what we're loading
   const [debugInfo, setDebugInfo] = useState<string>('Loading...');
@@ -63,6 +64,7 @@ export default function CatalogueContent() {
   // Load from localStorage on mount
   useEffect(() => {
     console.log('🔥 CATALOGUE COMPONENT MOUNTING...');
+    setIsLoadingFavorites(true);
     
     // CLEAR STALE CATALOGUE STORE
     console.log('🔥 CLEARING STALE catalogueStore imageOrder');
@@ -101,6 +103,8 @@ export default function CatalogueContent() {
       console.error('🔥 ERROR LOADING:', error);
       setDebugInfo(`❌ Error: ${error}`);
       logger.error('❌ Failed to load from localStorage:', error);
+    } finally {
+      setIsLoadingFavorites(false);
     }
   }, [setImageOrder]);
   
@@ -146,6 +150,9 @@ export default function CatalogueContent() {
   useEffect(() => {
     const loadUrls = async () => {
       const startTime = performance.now();
+      
+      // Don't load URLs if still loading favorites
+      if (isLoadingFavorites) return;
       
       if (favorites.length === 0) {
         setImagesWithUrls([]);
@@ -193,7 +200,7 @@ export default function CatalogueContent() {
     };
 
     loadUrls();
-  }, [favorites, metadata]);
+  }, [favorites, metadata, isLoadingFavorites]);
 
   // Initialize order
   // REMOVED: No longer using imageOrder - just display imagesWithUrls directly
@@ -358,7 +365,14 @@ export default function CatalogueContent() {
       {/* Content */}
       {activeTab === 'setup' && (
         <div className="flex-1">
-          {orderedImages.length > 0 ? (
+          {isLoadingFavorites ? (
+            <div className="flex h-full items-center justify-center">
+              <div className="text-center">
+                <Loader2 className="mx-auto mb-4 h-12 w-12 animate-spin text-white/40" />
+                <p className="text-sm text-white/60">Loading favorites...</p>
+              </div>
+            </div>
+          ) : orderedImages.length > 0 ? (
             <div className="rounded-lg border border-white/10 bg-white/5 p-6">
               <h3 className="mb-4 text-lg font-semibold text-white">
                 Selected Images ({orderedImages.length})
@@ -409,7 +423,7 @@ export default function CatalogueContent() {
                 </a>
               </div>
             </div>
-          )}
+          ) : null}
         </div>
       )}
 
