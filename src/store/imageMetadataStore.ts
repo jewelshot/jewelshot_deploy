@@ -308,13 +308,6 @@ export const useImageMetadataStore = create<ImageMetadataState>()(
     {
       name: 'jewelshot-image-metadata',
       version: 1,
-      // Add post-rehydration sync
-      onRehydrateStorage: () => (state) => {
-        // Sync from Supabase after rehydration
-        if (state) {
-          state.syncFromSupabase();
-        }
-      },
     }
   )
 );
