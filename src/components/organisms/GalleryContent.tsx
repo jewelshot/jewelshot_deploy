@@ -1,6 +1,12 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, {
+  useState,
+  useMemo,
+  useEffect,
+  useRef,
+  useCallback,
+} from 'react';
 import { useRouter } from 'next/navigation';
 import { Folder, Star } from 'lucide-react';
 import GalleryToolbar from '@/components/molecules/GalleryToolbar';
@@ -13,6 +19,7 @@ import { BatchDetailModal } from '@/components/molecules/BatchDetailModal';
 import { ImageMetadataModal } from '@/components/molecules/ImageMetadataModal';
 import { useImageMetadataStore } from '@/store/imageMetadataStore';
 import { useSidebarStore } from '@/store/sidebarStore';
+import { ImageCardSkeleton } from '@/components/atoms/ImageCardSkeleton';
 import {
   downloadImageWithBlob,
   generateImageFilename,
@@ -56,6 +63,11 @@ export function GalleryContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
+
+  // Lazy loading state
+  const [visibleCount, setVisibleCount] = useState(20);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   // Batch Detail Modal state
   const [selectedBatchProject, setSelectedBatchProject] =
@@ -184,7 +196,8 @@ export function GalleryContent() {
   }, [activeTab]);
 
   // Filter and sort images
-  const filteredAndSortedImages = useMemo(() => {
+  // All filtered and sorted images (without pagination)
+  const allFilteredAndSortedImages = useMemo(() => {
     let filtered = images;
 
     // Apply filter
@@ -217,6 +230,63 @@ export function GalleryContent() {
 
     return sorted;
   }, [images, searchValue, activeFilter, sortValue]);
+
+  // Visible images (with lazy loading pagination)
+  const filteredAndSortedImages = useMemo(() => {
+    return allFilteredAndSortedImages.slice(0, visibleCount);
+  }, [allFilteredAndSortedImages, visibleCount]);
+
+  // Reset visible count when filters/search/sort changes
+  useEffect(() => {
+    setVisibleCount(20);
+  }, [searchValue, activeFilter, sortValue]);
+
+  // Load more images callback
+  const loadMoreImages = useCallback(() => {
+    if (isLoadingMore) return;
+
+    const hasMore = visibleCount < allFilteredAndSortedImages.length;
+    if (!hasMore) return;
+
+    setIsLoadingMore(true);
+
+    // Simulate loading delay for smooth UX
+    setTimeout(() => {
+      setVisibleCount((prev) =>
+        Math.min(prev + 20, allFilteredAndSortedImages.length)
+      );
+      setIsLoadingMore(false);
+      logger.info('Loaded more images', { newCount: visibleCount + 20 });
+    }, 300);
+  }, [isLoadingMore, visibleCount, allFilteredAndSortedImages.length]);
+
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const target = entries[0];
+        if (target.isIntersecting && !isLoadingMore) {
+          loadMoreImages();
+        }
+      },
+      {
+        root: null,
+        rootMargin: '200px', // Trigger 200px before reaching bottom
+        threshold: 0.1,
+      }
+    );
+
+    const currentRef = loadMoreRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [loadMoreImages, isLoadingMore]);
 
   // Favorite images (sorted by favorite order)
   const favoriteImages = useMemo(() => {
@@ -645,18 +715,55 @@ export function GalleryContent() {
 
           {/* Grid */}
           {!isLoading || images.length > 0 ? (
-            <GalleryGrid
-              images={filteredAndSortedImages}
-              onView={handleView}
-              onOpenInStudio={handleOpenInStudio}
-              onDownload={handleDownload}
-              onDelete={handleDelete}
-              onToggleFavorite={handleToggleFavorite}
-              onEditMetadata={handleEditMetadata}
-              isFavorite={isFavorite}
-              getFavoriteOrder={getFavoriteOrder}
-              hasMetadata={hasMetadata}
-            />
+            <>
+              <GalleryGrid
+                images={filteredAndSortedImages}
+                onView={handleView}
+                onOpenInStudio={handleOpenInStudio}
+                onDownload={handleDownload}
+                onDelete={handleDelete}
+                onToggleFavorite={handleToggleFavorite}
+                onEditMetadata={handleEditMetadata}
+                isFavorite={isFavorite}
+                getFavoriteOrder={getFavoriteOrder}
+                hasMetadata={hasMetadata}
+              />
+
+              {/* Loading More Skeletons */}
+              {isLoadingMore && (
+                <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {Array.from({ length: 8 }).map((_, i) => (
+                    <ImageCardSkeleton key={`skeleton-${i}`} />
+                  ))}
+                </div>
+              )}
+
+              {/* Intersection Observer Trigger */}
+              {visibleCount < allFilteredAndSortedImages.length && (
+                <div ref={loadMoreRef} className="flex justify-center py-8">
+                  {!isLoadingMore && (
+                    <button
+                      onClick={loadMoreImages}
+                      className="rounded-lg bg-white/5 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-white/10"
+                    >
+                      Load More (
+                      {allFilteredAndSortedImages.length - visibleCount}{' '}
+                      remaining)
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* All Loaded Message */}
+              {visibleCount >= allFilteredAndSortedImages.length &&
+                allFilteredAndSortedImages.length > 20 && (
+                  <div className="flex justify-center py-8">
+                    <p className="text-sm text-white/40">
+                      ✓ All {allFilteredAndSortedImages.length} images loaded
+                    </p>
+                  </div>
+                )}
+            </>
           ) : null}
         </>
       )}
