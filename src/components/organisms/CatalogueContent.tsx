@@ -69,7 +69,6 @@ export default function CatalogueContent() {
     // CLEAR STALE CATALOGUE STORE
     console.log('🔥 CLEARING STALE catalogueStore imageOrder');
     localStorage.removeItem('jewelshot-catalogue');
-    setImageOrder([]); // Force reset
     
     try {
       const stored = localStorage.getItem('jewelshot-image-metadata');
@@ -106,7 +105,7 @@ export default function CatalogueContent() {
     } finally {
       setIsLoadingFavorites(false);
     }
-  }, [setImageOrder]);
+  }, []);
   
   const {
     settings,
