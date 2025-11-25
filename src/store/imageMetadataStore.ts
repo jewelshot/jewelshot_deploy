@@ -308,8 +308,13 @@ export const useImageMetadataStore = create<ImageMetadataState>()(
     {
       name: 'jewelshot-image-metadata',
       version: 1,
-      // DON'T auto-sync on rehydration - it clears localStorage!
-      // Sync is called manually in components when needed
+      // Add post-rehydration sync
+      onRehydrateStorage: () => (state) => {
+        // Sync from Supabase after rehydration
+        if (state) {
+          state.syncFromSupabase();
+        }
+      },
     }
   )
 );

@@ -58,7 +58,7 @@ const logger = createScopedLogger('Catalogue');
 
 export default function CatalogueContent() {
   const { leftOpen, rightOpen, topOpen, bottomOpen } = useSidebarStore();
-  const { favorites, metadata } = useImageMetadataStore();
+  const { favorites, metadata, syncFromSupabase } = useImageMetadataStore();
   const {
     settings,
     setPageFormat,
@@ -78,6 +78,7 @@ export default function CatalogueContent() {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [editingImageId, setEditingImageId] = useState<string | null>(null);
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Prepare PDF data - Get actual image URLs from gallery
   const [pdfImagesWithUrls, setPdfImagesWithUrls] = useState<
@@ -182,10 +183,42 @@ export default function CatalogueContent() {
     loadImageUrls();
   }, [favorites, metadata]);
 
-  // Log current state for debugging
+  // Sync from Supabase on mount (optional - fallback to localStorage)
   useEffect(() => {
-    logger.info('📦 Favorites from localStorage:', favorites.length);
-  }, [favorites.length]);
+    const syncData = async () => {
+      try {
+        setIsLoading(true);
+
+        // First show what we have from localStorage
+        logger.info(
+          '📦 Current favorites from localStorage:',
+          favorites.length
+        );
+
+        // Try to sync from Supabase (optional)
+        try {
+          logger.info('🔄 Attempting Supabase sync...');
+          await syncFromSupabase();
+          logger.info('✅ Supabase sync completed');
+        } catch (syncError) {
+          // Sync failed, but that's okay - we'll use localStorage
+          logger.warn(
+            '⚠️ Supabase sync failed, using localStorage data:',
+            syncError
+          );
+          console.warn(
+            'Using localStorage favorites. To enable Supabase sync, run the migration in CATALOG_FIX_INSTRUCTIONS.md'
+          );
+        }
+      } catch (error) {
+        logger.error('❌ Error during initialization:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    syncData();
+  }, []); // Only run once on mount
 
   useEffect(() => {
     logger.info('📊 Catalogue State:', {
@@ -350,7 +383,14 @@ export default function CatalogueContent() {
       {/* Main Content */}
       {activeTab === 'setup' && (
         <div className="flex-1">
-          {favoriteItems.length > 0 ? (
+          {isLoading ? (
+            <div className="flex h-full items-center justify-center">
+              <div className="text-center">
+                <Loader2 className="mx-auto mb-4 h-12 w-12 animate-spin text-white/40" />
+                <p className="text-sm text-white/60">Loading favorites...</p>
+              </div>
+            </div>
+          ) : favoriteItems.length > 0 ? (
             <div className="space-y-6">
               {/* Images Section */}
               <div className="rounded-lg border border-white/10 bg-white/5 p-6">
@@ -411,7 +451,14 @@ export default function CatalogueContent() {
 
       {activeTab === 'preview' && (
         <div className="flex-1">
-          {favoriteItems.length > 0 ? (
+          {isLoading ? (
+            <div className="flex h-full items-center justify-center">
+              <div className="text-center">
+                <Loader2 className="mx-auto mb-4 h-12 w-12 animate-spin text-white/40" />
+                <p className="text-sm text-white/60">Loading favorites...</p>
+              </div>
+            </div>
+          ) : favoriteItems.length > 0 ? (
             <div className="h-full rounded-lg border border-white/10 bg-white/5 p-4">
               <PDFViewer
                 style={{
