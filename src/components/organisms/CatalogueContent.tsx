@@ -169,10 +169,12 @@ export default function CatalogueContent() {
 
   // Initialize order
   useEffect(() => {
-    if (imagesWithUrls.length > 0 && settings.imageOrder.length === 0) {
+    if (imagesWithUrls.length > 0) {
+      // ALWAYS reset order to current images - ignore old stale order
+      console.log('🔥 RESETTING IMAGE ORDER to current imagesWithUrls:', imagesWithUrls.length);
       setImageOrder(imagesWithUrls.map((img) => img.imageId));
     }
-  }, [imagesWithUrls.length, settings.imageOrder.length, setImageOrder]);
+  }, [imagesWithUrls.length, setImageOrder]);
 
   // Apply custom order
   const orderedImages = useMemo(() => {
@@ -192,6 +194,13 @@ export default function CatalogueContent() {
       .filter(Boolean) as typeof imagesWithUrls;
     
     console.log('🔥 CUSTOM ORDER APPLIED - RESULT:', ordered.length);
+    
+    // If ordered is empty but we have images, return all images (stale order)
+    if (ordered.length === 0 && imagesWithUrls.length > 0) {
+      console.log('🔥 ORDER STALE - RETURNING ALL imagesWithUrls instead');
+      return imagesWithUrls;
+    }
+    
     return ordered;
   }, [imagesWithUrls, settings.imageOrder]);
 
