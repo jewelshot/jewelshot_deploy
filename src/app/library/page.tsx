@@ -61,14 +61,14 @@ export default function LibraryPage() {
   const handlePresetToggle = (presetId: string, categoryId: string) => {
     if (isPresetSelected(presetId)) {
       removePreset(presetId);
-      toast.success('Preset removed from Quick Presets');
+      toast.success('Preset removed (auto-saved)');
     } else {
       if (!canAddMorePresets()) {
-        toast.error(`You can only select up to ${maxPresets} presets`);
+        toast.error(`Maximum ${maxPresets} presets allowed`);
         return;
       }
       addPreset(presetId, categoryId);
-      toast.success('Preset added to Quick Presets');
+      toast.success('Preset added (auto-saved)');
     }
     logger.info('Preset toggled:', presetId);
   };
@@ -120,7 +120,7 @@ export default function LibraryPage() {
               <option value="all">All Categories</option>
               {PRESET_CATEGORIES.map((cat) => (
                 <option key={cat.id} value={cat.id}>
-                  {cat.emoji} {cat.name}
+                  {cat.name}
                 </option>
               ))}
             </select>
@@ -133,9 +133,11 @@ export default function LibraryPage() {
         <div className="flex items-start gap-3 rounded-lg border border-purple-500/20 bg-purple-500/10 p-4">
           <Info className="mt-0.5 h-5 w-5 shrink-0 text-purple-400" />
           <div className="text-sm text-white/70">
-            <strong className="text-white">Pro Tip:</strong> Select your
-            favorite presets from different categories. They will appear in your
-            Quick Presets panel for easy access during editing.
+            <strong className="text-white">How it works:</strong> Click on any
+            preset to add it to your Quick Presets panel. Your selections are{' '}
+            <strong className="text-white">automatically saved</strong> and will
+            appear in Studio and Batch pages. You can select up to {maxPresets}{' '}
+            presets.
           </div>
         </div>
       </div>
