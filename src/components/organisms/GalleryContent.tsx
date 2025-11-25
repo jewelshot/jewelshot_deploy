@@ -223,6 +223,27 @@ export function GalleryContent() {
     return sorted;
   }, [images, searchValue, activeFilter, sortValue]);
 
+  // Favorite images (sorted by favorite order)
+  const favoriteImages = useMemo(() => {
+    const favorites = useImageMetadataStore.getState().favorites;
+
+    // Map favorite IDs to images
+    const favoriteImageList = favorites
+      .map((fav) => {
+        const image = images.find((img) => img.id === fav.imageId);
+        return image ? { ...image, favoriteOrder: fav.order } : null;
+      })
+      .filter(
+        (img): img is GalleryImage & { favoriteOrder: number } => img !== null
+      );
+
+    // Sort by favorite order (1, 2, 3, ...)
+    favoriteImageList.sort((a, b) => a.favoriteOrder - b.favoriteOrder);
+
+    logger.debug('Favorite images:', favoriteImageList.length);
+    return favoriteImageList;
+  }, [images]);
+
   const handleView = (image: GalleryImage) => {
     setSelectedImage(image);
     setIsModalOpen(true);
@@ -635,6 +656,46 @@ export function GalleryContent() {
               hasMetadata={hasMetadata}
             />
           ) : null}
+        </>
+      )}
+
+      {/* Favorites Tab Content */}
+      {activeTab === 'favorites' && (
+        <>
+          {favoriteImages.length > 0 ? (
+            <GalleryGrid
+              images={favoriteImages}
+              onView={handleView}
+              onOpenInStudio={handleOpenInStudio}
+              onDownload={handleDownload}
+              onDelete={handleDelete}
+              onToggleFavorite={handleToggleFavorite}
+              onEditMetadata={handleEditMetadata}
+              isFavorite={isFavorite}
+              getFavoriteOrder={getFavoriteOrder}
+              hasMetadata={hasMetadata}
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center py-20">
+              <div className="mb-4 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 p-6">
+                <Star className="h-12 w-12 fill-white text-white" />
+              </div>
+              <h3 className="mb-2 text-lg font-semibold text-white">
+                No Favorites Yet
+              </h3>
+              <p className="mb-4 text-center text-sm text-white/60">
+                Click the star icon on any image to add it to your favorites.
+                <br />
+                You can favorite up to 12 images.
+              </p>
+              <button
+                onClick={() => setActiveTab('images')}
+                className="rounded-lg bg-purple-500/20 px-4 py-2 text-sm font-medium text-purple-400 transition-colors hover:bg-purple-500/30"
+              >
+                Browse Images
+              </button>
+            </div>
+          )}
         </>
       )}
 
