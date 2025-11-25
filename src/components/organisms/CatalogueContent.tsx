@@ -17,6 +17,7 @@ import { useSidebarStore } from '@/store/sidebarStore';
 import { useImageMetadataStore } from '@/store/imageMetadataStore';
 import { useCatalogueStore } from '@/store/catalogueStore';
 import { createScopedLogger } from '@/lib/logger';
+import type { ImageMetadata } from '@/types/image-metadata';
 import {
   DndContext,
   closestCenter,
@@ -128,13 +129,38 @@ export default function CatalogueContent() {
     }
   };
 
-  // Prepare PDF data
-  const pdfImages = useMemo(() => {
-    return favoriteItems.map((item) => ({
-      imageId: item.imageId,
-      imageUrl: item.metadata?.fileName || undefined, // TODO: Get actual image URL from gallery
-      metadata: item.metadata,
-    }));
+  // Prepare PDF data - Get actual image URLs from gallery
+  const [pdfImagesWithUrls, setPdfImagesWithUrls] = useState<
+    Array<{
+      imageId: string;
+      imageUrl?: string;
+      metadata?: ImageMetadata;
+    }>
+  >([]);
+
+  // Load actual image URLs for favorited images
+  useEffect(() => {
+    const loadImageUrls = async () => {
+      const { getSavedImages } = await import('@/lib/gallery-storage');
+      const galleryImages = await getSavedImages();
+
+      const imagesWithUrls = favoriteItems.map((item) => {
+        const galleryImage = galleryImages.find(
+          (img) => img.id === item.imageId
+        );
+        return {
+          imageId: item.imageId,
+          imageUrl: galleryImage?.src,
+          metadata: item.metadata,
+        };
+      });
+
+      setPdfImagesWithUrls(imagesWithUrls);
+    };
+
+    if (favoriteItems.length > 0) {
+      loadImageUrls();
+    }
   }, [favoriteItems]);
 
   useEffect(() => {
@@ -472,7 +498,10 @@ export default function CatalogueContent() {
               {/* Export Button */}
               <PDFDownloadLink
                 document={
-                  <CataloguePDF settings={settings} images={pdfImages} />
+                  <CataloguePDF
+                    settings={settings}
+                    images={pdfImagesWithUrls}
+                  />
                 }
                 fileName={`${settings.contactInfo.companyName || 'Catalogue'}_${new Date().toISOString().split('T')[0]}.pdf`}
               >
@@ -529,7 +558,7 @@ export default function CatalogueContent() {
                   borderRadius: '8px',
                 }}
               >
-                <CataloguePDF settings={settings} images={pdfImages} />
+                <CataloguePDF settings={settings} images={pdfImagesWithUrls} />
               </PDFViewer>
             </div>
           ) : (
