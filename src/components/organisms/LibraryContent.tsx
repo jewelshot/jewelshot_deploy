@@ -13,10 +13,10 @@ const logger = createScopedLogger('Library');
 
 /**
  * Library Content
- * Main content area for preset library with sidebar integration
+ * Main content area for preset library with all bars integration
  */
 export function LibraryContent() {
-  const { leftOpen } = useSidebarStore();
+  const { leftOpen, rightOpen, topOpen, bottomOpen } = useSidebarStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
@@ -74,108 +74,112 @@ export function LibraryContent() {
     logger.info('Preset toggled:', presetId);
   };
 
+  // Calculate preset selection order (1-12)
+  const getPresetOrder = (presetId: string): number => {
+    const index = selectedPresets.findIndex((p) => p.presetId === presetId);
+    return index !== -1 ? index + 1 : 0;
+  };
+
   return (
-    <main
-      className="relative flex min-h-screen flex-col transition-all duration-300"
+    <div
+      className="fixed z-10 flex h-full flex-col gap-6 overflow-y-auto p-6 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
       style={{
-        marginLeft: leftOpen ? '244px' : '0px',
+        left: leftOpen ? '260px' : '16px',
+        right: rightOpen ? '276px' : '16px',
+        top: topOpen ? '64px' : '16px',
+        bottom: bottomOpen ? '64px' : '16px',
       }}
     >
-      <div className="relative min-h-screen bg-gradient-to-br from-[#0A0A0F] via-[#111118] to-[#0A0A0F]">
-        {/* Header */}
-        <div className="sticky top-0 z-10 border-b border-white/10 bg-[#0A0A0F]/80 backdrop-blur-xl">
-          <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-white sm:text-3xl">
-                  Preset Library
-                </h1>
-                <p className="mt-1 text-sm text-white/60">
-                  Choose presets for your Quick Presets panel
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2">
-                  <span className="text-xs text-white/40">Selected:</span>{' '}
-                  <span className="font-semibold text-white">
-                    {selectedCount}/{maxPresets}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Search and Category Filter */}
-            <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-              {/* Search */}
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
-                <input
-                  type="text"
-                  placeholder="Search presets..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="h-10 w-full rounded-lg border border-white/10 bg-white/5 pl-10 pr-4 text-sm text-white placeholder:text-white/40 focus:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
-                />
-              </div>
-
-              {/* Category Filter */}
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="h-10 rounded-lg border border-white/10 bg-white/5 px-4 text-sm text-white focus:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
-              >
-                <option value="all">All Categories</option>
-                {PRESET_CATEGORIES.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
+      {/* Header */}
+      <div>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-[rgba(196,181,253,1)]">
+              Preset Library
+            </h1>
+            <p className="mt-1 text-sm text-[rgba(196,181,253,0.6)]">
+              Choose presets for your Quick Presets panel
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg border border-purple-500/30 bg-purple-500/10 px-4 py-2">
+              <span className="text-xs text-purple-300/60">Selected:</span>{' '}
+              <span className="text-lg font-semibold text-purple-300">
+                {selectedCount}/{maxPresets}
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Info Banner */}
-        <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex items-start gap-3 rounded-lg border border-purple-500/20 bg-purple-500/10 p-4">
-            <Info className="mt-0.5 h-5 w-5 shrink-0 text-purple-400" />
-            <div className="text-sm text-white/70">
-              <strong className="text-white">How it works:</strong> Click on any
-              preset to add it to your Quick Presets panel. Your selections are{' '}
-              <strong className="text-white">automatically saved</strong> and
-              will appear in Studio and Batch pages. You can select up to{' '}
-              {maxPresets} presets.
-            </div>
+        {/* Search and Category Filter */}
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          {/* Search */}
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
+            <input
+              type="text"
+              placeholder="Search presets..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="h-10 w-full rounded-lg border border-white/10 bg-white/5 pl-10 pr-4 text-sm text-white placeholder:text-white/40 focus:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+            />
           </div>
-        </div>
 
-        {/* Preset Categories */}
-        <div className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
-          <div className="space-y-8">
-            {filteredCategories.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 text-center">
-                <Sparkles className="mb-4 h-12 w-12 text-white/20" />
-                <h3 className="text-lg font-medium text-white/60">
-                  No presets found
-                </h3>
-                <p className="mt-1 text-sm text-white/40">
-                  Try adjusting your search or filters
-                </p>
-              </div>
-            ) : (
-              filteredCategories.map((category) => (
-                <CategorySection
-                  key={category.id}
-                  category={category}
-                  onPresetToggle={handlePresetToggle}
-                  isPresetSelected={isPresetSelected}
-                />
-              ))
-            )}
+          {/* Category Filter */}
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="h-10 rounded-lg border border-white/10 bg-white/5 px-4 text-sm text-white focus:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+          >
+            <option value="all">All Categories</option>
+            {PRESET_CATEGORIES.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Info Banner */}
+      <div className="mb-6">
+        <div className="flex items-start gap-3 rounded-lg border border-purple-500/20 bg-purple-500/10 p-4">
+          <Info className="mt-0.5 h-5 w-5 shrink-0 text-purple-400" />
+          <div className="text-sm text-white/70">
+            <strong className="text-white">How it works:</strong> Click on any
+            preset to add it to your Quick Presets panel. Your selections are{' '}
+            <strong className="text-white">automatically saved</strong> and will
+            appear in Studio and Batch pages (right sidebar). You can select up
+            to {maxPresets} presets.
           </div>
         </div>
       </div>
-    </main>
+
+      {/* Preset Categories */}
+      <div className="space-y-8">
+        {filteredCategories.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <Sparkles className="mb-4 h-12 w-12 text-white/20" />
+            <h3 className="text-lg font-medium text-white/60">
+              No presets found
+            </h3>
+            <p className="mt-1 text-sm text-white/40">
+              Try adjusting your search or filters
+            </p>
+          </div>
+        ) : (
+          filteredCategories.map((category) => (
+            <CategorySection
+              key={category.id}
+              category={category}
+              onPresetToggle={handlePresetToggle}
+              isPresetSelected={isPresetSelected}
+              getPresetOrder={getPresetOrder}
+            />
+          ))
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -186,12 +190,14 @@ interface CategorySectionProps {
   category: PresetCategory;
   onPresetToggle: (presetId: string, categoryId: string) => void;
   isPresetSelected: (presetId: string) => boolean;
+  getPresetOrder: (presetId: string) => number;
 }
 
 function CategorySection({
   category,
   onPresetToggle,
   isPresetSelected,
+  getPresetOrder,
 }: CategorySectionProps) {
   return (
     <div className="space-y-4">
@@ -208,6 +214,7 @@ function CategorySection({
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {category.presets.map((preset) => {
           const isSelected = isPresetSelected(preset.id);
+          const order = getPresetOrder(preset.id);
 
           return (
             <button
@@ -253,10 +260,21 @@ function CategorySection({
                 )}
               </div>
 
-              {/* Selected Badge */}
+              {/* Selection Order Badge (Top-Left) */}
+              {isSelected && order > 0 && (
+                <div className="absolute left-2 top-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg ring-2 ring-white/20">
+                    <span className="text-sm font-bold text-white">
+                      {order}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Check Mark Badge (Top-Right) */}
               {isSelected && (
                 <div className="absolute right-2 top-2">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-purple-500">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-purple-500/90">
                     <Check className="h-4 w-4 text-white" />
                   </div>
                 </div>
