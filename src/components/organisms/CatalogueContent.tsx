@@ -64,6 +64,11 @@ export default function CatalogueContent() {
   useEffect(() => {
     console.log('🔥 CATALOGUE COMPONENT MOUNTING...');
     
+    // CLEAR STALE CATALOGUE STORE
+    console.log('🔥 CLEARING STALE catalogueStore imageOrder');
+    localStorage.removeItem('jewelshot-catalogue');
+    setImageOrder([]); // Force reset
+    
     try {
       const stored = localStorage.getItem('jewelshot-image-metadata');
       console.log('🔥 LOCALSTORAGE KEY EXISTS:', !!stored);
@@ -97,7 +102,7 @@ export default function CatalogueContent() {
       setDebugInfo(`❌ Error: ${error}`);
       logger.error('❌ Failed to load from localStorage:', error);
     }
-  }, []);
+  }, [setImageOrder]);
   
   const {
     settings,
@@ -168,54 +173,25 @@ export default function CatalogueContent() {
   }, [favorites, metadata]);
 
   // Initialize order
-  useEffect(() => {
-    if (imagesWithUrls.length > 0) {
-      // ALWAYS reset order to current images - ignore old stale order
-      console.log('🔥 RESETTING IMAGE ORDER to current imagesWithUrls:', imagesWithUrls.length);
-      setImageOrder(imagesWithUrls.map((img) => img.imageId));
-    }
-  }, [imagesWithUrls.length, setImageOrder]);
+  // REMOVED: No longer using imageOrder - just display imagesWithUrls directly
 
-  // Apply custom order
+  // SCREW THE ORDERING - JUST USE imagesWithUrls DIRECTLY
   const orderedImages = useMemo(() => {
-    console.log('🔥 ORDERING IMAGES:', {
-      imagesWithUrlsCount: imagesWithUrls.length,
-      settingsImageOrderLength: settings.imageOrder.length,
-      settingsImageOrder: settings.imageOrder,
-    });
-    
-    if (settings.imageOrder.length === 0) {
-      console.log('🔥 NO CUSTOM ORDER - RETURNING ALL imagesWithUrls:', imagesWithUrls.length);
-      return imagesWithUrls;
-    }
-    
-    const ordered = settings.imageOrder
-      .map((id) => imagesWithUrls.find((img) => img.imageId === id))
-      .filter(Boolean) as typeof imagesWithUrls;
-    
-    console.log('🔥 CUSTOM ORDER APPLIED - RESULT:', ordered.length);
-    
-    // If ordered is empty but we have images, return all images (stale order)
-    if (ordered.length === 0 && imagesWithUrls.length > 0) {
-      console.log('🔥 ORDER STALE - RETURNING ALL imagesWithUrls instead');
-      return imagesWithUrls;
-    }
-    
-    return ordered;
-  }, [imagesWithUrls, settings.imageOrder]);
+    console.log('🔥 FUCK ORDERING - JUST RETURN imagesWithUrls:', imagesWithUrls.length);
+    return imagesWithUrls;
+  }, [imagesWithUrls]);
 
-  // Handle drag end
+  // Handle drag end - update imagesWithUrls order directly
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
-    const oldIndex = orderedImages.findIndex((img) => img.imageId === active.id);
-    const newIndex = orderedImages.findIndex((img) => img.imageId === over.id);
+    const oldIndex = imagesWithUrls.findIndex((img) => img.imageId === active.id);
+    const newIndex = imagesWithUrls.findIndex((img) => img.imageId === over.id);
 
-    const newOrder = arrayMove(orderedImages, oldIndex, newIndex).map(
-      (img) => img.imageId
-    );
-    setImageOrder(newOrder);
+    const newOrder = arrayMove(imagesWithUrls, oldIndex, newIndex);
+    setImagesWithUrls(newOrder);
+    console.log('🔥 REORDERED imagesWithUrls');
   };
 
   // Export PDF
@@ -256,16 +232,13 @@ export default function CatalogueContent() {
       }}
     >
       {/* DEBUG BANNER */}
-      <div className="rounded-lg border-2 border-yellow-500 bg-yellow-500/20 p-4">
-        <p className="text-sm font-mono text-yellow-200">{debugInfo}</p>
-        <p className="text-xs font-mono text-yellow-300 mt-1">
-          Favorites: {favorites.length} | ImagesWithUrls: {imagesWithUrls.length} | Ordered: {orderedImages.length}
+      <div className="rounded-lg border-2 border-green-500 bg-green-500/20 p-4">
+        <p className="text-sm font-mono text-green-200">{debugInfo}</p>
+        <p className="text-xs font-mono text-green-300 mt-1">
+          ✅ Favorites: {favorites.length} | Images Ready: {imagesWithUrls.length} | Displaying: {orderedImages.length}
         </p>
-        <p className="text-xs font-mono text-yellow-300 mt-1">
-          settings.imageOrder.length: {settings.imageOrder.length}
-        </p>
-        <p className="text-xs font-mono text-yellow-300 mt-1">
-          orderedImages IDs: {orderedImages.map(img => img.imageId.substring(0, 8)).join(', ')}
+        <p className="text-xs font-mono text-green-300 mt-1">
+          🎉 SIMPLIFIED - No more ordering bullshit, just showing images!
         </p>
       </div>
       
@@ -342,13 +315,13 @@ export default function CatalogueContent() {
         <div className="flex-1">
           <p className="text-sm text-white/60">Favorite Images</p>
           <p className="text-2xl font-semibold text-white">
-            {orderedImages.length}
+            {imagesWithUrls.length}
           </p>
         </div>
         <div className="flex-1">
           <p className="text-sm text-white/60">With Metadata</p>
           <p className="text-2xl font-semibold text-white">
-            {orderedImages.filter((img) => img.metadata).length}
+            {imagesWithUrls.filter((img) => img.metadata).length}
           </p>
         </div>
         <div className="flex-1">
