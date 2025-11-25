@@ -72,6 +72,15 @@ export default function CatalogueContent() {
   const [activeTab, setActiveTab] = useState<'setup' | 'preview'>('setup');
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
+  // Prepare PDF data - Get actual image URLs from gallery
+  const [pdfImagesWithUrls, setPdfImagesWithUrls] = useState<
+    Array<{
+      imageId: string;
+      imageUrl?: string;
+      metadata?: ImageMetadata;
+    }>
+  >([]);
+
   // Drag and drop sensors
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -80,15 +89,19 @@ export default function CatalogueContent() {
     })
   );
 
-  // Get favorite images with metadata
+  // Get favorite images with metadata and URLs
   const favoriteItems = useMemo(() => {
     const items = favorites
       .map((fav) => {
         const imageMetadata = metadata[fav.imageId];
+        const pdfImage = pdfImagesWithUrls.find(
+          (img) => img.imageId === fav.imageId
+        );
         return {
           imageId: fav.imageId,
           order: fav.order,
           metadata: imageMetadata,
+          imageUrl: pdfImage?.imageUrl,
         };
       })
       .sort((a, b) => a.order - b.order);
@@ -101,7 +114,7 @@ export default function CatalogueContent() {
     }
 
     return items;
-  }, [favorites, metadata, settings.imageOrder]);
+  }, [favorites, metadata, settings.imageOrder, pdfImagesWithUrls]);
 
   // Initialize image order when favorites change
   useEffect(() => {
@@ -129,39 +142,38 @@ export default function CatalogueContent() {
     }
   };
 
-  // Prepare PDF data - Get actual image URLs from gallery
-  const [pdfImagesWithUrls, setPdfImagesWithUrls] = useState<
-    Array<{
-      imageId: string;
-      imageUrl?: string;
-      metadata?: ImageMetadata;
-    }>
-  >([]);
-
   // Load actual image URLs for favorited images
   useEffect(() => {
     const loadImageUrls = async () => {
+      if (favorites.length === 0) {
+        setPdfImagesWithUrls([]);
+        return;
+      }
+
       const { getSavedImages } = await import('@/lib/gallery-storage');
       const galleryImages = await getSavedImages();
 
-      const imagesWithUrls = favoriteItems.map((item) => {
+      const imagesWithUrls = favorites.map((fav) => {
         const galleryImage = galleryImages.find(
-          (img) => img.id === item.imageId
+          (img) => img.id === fav.imageId
         );
+        const imageMetadata = metadata[fav.imageId];
         return {
-          imageId: item.imageId,
+          imageId: fav.imageId,
           imageUrl: galleryImage?.src,
-          metadata: item.metadata,
+          metadata: imageMetadata,
         };
       });
 
       setPdfImagesWithUrls(imagesWithUrls);
+      logger.info('Loaded image URLs for catalogue', {
+        count: imagesWithUrls.length,
+        withUrls: imagesWithUrls.filter((img) => img.imageUrl).length,
+      });
     };
 
-    if (favoriteItems.length > 0) {
-      loadImageUrls();
-    }
-  }, [favoriteItems]);
+    loadImageUrls();
+  }, [favorites, metadata]);
 
   useEffect(() => {
     logger.info('Catalogue loaded with favorites:', favoriteItems.length);
@@ -579,6 +591,7 @@ interface SortableImageCardProps {
   item: {
     imageId: string;
     order: number;
+    imageUrl?: string;
     metadata?: {
       fileName?: string;
     };
@@ -606,29 +619,41 @@ function SortableImageCard({ item, index }: SortableImageCardProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className="group relative aspect-square cursor-move rounded-lg border border-white/10 bg-white/5 p-2 transition-all hover:border-white/30 hover:bg-white/10"
+      className="group relative aspect-square cursor-move overflow-hidden rounded-lg border border-white/10 bg-white/5 transition-all hover:border-white/30 hover:bg-white/10"
       {...attributes}
       {...listeners}
     >
       {/* Drag Handle */}
-      <div className="absolute right-2 top-2 rounded bg-black/50 p-1 opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
+      <div className="absolute right-2 top-2 z-10 rounded bg-black/50 p-1 opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
         <GripVertical className="h-3 w-3 text-white" />
       </div>
 
       {/* Order Badge */}
-      <div className="absolute left-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white/10 text-xs font-semibold text-white backdrop-blur-sm">
+      <div className="absolute left-2 top-2 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-black/70 text-xs font-semibold text-white backdrop-blur-sm">
         {index + 1}
       </div>
 
-      <div className="flex h-full items-center justify-center">
-        <FileText className="h-8 w-8 text-white/40" />
-      </div>
+      {/* Image or Placeholder */}
+      {item.imageUrl ? (
+        <img
+          src={item.imageUrl}
+          alt={item.metadata?.fileName || `Image ${index + 1}`}
+          className="h-full w-full object-cover"
+          draggable={false}
+        />
+      ) : (
+        <div className="flex h-full items-center justify-center">
+          <FileText className="h-8 w-8 text-white/40" />
+        </div>
+      )}
 
-      {/* Metadata Indicator */}
+      {/* Metadata Indicator (Bottom overlay) */}
       {item.metadata?.fileName && (
-        <p className="mt-2 truncate text-center text-xs text-white/60">
-          {item.metadata.fileName}
-        </p>
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
+          <p className="truncate text-center text-xs text-white/80">
+            {item.metadata.fileName}
+          </p>
+        </div>
       )}
     </div>
   );
