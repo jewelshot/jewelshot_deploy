@@ -423,7 +423,7 @@ export default function CatalogueContent() {
                 </a>
               </div>
             </div>
-          ) : null}
+          )}
         </div>
       )}
 
