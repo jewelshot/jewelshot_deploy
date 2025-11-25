@@ -176,11 +176,23 @@ export default function CatalogueContent() {
 
   // Apply custom order
   const orderedImages = useMemo(() => {
-    if (settings.imageOrder.length === 0) return imagesWithUrls;
+    console.log('🔥 ORDERING IMAGES:', {
+      imagesWithUrlsCount: imagesWithUrls.length,
+      settingsImageOrderLength: settings.imageOrder.length,
+      settingsImageOrder: settings.imageOrder,
+    });
     
-    return settings.imageOrder
+    if (settings.imageOrder.length === 0) {
+      console.log('🔥 NO CUSTOM ORDER - RETURNING ALL imagesWithUrls:', imagesWithUrls.length);
+      return imagesWithUrls;
+    }
+    
+    const ordered = settings.imageOrder
       .map((id) => imagesWithUrls.find((img) => img.imageId === id))
       .filter(Boolean) as typeof imagesWithUrls;
+    
+    console.log('🔥 CUSTOM ORDER APPLIED - RESULT:', ordered.length);
+    return ordered;
   }, [imagesWithUrls, settings.imageOrder]);
 
   // Handle drag end
@@ -238,7 +250,13 @@ export default function CatalogueContent() {
       <div className="rounded-lg border-2 border-yellow-500 bg-yellow-500/20 p-4">
         <p className="text-sm font-mono text-yellow-200">{debugInfo}</p>
         <p className="text-xs font-mono text-yellow-300 mt-1">
-          Favorites in state: {favorites.length} | Images with URLs: {imagesWithUrls.length} | Ordered: {orderedImages.length}
+          Favorites: {favorites.length} | ImagesWithUrls: {imagesWithUrls.length} | Ordered: {orderedImages.length}
+        </p>
+        <p className="text-xs font-mono text-yellow-300 mt-1">
+          settings.imageOrder.length: {settings.imageOrder.length}
+        </p>
+        <p className="text-xs font-mono text-yellow-300 mt-1">
+          orderedImages IDs: {orderedImages.map(img => img.imageId.substring(0, 8)).join(', ')}
         </p>
       </div>
       
