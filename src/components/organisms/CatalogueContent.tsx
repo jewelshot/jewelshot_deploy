@@ -188,10 +188,12 @@ export default function CatalogueContent() {
     const syncData = async () => {
       try {
         setIsLoading(true);
+        logger.info('🔄 Starting Supabase sync...');
         await syncFromSupabase();
-        logger.info('Synced favorites from Supabase on catalogue mount');
+        logger.info('✅ Synced favorites from Supabase on catalogue mount');
       } catch (error) {
-        logger.error('Failed to sync from Supabase:', error);
+        logger.error('❌ Failed to sync from Supabase:', error);
+        console.error('Supabase sync error details:', error);
       } finally {
         setIsLoading(false);
       }
@@ -201,8 +203,23 @@ export default function CatalogueContent() {
   }, []); // Only run once on mount
 
   useEffect(() => {
-    logger.info('Catalogue loaded with favorites:', favoriteItems.length);
-  }, [favoriteItems.length]);
+    logger.info('📊 Catalogue State:', {
+      totalFavorites: favorites.length,
+      favoriteItems: favoriteItems.length,
+      withUrls: favoriteItems.filter((item) => item.imageUrl).length,
+      withMetadata: favoriteItems.filter((item) => item.metadata).length,
+      favoriteIds: favorites.map((f) => f.imageId),
+    });
+    console.table(
+      favoriteItems.map((item) => ({
+        imageId: item.imageId.substring(0, 8) + '...',
+        order: item.order,
+        hasUrl: !!item.imageUrl,
+        hasMetadata: !!item.metadata,
+        fileName: item.metadata?.fileName || 'N/A',
+      }))
+    );
+  }, [favoriteItems.length, favorites.length]);
 
   // Handle metadata editing
   const handleEditMetadata = (imageId: string) => {

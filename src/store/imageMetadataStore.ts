@@ -117,13 +117,13 @@ export const useImageMetadataStore = create<ImageMetadataState>()(
 
         // Check if already favorite
         if (state.favorites.some((f) => f.imageId === imageId)) {
-          logger.warn('Image already in favorites:', imageId);
+          logger.warn('⚠️ Image already in favorites:', imageId);
           return false;
         }
 
         // Check limit
         if (state.favorites.length >= state.maxFavorites) {
-          logger.warn('Max favorites limit reached:', state.maxFavorites);
+          logger.warn('⚠️ Max favorites limit reached:', state.maxFavorites);
           return false;
         }
 
@@ -144,11 +144,28 @@ export const useImageMetadataStore = create<ImageMetadataState>()(
         });
 
         // Sync to Supabase in background
-        syncFavoriteToSupabase(newFavorite).catch((error) => {
-          logger.error('Background favorite sync failed:', error);
-        });
+        syncFavoriteToSupabase(newFavorite)
+          .then((success) => {
+            if (success) {
+              logger.info('✅ Favorite synced to Supabase:', imageId);
+            } else {
+              logger.error('❌ Failed to sync favorite to Supabase:', imageId);
+            }
+          })
+          .catch((error) => {
+            logger.error('❌ Background favorite sync error:', error);
+            console.error('Favorite sync error details:', error);
+          });
 
-        logger.info('Added to favorites:', imageId, 'order:', nextOrder);
+        logger.info(
+          '⭐ Added to favorites:',
+          imageId,
+          'order:',
+          nextOrder,
+          'total:',
+          state.favorites.length + 1
+        );
+        console.log('Current favorites:', state.favorites);
         return true;
       },
 
@@ -225,13 +242,24 @@ export const useImageMetadataStore = create<ImageMetadataState>()(
 
       syncFromSupabase: async () => {
         try {
-          logger.info('Syncing from Supabase...');
+          logger.info('🔄 Syncing from Supabase...');
 
           // Load all metadata
           const metadataFromSupabase = await loadAllMetadataFromSupabase();
+          logger.info(
+            '📦 Loaded metadata from Supabase:',
+            Object.keys(metadataFromSupabase).length,
+            'items'
+          );
 
           // Load all favorites
           const favoritesFromSupabase = await loadFavoritesFromSupabase();
+          logger.info(
+            '⭐ Loaded favorites from Supabase:',
+            favoritesFromSupabase.length,
+            'items'
+          );
+          console.log('Favorites from Supabase:', favoritesFromSupabase);
 
           // Merge with local state (Supabase is source of truth)
           set({
@@ -239,9 +267,15 @@ export const useImageMetadataStore = create<ImageMetadataState>()(
             favorites: favoritesFromSupabase,
           });
 
-          logger.info('Synced from Supabase successfully');
+          logger.info(
+            '✅ Synced from Supabase successfully - Metadata:',
+            Object.keys(metadataFromSupabase).length,
+            'Favorites:',
+            favoritesFromSupabase.length
+          );
         } catch (error) {
-          logger.error('Failed to sync from Supabase:', error);
+          logger.error('❌ Failed to sync from Supabase:', error);
+          console.error('Supabase sync error details:', error);
         }
       },
 
