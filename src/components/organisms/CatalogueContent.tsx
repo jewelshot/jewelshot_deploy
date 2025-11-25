@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { FileText, Settings, Eye, Download } from 'lucide-react';
+import { FileText, Settings, Eye, Download, Check } from 'lucide-react';
 import { useSidebarStore } from '@/store/sidebarStore';
 import { useImageMetadataStore } from '@/store/imageMetadataStore';
+import { useCatalogueStore } from '@/store/catalogueStore';
 import { createScopedLogger } from '@/lib/logger';
 
 const logger = createScopedLogger('Catalogue');
@@ -11,6 +12,14 @@ const logger = createScopedLogger('Catalogue');
 export default function CatalogueContent() {
   const { leftOpen, rightOpen, topOpen, bottomOpen } = useSidebarStore();
   const { favorites, metadata } = useImageMetadataStore();
+  const {
+    settings,
+    setPageFormat,
+    setImagesPerPage,
+    toggleMetadataField,
+    setMargin,
+    setShowPageNumbers,
+  } = useCatalogueStore();
 
   const [activeTab, setActiveTab] = useState<'setup' | 'preview'>('setup');
 
@@ -133,30 +142,148 @@ export default function CatalogueContent() {
               </div>
 
               {/* Settings Section */}
-              <div className="rounded-lg border border-white/10 bg-white/5 p-6">
-                <h3 className="mb-4 text-lg font-semibold text-white">
+              <div className="space-y-6 rounded-lg border border-white/10 bg-white/5 p-6">
+                <h3 className="text-lg font-semibold text-white">
                   PDF Settings
                 </h3>
-                <div className="space-y-4">
-                  {/* Format Selection */}
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-white/80">
-                      Page Format
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <button className="rounded-lg border border-white/10 bg-white/5 p-3 text-sm text-white transition-colors hover:bg-white/10">
-                        A4 Portrait
-                      </button>
-                      <button className="rounded-lg border border-white/10 bg-white/5 p-3 text-sm text-white transition-colors hover:bg-white/10">
-                        A4 Landscape
-                      </button>
-                    </div>
-                  </div>
 
-                  {/* More settings will be added in next phases */}
-                  <p className="text-xs text-white/40">
-                    More settings coming soon...
-                  </p>
+                {/* Format Selection */}
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-white/80">
+                    Page Format
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => setPageFormat('a4-portrait')}
+                      className={`flex items-center justify-center gap-2 rounded-lg border p-3 text-sm transition-colors ${
+                        settings.pageFormat === 'a4-portrait'
+                          ? 'border-white/30 bg-white/10 text-white'
+                          : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
+                      }`}
+                    >
+                      {settings.pageFormat === 'a4-portrait' && (
+                        <Check className="h-4 w-4" />
+                      )}
+                      A4 Portrait
+                    </button>
+                    <button
+                      onClick={() => setPageFormat('a4-landscape')}
+                      className={`flex items-center justify-center gap-2 rounded-lg border p-3 text-sm transition-colors ${
+                        settings.pageFormat === 'a4-landscape'
+                          ? 'border-white/30 bg-white/10 text-white'
+                          : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
+                      }`}
+                    >
+                      {settings.pageFormat === 'a4-landscape' && (
+                        <Check className="h-4 w-4" />
+                      )}
+                      A4 Landscape
+                    </button>
+                  </div>
+                </div>
+
+                {/* Images Per Page */}
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-white/80">
+                    Images Per Page
+                  </label>
+                  <div className="grid grid-cols-6 gap-2">
+                    {[1, 2, 4, 6, 8, 12].map((count) => (
+                      <button
+                        key={count}
+                        onClick={() => setImagesPerPage(count)}
+                        className={`rounded-lg border p-2 text-sm transition-colors ${
+                          settings.imagesPerPage === count
+                            ? 'border-white/30 bg-white/10 text-white'
+                            : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
+                        }`}
+                      >
+                        {count}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Metadata Fields */}
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-white/80">
+                    Metadata Fields to Include
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {settings.metadataFields.map((field) => (
+                      <button
+                        key={field.key}
+                        onClick={() => toggleMetadataField(field.key)}
+                        className={`flex items-center gap-2 rounded-lg border p-2 text-sm transition-colors ${
+                          field.enabled
+                            ? 'border-white/30 bg-white/10 text-white'
+                            : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
+                        }`}
+                      >
+                        <div
+                          className={`flex h-4 w-4 items-center justify-center rounded border ${
+                            field.enabled
+                              ? 'border-white/50 bg-white/20'
+                              : 'border-white/30 bg-transparent'
+                          }`}
+                        >
+                          {field.enabled && <Check className="h-3 w-3" />}
+                        </div>
+                        <span className="flex-1 text-left">{field.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Margins */}
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-white/80">
+                    Page Margins (mm)
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {(['top', 'bottom', 'left', 'right'] as const).map(
+                      (side) => (
+                        <div key={side}>
+                          <label className="mb-1 block text-xs text-white/60">
+                            {side.charAt(0).toUpperCase() + side.slice(1)}
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            max="50"
+                            value={settings.margins[side]}
+                            onChange={(e) =>
+                              setMargin(side, parseInt(e.target.value) || 0)
+                            }
+                            className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none transition-colors focus:border-white/30 focus:bg-white/10"
+                          />
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+
+                {/* Page Numbers */}
+                <div className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 p-3">
+                  <label className="text-sm font-medium text-white/80">
+                    Show Page Numbers
+                  </label>
+                  <button
+                    onClick={() =>
+                      setShowPageNumbers(!settings.showPageNumbers)
+                    }
+                    className={`relative h-6 w-11 rounded-full transition-colors ${
+                      settings.showPageNumbers ? 'bg-white/20' : 'bg-white/10'
+                    }`}
+                  >
+                    <div
+                      className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-lg transition-transform ${
+                        settings.showPageNumbers
+                          ? 'translate-x-5'
+                          : 'translate-x-0.5'
+                      }`}
+                    />
+                  </button>
                 </div>
               </div>
 
