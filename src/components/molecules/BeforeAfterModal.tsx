@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import Image from 'next/image';
 import { X, Palette, Download, Info } from 'lucide-react';
+import { useSidebarStore } from '@/store/sidebarStore';
 
 interface BeforeAfterModalProps {
   isOpen: boolean;
@@ -27,6 +28,8 @@ export function BeforeAfterModal({
   onOpenInStudio,
   onDownload,
 }: BeforeAfterModalProps) {
+  const { leftOpen, rightOpen, topOpen, bottomOpen } = useSidebarStore();
+
   // Close on Escape key
   useEffect(() => {
     if (!isOpen) return;
@@ -58,11 +61,17 @@ export function BeforeAfterModal({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 backdrop-blur-xl transition-opacity duration-300"
+      className="fixed z-[100] flex items-center justify-center bg-black/90 backdrop-blur-xl transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
+      style={{
+        left: leftOpen ? '260px' : '16px',
+        right: rightOpen ? '276px' : '16px',
+        top: topOpen ? '64px' : '16px',
+        bottom: bottomOpen ? '64px' : '16px',
+      }}
       onClick={onClose}
     >
       <div
-        className="animate-in fade-in zoom-in-95 relative w-full max-w-7xl rounded-2xl border border-white/10 bg-[#0A0A0F] p-4 shadow-2xl shadow-purple-500/10 backdrop-blur-sm duration-300 md:p-6"
+        className="animate-in fade-in zoom-in-95 relative mx-4 my-4 w-full max-w-7xl rounded-2xl border border-white/10 bg-[#0A0A0F] p-4 shadow-2xl shadow-purple-500/10 backdrop-blur-sm duration-300 md:p-6"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

@@ -3,6 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { X, Download, Eye, FolderOpen, Palette } from 'lucide-react';
+import { useSidebarStore } from '@/store/sidebarStore';
 
 interface BatchImage {
   id: string;
@@ -45,17 +46,25 @@ export function BatchDetailModal({
   onOpenInStudio,
   onDownloadImage,
 }: BatchDetailModalProps) {
+  const { leftOpen, rightOpen, topOpen, bottomOpen } = useSidebarStore();
+
   if (!isOpen) return null;
 
   const images = project.batch_images || [];
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-black/90 p-4 backdrop-blur-xl transition-opacity duration-300"
+      className="fixed z-[100] flex items-center justify-center overflow-y-auto bg-black/90 backdrop-blur-xl transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
+      style={{
+        left: leftOpen ? '260px' : '16px',
+        right: rightOpen ? '276px' : '16px',
+        top: topOpen ? '64px' : '16px',
+        bottom: bottomOpen ? '64px' : '16px',
+      }}
       onClick={onClose}
     >
       <div
-        className="animate-in fade-in zoom-in-95 relative my-8 w-full max-w-6xl rounded-2xl border border-white/10 bg-[#0A0A0F] p-6 shadow-2xl shadow-purple-500/10 backdrop-blur-sm duration-300"
+        className="animate-in fade-in zoom-in-95 relative mx-4 my-4 w-full max-w-6xl rounded-2xl border border-white/10 bg-[#0A0A0F] p-6 shadow-2xl shadow-purple-500/10 backdrop-blur-sm duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
