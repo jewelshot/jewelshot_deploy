@@ -14,6 +14,10 @@ import { BatchDetailModal } from '@/components/molecules/BatchDetailModal';
 import { ImageMetadataModal } from '@/components/molecules/ImageMetadataModal';
 import { useImageMetadataStore } from '@/store/imageMetadataStore';
 import { useSidebarStore } from '@/store/sidebarStore';
+import {
+  downloadImageWithBlob,
+  generateImageFilename,
+} from '@/lib/download-utils';
 
 // Supabase batch project type
 interface BatchProject {
@@ -75,6 +79,7 @@ export function GalleryContent() {
     isFavorite,
     getFavoriteOrder,
     hasMetadata,
+    getMetadata,
   } = useImageMetadataStore();
 
   // Load images from localStorage (with prefetch support)
@@ -271,24 +276,48 @@ export function GalleryContent() {
     router.push(`/studio?${params.toString()}`);
   };
 
-  const handleDownload = (image: GalleryImage) => {
-    // Create a temporary link and trigger download
-    const link = document.createElement('a');
-    link.href = image.src;
-    link.download = `jewelshot-${image.id}.jpg`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleDownload = async (image: GalleryImage) => {
+    try {
+      // Get custom filename from metadata (if exists)
+      const metadata = getMetadata(image.id);
+      const filename = generateImageFilename(
+        image.id,
+        metadata || undefined,
+        image.createdAt
+      );
+
+      logger.info('Downloading image:', { imageId: image.id, filename });
+
+      // Show loading toast
+      const toastId = toast.loading(`Downloading ${filename}...`);
+
+      // Download using blob method (prevents opening in new tab)
+      await downloadImageWithBlob(image.src, filename);
+
+      // Success toast
+      toast.success('Downloaded successfully', { id: toastId });
+    } catch (error) {
+      logger.error('Download failed:', error);
+      toast.error('Failed to download image. Please try again.');
+    }
   };
 
-  const handleDownloadSingle = (imageUrl: string, filename: string) => {
-    // Download single image with custom filename
-    const link = document.createElement('a');
-    link.href = imageUrl;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleDownloadSingle = async (imageUrl: string, filename: string) => {
+    try {
+      logger.info('Downloading single image:', { filename });
+
+      // Show loading toast
+      const toastId = toast.loading(`Downloading ${filename}...`);
+
+      // Download using blob method
+      await downloadImageWithBlob(imageUrl, filename);
+
+      // Success toast
+      toast.success('Downloaded successfully', { id: toastId });
+    } catch (error) {
+      logger.error('Single image download failed:', error);
+      toast.error('Failed to download image. Please try again.');
+    }
   };
 
   const handleDelete = (image: GalleryImage) => {
