@@ -57,31 +57,44 @@ export default function CatalogueContent() {
   const [favorites, setFavorites] = useState<FavoriteImage[]>([]);
   const [metadata, setMetadata] = useState<Record<string, ImageMetadata>>({});
   
+  // DEBUG: Show what we're loading
+  const [debugInfo, setDebugInfo] = useState<string>('Loading...');
+  
   // Load from localStorage on mount
   useEffect(() => {
+    console.log('🔥 CATALOGUE COMPONENT MOUNTING...');
+    
     try {
       const stored = localStorage.getItem('jewelshot-image-metadata');
+      console.log('🔥 LOCALSTORAGE KEY EXISTS:', !!stored);
+      
       if (stored) {
         const parsed = JSON.parse(stored);
-        console.log('📦 RAW LOCALSTORAGE:', parsed);
+        console.log('🔥 PARSED LOCALSTORAGE:', parsed);
         
         const stateFavorites = parsed?.state?.favorites || [];
         const stateMetadata = parsed?.state?.metadata || {};
         
-        console.log('⭐ FAVORITES COUNT:', stateFavorites.length);
-        console.log('📝 METADATA COUNT:', Object.keys(stateMetadata).length);
+        console.log('🔥 FAVORITES ARRAY:', stateFavorites);
+        console.log('🔥 FAVORITES COUNT:', stateFavorites.length);
+        console.log('🔥 METADATA COUNT:', Object.keys(stateMetadata).length);
         
         setFavorites(stateFavorites);
         setMetadata(stateMetadata);
+        setDebugInfo(`✅ Loaded: ${stateFavorites.length} favorites, ${Object.keys(stateMetadata).length} metadata`);
         
         logger.info('✅ LOADED FROM LOCALSTORAGE:', {
           favorites: stateFavorites.length,
           metadata: Object.keys(stateMetadata).length,
         });
       } else {
+        console.log('🔥 NO LOCALSTORAGE DATA FOUND');
+        setDebugInfo('❌ No localStorage data found');
         logger.warn('⚠️ No localStorage data found');
       }
     } catch (error) {
+      console.error('🔥 ERROR LOADING:', error);
+      setDebugInfo(`❌ Error: ${error}`);
       logger.error('❌ Failed to load from localStorage:', error);
     }
   }, []);
@@ -221,6 +234,14 @@ export default function CatalogueContent() {
         bottom: bottomOpen ? '64px' : '16px',
       }}
     >
+      {/* DEBUG BANNER */}
+      <div className="rounded-lg border-2 border-yellow-500 bg-yellow-500/20 p-4">
+        <p className="text-sm font-mono text-yellow-200">{debugInfo}</p>
+        <p className="text-xs font-mono text-yellow-300 mt-1">
+          Favorites in state: {favorites.length} | Images with URLs: {imagesWithUrls.length} | Ordered: {orderedImages.length}
+        </p>
+      </div>
+      
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
