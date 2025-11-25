@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
+import dynamic from 'next/dynamic';
 import {
   FileText,
   Settings,
@@ -10,6 +11,7 @@ import {
   Upload,
   X,
   GripVertical,
+  Loader2,
 } from 'lucide-react';
 import { useSidebarStore } from '@/store/sidebarStore';
 import { useImageMetadataStore } from '@/store/imageMetadataStore';
@@ -33,6 +35,21 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
+// Dynamic import for PDF components (client-side only)
+const PDFViewer = dynamic(
+  () => import('@react-pdf/renderer').then((mod) => mod.PDFViewer),
+  { ssr: false }
+);
+const PDFDownloadLink = dynamic(
+  () => import('@react-pdf/renderer').then((mod) => mod.PDFDownloadLink),
+  { ssr: false }
+);
+const CataloguePDF = dynamic(() =>
+  import('@/components/pdf/CataloguePDF').then((mod) => ({
+    default: mod.CataloguePDF,
+  }))
+);
+
 const logger = createScopedLogger('Catalogue');
 
 export default function CatalogueContent() {
@@ -52,6 +69,7 @@ export default function CatalogueContent() {
   } = useCatalogueStore();
 
   const [activeTab, setActiveTab] = useState<'setup' | 'preview'>('setup');
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   // Drag and drop sensors
   const sensors = useSensors(
@@ -109,6 +127,15 @@ export default function CatalogueContent() {
       setImageOrder(newOrder);
     }
   };
+
+  // Prepare PDF data
+  const pdfImages = useMemo(() => {
+    return favoriteItems.map((item) => ({
+      imageId: item.imageId,
+      imageUrl: item.metadata?.fileName || undefined, // TODO: Get actual image URL from gallery
+      metadata: item.metadata,
+    }));
+  }, [favoriteItems]);
 
   useEffect(() => {
     logger.info('Catalogue loaded with favorites:', favoriteItems.length);
@@ -443,10 +470,29 @@ export default function CatalogueContent() {
               </div>
 
               {/* Export Button */}
-              <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-white/10 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-white/20">
-                <Download className="h-4 w-4" />
-                Export PDF (Coming Soon)
-              </button>
+              <PDFDownloadLink
+                document={
+                  <CataloguePDF settings={settings} images={pdfImages} />
+                }
+                fileName={`${settings.contactInfo.companyName || 'Catalogue'}_${new Date().toISOString().split('T')[0]}.pdf`}
+              >
+                {({ loading }) =>
+                  loading ? (
+                    <button
+                      disabled
+                      className="flex w-full items-center justify-center gap-2 rounded-lg bg-white/10 px-6 py-3 text-sm font-medium text-white/60"
+                    >
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Generating PDF...
+                    </button>
+                  ) : (
+                    <button className="flex w-full items-center justify-center gap-2 rounded-lg bg-white/10 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-white/20">
+                      <Download className="h-4 w-4" />
+                      Export PDF
+                    </button>
+                  )
+                }
+              </PDFDownloadLink>
             </div>
           ) : (
             <div className="flex h-full items-center justify-center">
@@ -472,8 +518,27 @@ export default function CatalogueContent() {
       )}
 
       {activeTab === 'preview' && (
-        <div className="flex h-full items-center justify-center">
-          <p className="text-white/60">Preview mode coming soon...</p>
+        <div className="flex-1">
+          {favoriteItems.length > 0 ? (
+            <div className="h-full rounded-lg border border-white/10 bg-white/5 p-4">
+              <PDFViewer
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  border: 'none',
+                  borderRadius: '8px',
+                }}
+              >
+                <CataloguePDF settings={settings} images={pdfImages} />
+              </PDFViewer>
+            </div>
+          ) : (
+            <div className="flex h-full items-center justify-center">
+              <p className="text-white/60">
+                Add favorite images to preview the catalogue
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>
