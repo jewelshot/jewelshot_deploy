@@ -30,11 +30,6 @@ const GalleryContent = dynamic(
   }
 );
 
-const Sidebar = dynamic(() => import('@/components/organisms/Sidebar'), {
-  loading: () => null,
-});
-const SidebarToggle = dynamic(() => import('@/components/atoms/SidebarToggle'));
-
 export default function GalleryPage() {
   const { isMobile } = useBreakpoint();
 
@@ -49,11 +44,7 @@ export default function GalleryPage() {
       {/* Aurora Background */}
       <AuroraBackground />
 
-      {/* Left Sidebar */}
-      <Sidebar />
-      <SidebarToggle />
-
-      {/* Gallery Content - Wrapped in Error Boundary */}
+      {/* Gallery Content - Wrapped in Error Boundary - Sidebar is now global */}
       <ErrorBoundary fallback={<GalleryFallback />}>
         <GalleryContent />
       </ErrorBoundary>

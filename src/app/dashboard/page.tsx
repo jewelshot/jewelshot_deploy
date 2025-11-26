@@ -13,10 +13,6 @@ import ErrorBoundary from '@/components/organisms/ErrorBoundary';
 import { useBreakpoint } from '@/hooks/useMediaQuery';
 
 // Dynamic imports for heavy components
-const Sidebar = dynamic(() => import('@/components/organisms/Sidebar'), {
-  loading: () => null,
-});
-const SidebarToggle = dynamic(() => import('@/components/atoms/SidebarToggle'));
 const DashboardContent = dynamic(
   () => import('@/components/organisms/DashboardContent'),
   {
@@ -79,11 +75,7 @@ export default function DashboardPage() {
       {/* Aurora Background */}
       <AuroraBackground />
 
-      {/* Left Sidebar */}
-      <Sidebar />
-      <SidebarToggle />
-
-      {/* Main Content */}
+      {/* Main Content - Sidebar is now global */}
       <ErrorBoundary fallback={<DashboardFallback />}>
         <DashboardContent />
       </ErrorBoundary>

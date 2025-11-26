@@ -13,10 +13,6 @@ import ErrorBoundary from '@/components/organisms/ErrorBoundary';
 import { useBreakpoint } from '@/hooks/useMediaQuery';
 
 // Dynamic imports for heavy components
-const Sidebar = dynamic(() => import('@/components/organisms/Sidebar'), {
-  loading: () => null,
-});
-const SidebarToggle = dynamic(() => import('@/components/atoms/SidebarToggle'));
 const ProfileContent = dynamic(
   () => import('@/components/organisms/ProfileContent'),
   {
@@ -79,9 +75,6 @@ export default function ProfilePage() {
       {/* Aurora Background */}
       <AuroraBackground />
 
-      {/* Left Sidebar */}
-      <Sidebar />
-      <SidebarToggle />
 
       {/* Main Content */}
       <ErrorBoundary fallback={<ProfileFallback />}>

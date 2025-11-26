@@ -29,10 +29,6 @@ const Canvas = dynamic(() => import('@/components/organisms/Canvas'), {
   ssr: false,
 });
 
-const Sidebar = dynamic(() => import('@/components/organisms/Sidebar'), {
-  loading: () => null,
-});
-const SidebarToggle = dynamic(() => import('@/components/atoms/SidebarToggle'));
 const RightSidebar = dynamic(
   () => import('@/components/organisms/RightSidebar'),
   { loading: () => null }
@@ -82,9 +78,6 @@ export default function StudioPage() {
       <TopBar />
       <TopBarToggle />
 
-      {/* Left Sidebar */}
-      <Sidebar />
-      <SidebarToggle />
 
       {/* Right Sidebar */}
       <RightSidebar onGenerateWithPreset={handleGenerateWithPreset} />

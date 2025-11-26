@@ -13,10 +13,6 @@ import ErrorBoundary from '@/components/organisms/ErrorBoundary';
 import { useBreakpoint } from '@/hooks/useMediaQuery';
 
 // Dynamic imports for heavy components
-const Sidebar = dynamic(() => import('@/components/organisms/Sidebar'), {
-  loading: () => null,
-});
-const SidebarToggle = dynamic(() => import('@/components/atoms/SidebarToggle'));
 const RightSidebar = dynamic(
   () => import('@/components/organisms/RightSidebar'),
   { loading: () => null }
@@ -96,9 +92,6 @@ export default function CataloguePage() {
       <TopBar />
       <TopBarToggle />
 
-      {/* Left Sidebar */}
-      <Sidebar />
-      <SidebarToggle />
 
       {/* Right Sidebar */}
       <RightSidebar />

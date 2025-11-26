@@ -28,10 +28,6 @@ const LibraryContent = dynamic(
   }
 );
 
-const Sidebar = dynamic(() => import('@/components/organisms/Sidebar'), {
-  loading: () => null,
-});
-const SidebarToggle = dynamic(() => import('@/components/atoms/SidebarToggle'));
 const RightSidebar = dynamic(
   () => import('@/components/organisms/RightSidebar'),
   { loading: () => null }
@@ -63,9 +59,6 @@ export default function LibraryPage() {
       <TopBar />
       <TopBarToggle />
 
-      {/* Left Sidebar */}
-      <Sidebar />
-      <SidebarToggle />
 
       {/* Right Sidebar - Live preset preview */}
       <RightSidebar />

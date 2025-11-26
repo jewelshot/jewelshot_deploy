@@ -7,6 +7,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import { ErrorBoundary } from '@/components/organisms/ErrorBoundary';
 import ToastContainer from '@/components/organisms/ToastContainer';
 import { GalleryPrefetch } from '@/components/organisms/GalleryPrefetch';
+import GlobalSidebar from '@/components/organisms/GlobalSidebar';
 import './globals.css';
 
 // Note: Environment validation is available in src/lib/env.ts
@@ -131,6 +132,7 @@ export default function RootLayout({
         data-theme="purple"
       >
         <ErrorBoundary>{children}</ErrorBoundary>
+        <GlobalSidebar />
         <ToastContainer />
         <GalleryPrefetch />
         <Analytics />
