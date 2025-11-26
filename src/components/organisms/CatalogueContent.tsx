@@ -124,6 +124,7 @@ export default function CatalogueContent() {
   const [activeTab, setActiveTab] = useState<'setup' | 'preview'>('setup');
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [editingImageId, setEditingImageId] = useState<string | null>(null);
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false);
 
@@ -255,7 +256,13 @@ export default function CatalogueContent() {
       className="fixed z-10 flex h-full flex-col gap-6 overflow-y-auto p-6 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
       style={{
         left: leftOpen ? '260px' : '16px',
-        right: rightOpen ? '276px' : '16px',
+        right: isRightSidebarOpen
+          ? isSidebarCollapsed
+            ? '96px'
+            : '366px'
+          : rightOpen
+          ? '276px'
+          : '16px',
         top: topOpen ? '64px' : '16px',
         bottom: bottomOpen ? '64px' : '16px',
       }}
@@ -457,6 +464,8 @@ export default function CatalogueContent() {
       <CatalogueRightSidebar
         isOpen={isRightSidebarOpen}
         onClose={() => setIsRightSidebarOpen(false)}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={setIsSidebarCollapsed}
       />
 
       {editingImageId && (
