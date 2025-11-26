@@ -16,8 +16,8 @@ import { useImageMetadataStore } from '@/store/imageMetadataStore';
 import { useCatalogueStore } from '@/store/catalogueStore';
 import { createScopedLogger } from '@/lib/logger';
 import type { ImageMetadata, FavoriteImage } from '@/types/image-metadata';
-import { CatalogueSettingsModal } from '@/components/molecules/CatalogueSettingsModal';
 import { ImageMetadataModal } from '@/components/molecules/ImageMetadataModal';
+import CatalogueRightSidebar from '@/components/organisms/CatalogueRightSidebar';
 import { getSavedImages } from '@/lib/gallery-storage';
 import {
   DndContext,
@@ -123,7 +123,7 @@ export default function CatalogueContent() {
 
   const [activeTab, setActiveTab] = useState<'setup' | 'preview'>('setup');
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false);
   const [editingImageId, setEditingImageId] = useState<string | null>(null);
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false);
 
@@ -309,10 +309,14 @@ export default function CatalogueContent() {
             </button>
           </div>
 
-          {/* Settings */}
+          {/* Settings - Toggle Right Sidebar */}
           <button
-            onClick={() => setIsSettingsModalOpen(true)}
-            className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white transition-colors hover:border-white/30 hover:bg-white/10"
+            onClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)}
+            className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-all ${
+              isRightSidebarOpen
+                ? 'border-purple-500/40 bg-purple-500/10 text-white'
+                : 'border-white/10 bg-white/5 text-white hover:border-white/30 hover:bg-white/10'
+            }`}
           >
             <Settings className="h-4 w-4" />
             Settings
@@ -449,10 +453,10 @@ export default function CatalogueContent() {
         </div>
       )}
 
-      {/* Modals */}
-      <CatalogueSettingsModal
-        isOpen={isSettingsModalOpen}
-        onClose={() => setIsSettingsModalOpen(false)}
+      {/* Right Sidebar for Settings */}
+      <CatalogueRightSidebar
+        isOpen={isRightSidebarOpen}
+        onClose={() => setIsRightSidebarOpen(false)}
       />
 
       {editingImageId && (
