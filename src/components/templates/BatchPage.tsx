@@ -113,20 +113,11 @@ export function BatchPage() {
         // Convert BatchImage to BatchImageState (with data URIs)
         const imagesToSave: BatchImageState[] = await Promise.all(
           images.map(async (img) => {
-            let preview = img.preview;
-            
-            // Convert blob URLs to data URIs for persistence
-            if (preview.startsWith('blob:')) {
-              try {
-                preview = await blobUrlToDataUri(preview);
-              } catch (error) {
-                console.error('[Batch] Failed to convert blob to data URI:', error);
-              }
-            }
-
+            // Preview is already handled by background processing
+            // No need to convert blob URLs as images are uploaded to Supabase
             return {
               id: img.id,
-              preview,
+              preview: img.preview,
               fileName: img.file?.name || 'untitled.jpg',
               fileSize: img.file?.size || 0,
               status: img.status,
@@ -353,7 +344,9 @@ export function BatchPage() {
       toast.success(`${uploadData.uploaded} images uploaded! Starting AI processing...`);
       
       // 🚀 STEP 3: Start background polling loop
-      startBackgroundProcessing(batchProjectId);
+      if (batchProjectId) {
+        startBackgroundProcessing(batchProjectId);
+      }
     } catch (error) {
       console.error('[Batch] Failed to upload images:', error);
       toast.error('Failed to upload images');
