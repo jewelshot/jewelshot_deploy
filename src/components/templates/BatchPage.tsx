@@ -137,6 +137,7 @@ export function BatchPage() {
     setImages(restoredImages);
     setBatchPrompt(savedState.batchPrompt);
     setBatchName(savedState.batchName);
+    setPresetName(savedState.presetName || ''); // Restore preset name
     setAspectRatio(savedState.aspectRatio);
 
     toast.success(`Restored ${restoredImages.length} images from previous session`);
@@ -184,6 +185,7 @@ export function BatchPage() {
           images: imagesToSave,
           batchPrompt,
           batchName,
+          presetName, // Include preset name for restore
           aspectRatio,
           isProcessing,
         });

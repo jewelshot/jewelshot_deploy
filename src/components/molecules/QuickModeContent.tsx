@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { ChevronDown, Library } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { PresetCard } from '@/components/atoms/PresetCard';
@@ -15,7 +15,12 @@ interface QuickModeContentProps {
  */
 export function QuickModeContent({ onPresetSelect }: QuickModeContentProps) {
   const router = useRouter();
-  const { selectedPresets } = usePresetLibraryStore();
+  const { selectedPresets, cleanupInvalidPresets } = usePresetLibraryStore();
+
+  // Cleanup invalid presets on mount
+  useEffect(() => {
+    cleanupInvalidPresets();
+  }, [cleanupInvalidPresets]);
 
   // Group selected presets by category
   const presetsByCategory = useMemo(() => {

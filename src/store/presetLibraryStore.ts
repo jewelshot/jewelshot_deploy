@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { SelectedPreset } from '@/types/preset';
 import { createScopedLogger } from '@/lib/logger';
+import { getPresetById } from '@/data/presets';
 
 const logger = createScopedLogger('PresetLibraryStore');
 
@@ -15,6 +16,7 @@ interface PresetLibraryState {
   removePreset: (presetId: string) => void;
   isPresetSelected: (presetId: string) => boolean;
   clearAllPresets: () => void;
+  cleanupInvalidPresets: () => void; // Remove presets that no longer exist
   getSelectedPresetsByCategory: (categoryId: string) => SelectedPreset[];
   getSelectedPresetsCount: () => number;
   canAddMorePresets: () => boolean;
@@ -75,6 +77,20 @@ export const usePresetLibraryStore = create<PresetLibraryState>()(
       clearAllPresets: () => {
         set({ selectedPresets: [] });
         logger.info('All presets cleared');
+      },
+
+      cleanupInvalidPresets: () => {
+        const state = get();
+        const validPresets = state.selectedPresets.filter((selected) => {
+          const preset = getPresetById(selected.presetId);
+          return preset !== null; // Keep only valid presets
+        });
+
+        const removedCount = state.selectedPresets.length - validPresets.length;
+        if (removedCount > 0) {
+          set({ selectedPresets: validPresets });
+          logger.info(`Cleaned up ${removedCount} invalid preset(s)`);
+        }
       },
 
       getSelectedPresetsByCategory: (categoryId: string) => {

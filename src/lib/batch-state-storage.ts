@@ -29,6 +29,7 @@ export interface BatchState {
   images: BatchImageState[];
   batchPrompt: string;
   batchName: string;
+  presetName: string; // Store preset name for UI display
   aspectRatio: string;
   isProcessing: boolean;
 }
@@ -56,6 +57,7 @@ export async function saveBatchState(state: Partial<BatchState>): Promise<void> 
       images: state.images || [],
       batchPrompt: state.batchPrompt || '',
       batchName: state.batchName || '',
+      presetName: state.presetName || '', // Include preset name
       aspectRatio: state.aspectRatio || 'auto',
       isProcessing: state.isProcessing || false,
     };
