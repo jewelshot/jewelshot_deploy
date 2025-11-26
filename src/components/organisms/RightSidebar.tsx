@@ -71,7 +71,10 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
   // Handle preset selection (no restrictions - always allow)
   const handlePresetSelect = (presetId: string) => {
     const preset = presetPrompts[presetId];
-    if (!preset) return;
+    if (!preset) {
+      console.error('[RightSidebar] Preset not found:', presetId);
+      return;
+    }
 
     // Show confirmation modal (jewelry selection can happen in modal if needed)
     setConfirmModal({
@@ -96,6 +99,12 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
     }
 
     const preset = presetPrompts[confirmModal.presetId];
+    if (!preset) {
+      console.error('[RightSidebar] Preset not found during generation:', confirmModal.presetId);
+      setConfirmModal(null);
+      return;
+    }
+
     const prompt = preset.buildPrompt(
       finalJewelryType,
       gender || undefined,
