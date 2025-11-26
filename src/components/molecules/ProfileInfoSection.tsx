@@ -133,8 +133,34 @@ export function ProfileInfoSection() {
 
       logger.info('Avatar uploaded successfully:', publicUrl);
 
-      // Update profile
+      // Update profile state
       setProfile({ ...profile, avatar_url: publicUrl });
+
+      // IMPORTANT: Save to database immediately
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: profileError } = (await (supabase as any)
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          email: profile.email,
+          full_name: profile.full_name,
+          avatar_url: publicUrl, // Save new avatar URL
+          bio: profile.bio,
+          updated_at: new Date().toISOString(),
+        })) as { error: any };
+
+      if (profileError) {
+        logger.error('Profile update error:', profileError);
+        throw new Error('Avatar uploaded but failed to save to profile');
+      }
+
+      // Also update auth user metadata
+      await supabase.auth.updateUser({
+        data: {
+          full_name: profile.full_name,
+          avatar_url: publicUrl,
+        },
+      });
 
       setMessage({ type: 'success', text: 'Avatar uploaded successfully! Refreshing...' });
 
