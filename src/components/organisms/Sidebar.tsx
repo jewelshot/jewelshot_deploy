@@ -19,7 +19,15 @@ import { useSidebarStore } from '@/store/sidebarStore';
 import SidebarLogo from '@/components/molecules/SidebarLogo';
 import NavigationItem from '@/components/molecules/NavigationItem';
 import UserProfile from '@/components/molecules/UserProfile';
-import { Home, Palette, Image, Layers, Library, FileText } from 'lucide-react';
+import {
+  Home,
+  Palette,
+  Image,
+  Layers,
+  Library,
+  FileText,
+  User,
+} from 'lucide-react';
 
 // Tools section (Coming Soon - All tools are integrated in Studio)
 const toolsItems: never[] = [
@@ -106,6 +114,12 @@ export function Sidebar() {
       icon: FileText,
       label: 'Catalogue',
       href: '/catalogue',
+      badge: { variant: 'new' as const },
+    },
+    {
+      icon: User,
+      label: 'Profile',
+      href: '/profile',
       badge: { variant: 'new' as const },
     },
     // Removed: Projects page not yet implemented
