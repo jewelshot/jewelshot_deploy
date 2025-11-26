@@ -20,7 +20,7 @@ import SidebarLogo from '@/components/molecules/SidebarLogo';
 import NavigationItem from '@/components/molecules/NavigationItem';
 import UserProfile from '@/components/molecules/UserProfile';
 import {
-  Home,
+  LayoutDashboard,
   Palette,
   Image,
   Layers,
@@ -82,7 +82,7 @@ export function Sidebar() {
 
   // Main navigation items (dynamic)
   const mainNavItems = [
-    { icon: Home, label: 'Home', href: '/', shortcut: '⌘H' },
+    { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard', shortcut: '⌘D' },
     {
       icon: Palette,
       label: 'Studio',
