@@ -18,6 +18,7 @@ import { createScopedLogger } from '@/lib/logger';
 import type { ImageMetadata, FavoriteImage } from '@/types/image-metadata';
 import { ImageMetadataModal } from '@/components/molecules/ImageMetadataModal';
 import CatalogueRightSidebar from '@/components/organisms/CatalogueRightSidebar';
+import CatalogueSettingsToggle from '@/components/atoms/CatalogueSettingsToggle';
 import { getSavedImages } from '@/lib/gallery-storage';
 import {
   DndContext,
@@ -124,7 +125,6 @@ export default function CatalogueContent() {
   const [activeTab, setActiveTab] = useState<'setup' | 'preview'>('setup');
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [editingImageId, setEditingImageId] = useState<string | null>(null);
   const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false);
 
@@ -256,11 +256,7 @@ export default function CatalogueContent() {
       className="fixed z-10 flex h-full flex-col gap-6 overflow-y-auto p-6 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
       style={{
         left: leftOpen ? '260px' : '16px',
-        right: isRightSidebarOpen
-          ? isSidebarCollapsed
-            ? '96px'
-            : '366px'
-          : '16px',
+        right: isRightSidebarOpen ? '366px' : '16px',
         top: '16px',
         bottom: '16px',
       }}
@@ -314,18 +310,6 @@ export default function CatalogueContent() {
             </button>
           </div>
 
-          {/* Settings - Toggle Right Sidebar */}
-          <button
-            onClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)}
-            className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-all ${
-              isRightSidebarOpen
-                ? 'border-purple-500/40 bg-purple-500/10 text-white'
-                : 'border-white/10 bg-white/5 text-white hover:border-white/30 hover:bg-white/10'
-            }`}
-          >
-            <Settings className="h-4 w-4" />
-            Settings
-          </button>
 
           {/* Export */}
           <button
@@ -459,11 +443,10 @@ export default function CatalogueContent() {
       )}
 
       {/* Right Sidebar for Settings */}
-      <CatalogueRightSidebar
+      <CatalogueRightSidebar isOpen={isRightSidebarOpen} />
+      <CatalogueSettingsToggle
         isOpen={isRightSidebarOpen}
-        onClose={() => setIsRightSidebarOpen(false)}
-        isCollapsed={isSidebarCollapsed}
-        onToggleCollapse={setIsSidebarCollapsed}
+        onToggle={() => setIsRightSidebarOpen(!isRightSidebarOpen)}
       />
 
       {editingImageId && (
