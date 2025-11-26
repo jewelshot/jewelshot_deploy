@@ -25,12 +25,13 @@ export const useCreditStore = create<CreditState>((set) => ({
 
   /**
    * Kullanıcının credit bakiyesini fetch eder
+   * NEW: Uses new atomic credit API endpoint
    */
   fetchCredits: async () => {
     set({ loading: true, error: null });
 
     try {
-      const response = await fetch('/api/credits/check');
+      const response = await fetch('/api/credits/balance');
       const data = await response.json();
 
       if (!response.ok) {
@@ -38,7 +39,7 @@ export const useCreditStore = create<CreditState>((set) => ({
       }
 
       set({
-        credits: data.credits || 0,
+        credits: data.credits || 0, // available credits
         used: data.used || 0,
         totalPurchased: data.total_purchased || 0,
         loading: false,
@@ -60,36 +61,32 @@ export const useCreditStore = create<CreditState>((set) => ({
 
   /**
    * Credit ekler (satın alma sonrası)
+   * NEW: Should be done via Supabase admin panel or payment webhook
+   * This is a placeholder that refreshes the balance
    */
   addCredits: async (amount: number, type = 'purchase') => {
     set({ loading: true, error: null });
 
     try {
-      const response = await fetch('/api/credits/add', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount,
-          type,
-          description: `${type === 'purchase' ? 'Credit purchase' : 'Bonus credits'}`,
-          metadata: { amount, type },
-        }),
-      });
-
+      // TODO: Implement admin endpoint for adding credits
+      // For now, just refresh the balance (admin should add via Supabase)
+      logger.warn('[CreditStore] addCredits() not fully implemented - refreshing balance');
+      
+      const response = await fetch('/api/credits/balance');
       const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Failed to add credits');
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to refresh credits');
       }
 
-      // Update local state
-      set((state) => ({
-        credits: data.credits,
-        totalPurchased: state.totalPurchased + amount,
+      set({
+        credits: data.credits || 0,
+        used: data.used || 0,
+        totalPurchased: data.total_purchased || 0,
         loading: false,
-      }));
+      });
 
-      logger.info('[CreditStore] Credits added, new balance:', data.credits);
+      logger.info('[CreditStore] Credits refreshed:', data.credits);
       return true;
     } catch (error) {
       const errorMessage =
