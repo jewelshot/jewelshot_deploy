@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { Star, Edit3, Eye, Palette, Download, Trash2 } from 'lucide-react';
+import { useImageMetadataStore } from '@/store/imageMetadataStore';
 
 interface ImageCardProps {
   id: string; // Image ID for metadata/favorites
@@ -41,13 +42,19 @@ export function ImageCard({
 }: ImageCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [imageError, setImageError] = useState(false);
+  
+  // Get metadata from store
+  const { getMetadata } = useImageMetadataStore();
+  const metadata = getMetadata(id);
 
   return (
     <div
-      className="group relative aspect-square overflow-hidden rounded-lg bg-[rgba(10,10,10,0.8)] ring-1 ring-[rgba(139,92,246,0.2)] transition-all duration-300 hover:ring-2 hover:ring-[rgba(139,92,246,0.4)]"
+      className="group relative overflow-hidden rounded-lg bg-[rgba(10,10,10,0.8)] ring-1 ring-[rgba(139,92,246,0.2)] transition-all duration-300 hover:ring-2 hover:ring-[rgba(139,92,246,0.4)]"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      {/* Image Container - Aspect Square */}
+      <div className="relative aspect-square overflow-hidden">
       {/* Image */}
       {!imageError ? (
         <Image
@@ -182,13 +189,40 @@ export function ImageCard({
         )}
       </div>
 
-      {/* Date Badge */}
-      {createdAt && (
-        <div
-          className="absolute bottom-2 right-2 rounded-full bg-black/60 px-2 py-1 text-xs text-white backdrop-blur-sm"
-          suppressHydrationWarning
-        >
-          {createdAt.toLocaleDateString()}
+        {/* Date Badge */}
+        {createdAt && (
+          <div
+            className="absolute bottom-2 right-2 rounded-full bg-black/60 px-2 py-1 text-xs text-white backdrop-blur-sm"
+            suppressHydrationWarning
+          >
+            {createdAt.toLocaleDateString()}
+          </div>
+        )}
+      </div>
+
+      {/* Metadata Info Below Image */}
+      {metadata && (metadata.fileName || metadata.setting || metadata.weight) && (
+        <div className="space-y-1 border-t border-white/10 bg-white/[0.02] p-2">
+          {/* File Name */}
+          {metadata.fileName && (
+            <p className="truncate text-xs text-white/80" title={metadata.fileName}>
+              📁 {metadata.fileName}
+            </p>
+          )}
+          
+          {/* Setting and Weight Row */}
+          <div className="flex items-center gap-2 text-xs">
+            {metadata.setting && (
+              <span className="truncate text-white/60" title={metadata.setting}>
+                ⚙️ {metadata.setting}
+              </span>
+            )}
+            {metadata.weight && (
+              <span className="text-white/60">
+                ⚖️ {metadata.weight}g
+              </span>
+            )}
+          </div>
         </div>
       )}
     </div>
