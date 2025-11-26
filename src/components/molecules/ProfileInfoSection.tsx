@@ -136,7 +136,12 @@ export function ProfileInfoSection() {
       // Update profile
       setProfile({ ...profile, avatar_url: publicUrl });
 
-      setMessage({ type: 'success', text: 'Avatar uploaded successfully' });
+      setMessage({ type: 'success', text: 'Avatar uploaded successfully! Refreshing...' });
+
+      // Reload page after 1 second to update sidebar avatar
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (error: any) {
       logger.error('Avatar upload error:', error);
       setMessage({
@@ -243,10 +248,22 @@ export function ProfileInfoSection() {
           <div className="flex items-center gap-6">
             {/* Avatar Preview */}
             <div className="relative h-20 w-20">
-              <Avatar
-                content={profile.avatar_url || profile.full_name.charAt(0)}
-                size="lg"
-              />
+              {profile.avatar_url ? (
+                <img
+                  src={profile.avatar_url}
+                  alt={profile.full_name}
+                  className="h-20 w-20 rounded-full object-cover"
+                  onError={(e) => {
+                    // Fallback to initial if image fails to load
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              ) : (
+                <Avatar
+                  content={profile.full_name.charAt(0)}
+                  size="lg"
+                />
+              )}
               {uploadingAvatar && (
                 <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm">
                   <div className="h-6 w-6 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
