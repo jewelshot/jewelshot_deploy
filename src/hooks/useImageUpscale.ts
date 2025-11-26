@@ -1,11 +1,13 @@
 /**
- * useImageUpscale Hook
+ * useImageUpscale Hook - MIGRATED TO QUEUE SYSTEM
  *
  * Handles image upscaling using Fal.ai SeedVR2
+ * NOW USES: Atomic credit system + queue
  */
 
 import { useState, useCallback } from 'react';
 import { createScopedLogger } from '@/lib/logger';
+import { useAIQueue } from './useAIQueue';
 
 const logger = createScopedLogger('useImageUpscale');
 
@@ -40,6 +42,9 @@ export function useImageUpscale(): UseImageUpscaleResult {
   const [progress, setProgress] = useState('');
   const [upscaledImageUrl, setUpscaledImageUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  
+  // NEW: Use queue system
+  const { submitAndWait } = useAIQueue();
 
   const upscaleImage = useCallback(async (input: UpscaleInput) => {
     setIsUpscaling(true);
@@ -48,64 +53,43 @@ export function useImageUpscale(): UseImageUpscaleResult {
     setUpscaledImageUrl(null);
 
     try {
-      logger.info('Starting image upscale', input);
+      logger.info('Starting image upscale (via queue)', input);
 
-      setProgress('Uploading image...');
+      setProgress('Submitting to queue...');
 
-      const response = await fetch('/api/ai/upscale', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      // NEW: Use queue system instead of direct API call
+      const result = await submitAndWait({
+        operation: 'upscale',
+        params: {
           image_url: input.image_url,
           upscale_mode: input.upscale_mode || 'factor',
           upscale_factor: input.upscale_factor || 2,
           target_resolution: input.target_resolution || '1080p',
           output_format: input.output_format || 'jpg',
           noise_scale: input.noise_scale || 0.1,
-        }),
+        },
+        priority: 'urgent',
+      }, {
+        onProgress: (status) => {
+          if (status.state === 'waiting') {
+            setProgress('Waiting in queue...');
+          } else if (status.state === 'active') {
+            setProgress('Upscaling image... This may take a few moments.');
+          }
+        },
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const errorMessage =
-          errorData.details ||
-          errorData.error ||
-          `Server error: ${response.status} ${response.statusText}`;
-        logger.error('Upscale API error - DETAILED:', {
-          status: response.status,
-          statusText: response.statusText,
-          errorData: errorData,
-          debug: errorData.debug,
-          fullResponse: JSON.stringify(errorData),
-        });
-
-        // Log the full error for debugging
-        console.error('[useImageUpscale] Full error response:', errorData);
-
-        throw new Error(errorMessage);
+      if (!result?.data?.imageUrl) {
+        throw new Error('No image returned from queue');
       }
 
-      setProgress('Upscaling image... This may take a few moments.');
-
-      const result = await response.json();
-      logger.info('Upscale API response:', result);
-
-      if (result.success && result.image?.url) {
-        setUpscaledImageUrl(result.image.url);
-        setProgress('Image upscaled successfully!');
-        logger.info('Image upscale completed successfully', {
-          imageUrl: result.image.url,
-          width: result.image.width,
-          height: result.image.height,
-          seed: result.seed,
-          requestId: result.requestId,
-        });
-      } else {
-        logger.error('Invalid upscale response:', result);
-        throw new Error('Invalid response from upscale API');
-      }
+      setUpscaledImageUrl(result.data.imageUrl);
+      setProgress('Image upscaled successfully!');
+      logger.info('Image upscale completed successfully (via queue)', {
+        imageUrl: result.data.imageUrl,
+        width: result.data.width,
+        height: result.data.height,
+      });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       logger.error('Image upscale failed:', err);
@@ -114,7 +98,7 @@ export function useImageUpscale(): UseImageUpscaleResult {
     } finally {
       setIsUpscaling(false);
     }
-  }, []);
+  }, [submitAndWait]);
 
   const reset = useCallback(() => {
     setIsUpscaling(false);

@@ -1,11 +1,13 @@
 /**
- * useRemoveBackground Hook
+ * useRemoveBackground Hook - MIGRATED TO QUEUE SYSTEM
  *
  * Handles background removal using Fal.ai rembg
+ * NOW USES: Atomic credit system + queue
  */
 
 import { useState, useCallback } from 'react';
 import { createScopedLogger } from '@/lib/logger';
+import { useAIQueue } from './useAIQueue';
 
 const logger = createScopedLogger('useRemoveBackground');
 
@@ -34,10 +36,10 @@ interface UseRemoveBackgroundResult {
 export function useRemoveBackground(): UseRemoveBackgroundResult {
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState('');
-  const [processedImageUrl, setProcessedImageUrl] = useState<string | null>(
-    null
-  );
+  const [processedImageUrl, setProcessedImageUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  
+  const { submitAndWait } = useAIQueue();
 
   const removeBackground = useCallback(async (input: RemoveBackgroundInput) => {
     setIsProcessing(true);
@@ -46,59 +48,29 @@ export function useRemoveBackground(): UseRemoveBackgroundResult {
     setProcessedImageUrl(null);
 
     try {
-      logger.info('Starting background removal', input);
+      logger.info('Starting background removal (via queue)', input);
 
-      setProgress('Uploading image...');
-
-      const response = await fetch('/api/ai/remove-background', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const result = await submitAndWait({
+        operation: 'remove-bg',
+        params: {
           image_url: input.image_url,
           crop_to_bbox: input.crop_to_bbox || false,
-        }),
+        },
+        priority: 'urgent',
+      }, {
+        onProgress: (status) => {
+          if (status.state === 'waiting') setProgress('Waiting in queue...');
+          else if (status.state === 'active') setProgress('Removing background... This may take a few moments.');
+        },
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const errorMessage =
-          errorData.details ||
-          errorData.error ||
-          `Server error: ${response.status} ${response.statusText}`;
-        logger.error('Remove background API error - DETAILED:', {
-          status: response.status,
-          statusText: response.statusText,
-          errorData: errorData,
-          debug: errorData.debug,
-          fullResponse: JSON.stringify(errorData),
-        });
-
-        // Log the full error for debugging
-        console.error('[useRemoveBackground] Full error response:', errorData);
-
-        throw new Error(errorMessage);
+      if (!result?.data?.imageUrl) {
+        throw new Error('No image returned from queue');
       }
 
-      setProgress('Removing background... This may take a few moments.');
-
-      const result = await response.json();
-      logger.info('Remove background API response:', result);
-
-      if (result.success && result.image?.url) {
-        setProcessedImageUrl(result.image.url);
-        setProgress('Background removed successfully!');
-        logger.info('Background removal completed successfully', {
-          imageUrl: result.image.url,
-          width: result.image.width,
-          height: result.image.height,
-          requestId: result.requestId,
-        });
-      } else {
-        logger.error('Invalid remove background response:', result);
-        throw new Error('Invalid response from background removal API');
-      }
+      setProcessedImageUrl(result.data.imageUrl);
+      setProgress('Background removed successfully!');
+      logger.info('Background removal completed (via queue)');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       logger.error('Background removal failed:', err);
@@ -107,7 +79,7 @@ export function useRemoveBackground(): UseRemoveBackgroundResult {
     } finally {
       setIsProcessing(false);
     }
-  }, []);
+  }, [submitAndWait]);
 
   const reset = useCallback(() => {
     setIsProcessing(false);

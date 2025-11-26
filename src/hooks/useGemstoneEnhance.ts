@@ -1,11 +1,13 @@
 /**
- * useGemstoneEnhance Hook
+ * useGemstoneEnhance Hook - MIGRATED TO QUEUE SYSTEM
  *
  * Handles gemstone quality enhancement using Fal.ai Nano-Banana
+ * NOW USES: Atomic credit system + queue
  */
 
 import { useState, useCallback } from 'react';
 import { createScopedLogger } from '@/lib/logger';
+import { useAIQueue } from './useAIQueue';
 
 const logger = createScopedLogger('useGemstoneEnhance');
 
@@ -35,6 +37,8 @@ export function useGemstoneEnhance(): UseGemstoneEnhanceResult {
   const [progress, setProgress] = useState('');
   const [enhancedImageUrl, setEnhancedImageUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  
+  const { submitAndWait } = useAIQueue();
 
   const enhanceGemstones = useCallback(async (input: GemstoneEnhanceInput) => {
     setIsEnhancing(true);
@@ -43,53 +47,26 @@ export function useGemstoneEnhance(): UseGemstoneEnhanceResult {
     setEnhancedImageUrl(null);
 
     try {
-      logger.info('Starting gemstone enhancement', input);
+      logger.info('Starting gemstone enhancement (via queue)', input);
 
-      setProgress('Analyzing gemstones...');
-
-      const response = await fetch('/api/ai/gemstone-enhance', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const result = await submitAndWait({
+        operation: 'gemstone',
+        params: { image_url: input.image_url },
+        priority: 'urgent',
+      }, {
+        onProgress: (status) => {
+          if (status.state === 'waiting') setProgress('Waiting in queue...');
+          else if (status.state === 'active') setProgress('Enhancing gemstone clarity and brilliance...');
         },
-        body: JSON.stringify({
-          image_url: input.image_url,
-        }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const errorMessage =
-          errorData.details ||
-          errorData.error ||
-          `Server error: ${response.status} ${response.statusText}`;
-        logger.error('Gemstone enhance API error:', {
-          status: response.status,
-          statusText: response.statusText,
-          errorData: errorData,
-        });
-
-        throw new Error(errorMessage);
+      if (!result?.data?.imageUrl) {
+        throw new Error('No image returned from queue');
       }
 
-      setProgress('Enhancing gemstone clarity and brilliance...');
-
-      const result = await response.json();
-      logger.info('Gemstone enhance API response:', result);
-
-      if (result.success && result.image?.url) {
-        setEnhancedImageUrl(result.image.url);
-        setProgress('Gemstones enhanced successfully!');
-        logger.info('Gemstone enhancement completed', {
-          imageUrl: result.image.url,
-          width: result.image.width,
-          height: result.image.height,
-          requestId: result.requestId,
-        });
-      } else {
-        logger.error('Invalid gemstone enhance response:', result);
-        throw new Error('Invalid response from gemstone enhance API');
-      }
+      setEnhancedImageUrl(result.data.imageUrl);
+      setProgress('Gemstones enhanced successfully!');
+      logger.info('Gemstone enhancement completed (via queue)');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       logger.error('Gemstone enhancement failed:', err);
@@ -98,7 +75,7 @@ export function useGemstoneEnhance(): UseGemstoneEnhanceResult {
     } finally {
       setIsEnhancing(false);
     }
-  }, []);
+  }, [submitAndWait]);
 
   const reset = useCallback(() => {
     setIsEnhancing(false);

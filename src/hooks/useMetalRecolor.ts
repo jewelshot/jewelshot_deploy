@@ -1,11 +1,13 @@
 /**
- * useMetalRecolor Hook
+ * useMetalRecolor Hook - MIGRATED TO QUEUE SYSTEM
  *
  * Handles metal color changes for jewelry
+ * NOW USES: Atomic credit system + queue
  */
 
 import { useState, useCallback } from 'react';
 import { createScopedLogger } from '@/lib/logger';
+import { useAIQueue } from './useAIQueue';
 
 const logger = createScopedLogger('useMetalRecolor');
 
@@ -43,16 +45,12 @@ interface UseMetalRecolorResult {
 export function useMetalRecolor(): UseMetalRecolorResult {
   const [isRecoloring, setIsRecoloring] = useState(false);
   const [progress, setProgress] = useState('');
-  const [recoloredImageUrl, setRecoloredImageUrl] = useState<string | null>(
-    null
-  );
-  const [appliedMetalType, setAppliedMetalType] = useState<MetalType | null>(
-    null
-  );
-  const [appliedMetalColor, setAppliedMetalColor] = useState<MetalColor | null>(
-    null
-  );
+  const [recoloredImageUrl, setRecoloredImageUrl] = useState<string | null>(null);
+  const [appliedMetalType, setAppliedMetalType] = useState<MetalType | null>(null);
+  const [appliedMetalColor, setAppliedMetalColor] = useState<MetalColor | null>(null);
   const [error, setError] = useState<string | null>(null);
+  
+  const { submitAndWait } = useAIQueue();
 
   const recolorMetal = useCallback(async (input: MetalRecolorInput) => {
     setIsRecoloring(true);
@@ -63,45 +61,29 @@ export function useMetalRecolor(): UseMetalRecolorResult {
     setAppliedMetalColor(null);
 
     try {
-      logger.info('Starting metal recolor', input);
+      logger.info('Starting metal recolor (via queue)', input);
 
-      const response = await fetch('/api/ai/metal-recolor', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const result = await submitAndWait({
+        operation: 'metal-recolor',
+        params: {
           image_url: input.image_url,
           metal_type: input.metal_type,
-        }),
+        },
+        priority: 'urgent',
+      }, {
+        onProgress: (status) => {
+          if (status.state === 'active') setProgress(`Recoloring to ${input.metal_type}...`);
+        },
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const errorMessage =
-          errorData.details ||
-          errorData.error ||
-          `Server error: ${response.status}`;
-        logger.error('Metal recolor API error:', errorData);
-        throw new Error(errorMessage);
+      if (!result?.data?.imageUrl) {
+        throw new Error('No image returned from queue');
       }
 
-      const result = await response.json();
-      logger.info('Metal recolor response:', result);
-
-      if (result.success && result.image?.url) {
-        setRecoloredImageUrl(result.image.url);
-        setAppliedMetalType(result.metal_type);
-        setAppliedMetalColor(result.metal_color);
-        setProgress('Metal color changed successfully!');
-        logger.info('Metal recolor completed', {
-          imageUrl: result.image.url,
-          metalType: result.metal_type,
-          metalColor: result.metal_color,
-        });
-      } else {
-        throw new Error('Invalid response from metal recolor API');
-      }
+      setRecoloredImageUrl(result.data.imageUrl);
+      setAppliedMetalType(input.metal_type);
+      setProgress('Metal color changed successfully!');
+      logger.info('Metal recolor completed (via queue)');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       logger.error('Metal recolor failed:', err);
@@ -110,7 +92,7 @@ export function useMetalRecolor(): UseMetalRecolorResult {
     } finally {
       setIsRecoloring(false);
     }
-  }, []);
+  }, [submitAndWait]);
 
   const reset = useCallback(() => {
     setIsRecoloring(false);

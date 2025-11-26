@@ -1,20 +1,14 @@
 /**
- * useMetalPolish Hook
+ * useMetalPolish Hook - MIGRATED TO QUEUE SYSTEM
  *
  * Manages metal polishing state and API calls
  * Enhances metal surfaces with mirror-like reflections and high luster
- *
- * Features:
- * - Mirror-finish surface quality
- * - Realistic reflections
- * - Professional polish appearance
- * - High luster and brilliance
- *
- * @returns {object} Metal polish state and functions
+ * NOW USES: Atomic credit system + queue
  */
 
 import { useState, useCallback } from 'react';
 import { createScopedLogger } from '@/lib/logger';
+import { useAIQueue } from './useAIQueue';
 
 const logger = createScopedLogger('hooks:metal-polish');
 
@@ -22,67 +16,34 @@ interface MetalPolishParams {
   image_url: string;
 }
 
-interface MetalPolishResult {
-  url: string;
-  width?: number;
-  height?: number;
-  content_type?: string;
-}
-
-interface MetalPolishResponse {
-  success: boolean;
-  image: MetalPolishResult;
-  credits_remaining: number;
-}
-
 export function useMetalPolish() {
   const [isPolishing, setIsPolishing] = useState(false);
   const [polishedImageUrl, setPolishedImageUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  
+  const { submitAndWait } = useAIQueue();
 
-  /**
-   * Polish metal surfaces in the image
-   */
   const polishMetal = useCallback(async (params: MetalPolishParams) => {
-    logger.info('[useMetalPolish] Starting metal polish:', params);
+    logger.info('[useMetalPolish] Starting metal polish (via queue):', params);
     setIsPolishing(true);
     setError(null);
     setPolishedImageUrl(null);
 
     try {
-      const response = await fetch('/api/ai/metal-polish', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          image_url: params.image_url,
-        }),
+      const result = await submitAndWait({
+        operation: 'metal-polish',
+        params: { image_url: params.image_url },
+        priority: 'urgent',
       });
 
-      const data: MetalPolishResponse = await response.json();
-
-      if (!response.ok) {
-        const errorMessage =
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (data as any).error ||
-          `HTTP ${response.status}: ${response.statusText}`;
-        logger.error('[useMetalPolish] API error:', errorMessage);
-        throw new Error(errorMessage);
+      if (!result?.data?.imageUrl) {
+        throw new Error('No image returned from queue');
       }
 
-      if (!data.success || !data.image?.url) {
-        logger.error('[useMetalPolish] Invalid response:', data);
-        throw new Error('Invalid response from metal polish API');
-      }
-
-      logger.info(
-        '[useMetalPolish] Metal polished successfully:',
-        data.image.url
-      );
-      setPolishedImageUrl(data.image.url);
-
-      return data;
+      logger.info('[useMetalPolish] Metal polished successfully (via queue)');
+      setPolishedImageUrl(result.data.imageUrl);
+      
+      return { success: true, image: { url: result.data.imageUrl } };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       logger.error('[useMetalPolish] Error:', errorMessage);
@@ -91,11 +52,8 @@ export function useMetalPolish() {
     } finally {
       setIsPolishing(false);
     }
-  }, []);
+  }, [submitAndWait]);
 
-  /**
-   * Reset polish state
-   */
   const resetPolish = useCallback(() => {
     logger.info('[useMetalPolish] Resetting state');
     setIsPolishing(false);
