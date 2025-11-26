@@ -13,23 +13,6 @@ import ErrorBoundary from '@/components/organisms/ErrorBoundary';
 import { useBreakpoint } from '@/hooks/useMediaQuery';
 
 // Dynamic imports for heavy components
-const RightSidebar = dynamic(
-  () => import('@/components/organisms/RightSidebar'),
-  { loading: () => null }
-);
-const RightSidebarToggle = dynamic(
-  () => import('@/components/atoms/RightSidebarToggle')
-);
-const TopBar = dynamic(() => import('@/components/organisms/TopBar'), {
-  loading: () => null,
-});
-const TopBarToggle = dynamic(() => import('@/components/atoms/TopBarToggle'));
-const BottomBar = dynamic(() => import('@/components/organisms/BottomBar'), {
-  loading: () => null,
-});
-const BottomBarToggle = dynamic(
-  () => import('@/components/atoms/BottomBarToggle')
-);
 const CatalogueContent = dynamic(
   () => import('@/components/organisms/CatalogueContent'),
   {
@@ -88,20 +71,7 @@ export default function CataloguePage() {
       {/* Aurora Background */}
       <AuroraBackground />
 
-      {/* Top Bar */}
-      <TopBar />
-      <TopBarToggle />
-
-
-      {/* Right Sidebar */}
-      <RightSidebar />
-      <RightSidebarToggle />
-
-      {/* Bottom Bar */}
-      <BottomBar />
-      <BottomBarToggle />
-
-      {/* Main Content */}
+      {/* Main Content with built-in CatalogueRightSidebar */}
       <ErrorBoundary fallback={<CatalogueFallback />}>
         <CatalogueContent />
       </ErrorBoundary>

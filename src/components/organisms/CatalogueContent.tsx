@@ -51,7 +51,7 @@ const CataloguePDF = dynamic(() =>
 const logger = createScopedLogger('Catalogue');
 
 export default function CatalogueContent() {
-  const { leftOpen, rightOpen, topOpen, bottomOpen } = useSidebarStore();
+  const { leftOpen } = useSidebarStore();
   
   // BYPASS ZUSTAND - Read directly from localStorage
   const [favorites, setFavorites] = useState<FavoriteImage[]>([]);
@@ -260,11 +260,9 @@ export default function CatalogueContent() {
           ? isSidebarCollapsed
             ? '96px'
             : '366px'
-          : rightOpen
-          ? '276px'
           : '16px',
-        top: topOpen ? '64px' : '16px',
-        bottom: bottomOpen ? '64px' : '16px',
+        top: '16px',
+        bottom: '16px',
       }}
     >
       {/* DEBUG BANNER */}
