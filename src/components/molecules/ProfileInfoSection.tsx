@@ -110,7 +110,7 @@ export function ProfileInfoSection() {
       // Upload to Supabase Storage
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}-${Date.now()}.${fileExt}`;
-      const filePath = `avatars/${fileName}`;
+      const filePath = fileName; // Path within the 'avatars' bucket
 
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('avatars')

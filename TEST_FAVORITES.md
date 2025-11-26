@@ -75,3 +75,5 @@ console.log('User:', user ? user.email : 'Not logged in');
 - Missing Supabase tables → Run migration
 - User not logged in → Favorites only in localStorage
 - LocalStorage has favorites but Supabase is empty → Sync issue
+
+
