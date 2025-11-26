@@ -26,7 +26,7 @@ export async function POST(request: Request) {
 
     // Parse request body
     const body = await request.json();
-    const { name, totalImages } = body;
+    const { name, totalImages, prompt, aspectRatio } = body;
 
     if (!name || typeof name !== 'string') {
       return NextResponse.json(
@@ -50,6 +50,8 @@ export async function POST(request: Request) {
         user_id: user.id,
         name,
         total_images: totalImages,
+        prompt: prompt || 'enhance the image quality and details',
+        aspect_ratio: aspectRatio || 'auto',
         status: 'processing',
       })
       .select()

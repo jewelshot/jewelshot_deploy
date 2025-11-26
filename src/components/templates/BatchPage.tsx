@@ -14,7 +14,6 @@ import {
   saveBatchState,
   loadBatchState,
   clearBatchState,
-  fileToDataUri,
   type BatchImageState,
 } from '@/lib/batch-state-storage';
 
@@ -41,50 +40,7 @@ const BottomBarToggle = dynamic(
   () => import('@/components/atoms/BottomBarToggle')
 );
 
-/**
- * Convert blob URL to base64 data URI
- */
-async function blobUrlToDataUri(blobUrl: string): Promise<string> {
-  const response = await fetch(blobUrl);
-  const blob = await response.blob();
-  
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
-
-/**
- * Upload original image to Supabase Storage
- * Returns the public URL
- */
-async function uploadOriginalToSupabase(
-  imageDataUri: string,
-  filename: string
-): Promise<string> {
-  try {
-    const response = await fetch('/api/batch/upload-original', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        imageDataUri,
-        filename,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to upload original image');
-    }
-
-    const data = await response.json();
-    return data.url;
-  } catch (error) {
-    console.error('[Batch] Failed to upload original:', error);
-    throw error;
-  }
-}
+// Helper functions removed - now using server-side background processing
 
 /**
  * BatchPage - Batch processing page with Studio layout
@@ -300,15 +256,16 @@ export function BatchPage() {
     [images, credits]
   );
 
-  // Handle confirm batch processing
+  // Handle confirm batch processing (BACKGROUND PROCESSING VERSION)
   const handleConfirmBatch = useCallback(async () => {
     setShowConfirmModal(false);
     setIsProcessing(true);
 
     // Capture current prompt (closure issue fix)
     const currentBatchPrompt = batchPrompt || 'enhance the image quality and details';
+    const currentAspectRatio = aspectRatio || 'auto';
 
-    // 1. Create batch project in Supabase
+    // 🚀 STEP 1: Create batch project in Supabase
     let batchProjectId: string | null = null;
     try {
       const response = await fetch('/api/batch/create', {
@@ -317,6 +274,8 @@ export function BatchPage() {
         body: JSON.stringify({
           name: batchName || `Batch ${new Date().toLocaleString()}`,
           totalImages: images.length,
+          prompt: currentBatchPrompt,
+          aspectRatio: currentAspectRatio,
         }),
       });
 
@@ -342,7 +301,7 @@ export function BatchPage() {
       const data = await response.json();
       batchProjectId = data.project.id;
       
-      toast.success('Batch project created! Processing images...');
+      toast.success('Batch project created! Uploading images...');
       console.log('[Batch] Project created:', batchProjectId);
     } catch (error) {
       console.error('[Batch] Failed to create project:', error);
@@ -351,255 +310,125 @@ export function BatchPage() {
       return;
     }
 
-    // Process images one by one
-    for (let i = 0; i < images.length; i++) {
-      const image = images[i];
-      const imageId = image.id;
+    // 🚀 STEP 2: Upload all images to Supabase Storage
+    try {
+      // Convert all images to data URIs
+      const imageDataArray = await Promise.all(
+        images.map(async (img) => {
+          let dataUri = img.preview;
+          
+          // Convert blob URLs to data URIs
+          if (dataUri.startsWith('blob:')) {
+            const blobResponse = await fetch(dataUri);
+            const blob = await blobResponse.blob();
+            const reader = new FileReader();
+            dataUri = await new Promise<string>((resolve, reject) => {
+              reader.onloadend = () => resolve(reader.result as string);
+              reader.onerror = reject;
+              reader.readAsDataURL(blob);
+            });
+          }
 
-      // Set processing
-      setImages((prev) =>
-        prev.map((img) =>
-          img.id === imageId ? { ...img, status: 'processing', progress: 0 } : img
-        )
+          return {
+            dataUri,
+            filename: img.file.name,
+            size: img.file.size,
+          };
+        })
       );
 
-      // Retry configuration
-      const MAX_RETRIES = 3;
+      const uploadResponse = await fetch(`/api/batch/${batchProjectId}/upload-images`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ images: imageDataArray }),
+      });
+
+      if (!uploadResponse.ok) {
+        const errorData = await uploadResponse.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to upload images');
+      }
+
+      const uploadData = await uploadResponse.json();
+      console.log('[Batch] Images uploaded:', uploadData);
+      toast.success(`${uploadData.uploaded} images uploaded! Starting AI processing...`);
       
-      // Start progress simulation (40 seconds to reach ~95%)
-      const progressInterval = setInterval(() => {
-        setImages((prev) =>
-          prev.map((img) => {
-            if (img.id === imageId && img.status === 'processing') {
-              const currentProgress = img.progress || 0;
-              // Increment by ~2.4% each second to reach 95% in ~40s
-              const newProgress = Math.min(currentProgress + 2.4, 95);
-              return { ...img, progress: newProgress };
-            }
-            return img;
-          })
-        );
-      }, 1000); // Update every second
+      // 🚀 STEP 3: Start background polling loop
+      startBackgroundProcessing(batchProjectId);
+    } catch (error) {
+      console.error('[Batch] Failed to upload images:', error);
+      toast.error('Failed to upload images');
+      setIsProcessing(false);
+      return;
+    }
+  }, [images, batchPrompt, batchName, aspectRatio]);
 
-      // Track original URL at higher scope (needed for both success and fail cases)
-      let originalUrl: string | null = null;
+  // 🔄 Background Processing Poll Loop
+  const startBackgroundProcessing = useCallback((projectId: string) => {
+    console.log('[Batch] Starting background processing loop for:', projectId);
 
+    const pollInterval = setInterval(async () => {
       try {
-        // Convert blob URL to data URI
-        const imageDataUri = await blobUrlToDataUri(image.preview);
+        // Call process-next API
+        const response = await fetch(`/api/batch/${projectId}/process-next`, {
+          method: 'POST',
+        });
 
-        // 1. Upload original image to Supabase (for Before/After comparison)
-        try {
-          originalUrl = await uploadOriginalToSupabase(imageDataUri, image.file.name);
-          console.log('[Batch] Original uploaded:', originalUrl.substring(0, 50));
-        } catch (uploadError) {
-          console.error('[Batch] Failed to upload original, continuing anyway:', uploadError);
-          // Don't fail the whole batch, just skip original URL
-        }
-
-        // 2. Retry logic: 3 attempts with exponential backoff
-        let lastError: Error | null = null;
-        let response: Response | null = null;
-
-        for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-          try {
-            console.log(`[Batch] Attempt ${attempt}/${MAX_RETRIES} for ${image.file.name}`, {
-              imageSize: imageDataUri.length,
-              promptLength: currentBatchPrompt.length,
-              prompt: currentBatchPrompt.substring(0, 100),
-              aspectRatio: aspectRatio || 'auto',
-            });
-
-            response = await fetch('/api/ai/edit', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                image_url: imageDataUri,
-                prompt: currentBatchPrompt,
-                aspect_ratio: aspectRatio || 'auto', // Send aspect ratio to nano banana (default: auto)
-              }),
-            });
-
-            // Success!
-            if (response.ok) {
-              if (attempt > 1) {
-                console.log(`[Batch] ✅ Succeeded on attempt ${attempt}`);
-              }
-              break;
-            }
-
-            // Error - check if we should retry
-            const errorData = await response.json().catch(() => ({}));
-            const statusCode = response.status;
-            
-            console.warn(`[Batch] Attempt ${attempt} failed:`, {
-              status: statusCode,
-              error: errorData,
-            });
-
-            // Retry on 500, 502, 503, 504 (server errors)
-            if (statusCode >= 500 && statusCode < 600 && attempt < MAX_RETRIES) {
-              const waitTime = Math.min(1000 * Math.pow(2, attempt - 1), 5000); // 1s, 2s, 4s (max 5s)
-              console.log(`[Batch] Retrying in ${waitTime}ms...`);
-              await new Promise(resolve => setTimeout(resolve, waitTime));
-              continue;
-            }
-
-            // Don't retry on 4xx errors (client errors)
-            lastError = new Error(errorData.message || errorData.error || `API error: ${response.statusText}`);
-            break;
-          } catch (fetchError) {
-            lastError = fetchError instanceof Error ? fetchError : new Error('Network error');
-            
-            // Retry on network errors
-            if (attempt < MAX_RETRIES) {
-              const waitTime = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
-              console.log(`[Batch] Network error, retrying in ${waitTime}ms...`);
-              await new Promise(resolve => setTimeout(resolve, waitTime));
-              continue;
-            }
-          }
-        }
-
-        // Check final result
-        if (!response || !response.ok) {
-          console.error('[Batch] All attempts failed:', {
-            filename: image.file.name,
-            attempts: MAX_RETRIES,
-            lastError: lastError?.message,
-          });
-          throw lastError || new Error('Failed after all retries');
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          console.error('[Batch] Process-next failed:', errorData);
+          
+          // Don't stop on errors, retry will handle it
+          return;
         }
 
         const data = await response.json();
+        console.log('[Batch] Poll result:', data);
 
-        // FAL.AI returns: { images: [{ url, width, height }] }
-        if (!data.images || !Array.isArray(data.images) || data.images.length === 0) {
-          throw new Error(data.error || 'No images returned from API');
+        // Check if batch is done
+        if (data.done) {
+          clearInterval(pollInterval);
+          setIsProcessing(false);
+          toast.success('🎉 Batch processing completed!');
+          console.log('[Batch] All images processed!');
+          
+          // Clear batch state
+          clearBatchState();
+          
+          // Optionally navigate to gallery
+          // router.push('/gallery');
+          return;
         }
 
-        const editedImageUrl = data.images[0].url;
-
-        console.log('[Batch] Image completed:', {
-          filename: image.file.name,
-          originalPreview: image.preview.substring(0, 50),
-          generatedUrl: editedImageUrl.substring(0, 50),
-        });
-
-        // Stop progress simulation
-        clearInterval(progressInterval);
-
-        // Update to completed with result (progress = 100%)
-        setImages((prev) =>
-          prev.map((img) =>
-            img.id === imageId
-              ? {
-                  ...img,
-                  status: 'completed',
-                  progress: 100,
-                  result: editedImageUrl,
-                }
-              : img
-          )
-        );
-
-        // 2. Save completed image to Supabase (with original URL for Before/After)
-        if (batchProjectId) {
-          try {
-            await fetch(`/api/batch/${batchProjectId}/image`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                originalFilename: image.file.name,
-                originalSize: image.file.size,
-                originalUrl: originalUrl, // For Before/After comparison
-                resultUrl: editedImageUrl,
-                status: 'completed',
-              }),
-            });
-            console.log('[Batch] Image saved to DB:', image.file.name);
-          } catch (dbError) {
-            console.error('[Batch] Failed to save image to DB:', dbError);
-            // Don't fail the whole batch, just log it
-          }
+        // Update progress message
+        if (data.remaining !== undefined) {
+          console.log('[Batch] Progress:', {
+            processed: data.processed,
+            remaining: data.remaining,
+          });
         }
-
-        toast.success(`✅ ${image.file.name} completed`);
       } catch (error) {
-        console.error(`❌ Failed to process ${image.file.name} after ${MAX_RETRIES} attempts:`, error);
-        
-        // Stop progress simulation
-        clearInterval(progressInterval);
-
-        // Mark as failed
-        const errorMessage = error instanceof Error ? error.message : 'Processing failed';
-        setImages((prev) =>
-          prev.map((img) =>
-            img.id === imageId
-              ? {
-                  ...img,
-                  status: 'failed',
-                  progress: 0,
-                  error: errorMessage,
-                }
-              : img
-          )
-        );
-
-        // Save failed image to Supabase (with original URL if available)
-        if (batchProjectId) {
-          try {
-            await fetch(`/api/batch/${batchProjectId}/image`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                originalFilename: image.file.name,
-                originalSize: image.file.size,
-                originalUrl: originalUrl, // For Before/After comparison (even if failed)
-                status: 'failed',
-                errorMessage: `Failed after ${MAX_RETRIES} retries: ${errorMessage}`,
-              }),
-            });
-            console.log('[Batch] Failed image saved to DB:', image.file.name);
-          } catch (dbError) {
-            console.error('[Batch] Failed to save failed image to DB:', dbError);
-          }
-        }
-
-        // Don't show error toast immediately - continue processing
-        console.log(`[Batch] ⏭️ Skipping ${image.file.name}, continuing with next image...`);
+        console.error('[Batch] Polling error:', error);
+        // Don't stop polling on errors
       }
-    }
+    }, 3000); // Poll every 3 seconds
 
-    // Batch processing complete
-    const completedCount = images.filter((img) => img.status === 'completed').length;
-    const failedCount = images.filter((img) => img.status === 'failed').length;
-    
-    // Show summary with retry info
-    if (failedCount > 0) {
-      toast.warning(
-        `🎯 Batch Complete!\n✅ ${completedCount} succeeded\n❌ ${failedCount} failed after retries`,
-        { duration: 6000 }
-      );
-    } else {
-      toast.success(
-        `🎉 All ${completedCount} images processed successfully!`,
-        { duration: 4000 }
-      );
-    }
-    
-    console.log('[Batch] Processing complete', {
-      total: images.length,
-      completed: completedCount,
-      failed: failedCount,
-      projectId: batchProjectId,
-    });
+    // Save interval ID for cleanup
+    (window as any).__batchPollInterval = pollInterval;
+  }, [router]);
 
-    // Refresh credits after batch completes
-    fetchCredits();
-    
-    setIsProcessing(false);
-  }, [images, batchPrompt, batchName, fetchCredits]);
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      const pollInterval = (window as any).__batchPollInterval;
+      if (pollInterval) {
+        clearInterval(pollInterval);
+        console.log('[Batch] Polling stopped (component unmounted)');
+      }
+    };
+  }, []);
+
+  // OLD CLIENT-SIDE PROCESSING LOOP REMOVED
+  // Now using server-side background processing with polling ✅
 
   return (
     <>
