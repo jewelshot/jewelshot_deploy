@@ -110,8 +110,21 @@ export function UserProfile() {
       >
         {/* Avatar with Online Indicator */}
         <div className="relative">
-          <Avatar content={user.avatar} size="md" />
-          <OnlineIndicator online={true} />
+          {user.avatar && user.avatar.startsWith('http') ? (
+            <div className="relative h-10 w-10">
+              <img
+                src={user.avatar}
+                alt={user.name}
+                className="h-10 w-10 rounded-full object-cover"
+              />
+              <OnlineIndicator online={true} />
+            </div>
+          ) : (
+            <div className="relative">
+              <Avatar content={user.avatar} size="md" />
+              <OnlineIndicator online={true} />
+            </div>
+          )}
         </div>
 
         {/* User Info & Credits */}
