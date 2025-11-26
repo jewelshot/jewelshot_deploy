@@ -15,7 +15,7 @@ import { SortOption } from '@/components/atoms/SortButton';
 import { getSavedImages, deleteImageFromGallery } from '@/lib/gallery-storage';
 import { toast } from 'sonner';
 import { createScopedLogger } from '@/lib/logger';
-import { BatchDetailModal } from '@/components/molecules/BatchDetailModal';
+import BatchDetailContent from '@/components/organisms/BatchDetailContent';
 import { ImageMetadataModal } from '@/components/molecules/ImageMetadataModal';
 import { useImageMetadataStore } from '@/store/imageMetadataStore';
 import { useSidebarStore } from '@/store/sidebarStore';
@@ -69,10 +69,9 @@ export function GalleryContent() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  // Batch Detail Modal state
+  // Batch Detail state (full-page, not modal)
   const [selectedBatchProject, setSelectedBatchProject] =
     useState<BatchProject | null>(null);
-  const [isBatchModalOpen, setIsBatchModalOpen] = useState(false);
 
   // Metadata Modal state
   const [metadataModalImage, setMetadataModalImage] =
@@ -335,7 +334,6 @@ export function GalleryContent() {
 
   const handleViewBatch = (project: BatchProject) => {
     setSelectedBatchProject(project);
-    setIsBatchModalOpen(true);
   };
 
   const handleViewBatchImage = (image: {
@@ -614,6 +612,32 @@ export function GalleryContent() {
       toast.error('Failed to rename batch');
     }
   };
+
+  // If batch detail is selected, show full-page view
+  if (selectedBatchProject) {
+    return (
+      <BatchDetailContent
+        project={selectedBatchProject}
+        onBack={() => setSelectedBatchProject(null)}
+        onViewImage={handleViewBatchImage}
+        onOpenInStudio={(image) => {
+          const params = new URLSearchParams({
+            imageUrl: image.imageUrl,
+            imageName: image.name,
+          });
+
+          // Add originalUrl for compare mode if it exists
+          if (image.originalUrl) {
+            params.set('originalUrl', image.originalUrl);
+            params.set('compareMode', 'true');
+          }
+
+          router.push(`/studio?${params.toString()}`);
+        }}
+        onDownloadImage={handleDownloadSingle}
+      />
+    );
+  }
 
   return (
     <div
@@ -942,33 +966,6 @@ export function GalleryContent() {
         </>
       )}
 
-      {/* Batch Detail Modal */}
-      {selectedBatchProject && (
-        <BatchDetailModal
-          isOpen={isBatchModalOpen}
-          onClose={() => {
-            setIsBatchModalOpen(false);
-            setSelectedBatchProject(null);
-          }}
-          project={selectedBatchProject}
-          onViewImage={handleViewBatchImage}
-          onOpenInStudio={(image) => {
-            const params = new URLSearchParams({
-              imageUrl: image.imageUrl,
-              imageName: image.name,
-            });
-
-            // Add originalUrl for compare mode if it exists
-            if (image.originalUrl) {
-              params.set('originalUrl', image.originalUrl);
-              params.set('compareMode', 'true');
-            }
-
-            router.push(`/studio?${params.toString()}`);
-          }}
-          onDownloadImage={handleDownloadSingle}
-        />
-      )}
 
       {/* Image Metadata Modal */}
       {metadataModalImage && (
