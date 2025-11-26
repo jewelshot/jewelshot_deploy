@@ -119,22 +119,29 @@ export function ProfileInfoSection() {
           upsert: true,
         });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        logger.error('Upload error details:', uploadError);
+        throw new Error(
+          uploadError.message || 'Storage upload failed. Please check Supabase Storage configuration.'
+        );
+      }
 
       // Get public URL
       const {
         data: { publicUrl },
       } = supabase.storage.from('avatars').getPublicUrl(uploadData.path);
 
+      logger.info('Avatar uploaded successfully:', publicUrl);
+
       // Update profile
       setProfile({ ...profile, avatar_url: publicUrl });
 
       setMessage({ type: 'success', text: 'Avatar uploaded successfully' });
-    } catch (error) {
+    } catch (error: any) {
       logger.error('Avatar upload error:', error);
       setMessage({
         type: 'error',
-        text: 'Failed to upload avatar. Please try again.',
+        text: error.message || 'Failed to upload avatar. Please check console for details.',
       });
     } finally {
       setUploadingAvatar(false);
