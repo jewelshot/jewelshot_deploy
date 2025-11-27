@@ -109,7 +109,7 @@ export default function AdminDashboard() {
   // Login form
   if (!isAuthenticated) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[#0a0a0a]">
+      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a] p-6">
         <div className="w-full max-w-md space-y-6 rounded-xl border border-white/10 bg-white/5 p-8 backdrop-blur-sm">
           <div className="text-center">
             <Server className="mx-auto h-12 w-12 text-purple-400" />
@@ -157,8 +157,8 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] p-6">
-      <div className="mx-auto max-w-[1920px] space-y-6">
+    <div className="min-h-screen bg-[#0a0a0a] p-6 overflow-y-auto">
+      <div className="mx-auto max-w-[1920px] space-y-6 pb-12">
         
         {/* Header */}
         <div className="flex items-center justify-between">
