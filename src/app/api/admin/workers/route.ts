@@ -22,6 +22,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  // Check if queues are available
+  if (!urgentQueue || !normalQueue || !backgroundQueue) {
+    return NextResponse.json(
+      { error: 'Queues not initialized. Make sure REDIS_URL is set.' },
+      { status: 503 }
+    );
+  }
+
   try {
     // Check if worker is accessible
     const workerHealthUrl = process.env.WORKER_HEALTH_URL || 'http://localhost:3001';

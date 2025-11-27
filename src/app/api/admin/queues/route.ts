@@ -5,24 +5,8 @@
  * Access: /api/admin/queues
  */
 
-import { createBullBoard } from '@bull-board/api';
-import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
-import { ExpressAdapter } from '@bull-board/express';
 import { urgentQueue, normalQueue, backgroundQueue } from '@/lib/queue/queues';
 import { NextRequest, NextResponse } from 'next/server';
-
-// Initialize Bull Board
-const serverAdapter = new ExpressAdapter();
-serverAdapter.setBasePath('/api/admin/queues');
-
-const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
-  queues: [
-    new BullMQAdapter(urgentQueue),
-    new BullMQAdapter(normalQueue),
-    new BullMQAdapter(backgroundQueue),
-  ],
-  serverAdapter: serverAdapter,
-});
 
 // Simple auth middleware (replace with proper auth)
 function isAuthorized(request: NextRequest): boolean {
@@ -38,6 +22,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       { error: 'Unauthorized' },
       { status: 401 }
+    );
+  }
+
+  // Check if queues are available
+  if (!urgentQueue || !normalQueue || !backgroundQueue) {
+    return NextResponse.json(
+      { error: 'Queues not initialized. Make sure REDIS_URL is set.' },
+      { status: 503 }
     );
   }
 
