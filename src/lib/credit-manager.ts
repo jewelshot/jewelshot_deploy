@@ -6,6 +6,15 @@
  */
 
 import { createClient } from '@/lib/supabase/server';
+import { createServiceClient } from '@/lib/supabase/service';
+
+/**
+ * Detect if running in worker context (no request scope)
+ */
+function isWorkerContext(): boolean {
+  // Simple check: if we're in Node.js and not in a Next.js request
+  return typeof window === 'undefined' && !process.env.NEXT_RUNTIME;
+}
 
 // ============================================
 // TYPES
@@ -80,7 +89,9 @@ export async function reserveCredit(
  * @param transactionId - Transaction ID from reserve
  */
 export async function confirmCredit(transactionId: string): Promise<void> {
-  const supabase = await createClient();
+  const supabase = isWorkerContext() 
+    ? createServiceClient() 
+    : await createClient();
   
   const { error } = await supabase.rpc('confirm_credit', {
     p_transaction_id: transactionId,
@@ -104,7 +115,9 @@ export async function confirmCredit(transactionId: string): Promise<void> {
  * @param transactionId - Transaction ID from reserve
  */
 export async function refundCredit(transactionId: string): Promise<void> {
-  const supabase = await createClient();
+  const supabase = isWorkerContext() 
+    ? createServiceClient() 
+    : await createClient();
   
   const { error } = await supabase.rpc('refund_credit', {
     p_transaction_id: transactionId,

@@ -5,6 +5,11 @@
  * Runs as a separate process for reliability
  */
 
+// Load environment variables
+import { config } from 'dotenv';
+import { resolve } from 'path';
+config({ path: resolve(process.cwd(), '.env.local') });
+
 import { Worker, Job } from 'bullmq';
 import { connection, workerConfig } from '@/lib/queue/config';
 import { QUEUE_NAMES, AIJobData, AIJobResult } from '@/lib/queue/types';

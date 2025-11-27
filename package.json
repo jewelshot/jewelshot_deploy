@@ -50,6 +50,7 @@
     "@vercel/speed-insights": "^1.2.0",
     "browser-image-compression": "^2.0.2",
     "bullmq": "^5.65.0",
+    "dotenv": "^17.2.3",
     "file-saver": "^2.0.5",
     "ioredis": "^5.8.2",
     "jszip": "^3.10.1",

@@ -4,6 +4,17 @@
  * Redis connection and queue settings
  */
 
+// Load environment variables (for worker process)
+if (typeof window === 'undefined') {
+  try {
+    const dotenv = require('dotenv');
+    const path = require('path');
+    dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
+  } catch (e) {
+    // dotenv might not be available in all contexts, ignore
+  }
+}
+
 import { ConnectionOptions } from 'bullmq';
 import Redis from 'ioredis';
 import { QUEUE_NAMES } from './types';
