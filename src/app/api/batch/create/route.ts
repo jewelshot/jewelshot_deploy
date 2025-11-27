@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { createScopedLogger } from '@/lib/logger';
+import { createApiError, ApiErrorCode, withErrorHandling } from '@/lib/api-error';
+import { validateString, validateNumber, ValidationError } from '@/lib/validation';
 
 const logger = createScopedLogger('API:Batch:Create');
 
@@ -9,38 +11,37 @@ const logger = createScopedLogger('API:Batch:Create');
  * Create a new batch project
  * Body: { name: string, totalImages: number }
  */
-export async function POST(request: Request) {
+export const POST = withErrorHandling(async (request: Request) => {
+  const supabase = await createClient();
+
+  // Auth check
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    logger.warn('Unauthorized batch create attempt');
+    return createApiError(ApiErrorCode.UNAUTHORIZED);
+  }
+
+  // Parse request body
+  const body = await request.json();
+  const { name, totalImages, prompt, aspectRatio } = body;
+
+  // Validate inputs
   try {
-    const supabase = await createClient();
-
-    // Auth check
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      logger.warn('Unauthorized batch create attempt');
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    validateString(name, 'name', { required: true, minLength: 1, maxLength: 100 });
+    validateNumber(totalImages, 'totalImages', { required: true, min: 1, max: 100, integer: true });
+    if (prompt) {
+      validateString(prompt, 'prompt', { minLength: 3, maxLength: 1000 });
     }
-
-    // Parse request body
-    const body = await request.json();
-    const { name, totalImages, prompt, aspectRatio } = body;
-
-    if (!name || typeof name !== 'string') {
-      return NextResponse.json(
-        { error: 'Name is required and must be a string' },
-        { status: 400 }
-      );
+  } catch (error) {
+    if (error instanceof ValidationError) {
+      return createApiError(error.code, error.message);
     }
-
-    if (!totalImages || typeof totalImages !== 'number' || totalImages < 1) {
-      return NextResponse.json(
-        { error: 'Total images is required and must be a positive number' },
-        { status: 400 }
-      );
-    }
+    throw error;
+  }
 
     // Create batch project
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -79,14 +80,5 @@ export async function POST(request: Request) {
       success: true,
       project,
     });
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown';
-    logger.error('Unexpected error in batch create', { error: errorMessage });
-
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
+});
 

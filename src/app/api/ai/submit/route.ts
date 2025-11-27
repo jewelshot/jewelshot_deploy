@@ -12,6 +12,7 @@ import { AIOperation, JobPriority } from '@/lib/queue/types';
 import { reserveCredit, getAvailableCredits } from '@/lib/credit-manager';
 import { aiRateLimit, checkRateLimit } from '@/lib/rate-limit';
 import { createApiError, ApiErrorCode, withErrorHandling } from '@/lib/api-error';
+import { validateAIParams, ValidationError } from '@/lib/validation';
 
 // ============================================
 // POST /api/ai/submit
@@ -72,13 +73,23 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
       metadata?: any;
     };
 
+    // ============================================
+    // INPUT VALIDATION
+    // ============================================
+    
     // Validate required fields
     if (!operation) {
       return createApiError(ApiErrorCode.MISSING_REQUIRED_FIELD, 'Operation is required');
     }
 
-    if (!params || typeof params !== 'object') {
-      return createApiError(ApiErrorCode.INVALID_INPUT, 'Params must be a valid object');
+    // Validate and sanitize params
+    try {
+      validateAIParams(operation, params);
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        return createApiError(error.code, error.message);
+      }
+      throw error;
     }
 
     // ============================================
