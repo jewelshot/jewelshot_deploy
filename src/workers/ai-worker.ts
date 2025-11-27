@@ -11,10 +11,24 @@ import { resolve } from 'path';
 config({ path: resolve(process.cwd(), '.env.local') });
 
 import { Worker, Job } from 'bullmq';
+import { createServer } from 'http';
 import { connection, workerConfig } from '@/lib/queue/config';
 import { QUEUE_NAMES, AIJobData, AIJobResult } from '@/lib/queue/types';
 import { processAIJob, validateJobData } from '@/lib/queue/processors/ai-processor';
 import { confirmCredit, refundCredit } from '@/lib/credit-manager';
+import { validateEnv } from '@/lib/env-validator';
+
+// ============================================
+// VALIDATE ENVIRONMENT
+// ============================================
+
+try {
+  validateEnv();
+  console.log('✅ Environment variables validated');
+} catch (error) {
+  console.error('❌ Environment validation failed:', (error as Error).message);
+  process.exit(1);
+}
 
 // ============================================
 // WORKER INSTANCES
@@ -138,12 +152,50 @@ const backgroundWorker = createWorker(QUEUE_NAMES.BACKGROUND);
 console.log('✅ All workers started successfully');
 
 // ============================================
+// HEALTH CHECK SERVER
+// ============================================
+
+const PORT = process.env.WORKER_PORT || 3001;
+
+const server = createServer((req, res) => {
+  if (req.url === '/health' && req.method === 'GET') {
+    const health = {
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      workers: {
+        urgent: urgentWorker.isRunning(),
+        normal: normalWorker.isRunning(),
+        background: backgroundWorker.isRunning(),
+      },
+      uptime: process.uptime(),
+      memory: process.memoryUsage(),
+    };
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(health));
+  } else {
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Not Found' }));
+  }
+});
+
+server.listen(PORT, () => {
+  console.log(`🏥 Health check server running on port ${PORT}`);
+});
+
+// ============================================
 // GRACEFUL SHUTDOWN
 // ============================================
 
 async function gracefulShutdown() {
   console.log('\n🛑 Shutting down workers gracefully...');
   
+  // Close health check server
+  server.close(() => {
+    console.log('✅ Health check server stopped');
+  });
+  
+  // Close workers
   await Promise.all([
     urgentWorker.close(),
     normalWorker.close(),
