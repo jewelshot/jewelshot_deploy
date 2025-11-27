@@ -1,4 +1,9 @@
 import type { NextConfig } from 'next';
+import withBundleAnalyzer from '@next/bundle-analyzer';
+
+const bundleAnalyzer = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+});
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -15,8 +20,17 @@ const nextConfig: NextConfig = {
 
   // Enable experimental optimizations
   experimental: {
-    optimizePackageImports: ['lucide-react'],
+    optimizePackageImports: [
+      'lucide-react',
+      '@supabase/supabase-js',
+      'zustand',
+      'sonner',
+      'react-dropzone',
+    ],
   },
+
+  // Output standalone for smaller Docker images (if deploying to containers)
+  ...(process.env.DOCKER_BUILD === 'true' && { output: 'standalone' }),
 
   // Image optimization
   images: {
@@ -92,4 +106,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default bundleAnalyzer(nextConfig);
