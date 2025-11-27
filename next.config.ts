@@ -1,5 +1,6 @@
 import type { NextConfig } from 'next';
 import withBundleAnalyzer from '@next/bundle-analyzer';
+import { withSentryConfig } from '@sentry/nextjs';
 
 const bundleAnalyzer = withBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -106,4 +107,15 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default bundleAnalyzer(nextConfig);
+// Export with Sentry (ULTRA MINIMAL - just error tracking)
+export default withSentryConfig(
+  bundleAnalyzer(nextConfig),
+  {
+    // Only required options
+    org: 'jewelshot',
+    project: 'jewelshot-production',
+    
+    // Be quiet during build
+    silent: true,
+  }
+);
