@@ -19,14 +19,10 @@ import { DataCard } from '@/components/admin/atoms/DataCard';
 import { Badge } from '@/components/admin/atoms/Badge';
 import { format } from 'date-fns';
 
-const ADMIN_KEY = typeof window !== 'undefined' 
-  ? localStorage.getItem('admin_key') || '' 
-  : '';
-
 export default function AdminDashboard() {
-  const [loading, setLoading] = useState(true);
-  const [authKey, setAuthKey] = useState(ADMIN_KEY);
-  const [isAuthenticated, setIsAuthenticated] = useState(!!ADMIN_KEY);
+  const [loading, setLoading] = useState(false);
+  const [authKey, setAuthKey] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Data states
@@ -39,7 +35,10 @@ export default function AdminDashboard() {
   const [costs, setCosts] = useState<any>(null);
 
   const fetchAllData = async () => {
-    if (!authKey) return;
+    if (!authKey) {
+      setError('Please enter admin key');
+      return;
+    }
 
     try {
       setLoading(true);
@@ -90,6 +89,15 @@ export default function AdminDashboard() {
     }
   };
 
+  // Check localStorage on mount
+  useEffect(() => {
+    const savedKey = localStorage.getItem('admin_key');
+    if (savedKey) {
+      setAuthKey(savedKey);
+      setIsAuthenticated(true);
+    }
+  }, []);
+
   useEffect(() => {
     if (isAuthenticated && authKey) {
       fetchAllData();
@@ -122,9 +130,19 @@ export default function AdminDashboard() {
             <button
               onClick={fetchAllData}
               disabled={!authKey || loading}
-              className="w-full rounded-lg bg-purple-600 px-4 py-3 font-semibold text-white transition-all hover:bg-purple-700 disabled:opacity-50"
+              className="w-full rounded-lg bg-purple-600 px-4 py-3 font-semibold text-white transition-all hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {loading ? 'Authenticating...' : 'Access Dashboard'}
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="h-5 w-5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Authenticating...
+                </span>
+              ) : (
+                'Access Dashboard'
+              )}
             </button>
 
             {error && (
