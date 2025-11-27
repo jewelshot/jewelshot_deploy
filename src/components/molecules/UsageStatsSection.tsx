@@ -18,6 +18,7 @@ import {
   Calendar,
 } from 'lucide-react';
 import { createScopedLogger } from '@/lib/logger';
+import { toast } from 'sonner';
 
 const logger = createScopedLogger('UsageStats');
 
@@ -50,14 +51,17 @@ export function UsageStatsSection() {
       if (response.ok) {
         const data = await response.json();
         logger.info('Added 10 credits. New balance:', data.balance);
+        toast.success(`✅ Added 10 credits! Balance: ${data.balance}`);
         // Refresh credits
         await fetchCredits();
       } else {
         const error = await response.json();
         logger.error('Failed to add credits:', error);
+        toast.error(`❌ Failed: ${error.error}`);
       }
     } catch (error) {
       logger.error('Error adding test credits:', error);
+      toast.error('❌ Network error');
     } finally {
       setAddingCredits(false);
     }
