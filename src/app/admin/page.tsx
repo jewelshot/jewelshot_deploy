@@ -24,6 +24,7 @@ import { OperationsChart } from '@/components/admin/organisms/OperationsChart';
 import { CostChart } from '@/components/admin/organisms/CostChart';
 import { UserGrowthChart } from '@/components/admin/organisms/UserGrowthChart';
 import { AuditLogsViewer } from '@/components/admin/organisms/AuditLogsViewer';
+import { BackupManager } from '@/components/admin/organisms/BackupManager';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/useToast';
 import { Toast } from '@/components/atoms/Toast';
@@ -51,7 +52,7 @@ export default function AdminDashboard() {
   // UI states
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [showUserDetail, setShowUserDetail] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'charts' | 'audit-logs'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'charts' | 'audit-logs' | 'backups'>('overview');
 
   // Search & Filter functions
   const handleSearch = (query: string) => {
@@ -525,6 +526,16 @@ export default function AdminDashboard() {
           >
             🔒 Audit Logs
           </button>
+          <button
+            onClick={() => setActiveTab('backups')}
+            className={`px-4 py-3 text-sm font-medium transition-all ${
+              activeTab === 'backups'
+                ? 'border-b-2 border-purple-500 text-white'
+                : 'text-white/60 hover:text-white'
+            }`}
+          >
+            💾 Backups
+          </button>
         </div>
 
         {/* Overview Tab */}
@@ -718,6 +729,11 @@ export default function AdminDashboard() {
         {/* Audit Logs Tab */}
         {activeTab === 'audit-logs' && (
           <AuditLogsViewer authKey={authKey} />
+        )}
+
+        {/* Backups Tab */}
+        {activeTab === 'backups' && (
+          <BackupManager authKey={authKey} />
         )}
 
         {/* User Detail Modal */}
