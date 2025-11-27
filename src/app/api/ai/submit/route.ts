@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getQueueByPriority } from '@/lib/queue/queues';
 import { AIOperation, JobPriority } from '@/lib/queue/types';
 import { reserveCredit, getAvailableCredits } from '@/lib/credit-manager';
+import { aiRateLimit, checkRateLimit } from '@/lib/rate-limit';
 
 // ============================================
 // POST /api/ai/submit
@@ -28,6 +29,32 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
+      );
+    }
+
+    // ============================================
+    // RATE LIMITING (AI Operations)
+    // ============================================
+    
+    const { success, limit, remaining, reset } = await checkRateLimit(user.id, aiRateLimit);
+    
+    if (!success) {
+      return NextResponse.json(
+        { 
+          error: 'Rate limit exceeded', 
+          message: 'Too many AI requests. Please wait before trying again.',
+          limit,
+          remaining: 0,
+          reset,
+        },
+        { 
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': limit?.toString() || '0',
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': reset?.toString() || '0',
+          },
+        }
       );
     }
 

@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { globalRateLimit, getClientIp, checkRateLimit } from '@/lib/rate-limit';
 
 // ============================================
 // 🔒 MAINTENANCE MODE CONFIGURATION
@@ -9,6 +10,38 @@ const MAINTENANCE_PASSWORD = 'jewelshot2024'; // 🔑 Geliştirici bypass şifre
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // ============================================
+  // 🚦 GLOBAL RATE LIMITING (First Priority)
+  // ============================================
+  // Skip rate limiting for static assets and health checks
+  const skipRateLimit = 
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api/health') ||
+    pathname.includes('.');
+
+  if (!skipRateLimit && globalRateLimit) {
+    const ip = getClientIp(request);
+    const { success, limit, remaining, reset } = await checkRateLimit(ip, globalRateLimit);
+
+    if (!success) {
+      return new NextResponse(
+        JSON.stringify({
+          error: 'Rate limit exceeded',
+          message: 'Too many requests. Please try again later.',
+        }),
+        {
+          status: 429,
+          headers: {
+            'Content-Type': 'application/json',
+            'X-RateLimit-Limit': limit?.toString() || '0',
+            'X-RateLimit-Remaining': remaining?.toString() || '0',
+            'X-RateLimit-Reset': reset?.toString() || '0',
+          },
+        }
+      );
+    }
+  }
 
   // ============================================
   // 🚧 MAINTENANCE MODE CHECK (First Priority)

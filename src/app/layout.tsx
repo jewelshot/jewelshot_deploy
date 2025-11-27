@@ -131,14 +131,12 @@ export default function RootLayout({
         className={`${inter.variable} font-sans antialiased`}
         data-theme="purple"
       >
-        <SentryProvider>
-          <ErrorBoundary>{children}</ErrorBoundary>
-          <GlobalSidebar />
-          <ToastContainer />
-          <GalleryPrefetch />
-          <Analytics />
-          <SpeedInsights />
-        </SentryProvider>
+        <ErrorBoundary>{children}</ErrorBoundary>
+        <GlobalSidebar />
+        <ToastContainer />
+        <GalleryPrefetch />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
