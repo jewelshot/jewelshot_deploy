@@ -8,19 +8,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connection } from '@/lib/queue/config';
 import { urgentQueue, normalQueue, backgroundQueue } from '@/lib/queue/queues';
-
-// Simple auth middleware
-function isAuthorized(request: NextRequest): boolean {
-  const authHeader = request.headers.get('authorization');
-  const adminKey = process.env.ADMIN_DASHBOARD_KEY || 'your-secret-admin-key-change-this';
-  
-  return authHeader === `Bearer ${adminKey}`;
-}
+import { isAdminAuthorized, logAdminAccess } from '@/lib/admin-auth';
 
 export async function GET(request: NextRequest) {
-  if (!isAuthorized(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  // Check admin authorization
+  const authCheck = await isAdminAuthorized(request);
+  
+  if (!authCheck.authorized) {
+    logAdminAccess(request, '/api/admin/workers', false, authCheck.error);
+    return NextResponse.json(
+      { error: authCheck.error },
+      { status: authCheck.statusCode || 401 }
+    );
   }
+  
+  logAdminAccess(request, '/api/admin/workers', true);
 
   // Check if queues are available
   if (!urgentQueue || !normalQueue || !backgroundQueue) {
