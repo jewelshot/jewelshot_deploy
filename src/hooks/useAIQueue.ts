@@ -8,8 +8,8 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
-import { toast } from 'sonner';
 import { AIOperation, JobPriority } from '@/lib/queue/types';
+import { useApiError } from './useApiError';
 
 // ============================================
 // TYPES
@@ -41,6 +41,7 @@ export function useAIQueue() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState<number>(0);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const { handleError } = useApiError();
 
   // ============================================
   // SUBMIT JOB
@@ -59,7 +60,8 @@ export function useAIQueue() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to submit job');
+        // Use standardized error from API
+        throw data;
       }
 
       return {
@@ -202,16 +204,8 @@ export function useAIQueue() {
 
         return result;
       } catch (error: any) {
-        // Show error toast
-        if (error.message?.includes('Insufficient credits')) {
-          toast.error('Insufficient credits', {
-            description: 'Please purchase more credits to continue.',
-          });
-        } else {
-          toast.error('Operation failed', {
-            description: error.message || 'An error occurred during processing.',
-          });
-        }
+        // Use standardized error handler
+        handleError(error);
         throw error;
       }
     },

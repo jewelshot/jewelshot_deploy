@@ -11,13 +11,13 @@ import { getQueueByPriority } from '@/lib/queue/queues';
 import { AIOperation, JobPriority } from '@/lib/queue/types';
 import { reserveCredit, getAvailableCredits } from '@/lib/credit-manager';
 import { aiRateLimit, checkRateLimit } from '@/lib/rate-limit';
+import { createApiError, ApiErrorCode, withErrorHandling } from '@/lib/api-error';
 
 // ============================================
 // POST /api/ai/submit
 // ============================================
 
-export async function POST(request: NextRequest) {
-  try {
+export const POST = withErrorHandling(async (request: NextRequest) => {
     // ============================================
     // AUTHENTICATION
     // ============================================
@@ -26,10 +26,7 @@ export async function POST(request: NextRequest) {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
     if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return createApiError(ApiErrorCode.UNAUTHORIZED);
     }
 
     // ============================================
@@ -77,17 +74,11 @@ export async function POST(request: NextRequest) {
 
     // Validate required fields
     if (!operation) {
-      return NextResponse.json(
-        { error: 'Missing operation' },
-        { status: 400 }
-      );
+      return createApiError(ApiErrorCode.MISSING_REQUIRED_FIELD, 'Operation is required');
     }
 
     if (!params || typeof params !== 'object') {
-      return NextResponse.json(
-        { error: 'Invalid params' },
-        { status: 400 }
-      );
+      return createApiError(ApiErrorCode.INVALID_INPUT, 'Params must be a valid object');
     }
 
     // ============================================
@@ -97,10 +88,7 @@ export async function POST(request: NextRequest) {
     // Check if user has enough credits
     const availableCredits = await getAvailableCredits(user.id);
     if (availableCredits <= 0) {
-      return NextResponse.json(
-        { error: 'Insufficient credits. Please purchase more credits to continue.' },
-        { status: 402 } // Payment Required
-      );
+      return createApiError(ApiErrorCode.INSUFFICIENT_CREDITS);
     }
 
     // Reserve credits atomically
@@ -179,16 +167,5 @@ export async function POST(request: NextRequest) {
         amount: creditReservation.amount,
       },
     });
-  } catch (error: any) {
-    console.error('[API] Error submitting job:', error);
-    
-    return NextResponse.json(
-      {
-        error: 'Failed to submit job',
-        details: error.message,
-      },
-      { status: 500 }
-    );
-  }
-}
+});
 

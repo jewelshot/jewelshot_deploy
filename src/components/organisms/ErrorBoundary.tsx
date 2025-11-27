@@ -49,13 +49,33 @@ export class ErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // Log error to console in development
-    if (process.env.NODE_ENV === 'development') {
-      logger.error('Error Boundary caught an error:', error, errorInfo);
-    }
+    // Always log to console
+    logger.error('Error Boundary caught an error:', error, errorInfo);
 
-    // In production, send to error tracking service (Sentry, etc.)
-    // logErrorToService(error, errorInfo);
+    // Log to analytics/monitoring in production
+    if (process.env.NODE_ENV === 'production') {
+      // Send error to monitoring service
+      try {
+        fetch('/api/errors/log', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            error: {
+              message: error.message,
+              stack: error.stack,
+              componentStack: errorInfo.componentStack,
+            },
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent,
+            url: window.location.href,
+          }),
+        }).catch(() => {
+          // Silently fail if logging endpoint is unavailable
+        });
+      } catch {
+        // Ignore logging errors
+      }
+    }
 
     this.setState({
       error,
