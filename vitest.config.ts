@@ -5,22 +5,22 @@ import path from 'path';
 export default defineConfig({
   plugins: [react()],
   test: {
-    globals: true,
     environment: 'jsdom',
-    setupFiles: './vitest.setup.ts',
-    css: true,
+    globals: true,
+    setupFiles: ['./src/__tests__/setup.ts'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
       exclude: [
         'node_modules/',
-        'vitest.setup.ts',
-        '**/*.d.ts',
-        '**/*.config.*',
-        '**/dist/**',
-        '**/.next/**',
+        'src/__tests__/',
+        '*.config.ts',
+        '*.config.js',
+        '.next/',
+        'coverage/',
       ],
     },
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
   },
   resolve: {
     alias: {

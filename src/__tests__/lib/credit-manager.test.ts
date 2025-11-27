@@ -1,0 +1,147 @@
+/**
+ * Credit Manager Tests
+ * 
+ * Tests for the atomic credit system
+ */
+
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { reserveCredit, confirmCredit, refundCredit, getUserCredits } from '@/lib/credit-manager';
+
+// Mock Supabase
+const mockServiceRpc = vi.fn();
+const mockClientRpc = vi.fn();
+
+vi.mock('@/lib/supabase/service', () => ({
+  createServiceClient: () => ({
+    rpc: mockServiceRpc,
+  }),
+}));
+
+vi.mock('@/lib/supabase/client', () => ({
+  createClient: async () => ({
+    rpc: mockClientRpc,
+  }),
+}));
+
+describe('Credit Manager', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe('reserveCredit', () => {
+    it('should reserve credits successfully', async () => {
+      mockClientRpc.mockResolvedValue({
+        data: { transaction_id: 'tx-123' },
+        error: null,
+      });
+
+      const result = await reserveCredit('user-123', 10, 'generate', 'test prompt');
+
+      expect(result).toBe('tx-123');
+      expect(mockClientRpc).toHaveBeenCalledWith('reserve_credit', {
+        p_user_id: 'user-123',
+        p_amount: 10,
+        p_operation_type: 'generate',
+        p_description: 'test prompt',
+      });
+    });
+
+    it('should throw error when insufficient credits', async () => {
+      mockClientRpc.mockResolvedValue({
+        data: null,
+        error: { message: 'Insufficient credits' },
+      });
+
+      await expect(
+        reserveCredit('user-123', 10, 'generate', 'test')
+      ).rejects.toThrow('Insufficient credits');
+    });
+
+    it('should throw error when user not found', async () => {
+      mockClientRpc.mockResolvedValue({
+        data: null,
+        error: { message: 'User not found' },
+      });
+
+      await expect(
+        reserveCredit('invalid-user', 10, 'generate', 'test')
+      ).rejects.toThrow('User not found');
+    });
+  });
+
+  describe('confirmCredit', () => {
+    it('should confirm credit transaction successfully', async () => {
+      mockServiceRpc.mockResolvedValue({
+        data: null,
+        error: null,
+      });
+
+      await expect(confirmCredit('tx-123')).resolves.not.toThrow();
+      expect(mockServiceRpc).toHaveBeenCalledWith('confirm_credit', {
+        p_transaction_id: 'tx-123',
+      });
+    });
+
+    it('should throw error when transaction not found', async () => {
+      mockServiceRpc.mockResolvedValue({
+        data: null,
+        error: { message: 'Transaction not found' },
+      });
+
+      await expect(confirmCredit('invalid-tx')).rejects.toThrow('Transaction not found');
+    });
+  });
+
+  describe('refundCredit', () => {
+    it('should refund credit transaction successfully', async () => {
+      mockServiceRpc.mockResolvedValue({
+        data: null,
+        error: null,
+      });
+
+      await expect(
+        refundCredit('tx-123', 'Operation failed')
+      ).resolves.not.toThrow();
+
+      expect(mockServiceRpc).toHaveBeenCalledWith('refund_credit', {
+        p_transaction_id: 'tx-123',
+        p_reason: 'Operation failed',
+      });
+    });
+  });
+
+  describe('getUserCredits', () => {
+    it('should get user credits successfully', async () => {
+      mockClientRpc.mockResolvedValue({
+        data: {
+          balance: 100,
+          reserved: 10,
+          available: 90,
+        },
+        error: null,
+      });
+
+      const credits = await getUserCredits('user-123');
+
+      expect(credits).toEqual({
+        balance: 100,
+        reserved: 10,
+        available: 90,
+      });
+
+      expect(mockClientRpc).toHaveBeenCalledWith('get_available_credits', {
+        p_user_id: 'user-123',
+      });
+    });
+
+    it('should throw error when user credits not found', async () => {
+      mockClientRpc.mockResolvedValue({
+        data: null,
+        error: { message: 'User credits not found' },
+      });
+
+      await expect(getUserCredits('invalid-user')).rejects.toThrow();
+    });
+  });
+});
+
