@@ -104,7 +104,7 @@ export function UsageStatsSection() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data: creditData } = (await supabase
           .from('user_credits')
-          .select('credits_used')
+          .select('total_spent')
           .eq('user_id', user.id)
           .maybeSingle()) as { data: any };
 
@@ -112,7 +112,7 @@ export function UsageStatsSection() {
           totalGenerations: imagesCount || 0,
           totalStorage,
           accountAge,
-          creditsUsed: creditData?.credits_used || 0,
+          creditsUsed: creditData?.total_spent || 0,
         });
       } catch (error) {
         logger.error('Error fetching stats:', error);
