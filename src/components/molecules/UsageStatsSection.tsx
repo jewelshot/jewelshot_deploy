@@ -37,6 +37,31 @@ export function UsageStatsSection() {
     creditsUsed: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [addingCredits, setAddingCredits] = useState(false);
+
+  // TEST FUNCTION - Remove before production
+  const handleAddTestCredits = async () => {
+    setAddingCredits(true);
+    try {
+      const response = await fetch('/api/credits/add-test', {
+        method: 'POST',
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        logger.info('Added 10 credits. New balance:', data.balance);
+        // Refresh credits
+        await fetchCredits();
+      } else {
+        const error = await response.json();
+        logger.error('Failed to add credits:', error);
+      }
+    } catch (error) {
+      logger.error('Error adding test credits:', error);
+    } finally {
+      setAddingCredits(false);
+    }
+  };
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -166,6 +191,23 @@ export function UsageStatsSection() {
         <p className="text-white/60">
           Track your account activity and resource usage
         </p>
+      </div>
+
+      {/* TEST BUTTON - REMOVE BEFORE PRODUCTION */}
+      <div className="mb-6 rounded-2xl border border-yellow-500/30 bg-yellow-500/5 p-4 backdrop-blur-sm">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-semibold text-yellow-400">⚠️ Test Mode</p>
+            <p className="text-xs text-white/60">Click to add 10 credits (for testing only)</p>
+          </div>
+          <button
+            onClick={handleAddTestCredits}
+            disabled={addingCredits}
+            className="rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 px-4 py-2 text-sm font-semibold text-white transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {addingCredits ? 'Adding...' : '+ 10 Credits'}
+          </button>
+        </div>
       </div>
 
       {/* Stats Grid */}

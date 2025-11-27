@@ -1,14 +1,14 @@
 /**
  * ============================================================================
- * FAL.AI CLIENT - SECURE API PROXY IMPLEMENTATION
+ * FAL.AI CLIENT - QUEUE-BASED IMPLEMENTATION
  * ============================================================================
  *
- * Client-side wrapper that calls Next.js API routes (server-side proxy)
- * This keeps the FAL.AI API key secure on the server
+ * Client-side wrapper that submits jobs to queue system
+ * Uses atomic credit system (reserve/confirm/refund)
  *
- * API Routes:
- * - /api/ai/generate - Text-to-image generation
- * - /api/ai/edit - Image-to-image editing
+ * NEW ROUTES:
+ * - /api/ai/submit - Submit job to queue
+ * - /api/ai/status/[jobId] - Poll for result
  */
 
 import { createScopedLogger } from '@/lib/logger';
@@ -175,7 +175,7 @@ async function retry<T>(
 // ============================================================================
 
 /**
- * Generate image from text prompt (via API proxy)
+ * Generate image from text prompt (via QUEUE SYSTEM)
  *
  * @example
  * ```ts
@@ -192,64 +192,93 @@ export async function generateImage(
 ): Promise<FalOutput> {
   if (onProgress) onProgress('INITIALIZING', 'Starting generation...');
 
-  return retry(async () => {
-    try {
-      if (onProgress) onProgress('GENERATING', 'Processing with AI...');
+  try {
+    if (onProgress) onProgress('SUBMITTING', 'Submitting to queue...');
 
-      const response = await fetchWithTimeout(
-        `${API_BASE_URL}/api/ai/generate`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
+    // Submit job to queue
+    const submitResponse = await fetchWithTimeout(
+      `${API_BASE_URL}/api/ai/submit`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          operation: 'generate',
+          params: {
             prompt: input.prompt,
             num_images: input.num_images ?? 1,
             output_format: input.output_format ?? 'jpeg',
             aspect_ratio: input.aspect_ratio ?? '1:1',
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({
-          message: `HTTP ${response.status}: ${response.statusText}`,
-        }));
-        throw new Error(error.message || 'Failed to generate image');
+          },
+          priority: 'urgent',
+        }),
       }
+    );
 
-      const result = await response.json();
-
-      if (onProgress) onProgress('COMPLETED', 'Generation complete!');
-
-      logger.info('✅ Generation successful');
-      return result as FalOutput;
-    } catch (error) {
-      logger.error('❌ Generation failed:', error);
-
-      // Improve error message for user
-      if (error instanceof Error) {
-        if (error.message.includes('timeout')) {
-          throw new Error(
-            'AI generation timed out. The server is taking longer than expected. Please try again.'
-          );
-        }
-        if (error.message.includes('429')) {
-          throw new Error(
-            'Too many requests. Please wait a moment and try again.'
-          );
-        }
-        if (error.message.includes('Network')) {
-          throw new Error(
-            'Network error. Please check your connection and try again.'
-          );
-        }
-      }
-
-      throw error;
+    if (!submitResponse.ok) {
+      const error = await submitResponse.json().catch(() => ({
+        error: `HTTP ${submitResponse.status}: ${submitResponse.statusText}`,
+      }));
+      throw new Error(error.error || 'Failed to submit job');
     }
-  });
+
+    const { jobId } = await submitResponse.json();
+
+    if (onProgress) onProgress('QUEUED', 'Waiting for processing...');
+
+    // Poll for result
+    let attempts = 0;
+    const maxAttempts = 150; // 5 minutes max (2s * 150)
+    
+    while (attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 2000)); // 2s interval
+      attempts++;
+
+      const statusResponse = await fetch(`${API_BASE_URL}/api/ai/status/${jobId}`);
+      const status = await statusResponse.json();
+
+      if (status.state === 'active') {
+        if (onProgress) onProgress('GENERATING', 'Processing with AI...');
+      }
+
+      if (status.state === 'completed' && status.result) {
+        if (onProgress) onProgress('COMPLETED', 'Generation complete!');
+        logger.info('✅ Generation successful (via queue)');
+        
+        // Map queue result to old FalOutput format
+        return {
+          images: [{
+            url: status.result.data.imageUrl,
+            width: status.result.data.width,
+            height: status.result.data.height,
+          }],
+        };
+      }
+
+      if (status.state === 'failed') {
+        throw new Error(status.error?.message || 'Generation failed');
+      }
+    }
+
+    throw new Error('Generation timeout - job took too long');
+  } catch (error) {
+    logger.error('❌ Generation failed:', error);
+
+    if (error instanceof Error) {
+      if (error.message.includes('Insufficient credits')) {
+        throw new Error('Insufficient credits. Please purchase more credits to continue.');
+      }
+      if (error.message.includes('timeout')) {
+        throw new Error('AI generation timed out. Please try again.');
+      }
+      if (error.message.includes('Network')) {
+        throw new Error('Network error. Please check your connection.');
+      }
+    }
+
+    throw error;
+  }
 }
 
 // ============================================================================
@@ -257,7 +286,7 @@ export async function generateImage(
 // ============================================================================
 
 /**
- * Edit existing image with AI (via API proxy)
+ * Edit existing image with AI (via QUEUE SYSTEM)
  *
  * @example
  * ```ts
@@ -274,62 +303,94 @@ export async function editImage(
 ): Promise<FalOutput> {
   if (onProgress) onProgress('UPLOADING', 'Preparing image...');
 
-  return retry(async () => {
-    try {
-      if (onProgress) onProgress('EDITING', 'Processing with AI...');
+  try {
+    if (onProgress) onProgress('SUBMITTING', 'Submitting to queue...');
 
-      const response = await fetchWithTimeout(`${API_BASE_URL}/api/ai/edit`, {
+    // Submit job to queue
+    const submitResponse = await fetchWithTimeout(
+      `${API_BASE_URL}/api/ai/submit`,
+      {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          prompt: input.prompt,
-          image_url: input.image_url,
-          num_images: input.num_images ?? 1,
-          output_format: input.output_format ?? 'jpeg',
-          aspect_ratio: input.aspect_ratio ?? '1:1',
+          operation: 'edit',
+          params: {
+            prompt: input.prompt,
+            image_url: input.image_url,
+            num_images: input.num_images ?? 1,
+            output_format: input.output_format ?? 'jpeg',
+            aspect_ratio: input.aspect_ratio ?? '1:1',
+          },
+          priority: 'urgent',
         }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({
-          message: `HTTP ${response.status}: ${response.statusText}`,
-        }));
-        throw new Error(error.message || 'Failed to edit image');
       }
+    );
 
-      const result = await response.json();
-
-      if (onProgress) onProgress('COMPLETED', 'Edit complete!');
-
-      logger.info('✅ Edit successful');
-      return result as FalOutput;
-    } catch (error) {
-      logger.error('❌ Edit failed:', error);
-
-      // Improve error message for user
-      if (error instanceof Error) {
-        if (error.message.includes('timeout')) {
-          throw new Error(
-            'AI editing timed out. The server is taking longer than expected. Please try again.'
-          );
-        }
-        if (error.message.includes('429')) {
-          throw new Error(
-            'Too many requests. Please wait a moment and try again.'
-          );
-        }
-        if (error.message.includes('Network')) {
-          throw new Error(
-            'Network error. Please check your connection and try again.'
-          );
-        }
-      }
-
-      throw error;
+    if (!submitResponse.ok) {
+      const error = await submitResponse.json().catch(() => ({
+        error: `HTTP ${submitResponse.status}: ${submitResponse.statusText}`,
+      }));
+      throw new Error(error.error || 'Failed to submit job');
     }
-  });
+
+    const { jobId } = await submitResponse.json();
+
+    if (onProgress) onProgress('QUEUED', 'Waiting for processing...');
+
+    // Poll for result
+    let attempts = 0;
+    const maxAttempts = 150; // 5 minutes max (2s * 150)
+    
+    while (attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 2000)); // 2s interval
+      attempts++;
+
+      const statusResponse = await fetch(`${API_BASE_URL}/api/ai/status/${jobId}`);
+      const status = await statusResponse.json();
+
+      if (status.state === 'active') {
+        if (onProgress) onProgress('EDITING', 'Processing with AI...');
+      }
+
+      if (status.state === 'completed' && status.result) {
+        if (onProgress) onProgress('COMPLETED', 'Edit complete!');
+        logger.info('✅ Edit successful (via queue)');
+        
+        // Map queue result to old FalOutput format
+        return {
+          images: [{
+            url: status.result.data.imageUrl,
+            width: status.result.data.width,
+            height: status.result.data.height,
+          }],
+        };
+      }
+
+      if (status.state === 'failed') {
+        throw new Error(status.error?.message || 'Edit failed');
+      }
+    }
+
+    throw new Error('Edit timeout - job took too long');
+  } catch (error) {
+    logger.error('❌ Edit failed:', error);
+
+    if (error instanceof Error) {
+      if (error.message.includes('Insufficient credits')) {
+        throw new Error('Insufficient credits. Please purchase more credits to continue.');
+      }
+      if (error.message.includes('timeout')) {
+        throw new Error('AI editing timed out. Please try again.');
+      }
+      if (error.message.includes('Network')) {
+        throw new Error('Network error. Please check your connection.');
+      }
+    }
+
+    throw error;
+  }
 }
 
 /**

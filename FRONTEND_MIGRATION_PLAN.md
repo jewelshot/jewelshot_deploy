@@ -1,8 +1,8 @@
 # 🔄 FRONTEND MIGRATION PLAN - Queue System Integration
 
-**Status:** In Progress  
-**Affected Files:** 11 hooks using deleted endpoints  
-**Strategy:** Wrapper pattern (minimal breaking changes)  
+**Status:** ✅ **COMPLETED**  
+**Affected Files:** 11/11 hooks migrated  
+**Strategy:** Wrapper pattern + Core fal-client migration  
 
 ---
 
@@ -65,32 +65,32 @@ const result = await submitAndWait({
 
 ## 📋 MIGRATION CHECKLIST
 
-### **Step 1: Migrate High-Priority Hooks** (30 min)
+### **Step 1: Migrate High-Priority Hooks** ✅ DONE
 
 Hooks used most frequently in UI:
 
-- [ ] `useCameraControl` (rotate, closeup buttons)
-- [ ] `useImageUpscale` (upscale button)
-- [ ] `useMetalRecolor` (quick actions)
-- [ ] `useMetalPolish` (quick actions)
-- [ ] `useNaturalLight` (quick actions)
+- [x] `useCameraControl` (rotate, closeup buttons)
+- [x] `useImageUpscale` (upscale button)
+- [x] `useMetalRecolor` (quick actions)
+- [x] `useMetalPolish` (quick actions)
+- [x] `useNaturalLight` (quick actions)
 
-### **Step 2: Migrate Medium-Priority Hooks** (30 min)
+### **Step 2: Migrate Medium-Priority Hooks** ✅ DONE
 
-- [ ] `useGemstoneEnhance`
-- [ ] `useRemoveBackground`
+- [x] `useGemstoneEnhance`
+- [x] `useRemoveBackground`
 
-### **Step 3: Migrate Video Hooks** (20 min)
+### **Step 3: Migrate Video Hooks** ✅ DONE
 
-- [ ] `useImageToVideo`
-- [ ] `useTurntableVideo`
+- [x] `useImageToVideo`
+- [x] `useTurntableVideo`
 
-### **Step 4: Migrate Core Hooks** (40 min)
+### **Step 4: Migrate Core Hooks** ✅ DONE
 
-These might be more complex:
+**Strategy:** Modified `fal-client.ts` to use queue system internally.
 
-- [ ] `useImageEdit` (if exists)
-- [ ] `useTextToImage` (if exists)
+- [x] `useImageEdit` → Via `fal-client.ts` (queue-based)
+- [x] `useTextToImage` → Via `fal-client.ts` (queue-based)
 
 ---
 
@@ -240,22 +240,51 @@ Map old endpoints to new queue operations:
 
 ---
 
-## 📊 ESTIMATED TIME
+## 📊 COMPLETION STATUS
 
 | Task | Time | Status |
 |------|------|--------|
-| Migrate 5 high-priority hooks | 30 min | ⏳ Pending |
-| Migrate 2 medium-priority hooks | 30 min | ⏳ Pending |
-| Migrate 2 video hooks | 20 min | ⏳ Pending |
-| Migrate 2 core hooks | 40 min | ⏳ Pending |
-| Testing all hooks | 30 min | ⏳ Pending |
-| Bug fixes | 20 min | ⏳ Pending |
+| Migrate 5 high-priority hooks | 30 min | ✅ Done |
+| Migrate 2 medium-priority hooks | 30 min | ✅ Done |
+| Migrate 2 video hooks | 20 min | ✅ Done |
+| Migrate 2 core hooks | 40 min | ✅ Done (via fal-client) |
+| Testing all hooks | 30 min | ⏳ **Next Step** |
+| Bug fixes | TBD | ⏳ After testing |
 
-**TOTAL:** ~2.5 hours
+**COMPLETED:** 2 hours  
+**REMAINING:** Testing + Bug fixes
 
 ---
 
-## 🚀 READY TO START?
+## ✅ MIGRATION COMPLETE!
 
-**Next command:** Migrate first hook (`useCameraControl`)
+**All 11 hooks now use queue system:**
+
+**Direct Queue (9 hooks):**
+- `useCameraControl`, `useGemstoneEnhance`, `useImageUpscale`
+- `useMetalPolish`, `useMetalRecolor`, `useNaturalLight`
+- `useRemoveBackground`, `useImageToVideo`, `useTurntableVideo`
+
+**Indirect Queue (2 core hooks):**
+- `useImageEdit` → Uses `fal-client.ts` → Queue
+- `useTextToImage` → Uses `fal-client.ts` → Queue
+
+**Benefits:**
+- ✅ All AI operations go through unified queue
+- ✅ Atomic credit system (reserve/confirm/refund)
+- ✅ No more free generations
+- ✅ Background processing support
+- ✅ Multi-API key load balancing (when Redis configured)
+
+**Next Steps:**
+1. ⏳ Setup Redis (REDIS_URL env var)
+2. ⏳ Run credit system migration (SQL)
+3. ⏳ Deploy worker (Vercel Cron or separate dyno)
+4. ⏳ Test all hooks end-to-end
+5. ⏳ Monitor queue performance
+
+---
+
+**Last Updated:** Nov 26, 2025  
+**Migration Status:** ✅ COMPLETE (11/11 hooks)
 
