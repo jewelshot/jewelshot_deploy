@@ -62,9 +62,9 @@ export function useImageUpscale(): UseImageUpscaleResult {
         operation: 'upscale',
         params: {
           image_url: input.image_url,
-          upscale_mode: input.upscale_mode || 'factor',
-          upscale_factor: input.upscale_factor || 2,
-          target_resolution: input.target_resolution || '1080p',
+          upscale_mode: input.upscale_mode || 'target',
+          upscale_factor: input.upscale_factor,
+          target_resolution: input.target_resolution || '2160p',
           output_format: input.output_format || 'jpg',
           noise_scale: input.noise_scale || 0.1,
         },
