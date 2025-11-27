@@ -1,0 +1,462 @@
+openapi: 3.0.3
+info:
+  title: Jewelshot API
+  description: |
+    AI-powered jewelry photography platform API.
+    
+    ## Authentication
+    All endpoints require authentication via Supabase Auth.
+    Include the session token in the `Authorization` header.
+    
+    ## Rate Limits
+    - **Global:** 30 requests/minute per IP
+    - **AI Operations:** 10 requests/minute per user
+    - **Admin:** 60 requests/minute (with admin key)
+    
+    ## Credits System
+    All AI operations cost credits. Check your balance before submitting jobs.
+    
+    ## Error Handling
+    All errors follow this format:
+    ```json
+    {
+      "error": "Error message",
+      "code": "ERROR_CODE",
+      "details": {}
+    }
+    ```
+    
+  version: 0.1.0
+  contact:
+    email: support@jewelshot.ai
+  license:
+    name: MIT
+    
+servers:
+  - url: https://www.jewelshot.ai/api
+    description: Production server
+  - url: http://localhost:3000/api
+    description: Development server
+
+tags:
+  - name: AI Operations
+    description: Submit and manage AI processing jobs
+  - name: Credits
+    description: Manage user credits
+  - name: Batch
+    description: Batch processing operations
+  - name: Admin
+    description: Admin-only endpoints
+  - name: Health
+    description: Health and status checks
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      tags: [Health]
+      description: Check API health status
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  timestamp:
+                    type: string
+                    format: date-time
+                  version:
+                    type: string
+                    example: 0.1.0
+
+  /ai/submit:
+    post:
+      summary: Submit AI job
+      tags: [AI Operations]
+      description: Submit an AI processing job to the queue
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - operationType
+                - data
+              properties:
+                operationType:
+                  type: string
+                  enum: [generate, edit, upscale, remove-background, relight, expand, magic-prompt, magic-edit, flux-lora, camera-control, video-replicate]
+                  description: Type of AI operation
+                data:
+                  type: object
+                  description: Operation-specific data
+                priority:
+                  type: string
+                  enum: [urgent, normal, background]
+                  default: normal
+                  description: Job priority
+            examples:
+              generate:
+                summary: Generate new image
+                value:
+                  operationType: generate
+                  data:
+                    prompt: "luxury diamond ring on marble surface with dramatic lighting"
+                    image_size: "landscape_16_9"
+                  priority: normal
+              upscale:
+                summary: Upscale image
+                value:
+                  operationType: upscale
+                  data:
+                    image_url: "https://example.com/image.jpg"
+                  priority: urgent
+      responses:
+        '200':
+          description: Job submitted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jobId:
+                    type: string
+                    example: "job-abc123"
+                  transactionId:
+                    type: string
+                    example: "tx-xyz789"
+                  status:
+                    type: string
+                    example: queued
+                  estimatedWait:
+                    type: integer
+                    description: Estimated wait time in seconds
+                    example: 30
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/InsufficientCredits'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+  /ai/status/{jobId}:
+    get:
+      summary: Get job status
+      tags: [AI Operations]
+      description: Check the status of an AI job
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Job ID from submit response
+      responses:
+        '200':
+          description: Job status
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/JobQueued'
+                  - $ref: '#/components/schemas/JobProcessing'
+                  - $ref: '#/components/schemas/JobCompleted'
+                  - $ref: '#/components/schemas/JobFailed'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /ai/cancel/{jobId}:
+    post:
+      summary: Cancel job
+      tags: [AI Operations]
+      description: Cancel a queued or processing job
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Job cancelled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  refunded:
+                    type: integer
+                    description: Credits refunded
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /credits/balance:
+    get:
+      summary: Get credit balance
+      tags: [Credits]
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Credit balance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreditBalance'
+
+  /batch/create:
+    post:
+      summary: Create batch project
+      tags: [Batch]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - prompt
+                - aspect_ratio
+                - total_images
+              properties:
+                name:
+                  type: string
+                  example: "Product Photoshoot"
+                prompt:
+                  type: string
+                  example: "luxury jewelry on marble"
+                aspect_ratio:
+                  type: string
+                  enum: ["1:1", "16:9", "9:16", "4:3"]
+                total_images:
+                  type: integer
+                  minimum: 1
+                  maximum: 50
+      responses:
+        '200':
+          description: Batch created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  batchId:
+                    type: string
+                  uploadUrl:
+                    type: string
+                    description: URL for uploading images
+
+  /admin/users:
+    get:
+      summary: Get all users
+      tags: [Admin]
+      security:
+        - AdminKey: []
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [all, active, banned]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Users list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  total:
+                    type: integer
+                  stats:
+                    type: object
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Supabase Auth JWT token
+    AdminKey:
+      type: apiKey
+      in: header
+      name: x-admin-key
+      description: Admin dashboard key
+
+  schemas:
+    JobQueued:
+      type: object
+      properties:
+        status:
+          type: string
+          example: queued
+        position:
+          type: integer
+          description: Position in queue
+        estimatedWait:
+          type: integer
+
+    JobProcessing:
+      type: object
+      properties:
+        status:
+          type: string
+          example: processing
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
+
+    JobCompleted:
+      type: object
+      properties:
+        status:
+          type: string
+          example: completed
+        result:
+          type: object
+          properties:
+            imageUrl:
+              type: string
+              format: uri
+            width:
+              type: integer
+            height:
+              type: integer
+
+    JobFailed:
+      type: object
+      properties:
+        status:
+          type: string
+          example: failed
+        error:
+          type: string
+        refunded:
+          type: integer
+
+    CreditBalance:
+      type: object
+      properties:
+        balance:
+          type: integer
+          description: Total credits
+        reserved:
+          type: integer
+          description: Reserved for ongoing operations
+        available:
+          type: integer
+          description: Available for use
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        created_at:
+          type: string
+          format: date-time
+        credits:
+          type: object
+          properties:
+            balance:
+              type: integer
+            spent:
+              type: integer
+            earned:
+              type: integer
+
+  responses:
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+
+    InsufficientCredits:
+      description: Not enough credits
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Insufficient credits
+              required:
+                type: integer
+              available:
+                type: integer
+
+    RateLimited:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Rate limit exceeded
+              retryAfter:
+                type: integer
+                description: Seconds until retry
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Not found
+
