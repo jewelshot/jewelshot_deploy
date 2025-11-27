@@ -98,7 +98,6 @@ export default withSentryConfig(nextConfig, {
   project: "jewelshot",
   silent: !process.env.CI,
   widenClientFileUpload: true,
-  hideSourceMaps: true,
   disableLogger: true,
   automaticVercelMonitors: true,
 });
