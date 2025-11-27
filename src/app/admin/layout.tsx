@@ -9,6 +9,10 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <div className="relative h-full w-full">
+      {children}
+    </div>
+  );
 }
 

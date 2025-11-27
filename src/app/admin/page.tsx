@@ -109,7 +109,7 @@ export default function AdminDashboard() {
   // Login form
   if (!isAuthenticated) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a] p-6">
+      <div className="flex h-screen w-screen items-center justify-center bg-[#0a0a0a] p-6 overflow-y-auto">
         <div className="w-full max-w-md space-y-6 rounded-xl border border-white/10 bg-white/5 p-8 backdrop-blur-sm">
           <div className="text-center">
             <Server className="mx-auto h-12 w-12 text-purple-400" />
@@ -157,8 +157,8 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] p-6 overflow-y-auto">
-      <div className="mx-auto max-w-[1920px] space-y-6 pb-12">
+    <div className="h-screen w-screen overflow-y-auto bg-[#0a0a0a]">
+      <div className="mx-auto max-w-[1920px] space-y-6 p-6 pb-12">
         
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -187,7 +187,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Stats Grid */}
+        {/* Stats Grid - Row 1 */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           <StatCard
             title="Total Users"
@@ -202,6 +202,22 @@ export default function AdminDashboard() {
             color="green"
           />
           <StatCard
+            title="Queue Waiting"
+            value={workers?.summary?.totalWaiting || 0}
+            icon={TrendingUp}
+            color="purple"
+          />
+          <StatCard
+            title="Failed Jobs"
+            value={workers?.summary?.totalFailed || 0}
+            icon={AlertCircle}
+            color="red"
+          />
+        </div>
+
+        {/* Stats Grid - Row 2 */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <StatCard
             title="Total Operations (7d)"
             value={costs?.summary?.totalOperations || 0}
             icon={Zap}
@@ -212,6 +228,18 @@ export default function AdminDashboard() {
             value={`$${costs?.summary?.estimatedCostUSD || '0.00'}`}
             icon={DollarSign}
             color="orange"
+          />
+          <StatCard
+            title="Active Users (7d)"
+            value={costs?.summary?.activeUsers || 0}
+            icon={Users}
+            color="blue"
+          />
+          <StatCard
+            title="Total Credits Issued"
+            value={users.reduce((sum, u) => sum + (u.credits?.total_earned || 0), 0)}
+            icon={DollarSign}
+            color="green"
           />
         </div>
 
@@ -275,53 +303,85 @@ export default function AdminDashboard() {
           </DataCard>
         </div>
 
-        {/* Users & Analytics */}
+        {/* Analytics Grid */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           
-          {/* Recent Users */}
-          <DataCard title="Recent Users" className="lg:col-span-2">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-white/10 text-left text-sm text-white/60">
-                    <th className="pb-3">Email</th>
-                    <th className="pb-3">Credits</th>
-                    <th className="pb-3">Operations</th>
-                    <th className="pb-3">Joined</th>
-                  </tr>
-                </thead>
-                <tbody className="text-sm">
-                  {users.slice(0, 10).map((user) => (
-                    <tr key={user.id} className="border-b border-white/5">
-                      <td className="py-3 text-white">{user.email}</td>
-                      <td className="py-3">
-                        <Badge variant={user.credits.balance > 10 ? 'success' : 'warning'}>
-                          {user.credits.balance}
-                        </Badge>
-                      </td>
-                      <td className="py-3 text-white/80">{user.stats.total_operations}</td>
-                      <td className="py-3 text-white/60">
-                        {format(new Date(user.created_at), 'MMM d, yyyy')}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </DataCard>
-
-          {/* Top Presets */}
-          <DataCard title="Top Presets (7d)">
-            <div className="space-y-2">
-              {analytics?.topPresets?.slice(0, 5).map((preset: any, idx: number) => (
-                <div key={idx} className="flex items-center justify-between text-sm">
-                  <span className="text-white/80">{preset.preset}</span>
-                  <Badge variant="neutral">{preset.count}</Badge>
+          {/* Top Operations (7d) */}
+          <DataCard title="Top Operations (7d)">
+            <div className="space-y-3">
+              {analytics?.topOperations?.map((op: any, idx: number) => (
+                <div key={idx} className="flex items-center justify-between">
+                  <span className="text-sm text-white/80">{op.operation}</span>
+                  <Badge variant="info">{op.count}</Badge>
                 </div>
               ))}
             </div>
           </DataCard>
+
+          {/* Top Presets (7d) */}
+          <DataCard title="Top Presets (7d)">
+            <div className="space-y-3">
+              {analytics?.topPresets?.map((preset: any, idx: number) => (
+                <div key={idx} className="flex items-center justify-between">
+                  <span className="text-sm text-white/80">{preset.preset}</span>
+                  <Badge variant="purple">{preset.count}</Badge>
+                </div>
+              ))}
+            </div>
+          </DataCard>
+
+          {/* Cost Breakdown (7d) */}
+          <DataCard title="Cost Breakdown (7d)">
+            <div className="space-y-3">
+              {costs?.costsByOperation && Object.entries(costs.costsByOperation)
+                .slice(0, 6)
+                .map(([op, credits]: [string, any], idx: number) => (
+                  <div key={idx} className="flex items-center justify-between">
+                    <span className="text-sm text-white/80">{op}</span>
+                    <span className="text-sm font-semibold text-white">{credits} cr</span>
+                  </div>
+                ))}
+            </div>
+          </DataCard>
         </div>
+
+        {/* Users Table */}
+        <DataCard title="Recent Users">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-white/10 text-left text-sm text-white/60">
+                  <th className="pb-3">Email</th>
+                  <th className="pb-3">Balance</th>
+                  <th className="pb-3">Spent</th>
+                  <th className="pb-3">Earned</th>
+                  <th className="pb-3">Operations</th>
+                  <th className="pb-3">Joined</th>
+                </tr>
+              </thead>
+              <tbody className="text-sm">
+                {users.slice(0, 10).map((user) => (
+                  <tr key={user.id} className="border-b border-white/5 hover:bg-white/5">
+                    <td className="py-3 text-white">{user.email}</td>
+                    <td className="py-3">
+                      <Badge variant={user.credits.balance > 10 ? 'success' : 'warning'}>
+                        {user.credits.balance}
+                      </Badge>
+                    </td>
+                    <td className="py-3 text-white/60">{user.credits.total_spent}</td>
+                    <td className="py-3 text-white/60">{user.credits.total_earned}</td>
+                    <td className="py-3">
+                      <Badge variant="info">{user.stats.total_operations}</Badge>
+                    </td>
+                    <td className="py-3 text-white/60">
+                      {format(new Date(user.created_at), 'MMM d, yyyy')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </DataCard>
 
         {/* Recent Activities */}
         <DataCard title="Recent Activities">
@@ -350,18 +410,18 @@ export default function AdminDashboard() {
         </DataCard>
 
         {/* Recent Images */}
-        <DataCard title="Recent Generations">
+        <DataCard title="Recent Generations (12 Latest)">
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
             {images.slice(0, 12).map((image) => (
-              <div key={image.id} className="group relative overflow-hidden rounded-lg">
+              <div key={image.id} className="group relative overflow-hidden rounded-lg border border-white/10">
                 <img
                   src={image.url}
                   alt="Generated"
                   className="h-32 w-full object-cover transition-transform group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 transition-opacity group-hover:opacity-100">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent opacity-0 transition-opacity group-hover:opacity-100">
                   <div className="absolute bottom-2 left-2 right-2">
-                    <p className="text-xs text-white/80">{image.batch_name || 'Studio'}</p>
+                    <p className="text-xs font-medium text-white">{image.batch_name || 'Studio'}</p>
                     <p className="text-xs text-white/60">
                       {format(new Date(image.created_at), 'MMM d, HH:mm')}
                     </p>
@@ -371,6 +431,19 @@ export default function AdminDashboard() {
             ))}
           </div>
         </DataCard>
+
+        {/* Recent Prompts */}
+        {analytics?.recentPrompts && analytics.recentPrompts.length > 0 && (
+          <DataCard title="Recent User Prompts">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              {analytics.recentPrompts.slice(0, 6).map((prompt: string, idx: number) => (
+                <div key={idx} className="rounded-lg border border-white/10 bg-white/5 p-3">
+                  <p className="text-sm text-white/80 line-clamp-2">{prompt}</p>
+                </div>
+              ))}
+            </div>
+          </DataCard>
+        )}
 
       </div>
     </div>
