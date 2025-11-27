@@ -29,6 +29,11 @@ export default function GlobalSidebar() {
     return null;
   }
 
+  // Don't show sidebar on admin pages
+  if (pathname.startsWith('/admin')) {
+    return null;
+  }
+
   return (
     <>
       <Sidebar />

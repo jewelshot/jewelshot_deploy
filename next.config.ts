@@ -85,7 +85,7 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://va.vercel-scripts.com", // Next.js + browser-image-compression CDN + Vercel Analytics
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://va.vercel-scripts.com https://plausible.io", // Next.js + browser-image-compression CDN + Vercel Analytics + Plausible
               "style-src 'self' 'unsafe-inline'", // Tailwind requires unsafe-inline
               "img-src 'self' data: https: blob:", // Allow images from FAL.AI and Supabase
               "font-src 'self' data:",
