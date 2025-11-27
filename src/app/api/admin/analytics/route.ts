@@ -57,6 +57,7 @@ export async function GET(request: NextRequest) {
     const presetUsage: { [key: string]: number } = {};
     const prompts: string[] = [];
     const dailyOperations: { [key: string]: number } = {};
+    const dailyCosts: { [key: string]: number } = {};
 
     operations?.forEach(op => {
       // Count operations
@@ -75,6 +76,10 @@ export async function GET(request: NextRequest) {
       // Daily counts
       const date = new Date(op.confirmed_at).toISOString().split('T')[0];
       dailyOperations[date] = (dailyOperations[date] || 0) + 1;
+      
+      // Daily costs (assuming 1 credit = $0.01, adjust as needed)
+      const creditCost = Math.abs(op.metadata?.credits_used || 1);
+      dailyCosts[date] = (dailyCosts[date] || 0) + (creditCost * 0.01);
     });
 
     // Sort by popularity
@@ -96,6 +101,46 @@ export async function GET(request: NextRequest) {
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([date, count]) => ({ date, count }));
 
+    // Chart data for operations
+    const dailyOperationsChart = Object.entries(dailyOperations)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, operations]) => ({
+        date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        operations,
+        cost: dailyCosts[date] || 0,
+      }));
+
+    // Chart data for costs
+    const dailyCostsChart = Object.entries(dailyCosts)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, cost]) => ({
+        date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        cost: Number(cost.toFixed(4)),
+      }));
+
+    // User growth data
+    const { data: users } = await supabase.auth.admin.listUsers();
+    const dailyUsers: { [key: string]: number } = {};
+    
+    users.users?.forEach(user => {
+      const date = new Date(user.created_at).toISOString().split('T')[0];
+      if (new Date(date) >= startDate) {
+        dailyUsers[date] = (dailyUsers[date] || 0) + 1;
+      }
+    });
+
+    // Cumulative user count
+    let cumulativeCount = 0;
+    const dailyUsersChart = Object.entries(dailyUsers)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, count]) => {
+        cumulativeCount += count;
+        return {
+          date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          users: cumulativeCount,
+        };
+      });
+
     return NextResponse.json({
       period,
       totalOperations: operations?.length || 0,
@@ -103,6 +148,10 @@ export async function GET(request: NextRequest) {
       topPresets,
       recentPrompts: uniquePrompts,
       dailyTrend,
+      // Chart data
+      dailyOperations: dailyOperationsChart,
+      dailyCosts: dailyCostsChart,
+      dailyUsers: dailyUsersChart,
       timestamp: new Date().toISOString(),
     });
 

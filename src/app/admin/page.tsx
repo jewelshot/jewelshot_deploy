@@ -17,9 +17,18 @@ import {
 import { StatCard } from '@/components/admin/atoms/StatCard';
 import { DataCard } from '@/components/admin/atoms/DataCard';
 import { Badge } from '@/components/admin/atoms/Badge';
+import { SearchFilters, type FilterOptions, type SortOption } from '@/components/admin/molecules/SearchFilters';
+import { UserActionMenu } from '@/components/admin/molecules/UserActionMenu';
+import { UserDetailModal } from '@/components/admin/molecules/UserDetailModal';
+import { OperationsChart } from '@/components/admin/organisms/OperationsChart';
+import { CostChart } from '@/components/admin/organisms/CostChart';
+import { UserGrowthChart } from '@/components/admin/organisms/UserGrowthChart';
 import { format } from 'date-fns';
+import { useToast } from '@/hooks/useToast';
+import { Toast } from '@/components/atoms/Toast';
 
 export default function AdminDashboard() {
+  const { showToast, toastState, hideToast } = useToast();
   const [loading, setLoading] = useState(false);
   const [authKey, setAuthKey] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -28,11 +37,181 @@ export default function AdminDashboard() {
   // Data states
   const [stats, setStats] = useState<any>(null);
   const [users, setUsers] = useState<any[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
   const [activities, setActivities] = useState<any[]>([]);
   const [images, setImages] = useState<any[]>([]);
   const [analytics, setAnalytics] = useState<any>(null);
   const [workers, setWorkers] = useState<any>(null);
   const [costs, setCosts] = useState<any>(null);
+  
+  // Chart data
+  const [chartData, setChartData] = useState<any>(null);
+  
+  // UI states
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [showUserDetail, setShowUserDetail] = useState(false);
+  const [activeTab, setActiveTab] = useState<'overview' | 'charts'>('overview');
+
+  // Search & Filter functions
+  const handleSearch = (query: string) => {
+    let filtered = users;
+    
+    if (query) {
+      filtered = filtered.filter(user =>
+        user.email?.toLowerCase().includes(query.toLowerCase()) ||
+        user.id?.toLowerCase().includes(query.toLowerCase())
+      );
+    }
+    
+    setFilteredUsers(filtered);
+  };
+
+  const handleFilter = (filters: FilterOptions) => {
+    let filtered = users;
+    
+    // Credit range
+    if (filters.creditRange && filters.creditRange !== 'all') {
+      filtered = filtered.filter(user => {
+        const balance = user.credits?.balance || 0;
+        if (filters.creditRange === '0-10') return balance <= 10;
+        if (filters.creditRange === '10-50') return balance > 10 && balance <= 50;
+        if (filters.creditRange === '50+') return balance > 50;
+        return true;
+      });
+    }
+    
+    // Date range (joined)
+    if (filters.dateRange && filters.dateRange !== 'all') {
+      const now = new Date();
+      filtered = filtered.filter(user => {
+        const createdAt = new Date(user.created_at);
+        if (filters.dateRange === '1d') {
+          return (now.getTime() - createdAt.getTime()) <= 86400000;
+        }
+        if (filters.dateRange === '7d') {
+          return (now.getTime() - createdAt.getTime()) <= 604800000;
+        }
+        if (filters.dateRange === '30d') {
+          return (now.getTime() - createdAt.getTime()) <= 2592000000;
+        }
+        return true;
+      });
+    }
+    
+    setFilteredUsers(filtered);
+  };
+
+  const handleSort = (sortBy: SortOption) => {
+    const sorted = [...filteredUsers];
+    
+    if (sortBy === 'created_desc') {
+      sorted.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    } else if (sortBy === 'created_asc') {
+      sorted.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+    } else if (sortBy === 'operations_desc') {
+      sorted.sort((a, b) => (b.stats?.total_operations || 0) - (a.stats?.total_operations || 0));
+    } else if (sortBy === 'credits_desc') {
+      sorted.sort((a, b) => (b.credits?.balance || 0) - (a.credits?.balance || 0));
+    }
+    
+    setFilteredUsers(sorted);
+  };
+
+  // User actions
+  const handleViewDetails = async (userId: string) => {
+    try {
+      const headers = { Authorization: `Bearer ${authKey}` };
+      const res = await fetch(`/api/admin/users/${userId}`, { headers });
+      if (!res.ok) throw new Error('Failed to fetch user details');
+      
+      const data = await res.json();
+      setSelectedUser(data);
+      setShowUserDetail(true);
+    } catch (err: any) {
+      showToast(err.message || 'Failed to load user details', 'error');
+    }
+  };
+
+  const handleAddCredits = async (userId: string, userEmail: string) => {
+    const amount = prompt(`How many credits to add for ${userEmail}?`);
+    if (!amount || isNaN(Number(amount))) return;
+    
+    try {
+      const headers = { Authorization: `Bearer ${authKey}`, 'Content-Type': 'application/json' };
+      const res = await fetch(`/api/admin/users/${userId}`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify({ action: 'add_credits', amount: Number(amount) }),
+      });
+      
+      if (!res.ok) throw new Error('Failed to add credits');
+      
+      showToast(`Added ${amount} credits to ${userEmail}`, 'success');
+      fetchAllData();
+    } catch (err: any) {
+      showToast(err.message || 'Failed to add credits', 'error');
+    }
+  };
+
+  const handleRemoveCredits = async (userId: string, userEmail: string) => {
+    const amount = prompt(`How many credits to remove from ${userEmail}?`);
+    if (!amount || isNaN(Number(amount))) return;
+    
+    try {
+      const headers = { Authorization: `Bearer ${authKey}`, 'Content-Type': 'application/json' };
+      const res = await fetch(`/api/admin/users/${userId}`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify({ action: 'remove_credits', amount: Number(amount) }),
+      });
+      
+      if (!res.ok) throw new Error('Failed to remove credits');
+      
+      showToast(`Removed ${amount} credits from ${userEmail}`, 'success');
+      fetchAllData();
+    } catch (err: any) {
+      showToast(err.message || 'Failed to remove credits', 'error');
+    }
+  };
+
+  const handleBanUser = async (userId: string, userEmail: string) => {
+    if (!confirm(`Are you sure you want to ban ${userEmail}?`)) return;
+    
+    try {
+      const headers = { Authorization: `Bearer ${authKey}`, 'Content-Type': 'application/json' };
+      const res = await fetch(`/api/admin/users/${userId}`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify({ action: 'ban' }),
+      });
+      
+      if (!res.ok) throw new Error('Failed to ban user');
+      
+      showToast(`Banned ${userEmail}`, 'success');
+      fetchAllData();
+    } catch (err: any) {
+      showToast(err.message || 'Failed to ban user', 'error');
+    }
+  };
+
+  const handleDeleteUser = async (userId: string, userEmail: string) => {
+    if (!confirm(`⚠️ PERMANENTLY DELETE ${userEmail}? This cannot be undone!`)) return;
+    
+    try {
+      const headers = { Authorization: `Bearer ${authKey}` };
+      const res = await fetch(`/api/admin/users/${userId}`, {
+        method: 'DELETE',
+        headers,
+      });
+      
+      if (!res.ok) throw new Error('Failed to delete user');
+      
+      showToast(`Deleted ${userEmail}`, 'success');
+      fetchAllData();
+    } catch (err: any) {
+      showToast(err.message || 'Failed to delete user', 'error');
+    }
+  };
 
   const fetchAllData = async () => {
     if (!authKey) {
@@ -74,9 +253,19 @@ export default function AdminDashboard() {
       setWorkers(workersData);
       setCosts(costsData);
       setUsers(usersData.users || []);
+      setFilteredUsers(usersData.users || []);
       setActivities(activitiesData.activities || []);
       setImages(imagesData.images || []);
       setAnalytics(analyticsData);
+      
+      // Generate chart data from analytics
+      if (analyticsData) {
+        setChartData({
+          operations: analyticsData.dailyOperations || [],
+          costs: analyticsData.dailyCosts || [],
+          users: analyticsData.dailyUsers || [],
+        });
+      }
       
       setIsAuthenticated(true);
       localStorage.setItem('admin_key', authKey);
@@ -303,11 +492,38 @@ export default function AdminDashboard() {
           </DataCard>
         </div>
 
-        {/* Analytics Grid */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          
-          {/* Top Operations (7d) */}
-          <DataCard title="Top Operations (7d)">
+        {/* Tab Navigation */}
+        <div className="flex gap-2 border-b border-white/10">
+          <button
+            onClick={() => setActiveTab('overview')}
+            className={`px-4 py-3 text-sm font-medium transition-all ${
+              activeTab === 'overview'
+                ? 'border-b-2 border-purple-500 text-white'
+                : 'text-white/60 hover:text-white'
+            }`}
+          >
+            Overview
+          </button>
+          <button
+            onClick={() => setActiveTab('charts')}
+            className={`px-4 py-3 text-sm font-medium transition-all ${
+              activeTab === 'charts'
+                ? 'border-b-2 border-purple-500 text-white'
+                : 'text-white/60 hover:text-white'
+            }`}
+          >
+            Charts & Trends
+          </button>
+        </div>
+
+        {/* Overview Tab */}
+        {activeTab === 'overview' && (
+          <>
+            {/* Analytics Grid */}
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+              
+              {/* Top Operations (7d) */}
+              <DataCard title="Top Operations (7d)">
             <div className="space-y-3">
               {analytics?.topOperations?.map((op: any, idx: number) => (
                 <div key={idx} className="flex items-center justify-between">
@@ -346,7 +562,16 @@ export default function AdminDashboard() {
         </div>
 
         {/* Users Table */}
-        <DataCard title="Recent Users">
+        <DataCard title="User Management">
+          {/* Search & Filters */}
+          <div className="mb-6">
+            <SearchFilters
+              onSearch={handleSearch}
+              onFilter={handleFilter}
+              onSort={handleSort}
+            />
+          </div>
+
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -357,10 +582,11 @@ export default function AdminDashboard() {
                   <th className="pb-3">Earned</th>
                   <th className="pb-3">Operations</th>
                   <th className="pb-3">Joined</th>
+                  <th className="pb-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="text-sm">
-                {users.slice(0, 10).map((user) => (
+                {filteredUsers.map((user) => (
                   <tr key={user.id} className="border-b border-white/5 hover:bg-white/5">
                     <td className="py-3 text-white">{user.email}</td>
                     <td className="py-3">
@@ -375,6 +601,17 @@ export default function AdminDashboard() {
                     </td>
                     <td className="py-3 text-white/60">
                       {format(new Date(user.created_at), 'MMM d, yyyy')}
+                    </td>
+                    <td className="py-3 text-right">
+                      <UserActionMenu
+                        userId={user.id}
+                        userEmail={user.email}
+                        onViewDetails={() => handleViewDetails(user.id)}
+                        onAddCredits={() => handleAddCredits(user.id, user.email)}
+                        onRemoveCredits={() => handleRemoveCredits(user.id, user.email)}
+                        onBanUser={() => handleBanUser(user.id, user.email)}
+                        onDeleteUser={() => handleDeleteUser(user.id, user.email)}
+                      />
                     </td>
                   </tr>
                 ))}
@@ -443,6 +680,48 @@ export default function AdminDashboard() {
               ))}
             </div>
           </DataCard>
+        )}
+        </>
+        )}
+
+        {/* Charts Tab */}
+        {activeTab === 'charts' && chartData && (
+          <div className="space-y-6">
+            {/* Operations Chart */}
+            {chartData.operations && chartData.operations.length > 0 && (
+              <OperationsChart data={chartData.operations} />
+            )}
+
+            {/* Grid: Cost & User Growth */}
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              {chartData.costs && chartData.costs.length > 0 && (
+                <CostChart data={chartData.costs} />
+              )}
+              {chartData.users && chartData.users.length > 0 && (
+                <UserGrowthChart data={chartData.users} />
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* User Detail Modal */}
+        {showUserDetail && selectedUser && (
+          <UserDetailModal
+            user={selectedUser}
+            onClose={() => {
+              setShowUserDetail(false);
+              setSelectedUser(null);
+            }}
+          />
+        )}
+
+        {/* Toast */}
+        {toastState.visible && (
+          <Toast
+            message={toastState.message}
+            type={toastState.type}
+            onClose={hideToast}
+          />
         )}
 
       </div>
