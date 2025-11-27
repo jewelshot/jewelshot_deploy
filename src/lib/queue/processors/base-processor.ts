@@ -42,10 +42,14 @@ export async function processFalAI(
       },
     });
 
+    // Normalize response format
+    // FAL.AI returns different formats, normalize to { imageUrl, ... }
+    const normalizedData = normalizeResponse(result.data);
+
     // Return successful result
     return {
       success: true,
-      data: result.data,
+      data: normalizedData,
       metadata: {
         processingTime: Date.now(),
       },
@@ -103,5 +107,48 @@ export function dataUriToBlob(dataUri: string): Blob {
     u8arr[n] = bstr.charCodeAt(n);
   }
   return new Blob([u8arr], { type: mime });
+}
+
+/**
+ * Normalize FAL.AI response to consistent format
+ * Different endpoints return different structures
+ */
+function normalizeResponse(data: any): any {
+  // If already has imageUrl, return as-is
+  if (data.imageUrl) {
+    return data;
+  }
+
+  // Handle { image: { url: "..." } } format (upscale, etc.)
+  if (data.image?.url) {
+    return {
+      imageUrl: data.image.url,
+      width: data.image.width,
+      height: data.image.height,
+      content_type: data.image.content_type,
+    };
+  }
+
+  // Handle { images: [{ url: "..." }] } format (generation)
+  if (data.images && Array.isArray(data.images) && data.images[0]?.url) {
+    return {
+      imageUrl: data.images[0].url,
+      width: data.images[0].width,
+      height: data.images[0].height,
+      content_type: data.images[0].content_type,
+      images: data.images.map((img: any) => img.url),
+    };
+  }
+
+  // Handle { video: { url: "..." } } format
+  if (data.video?.url) {
+    return {
+      videoUrl: data.video.url,
+      imageUrl: data.video.url, // For compatibility
+    };
+  }
+
+  // Return as-is if unknown format
+  return data;
 }
 
