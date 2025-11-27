@@ -17,7 +17,6 @@ const nextConfig: NextConfig = {
   // Enable experimental optimizations
   experimental: {
     optimizePackageImports: ['lucide-react'],
-    instrumentationHook: true,
   },
 
   // Image optimization
