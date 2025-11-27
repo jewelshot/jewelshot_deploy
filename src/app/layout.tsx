@@ -8,6 +8,7 @@ import { ErrorBoundary } from '@/components/organisms/ErrorBoundary';
 import ToastContainer from '@/components/organisms/ToastContainer';
 import { GalleryPrefetch } from '@/components/organisms/GalleryPrefetch';
 import GlobalSidebar from '@/components/organisms/GlobalSidebar';
+import { PlausibleAnalytics } from '@/components/analytics/PlausibleAnalytics';
 import './globals.css';
 
 // Note: Environment validation is available in src/lib/env.ts
@@ -135,6 +136,7 @@ export default function RootLayout({
         <GlobalSidebar />
         <ToastContainer />
         <GalleryPrefetch />
+        <PlausibleAnalytics />
         <Analytics />
         <SpeedInsights />
       </body>
