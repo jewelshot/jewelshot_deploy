@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/service';
+import { createServiceClient } from '@/lib/supabase/service';
 
 // Simple auth middleware
 function isAuthorized(request: NextRequest): boolean {
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const supabase = createClient();
+  const supabase = createServiceClient();
   const { searchParams } = new URL(request.url);
   const period = searchParams.get('period') || '7d'; // 1d, 7d, 30d
 
