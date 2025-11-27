@@ -11,3 +11,4 @@ export async function processVideo(params: any, apiKey: string): Promise<AIJobRe
   return processFalAI('fal-ai/kling-video/v1/standard/image-to-video', params, apiKey);
 }
 
+

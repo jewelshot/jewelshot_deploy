@@ -41,3 +41,4 @@ export function CatalogueSettingsToggle({
 
 export default CatalogueSettingsToggle;
 
+

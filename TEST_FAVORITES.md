@@ -77,3 +77,4 @@ console.log('User:', user ? user.email : 'Not logged in');
 - LocalStorage has favorites but Supabase is empty → Sync issue
 
 
+

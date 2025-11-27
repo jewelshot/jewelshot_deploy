@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import * as fal from '@fal-ai/serverless-client';
+import { fal } from '@fal-ai/client';
 
 // Configure FAL client
 fal.config({
@@ -30,8 +30,7 @@ export async function POST(request: NextRequest) {
         image_url,
         num_images,
         output_format,
-        image_size: aspect_ratio,
-      },
+      } as any,
       logs: true,
     });
 
@@ -44,4 +43,5 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
 

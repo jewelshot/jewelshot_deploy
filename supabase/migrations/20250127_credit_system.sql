@@ -344,3 +344,4 @@ GRANT EXECUTE ON FUNCTION public.get_available_credits(UUID) TO authenticated;
 -- END OF MIGRATION
 -- ============================================
 
+

@@ -71,3 +71,4 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- In production, you can add stricter policies later
 -- ========================================
 
+

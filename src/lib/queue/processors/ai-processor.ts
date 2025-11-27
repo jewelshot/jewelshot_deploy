@@ -147,3 +147,4 @@ export function validateJobData(data: AIJobData): { valid: boolean; error?: stri
   return { valid: true };
 }
 
+

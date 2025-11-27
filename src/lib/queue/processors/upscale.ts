@@ -11,3 +11,4 @@ export async function processUpscale(params: any, apiKey: string): Promise<AIJob
   return processFalAI('fal-ai/aura-sr', params, apiKey);
 }
 
+
