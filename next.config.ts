@@ -114,7 +114,7 @@ const sentryWebpackPluginOptions = {
   // This can increase your server load as well as your hosting bill.
   // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
   // side errors will fail.
-  tunnelRoute: '/monitoring',
+  // tunnelRoute: '/monitoring', // Disabled - causes 403 errors
 
   // Hides source maps from generated client bundles
   hideSourceMaps: true,
