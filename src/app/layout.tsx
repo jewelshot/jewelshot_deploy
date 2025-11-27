@@ -8,7 +8,6 @@ import { ErrorBoundary } from '@/components/organisms/ErrorBoundary';
 import ToastContainer from '@/components/organisms/ToastContainer';
 import { GalleryPrefetch } from '@/components/organisms/GalleryPrefetch';
 import GlobalSidebar from '@/components/organisms/GlobalSidebar';
-import { SentryProvider } from '@/components/providers/SentryProvider';
 import './globals.css';
 
 // Note: Environment validation is available in src/lib/env.ts
