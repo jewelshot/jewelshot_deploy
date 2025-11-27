@@ -7,6 +7,7 @@
 import { NextRequest } from 'next/server';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
+import { createServiceClient } from './supabase/service';
 
 // Admin rate limiter: 30 requests per minute per IP
 const redis = new Redis({
@@ -97,7 +98,7 @@ export function getClientIP(request: NextRequest): string {
 }
 
 /**
- * Log admin access attempt
+ * Log admin access attempt (to console for now, database logging in logAdminAction)
  */
 export function logAdminAccess(
   request: NextRequest,
@@ -120,5 +121,65 @@ export function logAdminAccess(
       error,
     })
   );
+}
+
+/**
+ * Log admin action to database (audit trail)
+ */
+export async function logAdminAction(params: {
+  adminEmail: string;
+  actionType: string;
+  actionCategory: string;
+  actionDetails?: Record<string, any>;
+  targetType?: string;
+  targetId?: string;
+  targetEmail?: string;
+  request?: NextRequest;
+  apiEndpoint?: string;
+  success?: boolean;
+  errorMessage?: string;
+}): Promise<void> {
+  const {
+    adminEmail,
+    actionType,
+    actionCategory,
+    actionDetails = {},
+    targetType,
+    targetId,
+    targetEmail,
+    request,
+    apiEndpoint,
+    success = true,
+    errorMessage,
+  } = params;
+
+  const supabase = createServiceClient();
+  const adminIp = request ? getClientIP(request) : undefined;
+
+  try {
+    await supabase.rpc('log_admin_action', {
+      p_admin_email: adminEmail,
+      p_action_type: actionType,
+      p_action_category: actionCategory,
+      p_action_details: actionDetails,
+      p_target_type: targetType,
+      p_target_id: targetId,
+      p_target_email: targetEmail,
+      p_admin_ip: adminIp,
+      p_api_endpoint: apiEndpoint,
+      p_success: success,
+      p_error_message: errorMessage,
+    });
+  } catch (error) {
+    console.error('Failed to log admin action:', error);
+    // Don't throw - logging failure shouldn't break the action
+  }
+}
+
+/**
+ * Get admin email from request (from custom header or default)
+ */
+export function getAdminEmail(request: NextRequest): string {
+  return request.headers.get('x-admin-email') || 'admin@jewelshot.ai';
 }
 

@@ -23,6 +23,7 @@ import { UserDetailModal } from '@/components/admin/molecules/UserDetailModal';
 import { OperationsChart } from '@/components/admin/organisms/OperationsChart';
 import { CostChart } from '@/components/admin/organisms/CostChart';
 import { UserGrowthChart } from '@/components/admin/organisms/UserGrowthChart';
+import { AuditLogsViewer } from '@/components/admin/organisms/AuditLogsViewer';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/useToast';
 import { Toast } from '@/components/atoms/Toast';
@@ -50,7 +51,7 @@ export default function AdminDashboard() {
   // UI states
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [showUserDetail, setShowUserDetail] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'charts'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'charts' | 'audit-logs'>('overview');
 
   // Search & Filter functions
   const handleSearch = (query: string) => {
@@ -514,6 +515,16 @@ export default function AdminDashboard() {
           >
             Charts & Trends
           </button>
+          <button
+            onClick={() => setActiveTab('audit-logs')}
+            className={`px-4 py-3 text-sm font-medium transition-all ${
+              activeTab === 'audit-logs'
+                ? 'border-b-2 border-purple-500 text-white'
+                : 'text-white/60 hover:text-white'
+            }`}
+          >
+            🔒 Audit Logs
+          </button>
         </div>
 
         {/* Overview Tab */}
@@ -702,6 +713,11 @@ export default function AdminDashboard() {
               )}
             </div>
           </div>
+        )}
+
+        {/* Audit Logs Tab */}
+        {activeTab === 'audit-logs' && (
+          <AuditLogsViewer authKey={authKey} />
         )}
 
         {/* User Detail Modal */}

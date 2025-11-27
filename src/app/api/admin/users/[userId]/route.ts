@@ -6,7 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/service';
-import { isAdminAuthorized, logAdminAccess } from '@/lib/admin-auth';
+import { isAdminAuthorized, logAdminAccess, logAdminAction, getAdminEmail } from '@/lib/admin-auth';
 
 // Get user details
 export async function GET(
@@ -24,6 +24,7 @@ export async function GET(
 
   const supabase = createServiceClient();
   const { userId } = await params;
+  const adminEmail = getAdminEmail(request);
 
   try {
     // Get user credits
@@ -47,6 +48,20 @@ export async function GET(
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(50);
+
+    // Log view action
+    await logAdminAction({
+      adminEmail,
+      actionType: 'user_view',
+      actionCategory: 'user_management',
+      actionDetails: { email: user?.email },
+      targetType: 'user',
+      targetId: userId,
+      targetEmail: user?.email || 'unknown',
+      request,
+      apiEndpoint: '/api/admin/users/[userId]',
+      success: true,
+    });
 
     return NextResponse.json({
       user,
@@ -84,6 +99,11 @@ export async function PATCH(
   const { userId } = await params;
   const body = await request.json();
   const { action, amount, reason } = body;
+  const adminEmail = getAdminEmail(request);
+
+  // Get user email for logging
+  const { data: { user: targetUser } } = await supabase.auth.admin.getUserById(userId);
+  const targetEmail = targetUser?.email || 'unknown';
 
   try {
     switch (action) {
@@ -100,6 +120,20 @@ export async function PATCH(
         });
         
         if (addError) throw addError;
+        
+        // Log action
+        await logAdminAction({
+          adminEmail,
+          actionType: 'credit_add',
+          actionCategory: 'credit_management',
+          actionDetails: { amount, reason },
+          targetType: 'user',
+          targetId: userId,
+          targetEmail,
+          request,
+          apiEndpoint: '/api/admin/users/[userId]',
+          success: true,
+        });
         
         return NextResponse.json({
           success: true,
@@ -120,6 +154,20 @@ export async function PATCH(
         
         if (removeError) throw removeError;
         
+        // Log action
+        await logAdminAction({
+          adminEmail,
+          actionType: 'credit_remove',
+          actionCategory: 'credit_management',
+          actionDetails: { amount, reason },
+          targetType: 'user',
+          targetId: userId,
+          targetEmail,
+          request,
+          apiEndpoint: '/api/admin/users/[userId]',
+          success: true,
+        });
+        
         return NextResponse.json({
           success: true,
           message: `Removed ${amount} credits`,
@@ -133,6 +181,20 @@ export async function PATCH(
         
         if (banError) throw banError;
         
+        // Log action
+        await logAdminAction({
+          adminEmail,
+          actionType: 'user_ban',
+          actionCategory: 'user_management',
+          actionDetails: { reason: reason || 'Admin ban' },
+          targetType: 'user',
+          targetId: userId,
+          targetEmail,
+          request,
+          apiEndpoint: '/api/admin/users/[userId]',
+          success: true,
+        });
+        
         return NextResponse.json({
           success: true,
           message: 'User banned successfully',
@@ -145,6 +207,20 @@ export async function PATCH(
         });
         
         if (unbanError) throw unbanError;
+        
+        // Log action
+        await logAdminAction({
+          adminEmail,
+          actionType: 'user_unban',
+          actionCategory: 'user_management',
+          actionDetails: { reason: reason || 'Admin unban' },
+          targetType: 'user',
+          targetId: userId,
+          targetEmail,
+          request,
+          apiEndpoint: '/api/admin/users/[userId]',
+          success: true,
+        });
         
         return NextResponse.json({
           success: true,
@@ -186,12 +262,31 @@ export async function DELETE(
 
   const supabase = createServiceClient();
   const { userId } = await params;
+  const adminEmail = getAdminEmail(request);
+
+  // Get user email before deletion
+  const { data: { user: targetUser } } = await supabase.auth.admin.getUserById(userId);
+  const targetEmail = targetUser?.email || 'unknown';
 
   try {
     // Delete user (cascade will delete related records)
     const { error } = await supabase.auth.admin.deleteUser(userId);
     
     if (error) throw error;
+
+    // Log action
+    await logAdminAction({
+      adminEmail,
+      actionType: 'user_delete',
+      actionCategory: 'user_management',
+      actionDetails: { email: targetEmail },
+      targetType: 'user',
+      targetId: userId,
+      targetEmail,
+      request,
+      apiEndpoint: '/api/admin/users/[userId]',
+      success: true,
+    });
 
     return NextResponse.json({
       success: true,
@@ -200,6 +295,22 @@ export async function DELETE(
 
   } catch (error: any) {
     console.error('User deletion error:', error);
+    
+    // Log failed action
+    await logAdminAction({
+      adminEmail,
+      actionType: 'user_delete',
+      actionCategory: 'user_management',
+      actionDetails: { email: targetEmail },
+      targetType: 'user',
+      targetId: userId,
+      targetEmail,
+      request,
+      apiEndpoint: '/api/admin/users/[userId]',
+      success: false,
+      errorMessage: error.message,
+    });
+    
     return NextResponse.json(
       { error: 'Failed to delete user', details: error.message },
       { status: 500 }
