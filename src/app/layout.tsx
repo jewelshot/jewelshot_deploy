@@ -1,9 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import React from 'react';
 
-// Initialize Sentry
-import '@/lib/sentry-init';
-
 import { Inter } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
@@ -11,6 +8,7 @@ import { ErrorBoundary } from '@/components/organisms/ErrorBoundary';
 import ToastContainer from '@/components/organisms/ToastContainer';
 import { GalleryPrefetch } from '@/components/organisms/GalleryPrefetch';
 import GlobalSidebar from '@/components/organisms/GlobalSidebar';
+import { SentryProvider } from '@/components/providers/SentryProvider';
 import './globals.css';
 
 // Note: Environment validation is available in src/lib/env.ts
@@ -134,12 +132,14 @@ export default function RootLayout({
         className={`${inter.variable} font-sans antialiased`}
         data-theme="purple"
       >
-        <ErrorBoundary>{children}</ErrorBoundary>
-        <GlobalSidebar />
-        <ToastContainer />
-        <GalleryPrefetch />
-        <Analytics />
-        <SpeedInsights />
+        <SentryProvider>
+          <ErrorBoundary>{children}</ErrorBoundary>
+          <GlobalSidebar />
+          <ToastContainer />
+          <GalleryPrefetch />
+          <Analytics />
+          <SpeedInsights />
+        </SentryProvider>
       </body>
     </html>
   );
