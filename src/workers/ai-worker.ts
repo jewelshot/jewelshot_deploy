@@ -17,6 +17,9 @@ import { QUEUE_NAMES, AIJobData, AIJobResult } from '@/lib/queue/types';
 import { processAIJob, validateJobData } from '@/lib/queue/processors/ai-processor';
 import { confirmCredit, refundCredit } from '@/lib/credit-manager';
 import { validateEnv } from '@/lib/env-validator';
+import { createLogger } from '@/lib/structured-logger';
+
+const logger = createLogger('Worker');
 
 // ============================================
 // VALIDATE ENVIRONMENT
@@ -24,9 +27,9 @@ import { validateEnv } from '@/lib/env-validator';
 
 try {
   validateEnv();
-  console.log('✅ Environment variables validated');
+  logger.info('Environment variables validated');
 } catch (error) {
-  console.error('❌ Environment validation failed:', (error as Error).message);
+  logger.fatal('Environment validation failed', error as Error);
   process.exit(1);
 }
 
@@ -47,8 +50,12 @@ function createWorker(queueName: string) {
     async (job: Job<AIJobData>) => {
       const startTime = Date.now();
       
-      console.log(`[Worker] Processing job ${job.id} from ${queueName}`);
-      console.log(`[Worker] Operation: ${job.data.operation}, User: ${job.data.userId}`);
+      logger.info('Processing job', {
+        jobId: job.id,
+        queue: queueName,
+        operation: job.data.operation,
+        userId: job.data.userId,
+      });
       
       // Validate job data
       const validation = validateJobData(job.data);
@@ -60,7 +67,11 @@ function createWorker(queueName: string) {
       const result = await processAIJob(job.data);
       
       const duration = Date.now() - startTime;
-      console.log(`[Worker] Job ${job.id} completed in ${duration}ms`);
+      logger.info('Job completed', {
+        jobId: job.id,
+        duration,
+        operation: job.data.operation,
+      });
       
       // If processing failed, throw error to trigger retry
       if (!result.success) {
@@ -81,24 +92,27 @@ function createWorker(queueName: string) {
   // ============================================
 
   worker.on('completed', async (job: Job<AIJobData, AIJobResult>) => {
-    console.log(`✅ [Worker] Job ${job.id} completed successfully`);
+    logger.info('Job completed successfully', { jobId: job.id });
     
     // Confirm credit deduction
     const transactionId = job.data.metadata?.creditTransactionId;
     if (transactionId) {
       try {
         await confirmCredit(transactionId);
-        console.log(`[Worker] Credits confirmed for job ${job.id}`);
+        logger.info('Credits confirmed', { jobId: job.id, transactionId });
       } catch (error) {
-        console.error(`[Worker] Failed to confirm credits for job ${job.id}:`, error);
+        logger.error('Failed to confirm credits', { jobId: job.id }, error as Error);
       }
     }
   });
 
   worker.on('failed', async (job: Job<AIJobData> | undefined, error: Error) => {
     if (job) {
-      console.error(`❌ [Worker] Job ${job.id} failed:`, error.message);
-      console.error(`[Worker] Attempt ${job.attemptsMade}/${job.opts.attempts}`);
+      logger.error('Job failed', {
+        jobId: job.id,
+        attempt: job.attemptsMade,
+        maxAttempts: job.opts.attempts,
+      }, error);
       
       // Refund credits if this is the final attempt
       if (job.attemptsMade >= (job.opts.attempts || 3)) {
@@ -106,27 +120,27 @@ function createWorker(queueName: string) {
         if (transactionId) {
           try {
             await refundCredit(transactionId);
-            console.log(`[Worker] Credits refunded for failed job ${job.id}`);
-          } catch (error) {
-            console.error(`[Worker] Failed to refund credits for job ${job.id}:`, error);
+            logger.info('Credits refunded for failed job', { jobId: job.id, transactionId });
+          } catch (refundError) {
+            logger.error('Failed to refund credits', { jobId: job.id }, refundError as Error);
           }
         }
       }
     } else {
-      console.error(`❌ [Worker] Job failed:`, error.message);
+      logger.error('Job failed (no job info)', error);
     }
   });
 
   worker.on('progress', (job: Job<AIJobData>, progress: any) => {
-    console.log(`⏳ [Worker] Job ${job.id} progress:`, progress);
+    logger.debug('Job progress', { jobId: job.id, progress });
   });
 
   worker.on('error', (error: Error) => {
-    console.error(`🔥 [Worker] Worker error:`, error);
+    logger.error('Worker error', error);
   });
 
   worker.on('stalled', (jobId: string) => {
-    console.warn(`⚠️  [Worker] Job ${jobId} stalled`);
+    logger.warn('Job stalled', { jobId });
   });
 
   return worker;
@@ -137,19 +151,20 @@ function createWorker(queueName: string) {
 // ============================================
 
 if (!connection) {
-  console.error('❌ Redis connection not available. Set REDIS_URL environment variable.');
+  logger.fatal('Redis connection not available. Set REDIS_URL environment variable.');
   process.exit(1);
 }
 
-console.log('🚀 Starting AI Workers...');
-console.log(`Concurrency: ${workerConfig.concurrency}`);
-console.log(`Queues: ${Object.values(QUEUE_NAMES).join(', ')}`);
+logger.info('Starting AI Workers', {
+  concurrency: workerConfig.concurrency,
+  queues: Object.values(QUEUE_NAMES),
+});
 
 const urgentWorker = createWorker(QUEUE_NAMES.URGENT);
 const normalWorker = createWorker(QUEUE_NAMES.NORMAL);
 const backgroundWorker = createWorker(QUEUE_NAMES.BACKGROUND);
 
-console.log('✅ All workers started successfully');
+logger.info('All workers started successfully');
 
 // ============================================
 // HEALTH CHECK SERVER
@@ -180,7 +195,7 @@ const server = createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`🏥 Health check server running on port ${PORT}`);
+  logger.info('Health check server started', { port: PORT });
 });
 
 // ============================================
@@ -188,11 +203,11 @@ server.listen(PORT, () => {
 // ============================================
 
 async function gracefulShutdown() {
-  console.log('\n🛑 Shutting down workers gracefully...');
+  logger.info('Shutting down workers gracefully');
   
   // Close health check server
   server.close(() => {
-    console.log('✅ Health check server stopped');
+    logger.info('Health check server stopped');
   });
   
   // Close workers
@@ -202,7 +217,7 @@ async function gracefulShutdown() {
     backgroundWorker.close(),
   ]);
   
-  console.log('✅ All workers stopped');
+  logger.info('All workers stopped');
   process.exit(0);
 }
 
@@ -218,6 +233,10 @@ process.stdin.resume();
 
 // Log worker status every 30 seconds
 setInterval(() => {
-  console.log(`📊 Workers running - Checking queue stats...`);
+  logger.debug('Workers running', {
+    urgent: urgentWorker.isRunning(),
+    normal: normalWorker.isRunning(),
+    background: backgroundWorker.isRunning(),
+  });
 }, 30000);
 
