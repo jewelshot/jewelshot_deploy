@@ -13,9 +13,9 @@ CREATE INDEX IF NOT EXISTS idx_user_credits_user_id
 ON user_credits(user_id);
 
 -- Index for finding users with low credits
-CREATE INDEX IF NOT EXISTS idx_user_credits_remaining 
-ON user_credits(credits_remaining) 
-WHERE credits_remaining < 10;
+CREATE INDEX IF NOT EXISTS idx_user_credits_balance 
+ON user_credits(balance) 
+WHERE balance < 10;
 
 -- ============================================
 -- 2. CREDIT TRANSACTIONS INDEXES
