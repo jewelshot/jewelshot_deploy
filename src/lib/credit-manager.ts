@@ -7,6 +7,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { createServiceClient } from '@/lib/supabase/service';
+import { sendCreditsLowEmail } from './email/email-service';
 
 /**
  * Detect if running in worker context (no request scope)
@@ -87,8 +88,9 @@ export async function reserveCredit(
  * Confirm credit deduction after successful job completion
  * 
  * @param transactionId - Transaction ID from reserve
+ * @param userId - Optional user ID for email notification check
  */
-export async function confirmCredit(transactionId: string): Promise<void> {
+export async function confirmCredit(transactionId: string, userId?: string): Promise<void> {
   const supabase = isWorkerContext() 
     ? createServiceClient() 
     : await createClient();
@@ -103,6 +105,36 @@ export async function confirmCredit(transactionId: string): Promise<void> {
   }
 
   console.log(`[Credit] Confirmed transaction ${transactionId}`);
+
+  // Check if credits are low and send email if needed
+  if (userId) {
+    try {
+      const credits = await getUserCredits(userId);
+      const LOW_CREDIT_THRESHOLD = 5;
+      
+      // Send email if credits dropped to or below threshold
+      if (credits.balance <= LOW_CREDIT_THRESHOLD) {
+        // Get user email
+        const { data: userData } = await supabase.auth.admin.getUserById(userId);
+        
+        if (userData.user?.email) {
+          // Fire and forget - don't block on email
+          sendCreditsLowEmail({
+            userEmail: userData.user.email,
+            userName: userData.user.user_metadata?.name,
+            creditsRemaining: credits.balance,
+          }).catch((error) => {
+            console.error('[Credit] Failed to send low credits email:', error);
+          });
+          
+          console.log(`[Credit] Sent low credits email to ${userData.user.email}`);
+        }
+      }
+    } catch (emailError) {
+      console.error('[Credit] Email notification error:', emailError);
+      // Don't throw - email failure shouldn't break credit confirm
+    }
+  }
 }
 
 // ============================================

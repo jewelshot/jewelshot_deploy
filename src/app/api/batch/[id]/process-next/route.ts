@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { createScopedLogger } from '@/lib/logger';
+import { sendBatchCompleteEmail } from '@/lib/email/email-service';
 
 const logger = createScopedLogger('API:Batch:ProcessNext');
 
@@ -302,8 +303,39 @@ export async function POST(
       .eq('batch_project_id', batchProjectId)
       .eq('status', 'pending');
 
+    // Check if batch is complete
+    if (remainingCount === 0) {
+      logger.info('Batch processing complete, sending email', { batchId: batchProjectId });
+      
+      // Get batch stats for email
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: batchStats } = await (supabase as any)
+        .from('batch_projects')
+        .select('name, total_images, completed_count, failed_count')
+        .eq('id', batchProjectId)
+        .single();
+
+      // Get user email
+      const { data: userData } = await supabase.auth.getUser();
+      
+      if (batchStats && userData.user?.email) {
+        // Send batch complete email (don't await - fire and forget)
+        sendBatchCompleteEmail({
+          userEmail: userData.user.email,
+          userName: userData.user.user_metadata?.name,
+          batchName: batchStats.name || 'Untitled Batch',
+          totalImages: batchStats.total_images || 0,
+          successfulImages: batchStats.completed_count || 0,
+          failedImages: batchStats.failed_count || 0,
+          batchId: batchProjectId,
+        }).catch((error) => {
+          logger.error('Failed to send batch complete email', { error });
+        });
+      }
+    }
+
     return NextResponse.json({
-      done: false,
+      done: remainingCount === 0,
       processed: 1,
       remaining: remainingCount || 0,
     });
