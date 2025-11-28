@@ -58,7 +58,7 @@ const rateLimiters: Record<RateLimitType, Ratelimit | null> = {
         redis,
         limiter: Ratelimit.slidingWindow(
           rateLimitConfigs.anonymous.requests,
-          rateLimitConfigs.anonymous.window
+          rateLimitConfigs.anonymous.window as any
         ),
         analytics: true,
         prefix: 'ratelimit:anonymous',
@@ -70,7 +70,7 @@ const rateLimiters: Record<RateLimitType, Ratelimit | null> = {
         redis,
         limiter: Ratelimit.slidingWindow(
           rateLimitConfigs.user.requests,
-          rateLimitConfigs.user.window
+          rateLimitConfigs.user.window as any
         ),
         analytics: true,
         prefix: 'ratelimit:user',
@@ -82,7 +82,7 @@ const rateLimiters: Record<RateLimitType, Ratelimit | null> = {
         redis,
         limiter: Ratelimit.slidingWindow(
           rateLimitConfigs.premium.requests,
-          rateLimitConfigs.premium.window
+          rateLimitConfigs.premium.window as any
         ),
         analytics: true,
         prefix: 'ratelimit:premium',
@@ -94,7 +94,7 @@ const rateLimiters: Record<RateLimitType, Ratelimit | null> = {
         redis,
         limiter: Ratelimit.slidingWindow(
           rateLimitConfigs.admin.requests,
-          rateLimitConfigs.admin.window
+          rateLimitConfigs.admin.window as any
         ),
         analytics: true,
         prefix: 'ratelimit:admin',
@@ -151,7 +151,7 @@ export function getClientIp(request: Request): string {
 async function getUserRateLimitType(request: Request): Promise<RateLimitType> {
   try {
     // Try to get authenticated user
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -225,7 +225,7 @@ export async function getRateLimitIdentifier(
   } else {
     // Authenticated: use user-based rate limiting
     try {
-      const cookieStore = cookies();
+      const cookieStore = await cookies();
       const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,

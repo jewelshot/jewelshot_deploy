@@ -32,11 +32,20 @@ interface AdminRouteConfig {
  * 
  * Usage:
  * ```typescript
- * export const DELETE = withAdminAuth(
- *   { action: 'USER_DELETE' },
+ * // Simple route (no params)
+ * export const GET = withAdminAuth(
+ *   { action: 'USER_LIST' },
  *   async (request, auth) => {
- *     // Your handler logic here
- *     return NextResponse.json({ success: true });
+ *     return NextResponse.json({ users: [] });
+ *   }
+ * );
+ * 
+ * // Dynamic route (with params)
+ * export const GET = withAdminAuth(
+ *   { action: 'USER_VIEW' },
+ *   async (request, auth, context) => {
+ *     const { userId } = await context.params;
+ *     return NextResponse.json({ user: {} });
  *   }
  * );
  * ```
@@ -96,7 +105,7 @@ export function withAdminAuth(
         );
       }
 
-      // 3. Execute handler
+      // 3. Execute handler (context is optional)
       const response = await handler(request, auth, context);
       const duration = Date.now() - startTime;
 

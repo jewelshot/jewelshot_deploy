@@ -15,7 +15,7 @@ export const GET = withAdminAuth(
   { action: 'USER_VIEW' },
   async (request: NextRequest, auth, context) => {
     const supabase = createServiceClient();
-    const { userId } = await context.params;
+    const { userId } = await context!.params;
 
   try {
     // Get user credits
@@ -60,7 +60,7 @@ export const PATCH = withAdminAuth(
   { action: 'USER_UPDATE', requireBody: true },
   async (request: NextRequest, auth, context) => {
     const supabase = createServiceClient();
-    const { userId } = await context.params;
+    const { userId } = await context!.params;
     const { action, amount, reason } = await request.json();
 
     // Get user email for logging
@@ -154,7 +154,7 @@ export const DELETE = withAdminAuth(
   { action: 'USER_DELETE' },  // Auto 2FA if configured
   async (request: NextRequest, auth, context) => {
     const supabase = createServiceClient();
-    const { userId } = await context.params;
+    const { userId } = await context!.params;
 
     // Get user email before deletion
     const { data: { user: targetUser } } = await supabase.auth.admin.getUserById(userId);
