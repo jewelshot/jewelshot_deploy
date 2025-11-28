@@ -1,7 +1,23 @@
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
-// Redis client for rate limiting
+// ============================================
+// Types
+// ============================================
+
+export type RateLimitType = 'anonymous' | 'user' | 'premium' | 'admin';
+
+export interface RateLimitConfig {
+  requests: number;
+  window: string;
+}
+
+// ============================================
+// Redis Client
+// ============================================
+
 const redis = process.env.UPSTASH_REDIS_REST_URL
   ? new Redis({
       url: process.env.UPSTASH_REDIS_REST_URL,
@@ -9,27 +25,92 @@ const redis = process.env.UPSTASH_REDIS_REST_URL
     })
   : null;
 
-// Global rate limiter - applies to all requests
-// 100 requests per 10 seconds per IP
-export const globalRateLimit = redis
-  ? new Ratelimit({
-      redis,
-      limiter: Ratelimit.slidingWindow(100, '10 s'),
-      analytics: true,
-      prefix: 'ratelimit:global',
-    })
-  : null;
+// ============================================
+// Rate Limit Configurations (by user type)
+// ============================================
 
-// User rate limiter - applies to authenticated users
-// 50 requests per minute per user
-export const userRateLimit = redis
-  ? new Ratelimit({
-      redis,
-      limiter: Ratelimit.slidingWindow(50, '1 m'),
-      analytics: true,
-      prefix: 'ratelimit:user',
-    })
-  : null;
+const rateLimitConfigs: Record<RateLimitType, RateLimitConfig> = {
+  anonymous: {
+    requests: 20,    // Very restrictive for anonymous users
+    window: '1 m',
+  },
+  user: {
+    requests: 100,   // Standard authenticated users
+    window: '1 m',
+  },
+  premium: {
+    requests: 500,   // Premium users get more quota
+    window: '1 m',
+  },
+  admin: {
+    requests: 1000,  // Admins get highest quota
+    window: '1 m',
+  },
+};
+
+// ============================================
+// Rate Limiters (cached instances)
+// ============================================
+
+const rateLimiters: Record<RateLimitType, Ratelimit | null> = {
+  anonymous: redis
+    ? new Ratelimit({
+        redis,
+        limiter: Ratelimit.slidingWindow(
+          rateLimitConfigs.anonymous.requests,
+          rateLimitConfigs.anonymous.window
+        ),
+        analytics: true,
+        prefix: 'ratelimit:anonymous',
+      })
+    : null,
+  
+  user: redis
+    ? new Ratelimit({
+        redis,
+        limiter: Ratelimit.slidingWindow(
+          rateLimitConfigs.user.requests,
+          rateLimitConfigs.user.window
+        ),
+        analytics: true,
+        prefix: 'ratelimit:user',
+      })
+    : null,
+  
+  premium: redis
+    ? new Ratelimit({
+        redis,
+        limiter: Ratelimit.slidingWindow(
+          rateLimitConfigs.premium.requests,
+          rateLimitConfigs.premium.window
+        ),
+        analytics: true,
+        prefix: 'ratelimit:premium',
+      })
+    : null,
+  
+  admin: redis
+    ? new Ratelimit({
+        redis,
+        limiter: Ratelimit.slidingWindow(
+          rateLimitConfigs.admin.requests,
+          rateLimitConfigs.admin.window
+        ),
+        analytics: true,
+        prefix: 'ratelimit:admin',
+      })
+    : null,
+};
+
+// ============================================
+// Legacy Rate Limiters (for backward compatibility)
+// ============================================
+
+// Global rate limiter - applies to all requests (IP-based)
+export const globalRateLimit = rateLimiters.user;
+
+// User rate limiter - same as standard user
+export const userRateLimit = rateLimiters.user;
 
 // AI operation rate limiter - applies to AI API calls
 // 10 AI requests per minute per user
@@ -42,7 +123,13 @@ export const aiRateLimit = redis
     })
   : null;
 
-// Helper function to get client IP
+// ============================================
+// Helper Functions
+// ============================================
+
+/**
+ * Get client IP address from request
+ */
 export function getClientIp(request: Request): string {
   const forwarded = request.headers.get('x-forwarded-for');
   const realIp = request.headers.get('x-real-ip');
@@ -58,7 +145,127 @@ export function getClientIp(request: Request): string {
   return 'unknown';
 }
 
-// Helper to check rate limit and return appropriate response
+/**
+ * Determine user's rate limit type based on authentication and role
+ */
+async function getUserRateLimitType(request: Request): Promise<RateLimitType> {
+  try {
+    // Try to get authenticated user
+    const cookieStore = cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get(name: string) {
+            return cookieStore.get(name)?.value;
+          },
+        },
+      }
+    );
+
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session?.user) {
+      // No session = anonymous user
+      return 'anonymous';
+    }
+
+    // Get user profile with role
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role, subscription_tier')
+      .eq('id', session.user.id)
+      .single();
+
+    if (!profile) {
+      return 'user'; // Default to user if profile not found
+    }
+
+    // Check role (admin/superadmin get highest limits)
+    if (profile.role === 'admin' || profile.role === 'superadmin') {
+      return 'admin';
+    }
+
+    // Check subscription tier
+    if (profile.subscription_tier === 'premium') {
+      return 'premium';
+    }
+
+    // Default authenticated user
+    return 'user';
+  } catch (error) {
+    // On error, fallback to anonymous (most restrictive)
+    console.error('Failed to determine user type for rate limiting:', error);
+    return 'anonymous';
+  }
+}
+
+/**
+ * Get rate limit identifier (user-based or IP-based)
+ * Returns both identifier and appropriate limiter
+ */
+export async function getRateLimitIdentifier(
+  request: Request
+): Promise<{
+  identifier: string;
+  type: RateLimitType;
+  limiter: Ratelimit | null;
+  config: RateLimitConfig;
+}> {
+  const userType = await getUserRateLimitType(request);
+  const ip = getClientIp(request);
+
+  // Try to get user ID for authenticated users
+  let identifier: string;
+  
+  if (userType === 'anonymous') {
+    // Anonymous: use IP-based rate limiting
+    identifier = `ip:${ip}`;
+  } else {
+    // Authenticated: use user-based rate limiting
+    try {
+      const cookieStore = cookies();
+      const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          cookies: {
+            get(name: string) {
+              return cookieStore.get(name)?.value;
+            },
+          },
+        }
+      );
+
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session?.user) {
+        identifier = `user:${session.user.id}`;
+      } else {
+        // Fallback to IP if session retrieval fails
+        identifier = `ip:${ip}`;
+      }
+    } catch {
+      // Fallback to IP on error
+      identifier = `ip:${ip}`;
+    }
+  }
+
+  return {
+    identifier,
+    type: userType,
+    limiter: rateLimiters[userType],
+    config: rateLimitConfigs[userType],
+  };
+}
+
+/**
+ * Check rate limit with automatic user type detection
+ * 
+ * @param request - The incoming request
+ * @returns Rate limit result
+ */
 export async function checkRateLimit(
   identifier: string,
   limiter: Ratelimit | null
@@ -75,5 +282,39 @@ export async function checkRateLimit(
     limit,
     remaining,
     reset,
+  };
+}
+
+/**
+ * Enhanced rate limit check with automatic user detection
+ * 
+ * @param request - The incoming request
+ * @returns Rate limit result with user type info
+ */
+export async function checkRateLimitEnhanced(
+  request: Request
+): Promise<{
+  success: boolean;
+  limit?: number;
+  remaining?: number;
+  reset?: number;
+  type?: RateLimitType;
+  identifier?: string;
+}> {
+  const { identifier, type, limiter } = await getRateLimitIdentifier(request);
+
+  if (!limiter) {
+    return { success: true, type, identifier };
+  }
+
+  const { success, limit, remaining, reset } = await limiter.limit(identifier);
+
+  return {
+    success,
+    limit,
+    remaining,
+    reset,
+    type,
+    identifier,
   };
 }

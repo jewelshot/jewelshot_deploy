@@ -1,6 +1,11 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
-import { globalRateLimit, getClientIp, checkRateLimit } from '@/lib/rate-limit';
+import { 
+  globalRateLimit, 
+  getClientIp, 
+  checkRateLimit,
+  checkRateLimitEnhanced, // Enhanced: auto-detects user type
+} from '@/lib/rate-limit';
 
 // ============================================
 // 🔒 MAINTENANCE MODE CONFIGURATION
