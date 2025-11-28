@@ -1,16 +1,20 @@
 /**
- * Canvas - Modular Version (Phase 2B - Filters & Transforms)
+ * Canvas - Modular Version (Phase 2C - AI Features)
  * 
  * Phase 2a: Basic upload + zoom ✅
- * Phase 2b: Filters & transforms ⚡ (IN PROGRESS)
+ * Phase 2b: Filters & transforms ✅
+ * Phase 2c: AI features ⚡ (IN PROGRESS)
  */
 
 'use client';
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { ImageViewer } from '@/components/molecules/ImageViewer';
 import { useImageFilters } from '@/hooks/useImageFilters';
 import { useImageTransform } from '@/hooks/useImageTransform';
+import { useRemoveBackground } from '@/hooks/useRemoveBackground';
+import { useImageUpscale } from '@/hooks/useImageUpscale';
+import { useCreditStore } from '@/store/creditStore';
 import { createScopedLogger } from '@/lib/logger';
 import { toastManager } from '@/lib/toast-manager';
 
@@ -50,8 +54,38 @@ export function CanvasNew({ onPresetPrompt }: CanvasProps) {
     resetTransform,
   } = useImageTransform();
   
+  // AI Hooks
+  const {
+    removeBackground,
+    isProcessing: isRemovingBg,
+    progress: removeBgProgress,
+    processedImageUrl: removedBgUrl,
+    error: removeBgError,
+  } = useRemoveBackground();
+  
+  const {
+    upscaleImage,
+    isUpscaling,
+    progress: upscaleProgress,
+    upscaledImageUrl,
+    error: upscaleError,
+  } = useImageUpscale();
+  
+  // Credits
+  const { fetchCredits } = useCreditStore();
+  
   // UI State
   const [showFilters, setShowFilters] = useState(false);
+  const [showAIPanel, setShowAIPanel] = useState(false);
+  
+  // Track AI processing
+  const isAIProcessing = isRemovingBg || isUpscaling;
+  const aiProgressMessage = removeBgProgress || upscaleProgress || 'AI Processing...';
+  
+  // Fetch credits on mount
+  useEffect(() => {
+    fetchCredits();
+  }, [fetchCredits]);
   
   // ============================================
   // FILE UPLOAD
@@ -157,6 +191,53 @@ export function CanvasNew({ onPresetPrompt }: CanvasProps) {
   }, [resetFilters, resetTransform]);
   
   // ============================================
+  // AI FEATURES
+  // ============================================
+  
+  const handleRemoveBackground = useCallback(async () => {
+    if (!uploadedImage) return;
+    
+    try {
+      logger.info('Removing background...');
+      await removeBackground({ image_url: uploadedImage });
+      await fetchCredits(); // Refresh credits
+    } catch (error) {
+      logger.error('Remove background failed', error);
+      toastManager.error(removeBgError || 'Failed to remove background');
+    }
+  }, [uploadedImage, removeBackground, removeBgError, fetchCredits]);
+  
+  const handleUpscale = useCallback(async () => {
+    if (!uploadedImage) return;
+    
+    try {
+      logger.info('Upscaling image...');
+      await upscaleImage({ image_url: uploadedImage });
+      await fetchCredits(); // Refresh credits
+    } catch (error) {
+      logger.error('Upscale failed', error);
+      toastManager.error(upscaleError || 'Failed to upscale image');
+    }
+  }, [uploadedImage, upscaleImage, upscaleError, fetchCredits]);
+  
+  // Update uploaded image when AI processing completes
+  useEffect(() => {
+    if (removedBgUrl) {
+      setUploadedImage(removedBgUrl);
+      toastManager.success('Background removed!');
+      logger.info('Background removed successfully');
+    }
+  }, [removedBgUrl]);
+  
+  useEffect(() => {
+    if (upscaledImageUrl) {
+      setUploadedImage(upscaledImageUrl);
+      toastManager.success('Image upscaled!');
+      logger.info('Image upscaled successfully');
+    }
+  }, [upscaledImageUrl]);
+  
+  // ============================================
   // CLOSE IMAGE
   // ============================================
   
@@ -205,7 +286,7 @@ export function CanvasNew({ onPresetPrompt }: CanvasProps) {
               🎨 Modular Canvas
             </h1>
             <p className="mb-6 text-white/70">
-              Phase 2B: Filters & Transforms working! Upload an image to continue.
+              Phase 2C: AI Features working! Upload an image to continue.
             </p>
             <button
               onClick={handleUploadClick}
@@ -214,13 +295,13 @@ export function CanvasNew({ onPresetPrompt }: CanvasProps) {
               Upload Image
             </button>
             <div className="mt-6 rounded-lg bg-green-500/20 p-4 text-sm text-green-400">
-              ✅ Upload + Zoom
+              ✅ Upload + Zoom + Pan
               <br />
-              ✅ Filters (Brightness, Contrast, Saturation)
+              ✅ Filters (Brightness, Contrast, Saturation, etc.)
               <br />
               ✅ Transforms (Rotate, Flip)
               <br />
-              ✅ Pan (Mouse drag)
+              ✅ AI Tools (Remove BG, Upscale)
             </div>
           </div>
         </div>
@@ -242,12 +323,63 @@ export function CanvasNew({ onPresetPrompt }: CanvasProps) {
               adjustFilters={adjustFilters}
               colorFilters={colorFilters}
               filterEffects={filterEffects}
+              isAIProcessing={isAIProcessing}
+              aiProgress={aiProgressMessage}
               controlsVisible={true}
             />
           </div>
           
+          {/* AI Panel (Right Sidebar) */}
+          {showAIPanel && (
+            <div className="w-80 overflow-y-auto border-l border-white/10 bg-black/80 p-6 backdrop-blur-xl">
+              <div className="mb-6 flex items-center justify-between">
+                <h2 className="text-xl font-bold text-white">AI Tools</h2>
+                <button
+                  onClick={() => setShowAIPanel(false)}
+                  className="text-white/50 hover:text-white"
+                >
+                  ✕
+                </button>
+              </div>
+              
+              {/* AI Actions */}
+              <div className="space-y-3">
+                <button
+                  onClick={handleRemoveBackground}
+                  disabled={isAIProcessing}
+                  className="w-full rounded-lg bg-purple-500/80 px-4 py-3 text-left text-white transition-colors hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <div className="font-semibold">Remove Background</div>
+                  <div className="text-xs text-white/70">AI-powered background removal</div>
+                </button>
+                
+                <button
+                  onClick={handleUpscale}
+                  disabled={isAIProcessing}
+                  className="w-full rounded-lg bg-blue-500/80 px-4 py-3 text-left text-white transition-colors hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <div className="font-semibold">Upscale (2x)</div>
+                  <div className="text-xs text-white/70">Enhance image resolution</div>
+                </button>
+              </div>
+              
+              {/* AI Status */}
+              {isAIProcessing && (
+                <div className="mt-6 rounded-lg bg-white/10 p-4">
+                  <div className="mb-2 text-sm font-semibold text-white">Processing...</div>
+                  <div className="text-xs text-white/70">{aiProgressMessage}</div>
+                  <div className="mt-2">
+                    <div className="h-1 w-full overflow-hidden rounded-full bg-white/20">
+                      <div className="h-full animate-pulse bg-blue-500" style={{ width: '60%' }} />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          
           {/* Filter Panel (Right Sidebar) */}
-          {showFilters && (
+          {showFilters && !showAIPanel && (
             <div className="w-80 overflow-y-auto border-l border-white/10 bg-black/80 p-6 backdrop-blur-xl">
               <div className="mb-6 flex items-center justify-between">
                 <h2 className="text-xl font-bold text-white">Filters</h2>
@@ -472,9 +604,26 @@ export function CanvasNew({ onPresetPrompt }: CanvasProps) {
               
               <div className="mx-2 h-6 w-px bg-white/20" />
               
+              {/* AI Toggle */}
+              <button
+                onClick={() => {
+                  setShowAIPanel(!showAIPanel);
+                  if (!showAIPanel) setShowFilters(false);
+                }}
+                className={`rounded px-3 py-2 text-sm text-white transition-colors ${
+                  showAIPanel ? 'bg-purple-500' : 'bg-white/10 hover:bg-white/20'
+                }`}
+                title="Toggle AI Tools"
+              >
+                AI Tools
+              </button>
+              
               {/* Filter Toggle */}
               <button
-                onClick={() => setShowFilters(!showFilters)}
+                onClick={() => {
+                  setShowFilters(!showFilters);
+                  if (!showFilters) setShowAIPanel(false);
+                }}
                 className={`rounded px-3 py-2 text-sm text-white transition-colors ${
                   showFilters ? 'bg-blue-500' : 'bg-white/10 hover:bg-white/20'
                 }`}
