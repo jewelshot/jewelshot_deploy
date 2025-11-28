@@ -25,6 +25,16 @@ export const FEATURE_FLAGS = {
    * Rollback: Set NEXT_PUBLIC_USE_MODULAR_CANVAS=false in Vercel
    */
   USE_MODULAR_CANVAS: process.env.NEXT_PUBLIC_USE_MODULAR_CANVAS === 'true',
+  
+  /**
+   * Use modular Gallery component (refactored from 987 lines)
+   * 
+   * Before: GalleryContent.tsx (987 lines - complex state management)
+   * After: GalleryNew.tsx (modular, clean separation)
+   * 
+   * Rollback: Set NEXT_PUBLIC_USE_MODULAR_GALLERY=false in Vercel
+   */
+  USE_MODULAR_GALLERY: process.env.NEXT_PUBLIC_USE_MODULAR_GALLERY === 'true',
 } as const;
 
 // Type-safe feature flag access

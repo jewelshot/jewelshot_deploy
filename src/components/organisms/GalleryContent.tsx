@@ -24,6 +24,8 @@ import {
   downloadImageWithBlob,
   generateImageFilename,
 } from '@/lib/download-utils';
+import { FEATURE_FLAGS } from '@/lib/feature-flags';
+import { GalleryNew } from './GalleryNew';
 
 // Supabase batch project type
 interface BatchProject {
@@ -48,7 +50,25 @@ const logger = createScopedLogger('Gallery');
 
 type GalleryTab = 'images' | 'batches' | 'favorites';
 
+// ============================================
+// GALLERY WRAPPER - Feature Flag Controlled
+// ============================================
 export function GalleryContent() {
+  if (FEATURE_FLAGS.USE_MODULAR_GALLERY) {
+    // NEW SYSTEM: Modular Gallery (clean, maintainable)
+    logger.debug('Using modular Gallery');
+    return <GalleryNew />;
+  }
+  
+  // OLD SYSTEM: Legacy Gallery (987 lines - will be removed)
+  logger.debug('Using legacy Gallery');
+  return <GalleryLegacy />;
+}
+
+// ============================================
+// LEGACY GALLERY (987 lines - BACKUP)
+// ============================================
+function GalleryLegacy() {
   const router = useRouter();
   const { leftOpen } = useSidebarStore();
   const [activeTab, setActiveTab] = useState<GalleryTab>('images');
