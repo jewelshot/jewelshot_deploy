@@ -12,36 +12,35 @@ fal.config({
 });
 
 export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const { prompt, image_url, num_images = 1, output_format = 'jpeg', aspect_ratio = '1:1' } = body;
-
-    if (!prompt || !image_url) {
-      return NextResponse.json(
-        { error: 'Missing required fields: prompt, image_url' },
-        { status: 400 }
-      );
+  // ⚠️ DEPRECATED ENDPOINT - Bypasses credit system!
+  // Use /api/ai/submit instead
+  
+  return NextResponse.json(
+    {
+      error: 'This endpoint is deprecated and has been removed for security reasons.',
+      message: 'Please use /api/ai/submit instead with operation="edit".',
+      migrateTo: '/api/ai/submit',
+      documentation: '/docs/api',
+      example: {
+        method: 'POST',
+        url: '/api/ai/submit',
+        body: {
+          operation: 'edit',
+          params: {
+            prompt: 'your prompt',
+            image_url: 'image url',
+          },
+        },
+      },
+    },
+    { 
+      status: 410, // Gone
+      headers: {
+        'X-Deprecated': 'true',
+        'X-Migrate-To': '/api/ai/submit',
+      },
     }
-
-    // Call FAL.AI directly (temporary - bypasses queue and credits)
-    const result = await fal.subscribe('fal-ai/flux/dev/image-to-image', {
-      input: {
-        prompt,
-        image_url,
-        num_images,
-        output_format,
-      } as any,
-      logs: true,
-    });
-
-    return NextResponse.json(result);
-  } catch (error) {
-    console.error('Edit error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Edit failed' },
-      { status: 500 }
-    );
-  }
+  );
 }
 
 

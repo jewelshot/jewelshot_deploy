@@ -12,35 +12,24 @@ fal.config({
 });
 
 export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const { prompt, num_images = 1, output_format = 'jpeg', aspect_ratio = '1:1' } = body;
-
-    if (!prompt) {
-      return NextResponse.json(
-        { error: 'Missing required field: prompt' },
-        { status: 400 }
-      );
+  // ⚠️ DEPRECATED ENDPOINT - Bypasses credit system!
+  // Use /api/ai/submit instead
+  
+  return NextResponse.json(
+    {
+      error: 'This endpoint is deprecated and has been removed for security reasons.',
+      message: 'Please use /api/ai/submit instead.',
+      migrateTo: '/api/ai/submit',
+      documentation: '/docs/api',
+    },
+    { 
+      status: 410, // Gone
+      headers: {
+        'X-Deprecated': 'true',
+        'X-Migrate-To': '/api/ai/submit',
+      },
     }
-
-    // Call FAL.AI directly (temporary - bypasses queue and credits)
-    const result = await fal.subscribe('fal-ai/flux-pro', {
-      input: {
-        prompt,
-        num_images,
-        output_format,
-      } as any,
-      logs: true,
-    });
-
-    return NextResponse.json(result);
-  } catch (error) {
-    console.error('Generate error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Generation failed' },
-      { status: 500 }
-    );
-  }
+  );
 }
 
 
