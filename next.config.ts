@@ -56,10 +56,38 @@ const nextConfig: NextConfig = {
       {
         source: '/:path*',
         headers: [
-          // Prevent clickjacking
+          // ============================================
+          // CORS Headers
+          // ============================================
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: process.env.NEXT_PUBLIC_APP_URL || 'https://jewelshot.ai',
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET,POST,PUT,DELETE,OPTIONS',
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Content-Type, Authorization, X-2FA-Token, X-Requested-With',
+          },
+          {
+            key: 'Access-Control-Allow-Credentials',
+            value: 'true',
+          },
+          {
+            key: 'Access-Control-Max-Age',
+            value: '86400', // 24 hours
+          },
+
+          // ============================================
+          // Security Headers
+          // ============================================
+          
+          // Prevent clickjacking (upgraded to DENY for max security)
           {
             key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
+            value: 'DENY',
           },
           // XSS Protection
           {
