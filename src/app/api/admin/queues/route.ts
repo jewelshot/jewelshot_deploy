@@ -3,46 +3,38 @@
  * 
  * Provides real-time queue monitoring via Bull Board
  * Access: /api/admin/queues
+ * 
+ * 🔒 SECURITY: Session-based admin auth with auto audit logging
  */
 
 import { urgentQueue, normalQueue, backgroundQueue } from '@/lib/queue/queues';
 import { NextRequest, NextResponse } from 'next/server';
-import { isAdminAuthorized, logAdminAccess } from '@/lib/admin-auth';
+import { withAdminAuth } from '@/lib/admin';
 
-export async function GET(request: NextRequest) {
-  // Check admin authorization
-  const authCheck = await isAdminAuthorized(request);
-  
-  if (!authCheck.authorized) {
-    logAdminAccess(request, '/api/admin/queues', false, authCheck.error);
-    return NextResponse.json(
-      { error: authCheck.error },
-      { status: authCheck.statusCode || 401 }
-    );
+export const GET = withAdminAuth(
+  { action: 'QUEUES_VIEW' },
+  async (request: NextRequest, auth) => {
+    // Check if queues are available
+    if (!urgentQueue || !normalQueue || !backgroundQueue) {
+      return NextResponse.json(
+        { error: 'Queues not initialized. Make sure REDIS_URL is set.' },
+        { status: 503 }
+      );
+    }
+
+    // Get queue stats
+    const stats = {
+      urgent: await getQueueStats(urgentQueue),
+      normal: await getQueueStats(normalQueue),
+      background: await getQueueStats(backgroundQueue),
+    };
+
+    return NextResponse.json({
+      queues: stats,
+      timestamp: new Date().toISOString(),
+    });
   }
-  
-  logAdminAccess(request, '/api/admin/queues', true);
-
-  // Check if queues are available
-  if (!urgentQueue || !normalQueue || !backgroundQueue) {
-    return NextResponse.json(
-      { error: 'Queues not initialized. Make sure REDIS_URL is set.' },
-      { status: 503 }
-    );
-  }
-
-  // Get queue stats
-  const stats = {
-    urgent: await getQueueStats(urgentQueue),
-    normal: await getQueueStats(normalQueue),
-    background: await getQueueStats(backgroundQueue),
-  };
-
-  return NextResponse.json({
-    queues: stats,
-    timestamp: new Date().toISOString(),
-  });
-}
+);
 
 async function getQueueStats(queue: any) {
   const counts = await queue.getJobCounts();
@@ -54,4 +46,3 @@ async function getQueueStats(queue: any) {
     workers: workers.length,
   };
 }
-

@@ -2,26 +2,18 @@
  * Admin Audit Logs API
  * 
  * View admin activity history for security & compliance
+ * 
+ * 🔒 SECURITY: Session-based admin auth with auto audit logging
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/service';
-import { isAdminAuthorized, logAdminAccess } from '@/lib/admin-auth';
+import { withAdminAuth } from '@/lib/admin';
 
-export async function GET(request: NextRequest) {
-  const authCheck = await isAdminAuthorized(request);
-  
-  if (!authCheck.authorized) {
-    logAdminAccess(request, '/api/admin/audit-logs', false, authCheck.error);
-    return NextResponse.json(
-      { error: authCheck.error },
-      { status: authCheck.statusCode || 401 }
-    );
-  }
-  
-  logAdminAccess(request, '/api/admin/audit-logs', true);
-
-  const supabase = createServiceClient();
+export const GET = withAdminAuth(
+  { action: 'AUDIT_LOGS_VIEW' },
+  async (request: NextRequest, auth) => {
+    const supabase = createServiceClient();
   const { searchParams } = new URL(request.url);
   
   const limit = parseInt(searchParams.get('limit') || '50');
@@ -93,5 +85,5 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});
 

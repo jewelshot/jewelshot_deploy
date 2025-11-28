@@ -2,29 +2,20 @@
  * User Management API
  * 
  * Manage individual users: ban, delete, update credits
+ * 
+ * 🔒 SECURITY: Session-based admin auth with auto audit logging
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/service';
-import { isAdminAuthorized, logAdminAccess, logAdminAction, getAdminEmail } from '@/lib/admin-auth';
+import { withAdminAuth } from '@/lib/admin';
 
 // Get user details
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
-) {
-  const authCheck = await isAdminAuthorized(request);
-  
-  if (!authCheck.authorized) {
-    return NextResponse.json(
-      { error: authCheck.error },
-      { status: authCheck.statusCode || 401 }
-    );
-  }
-
-  const supabase = createServiceClient();
-  const { userId } = await params;
-  const adminEmail = getAdminEmail(request);
+export const GET = withAdminAuth(
+  { action: 'USER_VIEW' },
+  async (request: NextRequest, auth, context) => {
+    const supabase = createServiceClient();
+    const { userId } = await context.params;
 
   try {
     // Get user credits
@@ -49,20 +40,6 @@ export async function GET(
       .order('created_at', { ascending: false })
       .limit(50);
 
-    // Log view action
-    await logAdminAction({
-      adminEmail,
-      actionType: 'user_view',
-      actionCategory: 'user_management',
-      actionDetails: { email: user?.email },
-      targetType: 'user',
-      targetId: userId,
-      targetEmail: user?.email || 'unknown',
-      request,
-      apiEndpoint: '/api/admin/users/[userId]',
-      success: true,
-    });
-
     return NextResponse.json({
       user,
       credits,
@@ -76,34 +53,19 @@ export async function GET(
       { status: 500 }
     );
   }
-}
+});
 
 // Update user (ban, credits, etc.)
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
-) {
-  const authCheck = await isAdminAuthorized(request);
-  
-  if (!authCheck.authorized) {
-    logAdminAccess(request, '/api/admin/users/[userId]', false, authCheck.error);
-    return NextResponse.json(
-      { error: authCheck.error },
-      { status: authCheck.statusCode || 401 }
-    );
-  }
-  
-  logAdminAccess(request, '/api/admin/users/[userId]', true);
+export const PATCH = withAdminAuth(
+  { action: 'USER_UPDATE', requireBody: true },
+  async (request: NextRequest, auth, context) => {
+    const supabase = createServiceClient();
+    const { userId } = await context.params;
+    const { action, amount, reason } = await request.json();
 
-  const supabase = createServiceClient();
-  const { userId } = await params;
-  const body = await request.json();
-  const { action, amount, reason } = body;
-  const adminEmail = getAdminEmail(request);
-
-  // Get user email for logging
-  const { data: { user: targetUser } } = await supabase.auth.admin.getUserById(userId);
-  const targetEmail = targetUser?.email || 'unknown';
+    // Get user email for logging
+    const { data: { user: targetUser } } = await supabase.auth.admin.getUserById(userId);
+    const targetEmail = targetUser?.email || 'unknown';
 
   try {
     switch (action) {
@@ -120,20 +82,6 @@ export async function PATCH(
         });
         
         if (addError) throw addError;
-        
-        // Log action
-        await logAdminAction({
-          adminEmail,
-          actionType: 'credit_add',
-          actionCategory: 'credit_management',
-          actionDetails: { amount, reason },
-          targetType: 'user',
-          targetId: userId,
-          targetEmail,
-          request,
-          apiEndpoint: '/api/admin/users/[userId]',
-          success: true,
-        });
         
         return NextResponse.json({
           success: true,
@@ -154,20 +102,6 @@ export async function PATCH(
         
         if (removeError) throw removeError;
         
-        // Log action
-        await logAdminAction({
-          adminEmail,
-          actionType: 'credit_remove',
-          actionCategory: 'credit_management',
-          actionDetails: { amount, reason },
-          targetType: 'user',
-          targetId: userId,
-          targetEmail,
-          request,
-          apiEndpoint: '/api/admin/users/[userId]',
-          success: true,
-        });
-        
         return NextResponse.json({
           success: true,
           message: `Removed ${amount} credits`,
@@ -181,20 +115,6 @@ export async function PATCH(
         
         if (banError) throw banError;
         
-        // Log action
-        await logAdminAction({
-          adminEmail,
-          actionType: 'user_ban',
-          actionCategory: 'user_management',
-          actionDetails: { reason: reason || 'Admin ban' },
-          targetType: 'user',
-          targetId: userId,
-          targetEmail,
-          request,
-          apiEndpoint: '/api/admin/users/[userId]',
-          success: true,
-        });
-        
         return NextResponse.json({
           success: true,
           message: 'User banned successfully',
@@ -207,20 +127,6 @@ export async function PATCH(
         });
         
         if (unbanError) throw unbanError;
-        
-        // Log action
-        await logAdminAction({
-          adminEmail,
-          actionType: 'user_unban',
-          actionCategory: 'user_management',
-          actionDetails: { reason: reason || 'Admin unban' },
-          targetType: 'user',
-          targetId: userId,
-          targetEmail,
-          request,
-          apiEndpoint: '/api/admin/users/[userId]',
-          success: true,
-        });
         
         return NextResponse.json({
           success: true,
@@ -241,52 +147,24 @@ export async function PATCH(
       { status: 500 }
     );
   }
-}
+});
 
-// Delete user
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
-) {
-  const authCheck = await isAdminAuthorized(request);
-  
-  if (!authCheck.authorized) {
-    logAdminAccess(request, '/api/admin/users/[userId]/delete', false, authCheck.error);
-    return NextResponse.json(
-      { error: authCheck.error },
-      { status: authCheck.statusCode || 401 }
-    );
-  }
-  
-  logAdminAccess(request, '/api/admin/users/[userId]/delete', true);
+// Delete user (SENSITIVE - Requires admin)
+export const DELETE = withAdminAuth(
+  { action: 'USER_DELETE' },  // Auto 2FA if configured
+  async (request: NextRequest, auth, context) => {
+    const supabase = createServiceClient();
+    const { userId } = await context.params;
 
-  const supabase = createServiceClient();
-  const { userId } = await params;
-  const adminEmail = getAdminEmail(request);
-
-  // Get user email before deletion
-  const { data: { user: targetUser } } = await supabase.auth.admin.getUserById(userId);
-  const targetEmail = targetUser?.email || 'unknown';
+    // Get user email before deletion
+    const { data: { user: targetUser } } = await supabase.auth.admin.getUserById(userId);
+    const targetEmail = targetUser?.email || 'unknown';
 
   try {
     // Delete user (cascade will delete related records)
     const { error } = await supabase.auth.admin.deleteUser(userId);
     
     if (error) throw error;
-
-    // Log action
-    await logAdminAction({
-      adminEmail,
-      actionType: 'user_delete',
-      actionCategory: 'user_management',
-      actionDetails: { email: targetEmail },
-      targetType: 'user',
-      targetId: userId,
-      targetEmail,
-      request,
-      apiEndpoint: '/api/admin/users/[userId]',
-      success: true,
-    });
 
     return NextResponse.json({
       success: true,
@@ -295,26 +173,10 @@ export async function DELETE(
 
   } catch (error: any) {
     console.error('User deletion error:', error);
-    
-    // Log failed action
-    await logAdminAction({
-      adminEmail,
-      actionType: 'user_delete',
-      actionCategory: 'user_management',
-      actionDetails: { email: targetEmail },
-      targetType: 'user',
-      targetId: userId,
-      targetEmail,
-      request,
-      apiEndpoint: '/api/admin/users/[userId]',
-      success: false,
-      errorMessage: error.message,
-    });
-    
     return NextResponse.json(
       { error: 'Failed to delete user', details: error.message },
       { status: 500 }
     );
   }
-}
+});
 

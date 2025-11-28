@@ -2,26 +2,18 @@
  * Suspicious Activities API
  * 
  * Monitor and review suspicious user behavior
+ * 
+ * 🔒 SECURITY: Session-based admin auth with auto audit logging
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/service';
-import { isAdminAuthorized, logAdminAccess } from '@/lib/admin-auth';
+import { withAdminAuth } from '@/lib/admin';
 
-export async function GET(request: NextRequest) {
-  const authCheck = await isAdminAuthorized(request);
-  
-  if (!authCheck.authorized) {
-    logAdminAccess(request, '/api/admin/suspicious', false, authCheck.error);
-    return NextResponse.json(
-      { error: authCheck.error },
-      { status: authCheck.statusCode || 401 }
-    );
-  }
-  
-  logAdminAccess(request, '/api/admin/suspicious', true);
-
-  const supabase = createServiceClient();
+export const GET = withAdminAuth(
+  { action: 'SUSPICIOUS_ACTIVITIES_VIEW' },
+  async (request: NextRequest, auth) => {
+    const supabase = createServiceClient();
   const { searchParams } = new URL(request.url);
   
   const limit = parseInt(searchParams.get('limit') || '50');
@@ -73,21 +65,14 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});
 
 // Mark as reviewed
-export async function POST(request: NextRequest) {
-  const authCheck = await isAdminAuthorized(request);
-  
-  if (!authCheck.authorized) {
-    return NextResponse.json(
-      { error: authCheck.error },
-      { status: authCheck.statusCode || 401 }
-    );
-  }
-
-  const supabase = createServiceClient();
-  const { activityId, action } = await request.json();
+export const POST = withAdminAuth(
+  { action: 'SUSPICIOUS_ACTIVITIES_REVIEW', requireBody: true },
+  async (request: NextRequest, auth) => {
+    const supabase = createServiceClient();
+    const { activityId, action } = await request.json();
 
   try {
     const { error } = await supabase
@@ -109,5 +94,5 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});
 

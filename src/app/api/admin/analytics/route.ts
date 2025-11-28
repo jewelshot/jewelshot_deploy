@@ -2,26 +2,18 @@
  * Analytics API
  * 
  * System-wide analytics: popular presets, actions, prompts, trends
+ * 
+ * 🔒 SECURITY: Session-based admin auth with auto audit logging
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/service';
-import { isAdminAuthorized, logAdminAccess } from '@/lib/admin-auth';
+import { withAdminAuth } from '@/lib/admin';
 
-export async function GET(request: NextRequest) {
-  const authCheck = await isAdminAuthorized(request);
-  
-  if (!authCheck.authorized) {
-    logAdminAccess(request, '/api/admin/analytics', false, authCheck.error);
-    return NextResponse.json(
-      { error: authCheck.error },
-      { status: authCheck.statusCode || 401 }
-    );
-  }
-  
-  logAdminAccess(request, '/api/admin/analytics', true);
-
-  const supabase = createServiceClient();
+export const GET = withAdminAuth(
+  { action: 'ANALYTICS_VIEW' },
+  async (request: NextRequest, auth) => {
+    const supabase = createServiceClient();
   const { searchParams } = new URL(request.url);
   const period = searchParams.get('period') || '30d'; // 1d, 7d, 30d, all
 
@@ -162,5 +154,5 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});
 
