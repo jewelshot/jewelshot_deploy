@@ -1,11 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
-import { 
-  globalRateLimit, 
-  getClientIp, 
-  checkRateLimit,
-  checkRateLimitEnhanced, // Enhanced: auto-detects user type
-} from '@/lib/rate-limit';
+// Rate limiting disabled in middleware (Edge runtime limitation)
+// Rate limiting is handled in individual API routes instead
 
 // ============================================
 // 🔒 MAINTENANCE MODE CONFIGURATION
@@ -30,34 +26,36 @@ export async function middleware(request: NextRequest) {
   // ============================================
   // 🚦 GLOBAL RATE LIMITING (First Priority)
   // ============================================
+  // DISABLED: Middleware runs in Edge runtime, cannot use cookies()
+  // Rate limiting moved to individual API routes
   // Skip rate limiting for static assets and health checks
-  const skipRateLimit = 
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/api/health') ||
-    pathname.includes('.');
+  // const skipRateLimit = 
+  //   pathname.startsWith('/_next') ||
+  //   pathname.startsWith('/api/health') ||
+  //   pathname.includes('.');
 
-  if (!skipRateLimit && globalRateLimit) {
-    const ip = getClientIp(request);
-    const { success, limit, remaining, reset } = await checkRateLimit(ip, globalRateLimit);
+  // if (!skipRateLimit && globalRateLimit) {
+  //   const ip = getClientIp(request);
+  //   const { success, limit, remaining, reset } = await checkRateLimit(ip, globalRateLimit);
 
-    if (!success) {
-      return new NextResponse(
-        JSON.stringify({
-          error: 'Rate limit exceeded',
-          message: 'Too many requests. Please try again later.',
-        }),
-        {
-          status: 429,
-          headers: {
-            'Content-Type': 'application/json',
-            'X-RateLimit-Limit': limit?.toString() || '0',
-            'X-RateLimit-Remaining': remaining?.toString() || '0',
-            'X-RateLimit-Reset': reset?.toString() || '0',
-          },
-        }
-      );
-    }
-  }
+  //   if (!success) {
+  //     return new NextResponse(
+  //       JSON.stringify({
+  //         error: 'Rate limit exceeded',
+  //         message: 'Too many requests. Please try again later.',
+  //       }),
+  //       {
+  //         status: 429,
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           'X-RateLimit-Limit': limit?.toString() || '0',
+  //           'X-RateLimit-Remaining': remaining?.toString() || '0',
+  //           'X-RateLimit-Reset': reset?.toString() || '0',
+  //         },
+  //       }
+  //     );
+  //   }
+  // }
 
   // ============================================
   // 🚧 MAINTENANCE MODE CHECK (First Priority)
