@@ -32,6 +32,9 @@ import { UserDetailModal } from '@/components/admin/molecules/UserDetailModal';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/useToast';
 import { Toast } from '@/components/atoms/Toast';
+import { AuditLogsViewer } from '@/components/admin/organisms/AuditLogsViewer';
+import { BackupManager } from '@/components/admin/organisms/BackupManager';
+import ErrorBoundary from '@/components/organisms/ErrorBoundary';
 
 // 🚀 PERFORMANCE: Lazy load heavy chart components
 const OperationsChart = dynamic(
@@ -76,7 +79,7 @@ export default function AdminDashboard() {
   // UI states
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [showUserDetail, setShowUserDetail] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'charts'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'charts' | 'audit' | 'backups'>('overview');
 
   // ============================================
   // 🔐 AUTHENTICATION CHECK
@@ -426,8 +429,9 @@ export default function AdminDashboard() {
   // ✅ ADMIN DASHBOARD (Authenticated)
   // ============================================
   return (
-    <div className="h-screen w-screen overflow-y-auto bg-[#0a0a0a]">
-      <div className="mx-auto max-w-[1920px] space-y-6 p-6 pb-12">
+    <ErrorBoundary>
+      <div className="h-screen w-screen overflow-y-auto bg-[#0a0a0a]">
+        <div className="mx-auto max-w-[1920px] space-y-6 p-6 pb-12">
         
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -490,6 +494,28 @@ export default function AdminDashboard() {
             }`}
           >
             Analytics
+          </button>
+          <button
+            onClick={() => setActiveTab('audit')}
+            className={`px-4 py-2 text-sm font-medium transition-colors ${
+              activeTab === 'audit'
+                ? 'border-b-2 border-purple-500 text-white'
+                : 'text-white/60 hover:text-white'
+            }`}
+          >
+            <Shield className="inline mr-1 h-4 w-4" />
+            Audit Logs
+          </button>
+          <button
+            onClick={() => setActiveTab('backups')}
+            className={`px-4 py-2 text-sm font-medium transition-colors ${
+              activeTab === 'backups'
+                ? 'border-b-2 border-purple-500 text-white'
+                : 'text-white/60 hover:text-white'
+            }`}
+          >
+            <Database className="inline mr-1 h-4 w-4" />
+            Backups
           </button>
         </div>
 
@@ -600,6 +626,20 @@ export default function AdminDashboard() {
           </div>
         )}
 
+        {/* Audit Logs Tab */}
+        {activeTab === 'audit' && (
+          <div className="space-y-6">
+            <AuditLogsViewer />
+          </div>
+        )}
+
+        {/* Backups Tab */}
+        {activeTab === 'backups' && (
+          <div className="space-y-6">
+            <BackupManager />
+          </div>
+        )}
+
         {/* User Detail Modal */}
         {showUserDetail && selectedUser && (
           <UserDetailModal
@@ -611,15 +651,16 @@ export default function AdminDashboard() {
           />
         )}
 
-        {/* Toast Notifications */}
-        {toastState.visible && (
-          <Toast
-            message={toastState.message}
-            type={toastState.type}
-            onClose={hideToast}
-          />
-        )}
+          {/* Toast Notifications */}
+          {toastState.visible && (
+            <Toast
+              message={toastState.message}
+              type={toastState.type}
+              onClose={hideToast}
+            />
+          )}
+        </div>
       </div>
-    </div>
+    </ErrorBoundary>
   );
 }

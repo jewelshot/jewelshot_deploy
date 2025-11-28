@@ -14,11 +14,8 @@ import { createScopedLogger } from '@/lib/logger';
 
 const logger = createScopedLogger('BackupManager');
 
-interface BackupManagerProps {
-  authKey: string;
-}
-
-export function BackupManager({ authKey }: BackupManagerProps) {
+// ✅ No props needed - uses session-based auth
+export function BackupManager() {
   const [loading, setLoading] = useState(true);
   const [triggering, setTriggering] = useState(false);
   const [backups, setBackups] = useState<any[]>([]);
@@ -31,8 +28,10 @@ export function BackupManager({ authKey }: BackupManagerProps) {
   const fetchBackups = async () => {
     try {
       setLoading(true);
-      const headers = { Authorization: `Bearer ${authKey}` };
-      const res = await fetch('/api/admin/backup', { headers });
+      // ✅ Session-based auth - no header needed
+      const res = await fetch('/api/admin/backup', {
+        credentials: 'include', // Include session cookies
+      });
       
       if (!res.ok) throw new Error('Failed to fetch backups');
 
@@ -51,14 +50,13 @@ export function BackupManager({ authKey }: BackupManagerProps) {
     
     try {
       setTriggering(true);
-      const headers = {
-        Authorization: `Bearer ${authKey}`,
-        'Content-Type': 'application/json',
-      };
-      
+      // ✅ Session-based auth - no Authorization header needed
       const res = await fetch('/api/admin/backup', {
         method: 'POST',
-        headers,
+        credentials: 'include', // Include session cookies
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ reason }),
       });
 

@@ -29,11 +29,8 @@ interface AuditLog {
   created_at: string;
 }
 
-interface AuditLogsViewerProps {
-  authKey: string;
-}
-
-export function AuditLogsViewer({ authKey }: AuditLogsViewerProps) {
+// ✅ No props needed - uses session-based auth
+export function AuditLogsViewer() {
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState<any>(null);
@@ -47,7 +44,7 @@ export function AuditLogsViewer({ authKey }: AuditLogsViewerProps) {
   const fetchLogs = async () => {
     try {
       setLoading(true);
-      const headers = { Authorization: `Bearer ${authKey}` };
+      // ✅ Session-based auth - no header needed
       const url = new URL('/api/admin/audit-logs', window.location.origin);
       url.searchParams.set('limit', '100');
       
@@ -55,7 +52,9 @@ export function AuditLogsViewer({ authKey }: AuditLogsViewerProps) {
         url.searchParams.set('action_category', filterCategory);
       }
 
-      const res = await fetch(url.toString(), { headers });
+      const res = await fetch(url.toString(), {
+        credentials: 'include', // Include session cookies
+      });
       if (!res.ok) throw new Error('Failed to fetch logs');
 
       const data = await res.json();
