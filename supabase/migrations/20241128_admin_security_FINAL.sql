@@ -148,6 +148,11 @@ CREATE POLICY "No one can delete audit logs"
 -- STEP 5: CREATE HELPER FUNCTIONS
 -- ============================================
 
+-- Drop existing functions first (if any)
+DROP FUNCTION IF EXISTS get_user_role(UUID);
+DROP FUNCTION IF EXISTS is_admin(UUID);
+DROP FUNCTION IF EXISTS log_admin_action(UUID, VARCHAR, VARCHAR, UUID, VARCHAR, TEXT, VARCHAR, TEXT, JSONB, INTEGER, BOOLEAN, TEXT, JSONB);
+
 -- Function 1: Get user role (convenience function)
 CREATE OR REPLACE FUNCTION get_user_role(user_id UUID)
 RETURNS VARCHAR(20)
