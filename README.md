@@ -40,6 +40,7 @@ Jewelshot is a production-ready SaaS platform for AI-powered image processing wi
 - Anti-abuse detection
 - GDPR/CCPA compliant
 - Admin authentication
+- Google OAuth integration
 
 **📧 Notifications:**
 - Email system (Resend)
@@ -130,6 +131,7 @@ Before deploying, read these essential guides:
 1. **[Environment Variables](./ENV_VARIABLES.md)** - Complete setup guide
 2. **[Migration Guide](./MIGRATION_GUIDE.md)** - Database migrations
 3. **[Worker Deployment](./WORKER_DEPLOYMENT.md)** - Railway worker setup
+4. **[Google OAuth Setup](./GOOGLE_OAUTH_SETUP.md)** - Google sign-in configuration
 4. **[Redis Setup](./REDIS_SETUP.md)** - Upstash configuration
 5. **[Email Setup](./EMAIL_SETUP_GUIDE.md)** - Resend integration
 

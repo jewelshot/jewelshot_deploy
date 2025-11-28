@@ -82,6 +82,18 @@ For internal service-to-service communication:
 INTERNAL_API_SECRET=your-internal-api-secret-min-32-chars
 ```
 
+### **Google OAuth (Optional but Recommended)**
+
+Setup guide: [GOOGLE_OAUTH_SETUP.md](./GOOGLE_OAUTH_SETUP.md)
+
+**Note:** Google credentials are configured in Supabase Dashboard, not .env  
+You only need to enable the provider in Supabase and add your Google OAuth credentials there.
+
+```bash
+# No environment variables needed - handled by Supabase
+# Just follow GOOGLE_OAUTH_SETUP.md to configure
+```
+
 ---
 
 ## 🟢 **OPTIONAL VARIABLES**

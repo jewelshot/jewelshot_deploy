@@ -202,7 +202,10 @@ export async function middleware(request: NextRequest) {
       ('confirmed_at' in user &&
         (user as { confirmed_at?: string }).confirmed_at);
 
-    if (!isEmailVerified) {
+    // Auto-verify OAuth users (Google, GitHub, etc.)
+    const isOAuthUser = user.app_metadata?.provider && user.app_metadata.provider !== 'email';
+
+    if (!isEmailVerified && !isOAuthUser) {
       const url = request.nextUrl.clone();
       url.pathname = '/auth/verify-email';
       url.searchParams.set('redirectTo', request.nextUrl.pathname);
