@@ -15,6 +15,7 @@ import { useSidebarStore } from '@/store/sidebarStore';
 import { useImageMetadataStore } from '@/store/imageMetadataStore';
 import { useCatalogueStore } from '@/store/catalogueStore';
 import { createScopedLogger } from '@/lib/logger';
+import { FEATURE_FLAGS } from '@/lib/feature-flags';
 import type { ImageMetadata, FavoriteImage } from '@/types/image-metadata';
 import { ImageMetadataModal } from '@/components/molecules/ImageMetadataModal';
 import CatalogueRightSidebar from '@/components/organisms/CatalogueRightSidebar';
@@ -54,58 +55,69 @@ const logger = createScopedLogger('Catalogue');
 export default function CatalogueContent() {
   const { leftOpen } = useSidebarStore();
   
-  // BYPASS ZUSTAND - Read directly from localStorage
-  const [favorites, setFavorites] = useState<FavoriteImage[]>([]);
-  const [metadata, setMetadata] = useState<Record<string, ImageMetadata>>({});
-  const [isLoadingFavorites, setIsLoadingFavorites] = useState(true); // Loading state
+  // ============================================
+  // STATE MANAGEMENT - Feature Flag Controlled
+  // ============================================
   
-  // DEBUG: Show what we're loading
-  const [debugInfo, setDebugInfo] = useState<string>('Loading...');
+  // NEW SYSTEM: Zustand-only (persist middleware auto-loads)
+  const zustandFavorites = useImageMetadataStore((state) => state.favorites);
+  const zustandMetadata = useImageMetadataStore((state) => state.metadata);
   
-  // Load from localStorage on mount
+  // OLD SYSTEM: localStorage bypass (DEPRECATED)
+  const [legacyFavorites, setLegacyFavorites] = useState<FavoriteImage[]>([]);
+  const [legacyMetadata, setLegacyMetadata] = useState<Record<string, ImageMetadata>>({});
+  const [isLoadingFavorites, setIsLoadingFavorites] = useState(true);
+  
+  // Choose which system to use based on feature flag
+  const favorites = FEATURE_FLAGS.USE_ZUSTAND_ONLY ? zustandFavorites : legacyFavorites;
+  const metadata = FEATURE_FLAGS.USE_ZUSTAND_ONLY ? zustandMetadata : legacyMetadata;
+  
+  // Load from localStorage on mount (LEGACY MODE ONLY)
   useEffect(() => {
-    logger.debug('Catalogue component mounting');
+    if (FEATURE_FLAGS.USE_ZUSTAND_ONLY) {
+      // ✅ NEW SYSTEM: Zustand persist middleware auto-loads
+      logger.debug('Catalogue mounting (Zustand-only mode)');
+      localStorage.removeItem('jewelshot-catalogue'); // Cleanup stale
+      setIsLoadingFavorites(false);
+      
+      logger.info('Favorites loaded from Zustand', {
+        favorites: zustandFavorites.length,
+        metadata: Object.keys(zustandMetadata).length,
+      });
+      return;
+    }
+    
+    // ❌ OLD SYSTEM: Manual localStorage bypass (DEPRECATED)
+    logger.debug('Catalogue mounting (legacy localStorage mode)');
     setIsLoadingFavorites(true);
     
     // Clear stale catalogue store
-    logger.debug('Clearing stale catalogueStore imageOrder');
     localStorage.removeItem('jewelshot-catalogue');
     
     try {
       const stored = localStorage.getItem('jewelshot-image-metadata');
-      logger.debug('LocalStorage key exists:', !!stored);
       
       if (stored) {
         const parsed = JSON.parse(stored);
-        
         const stateFavorites = parsed?.state?.favorites || [];
         const stateMetadata = parsed?.state?.metadata || {};
         
-        logger.debug('Favorites loaded', {
-          count: stateFavorites.length,
-          metadataCount: Object.keys(stateMetadata).length,
-        });
+        setLegacyFavorites(stateFavorites);
+        setLegacyMetadata(stateMetadata);
         
-        setFavorites(stateFavorites);
-        setMetadata(stateMetadata);
-        setDebugInfo(`✅ Loaded: ${stateFavorites.length} favorites, ${Object.keys(stateMetadata).length} metadata`);
-        
-        logger.info('Loaded from localStorage', {
+        logger.info('Loaded from localStorage (legacy)', {
           favorites: stateFavorites.length,
           metadata: Object.keys(stateMetadata).length,
         });
       } else {
-        logger.debug('No localStorage data found');
-        setDebugInfo('❌ No localStorage data found');
         logger.warn('No localStorage data found');
       }
     } catch (error) {
       logger.error('Failed to load from localStorage', error);
-      setDebugInfo(`❌ Error: ${error}`);
     } finally {
       setIsLoadingFavorites(false);
     }
-  }, []);
+  }, [zustandFavorites.length, zustandMetadata]);
   
   const {
     settings,
@@ -259,17 +271,6 @@ export default function CatalogueContent() {
         bottom: '16px',
       }}
     >
-      {/* DEBUG BANNER */}
-      <div className="rounded-lg border-2 border-green-500 bg-green-500/20 p-4">
-        <p className="text-sm font-mono text-green-200">{debugInfo}</p>
-        <p className="text-xs font-mono text-green-300 mt-1">
-          ✅ Favorites: {favorites.length} | Images Ready: {imagesWithUrls.length} | Displaying: {orderedImages.length}
-        </p>
-        <p className="text-xs font-mono text-green-300 mt-1">
-          🎉 SIMPLIFIED - No more ordering bullshit, just showing images!
-        </p>
-      </div>
-      
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

@@ -1,7 +1,4 @@
 /**
-import { createScopedLogger } from '@/lib/logger';
-const logger = createScopedLogger('BackupManager');
-
  * Backup Manager
  * 
  * View backup history and trigger manual backups
@@ -13,6 +10,9 @@ import { useState, useEffect } from 'react';
 import { Database, Download, Clock, CheckCircle, AlertCircle, ExternalLink } from 'lucide-react';
 import { Badge } from '../atoms/Badge';
 import { format } from 'date-fns';
+import { createScopedLogger } from '@/lib/logger';
+
+const logger = createScopedLogger('BackupManager');
 
 interface BackupManagerProps {
   authKey: string;

@@ -1,7 +1,4 @@
 /**
-import { createScopedLogger } from '@/lib/logger';
-const logger = createScopedLogger('AuditLogsViewer');
-
  * Audit Logs Viewer
  * 
  * Display admin activity logs for security & compliance
@@ -13,6 +10,9 @@ import { useState, useEffect } from 'react';
 import { Shield, AlertCircle, CheckCircle, XCircle, Search } from 'lucide-react';
 import { Badge } from '../atoms/Badge';
 import { format } from 'date-fns';
+import { createScopedLogger } from '@/lib/logger';
+
+const logger = createScopedLogger('AuditLogsViewer');
 
 interface AuditLog {
   id: string;

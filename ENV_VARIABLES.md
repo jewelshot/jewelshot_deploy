@@ -225,12 +225,37 @@ node -e "console.log({
 
 ---
 
+## 🚩 **Feature Flags (Optional - For Safe Rollouts)**
+
+Used for gradual feature rollouts and instant rollback. Toggle in Vercel dashboard.
+
+```bash
+# State Management Unification
+NEXT_PUBLIC_USE_ZUSTAND_ONLY=false  # Default: false (legacy mode)
+# Set to 'true' to use Zustand-only (recommended)
+```
+
+**When to use:**
+- Deploying new features
+- A/B testing
+- Gradual user rollouts
+- Instant rollback capability
+
+**How to toggle:**
+1. Go to Vercel Dashboard → Project → Settings → Environment Variables
+2. Find variable (e.g., `NEXT_PUBLIC_USE_ZUSTAND_ONLY`)
+3. Edit value (`true` or `false`)
+4. Redeploy (automatic, takes ~30 seconds)
+
+---
+
 ## 📚 **Related Documentation**
 
 - [Supabase Setup](./supabase/README.md)
 - [Redis Setup](./REDIS_SETUP.md)
 - [Worker Deployment](./WORKER_DEPLOYMENT.md)
 - [Migration Guide](./MIGRATION_GUIDE.md)
+- [Safe Refactoring Guide](./GÜVENLİ_REFACTORING_PLANI.md)
 
 ---
 

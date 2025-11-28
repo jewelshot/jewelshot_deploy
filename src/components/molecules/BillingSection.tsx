@@ -1,6 +1,4 @@
 /**
-import { createScopedLogger } from '@/lib/logger';
-const logger = createScopedLogger('BillingSection');
 
  * BillingSection Component
  *
@@ -20,6 +18,9 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { useCreditStore } from '@/store/creditStore';
+import { createScopedLogger } from '@/lib/logger';
+
+const logger = createScopedLogger('BillingSection');
 
 interface BillingInfo {
   plan: string;
