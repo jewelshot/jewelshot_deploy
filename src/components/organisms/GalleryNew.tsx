@@ -4,11 +4,8 @@
  * Refactored from 987 lines to maintainable sub-components
  * Feature flag controlled for safe rollout
  * 
- * Strategy: Start simple, add features incrementally
  * Phase 1: Basic image grid ✅
- * Phase 2: Tabs (images, batches, favorites)
- * Phase 3: Search & filters
- * Phase 4: Batch management
+ * Phase 2: Full features (Download, Delete, Favorites, Metadata) ⚡
  */
 
 'use client';
@@ -19,9 +16,13 @@ import { useSidebarStore } from '@/store/sidebarStore';
 import GalleryToolbar from '@/components/molecules/GalleryToolbar';
 import GalleryGrid, { GalleryImage } from '@/components/molecules/GalleryGrid';
 import { SortOption } from '@/components/atoms/SortButton';
-import { getSavedImages } from '@/lib/gallery-storage';
+import { getSavedImages, deleteImageFromGallery } from '@/lib/gallery-storage';
 import { createScopedLogger } from '@/lib/logger';
 import { ImageCardSkeleton } from '@/components/atoms/ImageCardSkeleton';
+import { downloadImageWithBlob, generateImageFilename } from '@/lib/download-utils';
+import { toast } from 'sonner';
+import { useImageMetadataStore } from '@/store/imageMetadataStore';
+import { ImageMetadataModal } from '@/components/molecules/ImageMetadataModal';
 
 const logger = createScopedLogger('GalleryNew');
 
@@ -35,6 +36,9 @@ export function GalleryNew() {
   const router = useRouter();
   const { leftOpen } = useSidebarStore();
   
+  // Zustand stores
+  const { favorites, addToFavorites, removeFromFavorites, isFavorite: isImageFavorite, getFavoriteOrder: getFavoriteOrderFromStore, metadata, setMetadata } = useImageMetadataStore();
+  
   // State
   const [activeTab, setActiveTab] = useState<GalleryTab>('images');
   const [searchValue, setSearchValue] = useState('');
@@ -43,6 +47,10 @@ export function GalleryNew() {
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(20);
+  
+  // Modal state
+  const [metadataModalImage, setMetadataModalImage] = useState<GalleryImage | null>(null);
+  const [isMetadataModalOpen, setIsMetadataModalOpen] = useState(false);
   
   // Load images
   useEffect(() => {
@@ -72,6 +80,11 @@ export function GalleryNew() {
   
   // Filter images
   const filteredImages = images.filter((img) => {
+    // Filter by tab
+    if (activeTab === 'favorites' && !isFavorite(img.id)) {
+      return false;
+    }
+    
     // Filter by type
     if (activeFilter !== 'all' && img.type !== activeFilter) {
       return false;
@@ -114,32 +127,121 @@ export function GalleryNew() {
   };
   
   const handleView = (image: GalleryImage) => {
-    // View modal - Phase 2
-    logger.info('View image', { id: image.id });
+    // Open metadata modal for viewing details
+    setMetadataModalImage(image);
+    setIsMetadataModalOpen(true);
   };
   
-  const handleDownload = (image: GalleryImage) => {
-    // Download - Phase 2
-    logger.info('Download image', { id: image.id });
+  const handleDownload = async (image: GalleryImage) => {
+    try {
+      const filename = image.alt || generateImageFilename(image.id, undefined, image.createdAt);
+      await downloadImageWithBlob(image.src, filename);
+      toast.success(`Downloaded: ${filename}`);
+      logger.info('Downloaded image', { id: image.id, filename });
+    } catch (error) {
+      logger.error('Download failed', error);
+      toast.error('Failed to download image');
+    }
   };
   
-  const handleDelete = (image: GalleryImage) => {
-    // Delete - Phase 2
-    logger.info('Delete image', { id: image.id });
-    loadImages();
+  const handleDelete = async (image: GalleryImage) => {
+    const confirmed = window.confirm(
+      `Delete "${image.alt || 'this image'}"?\n\nThis action cannot be undone.`
+    );
+    
+    if (!confirmed) return;
+    
+    try {
+      await deleteImageFromGallery(image.id);
+      toast.success('Image deleted');
+      logger.info('Deleted image', { id: image.id });
+      await loadImages(); // Reload images
+    } catch (error) {
+      logger.error('Delete failed', error);
+      toast.error('Failed to delete image');
+    }
   };
   
   const handleToggleFavorite = (image: GalleryImage) => {
-    // Favorite - Phase 2
-    logger.info('Toggle favorite', { id: image.id });
+    const isFav = isImageFavorite(image.id);
+    
+    if (isFav) {
+      removeFromFavorites(image.id);
+      toast.success('Removed from favorites');
+    } else {
+      const success = addToFavorites(image.id);
+      if (success) {
+        toast.success('Added to favorites');
+      } else {
+        toast.error('Could not add to favorites');
+      }
+    }
+    
+    logger.info('Toggled favorite', { id: image.id, isFavorite: !isFav });
+  };
+  
+  const handleEditMetadata = (image: GalleryImage) => {
+    setMetadataModalImage(image);
+    setIsMetadataModalOpen(true);
   };
   
   const handleLoadMore = () => {
     setVisibleCount((prev) => prev + 20);
   };
   
+  // Check if image is favorite (wrapper for store method)
+  const isFavorite = (imageId: string): boolean => {
+    return isImageFavorite(imageId);
+  };
+  
+  // Get favorite order (wrapper for store method)
+  const getFavoriteOrder = (imageId: string): number => {
+    return getFavoriteOrderFromStore(imageId);
+  };
+  
+  // Check if image has metadata
+  const hasMetadata = (imageId: string): boolean => {
+    return !!metadata[imageId];
+  };
+  
   return (
     <div className="flex h-full w-full flex-col overflow-hidden">
+      {/* Tab Switcher */}
+      <div className="flex gap-2 border-b border-white/10 bg-black/50 px-6 py-3">
+        <button
+          onClick={() => setActiveTab('images')}
+          className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === 'images'
+              ? 'bg-purple-500 text-white'
+              : 'bg-white/10 text-white/70 hover:bg-white/20'
+          }`}
+        >
+          Images ({images.length})
+        </button>
+        <button
+          onClick={() => setActiveTab('favorites')}
+          className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === 'favorites'
+              ? 'bg-purple-500 text-white'
+              : 'bg-white/10 text-white/70 hover:bg-white/20'
+          }`}
+        >
+          ⭐ Favorites ({favorites.length})
+        </button>
+        <button
+          onClick={() => setActiveTab('batches')}
+          className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+            activeTab === 'batches'
+              ? 'bg-purple-500 text-white'
+              : 'bg-white/10 text-white/70 hover:bg-white/20'
+          }`}
+          disabled
+          title="Coming soon"
+        >
+          Batches (Coming soon)
+        </button>
+      </div>
+      
       {/* Toolbar */}
       <GalleryToolbar
         searchValue={searchValue}
@@ -195,6 +297,10 @@ export function GalleryNew() {
               onDownload={handleDownload}
               onDelete={handleDelete}
               onToggleFavorite={handleToggleFavorite}
+              onEditMetadata={handleEditMetadata}
+              isFavorite={isFavorite}
+              getFavoriteOrder={getFavoriteOrder}
+              hasMetadata={hasMetadata}
             />
             
             {/* Load More Button */}
@@ -214,9 +320,24 @@ export function GalleryNew() {
       
       {/* Status Footer */}
       <div className="border-t border-white/10 bg-black/50 px-6 py-3 text-sm text-white/70">
-        Modular Gallery Phase 1 ✅ • {filteredImages.length} images
+        Modular Gallery Phase 2 ✅ • {filteredImages.length} images
         {filteredImages.length !== images.length && ` (${images.length} total)`}
+        {activeTab === 'favorites' && ` • ${favorites.length} favorites`}
       </div>
+      
+      {/* Image Metadata Modal */}
+      {metadataModalImage && (
+        <ImageMetadataModal
+          isOpen={isMetadataModalOpen}
+          onClose={() => {
+            setIsMetadataModalOpen(false);
+            setMetadataModalImage(null);
+          }}
+          imageId={metadataModalImage.id}
+          imageSrc={metadataModalImage.src}
+          currentFileName={metadataModalImage.alt || 'Untitled'}
+        />
+      )}
     </div>
   );
 }
