@@ -1,11 +1,11 @@
 /**
  * Health Check Endpoint
  * 
- * Monitors system health for uptime monitoring (UptimeRobot)
+ * Simple health check for uptime monitoring (UptimeRobot, etc.)
+ * Checks: Database connectivity, environment variables
  */
 
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/redis';
 import { createServiceClient } from '@/lib/supabase/service';
 
 export const dynamic = 'force-dynamic';
@@ -14,32 +14,19 @@ export const runtime = 'nodejs';
 export async function GET() {
   const checks = {
     status: 'healthy' as 'healthy' | 'degraded' | 'unhealthy',
-    timestamp: Date.now(),
+    timestamp: new Date().toISOString(),
     version: '1.0.0',
     services: {
-      redis: false,
-      supabase: false,
-      worker: false,
+      database: false,
+      environment: false,
     },
     details: {
-      redis: '',
-      supabase: '',
-      worker: '',
+      database: '',
+      environment: '',
     },
   };
 
-  // Check Redis
-  try {
-    const redis = createClient();
-    await redis.ping();
-    checks.services.redis = true;
-    checks.details.redis = 'Connected';
-  } catch (error: any) {
-    checks.status = 'degraded';
-    checks.details.redis = error.message || 'Connection failed';
-  }
-
-  // Check Supabase
+  // Check Database (Supabase)
   try {
     const supabase = createServiceClient();
     const { error } = await supabase
@@ -47,46 +34,38 @@ export async function GET() {
       .select('id')
       .limit(1);
     
-    checks.services.supabase = !error;
-    checks.details.supabase = error ? error.message : 'Connected';
+    checks.services.database = !error;
+    checks.details.database = error ? error.message : 'Connected';
     
     if (error) {
-      checks.status = 'degraded';
+      checks.status = 'unhealthy';
     }
   } catch (error: any) {
-    checks.status = 'degraded';
-    checks.services.supabase = false;
-    checks.details.supabase = error.message || 'Connection failed';
-  }
-
-  // Check Worker health (via last heartbeat)
-  try {
-    const redis = createClient();
-    const queueLength = await redis.llen('ai-queue');
-    const lastHeartbeat = await redis.get('worker:heartbeat');
-    
-    const workerAlive = lastHeartbeat && 
-      (Date.now() - parseInt(lastHeartbeat)) < 120000; // 2 minutes
-    
-    checks.services.worker = workerAlive;
-    checks.details.worker = workerAlive 
-      ? `Active - Queue: ${queueLength}` 
-      : `No heartbeat - Queue: ${queueLength}`;
-    
-    // Worker down is degraded, not critical
-    if (!workerAlive) {
-      checks.status = 'degraded';
-    }
-  } catch (error: any) {
-    // Worker check is optional
-    checks.details.worker = error.message || 'Check failed';
-  }
-
-  // Determine overall status
-  if (!checks.services.redis || !checks.services.supabase) {
     checks.status = 'unhealthy';
+    checks.services.database = false;
+    checks.details.database = error.message || 'Connection failed';
   }
 
+  // Check Environment Variables
+  const requiredEnvVars = [
+    'NEXT_PUBLIC_SUPABASE_URL',
+    'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+    'SUPABASE_SERVICE_ROLE_KEY',
+    'FAL_AI_KEY_1',
+  ];
+
+  const missingVars = requiredEnvVars.filter(v => !process.env[v]);
+  
+  if (missingVars.length === 0) {
+    checks.services.environment = true;
+    checks.details.environment = 'All required variables set';
+  } else {
+    checks.services.environment = false;
+    checks.details.environment = `Missing: ${missingVars.join(', ')}`;
+    checks.status = 'degraded';
+  }
+
+  // Determine HTTP status code
   const statusCode = checks.status === 'healthy' ? 200 : 
                      checks.status === 'degraded' ? 200 : 503;
 
