@@ -1,79 +1,99 @@
-import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { getQueueStats } from '@/lib/queue/queues';
-
 /**
  * Health Check Endpoint
  * 
- * Returns system health status for monitoring
+ * Monitors system health for uptime monitoring (UptimeRobot)
  */
+
+import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/redis';
+import { createServiceClient } from '@/lib/supabase/service';
+
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function GET() {
-  const health = {
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    services: {} as Record<string, { status: string; latency?: number; error?: string }>,
+  const checks = {
+    status: 'healthy' as 'healthy' | 'degraded' | 'unhealthy',
+    timestamp: Date.now(),
+    version: '1.0.0',
+    services: {
+      redis: false,
+      supabase: false,
+      worker: false,
+    },
+    details: {
+      redis: '',
+      supabase: '',
+      worker: '',
+    },
   };
 
-  // ============================================
-  // 1. DATABASE CHECK
-  // ============================================
-  
+  // Check Redis
   try {
-    const start = Date.now();
-    const supabase = await createClient();
-    const { error } = await supabase.from('user_credits').select('user_id').limit(1);
-    const latency = Date.now() - start;
+    const redis = createClient();
+    await redis.ping();
+    checks.services.redis = true;
+    checks.details.redis = 'Connected';
+  } catch (error: any) {
+    checks.status = 'degraded';
+    checks.details.redis = error.message || 'Connection failed';
+  }
 
-    health.services.database = {
-      status: error ? 'unhealthy' : 'healthy',
-      latency,
-      error: error?.message,
-    };
-
+  // Check Supabase
+  try {
+    const supabase = createServiceClient();
+    const { error } = await supabase
+      .from('user_credits')
+      .select('id')
+      .limit(1);
+    
+    checks.services.supabase = !error;
+    checks.details.supabase = error ? error.message : 'Connected';
+    
     if (error) {
-      health.status = 'degraded';
+      checks.status = 'degraded';
     }
   } catch (error: any) {
-    health.services.database = {
-      status: 'unhealthy',
-      error: error.message,
-    };
-    health.status = 'degraded';
+    checks.status = 'degraded';
+    checks.services.supabase = false;
+    checks.details.supabase = error.message || 'Connection failed';
   }
 
-  // ============================================
-  // 2. QUEUE CHECK
-  // ============================================
-  
+  // Check Worker health (via last heartbeat)
   try {
-    const start = Date.now();
-    const stats = await getQueueStats();
-    const latency = Date.now() - start;
-
-    const hasQueues = stats && (stats.urgent || stats.normal || stats.background);
-
-    health.services.queue = {
-      status: hasQueues ? 'healthy' : 'unhealthy',
-      latency,
-    };
-
-    if (!hasQueues) {
-      health.status = 'degraded';
+    const redis = createClient();
+    const queueLength = await redis.llen('ai-queue');
+    const lastHeartbeat = await redis.get('worker:heartbeat');
+    
+    const workerAlive = lastHeartbeat && 
+      (Date.now() - parseInt(lastHeartbeat)) < 120000; // 2 minutes
+    
+    checks.services.worker = workerAlive;
+    checks.details.worker = workerAlive 
+      ? `Active - Queue: ${queueLength}` 
+      : `No heartbeat - Queue: ${queueLength}`;
+    
+    // Worker down is degraded, not critical
+    if (!workerAlive) {
+      checks.status = 'degraded';
     }
   } catch (error: any) {
-    health.services.queue = {
-      status: 'unhealthy',
-      error: error.message,
-    };
-    health.status = 'degraded';
+    // Worker check is optional
+    checks.details.worker = error.message || 'Check failed';
   }
 
-  // ============================================
-  // 3. RESPONSE
-  // ============================================
-  
-  const statusCode = health.status === 'healthy' ? 200 : 503;
+  // Determine overall status
+  if (!checks.services.redis || !checks.services.supabase) {
+    checks.status = 'unhealthy';
+  }
 
-  return NextResponse.json(health, { status: statusCode });
+  const statusCode = checks.status === 'healthy' ? 200 : 
+                     checks.status === 'degraded' ? 200 : 503;
+
+  return NextResponse.json(checks, { 
+    status: statusCode,
+    headers: {
+      'Cache-Control': 'no-store, no-cache, must-revalidate',
+    },
+  });
 }
-
