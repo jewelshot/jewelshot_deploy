@@ -1,4 +1,7 @@
 'use client';
+import { createScopedLogger } from '@/lib/logger';
+const logger = createScopedLogger('ImageViewer');
+
 
 import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { useImageSharpening } from '@/hooks/useImageSharpening';
@@ -143,7 +146,7 @@ export function ImageViewer({
   // Log extreme filter warning (once per change)
   useEffect(() => {
     if (extremeWarning) {
-      console.warn('⚠️ EXTREME FILTERS DETECTED:', extremeWarning);
+      logger.warn('⚠️ EXTREME FILTERS DETECTED:', extremeWarning);
     }
   }, [extremeWarning]);
 

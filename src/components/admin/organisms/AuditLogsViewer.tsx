@@ -1,4 +1,7 @@
 /**
+import { createScopedLogger } from '@/lib/logger';
+const logger = createScopedLogger('AuditLogsViewer');
+
  * Audit Logs Viewer
  * 
  * Display admin activity logs for security & compliance
@@ -59,7 +62,7 @@ export function AuditLogsViewer({ authKey }: AuditLogsViewerProps) {
       setLogs(data.logs || []);
       setSummary(data.summary);
     } catch (error) {
-      console.error('Failed to fetch audit logs:', error);
+      logger.error('Failed to fetch audit logs:', error);
     } finally {
       setLoading(false);
     }

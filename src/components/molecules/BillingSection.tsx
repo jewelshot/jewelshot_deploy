@@ -1,4 +1,7 @@
 /**
+import { createScopedLogger } from '@/lib/logger';
+const logger = createScopedLogger('BillingSection');
+
  * BillingSection Component
  *
  * Subscription and billing information.
@@ -54,7 +57,7 @@ export function BillingSection() {
           amount: '$0.00',
         });
       } catch (error) {
-        console.error('Error fetching billing:', error);
+        logger.error('Error fetching billing:', error);
       } finally {
         setLoading(false);
       }

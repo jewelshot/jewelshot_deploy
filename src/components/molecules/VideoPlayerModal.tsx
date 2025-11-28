@@ -7,6 +7,9 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { X, Download } from 'lucide-react';
+import { createScopedLogger } from '@/lib/logger';
+
+const logger = createScopedLogger('VideoPlayerModal');
 
 interface VideoPlayerModalProps {
   videoUrl: string;
@@ -28,7 +31,7 @@ export function VideoPlayerModal({ videoUrl, onClose }: VideoPlayerModalProps) {
   // Log video URL for debugging (only on client)
   useEffect(() => {
     if (isClient) {
-      console.log('[VideoPlayerModal] Opening with URL:', videoUrl);
+      logger.debug('VideoPlayerModal: Opening with URL:', videoUrl);
     }
   }, [videoUrl, isClient]);
 
@@ -40,7 +43,7 @@ export function VideoPlayerModal({ videoUrl, onClose }: VideoPlayerModalProps) {
     const errorMessage = error
       ? `Video error: ${error.code} - ${error.message}`
       : 'Unknown video error';
-    console.error('[VideoPlayerModal] Video error:', errorMessage);
+    logger.error('VideoPlayerModal: Video error:', errorMessage);
     setVideoError(errorMessage);
   };
 
@@ -57,7 +60,7 @@ export function VideoPlayerModal({ videoUrl, onClose }: VideoPlayerModalProps) {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (error) {
-      console.error('Download failed:', error);
+      logger.error('Download failed:', error);
     }
   };
 
@@ -123,10 +126,10 @@ export function VideoPlayerModal({ videoUrl, onClose }: VideoPlayerModalProps) {
               className="h-auto w-full"
               onError={handleVideoError}
               onLoadStart={() =>
-                console.log('[VideoPlayerModal] Video loading started')
+                logger.debug('VideoPlayerModal: Video loading started')
               }
               onLoadedData={() =>
-                console.log('[VideoPlayerModal] Video loaded successfully')
+                logger.debug('VideoPlayerModal: Video loaded successfully')
               }
             >
               Your browser does not support the video tag.

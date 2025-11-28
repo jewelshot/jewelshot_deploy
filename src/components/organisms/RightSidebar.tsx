@@ -16,6 +16,9 @@ import { SelectiveModeContent } from '@/components/molecules/SelectiveModeConten
 import { AdvancedModeContent } from '@/components/molecules/AdvancedModeContent';
 import { PresetConfirmModal } from '@/components/molecules/PresetConfirmModal';
 import { presetPrompts } from '@/lib/preset-prompts';
+import { createScopedLogger } from '@/lib/logger';
+
+const logger = createScopedLogger('RightSidebar');
 
 type Gender = 'women' | 'men' | null;
 type JewelryType = 'ring' | 'necklace' | 'earring' | 'bracelet' | null;
@@ -72,7 +75,7 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
   const handlePresetSelect = (presetId: string) => {
     const preset = presetPrompts[presetId];
     if (!preset) {
-      console.error('[RightSidebar] Preset not found:', presetId);
+      logger.error('RightSidebar: Preset not found:', presetId);
       return;
     }
 
@@ -94,13 +97,13 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
 
     if (!finalJewelryType) {
       // This shouldn't happen if modal handles it correctly
-      console.error('[RightSidebar] No jewelry type provided');
+      logger.error('RightSidebar: No jewelry type provided');
       return;
     }
 
     const preset = presetPrompts[confirmModal.presetId];
     if (!preset) {
-      console.error('[RightSidebar] Preset not found during generation:', confirmModal.presetId);
+      logger.error('RightSidebar: Preset not found during generation:', confirmModal.presetId);
       setConfirmModal(null);
       return;
     }

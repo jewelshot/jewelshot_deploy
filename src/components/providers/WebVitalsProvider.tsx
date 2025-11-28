@@ -1,4 +1,7 @@
 'use client';
+import { createScopedLogger } from '@/lib/logger';
+const logger = createScopedLogger('WebVitalsProvider');
+
 
 import { useReportWebVitals } from 'next/web-vitals';
 
@@ -39,7 +42,7 @@ export function WebVitalsProvider() {
         keepalive: true,
       }).catch((error) => {
         // Fail silently - don't break the app if analytics fail
-        console.error('Failed to send web vitals:', error);
+        logger.error('Failed to send web vitals:', error);
       });
     }
 

@@ -10,12 +10,15 @@ import type { BatchImage } from '@/components/molecules/BatchImageGrid';
 import { useSidebarStore } from '@/store/sidebarStore';
 import { useCreditStore } from '@/store/creditStore';
 import { toast } from 'sonner';
+import { createScopedLogger } from '@/lib/logger';
 import {
   saveBatchState,
   loadBatchState,
   clearBatchState,
   type BatchImageState,
 } from '@/lib/batch-state-storage';
+
+const logger = createScopedLogger('BatchPage');
 
 // Dynamic imports matching Studio page
 const Sidebar = dynamic(() => import('@/components/organisms/Sidebar'), {
@@ -74,7 +77,7 @@ export function BatchPage() {
     // Skip if already have images (avoid duplicates)
     if (images.length > 0) return;
 
-    console.log('[Batch] Restoring batch state...', {
+    logger.debug('Batch: Restoring batch state...', {
       imageCount: savedState.images.length,
       isProcessing: savedState.isProcessing,
     });
@@ -137,9 +140,9 @@ export function BatchPage() {
           isProcessing,
         });
 
-        console.log('[Batch] State auto-saved', { imageCount: imagesToSave.length });
+        logger.debug('Batch: State auto-saved', { imageCount: imagesToSave.length });
       } catch (error) {
-        console.error('[Batch] Failed to auto-save state:', error);
+        logger.error('Batch: Failed to auto-save state:', error);
       }
     }, 1000);
 
@@ -275,7 +278,7 @@ export function BatchPage() {
         
         // Check if it's a migration issue (500 error)
         if (response.status === 500) {
-          console.error('[Batch] ❌ Database migration required!');
+          logger.error('Batch: ❌ Database migration required!');
           toast.error('⚠️ Database setup required! Redirecting...');
           setIsProcessing(false);
           
@@ -293,9 +296,9 @@ export function BatchPage() {
       batchProjectId = data.project.id;
       
       toast.success('Batch project created! Uploading images...');
-      console.log('[Batch] Project created:', batchProjectId);
+      logger.debug('Batch: Project created:', batchProjectId);
     } catch (error) {
-      console.error('[Batch] Failed to create project:', error);
+      logger.error('Batch: Failed to create project:', error);
       toast.error('Failed to create batch project');
       setIsProcessing(false);
       return;
@@ -340,7 +343,7 @@ export function BatchPage() {
       }
 
       const uploadData = await uploadResponse.json();
-      console.log('[Batch] Images uploaded:', uploadData);
+      logger.debug('Batch: Images uploaded:', uploadData);
       toast.success(`${uploadData.uploaded} images uploaded! Starting AI processing...`);
       
       // 🚀 STEP 3: Start background polling loop
@@ -348,7 +351,7 @@ export function BatchPage() {
         startBackgroundProcessing(batchProjectId);
       }
     } catch (error) {
-      console.error('[Batch] Failed to upload images:', error);
+      logger.error('Batch: Failed to upload images:', error);
       toast.error('Failed to upload images');
       setIsProcessing(false);
       return;
@@ -357,7 +360,7 @@ export function BatchPage() {
 
   // 🔄 Background Processing Poll Loop
   const startBackgroundProcessing = useCallback((projectId: string) => {
-    console.log('[Batch] Starting background processing loop for:', projectId);
+    logger.debug('Batch: Starting background processing loop for:', projectId);
 
     const pollInterval = setInterval(async () => {
       try {
@@ -368,21 +371,21 @@ export function BatchPage() {
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
-          console.error('[Batch] Process-next failed:', errorData);
+          logger.error('Batch: Process-next failed:', errorData);
           
           // Don't stop on errors, retry will handle it
           return;
         }
 
         const data = await response.json();
-        console.log('[Batch] Poll result:', data);
+        logger.debug('Batch: Poll result:', data);
 
         // Check if batch is done
         if (data.done) {
           clearInterval(pollInterval);
           setIsProcessing(false);
           toast.success('🎉 Batch processing completed!');
-          console.log('[Batch] All images processed!');
+          logger.debug('Batch: All images processed!');
           
           // Clear batch state
           clearBatchState();
@@ -394,13 +397,13 @@ export function BatchPage() {
 
         // Update progress message
         if (data.remaining !== undefined) {
-          console.log('[Batch] Progress:', {
+          logger.debug('Batch: Progress:', {
             processed: data.processed,
             remaining: data.remaining,
           });
         }
       } catch (error) {
-        console.error('[Batch] Polling error:', error);
+        logger.error('Batch: Polling error:', error);
         // Don't stop polling on errors
       }
     }, 3000); // Poll every 3 seconds
@@ -415,7 +418,7 @@ export function BatchPage() {
       const pollInterval = (window as any).__batchPollInterval;
       if (pollInterval) {
         clearInterval(pollInterval);
-        console.log('[Batch] Polling stopped (component unmounted)');
+        logger.debug('Batch: Polling stopped (component unmounted)');
       }
     };
   }, []);

@@ -1,4 +1,7 @@
 /**
+import { createScopedLogger } from '@/lib/logger';
+const logger = createScopedLogger('BackupManager');
+
  * Backup Manager
  * 
  * View backup history and trigger manual backups
@@ -37,7 +40,7 @@ export function BackupManager({ authKey }: BackupManagerProps) {
       setBackups(data.backups || []);
       setStats(data.stats);
     } catch (error) {
-      console.error('Failed to fetch backups:', error);
+      logger.error('Failed to fetch backups:', error);
     } finally {
       setLoading(false);
     }

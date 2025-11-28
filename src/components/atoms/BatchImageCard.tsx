@@ -1,4 +1,7 @@
 import { X, Check } from 'lucide-react';
+import { createScopedLogger } from '@/lib/logger';
+const logger = createScopedLogger('BatchImageCard');
+
 import Image from 'next/image';
 
 interface BatchImageCardProps {
@@ -25,7 +28,7 @@ export function BatchImageCard({
 }: BatchImageCardProps) {
   // Debug: Log when thumbnail updates
   if (status === 'completed') {
-    console.log('[BatchImageCard] Completed image:', {
+    logger.debug('[BatchImageCard] Completed image:', {
       filename: file.name,
       preview: preview.substring(0, 50),
       isGenerated: preview.startsWith('https://'),
