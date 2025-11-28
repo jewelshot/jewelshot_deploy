@@ -1,14 +1,11 @@
 import { defineConfig, devices } from '@playwright/test';
 
 /**
- * Playwright E2E Test Configuration
+ * Playwright E2E Test Configuration (Manual Server Mode)
  *
- * Tests critical user flows:
- * - Authentication (signup/login)
- * - Image upload
- * - AI generation
- * - Gallery management
- * - Rate limiting
+ * Use this when you want to run tests against an already-running dev server.
+ * Start your dev server manually first: npm run dev
+ * Then run tests: npx playwright test --config=playwright.config.manual.ts
  */
 
 export default defineConfig({
@@ -49,6 +46,11 @@ export default defineConfig({
 
     // Video on failure
     video: 'retain-on-failure',
+    
+    // Extra HTTP headers
+    extraHTTPHeaders: {
+      'X-Skip-Rate-Limit': 'true',
+    },
   },
 
   // Configure projects for major browsers
@@ -57,26 +59,9 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-
-    // Uncomment for multi-browser testing
-    // {
-    //   name: 'firefox',
-    //   use: { ...devices['Desktop Firefox'] },
-    // },
-    // {
-    //   name: 'webkit',
-    //   use: { ...devices['Desktop Safari'] },
-    // },
   ],
 
-  // Run your local dev server before starting the tests
-  webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
-    env: {
-      SKIP_RATE_LIMIT: 'true', // Disable rate limiting for E2E tests
-    },
-  },
+  // NO webServer - expect it to be running already
+  // Start manually: npm run dev
 });
+

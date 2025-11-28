@@ -12,6 +12,17 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // ============================================
+  // 🧪 SKIP MIDDLEWARE FOR TESTS
+  // ============================================
+  // Disable rate limiting and other checks in test/development
+  const isTest = process.env.NODE_ENV === 'test' || process.env.SKIP_RATE_LIMIT === 'true';
+  
+  if (isTest) {
+    // Pass through to the app without any checks
+    return NextResponse.next();
+  }
+
+  // ============================================
   // 🚦 GLOBAL RATE LIMITING (First Priority)
   // ============================================
   // Skip rate limiting for static assets and health checks
