@@ -64,45 +64,44 @@ export default function CatalogueContent() {
   
   // Load from localStorage on mount
   useEffect(() => {
-    console.log('🔥 CATALOGUE COMPONENT MOUNTING...');
+    logger.debug('Catalogue component mounting');
     setIsLoadingFavorites(true);
     
-    // CLEAR STALE CATALOGUE STORE
-    console.log('🔥 CLEARING STALE catalogueStore imageOrder');
+    // Clear stale catalogue store
+    logger.debug('Clearing stale catalogueStore imageOrder');
     localStorage.removeItem('jewelshot-catalogue');
     
     try {
       const stored = localStorage.getItem('jewelshot-image-metadata');
-      console.log('🔥 LOCALSTORAGE KEY EXISTS:', !!stored);
+      logger.debug('LocalStorage key exists:', !!stored);
       
       if (stored) {
         const parsed = JSON.parse(stored);
-        console.log('🔥 PARSED LOCALSTORAGE:', parsed);
         
         const stateFavorites = parsed?.state?.favorites || [];
         const stateMetadata = parsed?.state?.metadata || {};
         
-        console.log('🔥 FAVORITES ARRAY:', stateFavorites);
-        console.log('🔥 FAVORITES COUNT:', stateFavorites.length);
-        console.log('🔥 METADATA COUNT:', Object.keys(stateMetadata).length);
+        logger.debug('Favorites loaded', {
+          count: stateFavorites.length,
+          metadataCount: Object.keys(stateMetadata).length,
+        });
         
         setFavorites(stateFavorites);
         setMetadata(stateMetadata);
         setDebugInfo(`✅ Loaded: ${stateFavorites.length} favorites, ${Object.keys(stateMetadata).length} metadata`);
         
-        logger.info('✅ LOADED FROM LOCALSTORAGE:', {
+        logger.info('Loaded from localStorage', {
           favorites: stateFavorites.length,
           metadata: Object.keys(stateMetadata).length,
         });
       } else {
-        console.log('🔥 NO LOCALSTORAGE DATA FOUND');
+        logger.debug('No localStorage data found');
         setDebugInfo('❌ No localStorage data found');
-        logger.warn('⚠️ No localStorage data found');
+        logger.warn('No localStorage data found');
       }
     } catch (error) {
-      console.error('🔥 ERROR LOADING:', error);
+      logger.error('Failed to load from localStorage', error);
       setDebugInfo(`❌ Error: ${error}`);
-      logger.error('❌ Failed to load from localStorage:', error);
     } finally {
       setIsLoadingFavorites(false);
     }
@@ -165,19 +164,19 @@ export default function CatalogueContent() {
       let galleryImages;
       
       if (cached) {
-        console.log('🚀 CACHE HIT - Loading from sessionStorage');
+        logger.debug('Cache hit - loading from sessionStorage');
         galleryImages = JSON.parse(cached);
       } else {
-        console.log('🔄 CACHE MISS - Fetching from gallery...');
+        logger.debug('Cache miss - fetching from gallery');
         const { getSavedImages } = await import('@/lib/gallery-storage');
         galleryImages = await getSavedImages();
         
         // Cache for session
         try {
           sessionStorage.setItem(cacheKey, JSON.stringify(galleryImages));
-          console.log('💾 Cached to sessionStorage');
+          logger.debug('Cached to sessionStorage');
         } catch (e) {
-          console.warn('⚠️ Failed to cache (quota?)');
+          logger.warn('Failed to cache (quota exceeded)');
         }
       }
 
@@ -195,23 +194,22 @@ export default function CatalogueContent() {
       
       const endTime = performance.now();
       const loadTime = (endTime - startTime).toFixed(0);
-      console.log(`⚡ Loaded ${withUrls.length} images in ${loadTime}ms`);
-      logger.info('✅ Loaded favorites:', withUrls.length);
+      logger.info('Loaded favorites', {
+        count: withUrls.length,
+        loadTime: `${loadTime}ms`,
+      });
     };
 
     loadUrls();
   }, [favorites, metadata, isLoadingFavorites]);
 
-  // Initialize order
-  // REMOVED: No longer using imageOrder - just display imagesWithUrls directly
-
-  // SCREW THE ORDERING - JUST USE imagesWithUrls DIRECTLY
+  // Images are already ordered, use directly
   const orderedImages = useMemo(() => {
-    console.log('🔥 FUCK ORDERING - JUST RETURN imagesWithUrls:', imagesWithUrls.length);
+    logger.debug('Ordered images', { count: imagesWithUrls.length });
     return imagesWithUrls;
   }, [imagesWithUrls]);
 
-  // Handle drag end - update imagesWithUrls order directly
+  // Handle drag end - update image order
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
@@ -221,7 +219,7 @@ export default function CatalogueContent() {
 
     const newOrder = arrayMove(imagesWithUrls, oldIndex, newIndex);
     setImagesWithUrls(newOrder);
-    console.log('🔥 REORDERED imagesWithUrls');
+    logger.debug('Reordered images', { from: oldIndex, to: newIndex });
   };
 
   // Export PDF
