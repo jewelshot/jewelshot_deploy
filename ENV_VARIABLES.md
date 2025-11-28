@@ -233,6 +233,10 @@ Used for gradual feature rollouts and instant rollback. Toggle in Vercel dashboa
 # State Management Unification
 NEXT_PUBLIC_USE_ZUSTAND_ONLY=false  # Default: false (legacy mode)
 # Set to 'true' to use Zustand-only (recommended)
+
+# Canvas Component Refactoring
+NEXT_PUBLIC_USE_MODULAR_CANVAS=false  # Default: false (legacy 2,049 line Canvas)
+# Set to 'true' to use modular Canvas (maintainable sub-components)
 ```
 
 **When to use:**

@@ -15,6 +15,16 @@ export const FEATURE_FLAGS = {
    * Rollback: Set NEXT_PUBLIC_USE_ZUSTAND_ONLY=false in Vercel
    */
   USE_ZUSTAND_ONLY: process.env.NEXT_PUBLIC_USE_ZUSTAND_ONLY === 'true',
+  
+  /**
+   * Use modular Canvas component (refactored from 2,049 lines)
+   * 
+   * Before: Canvas.tsx (2,049 lines - unmaintainable)
+   * After: CanvasNew.tsx (modular sub-components)
+   * 
+   * Rollback: Set NEXT_PUBLIC_USE_MODULAR_CANVAS=false in Vercel
+   */
+  USE_MODULAR_CANVAS: process.env.NEXT_PUBLIC_USE_MODULAR_CANVAS === 'true',
 } as const;
 
 // Type-safe feature flag access

@@ -28,6 +28,8 @@ import { VideoPlayerModal } from '@/components/molecules/VideoPlayerModal';
 import { VideoGeneratingModal } from '@/components/molecules/VideoGeneratingModal';
 import { QuickActionsBar } from '@/components/molecules/QuickActionsBar';
 import { saveCanvasState, loadCanvasState } from '@/lib/canvas-state-storage';
+import { FEATURE_FLAGS } from '@/lib/feature-flags';
+import { CanvasNew } from './CanvasNew';
 
 const logger = createScopedLogger('Canvas');
 // New refactored components
@@ -40,7 +42,25 @@ interface CanvasProps {
   onPresetPrompt?: (prompt: string) => void;
 }
 
+// ============================================
+// CANVAS WRAPPER - Feature Flag Controlled
+// ============================================
 export function Canvas({ onPresetPrompt }: CanvasProps = {}) {
+  if (FEATURE_FLAGS.USE_MODULAR_CANVAS) {
+    // NEW SYSTEM: Modular Canvas (clean, maintainable)
+    logger.debug('Using modular Canvas');
+    return <CanvasNew onPresetPrompt={onPresetPrompt} />;
+  }
+  
+  // OLD SYSTEM: Legacy Canvas (2,049 lines - will be removed)
+  logger.debug('Using legacy Canvas');
+  return <CanvasLegacy onPresetPrompt={onPresetPrompt} />;
+}
+
+// ============================================
+// LEGACY CANVAS (2,049 lines - BACKUP)
+// ============================================
+function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
   const searchParams = useSearchParams();
   const router = useRouter();
 
