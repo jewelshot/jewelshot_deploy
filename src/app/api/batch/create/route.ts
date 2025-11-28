@@ -3,8 +3,30 @@ import { NextResponse } from 'next/server';
 import { createScopedLogger } from '@/lib/logger';
 import { createApiError, ApiErrorCode, withErrorHandling } from '@/lib/api-error';
 import { validateString, validateNumber, ValidationError } from '@/lib/validation';
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
 
 const logger = createScopedLogger('API:Batch:Create');
+
+// ============================================
+// 🚦 BATCH CREATE RATE LIMITING
+// ============================================
+// 15 batch projects per minute per user (prevents spam)
+const redis = process.env.UPSTASH_REDIS_REST_URL
+  ? new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+    })
+  : null;
+
+const batchCreateLimiter = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(15, '1 m'),
+      analytics: true,
+      prefix: 'ratelimit:batch:create',
+    })
+  : null;
 
 /**
  * POST /api/batch/create
@@ -23,6 +45,35 @@ export const POST = withErrorHandling(async (request: Request) => {
   if (authError || !user) {
     logger.warn('Unauthorized batch create attempt');
     return createApiError(ApiErrorCode.UNAUTHORIZED);
+  }
+
+  // ============================================
+  // 🚦 RATE LIMITING CHECK
+  // ============================================
+  if (batchCreateLimiter) {
+    const { success, limit, remaining, reset } = await batchCreateLimiter.limit(user.id);
+
+    if (!success) {
+      logger.warn('Batch create rate limit exceeded', { userId: user.id });
+      return NextResponse.json(
+        {
+          error: 'Rate limit exceeded',
+          message: 'You are creating batch projects too quickly. Please wait a minute.',
+          limit,
+          remaining: 0,
+          reset,
+        },
+        {
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': limit?.toString() || '15',
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': reset?.toString() || '0',
+            'Retry-After': '60',
+          },
+        }
+      );
+    }
   }
 
   // Parse request body

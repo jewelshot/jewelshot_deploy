@@ -1,8 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createScopedLogger } from '@/lib/logger';
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
 
 const logger = createScopedLogger('BatchUploadOriginal');
+
+// ============================================
+// 🚦 BATCH UPLOAD RATE LIMITING
+// ============================================
+// 5 uploads per minute per user (large files, more restrictive)
+const redis = process.env.UPSTASH_REDIS_REST_URL
+  ? new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+    })
+  : null;
+
+const batchUploadLimiter = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(5, '1 m'),
+      analytics: true,
+      prefix: 'ratelimit:batch:upload',
+    })
+  : null;
 
 /**
  * POST /api/batch/upload-original
@@ -21,6 +43,35 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // ============================================
+    // 🚦 RATE LIMITING CHECK
+    // ============================================
+    if (batchUploadLimiter) {
+      const { success, limit, remaining, reset } = await batchUploadLimiter.limit(user.id);
+
+      if (!success) {
+        logger.warn('Batch upload rate limit exceeded', { userId: user.id });
+        return NextResponse.json(
+          {
+            error: 'Rate limit exceeded',
+            message: 'Too many uploads. Please wait a minute before uploading more files.',
+            limit,
+            remaining: 0,
+            reset,
+          },
+          {
+            status: 429,
+            headers: {
+              'X-RateLimit-Limit': limit?.toString() || '5',
+              'X-RateLimit-Remaining': '0',
+              'X-RateLimit-Reset': reset?.toString() || '0',
+              'Retry-After': '60',
+            },
+          }
+        );
+      }
     }
 
     // Parse request body

@@ -5,6 +5,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -15,8 +17,72 @@ const supabaseKey =
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// ============================================
+// 🚦 WAITLIST RATE LIMITING (VERY RESTRICTIVE)
+// ============================================
+// 3 signups per 5 minutes per IP (prevents email spam)
+const redis = process.env.UPSTASH_REDIS_REST_URL
+  ? new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+    })
+  : null;
+
+const waitlistLimiter = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(3, '5 m'),
+      analytics: true,
+      prefix: 'ratelimit:waitlist',
+    })
+  : null;
+
+function getClientIp(request: NextRequest): string {
+  const forwarded = request.headers.get('x-forwarded-for');
+  const realIp = request.headers.get('x-real-ip');
+  
+  if (forwarded) {
+    return forwarded.split(',')[0].trim();
+  }
+  
+  if (realIp) {
+    return realIp;
+  }
+  
+  return 'unknown';
+}
+
 export async function POST(request: NextRequest) {
   try {
+    // ============================================
+    // 🚦 RATE LIMITING CHECK (IP-based)
+    // ============================================
+    if (waitlistLimiter) {
+      const ip = getClientIp(request);
+      const { success, limit, remaining, reset } = await waitlistLimiter.limit(ip);
+
+      if (!success) {
+        return NextResponse.json(
+          {
+            error: 'Rate limit exceeded',
+            message: 'Too many waitlist submissions from your IP. Please try again later.',
+            limit,
+            remaining: 0,
+            reset,
+          },
+          {
+            status: 429,
+            headers: {
+              'X-RateLimit-Limit': limit?.toString() || '3',
+              'X-RateLimit-Remaining': '0',
+              'X-RateLimit-Reset': reset?.toString() || '0',
+              'Retry-After': '300', // 5 minutes
+            },
+          }
+        );
+      }
+    }
+
     const body = await request.json();
     const { email, name } = body;
 
@@ -38,7 +104,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get IP and user agent for analytics
-    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+    const ip = getClientIp(request);
     const userAgent = request.headers.get('user-agent') || 'unknown';
 
     // Insert to database

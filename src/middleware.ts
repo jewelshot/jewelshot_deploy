@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
-// Rate limiting disabled in middleware (Edge runtime limitation)
-// Rate limiting is handled in individual API routes instead
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
 
 // ============================================
 // 🔒 MAINTENANCE MODE CONFIGURATION
@@ -9,53 +9,98 @@ import { NextResponse, type NextRequest } from 'next/server';
 const MAINTENANCE_MODE = false; // ✅ true = site kapalı, false = site açık
 const MAINTENANCE_PASSWORD = 'jewelshot2024'; // 🔑 Geliştirici bypass şifresi
 
+// ============================================
+// 🚦 IP-BASED RATE LIMITING (GLOBAL PROTECTION)
+// ============================================
+// Edge runtime compatible - uses only IP, no cookies()
+const redis = process.env.UPSTASH_REDIS_REST_URL
+  ? new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN,
+    })
+  : null;
+
+const ipRateLimiter = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(100, '1 m'), // 100 requests per minute per IP
+      analytics: true,
+      prefix: 'ratelimit:global:ip',
+    })
+  : null;
+
+function getClientIp(request: NextRequest): string {
+  const forwarded = request.headers.get('x-forwarded-for');
+  const realIp = request.headers.get('x-real-ip');
+  
+  if (forwarded) {
+    return forwarded.split(',')[0].trim();
+  }
+  
+  if (realIp) {
+    return realIp;
+  }
+  
+  return 'unknown';
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // ============================================
   // 🧪 SKIP MIDDLEWARE FOR TESTS
   // ============================================
-  // Disable rate limiting and other checks in test/development
   const isTest = process.env.NODE_ENV === 'test' || process.env.SKIP_RATE_LIMIT === 'true';
   
   if (isTest) {
-    // Pass through to the app without any checks
     return NextResponse.next();
   }
 
   // ============================================
-  // 🚦 GLOBAL RATE LIMITING (First Priority)
+  // 🚦 GLOBAL IP-BASED RATE LIMITING
   // ============================================
-  // DISABLED: Middleware runs in Edge runtime, cannot use cookies()
-  // Rate limiting moved to individual API routes
-  // Skip rate limiting for static assets and health checks
-  // const skipRateLimit = 
-  //   pathname.startsWith('/_next') ||
-  //   pathname.startsWith('/api/health') ||
-  //   pathname.includes('.');
+  // Skip rate limiting for:
+  // - Static assets (_next/static, images, etc.)
+  // - Health check endpoint
+  // - Auth callbacks (to prevent login issues)
+  const skipRateLimit = 
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api/health') ||
+    pathname === '/auth/callback' ||
+    pathname.includes('.'); // Static files
 
-  // if (!skipRateLimit && globalRateLimit) {
-  //   const ip = getClientIp(request);
-  //   const { success, limit, remaining, reset } = await checkRateLimit(ip, globalRateLimit);
+  if (!skipRateLimit && ipRateLimiter) {
+    const ip = getClientIp(request);
+    
+    try {
+      const { success, limit, remaining, reset } = await ipRateLimiter.limit(ip);
 
-  //   if (!success) {
-  //     return new NextResponse(
-  //       JSON.stringify({
-  //         error: 'Rate limit exceeded',
-  //         message: 'Too many requests. Please try again later.',
-  //       }),
-  //       {
-  //         status: 429,
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //           'X-RateLimit-Limit': limit?.toString() || '0',
-  //           'X-RateLimit-Remaining': remaining?.toString() || '0',
-  //           'X-RateLimit-Reset': reset?.toString() || '0',
-  //         },
-  //       }
-  //     );
-  //   }
-  // }
+      if (!success) {
+        return new NextResponse(
+          JSON.stringify({
+            error: 'Rate limit exceeded',
+            message: 'Too many requests from your IP. Please try again later.',
+            limit,
+            remaining: 0,
+            reset,
+          }),
+          {
+            status: 429,
+            headers: {
+              'Content-Type': 'application/json',
+              'X-RateLimit-Limit': limit?.toString() || '100',
+              'X-RateLimit-Remaining': '0',
+              'X-RateLimit-Reset': reset?.toString() || '0',
+              'Retry-After': '60',
+            },
+          }
+        );
+      }
+    } catch (error) {
+      // If rate limiting fails, log but don't block request
+      console.error('Rate limiting error:', error);
+    }
+  }
 
   // ============================================
   // 🚧 MAINTENANCE MODE CHECK (First Priority)
