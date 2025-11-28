@@ -8,7 +8,7 @@
 
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import AuroraBackground from '@/components/atoms/AuroraBackground';
 import ErrorBoundary from '@/components/organisms/ErrorBoundary';
@@ -49,8 +49,12 @@ const BottomBarToggle = dynamic(
 
 export default function StudioPage() {
   const { isMobile, isTablet, isDesktop } = useBreakpoint();
+  const [isClient, setIsClient] = useState(false);
 
-  // Breakpoint detection (no logging in production)
+  // Fix hydration: Only check breakpoint after client mount
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Handle preset generation from RightSidebar
   const handleGenerateWithPreset = (prompt: string, aspectRatio?: string) => {
@@ -63,8 +67,8 @@ export default function StudioPage() {
     }
   };
 
-  // Mobile: Show simplified studio directly
-  if (isMobile) {
+  // Mobile: Show simplified studio directly (only after hydration)
+  if (isClient && isMobile) {
     return <MobileStudio />;
   }
 
