@@ -48,10 +48,11 @@ export function ImageCard({
   const metadata = getMetadata(id);
 
   return (
-    <div
+    <article
       className="group relative overflow-hidden rounded-lg bg-[rgba(10,10,10,0.8)] ring-1 ring-[rgba(139,92,246,0.2)] transition-all duration-300 hover:ring-2 hover:ring-[rgba(139,92,246,0.4)]"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      aria-label={`${alt}${isFavorite ? ', favorited' : ''}`}
     >
       {/* Image Container - Aspect Square */}
       <div className="relative aspect-square overflow-hidden">
@@ -94,8 +95,9 @@ export function ImageCard({
           <button
             onClick={onView}
             className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+            aria-label={originalUrl ? `Compare ${alt} in studio` : `Open ${alt} in studio`}
           >
-            <Palette className="h-4 w-4" />
+            <Palette className="h-4 w-4" aria-hidden="true" />
             {originalUrl ? 'Compare in Studio' : 'Open in Studio'}
           </button>
         )}
@@ -117,18 +119,18 @@ export function ImageCard({
             <button
               onClick={onDownload}
               className="rounded-lg bg-white/10 p-2.5 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
-              title="Download"
+              aria-label={`Download ${alt}`}
             >
-              <Download className="h-4 w-4" />
+              <Download className="h-4 w-4" aria-hidden="true" />
             </button>
           )}
           {onDelete && (
             <button
               onClick={onDelete}
               className="rounded-lg bg-white/10 p-2.5 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
-              title="Delete"
+              aria-label={`Delete ${alt}`}
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="h-4 w-4" aria-hidden="true" />
             </button>
           )}
         </div>
@@ -168,9 +170,10 @@ export function ImageCard({
                 ? 'bg-white/30 text-white'
                 : 'bg-black/60 text-white/60 hover:bg-white/20 hover:text-white'
             }`}
-            title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+            aria-label={isFavorite ? `Remove ${alt} from favorites` : `Add ${alt} to favorites`}
+            aria-pressed={isFavorite}
           >
-            <Star className={`h-4 w-4 ${isFavorite ? 'fill-white' : ''}`} />
+            <Star className={`h-4 w-4 ${isFavorite ? 'fill-white' : ''}`} aria-hidden="true" />
           </button>
         )}
 
@@ -225,7 +228,7 @@ export function ImageCard({
           </div>
         </div>
       )}
-    </div>
+    </article>
   );
 }
 

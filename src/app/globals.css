@@ -3,6 +3,44 @@
 @tailwind utilities;
 
 /* ============================================
+   Accessibility - Focus Indicators
+   ============================================ */
+
+@layer base {
+  /* Visible focus indicators for keyboard navigation */
+  *:focus-visible {
+    outline: 2px solid rgb(168 85 247);
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+  }
+
+  /* Remove default focus outline (replaced with focus-visible) */
+  *:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    *:focus-visible {
+      outline-width: 3px;
+      outline-offset: 3px;
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ============================================
    Base Styles from studio.html
    ============================================ */
 

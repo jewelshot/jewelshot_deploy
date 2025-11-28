@@ -15,6 +15,7 @@ import ErrorBoundary from '@/components/organisms/ErrorBoundary';
 import CanvasFallback from '@/components/molecules/CanvasFallback';
 import { useBreakpoint } from '@/hooks/useMediaQuery';
 import MobileStudio from '@/components/organisms/MobileStudio';
+import SkipLink from '@/components/atoms/SkipLink';
 
 // Dynamic imports for heavy components
 const Canvas = dynamic(() => import('@/components/organisms/Canvas'), {
@@ -75,26 +76,37 @@ export default function StudioPage() {
   // Desktop: Full studio
   return (
     <>
+      {/* Skip Links for Accessibility */}
+      <SkipLink href="#main-content">Skip to main content</SkipLink>
+      <SkipLink href="#ai-controls">Skip to AI controls</SkipLink>
+      
       {/* Aurora Background */}
       <AuroraBackground />
 
       {/* Top Bar */}
-      <TopBar />
+      <nav aria-label="Top toolbar">
+        <TopBar />
+      </nav>
       <TopBarToggle />
 
-
-      {/* Right Sidebar */}
-      <RightSidebar onGenerateWithPreset={handleGenerateWithPreset} />
+      {/* Right Sidebar - AI Controls */}
+      <aside id="ai-controls" aria-label="AI generation controls" role="complementary">
+        <RightSidebar onGenerateWithPreset={handleGenerateWithPreset} />
+      </aside>
       <RightSidebarToggle />
 
       {/* Bottom Bar */}
-      <BottomBar />
+      <nav aria-label="Bottom toolbar">
+        <BottomBar />
+      </nav>
       <BottomBarToggle />
 
-      {/* Canvas Area - Wrapped in Error Boundary */}
-      <ErrorBoundary fallback={<CanvasFallback />}>
-        <Canvas onPresetPrompt={handleGenerateWithPreset} />
-      </ErrorBoundary>
+      {/* Canvas Area - Main Content */}
+      <main id="main-content" aria-label="Image editor canvas">
+        <ErrorBoundary fallback={<CanvasFallback />}>
+          <Canvas onPresetPrompt={handleGenerateWithPreset} />
+        </ErrorBoundary>
+      </main>
     </>
   );
 }

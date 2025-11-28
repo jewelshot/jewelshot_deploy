@@ -13,6 +13,7 @@ import ErrorBoundary from '@/components/organisms/ErrorBoundary';
 import GalleryFallback from '@/components/molecules/GalleryFallback';
 import { useBreakpoint } from '@/hooks/useMediaQuery';
 import MobileGallery from '@/components/organisms/MobileGallery';
+import SkipLink from '@/components/atoms/SkipLink';
 
 // Dynamic imports for heavy components
 const GalleryContent = dynamic(
@@ -41,13 +42,19 @@ export default function GalleryPage() {
   // Desktop: Full gallery with sidebar
   return (
     <>
+      {/* Skip Links for Accessibility */}
+      <SkipLink href="#gallery-content">Skip to gallery</SkipLink>
+      <SkipLink href="#gallery-search">Skip to search</SkipLink>
+      
       {/* Aurora Background */}
       <AuroraBackground />
 
-      {/* Gallery Content - Wrapped in Error Boundary - Sidebar is now global */}
-      <ErrorBoundary fallback={<GalleryFallback />}>
-        <GalleryContent />
-      </ErrorBoundary>
+      {/* Gallery Content - Wrapped in Error Boundary */}
+      <main id="gallery-content" aria-label="Image gallery">
+        <ErrorBoundary fallback={<GalleryFallback />}>
+          <GalleryContent />
+        </ErrorBoundary>
+      </main>
     </>
   );
 }
