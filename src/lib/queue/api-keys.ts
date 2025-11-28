@@ -5,6 +5,10 @@
  * SECURITY: Keys never logged, server-side only
  */
 
+import { createScopedLogger } from '@/lib/logger';
+
+const logger = createScopedLogger('APIKeys');
+
 // Load environment variables (for worker process)
 if (typeof window === 'undefined') {
   try {
@@ -53,9 +57,7 @@ export function getNextApiKey(): string {
   currentIndex = (currentIndex + 1) % API_KEYS.length;
   
   // SECURITY: Never log the actual key value
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`[API Keys] Using key #${currentIndex + 1}/${API_KEYS.length}`);
-  }
+  logger.debug(`Using key #${currentIndex + 1}/${API_KEYS.length}`);
   
   return key;
 }
@@ -107,9 +109,7 @@ export function markKeyAsRateLimited(keyIndex: number, resetAt: Date) {
     rateLimitResetAt: resetAt,
   });
   
-  if (process.env.NODE_ENV === 'development') {
-    console.warn(`[API Keys] Key #${keyIndex} rate limited until ${resetAt.toISOString()}`);
-  }
+  logger.warn(`Key #${keyIndex} rate limited until ${resetAt.toISOString()}`);
 }
 
 /**

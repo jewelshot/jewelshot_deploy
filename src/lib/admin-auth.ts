@@ -1,7 +1,17 @@
 /**
- * Admin Authentication & Authorization
+ * ⚠️ DEPRECATED - DO NOT USE
  * 
- * Centralized admin security checks
+ * @deprecated This file is deprecated. Use @/lib/admin/auth.ts instead.
+ * 
+ * Old header-based admin authentication (INSECURE).
+ * Replaced by session-based authentication with RLS and 2FA.
+ * 
+ * Migration path:
+ * - Import from '@/lib/admin' instead
+ * - Use `withAdminAuth(handler, 'action-name')` wrapper for API routes
+ * - Use `authenticateAdmin(request)` for manual auth checks
+ * 
+ * This file is kept for reference only and will be removed in a future version.
  */
 
 import { NextRequest } from 'next/server';
@@ -26,6 +36,7 @@ export const adminRateLimiter = new Ratelimit({
 const ALLOWED_IPS = process.env.ADMIN_ALLOWED_IPS?.split(',').map(ip => ip.trim()) || [];
 
 /**
+ * @deprecated Use @/lib/admin/auth.ts instead
  * Check if request is authorized as admin
  */
 export async function isAdminAuthorized(request: NextRequest): Promise<{
@@ -33,153 +44,83 @@ export async function isAdminAuthorized(request: NextRequest): Promise<{
   error?: string;
   statusCode?: number;
 }> {
-  // 1. Check rate limit
-  const ip = getClientIP(request);
-  
   try {
-    const { success, limit, remaining, reset } = await adminRateLimiter.limit(ip);
+    // 1. Check IP whitelist (if configured)
+    if (ALLOWED_IPS.length > 0) {
+      const clientIP = getClientIP(request);
+      if (!ALLOWED_IPS.includes(clientIP)) {
+        return {
+          authorized: false,
+          error: 'IP not whitelisted',
+          statusCode: 403,
+        };
+      }
+    }
+
+    // 2. Check rate limit
+    const clientIP = getClientIP(request);
+    const { success: rateLimitPassed } = await adminRateLimiter.limit(clientIP);
     
-    if (!success) {
+    if (!rateLimitPassed) {
       return {
         authorized: false,
-        error: 'Too many requests. Please try again later.',
+        error: 'Rate limit exceeded',
         statusCode: 429,
       };
     }
+
+    // 3. Check admin key
+    const authHeader = request.headers.get('authorization');
+    const adminKey = process.env.ADMIN_DASHBOARD_KEY;
+
+    if (!adminKey) {
+      console.error('ADMIN_DASHBOARD_KEY not configured');
+      return {
+        authorized: false,
+        error: 'Server configuration error',
+        statusCode: 500,
+      };
+    }
+
+    if (!authHeader) {
+      return {
+        authorized: false,
+        error: 'Missing authorization header',
+        statusCode: 401,
+      };
+    }
+
+    // Support both "Bearer TOKEN" and direct token
+    const token = authHeader.startsWith('Bearer ')
+      ? authHeader.substring(7)
+      : authHeader;
+
+    if (token !== adminKey) {
+      return {
+        authorized: false,
+        error: 'Invalid admin key',
+        statusCode: 401,
+      };
+    }
+
+    return { authorized: true };
   } catch (error) {
-    console.error('Admin rate limit check failed:', error);
-    // Don't block if rate limit check fails
-  }
-
-  // 2. Check IP whitelist (if configured)
-  if (ALLOWED_IPS.length > 0 && !ALLOWED_IPS.includes(ip)) {
-    console.warn(`Admin access denied from unauthorized IP: ${ip}`);
+    console.error('[Admin Auth] Error:', error);
     return {
       authorized: false,
-      error: 'Access denied from your IP address.',
-      statusCode: 403,
-    };
-  }
-
-  // 3. Check admin key
-  const authHeader = request.headers.get('authorization');
-  const adminKey = process.env.ADMIN_DASHBOARD_KEY;
-
-  if (!adminKey) {
-    console.error('ADMIN_DASHBOARD_KEY not configured');
-    return {
-      authorized: false,
-      error: 'Server configuration error',
+      error: 'Authentication failed',
       statusCode: 500,
     };
   }
-
-  if (!authHeader || authHeader !== `Bearer ${adminKey}`) {
-    return {
-      authorized: false,
-      error: 'Invalid or missing authorization token',
-      statusCode: 401,
-    };
-  }
-
-  // All checks passed
-  return { authorized: true };
 }
 
 /**
- * Get client IP address
+ * Get client IP address from request
  */
 export function getClientIP(request: NextRequest): string {
   return (
-    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
-    request.headers.get('x-real-ip') ??
-    '127.0.0.1'
+    request.headers.get('x-forwarded-for')?.split(',')[0] ||
+    request.headers.get('x-real-ip') ||
+    'unknown'
   );
 }
-
-/**
- * Log admin access attempt (to console for now, database logging in logAdminAction)
- */
-export function logAdminAccess(
-  request: NextRequest,
-  endpoint: string,
-  success: boolean,
-  error?: string
-) {
-  const ip = getClientIP(request);
-  const timestamp = new Date().toISOString();
-  const userAgent = request.headers.get('user-agent') ?? 'unknown';
-
-  console.log(
-    JSON.stringify({
-      type: 'admin_access',
-      timestamp,
-      endpoint,
-      ip,
-      userAgent,
-      success,
-      error,
-    })
-  );
-}
-
-/**
- * Log admin action to database (audit trail)
- */
-export async function logAdminAction(params: {
-  adminEmail: string;
-  actionType: string;
-  actionCategory: string;
-  actionDetails?: Record<string, any>;
-  targetType?: string;
-  targetId?: string;
-  targetEmail?: string;
-  request?: NextRequest;
-  apiEndpoint?: string;
-  success?: boolean;
-  errorMessage?: string;
-}): Promise<void> {
-  const {
-    adminEmail,
-    actionType,
-    actionCategory,
-    actionDetails = {},
-    targetType,
-    targetId,
-    targetEmail,
-    request,
-    apiEndpoint,
-    success = true,
-    errorMessage,
-  } = params;
-
-  const supabase = createServiceClient();
-  const adminIp = request ? getClientIP(request) : undefined;
-
-  try {
-    await supabase.rpc('log_admin_action', {
-      p_admin_email: adminEmail,
-      p_action_type: actionType,
-      p_action_category: actionCategory,
-      p_action_details: actionDetails,
-      p_target_type: targetType,
-      p_target_id: targetId,
-      p_target_email: targetEmail,
-      p_admin_ip: adminIp,
-      p_api_endpoint: apiEndpoint,
-      p_success: success,
-      p_error_message: errorMessage,
-    });
-  } catch (error) {
-    console.error('Failed to log admin action:', error);
-    // Don't throw - logging failure shouldn't break the action
-  }
-}
-
-/**
- * Get admin email from request (from custom header or default)
- */
-export function getAdminEmail(request: NextRequest): string {
-  return request.headers.get('x-admin-email') || 'admin@jewelshot.ai';
-}
-

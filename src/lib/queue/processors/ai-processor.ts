@@ -7,6 +7,9 @@
 
 import { AIJobData, AIJobResult, AIOperation } from '../types';
 import { getNextApiKey } from '../api-keys';
+import { createScopedLogger } from '@/lib/logger';
+
+const logger = createScopedLogger('AIProcessor');
 
 // Import all operation processors
 import { processEdit } from './edit';
@@ -38,9 +41,7 @@ export async function processAIJob(data: AIJobData): Promise<AIJobResult> {
   // Get next API key from pool
   const apiKey = getNextApiKey();
   
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`[AI Processor] Processing ${data.operation} for user ${data.userId}`);
-  }
+  logger.debug(`Processing ${data.operation} for user ${data.userId}`);
 
   try {
     // Route to appropriate processor
@@ -112,7 +113,7 @@ export async function processAIJob(data: AIJobData): Promise<AIJobResult> {
       },
     };
   } catch (error: any) {
-    console.error(`[AI Processor] Error processing ${data.operation}:`, error);
+    logger.error(`Error processing ${data.operation}:`, error);
     
     return {
       success: false,

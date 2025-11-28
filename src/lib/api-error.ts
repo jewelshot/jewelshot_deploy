@@ -1,4 +1,7 @@
 import { NextResponse } from 'next/server';
+import { createScopedLogger } from './logger';
+
+const logger = createScopedLogger('APIError');
 
 /**
  * Standard API Error Codes
@@ -150,7 +153,7 @@ export function withErrorHandling<T = any>(
     try {
       return await handler(request);
     } catch (error) {
-      console.error('[API Error]', error);
+      logger.error('API Error:', error);
 
       // Handle known error types
       if (error instanceof Error) {

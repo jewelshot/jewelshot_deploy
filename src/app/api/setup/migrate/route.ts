@@ -1,29 +1,25 @@
-import { createClient } from '@/lib/supabase/server';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createScopedLogger } from '@/lib/logger';
+import { withAdminAuth } from '@/lib/admin';
 
 const logger = createScopedLogger('API:Setup:Migrate');
 
 /**
  * POST /api/setup/migrate
- * Run batch_projects migration
- * ⚠️ ADMIN ONLY - Remove this endpoint after migration!
+ * Run batch_projects migration check
+ * 🔒 ADMIN ONLY - Secured with session-based auth
+ * ⚠️ Remove this endpoint after migration is confirmed!
  */
-export async function POST(request: Request) {
+async function handler(request: NextRequest, auth: any) {
   try {
+    const { createClient } = await import('@/lib/supabase/server');
     const supabase = await createClient();
 
-    // Auth check
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    logger.info('Running batch tables migration', { userId: user.id });
+    logger.info('Running batch tables migration check', { 
+      userId: auth.userId,
+      adminEmail: auth.userEmail,
+      role: auth.role,
+    });
 
     // Check if tables already exist
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -33,7 +29,7 @@ export async function POST(request: Request) {
       .limit(1);
 
     if (!checkError) {
-      logger.info('Tables already exist', { userId: user.id });
+      logger.info('Tables already exist', { userId: auth.userId });
       return NextResponse.json({
         success: true,
         message: 'Tables already exist!',
@@ -43,7 +39,7 @@ export async function POST(request: Request) {
 
     // Tables don't exist, show error
     logger.error('Tables not found - migration needed', {
-      userId: user.id,
+      userId: auth.userId,
       error: checkError.message,
     });
 
@@ -75,4 +71,10 @@ export async function POST(request: Request) {
     );
   }
 }
+
+// Export wrapped with admin auth
+export const POST = withAdminAuth(
+  { action: 'setup:migrate' },
+  handler
+);
 

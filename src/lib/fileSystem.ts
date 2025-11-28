@@ -3,6 +3,10 @@
  * Manages directory selection and file downloads using File System Access API
  */
 
+import { createScopedLogger } from './logger';
+
+const logger = createScopedLogger('FileSystem');
+
 const DB_NAME = 'jewelshot-fs';
 const DB_VERSION = 1;
 const STORE_NAME = 'directory-handles';
@@ -121,7 +125,7 @@ async function pickDirectory(): Promise<FileSystemDirectoryHandle | null> {
     return handle;
   } catch (error) {
     // User cancelled or error occurred
-    console.warn('Directory picker cancelled or failed:', error);
+    logger.debug('Directory picker cancelled or failed:', error);
     return null;
   }
 }
@@ -164,7 +168,7 @@ async function saveFileToDirectory(
 
     return true;
   } catch (error) {
-    console.error('Failed to save file:', error);
+    logger.error('Failed to save file:', error);
     return false;
   }
 }
@@ -204,7 +208,7 @@ async function downloadImage(
     // Fallback to traditional download
     fallbackDownload(blob, fileName);
   } catch (error) {
-    console.error('Download failed:', error);
+    logger.error('Download failed:', error);
     throw error;
   }
 }

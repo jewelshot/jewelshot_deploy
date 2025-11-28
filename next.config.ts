@@ -14,6 +14,9 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: process.env.SKIP_TYPE_CHECK === 'true',
   },
 
+  // 🔒 Security: Disable source maps in production
+  productionBrowserSourceMaps: false,
+
   // Performance optimizations
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',

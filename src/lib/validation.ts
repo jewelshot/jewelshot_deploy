@@ -1,4 +1,7 @@
 import { ApiErrorCode, createApiError } from './api-error';
+import { createScopedLogger } from './logger';
+
+const logger = createScopedLogger('Validation');
 
 /**
  * Validation Error Class
@@ -226,7 +229,7 @@ export const validateAIParams = (operation: string, params: any) => {
 
     default:
       // Unknown operation - allow but log
-      console.warn(`[Validation] Unknown operation: ${operation}`);
+      logger.warn(`Unknown operation: ${operation}`);
   }
 
   return params;

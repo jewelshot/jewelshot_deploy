@@ -8,6 +8,9 @@
 import { createClient } from '@/lib/supabase/server';
 import { createServiceClient } from '@/lib/supabase/service';
 import { sendCreditsLowEmail } from './email/email-service';
+import { createScopedLogger } from '@/lib/logger';
+
+const logger = createScopedLogger('CreditManager');
 
 /**
  * Detect if running in worker context (no request scope)
@@ -62,7 +65,7 @@ export async function reserveCredit(
   } as any);
 
   if (error) {
-    console.error('[Credit] Reserve failed:', error);
+    logger.error('Reserve failed:', error);
     throw new Error(error.message || 'Failed to reserve credits');
   }
 
@@ -100,11 +103,11 @@ export async function confirmCredit(transactionId: string, userId?: string): Pro
   } as any);
 
   if (error) {
-    console.error('[Credit] Confirm failed:', error);
+    logger.error('Confirm failed:', error);
     throw new Error(error.message || 'Failed to confirm credits');
   }
 
-  console.log(`[Credit] Confirmed transaction ${transactionId}`);
+  logger.info(`Confirmed transaction ${transactionId}`);
 
   // Check if credits are low and send email if needed
   if (userId) {
@@ -124,14 +127,14 @@ export async function confirmCredit(transactionId: string, userId?: string): Pro
             userName: userData.user.user_metadata?.name,
             creditsRemaining: credits.balance,
           }).catch((error) => {
-            console.error('[Credit] Failed to send low credits email:', error);
+            logger.error('Failed to send low credits email:', error);
           });
           
-          console.log(`[Credit] Sent low credits email to ${userData.user.email}`);
+          logger.info(`Sent low credits email to user`);
         }
       }
     } catch (emailError) {
-      console.error('[Credit] Email notification error:', emailError);
+      logger.error('Email notification error:', emailError);
       // Don't throw - email failure shouldn't break credit confirm
     }
   }
@@ -156,11 +159,11 @@ export async function refundCredit(transactionId: string): Promise<void> {
   } as any);
 
   if (error) {
-    console.error('[Credit] Refund failed:', error);
+    logger.error('Refund failed:', error);
     throw new Error(error.message || 'Failed to refund credits');
   }
 
-  console.log(`[Credit] Refunded transaction ${transactionId}`);
+  logger.info(`Refunded transaction ${transactionId}`);
 }
 
 // ============================================
@@ -214,7 +217,7 @@ export async function getAvailableCredits(userId: string): Promise<number> {
   } as any);
 
   if (error) {
-    console.error('[Credit] Get available credits failed:', error);
+    logger.error('Get available credits failed:', error);
     return 0;
   }
 
@@ -240,7 +243,7 @@ export async function getOperationCost(operationType: string): Promise<number> {
     .single();
 
   if (error || !data) {
-    console.error('[Credit] Get operation cost failed:', error);
+    logger.error('Get operation cost failed:', error);
     return 0;
   }
 

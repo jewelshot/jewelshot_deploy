@@ -5,6 +5,9 @@
 
 import JSZip from 'jszip';
 import type { BatchProject } from './batch-storage';
+import { createScopedLogger } from './logger';
+
+const logger = createScopedLogger('ZipUtils');
 
 /**
  * Download a batch project as ZIP
@@ -70,7 +73,7 @@ export async function downloadBatchAsZip(project: BatchProject): Promise<void> {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   } catch (error) {
-    console.error('Failed to create ZIP:', error);
+    logger.error('Failed to create ZIP:', error);
     throw error;
   }
 }

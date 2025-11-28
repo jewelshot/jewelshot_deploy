@@ -18,9 +18,10 @@ function isAuthorizedCron(request: NextRequest): boolean {
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
   
+  // 🔒 SECURITY: Always require CRON_SECRET (no development bypass)
   if (!cronSecret) {
-    logger.warn('CRON_SECRET not configured - allowing all requests in development');
-    return process.env.NODE_ENV === 'development';
+    logger.error('CRON_SECRET not configured - denying all requests');
+    return false;
   }
   
   return authHeader === `Bearer ${cronSecret}`;
