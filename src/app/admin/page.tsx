@@ -8,6 +8,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { 
   Users, DollarSign, Activity, Image, 
   TrendingUp, Server, Database, AlertCircle,
@@ -20,14 +21,25 @@ import { Badge } from '@/components/admin/atoms/Badge';
 import { SearchFilters, type FilterOptions, type SortOption } from '@/components/admin/molecules/SearchFilters';
 import { UserActionMenu } from '@/components/admin/molecules/UserActionMenu';
 import { UserDetailModal } from '@/components/admin/molecules/UserDetailModal';
-import { OperationsChart } from '@/components/admin/organisms/OperationsChart';
-import { CostChart } from '@/components/admin/organisms/CostChart';
-import { UserGrowthChart } from '@/components/admin/organisms/UserGrowthChart';
 import { AuditLogsViewer } from '@/components/admin/organisms/AuditLogsViewer';
 import { BackupManager } from '@/components/admin/organisms/BackupManager';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/useToast';
 import { Toast } from '@/components/atoms/Toast';
+
+// 🚀 PERFORMANCE: Lazy load heavy chart components (recharts = 400 KB!)
+const OperationsChart = dynamic(
+  () => import('@/components/admin/organisms/OperationsChart').then(mod => ({ default: mod.OperationsChart })),
+  { ssr: false, loading: () => <div className="h-64 flex items-center justify-center"><div className="animate-spin h-8 w-8 border-4 border-purple-500 border-t-transparent rounded-full"></div></div> }
+);
+const CostChart = dynamic(
+  () => import('@/components/admin/organisms/CostChart').then(mod => ({ default: mod.CostChart })),
+  { ssr: false, loading: () => <div className="h-64 flex items-center justify-center"><div className="animate-spin h-8 w-8 border-4 border-purple-500 border-t-transparent rounded-full"></div></div> }
+);
+const UserGrowthChart = dynamic(
+  () => import('@/components/admin/organisms/UserGrowthChart').then(mod => ({ default: mod.UserGrowthChart })),
+  { ssr: false, loading: () => <div className="h-64 flex items-center justify-center"><div className="animate-spin h-8 w-8 border-4 border-purple-500 border-t-transparent rounded-full"></div></div> }
+);
 
 export default function AdminDashboard() {
   const { showToast, toastState, hideToast } = useToast();
