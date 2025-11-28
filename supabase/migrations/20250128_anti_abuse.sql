@@ -232,3 +232,4 @@ COMMENT ON TABLE public.device_fingerprints IS 'Tracks device fingerprints to de
 COMMENT ON TABLE public.credit_unlocks IS 'Tracks progressive credit unlock stages for each user';
 COMMENT ON TABLE public.suspicious_activities IS 'Logs suspicious user behavior for admin review';
 
+
