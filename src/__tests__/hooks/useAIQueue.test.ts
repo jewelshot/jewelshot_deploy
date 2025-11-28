@@ -8,11 +8,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useAIQueue } from '@/hooks/useAIQueue';
 
-// Mock fetch
-global.fetch = vi.fn();
-
-// TODO: Fix fetch mock issues (global fetch not being picked up correctly)
-describe.skip('useAIQueue Hook', () => {
+// Mock fetch is already set up in setup.ts
+describe('useAIQueue Hook', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     (global.fetch as any).mockClear();

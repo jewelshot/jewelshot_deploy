@@ -142,3 +142,4 @@ This accessibility statement is approved by:
 
 *We recognize that accessibility is an ongoing effort, and we are committed to continuously improving the accessibility of Jewelshot.*
 
+

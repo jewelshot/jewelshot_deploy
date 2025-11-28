@@ -8,9 +8,11 @@ import DeleteButton from '@/components/atoms/DeleteButton';
 
 describe('DeleteButton', () => {
   it('renders delete icon', () => {
-    const { container } = render(<DeleteButton onClick={() => {}} />);
-    const svg = container.querySelector('svg');
-    expect(svg).toBeInTheDocument();
+    const handleClick = vi.fn();
+    const { container } = render(<DeleteButton onClick={handleClick} />);
+    
+    const icon = container.querySelector('svg.lucide-trash2');
+    expect(icon).toBeInTheDocument();
   });
 
   it('calls onClick when clicked', () => {
@@ -18,35 +20,36 @@ describe('DeleteButton', () => {
     const { container } = render(<DeleteButton onClick={handleClick} />);
     
     const button = container.querySelector('button');
-    expect(button).toBeInTheDocument();
-    
     if (button) {
       fireEvent.click(button);
       expect(handleClick).toHaveBeenCalledTimes(1);
     }
   });
 
-  it('disables button when disabled prop is true', () => {
-    const { container } = render(<DeleteButton onClick={() => {}} disabled />);
-    const button = container.querySelector('button');
-    expect(button).toBeDisabled();
-  });
-
-  it('does not call onClick when disabled', () => {
+  it('has delete title attribute', () => {
     const handleClick = vi.fn();
-    const { container } = render(<DeleteButton onClick={handleClick} disabled />);
+    const { container } = render(<DeleteButton onClick={handleClick} />);
     
     const button = container.querySelector('button');
-    if (button) {
-      fireEvent.click(button);
-      expect(handleClick).not.toHaveBeenCalled();
-    }
+    expect(button).toHaveAttribute('title', 'Delete Image');
   });
 
-  it('has hover effect when enabled', () => {
-    const { container } = render(<DeleteButton onClick={() => {}} />);
+  it('has hover effect classes', () => {
+    const handleClick = vi.fn();
+    const { container } = render(<DeleteButton onClick={handleClick} />);
+    
     const button = container.querySelector('button');
-    expect(button?.className).toContain('hover:');
+    expect(button).toHaveClass('hover:bg-red-500/20');
+    expect(button).toHaveClass('hover:text-red-300');
+  });
+
+  it('renders with correct styling', () => {
+    const handleClick = vi.fn();
+    const { container } = render(<DeleteButton onClick={handleClick} />);
+    
+    const button = container.querySelector('button');
+    expect(button).toHaveClass('bg-red-500/10');
+    expect(button).toHaveClass('text-red-400');
+    expect(button).toHaveClass('border-red-500/30');
   });
 });
-

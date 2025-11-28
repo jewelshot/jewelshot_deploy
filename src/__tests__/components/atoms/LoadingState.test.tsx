@@ -7,39 +7,22 @@ import { render, screen } from '@testing-library/react';
 import LoadingState from '@/components/atoms/LoadingState';
 
 describe('LoadingState', () => {
-  it('renders loading spinner', () => {
+  it('renders loading text', () => {
+    render(<LoadingState />);
+    expect(screen.getByText('Loading...')).toBeInTheDocument();
+  });
+
+  it('renders with correct styling', () => {
     const { container } = render(<LoadingState />);
-    const spinner = container.querySelector('.animate-spin');
-    expect(spinner).toBeInTheDocument();
+    const wrapper = container.querySelector('.flex.h-full');
+    expect(wrapper).toBeInTheDocument();
+    expect(wrapper).toHaveClass('items-center', 'justify-center');
   });
 
-  it('renders with custom message', () => {
-    render(<LoadingState message="Loading data..." />);
-    expect(screen.getByText('Loading data...')).toBeInTheDocument();
-  });
-
-  it('renders without message when not provided', () => {
+  it('renders text with correct color', () => {
     const { container } = render(<LoadingState />);
-    // Should only have spinner, no text
-    expect(container.textContent).toBe('');
-  });
-
-  it('renders with custom size', () => {
-    const { container, rerender } = render(<LoadingState size="sm" />);
-    let spinner = container.querySelector('.animate-spin');
-    expect(spinner).toBeInTheDocument();
-
-    rerender(<LoadingState size="lg" />);
-    spinner = container.querySelector('.animate-spin');
-    expect(spinner).toBeInTheDocument();
-  });
-
-  it('centers content by default', () => {
-    const { container } = render(<LoadingState />);
-    const wrapper = container.firstChild as HTMLElement;
-    expect(wrapper.className).toContain('flex');
-    expect(wrapper.className).toContain('items-center');
-    expect(wrapper.className).toContain('justify-center');
+    const text = container.querySelector('.text-white\\/60');
+    expect(text).toBeInTheDocument();
+    expect(text).toHaveTextContent('Loading...');
   });
 });
-

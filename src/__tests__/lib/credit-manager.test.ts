@@ -13,8 +13,7 @@ import { createServiceClient } from '@/lib/supabase/service';
 const mockServiceClient = vi.mocked(createServiceClient);
 const mockClient = vi.mocked(createClient);
 
-// TODO: Fix mock chain issues (Supabase server/service client mocking)
-describe.skip('Credit Manager', () => {
+describe('Credit Manager', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });

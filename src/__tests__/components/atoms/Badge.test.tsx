@@ -7,47 +7,39 @@ import { render, screen } from '@testing-library/react';
 import Badge from '@/components/atoms/Badge';
 
 describe('Badge', () => {
-  it('renders with children', () => {
-    render(<Badge>Test Badge</Badge>);
-    expect(screen.getByText('Test Badge')).toBeInTheDocument();
+  it('renders NEW badge', () => {
+    const { container } = render(<Badge variant="new" />);
+    expect(screen.getByText('NEW')).toBeInTheDocument();
+    const badge = container.querySelector('span');
+    expect(badge).toHaveClass('bg-[#6366f1]');
   });
 
-  it('applies variant styles correctly', () => {
-    const { rerender } = render(<Badge variant="default">Default</Badge>);
-    let badge = screen.getByText('Default');
-    expect(badge).toBeInTheDocument();
-
-    rerender(<Badge variant="success">Success</Badge>);
-    badge = screen.getByText('Success');
-    expect(badge).toBeInTheDocument();
-
-    rerender(<Badge variant="warning">Warning</Badge>);
-    badge = screen.getByText('Warning');
-    expect(badge).toBeInTheDocument();
-
-    rerender(<Badge variant="error">Error</Badge>);
-    badge = screen.getByText('Error');
-    expect(badge).toBeInTheDocument();
+  it('renders PRO badge', () => {
+    const { container } = render(<Badge variant="pro" />);
+    expect(screen.getByText('PRO')).toBeInTheDocument();
+    const badge = container.querySelector('span');
+    expect(badge).toHaveClass('bg-[#f97316]');
   });
 
-  it('applies custom className', () => {
-    render(<Badge className="custom-badge">Custom</Badge>);
-    const badge = screen.getByText('Custom');
-    expect(badge.className).toContain('custom-badge');
+  it('renders count badge with number', () => {
+    render(<Badge variant="count" count={24} />);
+    expect(screen.getByText('24')).toBeInTheDocument();
   });
 
-  it('renders with different sizes', () => {
-    const { rerender } = render(<Badge size="sm">Small</Badge>);
-    let badge = screen.getByText('Small');
-    expect(badge).toBeInTheDocument();
+  it('renders dot badge', () => {
+    const { container } = render(<Badge variant="dot" color="green" />);
+    const dot = container.querySelector('span');
+    expect(dot).toHaveClass('bg-green-500');
+  });
 
-    rerender(<Badge size="md">Medium</Badge>);
-    badge = screen.getByText('Medium');
-    expect(badge).toBeInTheDocument();
+  it('renders dot badge with custom color', () => {
+    const { container } = render(<Badge variant="dot" color="red" />);
+    const dot = container.querySelector('span');
+    expect(dot).toHaveClass('bg-red-500');
+  });
 
-    rerender(<Badge size="lg">Large</Badge>);
-    badge = screen.getByText('Large');
-    expect(badge).toBeInTheDocument();
+  it('returns null for count badge without count', () => {
+    const { container } = render(<Badge variant="count" />);
+    expect(container.textContent).toBe('');
   });
 });
-

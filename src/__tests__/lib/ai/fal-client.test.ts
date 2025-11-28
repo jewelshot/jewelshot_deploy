@@ -29,7 +29,7 @@ vi.mock('@fal-ai/client', () => {
 // Import the mocked fal after setting up the mock
 import { fal } from '@fal-ai/client';
 
-describe.skip('fal-client', () => {
+describe('fal-client', () => {
   const mockSuccessOutput: FalOutput = {
     images: [
       {

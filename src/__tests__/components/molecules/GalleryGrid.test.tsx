@@ -39,8 +39,8 @@ describe('GalleryGrid', () => {
   it('renders grid with images', () => {
     render(<GalleryGrid images={mockImages} {...mockHandlers} />);
     
-    expect(screen.getByText('Test Image 1')).toBeInTheDocument();
-    expect(screen.getByText('Test Image 2')).toBeInTheDocument();
+    expect(screen.getByAltText('Test Image 1')).toBeInTheDocument();
+    expect(screen.getByAltText('Test Image 2')).toBeInTheDocument();
   });
 
   it('renders empty state when no images', () => {
