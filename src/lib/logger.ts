@@ -44,15 +44,12 @@ class Logger {
   }
 
   /**
-   * Error messages (development only - production sends to Sentry)
+   * Error messages (always logged - critical for debugging)
    */
   error(...args: unknown[]) {
-    if (isDevelopment) {
-      console.error(...args);
-    }
-
-    // In production, errors are already tracked by Sentry
-    // via automatic instrumentation, no manual logging needed
+    // Always log errors to console (even in production)
+    // Critical errors should be visible
+    console.error(...args);
   }
 
   /**
