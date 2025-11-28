@@ -253,11 +253,45 @@ NEXT_PUBLIC_USE_MODULAR_CANVAS=false  # Default: false (legacy 2,049 line Canvas
 
 ---
 
+## 🏗️ **STAGING ENVIRONMENT**
+
+### **Staging-Specific Variables**
+
+For pre-production testing, use separate instances of all services:
+
+```bash
+# Staging Supabase (separate project)
+NEXT_PUBLIC_SUPABASE_URL=https://your-staging-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_staging_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_staging_service_role_key
+
+# Staging Redis (separate instance)
+UPSTASH_REDIS_REST_URL=https://staging-redis.upstash.io
+UPSTASH_REDIS_REST_TOKEN=your_staging_token
+
+# Staging Sentry (separate project)
+NEXT_PUBLIC_SENTRY_DSN=https://your-staging-sentry-dsn
+SENTRY_ENVIRONMENT=staging
+
+# Environment identifier
+NEXT_PUBLIC_ENV=staging
+
+# Feature Flags (Enable all new features in staging)
+NEXT_PUBLIC_USE_ZUSTAND_ONLY=true
+NEXT_PUBLIC_USE_MODULAR_CANVAS=true
+NEXT_PUBLIC_USE_MODULAR_GALLERY=true
+```
+
+**See:** [STAGING_ENVIRONMENT.md](./STAGING_ENVIRONMENT.md) for complete setup guide
+
+---
+
 ## 📚 **Related Documentation**
 
 - [Supabase Setup](./supabase/README.md)
 - [Redis Setup](./REDIS_SETUP.md)
 - [Worker Deployment](./WORKER_DEPLOYMENT.md)
+- [Staging Environment](./STAGING_ENVIRONMENT.md)
 - [Migration Guide](./MIGRATION_GUIDE.md)
 - [Safe Refactoring Guide](./GÜVENLİ_REFACTORING_PLANI.md)
 

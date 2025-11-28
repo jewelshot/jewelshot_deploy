@@ -26,7 +26,10 @@
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:report": "playwright show-report",
-    "test:all": "npm run test:run && npm run test:e2e"
+    "test:all": "npm run test:run && npm run test:e2e",
+    "staging:deploy": "bash scripts/deploy-staging.sh",
+    "staging:test": "bash scripts/staging-smoke-test.sh",
+    "staging:setup": "git checkout -b staging && git push origin staging"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [

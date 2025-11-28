@@ -297,6 +297,43 @@ MIT License - See [LICENSE](LICENSE) for details.
 
 ---
 
+## 🚀 **Deployment**
+
+### Production Deployment
+
+```bash
+# Automatic deployment on push to main
+git push origin main
+
+# Vercel automatically builds and deploys
+# URL: https://www.jewelshot.ai
+```
+
+### Staging Deployment
+
+```bash
+# Deploy to staging environment
+npm run staging:deploy
+
+# Or manually:
+git checkout staging
+git merge main
+git push origin staging
+
+# Run smoke tests
+npm run staging:test
+```
+
+See [STAGING_ENVIRONMENT.md](./STAGING_ENVIRONMENT.md) for complete setup guide.
+
+### Environment-Specific URLs
+
+- **Production:** https://www.jewelshot.ai
+- **Staging:** https://staging.jewelshot.ai (or Vercel preview URL)
+- **Development:** http://localhost:3000
+
+---
+
 ## 🔗 **Links**
 
 - **Live Demo:** [https://www.jewelshot.ai](https://www.jewelshot.ai)
