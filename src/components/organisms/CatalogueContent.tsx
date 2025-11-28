@@ -63,21 +63,21 @@ export default function CatalogueContent() {
   const zustandFavorites = useImageMetadataStore((state) => state.favorites);
   const zustandMetadata = useImageMetadataStore((state) => state.metadata);
   
-  // OLD SYSTEM: localStorage bypass (DEPRECATED)
+  // Legacy system state (for backward compatibility during migration)
   const [legacyFavorites, setLegacyFavorites] = useState<FavoriteImage[]>([]);
   const [legacyMetadata, setLegacyMetadata] = useState<Record<string, ImageMetadata>>({});
   const [isLoadingFavorites, setIsLoadingFavorites] = useState(true);
   
-  // Choose which system to use based on feature flag
+  // Select state source based on feature flag
   const favorites = FEATURE_FLAGS.USE_ZUSTAND_ONLY ? zustandFavorites : legacyFavorites;
   const metadata = FEATURE_FLAGS.USE_ZUSTAND_ONLY ? zustandMetadata : legacyMetadata;
   
-  // Load from localStorage on mount (LEGACY MODE ONLY)
+  // Initialize state on mount (system determined by feature flag)
   useEffect(() => {
     if (FEATURE_FLAGS.USE_ZUSTAND_ONLY) {
-      // ✅ NEW SYSTEM: Zustand persist middleware auto-loads
-      logger.debug('Catalogue mounting (Zustand-only mode)');
-      localStorage.removeItem('jewelshot-catalogue'); // Cleanup stale
+      // New system: Zustand persist middleware handles loading automatically
+      logger.debug('Catalogue mounting (Zustand mode)');
+      localStorage.removeItem('jewelshot-catalogue'); // Cleanup stale data
       setIsLoadingFavorites(false);
       
       logger.info('Favorites loaded from Zustand', {
@@ -87,8 +87,8 @@ export default function CatalogueContent() {
       return;
     }
     
-    // ❌ OLD SYSTEM: Manual localStorage bypass (DEPRECATED)
-    logger.debug('Catalogue mounting (legacy localStorage mode)');
+    // Legacy system: Manual localStorage loading (backward compatibility)
+    logger.debug('Catalogue mounting (legacy mode)');
     setIsLoadingFavorites(true);
     
     // Clear stale catalogue store

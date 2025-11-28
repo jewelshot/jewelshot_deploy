@@ -26,9 +26,9 @@ export function BatchImageCard({
   onRemove,
   onClick,
 }: BatchImageCardProps) {
-  // Debug: Log when thumbnail updates
+  // Log completed images for monitoring
   if (status === 'completed') {
-    logger.debug('[BatchImageCard] Completed image:', {
+    logger.debug('Completed image', {
       filename: file.name,
       preview: preview.substring(0, 50),
       isGenerated: preview.startsWith('https://'),
