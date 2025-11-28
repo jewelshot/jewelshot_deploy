@@ -10,6 +10,8 @@ import { NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { createServiceClient } from '@/lib/supabase/service';
 import { createScopedLogger } from '@/lib/logger';
+import { authenticator } from 'otplib';
+import QRCode from 'qrcode';
 
 const logger = createScopedLogger('AdminAuth');
 
@@ -245,18 +247,7 @@ export function requiresSuperAdmin(action: string): boolean {
  */
 async function verify2FAToken(userId: string, token: string): Promise<boolean> {
   try {
-    // TODO: Implement actual 2FA verification
-    // For now, we'll use a simple placeholder
-    // In production, use libraries like:
-    // - speakeasy (TOTP)
-    // - otpauth
-    
-    // Placeholder: Accept any 6-digit token for development
-    if (process.env.NODE_ENV === 'development') {
-      return /^\d{6}$/.test(token);
-    }
-    
-    // Production: Implement real TOTP verification
+    // Get user's 2FA secret from database
     const supabase = createServiceClient();
     const { data: profile } = await supabase
       .from('profiles')
@@ -265,21 +256,197 @@ async function verify2FAToken(userId: string, token: string): Promise<boolean> {
       .single();
     
     if (!profile?.two_factor_secret) {
+      logger.warn('User has no 2FA secret', { userId });
       return false;
     }
     
-    // TODO: Verify TOTP token against user's secret
-    // const speakeasy = require('speakeasy');
-    // return speakeasy.totp.verify({
-    //   secret: profile.two_factor_secret,
-    //   encoding: 'base32',
-    //   token: token,
-    //   window: 2,
-    // });
+    // Verify TOTP token using otplib
+    const isValid = authenticator.check(token, profile.two_factor_secret);
     
-    return false;
+    if (isValid) {
+      logger.info('2FA verification successful', { userId });
+    } else {
+      logger.warn('2FA verification failed', { userId });
+    }
+    
+    return isValid;
   } catch (error) {
     logger.error('2FA verification error', error);
+    return false;
+  }
+}
+
+// ============================================
+// 2FA Setup & Management
+// ============================================
+
+/**
+ * Generate 2FA secret for user
+ * 
+ * @param userId - User ID
+ * @param userEmail - User email (for QR label)
+ * @returns Object with secret and QR code data URL
+ */
+export async function generate2FASecret(
+  userId: string,
+  userEmail: string
+): Promise<{ secret: string; qrCode: string } | null> {
+  try {
+    // Generate secret
+    const secret = authenticator.generateSecret();
+    
+    // Create OTP auth URL for QR code
+    const otpauthUrl = authenticator.keyuri(
+      userEmail,
+      'Jewelshot Admin',
+      secret
+    );
+    
+    // Generate QR code as data URL
+    const qrCode = await QRCode.toDataURL(otpauthUrl);
+    
+    logger.info('2FA secret generated', { userId });
+    
+    return {
+      secret,
+      qrCode,
+    };
+  } catch (error) {
+    logger.error('Failed to generate 2FA secret', error);
+    return null;
+  }
+}
+
+/**
+ * Enable 2FA for user
+ * 
+ * @param userId - User ID
+ * @param secret - 2FA secret
+ * @param verificationToken - Token to verify setup
+ * @returns Success boolean
+ */
+export async function enable2FA(
+  userId: string,
+  secret: string,
+  verificationToken: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    // Verify token before enabling
+    const isValid = authenticator.check(verificationToken, secret);
+    
+    if (!isValid) {
+      logger.warn('2FA enable failed: invalid verification token', { userId });
+      return {
+        success: false,
+        error: 'Invalid verification token',
+      };
+    }
+    
+    // Update user profile
+    const supabase = createServiceClient();
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        is_2fa_enabled: true,
+        two_factor_secret: secret,
+      })
+      .eq('id', userId);
+    
+    if (error) {
+      logger.error('Failed to enable 2FA in database', { error, userId });
+      return {
+        success: false,
+        error: 'Database update failed',
+      };
+    }
+    
+    logger.info('2FA enabled successfully', { userId });
+    
+    return {
+      success: true,
+    };
+  } catch (error) {
+    logger.error('2FA enable error', error);
+    return {
+      success: false,
+      error: 'Internal error',
+    };
+  }
+}
+
+/**
+ * Disable 2FA for user
+ * 
+ * @param userId - User ID
+ * @param verificationToken - Token to verify before disabling
+ * @returns Success boolean
+ */
+export async function disable2FA(
+  userId: string,
+  verificationToken: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    // Verify token before disabling (to prevent unauthorized disable)
+    const isValid = await verify2FAToken(userId, verificationToken);
+    
+    if (!isValid) {
+      logger.warn('2FA disable failed: invalid verification token', { userId });
+      return {
+        success: false,
+        error: 'Invalid verification token',
+      };
+    }
+    
+    // Update user profile
+    const supabase = createServiceClient();
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        is_2fa_enabled: false,
+        two_factor_secret: null,
+      })
+      .eq('id', userId);
+    
+    if (error) {
+      logger.error('Failed to disable 2FA in database', { error, userId });
+      return {
+        success: false,
+        error: 'Database update failed',
+      };
+    }
+    
+    logger.info('2FA disabled successfully', { userId });
+    
+    return {
+      success: true,
+    };
+  } catch (error) {
+    logger.error('2FA disable error', error);
+    return {
+      success: false,
+      error: 'Internal error',
+    };
+  }
+}
+
+/**
+ * Get 2FA status for user
+ * 
+ * @param userId - User ID
+ * @returns 2FA enabled status
+ */
+export async function get2FAStatus(userId: string): Promise<boolean> {
+  try {
+    const supabase = createServiceClient();
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_2fa_enabled')
+      .eq('id', userId)
+      .single();
+    
+    return profile?.is_2fa_enabled || false;
+  } catch (error) {
+    logger.error('Failed to get 2FA status', error);
     return false;
   }
 }

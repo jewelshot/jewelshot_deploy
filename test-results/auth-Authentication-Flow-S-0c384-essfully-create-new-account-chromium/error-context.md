@@ -1,0 +1,61 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e5]:
+    - button "Back to home" [ref=e6] [cursor=pointer]:
+      - img [ref=e7]
+      - generic [ref=e9]: Back to home
+    - generic [ref=e14]:
+      - generic [ref=e15]:
+        - heading "Create Account" [level=1] [ref=e16]
+        - paragraph [ref=e17]: Start creating stunning jewelry photos
+      - generic [ref=e18]:
+        - generic [ref=e20]:
+          - generic:
+            - img
+          - textbox "Full name" [ref=e21]: Test User
+        - generic [ref=e23]:
+          - generic:
+            - img
+          - textbox "Email address" [ref=e24]: test-1764327582754@example.com
+        - generic [ref=e26]:
+          - generic:
+            - img
+          - textbox "Password (min. 6 characters)" [ref=e27]: TestPassword123!
+        - generic [ref=e28]: Database error saving new user
+        - paragraph [ref=e29]:
+          - text: By signing up, you agree to our
+          - link "Terms of Service" [ref=e30] [cursor=pointer]:
+            - /url: "#"
+          - text: and
+          - link "Privacy Policy" [ref=e31] [cursor=pointer]:
+            - /url: "#"
+        - button "Create Account" [ref=e32] [cursor=pointer]
+      - generic [ref=e35]: Or continue with
+      - button "Continue with Google" [ref=e38] [cursor=pointer]:
+        - generic [ref=e39]:
+          - img [ref=e41]
+          - generic [ref=e46]: Continue with Google
+      - generic [ref=e47]:
+        - text: Already have an account?
+        - button "Sign in" [ref=e48] [cursor=pointer]
+  - generic [ref=e50]:
+    - generic [ref=e51]:
+      - generic [ref=e52]:
+        - heading "🍪 We use cookies" [level=3] [ref=e53]
+        - paragraph [ref=e54]: We use essential cookies to make our site work. We'd also like to use analytics cookies (privacy-focused, no personal data) to understand how you use our service and improve it.
+        - generic [ref=e55]:
+          - link "Privacy Policy" [ref=e56] [cursor=pointer]:
+            - /url: /privacy-policy
+          - link "Cookie Policy" [ref=e57] [cursor=pointer]:
+            - /url: /cookie-policy
+      - generic [ref=e58]:
+        - button "Essential Only" [ref=e59] [cursor=pointer]
+        - button "Accept All" [ref=e60] [cursor=pointer]
+    - group [ref=e61]:
+      - generic "What cookies do we use?" [ref=e62] [cursor=pointer]
+  - button "Open Next.js Dev Tools" [ref=e68] [cursor=pointer]:
+    - img [ref=e69]
+  - alert [ref=e72]
+```

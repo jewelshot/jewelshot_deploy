@@ -17,7 +17,8 @@ const logger = createScopedLogger('AdminRoute');
 
 type AdminRouteHandler = (
   request: NextRequest,
-  auth: AdminAuthResult
+  auth: AdminAuthResult,
+  context?: { params: Promise<Record<string, string>> }
 ) => Promise<NextResponse | Response>;
 
 interface AdminRouteConfig {
@@ -44,7 +45,10 @@ export function withAdminAuth(
   config: AdminRouteConfig,
   handler: AdminRouteHandler
 ) {
-  return async (request: NextRequest): Promise<NextResponse> => {
+  return async (
+    request: NextRequest,
+    context?: { params: Promise<Record<string, string>> }
+  ): Promise<NextResponse> => {
     const startTime = Date.now();
     let requestBody: any = null;
     let auth: AdminAuthResult | null = null;
@@ -93,7 +97,7 @@ export function withAdminAuth(
       }
 
       // 3. Execute handler
-      const response = await handler(request, auth);
+      const response = await handler(request, auth, context);
       const duration = Date.now() - startTime;
 
       // 4. Log success

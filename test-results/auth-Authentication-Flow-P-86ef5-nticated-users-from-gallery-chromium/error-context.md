@@ -1,0 +1,119 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - link "Skip to gallery" [ref=e2] [cursor=pointer]:
+    - /url: "#gallery-content"
+  - link "Skip to search" [ref=e3] [cursor=pointer]:
+    - /url: "#gallery-search"
+  - main "Image gallery":
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - heading "Gallery" [level=1] [ref=e6]
+        - paragraph [ref=e7]: Browse and manage your jewelry images
+      - generic [ref=e8]:
+        - button "All Images" [ref=e9] [cursor=pointer]: All Images
+        - button "Favorites" [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+          - text: Favorites
+        - button "Batches" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - text: Batches
+      - generic [ref=e17]:
+        - generic [ref=e18]:
+          - generic:
+            - img
+          - textbox "Search images..." [ref=e19]
+        - generic [ref=e20]:
+          - generic [ref=e21]:
+            - button "All" [ref=e22] [cursor=pointer]:
+              - generic [ref=e23]: All
+            - button "✨ AI Edited" [ref=e24] [cursor=pointer]:
+              - generic [ref=e25]: ✨
+              - generic [ref=e26]: AI Edited
+            - button "🎨 Manual" [ref=e27] [cursor=pointer]:
+              - generic [ref=e28]: 🎨
+              - generic [ref=e29]: Manual
+          - button "Newest First" [ref=e31] [cursor=pointer]:
+            - img [ref=e32]
+            - generic [ref=e34]: Newest First
+            - img [ref=e35]
+      - generic [ref=e37]:
+        - img [ref=e38]
+        - generic [ref=e40]:
+          - heading "No images yet" [level=3] [ref=e41]
+          - paragraph [ref=e42]: Start creating in Studio to see your images here
+  - complementary [ref=e43]:
+    - generic [ref=e44]:
+      - generic [ref=e45] [cursor=pointer]:
+        - img [ref=e47]
+        - generic [ref=e50]:
+          - generic [ref=e51]: Jewelshot
+          - generic [ref=e52]: STUDIO
+      - navigation [ref=e54]:
+        - link "Dashboard ⌘D" [ref=e55] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e56]
+          - generic [ref=e61]: Dashboard
+          - generic [ref=e62]: ⌘D
+        - link "Studio NEW" [ref=e63] [cursor=pointer]:
+          - /url: /studio
+          - img [ref=e64]
+          - generic [ref=e70]: Studio
+          - generic [ref=e71]: NEW
+        - link "Batch NEW" [ref=e72] [cursor=pointer]:
+          - /url: /batch
+          - img [ref=e73]
+          - generic [ref=e77]: Batch
+          - generic [ref=e78]: NEW
+        - link "Gallery" [ref=e79] [cursor=pointer]:
+          - /url: /gallery
+          - img [ref=e81]
+          - generic [ref=e85]: Gallery
+        - link "Library NEW" [ref=e86] [cursor=pointer]:
+          - /url: /library
+          - img [ref=e87]
+          - generic [ref=e89]: Library
+          - generic [ref=e90]: NEW
+        - link "Catalogue NEW" [ref=e91] [cursor=pointer]:
+          - /url: /catalogue
+          - img [ref=e92]
+          - generic [ref=e95]: Catalogue
+          - generic [ref=e96]: NEW
+        - link "Profile NEW" [ref=e97] [cursor=pointer]:
+          - /url: /profile
+          - img [ref=e98]
+          - generic [ref=e101]: Profile
+          - generic [ref=e102]: NEW
+  - button "Close sidebar" [expanded] [ref=e110] [cursor=pointer]:
+    - generic [ref=e111]: ›
+  - generic [ref=e113]:
+    - generic [ref=e114]:
+      - generic [ref=e115]:
+        - heading "🍪 We use cookies" [level=3] [ref=e116]
+        - paragraph [ref=e117]: We use essential cookies to make our site work. We'd also like to use analytics cookies (privacy-focused, no personal data) to understand how you use our service and improve it.
+        - generic [ref=e118]:
+          - link "Privacy Policy" [ref=e119] [cursor=pointer]:
+            - /url: /privacy-policy
+          - link "Cookie Policy" [ref=e120] [cursor=pointer]:
+            - /url: /cookie-policy
+      - generic [ref=e121]:
+        - button "Essential Only" [ref=e122] [cursor=pointer]
+        - button "Accept All" [ref=e123] [cursor=pointer]
+    - group [ref=e124]:
+      - generic "What cookies do we use?" [ref=e125] [cursor=pointer]
+  - generic [ref=e130] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e131]:
+      - img [ref=e132]
+    - generic [ref=e135]:
+      - button "Open issues overlay" [ref=e136]:
+        - generic [ref=e137]:
+          - generic [ref=e138]: "1"
+          - generic [ref=e139]: "2"
+        - generic [ref=e140]:
+          - text: Issue
+          - generic [ref=e141]: s
+      - button "Collapse issues badge" [ref=e142]:
+        - img [ref=e143]
+  - alert [ref=e145]
+```

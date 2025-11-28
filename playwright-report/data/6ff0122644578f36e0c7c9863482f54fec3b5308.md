@@ -1,0 +1,155 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - link "Skip to main content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - link "Skip to AI controls" [ref=e3] [cursor=pointer]:
+    - /url: "#ai-controls"
+  - navigation "Top toolbar":
+    - generic [ref=e6]: Jewelshot
+  - button "Close top bar" [expanded] [ref=e7] [cursor=pointer]:
+    - generic [ref=e8]: ∧
+  - complementary "AI generation controls":
+    - complementary [ref=e9]:
+      - generic [ref=e10]:
+        - generic [ref=e13]:
+          - button "Gender" [ref=e17] [cursor=pointer]:
+            - generic [ref=e18]: Gender
+            - img [ref=e19]
+          - button "Jewelry" [disabled] [ref=e24]:
+            - generic [ref=e25]: Jewelry
+            - img [ref=e26]
+        - generic [ref=e28]:
+          - button "📐 Aspect Ratio 9:16" [ref=e29] [cursor=pointer]:
+            - generic [ref=e30]:
+              - generic [ref=e31]: 📐
+              - generic [ref=e32]: Aspect Ratio
+            - generic [ref=e33]:
+              - generic [ref=e34]: 9:16
+              - img [ref=e35]
+          - generic [ref=e38]:
+            - button "1:1 Square" [ref=e39] [cursor=pointer]:
+              - generic [ref=e40]: 1:1
+              - generic [ref=e41]: Square
+            - button "4:5 Portrait" [ref=e42] [cursor=pointer]:
+              - generic [ref=e43]: 4:5
+              - generic [ref=e44]: Portrait
+            - button "3:4 Classic" [ref=e45] [cursor=pointer]:
+              - generic [ref=e46]: 3:4
+              - generic [ref=e47]: Classic
+            - button "2:3 Standard" [ref=e48] [cursor=pointer]:
+              - generic [ref=e49]: 2:3
+              - generic [ref=e50]: Standard
+            - button "9:16 Story" [ref=e51] [cursor=pointer]:
+              - generic [ref=e52]: 9:16
+              - generic [ref=e53]: Story
+            - button "16:9 Landscape" [ref=e54] [cursor=pointer]:
+              - generic [ref=e55]: 16:9
+              - generic [ref=e56]: Landscape
+            - button "21:9 Ultrawide" [ref=e57] [cursor=pointer]:
+              - generic [ref=e58]: 21:9
+              - generic [ref=e59]: Ultrawide
+            - button "4:3 Classic" [ref=e60] [cursor=pointer]:
+              - generic [ref=e61]: 4:3
+              - generic [ref=e62]: Classic
+        - generic [ref=e65]:
+          - button "Quick" [ref=e66] [cursor=pointer]
+          - button "Select" [ref=e67] [cursor=pointer]
+          - button "Adv" [ref=e68] [cursor=pointer]
+        - generic [ref=e70]:
+          - paragraph [ref=e71]: Select presets from the Library to get started
+          - generic [ref=e72]:
+            - img [ref=e73]
+            - paragraph [ref=e75]: No presets selected
+            - button "Go to Library" [ref=e76] [cursor=pointer]
+  - button "Open right sidebar" [ref=e77] [cursor=pointer]:
+    - generic [ref=e78]: ‹
+  - navigation "Bottom toolbar":
+    - generic [ref=e81]:
+      - img [ref=e82]
+      - generic [ref=e84]: File is too small (0.00MB). Minimum size is 0.001MB.
+      - button "Dismiss notification" [ref=e85] [cursor=pointer]:
+        - img [ref=e86]
+  - button "Close bottom bar" [expanded] [ref=e89] [cursor=pointer]:
+    - generic [ref=e90]: ∨
+  - main "Image editor canvas":
+    - generic [ref=e93]:
+      - img [ref=e94]
+      - heading "Welcome to Jewelshot Studio" [level=2] [ref=e97]
+      - paragraph [ref=e98]: Upload an image to start editing
+      - button "Upload Image" [ref=e101] [cursor=pointer]:
+        - img [ref=e102]
+        - text: Upload Image
+  - complementary [ref=e105]:
+    - generic [ref=e106]:
+      - generic [ref=e107] [cursor=pointer]:
+        - img [ref=e109]
+        - generic [ref=e112]:
+          - generic [ref=e113]: Jewelshot
+          - generic [ref=e114]: STUDIO
+      - navigation [ref=e116]:
+        - link "Dashboard ⌘D" [ref=e117] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e118]
+          - generic [ref=e123]: Dashboard
+          - generic [ref=e124]: ⌘D
+        - link "Studio NEW" [ref=e125] [cursor=pointer]:
+          - /url: /studio
+          - img [ref=e127]
+          - generic [ref=e133]: Studio
+          - generic [ref=e134]: NEW
+        - link "Batch NEW" [ref=e135] [cursor=pointer]:
+          - /url: /batch
+          - img [ref=e136]
+          - generic [ref=e140]: Batch
+          - generic [ref=e141]: NEW
+        - link "Gallery" [ref=e142] [cursor=pointer]:
+          - /url: /gallery
+          - img [ref=e143]
+          - generic [ref=e147]: Gallery
+        - link "Library NEW" [ref=e148] [cursor=pointer]:
+          - /url: /library
+          - img [ref=e149]
+          - generic [ref=e151]: Library
+          - generic [ref=e152]: NEW
+        - link "Catalogue NEW" [ref=e153] [cursor=pointer]:
+          - /url: /catalogue
+          - img [ref=e154]
+          - generic [ref=e157]: Catalogue
+          - generic [ref=e158]: NEW
+        - link "Profile NEW" [ref=e159] [cursor=pointer]:
+          - /url: /profile
+          - img [ref=e160]
+          - generic [ref=e163]: Profile
+          - generic [ref=e164]: NEW
+  - button "Close sidebar" [expanded] [ref=e172] [cursor=pointer]:
+    - generic [ref=e173]: ›
+  - generic [ref=e175]:
+    - generic [ref=e176]:
+      - generic [ref=e177]:
+        - heading "🍪 We use cookies" [level=3] [ref=e178]
+        - paragraph [ref=e179]: We use essential cookies to make our site work. We'd also like to use analytics cookies (privacy-focused, no personal data) to understand how you use our service and improve it.
+        - generic [ref=e180]:
+          - link "Privacy Policy" [ref=e181] [cursor=pointer]:
+            - /url: /privacy-policy
+          - link "Cookie Policy" [ref=e182] [cursor=pointer]:
+            - /url: /cookie-policy
+      - generic [ref=e183]:
+        - button "Essential Only" [ref=e184] [cursor=pointer]
+        - button "Accept All" [ref=e185] [cursor=pointer]
+    - group [ref=e186]:
+      - generic "What cookies do we use?" [ref=e187] [cursor=pointer]
+  - generic [ref=e192] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e193]:
+      - img [ref=e194]
+    - generic [ref=e197]:
+      - button "Open issues overlay" [ref=e198]:
+        - generic [ref=e199]:
+          - generic [ref=e200]: "0"
+          - generic [ref=e201]: "1"
+        - generic [ref=e202]: Issue
+      - button "Collapse issues badge" [ref=e203]:
+        - img [ref=e204]
+  - alert [ref=e206]
+```

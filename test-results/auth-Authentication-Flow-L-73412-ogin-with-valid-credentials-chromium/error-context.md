@@ -1,0 +1,51 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e5]:
+    - button "Back to home" [ref=e6] [cursor=pointer]:
+      - img [ref=e7]
+      - generic [ref=e9]: Back to home
+    - generic [ref=e14]:
+      - generic [ref=e15]:
+        - heading "Welcome Back" [level=1] [ref=e16]
+        - paragraph [ref=e17]: Sign in to your Jewelshot account
+      - generic [ref=e18]:
+        - generic [ref=e20]:
+          - generic:
+            - img
+          - textbox "Email address" [ref=e21]: test-1764327582762@example.com
+        - generic [ref=e23]:
+          - generic:
+            - img
+          - textbox "Password" [ref=e24]: TestPassword123!
+        - generic [ref=e25]: Invalid login credentials
+        - button "Forgot password?" [ref=e27] [cursor=pointer]
+        - button "Sign In" [ref=e28] [cursor=pointer]
+      - generic [ref=e31]: Or continue with
+      - button "Continue with Google" [ref=e34] [cursor=pointer]:
+        - generic [ref=e35]:
+          - img [ref=e37]
+          - generic [ref=e42]: Continue with Google
+      - generic [ref=e43]:
+        - text: Don't have an account?
+        - button "Sign up" [ref=e44] [cursor=pointer]
+  - generic [ref=e46]:
+    - generic [ref=e47]:
+      - generic [ref=e48]:
+        - heading "🍪 We use cookies" [level=3] [ref=e49]
+        - paragraph [ref=e50]: We use essential cookies to make our site work. We'd also like to use analytics cookies (privacy-focused, no personal data) to understand how you use our service and improve it.
+        - generic [ref=e51]:
+          - link "Privacy Policy" [ref=e52] [cursor=pointer]:
+            - /url: /privacy-policy
+          - link "Cookie Policy" [ref=e53] [cursor=pointer]:
+            - /url: /cookie-policy
+      - generic [ref=e54]:
+        - button "Essential Only" [ref=e55] [cursor=pointer]
+        - button "Accept All" [ref=e56] [cursor=pointer]
+    - group [ref=e57]:
+      - generic "What cookies do we use?" [ref=e58] [cursor=pointer]
+  - button "Open Next.js Dev Tools" [ref=e64] [cursor=pointer]:
+    - img [ref=e65]
+  - alert [ref=e68]
+```

@@ -1,0 +1,60 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e5]:
+    - button "Back to home" [ref=e6] [cursor=pointer]:
+      - img [ref=e7]
+      - generic [ref=e9]: Back to home
+    - generic [ref=e14]:
+      - generic [ref=e15]:
+        - heading "Create Account" [level=1] [ref=e16]
+        - paragraph [ref=e17]: Start creating stunning jewelry photos
+      - generic [ref=e18]:
+        - generic [ref=e20]:
+          - generic:
+            - img
+          - textbox "Full name" [ref=e21]
+        - generic [ref=e23]:
+          - generic:
+            - img
+          - textbox "Email address" [ref=e24]
+        - generic [ref=e26]:
+          - generic:
+            - img
+          - textbox "Password (min. 6 characters)" [ref=e27]
+        - paragraph [ref=e28]:
+          - text: By signing up, you agree to our
+          - link "Terms of Service" [ref=e29] [cursor=pointer]:
+            - /url: "#"
+          - text: and
+          - link "Privacy Policy" [ref=e30] [cursor=pointer]:
+            - /url: "#"
+        - button "Create Account" [ref=e31] [cursor=pointer]
+      - generic [ref=e34]: Or continue with
+      - button "Continue with Google" [ref=e37] [cursor=pointer]:
+        - generic [ref=e38]:
+          - img [ref=e40]
+          - generic [ref=e45]: Continue with Google
+      - generic [ref=e46]:
+        - text: Already have an account?
+        - button "Sign in" [ref=e47] [cursor=pointer]
+  - generic [ref=e49]:
+    - generic [ref=e50]:
+      - generic [ref=e51]:
+        - heading "🍪 We use cookies" [level=3] [ref=e52]
+        - paragraph [ref=e53]: We use essential cookies to make our site work. We'd also like to use analytics cookies (privacy-focused, no personal data) to understand how you use our service and improve it.
+        - generic [ref=e54]:
+          - link "Privacy Policy" [ref=e55] [cursor=pointer]:
+            - /url: /privacy-policy
+          - link "Cookie Policy" [ref=e56] [cursor=pointer]:
+            - /url: /cookie-policy
+      - generic [ref=e57]:
+        - button "Essential Only" [ref=e58] [cursor=pointer]
+        - button "Accept All" [ref=e59] [cursor=pointer]
+    - group [ref=e60]:
+      - generic "What cookies do we use?" [ref=e61] [cursor=pointer]
+  - button "Open Next.js Dev Tools" [ref=e67] [cursor=pointer]:
+    - img [ref=e68]
+  - alert [ref=e71]
+```
