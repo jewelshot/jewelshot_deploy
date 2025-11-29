@@ -58,6 +58,7 @@ export const CATEGORY_GROUPS: Record<string, string> = {
   'wrist-exposure': 'bracelet-styling',
   
   // Singular categories (no grouping)
+  'clothing-type': 'clothing',
   'skin-tone': 'skin',
   'makeup': 'makeup',
   'expression': 'expression',

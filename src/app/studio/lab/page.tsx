@@ -91,10 +91,29 @@ export default function StudioLabPage() {
   };
 
   const handleBlockSelect = (categoryId: string, blockId: string) => {
-    setSelections(prev => ({
-      ...prev,
-      [categoryId]: blockId,
-    }));
+    setSelections(prev => {
+      const newSelections = {
+        ...prev,
+        [categoryId]: blockId,
+      };
+      
+      // If clothing-type is selected, clear conflicting selections
+      if (categoryId === 'clothing-type') {
+        const selectedBlock = BLOCK_REGISTRY.getBlock(blockId);
+        if (selectedBlock?.conflictsWith) {
+          // Remove any selections that conflict with this clothing type
+          const conflictIds = selectedBlock.conflictsWith;
+          Object.keys(newSelections).forEach(key => {
+            const selectedBlockId = newSelections[key];
+            if (conflictIds.includes(selectedBlockId)) {
+              delete newSelections[key];
+            }
+          });
+        }
+      }
+      
+      return newSelections;
+    });
   };
 
   const toggleCategory = (categoryId: string) => {
@@ -512,13 +531,22 @@ export default function StudioLabPage() {
               {categoryBlocks.map(block => {
                 const isSelected = selectedBlockId === block.id;
                 
+                // Check if this block conflicts with selected clothing type
+                const selectedClothingId = selections['clothing-type'];
+                const selectedClothing = selectedClothingId ? BLOCK_REGISTRY.getBlock(selectedClothingId) : null;
+                const isConflicting = selectedClothing?.conflictsWith?.includes(block.id) || false;
+                const isDisabled = isConflicting && !isSelected;
+                
                 return (
                   <button
                     key={block.id}
-                    onClick={() => handleBlockSelect(category.id, block.id)}
+                    onClick={() => !isDisabled && handleBlockSelect(category.id, block.id)}
+                    disabled={isDisabled}
                     className={`rounded-lg border p-2 text-left transition-all ${
                       isSelected
                         ? 'border-purple-500 bg-purple-500/10 shadow-lg shadow-purple-500/20'
+                        : isDisabled
+                        ? 'border-red-500/20 bg-red-500/5 opacity-40 cursor-not-allowed'
                         : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
                     }`}
                   >
@@ -528,11 +556,17 @@ export default function StudioLabPage() {
                       )}
                       <div className="text-xs font-medium">
                         {block.name}
+                        {isDisabled && <span className="ml-1 text-red-400">⚠️</span>}
                       </div>
                     </div>
                     {block.description && (
                       <div className="text-[10px] text-white/60 leading-tight">
                         {block.description}
+                      </div>
+                    )}
+                    {isDisabled && (
+                      <div className="mt-1 text-[9px] text-red-400/80">
+                        Conflicts with clothing
                       </div>
                     )}
                   </button>

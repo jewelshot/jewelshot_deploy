@@ -23,6 +23,24 @@ export interface BlockContext {
  * Block Category (high-level grouping)
  * Example: "Hand Pose", "Nail Type", "Lighting"
  */
+/**
+ * Clothing constraints - what each clothing type allows/disallows
+ */
+export interface ClothingConstraints {
+  // Allowed neckline IDs for this clothing
+  allowedNecklines?: string[];
+  // Disallowed neckline IDs
+  disallowedNecklines?: string[];
+  // Allowed sleeve IDs
+  allowedSleeves?: string[];
+  // Forced sleeve type (auto-selected, user can't change)
+  forcedSleeve?: string;
+  // Allowed shoulder positions
+  allowedShoulders?: string[];
+  // Disallowed shoulder positions
+  disallowedShoulders?: string[];
+}
+
 export interface BlockCategory {
   id: string;
   name: string;
@@ -44,6 +62,14 @@ export interface BlockCategory {
   
   // Which block IDs trigger auto-show for this conditional category?
   autoShowTriggers?: string[];
+}
+
+/**
+ * MicroBlock with conflict detection support
+ */
+export interface MicroBlockWithConstraints extends MicroBlock {
+  // Clothing constraints (only for clothing-type blocks)
+  constraints?: ClothingConstraints;
 }
 
 /**
