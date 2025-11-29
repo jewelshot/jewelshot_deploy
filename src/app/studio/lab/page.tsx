@@ -8,7 +8,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Settings, ChevronDown, ChevronUp, Zap, Code } from 'lucide-react';
+import { Settings, ChevronDown, ChevronUp, Zap, Code, Shuffle } from 'lucide-react';
 import { BLOCK_REGISTRY } from '@/lib/prompt-system/registry';
 import { buildPromptFromSelections, buildGroupedJSON } from '@/lib/prompt-system/builder';
 import type { BlockSelections, Gender, JewelryType, BlockCategory } from '@/lib/prompt-system/types';
@@ -194,6 +194,37 @@ export default function StudioLabPage() {
     setGeneratedPrompt('');
   };
 
+  /**
+   * Randomize blocks for specific categories
+   */
+  const randomizeCategories = (categoryIds: string[]) => {
+    if (!gender || !jewelryType) return;
+
+    const newSelections = { ...selections };
+    
+    categoryIds.forEach(categoryId => {
+      const categoryBlocks = BLOCK_REGISTRY.getBlocksByCategory(categoryId, { gender, jewelryType });
+      if (categoryBlocks.length > 0) {
+        const randomBlock = categoryBlocks[Math.floor(Math.random() * categoryBlocks.length)];
+        newSelections[categoryId] = randomBlock.id;
+      }
+    });
+
+    setSelections(newSelections);
+  };
+
+  /**
+   * Randomize ALL categories except Gender and Jewelry Type
+   */
+  const randomizeAll = () => {
+    if (!gender || !jewelryType) return;
+
+    const allCategories = BLOCK_REGISTRY.getCategories({ gender, jewelryType });
+    const categoryIds = allCategories.map(cat => cat.id);
+    
+    randomizeCategories(categoryIds);
+  };
+
   const handleBlockSelect = (categoryId: string, blockId: string) => {
     setSelections(prev => {
       const newSelections = {
@@ -301,6 +332,15 @@ export default function StudioLabPage() {
             </div>
             
             <div className="flex items-center gap-3 text-sm">
+              {gender && jewelryType && (
+                <button
+                  onClick={randomizeAll}
+                  className="flex items-center gap-2 rounded-lg border border-purple-500/30 bg-purple-500/10 px-4 py-2 text-purple-400 transition-colors hover:bg-purple-500/20 hover:border-purple-500/50"
+                >
+                  <Shuffle className="h-4 w-4" />
+                  Random All
+                </button>
+              )}
               {(gender || jewelryType) && (
                 <button
                   onClick={handleResetAll}
@@ -425,7 +465,19 @@ export default function StudioLabPage() {
                       </p>
                     </div>
                   </div>
-                  {showWomenFeatures ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        randomizeCategories(universalWomenCategories.map(c => c.id));
+                      }}
+                      className={`rounded-lg border ${gender === 'women' ? 'border-purple-500/30 bg-purple-500/10 text-purple-400 hover:bg-purple-500/20' : 'border-blue-500/30 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20'} px-3 py-1.5 text-sm transition-colors flex items-center gap-1.5`}
+                    >
+                      <Shuffle className="h-3.5 w-3.5" />
+                      Random
+                    </button>
+                    {showWomenFeatures ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
+                  </div>
                 </button>
                 {showWomenFeatures && (
                   <div className={`p-5 pt-0 space-y-3 border-t ${gender === 'women' ? 'border-purple-500/20' : 'border-blue-500/20'}`}>
@@ -455,7 +507,19 @@ export default function StudioLabPage() {
                       </p>
                     </div>
                   </div>
-                  {showStyling ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        randomizeCategories(stylingCategories.map(c => c.id));
+                      }}
+                      className="rounded-lg border border-orange-500/30 bg-orange-500/10 text-orange-400 hover:bg-orange-500/20 px-3 py-1.5 text-sm transition-colors flex items-center gap-1.5"
+                    >
+                      <Shuffle className="h-3.5 w-3.5" />
+                      Random
+                    </button>
+                    {showStyling ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
+                  </div>
                 </button>
                 {showStyling && (
                   <div className="p-5 pt-0 space-y-3 border-t border-orange-500/20">
@@ -485,7 +549,19 @@ export default function StudioLabPage() {
                       </p>
                     </div>
                   </div>
-                  {showEnvironment ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        randomizeCategories(environmentCategories.map(c => c.id));
+                      }}
+                      className="rounded-lg border border-green-500/30 bg-green-500/10 text-green-400 hover:bg-green-500/20 px-3 py-1.5 text-sm transition-colors flex items-center gap-1.5"
+                    >
+                      <Shuffle className="h-3.5 w-3.5" />
+                      Random
+                    </button>
+                    {showEnvironment ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
+                  </div>
                 </button>
                 {showEnvironment && (
                   <div className="p-5 pt-0 space-y-3 border-t border-green-500/20">
@@ -515,7 +591,19 @@ export default function StudioLabPage() {
                       </p>
                     </div>
                   </div>
-                  {showCamera ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        randomizeCategories(cameraCategories.map(c => c.id));
+                      }}
+                      className="rounded-lg border border-cyan-500/30 bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 px-3 py-1.5 text-sm transition-colors flex items-center gap-1.5"
+                    >
+                      <Shuffle className="h-3.5 w-3.5" />
+                      Random
+                    </button>
+                    {showCamera ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
+                  </div>
                 </button>
                 {showCamera && (
                   <div className="p-5 pt-0 space-y-3 border-t border-cyan-500/20">
@@ -545,7 +633,19 @@ export default function StudioLabPage() {
                       </p>
                     </div>
                   </div>
-                  {showPostProduction ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        randomizeCategories(postProductionCategories.map(c => c.id));
+                      }}
+                      className="rounded-lg border border-pink-500/30 bg-pink-500/10 text-pink-400 hover:bg-pink-500/20 px-3 py-1.5 text-sm transition-colors flex items-center gap-1.5"
+                    >
+                      <Shuffle className="h-3.5 w-3.5" />
+                      Random
+                    </button>
+                    {showPostProduction ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
+                  </div>
                 </button>
                 {showPostProduction && (
                   <div className="p-5 pt-0 space-y-3 border-t border-pink-500/20">
@@ -575,7 +675,19 @@ export default function StudioLabPage() {
                       </p>
                     </div>
                   </div>
-                  {showCreativeDirection ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        randomizeCategories(creativeDirectionCategories.map(c => c.id));
+                      }}
+                      className="rounded-lg border border-indigo-500/30 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 px-3 py-1.5 text-sm transition-colors flex items-center gap-1.5"
+                    >
+                      <Shuffle className="h-3.5 w-3.5" />
+                      Random
+                    </button>
+                    {showCreativeDirection ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
+                  </div>
                 </button>
                 {showCreativeDirection && (
                   <div className="p-5 pt-0 space-y-3 border-t border-indigo-500/20">
@@ -605,7 +717,19 @@ export default function StudioLabPage() {
                       </p>
                     </div>
                   </div>
-                  {showLifestyleExtras ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        randomizeCategories(lifestyleExtrasCategories.map(c => c.id));
+                      }}
+                      className="rounded-lg border border-rose-500/30 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 px-3 py-1.5 text-sm transition-colors flex items-center gap-1.5"
+                    >
+                      <Shuffle className="h-3.5 w-3.5" />
+                      Random
+                    </button>
+                    {showLifestyleExtras ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
+                  </div>
                 </button>
                 {showLifestyleExtras && (
                   <div className="p-5 pt-0 space-y-3 border-t border-rose-500/20">
@@ -638,7 +762,19 @@ export default function StudioLabPage() {
                         </p>
                       </div>
                     </div>
-                    {showFaceDetailsSection ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          randomizeCategories(conditionalFaceCategories.map(c => c.id));
+                        }}
+                        className="rounded-lg border border-yellow-500/30 bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 px-3 py-1.5 text-sm transition-colors flex items-center gap-1.5"
+                      >
+                        <Shuffle className="h-3.5 w-3.5" />
+                        Random
+                      </button>
+                      {showFaceDetailsSection ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
+                    </div>
                   </button>
                   {showFaceDetailsSection && (
                     <div className="p-5 pt-0 space-y-3 border-t border-yellow-500/20">
@@ -673,7 +809,19 @@ export default function StudioLabPage() {
                         </p>
                       </div>
                     </div>
-                    {showJewelrySpecific ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          randomizeCategories(jewelrySpecificCategories.map(c => c.id));
+                        }}
+                        className="rounded-lg border border-blue-500/30 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 px-3 py-1.5 text-sm transition-colors flex items-center gap-1.5"
+                      >
+                        <Shuffle className="h-3.5 w-3.5" />
+                        Random
+                      </button>
+                      {showJewelrySpecific ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
+                    </div>
                   </button>
                   {showJewelrySpecific && (
                     <div className="p-5 pt-0 space-y-3 border-t border-blue-500/20">
