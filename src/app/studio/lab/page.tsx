@@ -119,10 +119,10 @@ export default function StudioLabPage() {
   }, [gender, jewelryType, selections, categories]);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white p-6">
-      <div className="mx-auto max-w-7xl">
+    <div className="min-h-screen bg-[#0a0a0a] text-white">
+      <div className="mx-auto max-w-7xl p-4 sm:p-6 pb-12">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/10">
@@ -178,7 +178,7 @@ export default function StudioLabPage() {
 
         {/* Jewelry Type Selector - Shows after gender selection */}
         {gender && !jewelryType && (
-          <div className="mb-8">
+          <div className="mb-6">
             <label className="mb-3 block text-xl font-semibold text-white">
               2️⃣ Select Jewelry Type
             </label>
@@ -212,9 +212,9 @@ export default function StudioLabPage() {
 
         {/* Block Selection - Shows after both gender and jewelry selected */}
         {gender && jewelryType && (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
             {/* Left: Block Selection */}
-            <div className="space-y-6">
+            <div className="space-y-6 w-full">
               {/* Gender-Based Blocks */}
               {genderBasedCategories.length > 0 && (
               <div>
@@ -225,7 +225,7 @@ export default function StudioLabPage() {
                     ({genderBasedCategories.length} categories)
                   </span>
                 </h2>
-                <div className="space-y-3">
+                <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2">
                   {genderBasedCategories.map(category => renderCategory(category))}
                 </div>
               </div>
@@ -246,7 +246,7 @@ export default function StudioLabPage() {
                       ({jewelryBasedCategories.length} categories)
                     </span>
                   </h2>
-                  <div className="space-y-3">
+                  <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2">
                     {jewelryBasedCategories.map(category => renderCategory(category))}
                   </div>
                 </div>
@@ -255,7 +255,7 @@ export default function StudioLabPage() {
             </div>
 
             {/* Right: Prompt Preview */}
-            <div className="space-y-4 sticky top-6">
+            <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">Generated Output</h2>
               <div className="flex gap-2">
@@ -296,7 +296,7 @@ export default function StudioLabPage() {
                 </button>
 
                 {generatedPrompt ? (
-                  <div className="rounded-lg border border-white/10 bg-white/5 p-4 max-h-96 overflow-y-auto">
+                  <div className="rounded-lg border border-white/10 bg-white/5 p-4 max-h-[600px] overflow-y-auto">
                     <pre className="whitespace-pre-wrap text-xs text-white/80 font-mono leading-relaxed">
                       {generatedPrompt}
                     </pre>
@@ -312,7 +312,7 @@ export default function StudioLabPage() {
               </>
             ) : (
               // JSON View
-              <div className="rounded-lg border border-white/10 bg-white/5 p-4 max-h-[500px] overflow-y-auto">
+              <div className="rounded-lg border border-white/10 bg-white/5 p-4 max-h-[600px] overflow-y-auto">
                 <pre className="whitespace-pre-wrap text-xs text-green-400 font-mono leading-relaxed">
                   {selectionsJson}
                 </pre>
@@ -325,7 +325,7 @@ export default function StudioLabPage() {
                 <h3 className="mb-3 text-sm font-medium text-white/80">
                   Selected Blocks ({selectedCount})
                 </h3>
-                <div className="space-y-2">
+                <div className="space-y-2 max-h-[300px] overflow-y-auto">
                   {Object.entries(selections).map(([categoryId, blockId]) => {
                     const category = categories.find(c => c.id === categoryId);
                     const block = BLOCK_REGISTRY.getBlock(blockId);
