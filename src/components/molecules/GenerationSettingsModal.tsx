@@ -9,7 +9,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Settings, User, Users, Circle, Square } from 'lucide-react';
+import { X, Settings } from 'lucide-react';
 
 type Gender = 'women' | 'men' | null;
 type JewelryType = 'ring' | 'necklace' | 'earring' | 'bracelet' | null;
@@ -32,26 +32,31 @@ interface GenerationSettingsModalProps {
 }
 
 const genderOptions = [
-  { value: 'women', label: 'Women', icon: User },
-  { value: 'men', label: 'Men', icon: Users },
+  { value: 'women', label: 'Women' },
+  { value: 'men', label: 'Men' },
 ];
 
 const jewelryOptions = [
-  { value: 'ring', label: 'Ring', icon: Circle },
-  { value: 'necklace', label: 'Necklace', icon: Circle },
-  { value: 'bracelet', label: 'Bracelet', icon: Circle },
-  { value: 'earring', label: 'Earring', icon: Circle },
+  { value: 'ring', label: 'Ring' },
+  { value: 'necklace', label: 'Necklace' },
+  { value: 'bracelet', label: 'Bracelet' },
+  { value: 'earring', label: 'Earring' },
 ];
 
-const aspectRatioOptions = [
-  { value: '1:1', label: '1:1', description: 'Square', ratio: 1 },
-  { value: '4:5', label: '4:5', description: 'Portrait', ratio: 0.8 },
-  { value: '3:4', label: '3:4', description: 'Classic', ratio: 0.75 },
-  { value: '2:3', label: '2:3', description: 'Standard', ratio: 0.667 },
+// Vertical formats - ordered by increasing width (narrowest to widest)
+const verticalRatios = [
   { value: '9:16', label: '9:16', description: 'Story', ratio: 0.5625 },
+  { value: '2:3', label: '2:3', description: 'Standard', ratio: 0.667 },
+  { value: '3:4', label: '3:4', description: 'Classic', ratio: 0.75 },
+  { value: '4:5', label: '4:5', description: 'Portrait', ratio: 0.8 },
+];
+
+// Horizontal formats - ordered by increasing width (narrowest to widest)
+const horizontalRatios = [
+  { value: '1:1', label: '1:1', description: 'Square', ratio: 1 },
+  { value: '4:3', label: '4:3', description: 'Classic', ratio: 1.333 },
   { value: '16:9', label: '16:9', description: 'Landscape', ratio: 1.778 },
   { value: '21:9', label: '21:9', description: 'Ultrawide', ratio: 2.333 },
-  { value: '4:3', label: '4:3', description: 'Classic', ratio: 1.333 },
 ];
 
 export function GenerationSettingsModal({
@@ -119,23 +124,19 @@ export function GenerationSettingsModal({
                 Gender
               </label>
               <div className="grid grid-cols-2 gap-2">
-                {genderOptions.map((option) => {
-                  const Icon = option.icon;
-                  return (
-                    <button
-                      key={option.value}
-                      onClick={() => onGenderChange(option.value as Gender)}
-                      className={`flex items-center justify-center gap-2 rounded-lg border px-4 py-3 text-sm font-medium transition-all ${
-                        gender === option.value
-                          ? 'border-purple-500 bg-purple-500/10 text-purple-400 shadow-lg shadow-purple-500/20'
-                          : 'border-white/10 bg-white/[0.02] text-white/60 hover:border-white/20 hover:bg-white/5 hover:text-white'
-                      }`}
-                    >
-                      <Icon className="h-4 w-4" />
-                      {option.label}
-                    </button>
-                  );
-                })}
+                {genderOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => onGenderChange(option.value as Gender)}
+                    className={`rounded-lg border px-4 py-3 text-sm font-medium transition-all ${
+                      gender === option.value
+                        ? 'border-purple-500 bg-purple-500/10 text-purple-400 shadow-lg shadow-purple-500/20'
+                        : 'border-white/10 bg-white/[0.02] text-white/60 hover:border-white/20 hover:bg-white/5 hover:text-white'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -145,23 +146,19 @@ export function GenerationSettingsModal({
                 Jewelry Type
               </label>
               <div className="grid grid-cols-2 gap-2">
-                {jewelryOptions.map((option) => {
-                  const Icon = option.icon;
-                  return (
-                    <button
-                      key={option.value}
-                      onClick={() => onJewelryChange(option.value as JewelryType)}
-                      className={`flex items-center justify-center gap-2 rounded-lg border px-4 py-3 text-sm font-medium capitalize transition-all ${
-                        jewelryType === option.value
-                          ? 'border-purple-500 bg-purple-500/10 text-purple-400 shadow-lg shadow-purple-500/20'
-                          : 'border-white/10 bg-white/[0.02] text-white/60 hover:border-white/20 hover:bg-white/5 hover:text-white'
-                      }`}
-                    >
-                      <Icon className="h-4 w-4" />
-                      {option.label}
-                    </button>
-                  );
-                })}
+                {jewelryOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => onJewelryChange(option.value as JewelryType)}
+                    className={`rounded-lg border px-4 py-3 text-sm font-medium capitalize transition-all ${
+                      jewelryType === option.value
+                        ? 'border-purple-500 bg-purple-500/10 text-purple-400 shadow-lg shadow-purple-500/20'
+                        : 'border-white/10 bg-white/[0.02] text-white/60 hover:border-white/20 hover:bg-white/5 hover:text-white'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -170,47 +167,80 @@ export function GenerationSettingsModal({
               <label className="mb-2 block text-sm font-medium text-white/80">
                 Aspect Ratio
               </label>
-              <div className="grid grid-cols-4 gap-2">
-                {aspectRatioOptions.map((option) => {
-                  // Calculate frame dimensions (max height 32px)
-                  const maxHeight = 32;
-                  const width = option.ratio >= 1 
-                    ? maxHeight * option.ratio 
-                    : maxHeight;
-                  const height = option.ratio >= 1 
-                    ? maxHeight 
-                    : maxHeight / option.ratio;
-                  
-                  return (
-                    <button
-                      key={option.value}
-                      onClick={() => onAspectRatioChange(option.value)}
-                      className={`group relative flex flex-col items-center gap-2 rounded-lg border px-2 py-3 transition-all ${
-                        aspectRatio === option.value
-                          ? 'border-purple-500 bg-purple-500/10 text-purple-400 shadow-lg shadow-purple-500/20'
-                          : 'border-white/10 bg-white/[0.02] text-white/60 hover:border-white/20 hover:bg-white/5 hover:text-white'
-                      }`}
-                      title={option.description}
-                    >
-                      {/* Visual Frame */}
-                      <div className="flex h-8 w-full items-center justify-center">
-                        <div
-                          className={`rounded border ${
-                            aspectRatio === option.value
-                              ? 'border-purple-400'
-                              : 'border-white/40 group-hover:border-white/60'
-                          }`}
-                          style={{
-                            width: `${Math.min(width, 40)}px`,
-                            height: `${Math.min(height, 32)}px`,
-                          }}
-                        />
-                      </div>
-                      {/* Label */}
-                      <div className="text-xs font-medium">{option.label}</div>
-                    </button>
-                  );
-                })}
+              <div className="space-y-2">
+                {/* Vertical Formats Row */}
+                <div className="grid grid-cols-4 gap-2">
+                  {verticalRatios.map((option) => {
+                    const maxHeight = 32;
+                    const width = maxHeight * option.ratio;
+                    const height = maxHeight;
+                    
+                    return (
+                      <button
+                        key={option.value}
+                        onClick={() => onAspectRatioChange(option.value)}
+                        className={`group relative flex flex-col items-center gap-2 rounded-lg border px-2 py-3 transition-all ${
+                          aspectRatio === option.value
+                            ? 'border-purple-500 bg-purple-500/10 text-purple-400 shadow-lg shadow-purple-500/20'
+                            : 'border-white/10 bg-white/[0.02] text-white/60 hover:border-white/20 hover:bg-white/5 hover:text-white'
+                        }`}
+                        title={option.description}
+                      >
+                        <div className="flex h-8 w-full items-center justify-center">
+                          <div
+                            className={`rounded border ${
+                              aspectRatio === option.value
+                                ? 'border-purple-400'
+                                : 'border-white/40 group-hover:border-white/60'
+                            }`}
+                            style={{
+                              width: `${width}px`,
+                              height: `${height}px`,
+                            }}
+                          />
+                        </div>
+                        <div className="text-xs font-medium">{option.label}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Horizontal Formats Row */}
+                <div className="grid grid-cols-4 gap-2">
+                  {horizontalRatios.map((option) => {
+                    const maxHeight = 32;
+                    const width = option.ratio >= 1 ? maxHeight * option.ratio : maxHeight;
+                    const height = option.ratio >= 1 ? maxHeight : maxHeight / option.ratio;
+                    
+                    return (
+                      <button
+                        key={option.value}
+                        onClick={() => onAspectRatioChange(option.value)}
+                        className={`group relative flex flex-col items-center gap-2 rounded-lg border px-2 py-3 transition-all ${
+                          aspectRatio === option.value
+                            ? 'border-purple-500 bg-purple-500/10 text-purple-400 shadow-lg shadow-purple-500/20'
+                            : 'border-white/10 bg-white/[0.02] text-white/60 hover:border-white/20 hover:bg-white/5 hover:text-white'
+                        }`}
+                        title={option.description}
+                      >
+                        <div className="flex h-8 w-full items-center justify-center">
+                          <div
+                            className={`rounded border ${
+                              aspectRatio === option.value
+                                ? 'border-purple-400'
+                                : 'border-white/40 group-hover:border-white/60'
+                            }`}
+                            style={{
+                              width: `${Math.min(width, 48)}px`,
+                              height: `${Math.min(height, 32)}px`,
+                            }}
+                          />
+                        </div>
+                        <div className="text-xs font-medium">{option.label}</div>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>
