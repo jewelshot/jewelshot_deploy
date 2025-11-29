@@ -37,6 +37,7 @@ export default function StudioLabPage() {
   const [showWomenFeatures, setShowWomenFeatures] = useState(true);
   const [showStyling, setShowStyling] = useState(true);
   const [showEnvironment, setShowEnvironment] = useState(true);
+  const [showCamera, setShowCamera] = useState(true);
   const [showFaceDetailsSection, setShowFaceDetailsSection] = useState(false);
   const [showJewelrySpecific, setShowJewelrySpecific] = useState(true);
   
@@ -52,12 +53,15 @@ export default function StudioLabPage() {
   // Environment category IDs (to separate from other features)
   const ENVIRONMENT_CATEGORY_IDS = ['location-background', 'lighting'];
   
-  // Separate WOMEN BODY FEATURES, STYLING, ENVIRONMENT, CONDITIONAL (Face Details), and JEWELRY-SPECIFIC features
+  // Camera category IDs (to separate from other features)
+  const CAMERA_CATEGORY_IDS = ['jewelry-framing', 'viewing-angle', 'focus-depth'];
+  
+  // Separate WOMEN BODY FEATURES, STYLING, ENVIRONMENT, CAMERA, CONDITIONAL (Face Details), and JEWELRY-SPECIFIC features
   const universalWomenCategories = useMemo(() => {
     return categories.filter(cat => {
-      // Universal WOMEN BODY: Exist across ALL jewelry types & NOT conditional & NOT styling & NOT environment
+      // Universal WOMEN BODY: Exist across ALL jewelry types & NOT conditional & NOT styling & NOT environment & NOT camera
       const jewelryTypes = cat.applicableTo.jewelryTypes;
-      return jewelryTypes.length > 1 && !cat.conditional && !STYLING_CATEGORY_IDS.includes(cat.id) && !ENVIRONMENT_CATEGORY_IDS.includes(cat.id);
+      return jewelryTypes.length > 1 && !cat.conditional && !STYLING_CATEGORY_IDS.includes(cat.id) && !ENVIRONMENT_CATEGORY_IDS.includes(cat.id) && !CAMERA_CATEGORY_IDS.includes(cat.id);
     }).sort((a, b) => a.order - b.order);
   }, [categories]);
   
@@ -72,6 +76,13 @@ export default function StudioLabPage() {
     return categories.filter(cat => {
       // Environment: Location and lighting
       return ENVIRONMENT_CATEGORY_IDS.includes(cat.id);
+    }).sort((a, b) => a.order - b.order);
+  }, [categories]);
+  
+  const cameraCategories = useMemo(() => {
+    return categories.filter(cat => {
+      // Camera: Framing, angle, focus
+      return CAMERA_CATEGORY_IDS.includes(cat.id);
     }).sort((a, b) => a.order - b.order);
   }, [categories]);
   
@@ -411,6 +422,36 @@ export default function StudioLabPage() {
                 {showEnvironment && (
                   <div className="p-5 pt-0 space-y-3 border-t border-green-500/20">
                     {environmentCategories.map(category => renderCategory(category))}
+                  </div>
+                )}
+              </div>
+            )}
+            
+              {/* 📷 CAMERA - Accordion */}
+              {cameraCategories.length > 0 && (
+              <div className="rounded-2xl border-2 border-cyan-500/30 bg-cyan-500/5">
+                <button
+                  onClick={() => setShowCamera(!showCamera)}
+                  className="w-full flex items-center justify-between p-5 hover:bg-cyan-500/10 transition-all rounded-t-2xl"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/20">
+                      <span className="text-2xl">📷</span>
+                    </div>
+                    <div className="text-left">
+                      <h2 className="text-lg font-bold text-white">
+                        Camera & Composition
+                      </h2>
+                      <p className="text-xs text-white/60">
+                        Jewelry framing, viewing angle & focus · {cameraCategories.length} categories
+                      </p>
+                    </div>
+                  </div>
+                  {showCamera ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
+                </button>
+                {showCamera && (
+                  <div className="p-5 pt-0 space-y-3 border-t border-cyan-500/20">
+                    {cameraCategories.map(category => renderCategory(category))}
                   </div>
                 )}
               </div>

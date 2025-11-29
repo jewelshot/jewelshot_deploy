@@ -253,6 +253,51 @@ export const ENVIRONMENT_CATEGORIES: BlockCategory[] = [
 ];
 
 // ============================================
+// CAMERA CATEGORIES (Jewelry-Centric)
+// ============================================
+
+export const CAMERA_CATEGORIES: BlockCategory[] = [
+  {
+    id: 'jewelry-framing',
+    name: 'Jewelry Framing',
+    icon: '🔍',
+    description: 'How jewelry fills the frame (jewelry always in focus)',
+    order: 1,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'viewing-angle',
+    name: 'Viewing Angle',
+    icon: '📐',
+    description: 'Camera angle relative to jewelry',
+    order: 2,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'focus-depth',
+    name: 'Focus & Depth',
+    icon: '🎯',
+    description: 'Jewelry sharpness vs background blur (jewelry always sharp)',
+    order: 3,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+];
+
+// ============================================
 // FACE DETAILS CATEGORIES (Conditional/Toggle)
 // ============================================
 
@@ -1054,6 +1099,258 @@ const LIGHTING_BLOCKS: MicroBlock[] = [
 ];
 
 // ============================================
+// CAMERA BLOCKS - Jewelry Framing (How jewelry fills frame)
+// ============================================
+
+const JEWELRY_FRAMING_BLOCKS: MicroBlock[] = [
+  // EXTREME CLOSE-UP (Jewelry dominates frame)
+  { 
+    id: 'frame-extreme-closeup', 
+    name: 'Extreme Close-Up', 
+    categoryId: 'jewelry-framing', 
+    icon: '🔬', 
+    promptFragment: 'extreme close-up on jewelry, filling entire frame, intricate details visible, minimal context', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['extreme', 'close-up', 'detail'], 
+    level: 'advanced',
+    conflictsWith: ['frame-wide-context', 'frame-lifestyle']
+  },
+  
+  // CLOSE-UP (Jewelry + immediate context)
+  { 
+    id: 'frame-closeup', 
+    name: 'Close-Up', 
+    categoryId: 'jewelry-framing', 
+    icon: '🔍', 
+    promptFragment: 'close-up on jewelry, prominent in frame with minimal surrounding context', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['close-up', 'prominent'], 
+    level: 'advanced',
+    conflictsWith: ['frame-extreme-closeup', 'frame-wide-context', 'frame-lifestyle']
+  },
+  
+  // DETAIL SHOT (Specific jewelry feature)
+  { 
+    id: 'frame-detail', 
+    name: 'Detail Shot', 
+    categoryId: 'jewelry-framing', 
+    icon: '💎', 
+    promptFragment: 'macro detail shot of jewelry, gemstones and settings in sharp focus, craftsmanship visible', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['detail', 'macro', 'craftsmanship'], 
+    level: 'advanced',
+    conflictsWith: ['frame-wide-context', 'frame-lifestyle']
+  },
+  
+  // MEDIUM (Jewelry + hand/neck/wrist context)
+  { 
+    id: 'frame-medium-context', 
+    name: 'Jewelry + Context', 
+    categoryId: 'jewelry-framing', 
+    icon: '👌', 
+    promptFragment: 'jewelry featured prominently with hand/neck/wrist context, balanced composition', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['medium', 'context', 'balanced'], 
+    level: 'advanced',
+    conflictsWith: ['frame-extreme-closeup', 'frame-lifestyle']
+  },
+  
+  // WIDE CONTEXT (Jewelry worn naturally, lifestyle feel but jewelry still clear)
+  { 
+    id: 'frame-wide-context', 
+    name: 'Wide Context', 
+    categoryId: 'jewelry-framing', 
+    icon: '🖼️', 
+    promptFragment: 'jewelry worn naturally in wider frame, model partial view, jewelry clearly visible', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['wide', 'context', 'natural'], 
+    level: 'advanced',
+    conflictsWith: ['frame-extreme-closeup', 'frame-detail']
+  },
+  
+  // LIFESTYLE (Jewelry in real-life context but still identifiable)
+  { 
+    id: 'frame-lifestyle', 
+    name: 'Lifestyle Context', 
+    categoryId: 'jewelry-framing', 
+    icon: '✨', 
+    promptFragment: 'jewelry in lifestyle context, natural moment captured, jewelry prominent and identifiable', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['lifestyle', 'natural', 'moment'], 
+    level: 'advanced',
+    conflictsWith: ['frame-extreme-closeup', 'frame-closeup', 'frame-detail']
+  },
+];
+
+// ============================================
+// CAMERA BLOCKS - Viewing Angle (Relative to jewelry)
+// ============================================
+
+const VIEWING_ANGLE_BLOCKS: MicroBlock[] = [
+  // EYE-LEVEL TO JEWELRY
+  { 
+    id: 'angle-eye-level', 
+    name: 'Eye-Level to Jewelry', 
+    categoryId: 'viewing-angle', 
+    icon: '👁️', 
+    promptFragment: 'camera at eye-level to jewelry, straight-on view, natural perspective', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['eye-level', 'straight', 'natural'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // OVERHEAD (Top-down on jewelry)
+  { 
+    id: 'angle-overhead', 
+    name: 'Overhead (Top-Down)', 
+    categoryId: 'viewing-angle', 
+    icon: '⬇️', 
+    promptFragment: 'overhead camera angle, looking down at jewelry from above, birds-eye view', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['overhead', 'top-down', 'birds-eye'], 
+    level: 'advanced',
+    conflictsWith: ['angle-low', 'angle-worms-eye']
+  },
+  
+  // 45-DEGREE (Classic product angle)
+  { 
+    id: 'angle-45-degree', 
+    name: '45-Degree Angle', 
+    categoryId: 'viewing-angle', 
+    icon: '📐', 
+    promptFragment: '45-degree angle to jewelry, classic product photography perspective', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['45-degree', 'classic', 'product'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // LOW ANGLE (Upward to jewelry)
+  { 
+    id: 'angle-low', 
+    name: 'Low Angle (Upward)', 
+    categoryId: 'viewing-angle', 
+    icon: '⬆️', 
+    promptFragment: 'low camera angle, looking up at jewelry, dramatic perspective', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['low', 'upward', 'dramatic'], 
+    level: 'advanced',
+    conflictsWith: ['angle-overhead', 'angle-worms-eye']
+  },
+  
+  // SIDE PROFILE (Jewelry in profile)
+  { 
+    id: 'angle-side-profile', 
+    name: 'Side Profile', 
+    categoryId: 'viewing-angle', 
+    icon: '↔️', 
+    promptFragment: 'side profile angle to jewelry, showing thickness and dimension', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['side', 'profile', 'dimension'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // THREE-QUARTER (Angled view)
+  { 
+    id: 'angle-three-quarter', 
+    name: 'Three-Quarter View', 
+    categoryId: 'viewing-angle', 
+    icon: '↗️', 
+    promptFragment: 'three-quarter angle to jewelry, dynamic perspective showing depth', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['three-quarter', 'dynamic', 'depth'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+];
+
+// ============================================
+// CAMERA BLOCKS - Focus & Depth (Jewelry always sharp)
+// ============================================
+
+const FOCUS_DEPTH_BLOCKS: MicroBlock[] = [
+  // JEWELRY PIN-SHARP, EVERYTHING ELSE SOFT BLUR (f/1.4-2.0)
+  { 
+    id: 'focus-jewelry-only', 
+    name: 'Jewelry Only Sharp', 
+    categoryId: 'focus-depth', 
+    icon: '💍', 
+    promptFragment: 'jewelry pin-sharp focus, extreme shallow depth of field, background and model soft blur, f/1.4-2.0', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['sharp', 'blur', 'shallow'], 
+    level: 'advanced',
+    conflictsWith: ['focus-jewelry-context-sharp', 'focus-all-sharp']
+  },
+  
+  // JEWELRY + IMMEDIATE SURFACE SHARP, REST BLUR (f/2.8-4.0)
+  { 
+    id: 'focus-jewelry-surface', 
+    name: 'Jewelry + Surface Sharp', 
+    categoryId: 'focus-depth', 
+    icon: '✨', 
+    promptFragment: 'jewelry and immediate surface sharp focus, shallow depth, background soft bokeh, f/2.8-4.0', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['sharp', 'surface', 'bokeh'], 
+    level: 'advanced',
+    conflictsWith: ['focus-jewelry-only', 'focus-all-sharp']
+  },
+  
+  // JEWELRY + HAND/NECK SHARP, BACKGROUND BLUR (f/4.0-5.6)
+  { 
+    id: 'focus-jewelry-context-sharp', 
+    name: 'Jewelry + Context Sharp', 
+    categoryId: 'focus-depth', 
+    icon: '🤲', 
+    promptFragment: 'jewelry and hand/neck in sharp focus, moderate depth, background gently blurred, f/4.0-5.6', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['sharp', 'context', 'moderate'], 
+    level: 'advanced',
+    conflictsWith: ['focus-jewelry-only', 'focus-all-sharp']
+  },
+  
+  // JEWELRY + MODEL MOSTLY SHARP, BACKGROUND SLIGHTLY SOFT (f/5.6-8.0)
+  { 
+    id: 'focus-jewelry-model', 
+    name: 'Jewelry + Model Sharp', 
+    categoryId: 'focus-depth', 
+    icon: '👤', 
+    promptFragment: 'jewelry and model in sharp focus, good depth, background slightly softened, f/5.6-8.0', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['sharp', 'model', 'good-depth'], 
+    level: 'advanced',
+    conflictsWith: ['focus-jewelry-only']
+  },
+  
+  // EVERYTHING SHARP, CATALOG STYLE (f/8.0-16)
+  { 
+    id: 'focus-all-sharp', 
+    name: 'All Sharp (Catalog)', 
+    categoryId: 'focus-depth', 
+    icon: '📸', 
+    promptFragment: 'everything in sharp focus, deep depth of field, catalog-style clarity, f/8.0-16', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['all-sharp', 'catalog', 'deep'], 
+    level: 'advanced',
+    conflictsWith: ['focus-jewelry-only', 'focus-jewelry-surface']
+  },
+  
+  // JEWELRY ULTRA-SHARP, ARTISTIC BOKEH (f/1.4-2.8 + post)
+  { 
+    id: 'focus-artistic-bokeh', 
+    name: 'Artistic Bokeh', 
+    categoryId: 'focus-depth', 
+    icon: '🌟', 
+    promptFragment: 'jewelry ultra-sharp, artistic bokeh background, dreamy circular lights, f/1.4-2.8', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['artistic', 'bokeh', 'dreamy'], 
+    level: 'advanced',
+    conflictsWith: ['focus-all-sharp']
+  },
+];
+
+// ============================================
 // STYLING BLOCKS - Upper Clothing Details
 // ============================================
 
@@ -1668,6 +1965,7 @@ export const WOMEN_ALL_CATEGORIES = [
   ...WOMEN_FACE_CATEGORIES, // Conditional (toggle)
   ...STYLING_CATEGORIES, // Separate styling group
   ...ENVIRONMENT_CATEGORIES, // Separate environment group
+  ...CAMERA_CATEGORIES, // Separate camera group
   ...WOMEN_RING_CATEGORIES,
   ...WOMEN_NECKLACE_CATEGORIES,
   ...WOMEN_EARRING_CATEGORIES,
@@ -1752,6 +2050,11 @@ export const WOMEN_ALL_BLOCKS: MicroBlock[] = [
   // Environment blocks
   ...LOCATION_BACKGROUND_BLOCKS,
   ...LIGHTING_BLOCKS,
+  
+  // Camera blocks
+  ...JEWELRY_FRAMING_BLOCKS,
+  ...VIEWING_ANGLE_BLOCKS,
+  ...FOCUS_DEPTH_BLOCKS,
   
   // Face Details blocks (Conditional/Toggle)
   ...RACE_ETHNICITY_BLOCKS,
