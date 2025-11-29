@@ -1372,6 +1372,19 @@ export const MEN_EARRING_CATEGORIES: BlockCategory[] = [
     },
     required: false,
   },
+  
+  {
+    id: 'ear-visibility-men',
+    name: 'Ear Visibility',
+    icon: '👂',
+    description: 'How clearly earrings are visible',
+    order: 722,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['earring'],
+    },
+    required: false,
+  },
 ];
 
 const HEAD_POSITION_MEN_EARRING_BLOCKS: MicroBlock[] = [
@@ -1387,6 +1400,13 @@ const HAIR_POSITION_MEN_EARRING_BLOCKS: MicroBlock[] = [
   { id: 'hair-slicked-back-men', name: 'Slicked Back', categoryId: 'hair-position-men-earring', icon: '💼', promptFragment: 'hair slicked back ears exposed earring visible clean', applicableTo: { gender: ['men'], jewelryTypes: ['earring'] }, tags: ['slicked', 'clean'], level: 'advanced' },
   { id: 'hair-undercut-men', name: 'Undercut', categoryId: 'hair-position-men-earring', icon: '✂️', promptFragment: 'undercut short sides ears visible earring displayed', applicableTo: { gender: ['men'], jewelryTypes: ['earring'] }, tags: ['undercut', 'visible'], level: 'advanced' },
   { id: 'hair-bald-men', name: 'Bald/Shaved', categoryId: 'hair-position-men-earring', icon: '🪒', promptFragment: 'bald shaved head ears fully visible earring prominent', applicableTo: { gender: ['men'], jewelryTypes: ['earring'] }, tags: ['bald', 'exposed'], level: 'advanced' },
+];
+
+const EAR_VISIBILITY_MEN_BLOCKS: MicroBlock[] = [
+  { id: 'ear-full-visible-men', name: 'Fully Visible', categoryId: 'ear-visibility-men', icon: '👁️', promptFragment: 'earring completely visible unobstructed clear view', applicableTo: { gender: ['men'], jewelryTypes: ['earring'] }, tags: ['full', 'clear'], level: 'advanced' },
+  { id: 'ear-partial-peek-men', name: 'Partial Peek', categoryId: 'ear-visibility-men', icon: '👀', promptFragment: 'earring partially visible artistic peek through hair', applicableTo: { gender: ['men'], jewelryTypes: ['earring'] }, tags: ['partial', 'peek'], level: 'advanced' },
+  { id: 'ear-dramatic-reveal-men', name: 'Dramatic Reveal', categoryId: 'ear-visibility-men', icon: '✨', promptFragment: 'earring dramatically revealed spotlight focus on ear jewelry', applicableTo: { gender: ['men'], jewelryTypes: ['earring'] }, tags: ['dramatic', 'reveal'], level: 'advanced' },
+  { id: 'ear-both-equal-men', name: 'Both Ears Equal', categoryId: 'ear-visibility-men', icon: '⚖️', promptFragment: 'both earrings equally visible symmetrical display', applicableTo: { gender: ['men'], jewelryTypes: ['earring'] }, tags: ['both', 'equal'], level: 'advanced' },
 ];
 
 // ===== BRACELET-SPECIFIC =====
@@ -1410,6 +1430,32 @@ export const MEN_BRACELET_CATEGORIES: BlockCategory[] = [
     icon: '💪',
     description: 'Overall arm positioning',
     order: 731,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['bracelet'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'sleeve-type-men',
+    name: 'Sleeve Type',
+    icon: '👔',
+    description: 'Sleeve length and style',
+    order: 732,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['bracelet'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'wrist-exposure-men',
+    name: 'Wrist Exposure',
+    icon: '🤚',
+    description: 'How much wrist/bracelet is visible',
+    order: 733,
     applicableTo: {
       gender: ['men'],
       jewelryTypes: ['bracelet'],
@@ -1442,6 +1488,22 @@ const ARM_POSITION_MEN_BRACELET_BLOCKS: MicroBlock[] = [
   { id: 'arm-leaning-men', name: 'Leaning on Wall', categoryId: 'arm-position-men-bracelet', icon: '🧱', promptFragment: 'arm leaning on wall casual pose wrist visible bracelet', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['leaning', 'casual'], level: 'advanced' },
 ];
 
+const SLEEVE_TYPE_MEN_BLOCKS: MicroBlock[] = [
+  { id: 'sleeve-none-men', name: 'No Sleeve/Tank', categoryId: 'sleeve-type-men', icon: '🎽', promptFragment: 'sleeveless tank top bare arms bracelet fully visible', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['sleeveless', 'tank'], level: 'advanced' },
+  { id: 'sleeve-short-men', name: 'Short Sleeve', categoryId: 'sleeve-type-men', icon: '👕', promptFragment: 'short sleeves arms visible bracelet displayed', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['short'], level: 'advanced' },
+  { id: 'sleeve-rolled-men', name: 'Rolled Up', categoryId: 'sleeve-type-men', icon: '🔄', promptFragment: 'sleeves rolled up casual forearms visible bracelet prominent', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['rolled', 'casual'], level: 'advanced' },
+  { id: 'sleeve-pushed-men', name: 'Pushed Up', categoryId: 'sleeve-type-men', icon: '⬆️', promptFragment: 'sleeves pushed up working style bracelet visible', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['pushed', 'working'], level: 'advanced' },
+  { id: 'sleeve-long-men', name: 'Long Sleeve', categoryId: 'sleeve-type-men', icon: '👔', promptFragment: 'long sleeves wrist covered bracelet under sleeve', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['long', 'covered'], level: 'advanced' },
+  { id: 'sleeve-jacket-men', name: 'Jacket/Blazer', categoryId: 'sleeve-type-men', icon: '🧥', promptFragment: 'jacket blazer sleeve formal wrist partially covered', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['jacket', 'formal'], level: 'advanced' },
+];
+
+const WRIST_EXPOSURE_MEN_BLOCKS: MicroBlock[] = [
+  { id: 'wrist-fully-exposed-men', name: 'Fully Exposed', categoryId: 'wrist-exposure-men', icon: '🤚', promptFragment: 'wrist fully exposed bare arms bracelet completely visible', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['fully-exposed'], level: 'advanced' },
+  { id: 'wrist-mostly-visible-men', name: 'Mostly Visible', categoryId: 'wrist-exposure-men', icon: '👀', promptFragment: 'wrist mostly visible sleeve edge visible bracelet displayed', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['mostly-visible'], level: 'advanced' },
+  { id: 'wrist-partially-covered-men', name: 'Partially Covered', categoryId: 'wrist-exposure-men', icon: '📏', promptFragment: 'wrist partially covered sleeve edge bracelet peek', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['partially-covered'], level: 'advanced' },
+  { id: 'wrist-mostly-covered-men', name: 'Mostly Covered', categoryId: 'wrist-exposure-men', icon: '👔', promptFragment: 'wrist mostly covered long sleeve bracelet subtle hint', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['mostly-covered'], level: 'advanced' },
+];
+
 // ============================================
 // AGGREGATE JEWELRY-SPECIFIC BLOCKS
 // ============================================
@@ -1460,11 +1522,14 @@ const MEN_NECKLACE_BLOCKS: MicroBlock[] = [
 const MEN_EARRING_BLOCKS: MicroBlock[] = [
   ...HEAD_POSITION_MEN_EARRING_BLOCKS,
   ...HAIR_POSITION_MEN_EARRING_BLOCKS,
+  ...EAR_VISIBILITY_MEN_BLOCKS,
 ];
 
 const MEN_BRACELET_BLOCKS: MicroBlock[] = [
   ...WRIST_POSE_MEN_BRACELET_BLOCKS,
   ...ARM_POSITION_MEN_BRACELET_BLOCKS,
+  ...SLEEVE_TYPE_MEN_BLOCKS,
+  ...WRIST_EXPOSURE_MEN_BLOCKS,
 ];
 
 // ============================================

@@ -73,6 +73,7 @@ export const CATEGORY_GROUPS: Record<string, string> = {
   // Head group (earring-specific - men)
   'head-position-men-earring': 'head',
   'hair-position-men-earring': 'head',
+  'ear-visibility-men': 'head',
 
   // Arm group (bracelet-specific - women)
   'wrist-pose': 'arm',
@@ -81,6 +82,8 @@ export const CATEGORY_GROUPS: Record<string, string> = {
   // Arm group (bracelet-specific - men)
   'wrist-pose-men-bracelet': 'arm',
   'arm-position-men-bracelet': 'arm',
+  'sleeve-type-men': 'bracelet-styling',
+  'wrist-exposure-men': 'bracelet-styling',
   
   // Necklace styling group
   'neckline': 'necklace-styling',
