@@ -7,7 +7,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Settings } from 'lucide-react';
 import { useSidebarStore } from '@/store/sidebarStore';
 import { GenerationSettingsModal } from '@/components/molecules/GenerationSettingsModal';
@@ -17,12 +17,20 @@ import { AdvancedModeContent } from '@/components/molecules/AdvancedModeContent'
 import { PresetConfirmModal } from '@/components/molecules/PresetConfirmModal';
 import { presetPrompts } from '@/lib/preset-prompts';
 import { createScopedLogger } from '@/lib/logger';
+import { loadGenerationSettings, areSettingsComplete, type GenerationSettings } from '@/lib/generation-settings-storage';
 
 const logger = createScopedLogger('RightSidebar');
 
 type Gender = 'women' | 'men' | null;
 type JewelryType = 'ring' | 'necklace' | 'earring' | 'bracelet' | null;
 type Mode = 'quick' | 'selective' | 'advanced';
+
+// Custom event for image upload
+declare global {
+  interface WindowEventMap {
+    'jewelshot:imageUploaded': CustomEvent;
+  }
+}
 
 interface RightSidebarProps {
   onGenerateWithPreset?: (prompt: string, aspectRatio?: string) => void;
@@ -39,12 +47,52 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
 
   // Modal states
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+  const [isSettingsRequired, setIsSettingsRequired] = useState(false);
   const [confirmModal, setConfirmModal] = useState<{
     show: boolean;
     presetName: string;
     presetId: string;
     requiresModel: boolean;
   } | null>(null);
+
+  // Load saved settings on mount
+  useEffect(() => {
+    const savedSettings = loadGenerationSettings();
+    if (savedSettings) {
+      setGender(savedSettings.gender);
+      setJewelryType(savedSettings.jewelryType);
+      setAspectRatio(savedSettings.aspectRatio);
+      logger.info('Loaded saved generation settings', savedSettings);
+    }
+  }, []);
+
+  // Listen for image upload events
+  useEffect(() => {
+    const handleImageUpload = () => {
+      logger.info('Image uploaded event received');
+      
+      // Check if we should apply saved settings or show modal
+      const savedSettings = loadGenerationSettings();
+      
+      if (savedSettings?.applyToAll && areSettingsComplete(savedSettings)) {
+        // Use saved settings without showing modal
+        logger.info('Using saved settings (apply to all enabled)');
+        setGender(savedSettings.gender);
+        setJewelryType(savedSettings.jewelryType);
+        setAspectRatio(savedSettings.aspectRatio);
+      } else {
+        // Show modal (required)
+        logger.info('Opening settings modal (required)');
+        setIsSettingsRequired(true);
+        setSettingsModalOpen(true);
+      }
+    };
+
+    window.addEventListener('jewelshot:imageUploaded', handleImageUpload);
+    return () => {
+      window.removeEventListener('jewelshot:imageUploaded', handleImageUpload);
+    };
+  }, []);
 
   // Handle preset selection (no restrictions - always allow)
   const handlePresetSelect = (presetId: string) => {
@@ -104,7 +152,19 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
     if (gender) parts.push(gender === 'women' ? 'Women' : 'Men');
     if (jewelryType) parts.push(jewelryType.charAt(0).toUpperCase() + jewelryType.slice(1));
     parts.push(aspectRatio);
-    return parts.join(' · ');
+    return parts.length > 1 ? parts.join(' · ') : 'Not configured';
+  };
+
+  // Handle settings modal save
+  const handleSettingsSave = (applyToAll: boolean) => {
+    logger.info('Settings saved', { gender, jewelryType, aspectRatio, applyToAll });
+    setIsSettingsRequired(false);
+  };
+
+  // Handle manual settings button click
+  const handleSettingsButtonClick = () => {
+    setIsSettingsRequired(false); // Not required when opened manually
+    setSettingsModalOpen(true);
   };
 
   return (
@@ -114,7 +174,7 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
       <div className="sidebar-scroll flex h-full flex-col overflow-y-auto px-4 py-3">
         {/* Settings Button - Replaces Configuration Accordion & Aspect Ratio */}
         <button
-          onClick={() => setSettingsModalOpen(true)}
+          onClick={handleSettingsButtonClick}
           className="group mb-3 flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2.5 transition-all hover:border-purple-500/30 hover:bg-purple-500/5"
         >
           <Settings className="h-4 w-4 text-purple-400 transition-transform group-hover:rotate-45" />
@@ -204,12 +264,14 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
         <GenerationSettingsModal
           isOpen={settingsModalOpen}
           onClose={() => setSettingsModalOpen(false)}
+          onSave={handleSettingsSave}
           gender={gender}
           onGenderChange={(value) => setGender(value)}
           jewelryType={jewelryType}
           onJewelryChange={(value) => setJewelryType(value)}
           aspectRatio={aspectRatio}
           onAspectRatioChange={setAspectRatio}
+          isRequired={isSettingsRequired}
         />
       </div>
     </aside>

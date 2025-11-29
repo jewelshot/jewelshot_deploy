@@ -193,6 +193,13 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
             // Auto-open right sidebar for AI generation setup
             openRight();
             logger.info('Image uploaded successfully, opening right sidebar');
+            
+            // 🎯 NEW: Dispatch image upload event for settings modal
+            const uploadEvent = new CustomEvent('jewelshot:imageUploaded', {
+              detail: { fileName: processedFile.name },
+            });
+            window.dispatchEvent(uploadEvent);
+            logger.info('📢 Image upload event dispatched');
           } else {
             throw new Error('Failed to read image file');
           }

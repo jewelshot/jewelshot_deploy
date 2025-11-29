@@ -9,7 +9,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Settings } from 'lucide-react';
+import { X, Settings, AlertCircle } from 'lucide-react';
+import { saveGenerationSettings, areSettingsComplete } from '@/lib/generation-settings-storage';
 
 type Gender = 'women' | 'men' | null;
 type JewelryType = 'ring' | 'necklace' | 'earring' | 'bracelet' | null;
@@ -17,6 +18,7 @@ type JewelryType = 'ring' | 'necklace' | 'earring' | 'bracelet' | null;
 interface GenerationSettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSave?: (applyToAll: boolean) => void;
   
   // Gender
   gender: Gender;
@@ -29,6 +31,9 @@ interface GenerationSettingsModalProps {
   // Aspect Ratio
   aspectRatio: string;
   onAspectRatioChange: (value: string) => void;
+  
+  // Required validation
+  isRequired?: boolean;
 }
 
 const genderOptions = [
@@ -62,18 +67,67 @@ const horizontalRatios = [
 export function GenerationSettingsModal({
   isOpen,
   onClose,
+  onSave,
   gender,
   onGenderChange,
   jewelryType,
   onJewelryChange,
   aspectRatio,
   onAspectRatioChange,
+  isRequired = false,
 }: GenerationSettingsModalProps) {
   const [mounted, setMounted] = useState(false);
+  const [applyToAll, setApplyToAll] = useState(false);
+  const [showValidationError, setShowValidationError] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Reset validation error when settings change
+  useEffect(() => {
+    if (showValidationError && areSettingsComplete({ gender, jewelryType, aspectRatio })) {
+      setShowValidationError(false);
+    }
+  }, [gender, jewelryType, aspectRatio, showValidationError]);
+
+  const handleClose = () => {
+    // If required and settings incomplete, show validation error
+    if (isRequired && !areSettingsComplete({ gender, jewelryType, aspectRatio })) {
+      setShowValidationError(true);
+      return;
+    }
+    
+    setShowValidationError(false);
+    onClose();
+  };
+
+  const handleDone = () => {
+    // Validate before closing
+    if (!areSettingsComplete({ gender, jewelryType, aspectRatio })) {
+      setShowValidationError(true);
+      return;
+    }
+
+    // Save to localStorage
+    if (gender && jewelryType) {
+      saveGenerationSettings({
+        gender,
+        jewelryType,
+        aspectRatio,
+        applyToAll,
+        timestamp: Date.now(),
+      });
+    }
+
+    // Call onSave callback
+    if (onSave) {
+      onSave(applyToAll);
+    }
+
+    setShowValidationError(false);
+    onClose();
+  };
 
   if (!isOpen || !mounted) return null;
 
@@ -245,13 +299,57 @@ export function GenerationSettingsModal({
             </div>
           </div>
 
+          {/* Validation Error */}
+          {showValidationError && (
+            <div className="mt-4 flex items-start gap-2 rounded-lg border border-red-500/20 bg-red-500/10 p-3">
+              <AlertCircle className="h-5 w-5 flex-shrink-0 text-red-400" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-red-400">
+                  Required Settings Missing
+                </p>
+                <p className="mt-1 text-xs text-red-400/80">
+                  Please select Gender, Jewelry Type, and Aspect Ratio to continue.
+                  These settings help AI generate better results.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Apply to All Checkbox */}
+          <div className="mt-4">
+            <label className="flex items-start gap-3 cursor-pointer group">
+              <input
+                type="checkbox"
+                checked={applyToAll}
+                onChange={(e) => setApplyToAll(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-white/20 bg-white/5 text-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-offset-0"
+              />
+              <div className="flex-1">
+                <span className="text-sm font-medium text-white group-hover:text-purple-300 transition-colors">
+                  Remember for all uploads
+                </span>
+                <p className="mt-0.5 text-xs text-white/60">
+                  Use these settings automatically for future images
+                </p>
+              </div>
+            </label>
+          </div>
+
           {/* Footer */}
-          <div className="mt-6 flex justify-end">
+          <div className="mt-6 flex justify-end gap-2">
+            {!isRequired && (
+              <button
+                onClick={handleClose}
+                className="rounded-lg border border-white/10 px-6 py-2.5 text-sm font-medium text-white/80 transition-colors hover:bg-white/5"
+              >
+                Cancel
+              </button>
+            )}
             <button
-              onClick={onClose}
+              onClick={handleDone}
               className="rounded-lg bg-purple-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-purple-700"
             >
-              Done
+              {isRequired ? 'Continue' : 'Done'}
             </button>
           </div>
         </div>
