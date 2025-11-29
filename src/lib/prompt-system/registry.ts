@@ -34,6 +34,14 @@ export class BlockRegistry {
   }
   
   /**
+   * Get all categories (no filtering)
+   */
+  getAllCategories(): BlockCategory[] {
+    return Array.from(this.categories.values())
+      .sort((a, b) => a.order - b.order);
+  }
+  
+  /**
    * Get all categories applicable to context
    */
   getCategories(context: BlockContext): BlockCategory[] {

@@ -85,46 +85,40 @@ export default function StudioLabPage() {
   }, [categories]);
   
   const stylingCategories = useMemo(() => {
-    return categories.filter(cat => {
-      // Styling: Clothing-related categories
-      return STYLING_CATEGORY_IDS.includes(cat.id);
-    }).sort((a, b) => a.order - b.order);
-  }, [categories]);
+    // Always show styling (universal, not gender/jewelry dependent)
+    const allCategories = BLOCK_REGISTRY.getAllCategories();
+    return allCategories.filter(cat => STYLING_CATEGORY_IDS.includes(cat.id)).sort((a, b) => a.order - b.order);
+  }, []);
   
   const environmentCategories = useMemo(() => {
-    return categories.filter(cat => {
-      // Environment: Location and lighting
-      return ENVIRONMENT_CATEGORY_IDS.includes(cat.id);
-    }).sort((a, b) => a.order - b.order);
-  }, [categories]);
+    // Always show environment (universal, not gender/jewelry dependent)
+    const allCategories = BLOCK_REGISTRY.getAllCategories();
+    return allCategories.filter(cat => ENVIRONMENT_CATEGORY_IDS.includes(cat.id)).sort((a, b) => a.order - b.order);
+  }, []);
   
   const cameraCategories = useMemo(() => {
-    return categories.filter(cat => {
-      // Camera: Framing, angle, focus, composition
-      return CAMERA_CATEGORY_IDS.includes(cat.id);
-    }).sort((a, b) => a.order - b.order);
-  }, [categories]);
+    // Always show camera (universal, not gender/jewelry dependent)
+    const allCategories = BLOCK_REGISTRY.getAllCategories();
+    return allCategories.filter(cat => CAMERA_CATEGORY_IDS.includes(cat.id)).sort((a, b) => a.order - b.order);
+  }, []);
   
   const postProductionCategories = useMemo(() => {
-    return categories.filter(cat => {
-      // Post-production: Processing level, color grading
-      return POST_PRODUCTION_CATEGORY_IDS.includes(cat.id);
-    }).sort((a, b) => a.order - b.order);
-  }, [categories]);
+    // Always show post-production (universal, not gender/jewelry dependent)
+    const allCategories = BLOCK_REGISTRY.getAllCategories();
+    return allCategories.filter(cat => POST_PRODUCTION_CATEGORY_IDS.includes(cat.id)).sort((a, b) => a.order - b.order);
+  }, []);
   
   const creativeDirectionCategories = useMemo(() => {
-    return categories.filter(cat => {
-      // Creative direction: Intent, mood, context
-      return CREATIVE_DIRECTION_CATEGORY_IDS.includes(cat.id);
-    }).sort((a, b) => a.order - b.order);
-  }, [categories]);
+    // Always show creative direction (universal, not gender/jewelry dependent)
+    const allCategories = BLOCK_REGISTRY.getAllCategories();
+    return allCategories.filter(cat => CREATIVE_DIRECTION_CATEGORY_IDS.includes(cat.id)).sort((a, b) => a.order - b.order);
+  }, []);
   
   const lifestyleExtrasCategories = useMemo(() => {
-    return categories.filter(cat => {
-      // Lifestyle extras: Props
-      return LIFESTYLE_EXTRAS_CATEGORY_IDS.includes(cat.id);
-    }).sort((a, b) => a.order - b.order);
-  }, [categories]);
+    // Always show lifestyle extras (universal, not gender/jewelry dependent)
+    const allCategories = BLOCK_REGISTRY.getAllCategories();
+    return allCategories.filter(cat => LIFESTYLE_EXTRAS_CATEGORY_IDS.includes(cat.id)).sort((a, b) => a.order - b.order);
+  }, []);
   
   const conditionalFaceCategories = useMemo(() => {
     return categories.filter(cat => {
@@ -372,13 +366,12 @@ export default function StudioLabPage() {
             </div>
         </div>
 
-        {/* Block Selection - Shows after both gender and jewelry selected */}
-        {gender && jewelryType && (
-          <div className="grid grid-cols-1 gap-8 xl:grid-cols-2">
-            {/* Left: Block Selection */}
-            <div className="space-y-8 w-full">
-              {/* 1️⃣ UNIVERSAL WOMEN FEATURES - Accordion */}
-              {universalWomenCategories.length > 0 && (
+        {/* Block Selection - Always visible, some sections require gender/jewelry selection */}
+        <div className="grid grid-cols-1 gap-8 xl:grid-cols-2">
+          {/* Left: Block Selection */}
+          <div className="space-y-8 w-full">
+            {/* 1️⃣ UNIVERSAL WOMEN FEATURES - Accordion (requires gender & jewelry) */}
+            {gender && jewelryType && universalWomenCategories.length > 0 && (
               <div className="rounded-2xl border-2 border-purple-500/30 bg-purple-500/5">
                 <button
                   onClick={() => setShowWomenFeatures(!showWomenFeatures)}
@@ -620,8 +613,8 @@ export default function StudioLabPage() {
                 </div>
               )}
             
-              {/* 2️⃣ JEWELRY-SPECIFIC FEATURES - Accordion */}
-              {jewelrySpecificCategories.length > 0 && (
+              {/* 2️⃣ JEWELRY-SPECIFIC FEATURES - Accordion (requires gender & jewelry) */}
+              {gender && jewelryType && jewelrySpecificCategories.length > 0 && (
                 <div className="rounded-2xl border-2 border-blue-500/30 bg-blue-500/5">
                   <button
                     onClick={() => setShowJewelrySpecific(!showJewelrySpecific)}
@@ -777,7 +770,6 @@ export default function StudioLabPage() {
             )}
           </div>
         </div>
-        )}
       </div>
     </div>
   );

@@ -788,6 +788,32 @@ export const WOMEN_NECKLACE_CATEGORIES: BlockCategory[] = [
     },
     required: false,
   },
+  
+  {
+    id: 'chest-presentation',
+    name: 'Chest Presentation',
+    icon: '💝',
+    description: 'Bust/chest area styling',
+    order: 45,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['necklace'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'chain-positioning',
+    name: 'Chain/Pendant Positioning',
+    icon: '⛓️',
+    description: 'How necklace chain and pendant rest',
+    order: 46,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['necklace'],
+    },
+    required: false,
+  },
 ];
 
 // ============================================
@@ -2459,6 +2485,21 @@ const COLLARBONE_BLOCKS: MicroBlock[] = [
   { id: 'collarbone-hidden', name: 'Hidden', categoryId: 'collarbone', icon: '⬛', promptFragment: 'collarbone hidden covered', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['hidden', 'covered'], level: 'advanced' },
 ];
 
+const CHEST_PRESENTATION_BLOCKS: MicroBlock[] = [
+  { id: 'chest-modest', name: 'Modest Coverage', categoryId: 'chest-presentation', icon: '👔', promptFragment: 'modest chest coverage, conservative presentation', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['modest', 'conservative'], level: 'advanced' },
+  { id: 'chest-subtle', name: 'Subtle Elegant', categoryId: 'chest-presentation', icon: '✨', promptFragment: 'subtle elegant chest presentation, refined tasteful', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['subtle', 'elegant'], level: 'advanced' },
+  { id: 'chest-natural', name: 'Natural Relaxed', categoryId: 'chest-presentation', icon: '🌿', promptFragment: 'natural relaxed chest area, comfortable casual', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['natural', 'relaxed'], level: 'advanced' },
+  { id: 'chest-sculpted', name: 'Sculpted Defined', categoryId: 'chest-presentation', icon: '💪', promptFragment: 'sculpted defined chest contours, athletic fit', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['sculpted', 'defined'], level: 'advanced' },
+  { id: 'chest-soft', name: 'Soft Feminine', categoryId: 'chest-presentation', icon: '🌸', promptFragment: 'soft feminine chest curves, gentle natural form', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['soft', 'feminine'], level: 'advanced' },
+];
+
+const CHAIN_POSITIONING_BLOCKS: MicroBlock[] = [
+  { id: 'chain-centered', name: 'Centered Perfect', categoryId: 'chain-positioning', icon: '⊕', promptFragment: 'necklace chain centered perfectly, symmetrical fall, pendant aligned', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['centered', 'symmetrical'], level: 'advanced' },
+  { id: 'chain-natural-drape', name: 'Natural Drape', categoryId: 'chain-positioning', icon: '〰️', promptFragment: 'chain natural drape, organic fall following neckline', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['natural', 'drape'], level: 'advanced' },
+  { id: 'chain-layered', name: 'Layered Stack', categoryId: 'chain-positioning', icon: '📿', promptFragment: 'necklace layered with multiple chains, stacked arrangement', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['layered', 'stacked'], level: 'advanced' },
+  { id: 'chain-asymmetric', name: 'Asymmetric Fall', categoryId: 'chain-positioning', icon: '⚖️', promptFragment: 'chain asymmetric fall, artistic off-center positioning', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['asymmetric', 'artistic'], level: 'advanced' },
+];
+
 // Hair Length Blocks
 const HAIR_LENGTH_BLOCKS: MicroBlock[] = [
   { id: 'hair-length-pixie', name: 'Pixie/Very Short', categoryId: 'hair-length', icon: '✂️', promptFragment: 'pixie cut very short', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['short', 'pixie'], level: 'advanced' },
@@ -2645,6 +2686,19 @@ export const WOMEN_EARRING_CATEGORIES: BlockCategory[] = [
     },
     required: false,
   },
+  
+  {
+    id: 'ear-visibility',
+    name: 'Ear Visibility',
+    icon: '👂',
+    description: 'How clearly earrings are visible',
+    order: 52,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['earring'],
+    },
+    required: false,
+  },
 ];
 
 // ============================================
@@ -2741,6 +2795,13 @@ const HAIR_POSITION_BLOCKS: MicroBlock[] = [
   { id: 'hair-updo-ears', name: 'Updo (Ears Exposed)', categoryId: 'hair-position', icon: '💁', promptFragment: 'hair in elegant updo, ears completely visible', applicableTo: { gender: ['women'], jewelryTypes: ['earring'] }, tags: ['updo', 'exposed'], level: 'advanced' },
 ];
 
+const EAR_VISIBILITY_BLOCKS: MicroBlock[] = [
+  { id: 'ear-full-visible', name: 'Fully Visible', categoryId: 'ear-visibility', icon: '👁️', promptFragment: 'earring completely visible, unobstructed clear view', applicableTo: { gender: ['women'], jewelryTypes: ['earring'] }, tags: ['full', 'clear'], level: 'advanced' },
+  { id: 'ear-partial-peek', name: 'Partial Peek', categoryId: 'ear-visibility', icon: '👀', promptFragment: 'earring partially visible, artistic peek through hair', applicableTo: { gender: ['women'], jewelryTypes: ['earring'] }, tags: ['partial', 'peek'], level: 'advanced' },
+  { id: 'ear-dramatic-reveal', name: 'Dramatic Reveal', categoryId: 'ear-visibility', icon: '✨', promptFragment: 'earring dramatically revealed, spotlight focus on ear jewelry', applicableTo: { gender: ['women'], jewelryTypes: ['earring'] }, tags: ['dramatic', 'reveal'], level: 'advanced' },
+  { id: 'ear-both-equal', name: 'Both Ears Equal', categoryId: 'ear-visibility', icon: '⚖️', promptFragment: 'both earrings equally visible, symmetrical display', applicableTo: { gender: ['women'], jewelryTypes: ['earring'] }, tags: ['both', 'equal'], level: 'advanced' },
+];
+
 // ============================================
 // BRACELET BLOCKS
 // ============================================
@@ -2749,12 +2810,24 @@ const WRIST_POSE_BLOCKS: MicroBlock[] = [
   { id: 'wrist-extended', name: 'Extended Forward', categoryId: 'wrist-pose', icon: '👉', promptFragment: 'wrist extended forward, arm outstretched, bracelet displayed', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['extended', 'forward'], level: 'advanced' },
   { id: 'wrist-relaxed', name: 'Relaxed Down', categoryId: 'wrist-pose', icon: '🤚', promptFragment: 'wrist relaxed down, arm hanging naturally', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['relaxed', 'down'], level: 'advanced' },
   { id: 'wrist-hand-up', name: 'Hand Up', categoryId: 'wrist-pose', icon: '🙋', promptFragment: 'hand raised up, wrist elevated, graceful gesture', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['up', 'raised'], level: 'advanced' },
+  { id: 'wrist-bent-inward', name: 'Bent Inward', categoryId: 'wrist-pose', icon: '🤲', promptFragment: 'wrist bent inward toward body, intimate gesture, bracelet close', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['bent', 'inward'], level: 'advanced' },
+  { id: 'wrist-crossed-arms', name: 'Crossed Arms', categoryId: 'wrist-pose', icon: '🙅', promptFragment: 'arms crossed, wrist visible on folded arms, bracelet prominent', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['crossed', 'folded'], level: 'advanced' },
+  { id: 'wrist-hand-on-hip', name: 'Hand on Hip', categoryId: 'wrist-pose', icon: '🤷', promptFragment: 'hand resting on hip, wrist angled, bracelet cascading down', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['hip', 'angled'], level: 'advanced' },
+  { id: 'wrist-hand-to-face', name: 'Hand to Face', categoryId: 'wrist-pose', icon: '🤔', promptFragment: 'hand gently touching face, wrist near cheek, bracelet framing', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['face', 'touching'], level: 'advanced' },
+  { id: 'wrist-hands-clasped', name: 'Hands Clasped', categoryId: 'wrist-pose', icon: '🙏', promptFragment: 'hands clasped together, both wrists visible, bracelets displayed', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['clasped', 'together'], level: 'advanced' },
+  { id: 'wrist-arm-bent-90', name: 'Arm Bent 90°', categoryId: 'wrist-pose', icon: '💪', promptFragment: 'arm bent 90 degrees, wrist at shoulder level, bracelet hanging naturally', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['bent', '90-degree'], level: 'advanced' },
+  { id: 'wrist-reaching-gesture', name: 'Reaching Gesture', categoryId: 'wrist-pose', icon: '🤸', promptFragment: 'arm reaching upward or outward, wrist extended gracefully, bracelet sliding', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['reaching', 'extended'], level: 'advanced' },
 ];
 
 const ARM_POSITION_BLOCKS: MicroBlock[] = [
   { id: 'arm-vertical', name: 'Vertical Down', categoryId: 'arm-position', icon: '⬇️', promptFragment: 'arm vertical down natural hanging', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['vertical', 'down'], level: 'advanced' },
   { id: 'arm-horizontal', name: 'Horizontal', categoryId: 'arm-position', icon: '↔️', promptFragment: 'arm horizontal across extended', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['horizontal', 'across'], level: 'advanced' },
   { id: 'arm-diagonal', name: 'Diagonal', categoryId: 'arm-position', icon: '↗️', promptFragment: 'arm diagonal angle dynamic', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['diagonal', 'dynamic'], level: 'advanced' },
+  { id: 'arm-behind-back', name: 'Behind Back', categoryId: 'arm-position', icon: '🔙', promptFragment: 'arm positioned behind back, wrist visible from side, elegant posture', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['behind', 'back'], level: 'advanced' },
+  { id: 'arm-overhead', name: 'Overhead Raised', categoryId: 'arm-position', icon: '🙌', promptFragment: 'arm raised overhead, wrist above head, bracelet sliding down forearm', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['overhead', 'raised'], level: 'advanced' },
+  { id: 'arm-chest-level', name: 'Chest Level', categoryId: 'arm-position', icon: '🤝', promptFragment: 'arm at chest level, wrist centered, bracelet focal point', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['chest', 'center'], level: 'advanced' },
+  { id: 'arm-resting-surface', name: 'Resting on Surface', categoryId: 'arm-position', icon: '🪑', promptFragment: 'arm resting on table or armrest, wrist relaxed, bracelet naturally positioned', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['resting', 'surface'], level: 'advanced' },
+  { id: 'arm-side-extended', name: 'Side Extended', categoryId: 'arm-position', icon: '🤸', promptFragment: 'arm extended to the side, wrist visible from profile, bracelet highlighted', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['side', 'extended'], level: 'advanced' },
 ];
 
 // ============================================
@@ -2844,10 +2917,13 @@ export const WOMEN_ALL_BLOCKS: MicroBlock[] = [
   ...DECOLLETAGE_BLOCKS,
   ...SHOULDER_POSITION_BLOCKS,
   ...COLLARBONE_BLOCKS,
+  ...CHEST_PRESENTATION_BLOCKS,
+  ...CHAIN_POSITIONING_BLOCKS,
   
   // Earring-specific blocks
   ...HEAD_POSITION_BLOCKS,
   ...HAIR_POSITION_BLOCKS,
+  ...EAR_VISIBILITY_BLOCKS,
   
   // Bracelet-specific blocks
   ...WRIST_POSE_BLOCKS,

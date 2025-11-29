@@ -42,6 +42,7 @@ export const CATEGORY_GROUPS: Record<string, string> = {
   // Head group (earring-specific)
   'head-position': 'head',
   'hair-position': 'head',
+  'ear-visibility': 'head',
   
   // Arm group (bracelet-specific)
   'wrist-pose': 'arm',
@@ -52,6 +53,8 @@ export const CATEGORY_GROUPS: Record<string, string> = {
   'decolletage': 'necklace-styling',
   'shoulder-position': 'necklace-styling',
   'collarbone': 'necklace-styling',
+  'chest-presentation': 'necklace-styling',
+  'chain-positioning': 'necklace-styling',
   
   // Bracelet styling group
   'sleeve-type': 'bracelet-styling',
