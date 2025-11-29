@@ -47,10 +47,12 @@ export default function StudioLabPage() {
   }, [categories]);
   
   const jewelrySpecificCategories = useMemo(() => {
+    if (!jewelryType) return [];
+    const currentJewelryType = jewelryType; // Type narrowing for TypeScript
     return categories.filter(cat => {
       // Jewelry-specific: Only for this specific jewelry type
       const jewelryTypes = cat.applicableTo.jewelryTypes;
-      return jewelryTypes.length === 1 && jewelryTypes.includes(jewelryType);
+      return jewelryTypes.length === 1 && jewelryTypes.includes(currentJewelryType);
     }).sort((a, b) => a.order - b.order);
   }, [categories, jewelryType]);
   
