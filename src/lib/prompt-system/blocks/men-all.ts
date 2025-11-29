@@ -850,16 +850,111 @@ const MEN_STYLING_BLOCKS: MicroBlock[] = [
 ];
 
 // ============================================
+// MEN ENVIRONMENT CATEGORIES
+// ============================================
+
+export const MEN_ENVIRONMENT_CATEGORIES: BlockCategory[] = [
+  // Location & Background
+  {
+    id: 'location-background-men',
+    name: 'Location & Background',
+    icon: '🌍',
+    description: 'Setting and background environment',
+    order: 200,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  // Lighting
+  {
+    id: 'lighting-men',
+    name: 'Lighting',
+    icon: '💡',
+    description: 'Light source and quality',
+    order: 201,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+];
+
+// ============================================
+// MEN ENVIRONMENT BLOCKS
+// ============================================
+
+// Location & Background Blocks
+const LOCATION_BACKGROUND_MEN_BLOCKS: MicroBlock[] = [
+  // Universal/Shared Locations
+  { id: 'loc-studio-white-men', name: 'Studio White', categoryId: 'location-background-men', icon: '⬜', promptFragment: 'clean white studio background minimalist', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['studio', 'white'], level: 'advanced' },
+  { id: 'loc-studio-black-men', name: 'Studio Black', categoryId: 'location-background-men', icon: '⬛', promptFragment: 'dramatic black studio background dark', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['studio', 'black'], level: 'advanced' },
+  { id: 'loc-studio-gray-men', name: 'Studio Gray', categoryId: 'location-background-men', icon: '◻️', promptFragment: 'neutral gray studio background', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['studio', 'gray'], level: 'advanced' },
+  { id: 'loc-natural-window-men', name: 'Natural Window Light', categoryId: 'location-background-men', icon: '🪟', promptFragment: 'natural window light indoor soft', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['natural', 'window'], level: 'advanced' },
+  { id: 'loc-outdoor-garden-men', name: 'Outdoor Garden', categoryId: 'location-background-men', icon: '🌳', promptFragment: 'outdoor garden natural greenery', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['outdoor', 'garden'], level: 'advanced' },
+  { id: 'loc-minimalist-interior-men', name: 'Minimalist Interior', categoryId: 'location-background-men', icon: '🏠', promptFragment: 'minimalist modern interior clean lines', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['minimalist', 'interior'], level: 'advanced' },
+  
+  // Masculine Locations
+  { id: 'loc-industrial-loft-men', name: 'Industrial Loft', categoryId: 'location-background-men', icon: '🏭', promptFragment: 'industrial loft exposed brick concrete masculine', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['industrial', 'masculine'], level: 'advanced' },
+  { id: 'loc-workshop-garage-men', name: 'Workshop/Garage', categoryId: 'location-background-men', icon: '🔧', promptFragment: 'workshop garage tools workbench masculine rugged', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['workshop', 'rugged'], level: 'advanced' },
+  { id: 'loc-boxing-gym-men', name: 'Boxing Gym', categoryId: 'location-background-men', icon: '🥊', promptFragment: 'boxing gym athletic gritty masculine', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['gym', 'athletic'], level: 'advanced' },
+  { id: 'loc-man-cave-men', name: 'Man Cave', categoryId: 'location-background-men', icon: '🎮', promptFragment: 'man cave leather furniture wood paneling masculine', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['man-cave', 'masculine'], level: 'advanced' },
+  { id: 'loc-cigar-lounge-men', name: 'Cigar Lounge', categoryId: 'location-background-men', icon: '🚬', promptFragment: 'cigar lounge leather chairs dark wood sophisticated', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['lounge', 'sophisticated'], level: 'advanced' },
+  { id: 'loc-whiskey-bar-men', name: 'Whiskey Bar', categoryId: 'location-background-men', icon: '🥃', promptFragment: 'whiskey bar dark wood bottles backlit masculine', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['bar', 'sophisticated'], level: 'advanced' },
+  { id: 'loc-barbershop-men', name: 'Barbershop', categoryId: 'location-background-men', icon: '💈', promptFragment: 'classic barbershop vintage chairs mirrors masculine', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['barbershop', 'vintage'], level: 'advanced' },
+  { id: 'loc-rooftop-urban-men', name: 'Rooftop Urban', categoryId: 'location-background-men', icon: '🏙️', promptFragment: 'rooftop cityscape urban skyline masculine', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['urban', 'rooftop'], level: 'advanced' },
+  { id: 'loc-concrete-architecture-men', name: 'Concrete Architecture', categoryId: 'location-background-men', icon: '🏗️', promptFragment: 'concrete brutalist architecture industrial modern', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['concrete', 'modern'], level: 'advanced' },
+  { id: 'loc-warehouse-men', name: 'Warehouse', categoryId: 'location-background-men', icon: '📦', promptFragment: 'warehouse industrial raw space masculine', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['warehouse', 'industrial'], level: 'advanced' },
+  { id: 'loc-leather-study-men', name: 'Leather Study', categoryId: 'location-background-men', icon: '📚', promptFragment: 'leather study library books wood paneling sophisticated', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['study', 'sophisticated'], level: 'advanced' },
+  { id: 'loc-outdoor-rugged-men', name: 'Outdoor Rugged', categoryId: 'location-background-men', icon: '⛰️', promptFragment: 'outdoor rugged natural wilderness masculine', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['outdoor', 'rugged'], level: 'advanced' },
+];
+
+// Lighting Blocks
+const LIGHTING_MEN_BLOCKS: MicroBlock[] = [
+  // Universal/Shared Lighting
+  { id: 'light-natural-soft-men', name: 'Natural Soft', categoryId: 'lighting-men', icon: '☀️', promptFragment: 'natural soft daylight even gentle', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['natural', 'soft'], level: 'advanced' },
+  { id: 'light-golden-hour-men', name: 'Golden Hour', categoryId: 'lighting-men', icon: '🌅', promptFragment: 'golden hour warm sunset glow', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['golden', 'warm'], level: 'advanced' },
+  { id: 'light-studio-flash-men', name: 'Studio Flash', categoryId: 'lighting-men', icon: '📸', promptFragment: 'studio strobe flash photography lighting', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['studio', 'flash'], level: 'advanced' },
+  { id: 'light-overcast-diffused-men', name: 'Overcast Diffused', categoryId: 'lighting-men', icon: '☁️', promptFragment: 'overcast cloudy diffused soft shadowless', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['overcast', 'diffused'], level: 'advanced' },
+  { id: 'light-rim-backlight-men', name: 'Rim/Backlight', categoryId: 'lighting-men', icon: '🔆', promptFragment: 'rim lighting backlit edge glow dramatic', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['rim', 'backlight'], level: 'advanced' },
+  
+  // Masculine Lighting
+  { id: 'light-harsh-industrial-men', name: 'Harsh Industrial', categoryId: 'lighting-men', icon: '💡', promptFragment: 'harsh industrial fluorescent lighting hard shadows masculine', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['industrial', 'harsh'], level: 'advanced' },
+  { id: 'light-dramatic-shadows-men', name: 'Dramatic Hard Shadows', categoryId: 'lighting-men', icon: '🌑', promptFragment: 'dramatic hard shadows high contrast masculine moody', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['dramatic', 'shadows'], level: 'advanced' },
+  { id: 'light-moody-dark-men', name: 'Moody Dark', categoryId: 'lighting-men', icon: '🌚', promptFragment: 'moody dark low-key lighting mysterious masculine', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['moody', 'dark'], level: 'advanced' },
+  { id: 'light-garage-fluorescent-men', name: 'Garage Fluorescent', categoryId: 'lighting-men', icon: '🔦', promptFragment: 'garage workshop fluorescent cool harsh industrial', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['garage', 'fluorescent'], level: 'advanced' },
+  { id: 'light-workshop-task-men', name: 'Workshop Task Light', categoryId: 'lighting-men', icon: '🔧', promptFragment: 'workshop task lighting focused work light utilitarian', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['workshop', 'task'], level: 'advanced' },
+  { id: 'light-masculine-warm-men', name: 'Masculine Warm', categoryId: 'lighting-men', icon: '🔥', promptFragment: 'masculine warm amber lighting rich deep tones', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['warm', 'masculine'], level: 'advanced' },
+  { id: 'light-neon-urban-men', name: 'Neon Urban', categoryId: 'lighting-men', icon: '🌃', promptFragment: 'neon urban night lighting colorful edgy', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['neon', 'urban'], level: 'advanced' },
+  { id: 'light-firelight-men', name: 'Firelight/Candlelight', categoryId: 'lighting-men', icon: '🕯️', promptFragment: 'firelight candlelight warm flickering intimate', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['fire', 'warm'], level: 'advanced' },
+  { id: 'light-spotlight-men', name: 'Spotlight Dramatic', categoryId: 'lighting-men', icon: '🎭', promptFragment: 'spotlight dramatic single source theatrical', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['spotlight', 'dramatic'], level: 'advanced' },
+];
+
+// ============================================
+// AGGREGATE MEN ENVIRONMENT BLOCKS
+// ============================================
+
+const MEN_ENVIRONMENT_BLOCKS: MicroBlock[] = [
+  ...LOCATION_BACKGROUND_MEN_BLOCKS,
+  ...LIGHTING_MEN_BLOCKS,
+];
+
+// ============================================
 // EXPORT ALL MEN CATEGORIES & BLOCKS
 // ============================================
 
 export const MEN_ALL_CATEGORIES: BlockCategory[] = [
   ...MEN_UNIVERSAL_CATEGORIES,
   ...MEN_STYLING_CATEGORIES,
+  ...MEN_ENVIRONMENT_CATEGORIES,
 ];
 
 export const MEN_ALL_BLOCKS: MicroBlock[] = [
   ...MEN_UNIVERSAL_BLOCKS,
   ...MEN_STYLING_BLOCKS,
+  ...MEN_ENVIRONMENT_BLOCKS,
 ];
 

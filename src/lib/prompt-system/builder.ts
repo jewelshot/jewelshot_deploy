@@ -100,9 +100,13 @@ export const CATEGORY_GROUPS: Record<string, string> = {
   'lower-clothing-men': 'styling-lower',
   'lower-color-men': 'styling-lower',
   
-  // Environment groups
+  // Environment groups (Women)
   'location-background': 'location',
   'lighting': 'lighting',
+  
+  // Environment groups (Men)
+  'location-background-men': 'location',
+  'lighting-men': 'lighting',
   
   // Camera groups
   'jewelry-framing': 'framing',

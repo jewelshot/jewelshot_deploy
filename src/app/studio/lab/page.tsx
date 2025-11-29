@@ -60,7 +60,12 @@ export default function StudioLabPage() {
   ];
   
   // Environment category IDs (to separate from other features)
-  const ENVIRONMENT_CATEGORY_IDS = ['location-background', 'lighting'];
+  const ENVIRONMENT_CATEGORY_IDS = [
+    // Women environment
+    'location-background', 'lighting',
+    // Men environment
+    'location-background-men', 'lighting-men'
+  ];
   
   // Camera category IDs (to separate from other features)
   const CAMERA_CATEGORY_IDS = ['jewelry-framing', 'viewing-angle', 'focus-depth', 'composition-rules'];
