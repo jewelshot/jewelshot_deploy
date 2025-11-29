@@ -357,15 +357,21 @@ export default function StudioLabPage() {
               </div>
             )}
             
-              {/* 🎭 FACE DETAILS (Conditional/Toggle) */}
+              {/* 🎭 FACE DETAILS - Accordion (Optional) */}
               {conditionalFaceCategories.length > 0 && (
-                <div className="rounded-2xl border-2 border-yellow-500/30 bg-yellow-500/5 p-5">
-                  <div className="mb-4 flex items-center justify-between">
+                <div className="rounded-2xl border-2 border-yellow-500/30 bg-yellow-500/5">
+                  <button
+                    onClick={() => {
+                      setShowFaceDetailsSection(!showFaceDetailsSection);
+                      if (!showFaceDetailsSection) setShowFaceDetails(true);
+                    }}
+                    className="w-full flex items-center justify-between p-5 hover:bg-yellow-500/10 transition-all rounded-t-2xl"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-yellow-500/20">
                         <span className="text-2xl">🎭</span>
                       </div>
-                      <div>
+                      <div className="text-left">
                         <h2 className="text-lg font-bold text-white">
                           Face Details
                         </h2>
@@ -374,71 +380,48 @@ export default function StudioLabPage() {
                         </p>
                       </div>
                     </div>
-                    
-                    {/* Toggle Button */}
-                    <button
-                      onClick={() => setShowFaceDetails(!showFaceDetails)}
-                      className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
-                        showFaceDetails
-                          ? 'bg-yellow-500/20 text-yellow-300 border-2 border-yellow-500/50'
-                          : 'bg-white/5 text-white/60 border-2 border-white/10 hover:border-yellow-500/30 hover:bg-yellow-500/10 hover:text-white'
-                      }`}
-                    >
-                      {showFaceDetails ? (
-                        <>
-                          <ChevronUp className="h-4 w-4" />
-                          Hide Details
-                        </>
-                      ) : (
-                        <>
-                          <ChevronDown className="h-4 w-4" />
-                          Show Details
-                        </>
-                      )}
-                    </button>
-                  </div>
-                  
-                  {/* Conditional Content */}
-                  {showFaceDetails && (
-                    <div className="space-y-3">
+                    {showFaceDetailsSection ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
+                  </button>
+                  {showFaceDetailsSection && (
+                    <div className="p-5 pt-0 space-y-3 border-t border-yellow-500/20">
                       {conditionalFaceCategories.map(category => renderCategory(category))}
-                    </div>
-                  )}
-                  
-                  {!showFaceDetails && (
-                    <div className="rounded-lg border border-dashed border-yellow-500/20 bg-yellow-500/5 p-4 text-center">
-                      <p className="text-sm text-white/50">
-                        Click "Show Details" to customize face features (race, face shape, eye color, etc.)
-                      </p>
                     </div>
                   )}
                 </div>
               )}
             
-              {/* 2️⃣ JEWELRY-SPECIFIC FEATURES - Only for selected jewelry */}
+              {/* 2️⃣ JEWELRY-SPECIFIC FEATURES - Accordion */}
               {jewelrySpecificCategories.length > 0 && (
-                <div className="rounded-2xl border-2 border-blue-500/30 bg-blue-500/5 p-5">
-                  <div className="mb-4 flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/20">
-                      <span className="text-2xl">
-                        {jewelryType === 'ring' && '💍'}
-                        {jewelryType === 'necklace' && '📿'}
-                        {jewelryType === 'earring' && '💎'}
-                        {jewelryType === 'bracelet' && '⌚'}
-                      </span>
+                <div className="rounded-2xl border-2 border-blue-500/30 bg-blue-500/5">
+                  <button
+                    onClick={() => setShowJewelrySpecific(!showJewelrySpecific)}
+                    className="w-full flex items-center justify-between p-5 hover:bg-blue-500/10 transition-all rounded-t-2xl"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/20">
+                        <span className="text-2xl">
+                          {jewelryType === 'ring' && '💍'}
+                          {jewelryType === 'necklace' && '📿'}
+                          {jewelryType === 'earring' && '💎'}
+                          {jewelryType === 'bracelet' && '⌚'}
+                        </span>
+                      </div>
+                      <div className="text-left">
+                        <h2 className="text-lg font-bold text-white">
+                          {jewelryType.charAt(0).toUpperCase() + jewelryType.slice(1)}-Specific Features
+                        </h2>
+                        <p className="text-xs text-white/60">
+                          Only for {jewelryType}s · {jewelrySpecificCategories.length} categories
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h2 className="text-lg font-bold text-white">
-                        {jewelryType.charAt(0).toUpperCase() + jewelryType.slice(1)}-Specific Features
-                      </h2>
-                      <p className="text-xs text-white/60">
-                        Only for {jewelryType}s · {jewelrySpecificCategories.length} categories
-                      </p>
+                    {showJewelrySpecific ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
+                  </button>
+                  {showJewelrySpecific && (
+                    <div className="p-5 pt-0 space-y-3 border-t border-blue-500/20">
+                      {jewelrySpecificCategories.map(category => renderCategory(category))}
                     </div>
-                  </div>
-                  <div className="space-y-3">
-                    {jewelrySpecificCategories.map(category => renderCategory(category))}
-                  </div>
+                  )}
                 </div>
               )}
             
