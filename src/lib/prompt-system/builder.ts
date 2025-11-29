@@ -108,23 +108,41 @@ export const CATEGORY_GROUPS: Record<string, string> = {
   'location-background-men': 'location',
   'lighting-men': 'lighting',
   
-  // Camera groups
+  // Camera groups (Women)
   'jewelry-framing': 'framing',
   'viewing-angle': 'angle',
   'focus-depth': 'focus',
   'composition-rules': 'composition',
   
-  // Post-production groups
+  // Camera groups (Men)
+  'jewelry-framing-men': 'framing',
+  'viewing-angle-men': 'angle',
+  'focus-depth-men': 'focus',
+  'composition-rules-men': 'composition',
+  
+  // Post-production groups (Women)
   'post-processing-level': 'processing',
   'color-grading': 'grading',
   
-  // Creative direction groups
+  // Post-production groups (Men)
+  'post-processing-level-men': 'processing',
+  'color-grading-men': 'grading',
+  
+  // Creative direction groups (Women)
   'presentation-intent': 'intent',
   'mood-atmosphere': 'mood',
   'jewelry-context': 'context',
   
-  // Lifestyle extras
+  // Creative direction groups (Men)
+  'presentation-intent-men': 'intent',
+  'mood-atmosphere-men': 'mood',
+  'jewelry-context-men': 'context',
+  
+  // Lifestyle extras (Women)
   'props-accessories': 'props',
+  
+  // Lifestyle extras (Men)
+  'props-accessories-men': 'props',
   
   // Singular categories (no grouping)
   'skin-tone': 'skin',

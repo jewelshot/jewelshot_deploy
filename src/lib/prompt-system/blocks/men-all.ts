@@ -943,6 +943,282 @@ const MEN_ENVIRONMENT_BLOCKS: MicroBlock[] = [
 ];
 
 // ============================================
+// MEN CAMERA CATEGORIES (Jewelry-Centric - Same as Women)
+// ============================================
+
+export const MEN_CAMERA_CATEGORIES: BlockCategory[] = [
+  {
+    id: 'jewelry-framing-men',
+    name: 'Jewelry Framing',
+    icon: '📷',
+    description: 'How jewelry is framed in shot',
+    order: 300,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'viewing-angle-men',
+    name: 'Viewing Angle',
+    icon: '📐',
+    description: 'Camera angle relative to jewelry',
+    order: 301,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'focus-depth-men',
+    name: 'Focus & Depth',
+    icon: '🎯',
+    description: 'Focus point and depth of field',
+    order: 302,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'composition-rules-men',
+    name: 'Composition Rules',
+    icon: '📐',
+    description: 'Compositional guidelines',
+    order: 303,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+];
+
+// Camera Blocks (Jewelry-Centric - Same as Women)
+const JEWELRY_FRAMING_MEN_BLOCKS: MicroBlock[] = [
+  { id: 'frame-extreme-closeup-men', name: 'Extreme Close-Up', categoryId: 'jewelry-framing-men', icon: '🔍', promptFragment: 'extreme close-up jewelry fills frame macro detail', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['close-up', 'macro'], level: 'advanced' },
+  { id: 'frame-closeup-men', name: 'Close-Up', categoryId: 'jewelry-framing-men', icon: '📷', promptFragment: 'close-up jewelry prominent sharp focus', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['close-up'], level: 'advanced' },
+  { id: 'frame-medium-men', name: 'Medium Shot', categoryId: 'jewelry-framing-men', icon: '📸', promptFragment: 'medium shot jewelry clearly visible with context', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['medium'], level: 'advanced' },
+  { id: 'frame-full-men', name: 'Full Context', categoryId: 'jewelry-framing-men', icon: '🖼️', promptFragment: 'full context jewelry in lifestyle setting', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['full', 'context'], level: 'advanced' },
+  { id: 'frame-detail-men', name: 'Detail Hero', categoryId: 'jewelry-framing-men', icon: '💎', promptFragment: 'jewelry detail hero shot isolated focused', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['detail', 'hero'], level: 'advanced' },
+  { id: 'frame-lifestyle-men', name: 'Lifestyle Wide', categoryId: 'jewelry-framing-men', icon: '🌅', promptFragment: 'lifestyle wide shot jewelry subtle accent', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['lifestyle', 'wide'], level: 'advanced' },
+];
+
+const VIEWING_ANGLE_MEN_BLOCKS: MicroBlock[] = [
+  { id: 'angle-straight-men', name: 'Straight On', categoryId: 'viewing-angle-men', icon: '➡️', promptFragment: 'straight on eye-level jewelry centered', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['straight', 'eye-level'], level: 'advanced' },
+  { id: 'angle-top-down-men', name: 'Top-Down', categoryId: 'viewing-angle-men', icon: '⬇️', promptFragment: 'top-down overhead jewelry flat lay', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['top-down', 'overhead'], level: 'advanced' },
+  { id: 'angle-side-profile-men', name: 'Side Profile', categoryId: 'viewing-angle-men', icon: '↔️', promptFragment: 'side profile angle jewelry dimension visible', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['side', 'profile'], level: 'advanced' },
+  { id: 'angle-low-angle-men', name: 'Low Angle', categoryId: 'viewing-angle-men', icon: '⬆️', promptFragment: 'low angle looking up jewelry elevated heroic', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['low', 'heroic'], level: 'advanced' },
+  { id: 'angle-high-angle-men', name: 'High Angle', categoryId: 'viewing-angle-men', icon: '⬇️', promptFragment: 'high angle looking down jewelry featured', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['high'], level: 'advanced' },
+  { id: 'angle-three-quarter-men', name: 'Three-Quarter', categoryId: 'viewing-angle-men', icon: '↗️', promptFragment: 'three-quarter angle jewelry dynamic perspective', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['three-quarter', 'dynamic'], level: 'advanced' },
+];
+
+const FOCUS_DEPTH_MEN_BLOCKS: MicroBlock[] = [
+  { id: 'focus-sharp-jewelry-men', name: 'Sharp Jewelry Only', categoryId: 'focus-depth-men', icon: '🎯', promptFragment: 'jewelry razor sharp focus background blurred', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['sharp', 'jewelry'], level: 'advanced' },
+  { id: 'focus-shallow-dof-men', name: 'Shallow DOF', categoryId: 'focus-depth-men', icon: '📷', promptFragment: 'shallow depth of field jewelry sharp background soft bokeh', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['shallow', 'bokeh'], level: 'advanced' },
+  { id: 'focus-medium-dof-men', name: 'Medium DOF', categoryId: 'focus-depth-men', icon: '📸', promptFragment: 'medium depth of field jewelry and immediate context sharp', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['medium'], level: 'advanced' },
+  { id: 'focus-deep-dof-men', name: 'Deep DOF', categoryId: 'focus-depth-men', icon: '🌄', promptFragment: 'deep depth of field everything sharp jewelry and background', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['deep', 'sharp'], level: 'advanced' },
+  { id: 'focus-tack-sharp-men', name: 'Tack Sharp All', categoryId: 'focus-depth-men', icon: '💎', promptFragment: 'tack sharp focus jewelry perfectly crisp detailed', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['tack-sharp'], level: 'advanced' },
+  { id: 'focus-selective-men', name: 'Selective Focus', categoryId: 'focus-depth-men', icon: '🔍', promptFragment: 'selective focus jewelry element highlighted rest soft', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['selective'], level: 'advanced' },
+];
+
+const COMPOSITION_RULES_MEN_BLOCKS: MicroBlock[] = [
+  { id: 'comp-rule-thirds-men', name: 'Rule of Thirds', categoryId: 'composition-rules-men', icon: '⊞', promptFragment: 'jewelry at rule of thirds intersection balanced grid', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['thirds', 'balanced'], level: 'advanced' },
+  { id: 'comp-golden-ratio-men', name: 'Golden Ratio', categoryId: 'composition-rules-men', icon: '🌀', promptFragment: 'jewelry positioned golden ratio fibonacci spiral natural flow', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['golden', 'fibonacci'], level: 'advanced' },
+  { id: 'comp-centered-men', name: 'Centered Symmetry', categoryId: 'composition-rules-men', icon: '⊕', promptFragment: 'jewelry perfectly centered symmetrical balanced', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['centered', 'symmetry'], level: 'advanced' },
+  { id: 'comp-negative-space-men', name: 'Negative Space', categoryId: 'composition-rules-men', icon: '⬜', promptFragment: 'minimalist negative space jewelry breathing room', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['negative', 'minimal'], level: 'advanced' },
+  { id: 'comp-leading-lines-men', name: 'Leading Lines', categoryId: 'composition-rules-men', icon: '↗️', promptFragment: 'leading lines directing eye to jewelry compositional flow', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['leading', 'lines'], level: 'advanced' },
+  { id: 'comp-frame-within-men', name: 'Frame within Frame', categoryId: 'composition-rules-men', icon: '🖼️', promptFragment: 'frame within frame jewelry naturally framed compositional depth', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['frame', 'depth'], level: 'advanced' },
+  { id: 'comp-diagonal-men', name: 'Diagonal Composition', categoryId: 'composition-rules-men', icon: '⟋', promptFragment: 'diagonal composition jewelry dynamic angled flow', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['diagonal', 'dynamic'], level: 'advanced' },
+  { id: 'comp-balanced-asym-men', name: 'Balanced Asymmetry', categoryId: 'composition-rules-men', icon: '⚖️', promptFragment: 'balanced asymmetry jewelry off-center visual equilibrium', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['asymmetry', 'balanced'], level: 'advanced' },
+];
+
+// ============================================
+// MEN POST-PRODUCTION CATEGORIES (Same as Women)
+// ============================================
+
+export const MEN_POST_PRODUCTION_CATEGORIES: BlockCategory[] = [
+  {
+    id: 'post-processing-level-men',
+    name: 'Processing Level',
+    icon: '✨',
+    description: 'Image processing intensity',
+    order: 400,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'color-grading-men',
+    name: 'Color Grading',
+    icon: '🎨',
+    description: 'Color tone and grading style',
+    order: 401,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+];
+
+const PROCESSING_LEVEL_MEN_BLOCKS: MicroBlock[] = [
+  { id: 'proc-natural-men', name: 'Natural/RAW', categoryId: 'post-processing-level-men', icon: '🌿', promptFragment: 'natural RAW minimal processing authentic', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['natural', 'raw'], level: 'advanced' },
+  { id: 'proc-light-retouch-men', name: 'Light Retouch', categoryId: 'post-processing-level-men', icon: '✏️', promptFragment: 'light retouch basic color correction subtle', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['light', 'retouch'], level: 'advanced' },
+  { id: 'proc-professional-men', name: 'Professional Edit', categoryId: 'post-processing-level-men', icon: '⚡', promptFragment: 'professional editing polished refined', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['professional'], level: 'advanced' },
+  { id: 'proc-catalog-men', name: 'Catalog Perfect', categoryId: 'post-processing-level-men', icon: '💎', promptFragment: 'catalog perfect heavy editing flawless commercial', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['catalog', 'perfect'], level: 'advanced' },
+  { id: 'proc-hdr-men', name: 'HDR Enhanced', categoryId: 'post-processing-level-men', icon: '🌟', promptFragment: 'HDR enhanced high dynamic range dramatic', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['hdr', 'dramatic'], level: 'advanced' },
+];
+
+const COLOR_GRADING_MEN_BLOCKS: MicroBlock[] = [
+  { id: 'grade-natural-men', name: 'Natural Balanced', categoryId: 'color-grading-men', icon: '⚖️', promptFragment: 'natural balanced color grading true-to-life', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['natural', 'balanced'], level: 'advanced' },
+  { id: 'grade-warm-men', name: 'Warm Golden', categoryId: 'color-grading-men', icon: '🔥', promptFragment: 'warm golden color grading cozy amber tones', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['warm', 'golden'], level: 'advanced' },
+  { id: 'grade-cool-men', name: 'Cool Blue', categoryId: 'color-grading-men', icon: '❄️', promptFragment: 'cool blue color grading crisp cyan tones', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['cool', 'blue'], level: 'advanced' },
+  { id: 'grade-vintage-men', name: 'Vintage Film', categoryId: 'color-grading-men', icon: '📷', promptFragment: 'vintage film color grading nostalgic desaturated', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['vintage', 'film'], level: 'advanced' },
+  { id: 'grade-faded-men', name: 'Faded Pastel', categoryId: 'color-grading-men', icon: '🌸', promptFragment: 'faded pastel color grading soft muted dreamy', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['faded', 'pastel'], level: 'advanced' },
+  { id: 'grade-high-contrast-men', name: 'High Contrast', categoryId: 'color-grading-men', icon: '⚫⚪', promptFragment: 'high contrast color grading bold dramatic', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['contrast', 'bold'], level: 'advanced' },
+  { id: 'grade-matte-men', name: 'Matte Finish', categoryId: 'color-grading-men', icon: '🎬', promptFragment: 'matte finish color grading cinematic lifted blacks', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['matte', 'cinematic'], level: 'advanced' },
+  { id: 'grade-vibrant-men', name: 'Vibrant Rich', categoryId: 'color-grading-men', icon: '🌈', promptFragment: 'vibrant rich color grading saturated bold', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['vibrant', 'saturated'], level: 'advanced' },
+];
+
+// ============================================
+// MEN CREATIVE DIRECTION CATEGORIES
+// ============================================
+
+export const MEN_CREATIVE_DIRECTION_CATEGORIES: BlockCategory[] = [
+  {
+    id: 'presentation-intent-men',
+    name: 'Presentation Intent',
+    icon: '🎯',
+    description: 'Photography purpose and style',
+    order: 500,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'mood-atmosphere-men',
+    name: 'Mood & Atmosphere',
+    icon: '🎭',
+    description: 'Emotional tone and feel',
+    order: 501,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'jewelry-context-men',
+    name: 'Jewelry Context',
+    icon: '💎',
+    description: 'How jewelry is featured',
+    order: 502,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+];
+
+const PRESENTATION_INTENT_MEN_BLOCKS: MicroBlock[] = [
+  { id: 'intent-catalog-men', name: 'Catalog Product', categoryId: 'presentation-intent-men', icon: '📋', promptFragment: 'catalog product photography clean commercial white background', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['catalog', 'commercial'], level: 'advanced' },
+  { id: 'intent-ecommerce-men', name: 'E-commerce Clean', categoryId: 'presentation-intent-men', icon: '🛍️', promptFragment: 'e-commerce clean web-ready neutral background', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['ecommerce', 'web'], level: 'advanced' },
+  { id: 'intent-editorial-men', name: 'Editorial Creative', categoryId: 'presentation-intent-men', icon: '📰', promptFragment: 'editorial creative magazine artistic storytelling', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['editorial', 'artistic'], level: 'advanced' },
+  { id: 'intent-lifestyle-men', name: 'Lifestyle Natural', categoryId: 'presentation-intent-men', icon: '🌟', promptFragment: 'lifestyle natural real-life moments authentic', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['lifestyle', 'authentic'], level: 'advanced' },
+  { id: 'intent-luxury-men', name: 'Luxury Campaign', categoryId: 'presentation-intent-men', icon: '👑', promptFragment: 'luxury campaign high-end aspirational sophisticated', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['luxury', 'high-end'], level: 'advanced' },
+];
+
+const MOOD_ATMOSPHERE_MEN_BLOCKS: MicroBlock[] = [
+  { id: 'mood-powerful-men', name: 'Powerful Bold', categoryId: 'mood-atmosphere-men', icon: '💪', promptFragment: 'powerful bold atmosphere strong commanding', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['powerful', 'bold'], level: 'advanced' },
+  { id: 'mood-confident-men', name: 'Confident Assured', categoryId: 'mood-atmosphere-men', icon: '😎', promptFragment: 'confident assured atmosphere self-assured masculine', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['confident', 'assured'], level: 'advanced' },
+  { id: 'mood-sophisticated-men', name: 'Sophisticated Refined', categoryId: 'mood-atmosphere-men', icon: '🎩', promptFragment: 'sophisticated refined atmosphere elegant timeless', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['sophisticated', 'elegant'], level: 'advanced' },
+  { id: 'mood-rugged-men', name: 'Rugged Adventurous', categoryId: 'mood-atmosphere-men', icon: '⛰️', promptFragment: 'rugged adventurous atmosphere masculine outdoorsy', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['rugged', 'adventurous'], level: 'advanced' },
+  { id: 'mood-minimalist-men', name: 'Minimalist Clean', categoryId: 'mood-atmosphere-men', icon: '🧘', promptFragment: 'minimalist clean atmosphere serene peaceful simple', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['minimalist', 'clean'], level: 'advanced' },
+  { id: 'mood-edgy-men', name: 'Edgy Contemporary', categoryId: 'mood-atmosphere-men', icon: '⚡', promptFragment: 'edgy contemporary atmosphere modern rebellious', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['edgy', 'modern'], level: 'advanced' },
+];
+
+const JEWELRY_CONTEXT_MEN_BLOCKS: MicroBlock[] = [
+  { id: 'context-hero-men', name: 'Jewelry Hero', categoryId: 'jewelry-context-men', icon: '💎', promptFragment: 'jewelry hero product dominates minimal model presence', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['hero', 'product'], level: 'advanced' },
+  { id: 'context-balanced-men', name: 'Balanced Product+Model', categoryId: 'jewelry-context-men', icon: '⚖️', promptFragment: 'balanced product and model equal visual weight harmonious', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['balanced'], level: 'advanced' },
+  { id: 'context-lifestyle-men', name: 'Lifestyle Moment', categoryId: 'jewelry-context-men', icon: '📸', promptFragment: 'lifestyle moment natural story context jewelry subtle', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['lifestyle', 'story'], level: 'advanced' },
+  { id: 'context-detail-men', name: 'Detail Showcase', categoryId: 'jewelry-context-men', icon: '🔍', promptFragment: 'detail showcase craftsmanship highlighted jewelry precision', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['detail', 'craftsmanship'], level: 'advanced' },
+];
+
+// ============================================
+// MEN LIFESTYLE EXTRAS CATEGORIES
+// ============================================
+
+export const MEN_LIFESTYLE_EXTRAS_CATEGORIES: BlockCategory[] = [
+  {
+    id: 'props-accessories-men',
+    name: 'Props & Accessories',
+    icon: '🌸',
+    description: 'Additional props and lifestyle elements',
+    order: 600,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+];
+
+const PROPS_ACCESSORIES_MEN_BLOCKS: MicroBlock[] = [
+  // Masculine Props
+  { id: 'prop-whiskey-men', name: 'Whiskey/Spirits', categoryId: 'props-accessories-men', icon: '🥃', promptFragment: 'whiskey glass spirits bottle masculine prop', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['whiskey', 'masculine'], level: 'advanced' },
+  { id: 'prop-cigar-men', name: 'Cigar', categoryId: 'props-accessories-men', icon: '🚬', promptFragment: 'cigar smoke masculine sophisticated prop', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['cigar', 'sophisticated'], level: 'advanced' },
+  { id: 'prop-watch-men', name: 'Luxury Watch', categoryId: 'props-accessories-men', icon: '⌚', promptFragment: 'luxury watch timepiece masculine accessory', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['watch', 'luxury'], level: 'advanced' },
+  { id: 'prop-leather-men', name: 'Leather Goods', categoryId: 'props-accessories-men', icon: '👜', promptFragment: 'leather wallet briefcase bag masculine accessories', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['leather', 'accessories'], level: 'advanced' },
+  { id: 'prop-tools-men', name: 'Tools/Workshop', categoryId: 'props-accessories-men', icon: '🔧', promptFragment: 'tools workshop equipment masculine rugged props', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['tools', 'rugged'], level: 'advanced' },
+  { id: 'prop-books-men', name: 'Books/Reading', categoryId: 'props-accessories-men', icon: '📚', promptFragment: 'books reading material intellectual sophisticated', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['books', 'intellectual'], level: 'advanced' },
+  { id: 'prop-car-keys-men', name: 'Car Keys/Auto', categoryId: 'props-accessories-men', icon: '🔑', promptFragment: 'car keys automotive elements masculine lifestyle', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['automotive', 'lifestyle'], level: 'advanced' },
+  { id: 'prop-coffee-men', name: 'Coffee/Espresso', categoryId: 'props-accessories-men', icon: '☕', promptFragment: 'coffee espresso cup morning routine prop', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['coffee', 'morning'], level: 'advanced' },
+  { id: 'prop-geometric-men', name: 'Minimal Geometric', categoryId: 'props-accessories-men', icon: '◇', promptFragment: 'minimal geometric shapes modern clean props', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['geometric', 'minimal'], level: 'advanced' },
+  { id: 'prop-natural-men', name: 'Natural Elements', categoryId: 'props-accessories-men', icon: '🪨', promptFragment: 'natural elements stone wood earthy organic', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['natural', 'organic'], level: 'advanced' },
+];
+
+// ============================================
+// AGGREGATE ALL CAMERA, POST, CREATIVE, LIFESTYLE BLOCKS
+// ============================================
+
+const MEN_CAMERA_BLOCKS: MicroBlock[] = [
+  ...JEWELRY_FRAMING_MEN_BLOCKS,
+  ...VIEWING_ANGLE_MEN_BLOCKS,
+  ...FOCUS_DEPTH_MEN_BLOCKS,
+  ...COMPOSITION_RULES_MEN_BLOCKS,
+];
+
+const MEN_POST_PRODUCTION_BLOCKS: MicroBlock[] = [
+  ...PROCESSING_LEVEL_MEN_BLOCKS,
+  ...COLOR_GRADING_MEN_BLOCKS,
+];
+
+const MEN_CREATIVE_DIRECTION_BLOCKS: MicroBlock[] = [
+  ...PRESENTATION_INTENT_MEN_BLOCKS,
+  ...MOOD_ATMOSPHERE_MEN_BLOCKS,
+  ...JEWELRY_CONTEXT_MEN_BLOCKS,
+];
+
+const MEN_LIFESTYLE_EXTRAS_BLOCKS: MicroBlock[] = [
+  ...PROPS_ACCESSORIES_MEN_BLOCKS,
+];
+
+// ============================================
 // EXPORT ALL MEN CATEGORIES & BLOCKS
 // ============================================
 
@@ -950,11 +1226,19 @@ export const MEN_ALL_CATEGORIES: BlockCategory[] = [
   ...MEN_UNIVERSAL_CATEGORIES,
   ...MEN_STYLING_CATEGORIES,
   ...MEN_ENVIRONMENT_CATEGORIES,
+  ...MEN_CAMERA_CATEGORIES,
+  ...MEN_POST_PRODUCTION_CATEGORIES,
+  ...MEN_CREATIVE_DIRECTION_CATEGORIES,
+  ...MEN_LIFESTYLE_EXTRAS_CATEGORIES,
 ];
 
 export const MEN_ALL_BLOCKS: MicroBlock[] = [
   ...MEN_UNIVERSAL_BLOCKS,
   ...MEN_STYLING_BLOCKS,
   ...MEN_ENVIRONMENT_BLOCKS,
+  ...MEN_CAMERA_BLOCKS,
+  ...MEN_POST_PRODUCTION_BLOCKS,
+  ...MEN_CREATIVE_DIRECTION_BLOCKS,
+  ...MEN_LIFESTYLE_EXTRAS_BLOCKS,
 ];
 

@@ -68,16 +68,36 @@ export default function StudioLabPage() {
   ];
   
   // Camera category IDs (to separate from other features)
-  const CAMERA_CATEGORY_IDS = ['jewelry-framing', 'viewing-angle', 'focus-depth', 'composition-rules'];
+  const CAMERA_CATEGORY_IDS = [
+    // Women camera
+    'jewelry-framing', 'viewing-angle', 'focus-depth', 'composition-rules',
+    // Men camera
+    'jewelry-framing-men', 'viewing-angle-men', 'focus-depth-men', 'composition-rules-men'
+  ];
   
   // Post-production category IDs
-  const POST_PRODUCTION_CATEGORY_IDS = ['post-processing-level', 'color-grading'];
+  const POST_PRODUCTION_CATEGORY_IDS = [
+    // Women post-production
+    'post-processing-level', 'color-grading',
+    // Men post-production
+    'post-processing-level-men', 'color-grading-men'
+  ];
   
   // Creative direction category IDs
-  const CREATIVE_DIRECTION_CATEGORY_IDS = ['presentation-intent', 'mood-atmosphere', 'jewelry-context'];
+  const CREATIVE_DIRECTION_CATEGORY_IDS = [
+    // Women creative direction
+    'presentation-intent', 'mood-atmosphere', 'jewelry-context',
+    // Men creative direction
+    'presentation-intent-men', 'mood-atmosphere-men', 'jewelry-context-men'
+  ];
   
   // Lifestyle extras category IDs
-  const LIFESTYLE_EXTRAS_CATEGORY_IDS = ['props-accessories'];
+  const LIFESTYLE_EXTRAS_CATEGORY_IDS = [
+    // Women lifestyle
+    'props-accessories',
+    // Men lifestyle
+    'props-accessories-men'
+  ];
   
   // Separate WOMEN BODY FEATURES, STYLING, ENVIRONMENT, CAMERA, POST-PRODUCTION, CREATIVE DIRECTION, LIFESTYLE EXTRAS, CONDITIONAL (Face Details), and JEWELRY-SPECIFIC features
   const universalWomenCategories = useMemo(() => {
