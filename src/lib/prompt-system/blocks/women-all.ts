@@ -869,6 +869,32 @@ export const WOMEN_BRACELET_CATEGORIES: BlockCategory[] = [
     },
     required: false,
   },
+  
+  {
+    id: 'sleeve-type',
+    name: 'Sleeve Type',
+    icon: '👕',
+    description: 'Clothing sleeve style',
+    order: 62,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['bracelet'],
+    },
+    required: true,
+  },
+  
+  {
+    id: 'wrist-exposure',
+    name: 'Wrist Exposure',
+    icon: '✨',
+    description: 'Bracelet visibility level',
+    order: 63,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['bracelet'],
+    },
+    required: false,
+  },
 ];
 
 // ============================================
@@ -912,9 +938,31 @@ const WRIST_POSE_BLOCKS: MicroBlock[] = [
 ];
 
 const ARM_POSITION_BLOCKS: MicroBlock[] = [
-  { id: 'arm-vertical', name: 'Vertical Down', categoryId: 'arm-position', icon: '⬇️', promptFragment: 'arm vertical down, natural hanging position', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['vertical', 'down'], level: 'advanced' },
-  { id: 'arm-horizontal', name: 'Horizontal', categoryId: 'arm-position', icon: '↔️', promptFragment: 'arm horizontal across, elegant extended', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['horizontal', 'across'], level: 'advanced' },
-  { id: 'arm-diagonal', name: 'Diagonal', categoryId: 'arm-position', icon: '↗️', promptFragment: 'arm diagonal angle, dynamic positioning', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['diagonal', 'dynamic'], level: 'advanced' },
+  { id: 'arm-vertical', name: 'Vertical Down', categoryId: 'arm-position', icon: '⬇️', promptFragment: 'arm vertical down natural hanging', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['vertical', 'down'], level: 'advanced' },
+  { id: 'arm-horizontal', name: 'Horizontal', categoryId: 'arm-position', icon: '↔️', promptFragment: 'arm horizontal across extended', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['horizontal', 'across'], level: 'advanced' },
+  { id: 'arm-diagonal', name: 'Diagonal', categoryId: 'arm-position', icon: '↗️', promptFragment: 'arm diagonal angle dynamic', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['diagonal', 'dynamic'], level: 'advanced' },
+];
+
+// ============================================
+// BRACELET STYLING BLOCKS
+// ============================================
+
+// Sleeve Type Blocks
+const SLEEVE_TYPE_BLOCKS: MicroBlock[] = [
+  { id: 'sleeve-sleeveless', name: 'Sleeveless', categoryId: 'sleeve-type', icon: '💪', promptFragment: 'sleeveless bare arms', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['sleeveless', 'bare'], level: 'advanced' },
+  { id: 'sleeve-tank', name: 'Tank Top', categoryId: 'sleeve-type', icon: '🎽', promptFragment: 'tank top straps shoulders exposed', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['tank', 'straps'], level: 'advanced' },
+  { id: 'sleeve-short', name: 'Short Sleeve', categoryId: 'sleeve-type', icon: '👕', promptFragment: 'short sleeve upper arm covered', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['short', 'casual'], level: 'advanced' },
+  { id: 'sleeve-three-quarter', name: '3/4 Sleeve', categoryId: 'sleeve-type', icon: '👚', promptFragment: 'three-quarter sleeve forearm exposed', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['three-quarter', 'forearm'], level: 'advanced' },
+  { id: 'sleeve-long-rolled', name: 'Long (Rolled Up)', categoryId: 'sleeve-type', icon: '📜', promptFragment: 'long sleeve rolled up wrist visible', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['rolled', 'casual'], level: 'advanced' },
+  { id: 'sleeve-long-pushed', name: 'Long (Pushed Up)', categoryId: 'sleeve-type', icon: '⬆️', promptFragment: 'long sleeve pushed up forearm showing', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['pushed', 'relaxed'], level: 'advanced' },
+  { id: 'sleeve-bare', name: 'Bare Arm', categoryId: 'sleeve-type', icon: '✨', promptFragment: 'completely bare arm no clothing', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['bare', 'nude'], level: 'advanced' },
+];
+
+// Wrist Exposure Blocks
+const WRIST_EXPOSURE_BLOCKS: MicroBlock[] = [
+  { id: 'wrist-full', name: 'Fully Visible', categoryId: 'wrist-exposure', icon: '✨', promptFragment: 'wrist fully visible bracelet prominent', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['full', 'prominent'], level: 'advanced' },
+  { id: 'wrist-partial', name: 'Partially Visible', categoryId: 'wrist-exposure', icon: '◐', promptFragment: 'wrist partially visible sleeve edge near', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['partial', 'edge'], level: 'advanced' },
+  { id: 'wrist-contrast', name: 'Sleeve Contrast', categoryId: 'wrist-exposure', icon: '🎨', promptFragment: 'bracelet contrasting with sleeve edge', applicableTo: { gender: ['women'], jewelryTypes: ['bracelet'] }, tags: ['contrast', 'edge'], level: 'advanced' },
 ];
 
 export const WOMEN_ALL_BLOCKS: MicroBlock[] = [
@@ -961,6 +1009,8 @@ export const WOMEN_ALL_BLOCKS: MicroBlock[] = [
   // Bracelet-specific blocks
   ...WRIST_POSE_BLOCKS,
   ...ARM_POSITION_BLOCKS,
+  ...SLEEVE_TYPE_BLOCKS,
+  ...WRIST_EXPOSURE_BLOCKS,
 ];
 
 /**
