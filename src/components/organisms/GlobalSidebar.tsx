@@ -34,6 +34,11 @@ export default function GlobalSidebar() {
     return null;
   }
 
+  // Don't show sidebar on lab pages (experimental features)
+  if (pathname.startsWith('/studio/lab')) {
+    return null;
+  }
+
   // Don't show sidebar on debug/test pages
   if (pathname.startsWith('/sentry-debug') || pathname.startsWith('/sentry-example-page')) {
     return null;

@@ -7,13 +7,23 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Settings, ChevronDown, ChevronUp, Zap, Code } from 'lucide-react';
 import { BLOCK_REGISTRY } from '@/lib/prompt-system/registry';
 import { buildPromptFromSelections } from '@/lib/prompt-system/builder';
 import type { BlockSelections, Gender, JewelryType, BlockCategory } from '@/lib/prompt-system/types';
 
 export default function StudioLabPage() {
+  // Enable body scroll for lab page (override globals.css)
+  useEffect(() => {
+    document.body.style.overflow = 'auto';
+    document.body.style.height = 'auto';
+    
+    return () => {
+      document.body.style.overflow = 'hidden';
+      document.body.style.height = '100vh';
+    };
+  }, []);
   const [gender, setGender] = useState<Gender | null>(null);
   const [jewelryType, setJewelryType] = useState<JewelryType | null>(null);
   const [selections, setSelections] = useState<BlockSelections>({});
@@ -27,21 +37,21 @@ export default function StudioLabPage() {
     return BLOCK_REGISTRY.getCategories({ gender, jewelryType });
   }, [gender, jewelryType]);
   
-  // Separate gender-based and jewelry-based categories
-  const genderBasedCategories = useMemo(() => {
+  // Separate UNIVERSAL women features vs JEWELRY-SPECIFIC features
+  const universalWomenCategories = useMemo(() => {
     return categories.filter(cat => {
-      // Categories that exist across multiple jewelry types (gender-specific)
+      // Universal: Exist across ALL jewelry types (skin tone, general features)
       const jewelryTypes = cat.applicableTo.jewelryTypes;
       return jewelryTypes.length > 1;
-    });
+    }).sort((a, b) => a.order - b.order);
   }, [categories]);
   
-  const jewelryBasedCategories = useMemo(() => {
+  const jewelrySpecificCategories = useMemo(() => {
     return categories.filter(cat => {
-      // Categories specific to this jewelry type
+      // Jewelry-specific: Only for this specific jewelry type
       const jewelryTypes = cat.applicableTo.jewelryTypes;
       return jewelryTypes.length === 1 && jewelryTypes.includes(jewelryType);
-    });
+    }).sort((a, b) => a.order - b.order);
   }, [categories, jewelryType]);
   
   // Handle gender selection
@@ -212,42 +222,54 @@ export default function StudioLabPage() {
 
         {/* Block Selection - Shows after both gender and jewelry selected */}
         {gender && jewelryType && (
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+          <div className="grid grid-cols-1 gap-8 xl:grid-cols-2">
             {/* Left: Block Selection */}
-            <div className="space-y-6 w-full">
-              {/* Gender-Based Blocks */}
-              {genderBasedCategories.length > 0 && (
-              <div>
-                <h2 className="mb-3 text-lg font-semibold flex items-center gap-2">
-                  <span className="text-2xl">{gender === 'women' ? '👩' : '👨'}</span>
-                  Gender-Specific Blocks
-                  <span className="text-xs font-normal text-white/60">
-                    ({genderBasedCategories.length} categories)
-                  </span>
-                </h2>
-                <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2">
-                  {genderBasedCategories.map(category => renderCategory(category))}
+            <div className="space-y-8 w-full">
+              {/* 1️⃣ UNIVERSAL WOMEN FEATURES - Applies to ALL jewelry types */}
+              {universalWomenCategories.length > 0 && (
+              <div className="rounded-2xl border-2 border-purple-500/30 bg-purple-500/5 p-5">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/20">
+                    <span className="text-2xl">👩</span>
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-white">
+                      Universal Women Features
+                    </h2>
+                    <p className="text-xs text-white/60">
+                      Applies to all jewelry types · {universalWomenCategories.length} categories
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  {universalWomenCategories.map(category => renderCategory(category))}
                 </div>
               </div>
             )}
             
-              {/* Jewelry-Based Blocks */}
-              {jewelryBasedCategories.length > 0 && (
-                <div>
-                  <h2 className="mb-3 text-lg font-semibold flex items-center gap-2">
-                    <span className="text-2xl">
-                      {jewelryType === 'ring' && '💍'}
-                      {jewelryType === 'necklace' && '📿'}
-                      {jewelryType === 'earring' && '💎'}
-                      {jewelryType === 'bracelet' && '⌚'}
-                    </span>
-                    {jewelryType.charAt(0).toUpperCase() + jewelryType.slice(1)}-Specific Blocks
-                    <span className="text-xs font-normal text-white/60">
-                      ({jewelryBasedCategories.length} categories)
-                    </span>
-                  </h2>
-                  <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2">
-                    {jewelryBasedCategories.map(category => renderCategory(category))}
+              {/* 2️⃣ JEWELRY-SPECIFIC FEATURES - Only for selected jewelry */}
+              {jewelrySpecificCategories.length > 0 && (
+                <div className="rounded-2xl border-2 border-blue-500/30 bg-blue-500/5 p-5">
+                  <div className="mb-4 flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/20">
+                      <span className="text-2xl">
+                        {jewelryType === 'ring' && '💍'}
+                        {jewelryType === 'necklace' && '📿'}
+                        {jewelryType === 'earring' && '💎'}
+                        {jewelryType === 'bracelet' && '⌚'}
+                      </span>
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-bold text-white">
+                        {jewelryType.charAt(0).toUpperCase() + jewelryType.slice(1)}-Specific Features
+                      </h2>
+                      <p className="text-xs text-white/60">
+                        Only for {jewelryType}s · {jewelrySpecificCategories.length} categories
+                      </p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    {jewelrySpecificCategories.map(category => renderCategory(category))}
                   </div>
                 </div>
               )}
