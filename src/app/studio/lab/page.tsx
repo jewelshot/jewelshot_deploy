@@ -30,6 +30,7 @@ export default function StudioLabPage() {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
   const [showJsonView, setShowJsonView] = useState(false);
+  const [showFaceDetails, setShowFaceDetails] = useState(false); // Toggle for Face Details
   
   // Get applicable categories based on context
   const categories = useMemo(() => {
@@ -37,12 +38,19 @@ export default function StudioLabPage() {
     return BLOCK_REGISTRY.getCategories({ gender, jewelryType });
   }, [gender, jewelryType]);
   
-  // Separate UNIVERSAL women features vs JEWELRY-SPECIFIC features
+  // Separate UNIVERSAL, CONDITIONAL (Face Details), and JEWELRY-SPECIFIC features
   const universalWomenCategories = useMemo(() => {
     return categories.filter(cat => {
-      // Universal: Exist across ALL jewelry types (skin tone, general features)
+      // Universal: Exist across ALL jewelry types (skin tone, general features) & NOT conditional
       const jewelryTypes = cat.applicableTo.jewelryTypes;
-      return jewelryTypes.length > 1;
+      return jewelryTypes.length > 1 && !cat.conditional;
+    }).sort((a, b) => a.order - b.order);
+  }, [categories]);
+  
+  const conditionalFaceCategories = useMemo(() => {
+    return categories.filter(cat => {
+      // Conditional: Face details (hidden until toggled)
+      return cat.conditional === true;
     }).sort((a, b) => a.order - b.order);
   }, [categories]);
   
@@ -269,6 +277,64 @@ export default function StudioLabPage() {
                 </div>
               </div>
             )}
+            
+              {/* 🎭 FACE DETAILS (Conditional/Toggle) */}
+              {conditionalFaceCategories.length > 0 && (
+                <div className="rounded-2xl border-2 border-yellow-500/30 bg-yellow-500/5 p-5">
+                  <div className="mb-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-yellow-500/20">
+                        <span className="text-2xl">🎭</span>
+                      </div>
+                      <div>
+                        <h2 className="text-lg font-bold text-white">
+                          Face Details
+                        </h2>
+                        <p className="text-xs text-white/60">
+                          Optional detailed face features · {conditionalFaceCategories.length} categories
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* Toggle Button */}
+                    <button
+                      onClick={() => setShowFaceDetails(!showFaceDetails)}
+                      className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                        showFaceDetails
+                          ? 'bg-yellow-500/20 text-yellow-300 border-2 border-yellow-500/50'
+                          : 'bg-white/5 text-white/60 border-2 border-white/10 hover:border-yellow-500/30 hover:bg-yellow-500/10 hover:text-white'
+                      }`}
+                    >
+                      {showFaceDetails ? (
+                        <>
+                          <ChevronUp className="h-4 w-4" />
+                          Hide Details
+                        </>
+                      ) : (
+                        <>
+                          <ChevronDown className="h-4 w-4" />
+                          Show Details
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  
+                  {/* Conditional Content */}
+                  {showFaceDetails && (
+                    <div className="space-y-3">
+                      {conditionalFaceCategories.map(category => renderCategory(category))}
+                    </div>
+                  )}
+                  
+                  {!showFaceDetails && (
+                    <div className="rounded-lg border border-dashed border-yellow-500/20 bg-yellow-500/5 p-4 text-center">
+                      <p className="text-sm text-white/50">
+                        Click "Show Details" to customize face features (race, face shape, eye color, etc.)
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
             
               {/* 2️⃣ JEWELRY-SPECIFIC FEATURES - Only for selected jewelry */}
               {jewelrySpecificCategories.length > 0 && (

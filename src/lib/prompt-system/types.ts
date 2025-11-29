@@ -38,6 +38,12 @@ export interface BlockCategory {
   
   // Is this category required or optional?
   required?: boolean;
+  
+  // Is this category conditional (hidden until user toggles)?
+  conditional?: boolean;
+  
+  // Which block IDs trigger auto-show for this conditional category?
+  autoShowTriggers?: string[];
 }
 
 /**

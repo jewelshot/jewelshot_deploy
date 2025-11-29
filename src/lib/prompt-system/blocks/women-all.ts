@@ -144,6 +144,55 @@ export const WOMEN_UNIVERSAL_CATEGORIES: BlockCategory[] = [
 ];
 
 // ============================================
+// FACE DETAILS CATEGORIES (Conditional/Toggle)
+// ============================================
+
+export const WOMEN_FACE_CATEGORIES: BlockCategory[] = [
+  {
+    id: 'race-ethnicity',
+    name: 'Race/Ethnicity',
+    icon: '🌍',
+    description: 'Ethnic background',
+    order: 11,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+    conditional: true, // Hidden until toggled
+    autoShowTriggers: [], // Can be populated with hand poses that show face
+  },
+  
+  {
+    id: 'face-shape',
+    name: 'Face Shape',
+    icon: '👤',
+    description: 'Overall face structure',
+    order: 12,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+    conditional: true,
+  },
+  
+  {
+    id: 'eye-color',
+    name: 'Eye Color',
+    icon: '👁️',
+    description: 'Eye color tone',
+    order: 13,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+    conditional: true,
+  },
+];
+
+// ============================================
 // RING CATEGORIES
 // ============================================
 
@@ -453,6 +502,40 @@ const HAIR_VOLUME_BLOCKS: MicroBlock[] = [
 ];
 
 // ============================================
+// FACE DETAILS BLOCKS (Conditional)
+// ============================================
+
+// Race/Ethnicity Blocks
+const RACE_ETHNICITY_BLOCKS: MicroBlock[] = [
+  { id: 'race-caucasian', name: 'Caucasian', categoryId: 'race-ethnicity', icon: '👱', promptFragment: 'caucasian european features', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['caucasian', 'european'], level: 'advanced' },
+  { id: 'race-asian', name: 'Asian', categoryId: 'race-ethnicity', icon: '👩', promptFragment: 'asian east asian features', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['asian', 'east-asian'], level: 'advanced' },
+  { id: 'race-african', name: 'African', categoryId: 'race-ethnicity', icon: '👩🏿', promptFragment: 'african features', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['african', 'black'], level: 'advanced' },
+  { id: 'race-middle-eastern', name: 'Middle Eastern', categoryId: 'race-ethnicity', icon: '🧕', promptFragment: 'middle eastern features', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['middle-eastern', 'arab'], level: 'advanced' },
+  { id: 'race-hispanic', name: 'Hispanic/Latina', categoryId: 'race-ethnicity', icon: '👩🏽', promptFragment: 'hispanic latina features', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['hispanic', 'latina'], level: 'advanced' },
+  { id: 'race-mixed', name: 'Mixed/Multiracial', categoryId: 'race-ethnicity', icon: '🌈', promptFragment: 'mixed multiracial features', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['mixed', 'multiracial'], level: 'advanced' },
+];
+
+// Face Shape Blocks
+const FACE_SHAPE_BLOCKS: MicroBlock[] = [
+  { id: 'face-oval', name: 'Oval', categoryId: 'face-shape', icon: '⭕', promptFragment: 'oval face shape', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['oval', 'balanced'], level: 'advanced' },
+  { id: 'face-round', name: 'Round', categoryId: 'face-shape', icon: '⚫', promptFragment: 'round face shape', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['round', 'soft'], level: 'advanced' },
+  { id: 'face-square', name: 'Square', categoryId: 'face-shape', icon: '⬜', promptFragment: 'square face shape', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['square', 'angular'], level: 'advanced' },
+  { id: 'face-heart', name: 'Heart', categoryId: 'face-shape', icon: '❤️', promptFragment: 'heart shaped face', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['heart', 'tapered'], level: 'advanced' },
+  { id: 'face-diamond', name: 'Diamond', categoryId: 'face-shape', icon: '💎', promptFragment: 'diamond face shape', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['diamond', 'angular'], level: 'advanced' },
+  { id: 'face-long', name: 'Long/Oblong', categoryId: 'face-shape', icon: '📏', promptFragment: 'long oblong face', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['long', 'oblong'], level: 'advanced' },
+];
+
+// Eye Color Blocks
+const EYE_COLOR_BLOCKS: MicroBlock[] = [
+  { id: 'eye-brown', name: 'Brown', categoryId: 'eye-color', icon: '🟤', promptFragment: 'brown eyes', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['brown', 'dark'], level: 'advanced' },
+  { id: 'eye-blue', name: 'Blue', categoryId: 'eye-color', icon: '🔵', promptFragment: 'blue eyes', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['blue', 'light'], level: 'advanced' },
+  { id: 'eye-green', name: 'Green', categoryId: 'eye-color', icon: '🟢', promptFragment: 'green eyes', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['green'], level: 'advanced' },
+  { id: 'eye-hazel', name: 'Hazel', categoryId: 'eye-color', icon: '🟡', promptFragment: 'hazel eyes', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['hazel', 'mixed'], level: 'advanced' },
+  { id: 'eye-gray', name: 'Gray', categoryId: 'eye-color', icon: '⚪', promptFragment: 'gray eyes', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['gray', 'cool'], level: 'advanced' },
+  { id: 'eye-amber', name: 'Amber', categoryId: 'eye-color', icon: '🟠', promptFragment: 'amber golden eyes', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['amber', 'golden'], level: 'advanced' },
+];
+
+// ============================================
 // EARRING CATEGORIES
 // ============================================
 
@@ -522,6 +605,7 @@ export const WOMEN_BRACELET_CATEGORIES: BlockCategory[] = [
 
 export const WOMEN_ALL_CATEGORIES = [
   ...WOMEN_UNIVERSAL_CATEGORIES,
+  ...WOMEN_FACE_CATEGORIES, // Conditional (toggle)
   ...WOMEN_RING_CATEGORIES,
   ...WOMEN_NECKLACE_CATEGORIES,
   ...WOMEN_EARRING_CATEGORIES,
@@ -573,6 +657,11 @@ export const WOMEN_ALL_BLOCKS: MicroBlock[] = [
   ...HAIR_TEXTURE_BLOCKS,
   ...HAIR_COLOR_BLOCKS,
   ...HAIR_VOLUME_BLOCKS,
+  
+  // Face Details blocks (Conditional/Toggle)
+  ...RACE_ETHNICITY_BLOCKS,
+  ...FACE_SHAPE_BLOCKS,
+  ...EYE_COLOR_BLOCKS,
   
   // Ring-specific blocks
   ...HAND_POSE_BLOCKS,
