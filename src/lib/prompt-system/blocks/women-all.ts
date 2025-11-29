@@ -78,14 +78,40 @@ export const WOMEN_UNIVERSAL_CATEGORIES: BlockCategory[] = [
   },
   
   {
+    id: 'hair-length',
+    name: 'Hair Length',
+    icon: '📏',
+    description: 'Length of hair',
+    order: 6,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  {
     id: 'hair-style',
     name: 'Hair Style',
     icon: '💇',
     description: 'Hairstyle and arrangement',
-    order: 6,
+    order: 7,
     applicableTo: {
       gender: ['women'],
-      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'], // Universal for all
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'hair-texture',
+    name: 'Hair Texture',
+    icon: '🌊',
+    description: 'Hair texture pattern',
+    order: 8,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
     },
     required: false,
   },
@@ -95,10 +121,23 @@ export const WOMEN_UNIVERSAL_CATEGORIES: BlockCategory[] = [
     name: 'Hair Color',
     icon: '🎨',
     description: 'Hair color tone',
-    order: 7,
+    order: 9,
     applicableTo: {
       gender: ['women'],
-      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'], // Universal for all
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'hair-volume',
+    name: 'Hair Volume',
+    icon: '✨',
+    description: 'Hair thickness and volume',
+    order: 10,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
     },
     required: false,
   },
@@ -114,7 +153,7 @@ export const WOMEN_RING_CATEGORIES: BlockCategory[] = [
     name: 'Hand Pose',
     icon: '✋',
     description: 'Hand positioning',
-    order: 10,
+    order: 20,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['ring'],
@@ -127,7 +166,7 @@ export const WOMEN_RING_CATEGORIES: BlockCategory[] = [
     name: 'Hand Structure',
     icon: '🖐️',
     description: 'Hand physical features',
-    order: 11,
+    order: 21,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['ring'],
@@ -146,7 +185,7 @@ export const WOMEN_NECKLACE_CATEGORIES: BlockCategory[] = [
     name: 'Neck/Head Pose',
     icon: '👤',
     description: 'Neck and head positioning',
-    order: 20,
+    order: 30,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['necklace'],
@@ -359,19 +398,58 @@ const NECK_POSE_BLOCKS: MicroBlock[] = [
   { id: 'neck-chin-down', name: 'Chin Down', categoryId: 'neck-pose', icon: '⬇️', promptFragment: 'chin tilted down, intimate gentle angle', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['chin-down', 'intimate'], level: 'advanced' },
 ];
 
-const HAIR_STYLE_BLOCKS: MicroBlock[] = [
-  { id: 'hair-updo-bun', name: 'Updo Bun', categoryId: 'hair-style', icon: '💁', promptFragment: 'elegant updo bun', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['updo', 'bun'], level: 'advanced' },
-  { id: 'hair-side-swept', name: 'Side Swept', categoryId: 'hair-style', icon: '💇', promptFragment: 'side-swept hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['side-swept', 'romantic'], level: 'advanced' },
-  { id: 'hair-behind', name: 'Behind Shoulders', categoryId: 'hair-style', icon: '🙋', promptFragment: 'hair behind shoulders', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['behind', 'clear'], level: 'advanced' },
-  { id: 'hair-long-straight', name: 'Long Straight', categoryId: 'hair-style', icon: '💆', promptFragment: 'long straight hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['long', 'straight'], level: 'advanced' },
-  { id: 'hair-long-wavy', name: 'Long Wavy', categoryId: 'hair-style', icon: '🌊', promptFragment: 'long wavy hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['long', 'wavy'], level: 'advanced' },
+// Hair Length Blocks
+const HAIR_LENGTH_BLOCKS: MicroBlock[] = [
+  { id: 'hair-length-pixie', name: 'Pixie/Very Short', categoryId: 'hair-length', icon: '✂️', promptFragment: 'pixie cut very short hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['short', 'pixie'], level: 'advanced' },
+  { id: 'hair-length-short', name: 'Short (Chin)', categoryId: 'hair-length', icon: '📏', promptFragment: 'short hair chin length', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['short', 'bob'], level: 'advanced' },
+  { id: 'hair-length-shoulder', name: 'Shoulder Length', categoryId: 'hair-length', icon: '📐', promptFragment: 'shoulder length hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['medium', 'shoulder'], level: 'advanced' },
+  { id: 'hair-length-mid-back', name: 'Mid-Back', categoryId: 'hair-length', icon: '📏', promptFragment: 'mid-back length hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['long', 'mid-back'], level: 'advanced' },
+  { id: 'hair-length-waist', name: 'Waist Length', categoryId: 'hair-length', icon: '📏', promptFragment: 'waist length long hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['very-long', 'waist'], level: 'advanced' },
 ];
 
+// Hair Style Blocks (Expanded)
+const HAIR_STYLE_BLOCKS: MicroBlock[] = [
+  { id: 'hair-loose-down', name: 'Loose & Down', categoryId: 'hair-style', icon: '💁', promptFragment: 'hair loose flowing down', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['loose', 'down'], level: 'advanced' },
+  { id: 'hair-updo-bun', name: 'Updo Bun', categoryId: 'hair-style', icon: '👱', promptFragment: 'elegant updo bun', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['updo', 'bun'], level: 'advanced' },
+  { id: 'hair-messy-bun', name: 'Messy Bun', categoryId: 'hair-style', icon: '🙆', promptFragment: 'casual messy bun', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['messy', 'bun'], level: 'advanced' },
+  { id: 'hair-ponytail-high', name: 'High Ponytail', categoryId: 'hair-style', icon: '🎀', promptFragment: 'high ponytail', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['ponytail', 'high'], level: 'advanced' },
+  { id: 'hair-ponytail-low', name: 'Low Ponytail', categoryId: 'hair-style', icon: '🎀', promptFragment: 'low ponytail', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['ponytail', 'low'], level: 'advanced' },
+  { id: 'hair-side-swept', name: 'Side Swept', categoryId: 'hair-style', icon: '💇', promptFragment: 'side-swept hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['side-swept', 'romantic'], level: 'advanced' },
+  { id: 'hair-behind', name: 'Behind Shoulders', categoryId: 'hair-style', icon: '🙋', promptFragment: 'hair behind shoulders', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['behind', 'clear'], level: 'advanced' },
+  { id: 'hair-half-up', name: 'Half-Up Half-Down', categoryId: 'hair-style', icon: '💆', promptFragment: 'half-up half-down hairstyle', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['half-up', 'mixed'], level: 'advanced' },
+  { id: 'hair-braided', name: 'Braided', categoryId: 'hair-style', icon: '🌾', promptFragment: 'braided hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['braided', 'intricate'], level: 'advanced' },
+  { id: 'hair-sleek-straight', name: 'Sleek Straight', categoryId: 'hair-style', icon: '✨', promptFragment: 'sleek straight styled', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['sleek', 'straight'], level: 'advanced' },
+  { id: 'hair-bob', name: 'Bob Cut', categoryId: 'hair-style', icon: '💇', promptFragment: 'bob haircut', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['bob', 'short'], level: 'advanced' },
+  { id: 'hair-layered', name: 'Layered', categoryId: 'hair-style', icon: '🌊', promptFragment: 'layered haircut', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['layered', 'textured'], level: 'advanced' },
+];
+
+// Hair Texture Blocks (NEW)
+const HAIR_TEXTURE_BLOCKS: MicroBlock[] = [
+  { id: 'hair-tex-straight', name: 'Straight', categoryId: 'hair-texture', icon: '📏', promptFragment: 'straight hair texture', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['straight', 'smooth'], level: 'advanced' },
+  { id: 'hair-tex-wavy', name: 'Wavy', categoryId: 'hair-texture', icon: '🌊', promptFragment: 'wavy hair texture', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['wavy', 'medium'], level: 'advanced' },
+  { id: 'hair-tex-curly', name: 'Curly', categoryId: 'hair-texture', icon: '🌀', promptFragment: 'curly hair texture', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['curly', 'bouncy'], level: 'advanced' },
+  { id: 'hair-tex-coily', name: 'Coily/Kinky', categoryId: 'hair-texture', icon: '🌪️', promptFragment: 'coily kinky hair texture', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['coily', 'kinky'], level: 'advanced' },
+];
+
+// Hair Color Blocks (Expanded)
 const HAIR_COLOR_BLOCKS: MicroBlock[] = [
-  { id: 'hair-black', name: 'Black', categoryId: 'hair-color', icon: '⬛', promptFragment: 'black hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['black', 'dark'], level: 'advanced' },
-  { id: 'hair-brown', name: 'Brown', categoryId: 'hair-color', icon: '🟤', promptFragment: 'brown hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['brown', 'warm'], level: 'advanced' },
-  { id: 'hair-blonde', name: 'Blonde', categoryId: 'hair-color', icon: '🟡', promptFragment: 'blonde hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['blonde', 'light'], level: 'advanced' },
-  { id: 'hair-auburn', name: 'Red Auburn', categoryId: 'hair-color', icon: '🟠', promptFragment: 'auburn hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['red', 'auburn'], level: 'advanced' },
+  { id: 'hair-black', name: 'Jet Black', categoryId: 'hair-color', icon: '⬛', promptFragment: 'jet black hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['black', 'dark'], level: 'advanced' },
+  { id: 'hair-dark-brown', name: 'Dark Brown', categoryId: 'hair-color', icon: '🟫', promptFragment: 'dark brown hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['brown', 'dark'], level: 'advanced' },
+  { id: 'hair-brown', name: 'Medium Brown', categoryId: 'hair-color', icon: '🟤', promptFragment: 'medium brown hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['brown', 'medium'], level: 'advanced' },
+  { id: 'hair-light-brown', name: 'Light Brown', categoryId: 'hair-color', icon: '🤎', promptFragment: 'light brown hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['brown', 'light'], level: 'advanced' },
+  { id: 'hair-honey-blonde', name: 'Honey Blonde', categoryId: 'hair-color', icon: '🍯', promptFragment: 'honey blonde hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['blonde', 'honey'], level: 'advanced' },
+  { id: 'hair-platinum', name: 'Platinum Blonde', categoryId: 'hair-color', icon: '⚪', promptFragment: 'platinum blonde hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['blonde', 'platinum'], level: 'advanced' },
+  { id: 'hair-auburn', name: 'Auburn', categoryId: 'hair-color', icon: '🟠', promptFragment: 'auburn hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['red', 'auburn'], level: 'advanced' },
+  { id: 'hair-red', name: 'Vibrant Red', categoryId: 'hair-color', icon: '🔴', promptFragment: 'vibrant red hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['red', 'vibrant'], level: 'advanced' },
+  { id: 'hair-burgundy', name: 'Burgundy', categoryId: 'hair-color', icon: '🍷', promptFragment: 'burgundy wine hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['burgundy', 'wine'], level: 'advanced' },
+  { id: 'hair-highlights', name: 'Highlighted', categoryId: 'hair-color', icon: '✨', promptFragment: 'highlighted hair with streaks', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['highlights', 'mixed'], level: 'advanced' },
+];
+
+// Hair Volume Blocks (NEW)
+const HAIR_VOLUME_BLOCKS: MicroBlock[] = [
+  { id: 'hair-vol-flat', name: 'Flat/Sleek', categoryId: 'hair-volume', icon: '📉', promptFragment: 'flat sleek hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['flat', 'sleek'], level: 'advanced' },
+  { id: 'hair-vol-normal', name: 'Normal Volume', categoryId: 'hair-volume', icon: '📊', promptFragment: 'normal volume hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['normal', 'medium'], level: 'advanced' },
+  { id: 'hair-vol-voluminous', name: 'Voluminous', categoryId: 'hair-volume', icon: '📈', promptFragment: 'voluminous bouncy hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['voluminous', 'thick'], level: 'advanced' },
 ];
 
 // ============================================
@@ -384,7 +462,7 @@ export const WOMEN_EARRING_CATEGORIES: BlockCategory[] = [
     name: 'Head Position',
     icon: '👤',
     description: 'Head angle for ear visibility',
-    order: 30,
+    order: 40,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['earring'],
@@ -397,7 +475,7 @@ export const WOMEN_EARRING_CATEGORIES: BlockCategory[] = [
     name: 'Hair Position',
     icon: '💇',
     description: 'Hair arrangement around ears',
-    order: 31,
+    order: 41,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['earring'],
@@ -416,7 +494,7 @@ export const WOMEN_BRACELET_CATEGORIES: BlockCategory[] = [
     name: 'Wrist/Arm Pose',
     icon: '🤚',
     description: 'Wrist and arm positioning',
-    order: 40,
+    order: 50,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['bracelet'],
@@ -429,7 +507,7 @@ export const WOMEN_BRACELET_CATEGORIES: BlockCategory[] = [
     name: 'Arm Position',
     icon: '💪',
     description: 'Arm angle and orientation',
-    order: 41,
+    order: 51,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['bracelet'],
@@ -484,18 +562,30 @@ const ARM_POSITION_BLOCKS: MicroBlock[] = [
 ];
 
 export const WOMEN_ALL_BLOCKS: MicroBlock[] = [
+  // Universal blocks
   ...SKIN_TONE_BLOCKS,
   ...NAIL_TYPE_BLOCKS,
   ...NAIL_COLOR_BLOCKS,
   ...MAKEUP_BLOCKS,
   ...EXPRESSION_BLOCKS,
+  ...HAIR_LENGTH_BLOCKS,
+  ...HAIR_STYLE_BLOCKS,
+  ...HAIR_TEXTURE_BLOCKS,
+  ...HAIR_COLOR_BLOCKS,
+  ...HAIR_VOLUME_BLOCKS,
+  
+  // Ring-specific blocks
   ...HAND_POSE_BLOCKS,
   ...HAND_STRUCTURE_BLOCKS,
+  
+  // Necklace-specific blocks
   ...NECK_POSE_BLOCKS,
-  ...HAIR_STYLE_BLOCKS,
-  ...HAIR_COLOR_BLOCKS,
+  
+  // Earring-specific blocks
   ...HEAD_POSITION_BLOCKS,
   ...HAIR_POSITION_BLOCKS,
+  
+  // Bracelet-specific blocks
   ...WRIST_POSE_BLOCKS,
   ...ARM_POSITION_BLOCKS,
 ];
