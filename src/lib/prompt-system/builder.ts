@@ -57,18 +57,30 @@ export const CATEGORY_GROUPS: Record<string, string> = {
   'cheekbones': 'face',
   'chin-type': 'face',
   
-  // Hand group (ring-specific)
+  // Hand group (ring-specific - women)
   'hand-pose': 'hand',
   'hand-structure': 'hand',
   
-  // Head group (earring-specific)
+  // Hand group (ring-specific - men)
+  'hand-pose-men-ring': 'hand',
+  'hand-structure-ring-men': 'hand',
+  
+  // Head group (earring-specific - women)
   'head-position': 'head',
   'hair-position': 'head',
   'ear-visibility': 'head',
   
-  // Arm group (bracelet-specific)
+  // Head group (earring-specific - men)
+  'head-position-men-earring': 'head',
+  'hair-position-men-earring': 'head',
+
+  // Arm group (bracelet-specific - women)
   'wrist-pose': 'arm',
   'arm-position': 'arm',
+  
+  // Arm group (bracelet-specific - men)
+  'wrist-pose-men-bracelet': 'arm',
+  'arm-position-men-bracelet': 'arm',
   
   // Necklace styling group
   'neckline': 'necklace-styling',
@@ -143,6 +155,11 @@ export const CATEGORY_GROUPS: Record<string, string> = {
   
   // Lifestyle extras (Men)
   'props-accessories-men': 'props',
+  
+  // Neck group (necklace-specific - men)
+  'neck-pose-men-necklace': 'neck',
+  'chest-presentation-men': 'chest',
+  'shirt-opening-men': 'shirt-opening',
   
   // Singular categories (no grouping)
   'skin-tone': 'skin',
@@ -285,7 +302,7 @@ export function buildGroupedJSON(
   const POST_PRODUCTION_GROUPS = ['processing', 'grading'];
   const CREATIVE_DIRECTION_GROUPS = ['intent', 'mood', 'context'];
   const LIFESTYLE_EXTRAS_GROUPS = ['props'];
-  const JEWELRY_GROUPS = ['hand', 'neck', 'head', 'arm', 'necklace-styling', 'bracelet-styling'];
+  const JEWELRY_GROUPS = ['hand', 'neck', 'head', 'arm', 'necklace-styling', 'bracelet-styling', 'chest', 'shirt-opening'];
   
   // Group prompt fragments by their parent group
   const groups: Record<string, string[]> = {};

@@ -1219,6 +1219,255 @@ const MEN_LIFESTYLE_EXTRAS_BLOCKS: MicroBlock[] = [
 ];
 
 // ============================================
+// MEN JEWELRY-SPECIFIC CATEGORIES
+// ============================================
+
+// ===== RING-SPECIFIC =====
+export const MEN_RING_CATEGORIES: BlockCategory[] = [
+  {
+    id: 'hand-pose-men-ring',
+    name: 'Hand Pose',
+    icon: '✋',
+    description: 'Hand positioning for ring display',
+    order: 700,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['ring'],
+    },
+    required: true,
+  },
+  
+  {
+    id: 'hand-structure-ring-men',
+    name: 'Hand Structure',
+    icon: '🤚',
+    description: 'Hand size and build for ring',
+    order: 701,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['ring'],
+    },
+    required: false,
+  },
+];
+
+// Ring-Specific Hand Pose Blocks (Masculine)
+const HAND_POSE_MEN_RING_BLOCKS: MicroBlock[] = [
+  { id: 'hand-fist-men', name: 'Fist Clenched', categoryId: 'hand-pose-men-ring', icon: '✊', promptFragment: 'fist clenched powerful ring prominent masculine', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['fist', 'powerful'], level: 'advanced' },
+  { id: 'hand-relaxed-men', name: 'Relaxed Open', categoryId: 'hand-pose-men-ring', icon: '🖐️', promptFragment: 'hand relaxed open fingers spread ring visible', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['relaxed', 'open'], level: 'advanced' },
+  { id: 'hand-pointing-men', name: 'Pointing Gesture', categoryId: 'hand-pose-men-ring', icon: '👉', promptFragment: 'pointing gesture index finger extended ring displayed', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['pointing', 'gesture'], level: 'advanced' },
+  { id: 'hand-grip-men', name: 'Power Grip', categoryId: 'hand-pose-men-ring', icon: '💪', promptFragment: 'power grip hand gripping object ring visible strong', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['grip', 'strong'], level: 'advanced' },
+  { id: 'hand-interlaced-men', name: 'Fingers Interlaced', categoryId: 'hand-pose-men-ring', icon: '🙏', promptFragment: 'fingers interlaced hands clasped rings visible', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['interlaced', 'clasped'], level: 'advanced' },
+  { id: 'hand-steering-men', name: 'Steering Wheel Grip', categoryId: 'hand-pose-men-ring', icon: '🚗', promptFragment: 'hand gripping steering wheel ring visible masculine lifestyle', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['steering', 'lifestyle'], level: 'advanced' },
+  { id: 'hand-chin-men', name: 'Hand to Chin', categoryId: 'hand-pose-men-ring', icon: '🤔', promptFragment: 'hand touching chin contemplative ring near face', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['chin', 'contemplative'], level: 'advanced' },
+  { id: 'hand-pocket-men', name: 'Hand in Pocket', categoryId: 'hand-pose-men-ring', icon: '👖', promptFragment: 'hand in pocket casual ring visible relaxed', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['pocket', 'casual'], level: 'advanced' },
+  { id: 'hand-watch-adjust-men', name: 'Adjusting Watch', categoryId: 'hand-pose-men-ring', icon: '⌚', promptFragment: 'hand adjusting watch ring and watch together luxury', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['watch', 'luxury'], level: 'advanced' },
+  { id: 'hand-glass-hold-men', name: 'Holding Glass', categoryId: 'hand-pose-men-ring', icon: '🥃', promptFragment: 'hand holding whiskey glass ring visible sophisticated', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['glass', 'sophisticated'], level: 'advanced' },
+  { id: 'hand-tool-grip-men', name: 'Tool Grip', categoryId: 'hand-pose-men-ring', icon: '🔧', promptFragment: 'hand gripping tool working hands ring visible rugged', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['tool', 'rugged'], level: 'advanced' },
+  { id: 'hand-steepled-men', name: 'Steepled Fingers', categoryId: 'hand-pose-men-ring', icon: '🙇', promptFragment: 'steepled fingers contemplative ring visible powerful', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['steepled', 'powerful'], level: 'advanced' },
+  { id: 'hand-cigar-men', name: 'Holding Cigar', categoryId: 'hand-pose-men-ring', icon: '🚬', promptFragment: 'hand holding cigar ring visible sophisticated masculine', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['cigar', 'sophisticated'], level: 'advanced' },
+  { id: 'hand-keys-men', name: 'Holding Keys', categoryId: 'hand-pose-men-ring', icon: '🔑', promptFragment: 'hand holding car keys ring visible lifestyle', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['keys', 'lifestyle'], level: 'advanced' },
+  { id: 'hand-crossed-arms-men', name: 'Arms Crossed', categoryId: 'hand-pose-men-ring', icon: '🙅', promptFragment: 'arms crossed hands visible ring confident pose', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['crossed', 'confident'], level: 'advanced' },
+];
+
+const HAND_STRUCTURE_RING_MEN_BLOCKS: MicroBlock[] = [
+  { id: 'hand-struct-large-men', name: 'Large Masculine', categoryId: 'hand-structure-ring-men', icon: '🤚', promptFragment: 'large masculine hands broad powerful', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['large', 'masculine'], level: 'advanced' },
+  { id: 'hand-struct-athletic-men', name: 'Athletic Strong', categoryId: 'hand-structure-ring-men', icon: '💪', promptFragment: 'athletic strong hands defined muscular', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['athletic', 'strong'], level: 'advanced' },
+  { id: 'hand-struct-refined-men', name: 'Refined Elegant', categoryId: 'hand-structure-ring-men', icon: '✨', promptFragment: 'refined elegant hands groomed sophisticated', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['refined', 'elegant'], level: 'advanced' },
+  { id: 'hand-struct-rugged-men', name: 'Rugged Working', categoryId: 'hand-structure-ring-men', icon: '🔨', promptFragment: 'rugged working hands calloused strong masculine', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['rugged', 'working'], level: 'advanced' },
+  { id: 'hand-struct-veiny-men', name: 'Veiny Athletic', categoryId: 'hand-structure-ring-men', icon: '🫀', promptFragment: 'veiny athletic hands prominent veins masculine', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['veiny', 'athletic'], level: 'advanced' },
+  { id: 'hand-struct-slender-men', name: 'Slender Artistic', categoryId: 'hand-structure-ring-men', icon: '🎨', promptFragment: 'slender artistic hands long fingers refined', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['slender', 'artistic'], level: 'advanced' },
+];
+
+// ===== NECKLACE-SPECIFIC =====
+export const MEN_NECKLACE_CATEGORIES: BlockCategory[] = [
+  {
+    id: 'neck-pose-men-necklace',
+    name: 'Neck/Head Pose',
+    icon: '👤',
+    description: 'Neck and head positioning',
+    order: 710,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['necklace'],
+    },
+    required: true,
+  },
+  
+  {
+    id: 'chest-presentation-men',
+    name: 'Chest Presentation',
+    icon: '🫁',
+    description: 'Chest area styling and visibility',
+    order: 711,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['necklace'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'shirt-opening-men',
+    name: 'Shirt Opening',
+    icon: '👔',
+    description: 'How shirt is worn/opened',
+    order: 712,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['necklace'],
+    },
+    required: false,
+  },
+];
+
+const NECK_POSE_MEN_NECKLACE_BLOCKS: MicroBlock[] = [
+  { id: 'neck-straight-men', name: 'Straight Forward', categoryId: 'neck-pose-men-necklace', icon: '⬆️', promptFragment: 'neck straight forward head level necklace centered', applicableTo: { gender: ['men'], jewelryTypes: ['necklace'] }, tags: ['straight', 'forward'], level: 'advanced' },
+  { id: 'neck-tilted-men', name: 'Head Tilted', categoryId: 'neck-pose-men-necklace', icon: '↗️', promptFragment: 'head tilted angle neck visible necklace displayed', applicableTo: { gender: ['men'], jewelryTypes: ['necklace'] }, tags: ['tilted', 'angle'], level: 'advanced' },
+  { id: 'neck-profile-men', name: 'Profile Side', categoryId: 'neck-pose-men-necklace', icon: '↔️', promptFragment: 'profile side view neck line visible necklace prominent', applicableTo: { gender: ['men'], jewelryTypes: ['necklace'] }, tags: ['profile', 'side'], level: 'advanced' },
+  { id: 'neck-looking-down-men', name: 'Looking Down', categoryId: 'neck-pose-men-necklace', icon: '⬇️', promptFragment: 'looking down neck curved necklace falls naturally', applicableTo: { gender: ['men'], jewelryTypes: ['necklace'] }, tags: ['down', 'curved'], level: 'advanced' },
+  { id: 'neck-looking-up-men', name: 'Looking Up', categoryId: 'neck-pose-men-necklace', icon: '⬆️', promptFragment: 'looking up neck extended necklace stretched visible', applicableTo: { gender: ['men'], jewelryTypes: ['necklace'] }, tags: ['up', 'extended'], level: 'advanced' },
+];
+
+const CHEST_PRESENTATION_MEN_BLOCKS: MicroBlock[] = [
+  { id: 'chest-bare-men', name: 'Bare Chest', categoryId: 'chest-presentation-men', icon: '🫁', promptFragment: 'bare chest shirtless necklace on skin masculine', applicableTo: { gender: ['men'], jewelryTypes: ['necklace'] }, tags: ['bare', 'shirtless'], level: 'advanced' },
+  { id: 'chest-hair-visible-men', name: 'Chest Hair Visible', categoryId: 'chest-presentation-men', icon: '🐻', promptFragment: 'chest hair visible masculine necklace resting on hair', applicableTo: { gender: ['men'], jewelryTypes: ['necklace'] }, tags: ['chest-hair', 'masculine'], level: 'advanced' },
+  { id: 'chest-smooth-men', name: 'Smooth Chest', categoryId: 'chest-presentation-men', icon: '✨', promptFragment: 'smooth chest hairless clean necklace on skin', applicableTo: { gender: ['men'], jewelryTypes: ['necklace'] }, tags: ['smooth', 'clean'], level: 'advanced' },
+  { id: 'chest-athletic-men', name: 'Athletic Defined', categoryId: 'chest-presentation-men', icon: '💪', promptFragment: 'athletic defined chest muscular necklace on pecs', applicableTo: { gender: ['men'], jewelryTypes: ['necklace'] }, tags: ['athletic', 'muscular'], level: 'advanced' },
+  { id: 'chest-covered-men', name: 'Fully Covered', categoryId: 'chest-presentation-men', icon: '👔', promptFragment: 'chest fully covered shirt buttoned necklace over clothing', applicableTo: { gender: ['men'], jewelryTypes: ['necklace'] }, tags: ['covered', 'formal'], level: 'advanced' },
+];
+
+const SHIRT_OPENING_MEN_BLOCKS: MicroBlock[] = [
+  { id: 'shirt-fully-open-men', name: 'Fully Open', categoryId: 'shirt-opening-men', icon: '📖', promptFragment: 'shirt fully open unbuttoned chest exposed necklace visible', applicableTo: { gender: ['men'], jewelryTypes: ['necklace'] }, tags: ['open', 'unbuttoned'], level: 'advanced' },
+  { id: 'shirt-half-open-men', name: 'Half Unbuttoned', categoryId: 'shirt-opening-men', icon: '🔓', promptFragment: 'shirt half unbuttoned 3-4 buttons open necklace partially visible', applicableTo: { gender: ['men'], jewelryTypes: ['necklace'] }, tags: ['half-open', 'casual'], level: 'advanced' },
+  { id: 'shirt-top-button-men', name: 'Top Button Open', categoryId: 'shirt-opening-men', icon: '🔘', promptFragment: 'shirt top button unbuttoned relaxed necklace peek', applicableTo: { gender: ['men'], jewelryTypes: ['necklace'] }, tags: ['top-button', 'relaxed'], level: 'advanced' },
+  { id: 'shirt-vneck-men', name: 'V-Neck Tee', categoryId: 'shirt-opening-men', icon: '🔻', promptFragment: 'V-neck t-shirt deep V necklace visible casual', applicableTo: { gender: ['men'], jewelryTypes: ['necklace'] }, tags: ['v-neck', 'casual'], level: 'advanced' },
+  { id: 'shirt-tank-men', name: 'Tank Top', categoryId: 'shirt-opening-men', icon: '🎽', promptFragment: 'tank top athletic wear necklace fully visible', applicableTo: { gender: ['men'], jewelryTypes: ['necklace'] }, tags: ['tank', 'athletic'], level: 'advanced' },
+];
+
+// ===== EARRING-SPECIFIC =====
+export const MEN_EARRING_CATEGORIES: BlockCategory[] = [
+  {
+    id: 'head-position-men-earring',
+    name: 'Head Position',
+    icon: '👤',
+    description: 'Head angle for earring visibility',
+    order: 720,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['earring'],
+    },
+    required: true,
+  },
+  
+  {
+    id: 'hair-position-men-earring',
+    name: 'Hair Position',
+    icon: '💈',
+    description: 'Hair arrangement around ears',
+    order: 721,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['earring'],
+    },
+    required: false,
+  },
+];
+
+const HEAD_POSITION_MEN_EARRING_BLOCKS: MicroBlock[] = [
+  { id: 'head-straight-earring-men', name: 'Straight Forward', categoryId: 'head-position-men-earring', icon: '⬆️', promptFragment: 'head straight forward both ears visible earrings displayed', applicableTo: { gender: ['men'], jewelryTypes: ['earring'] }, tags: ['straight', 'forward'], level: 'advanced' },
+  { id: 'head-profile-left-men', name: 'Profile Left', categoryId: 'head-position-men-earring', icon: '⬅️', promptFragment: 'head profile left side single ear prominent earring visible', applicableTo: { gender: ['men'], jewelryTypes: ['earring'] }, tags: ['profile', 'left'], level: 'advanced' },
+  { id: 'head-profile-right-men', name: 'Profile Right', categoryId: 'head-position-men-earring', icon: '➡️', promptFragment: 'head profile right side single ear prominent earring visible', applicableTo: { gender: ['men'], jewelryTypes: ['earring'] }, tags: ['profile', 'right'], level: 'advanced' },
+  { id: 'head-three-quarter-men', name: 'Three-Quarter', categoryId: 'head-position-men-earring', icon: '↗️', promptFragment: 'three-quarter view angle showing ear earring displayed', applicableTo: { gender: ['men'], jewelryTypes: ['earring'] }, tags: ['three-quarter'], level: 'advanced' },
+];
+
+const HAIR_POSITION_MEN_EARRING_BLOCKS: MicroBlock[] = [
+  { id: 'hair-short-crop-men', name: 'Short Crop', categoryId: 'hair-position-men-earring', icon: '✂️', promptFragment: 'short cropped hair ears fully exposed earring visible', applicableTo: { gender: ['men'], jewelryTypes: ['earring'] }, tags: ['short', 'exposed'], level: 'advanced' },
+  { id: 'hair-buzz-cut-men', name: 'Buzz Cut', categoryId: 'hair-position-men-earring', icon: '🪒', promptFragment: 'buzz cut very short ears completely visible earring prominent', applicableTo: { gender: ['men'], jewelryTypes: ['earring'] }, tags: ['buzz', 'exposed'], level: 'advanced' },
+  { id: 'hair-slicked-back-men', name: 'Slicked Back', categoryId: 'hair-position-men-earring', icon: '💼', promptFragment: 'hair slicked back ears exposed earring visible clean', applicableTo: { gender: ['men'], jewelryTypes: ['earring'] }, tags: ['slicked', 'clean'], level: 'advanced' },
+  { id: 'hair-undercut-men', name: 'Undercut', categoryId: 'hair-position-men-earring', icon: '✂️', promptFragment: 'undercut short sides ears visible earring displayed', applicableTo: { gender: ['men'], jewelryTypes: ['earring'] }, tags: ['undercut', 'visible'], level: 'advanced' },
+  { id: 'hair-bald-men', name: 'Bald/Shaved', categoryId: 'hair-position-men-earring', icon: '🪒', promptFragment: 'bald shaved head ears fully visible earring prominent', applicableTo: { gender: ['men'], jewelryTypes: ['earring'] }, tags: ['bald', 'exposed'], level: 'advanced' },
+];
+
+// ===== BRACELET-SPECIFIC =====
+export const MEN_BRACELET_CATEGORIES: BlockCategory[] = [
+  {
+    id: 'wrist-pose-men-bracelet',
+    name: 'Wrist Pose',
+    icon: '🤚',
+    description: 'Wrist positioning and gestures',
+    order: 730,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['bracelet'],
+    },
+    required: true,
+  },
+  
+  {
+    id: 'arm-position-men-bracelet',
+    name: 'Arm Position',
+    icon: '💪',
+    description: 'Overall arm positioning',
+    order: 731,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['bracelet'],
+    },
+    required: false,
+  },
+];
+
+const WRIST_POSE_MEN_BRACELET_BLOCKS: MicroBlock[] = [
+  { id: 'wrist-steering-men', name: 'Steering Wheel', categoryId: 'wrist-pose-men-bracelet', icon: '🚗', promptFragment: 'wrist on steering wheel driving bracelet visible masculine', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['steering', 'driving'], level: 'advanced' },
+  { id: 'wrist-watch-check-men', name: 'Checking Watch', categoryId: 'wrist-pose-men-bracelet', icon: '⌚', promptFragment: 'wrist raised checking watch bracelet and watch together', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['watch', 'checking'], level: 'advanced' },
+  { id: 'wrist-relaxed-men', name: 'Relaxed Down', categoryId: 'wrist-pose-men-bracelet', icon: '🤚', promptFragment: 'wrist relaxed down arm hanging naturally bracelet visible', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['relaxed', 'natural'], level: 'advanced' },
+  { id: 'wrist-crossed-arms-men', name: 'Arms Crossed', categoryId: 'wrist-pose-men-bracelet', icon: '🙅', promptFragment: 'arms crossed wrists visible bracelet displayed confident', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['crossed', 'confident'], level: 'advanced' },
+  { id: 'wrist-pocket-men', name: 'Hand in Pocket', categoryId: 'wrist-pose-men-bracelet', icon: '👖', promptFragment: 'hand in pocket wrist edge visible bracelet peek casual', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['pocket', 'casual'], level: 'advanced' },
+  { id: 'wrist-grip-men', name: 'Power Grip', categoryId: 'wrist-pose-men-bracelet', icon: '💪', promptFragment: 'wrist gripping object power grip bracelet visible strong', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['grip', 'strong'], level: 'advanced' },
+  { id: 'wrist-tool-hold-men', name: 'Holding Tool', categoryId: 'wrist-pose-men-bracelet', icon: '🔧', promptFragment: 'wrist holding tool working hands bracelet visible rugged', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['tool', 'rugged'], level: 'advanced' },
+  { id: 'wrist-glass-hold-men', name: 'Holding Glass', categoryId: 'wrist-pose-men-bracelet', icon: '🥃', promptFragment: 'wrist holding whiskey glass bracelet visible sophisticated', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['glass', 'sophisticated'], level: 'advanced' },
+  { id: 'wrist-extended-men', name: 'Extended Forward', categoryId: 'wrist-pose-men-bracelet', icon: '👉', promptFragment: 'wrist extended forward arm outstretched bracelet displayed', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['extended', 'forward'], level: 'advanced' },
+  { id: 'wrist-flexed-men', name: 'Wrist Flexed', categoryId: 'wrist-pose-men-bracelet', icon: '💪', promptFragment: 'wrist flexed hand up bracelet sliding down forearm', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['flexed', 'muscular'], level: 'advanced' },
+];
+
+const ARM_POSITION_MEN_BRACELET_BLOCKS: MicroBlock[] = [
+  { id: 'arm-vertical-men', name: 'Vertical Down', categoryId: 'arm-position-men-bracelet', icon: '⬇️', promptFragment: 'arm vertical down natural hanging bracelet visible', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['vertical', 'down'], level: 'advanced' },
+  { id: 'arm-horizontal-men', name: 'Horizontal Extended', categoryId: 'arm-position-men-bracelet', icon: '↔️', promptFragment: 'arm horizontal extended across bracelet displayed', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['horizontal'], level: 'advanced' },
+  { id: 'arm-bent-90-men', name: 'Bent 90°', categoryId: 'arm-position-men-bracelet', icon: '💪', promptFragment: 'arm bent 90 degrees wrist at chest level bracelet visible', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['bent', '90-degree'], level: 'advanced' },
+  { id: 'arm-overhead-men', name: 'Overhead Raised', categoryId: 'arm-position-men-bracelet', icon: '🙌', promptFragment: 'arm raised overhead wrist elevated bracelet sliding', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['overhead', 'raised'], level: 'advanced' },
+  { id: 'arm-resting-men', name: 'Resting on Surface', categoryId: 'arm-position-men-bracelet', icon: '🪑', promptFragment: 'arm resting on table surface wrist relaxed bracelet visible', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['resting', 'surface'], level: 'advanced' },
+  { id: 'arm-behind-head-men', name: 'Behind Head', categoryId: 'arm-position-men-bracelet', icon: '🙆', promptFragment: 'arm behind head relaxed pose wrist visible bracelet displayed', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['behind', 'relaxed'], level: 'advanced' },
+  { id: 'arm-flexed-men', name: 'Flexed Muscular', categoryId: 'arm-position-men-bracelet', icon: '💪', promptFragment: 'arm flexed muscles visible bracelet on forearm athletic', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['flexed', 'muscular'], level: 'advanced' },
+  { id: 'arm-leaning-men', name: 'Leaning on Wall', categoryId: 'arm-position-men-bracelet', icon: '🧱', promptFragment: 'arm leaning on wall casual pose wrist visible bracelet', applicableTo: { gender: ['men'], jewelryTypes: ['bracelet'] }, tags: ['leaning', 'casual'], level: 'advanced' },
+];
+
+// ============================================
+// AGGREGATE JEWELRY-SPECIFIC BLOCKS
+// ============================================
+
+const MEN_RING_BLOCKS: MicroBlock[] = [
+  ...HAND_POSE_MEN_RING_BLOCKS,
+  ...HAND_STRUCTURE_RING_MEN_BLOCKS,
+];
+
+const MEN_NECKLACE_BLOCKS: MicroBlock[] = [
+  ...NECK_POSE_MEN_NECKLACE_BLOCKS,
+  ...CHEST_PRESENTATION_MEN_BLOCKS,
+  ...SHIRT_OPENING_MEN_BLOCKS,
+];
+
+const MEN_EARRING_BLOCKS: MicroBlock[] = [
+  ...HEAD_POSITION_MEN_EARRING_BLOCKS,
+  ...HAIR_POSITION_MEN_EARRING_BLOCKS,
+];
+
+const MEN_BRACELET_BLOCKS: MicroBlock[] = [
+  ...WRIST_POSE_MEN_BRACELET_BLOCKS,
+  ...ARM_POSITION_MEN_BRACELET_BLOCKS,
+];
+
+// ============================================
 // EXPORT ALL MEN CATEGORIES & BLOCKS
 // ============================================
 
@@ -1230,6 +1479,10 @@ export const MEN_ALL_CATEGORIES: BlockCategory[] = [
   ...MEN_POST_PRODUCTION_CATEGORIES,
   ...MEN_CREATIVE_DIRECTION_CATEGORIES,
   ...MEN_LIFESTYLE_EXTRAS_CATEGORIES,
+  ...MEN_RING_CATEGORIES,
+  ...MEN_NECKLACE_CATEGORIES,
+  ...MEN_EARRING_CATEGORIES,
+  ...MEN_BRACELET_CATEGORIES,
 ];
 
 export const MEN_ALL_BLOCKS: MicroBlock[] = [
@@ -1240,5 +1493,9 @@ export const MEN_ALL_BLOCKS: MicroBlock[] = [
   ...MEN_POST_PRODUCTION_BLOCKS,
   ...MEN_CREATIVE_DIRECTION_BLOCKS,
   ...MEN_LIFESTYLE_EXTRAS_BLOCKS,
+  ...MEN_RING_BLOCKS,
+  ...MEN_NECKLACE_BLOCKS,
+  ...MEN_EARRING_BLOCKS,
+  ...MEN_BRACELET_BLOCKS,
 ];
 
