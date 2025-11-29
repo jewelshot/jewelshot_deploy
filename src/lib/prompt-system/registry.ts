@@ -5,9 +5,15 @@
  */
 
 import { BlockCategory, MicroBlock, BlockContext } from './types';
-import { WOMEN_RING_CATEGORIES, WOMEN_RING_BLOCKS } from './blocks/women-ring';
-import { MEN_RING_CATEGORIES, MEN_RING_BLOCKS } from './blocks/men-ring';
-import { WOMEN_NECKLACE_CATEGORIES, WOMEN_NECKLACE_BLOCKS } from './blocks/women-necklace';
+import { 
+  WOMEN_ALL_CATEGORIES,
+  WOMEN_UNIVERSAL_CATEGORIES,
+  WOMEN_RING_CATEGORIES,
+  WOMEN_NECKLACE_CATEGORIES,
+  WOMEN_EARRING_CATEGORIES,
+  WOMEN_BRACELET_CATEGORIES,
+  WOMEN_ALL_BLOCKS 
+} from './blocks/women-all';
 
 // ============================================
 // REGISTRY
@@ -22,17 +28,9 @@ export class BlockRegistry {
   }
   
   private registerAll() {
-    // Women + Ring
-    WOMEN_RING_CATEGORIES.forEach(c => this.categories.set(c.id, c));
-    WOMEN_RING_BLOCKS.forEach(b => this.blocks.set(b.id, b));
-    
-    // Men + Ring
-    MEN_RING_CATEGORIES.forEach(c => this.categories.set(c.id, c));
-    MEN_RING_BLOCKS.forEach(b => this.blocks.set(b.id, b));
-    
-    // Women + Necklace
-    WOMEN_NECKLACE_CATEGORIES.forEach(c => this.categories.set(c.id, c));
-    WOMEN_NECKLACE_BLOCKS.forEach(b => this.blocks.set(b.id, b));
+    // Register all women blocks
+    WOMEN_ALL_CATEGORIES.forEach(c => this.categories.set(c.id, c));
+    WOMEN_ALL_BLOCKS.forEach(b => this.blocks.set(b.id, b));
   }
   
   /**

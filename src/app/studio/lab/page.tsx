@@ -13,16 +13,9 @@ import { BLOCK_REGISTRY } from '@/lib/prompt-system/registry';
 import { buildPromptFromSelections } from '@/lib/prompt-system/builder';
 import type { BlockSelections, Gender, JewelryType, BlockCategory } from '@/lib/prompt-system/types';
 
-const JEWELRY_TYPES: { value: JewelryType; label: string; icon: string }[] = [
-  { value: 'ring', label: 'Ring', icon: '💍' },
-  { value: 'necklace', label: 'Necklace', icon: '📿' },
-  { value: 'earring', label: 'Earring', icon: '💎' },
-  { value: 'bracelet', label: 'Bracelet', icon: '⌚' },
-];
-
 export default function StudioLabPage() {
-  const [gender, setGender] = useState<Gender>('women');
-  const [jewelryType, setJewelryType] = useState<JewelryType>('ring');
+  const [gender, setGender] = useState<Gender | null>(null);
+  const [jewelryType, setJewelryType] = useState<JewelryType | null>(null);
   const [selections, setSelections] = useState<BlockSelections>({});
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
@@ -30,6 +23,7 @@ export default function StudioLabPage() {
   
   // Get applicable categories based on context
   const categories = useMemo(() => {
+    if (!gender || !jewelryType) return [];
     return BLOCK_REGISTRY.getCategories({ gender, jewelryType });
   }, [gender, jewelryType]);
   
@@ -50,16 +44,10 @@ export default function StudioLabPage() {
     });
   }, [categories, jewelryType]);
   
-  // Reset selections when context changes
+  // Handle gender selection
   const handleGenderChange = (newGender: Gender) => {
     setGender(newGender);
-    setSelections({});
-    setExpandedCategories(new Set());
-    setGeneratedPrompt('');
-  };
-  
-  const handleJewelryTypeChange = (newType: JewelryType) => {
-    setJewelryType(newType);
+    setJewelryType(null); // Reset jewelry selection
     setSelections({});
     setExpandedCategories(new Set());
     setGeneratedPrompt('');
@@ -85,6 +73,7 @@ export default function StudioLabPage() {
   };
 
   const handleGeneratePrompt = () => {
+    if (!gender || !jewelryType) return;
     const allBlocks = BLOCK_REGISTRY.getBlocks({ gender, jewelryType });
     const prompt = buildPromptFromSelections(
       { gender, jewelryType },
@@ -100,6 +89,10 @@ export default function StudioLabPage() {
   
   // Build JSON representation of selections
   const selectionsJson = useMemo(() => {
+    if (!gender || !jewelryType) {
+      return JSON.stringify({ message: 'Please select gender first' }, null, 2);
+    }
+    
     const json: Record<string, any> = {
       context: {
         gender,
@@ -153,60 +146,77 @@ export default function StudioLabPage() {
             </div>
           </div>
           
-          {/* Context Selectors */}
-          <div className="space-y-4">
-            {/* Gender Selector */}
+            {/* Gender Selector - PRIMARY */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-white/80">
-                👤 Gender
+              <label className="mb-3 block text-xl font-semibold text-white">
+                1️⃣ Select Gender
               </label>
-              <div className="flex gap-2">
-                {(['women', 'men'] as Gender[]).map(g => (
-                  <button
-                    key={g}
-                    onClick={() => handleGenderChange(g)}
-                    className={`flex-1 rounded-lg border px-6 py-3 text-sm font-medium transition-all ${
-                      gender === g
-                        ? 'border-purple-500 bg-purple-500/10 text-purple-400 shadow-lg shadow-purple-500/20'
-                        : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20 hover:bg-white/10 hover:text-white'
-                    }`}
-                  >
-                    {g === 'women' ? '👩 Women' : '👨 Men'}
-                  </button>
-                ))}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => handleGenderChange('women')}
+                  className={`flex-1 rounded-xl border-2 px-8 py-6 text-lg font-semibold transition-all ${
+                    gender === 'women'
+                      ? 'border-purple-500 bg-purple-500/20 text-purple-300 shadow-xl shadow-purple-500/30'
+                      : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20 hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  <div className="text-4xl mb-2">👩</div>
+                  Women
+                </button>
+                <button
+                  onClick={() => handleGenderChange('men')}
+                  disabled
+                  className="flex-1 rounded-xl border-2 border-white/10 bg-white/5 px-8 py-6 text-lg font-semibold text-white/30 cursor-not-allowed"
+                >
+                  <div className="text-4xl mb-2">👨</div>
+                  Men
+                  <div className="text-xs mt-1">(Coming Soon)</div>
+                </button>
               </div>
             </div>
-            
-            {/* Jewelry Type Selector */}
-            <div>
-              <label className="mb-2 block text-sm font-medium text-white/80">
-                💎 Jewelry Type
-              </label>
-              <div className="grid grid-cols-4 gap-2">
-                {JEWELRY_TYPES.map(type => (
-                  <button
-                    key={type.value}
-                    onClick={() => handleJewelryTypeChange(type.value)}
-                    className={`flex items-center justify-center gap-2 rounded-lg border px-4 py-3 text-sm font-medium transition-all ${
-                      jewelryType === type.value
-                        ? 'border-purple-500 bg-purple-500/10 text-purple-400 shadow-lg shadow-purple-500/20'
-                        : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20 hover:bg-white/10 hover:text-white'
-                    }`}
-                  >
-                    <span className="text-lg">{type.icon}</span>
-                    {type.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {/* Left: Block Selection */}
-          <div className="space-y-6">
-            {/* Gender-Based Blocks */}
-            {genderBasedCategories.length > 0 && (
+        {/* Jewelry Type Selector - Shows after gender selection */}
+        {gender && !jewelryType && (
+          <div className="mb-8">
+            <label className="mb-3 block text-xl font-semibold text-white">
+              2️⃣ Select Jewelry Type
+            </label>
+            <div className="grid grid-cols-4 gap-3">
+              {[
+                { value: 'ring', label: 'Ring', icon: '💍' },
+                { value: 'necklace', label: 'Necklace', icon: '📿' },
+                { value: 'earring', label: 'Earring', icon: '💎', disabled: true },
+                { value: 'bracelet', label: 'Bracelet', icon: '⌚', disabled: true },
+              ].map(type => (
+                <button
+                  key={type.value}
+                  onClick={() => !type.disabled && setJewelryType(type.value as JewelryType)}
+                  disabled={type.disabled}
+                  className={`flex flex-col items-center justify-center gap-2 rounded-xl border-2 px-6 py-6 font-semibold transition-all ${
+                    type.disabled
+                      ? 'border-white/10 bg-white/5 text-white/30 cursor-not-allowed'
+                      : 'border-white/10 bg-white/5 text-white/80 hover:border-purple-500/50 hover:bg-purple-500/10 hover:text-white'
+                  }`}
+                >
+                  <span className="text-3xl">{type.icon}</span>
+                  <span className="text-sm">{type.label}</span>
+                  {type.disabled && (
+                    <span className="text-xs text-white/40">Coming Soon</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Block Selection - Shows after both gender and jewelry selected */}
+        {gender && jewelryType && (
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            {/* Left: Block Selection */}
+            <div className="space-y-6">
+              {/* Gender-Based Blocks */}
+              {genderBasedCategories.length > 0 && (
               <div>
                 <h2 className="mb-3 text-lg font-semibold flex items-center gap-2">
                   <span className="text-2xl">{gender === 'women' ? '👩' : '👨'}</span>
@@ -221,40 +231,31 @@ export default function StudioLabPage() {
               </div>
             )}
             
-            {/* Jewelry-Based Blocks */}
-            {jewelryBasedCategories.length > 0 && (
-              <div>
-                <h2 className="mb-3 text-lg font-semibold flex items-center gap-2">
-                  <span className="text-2xl">
-                    {JEWELRY_TYPES.find(t => t.value === jewelryType)?.icon}
-                  </span>
-                  {jewelryType.charAt(0).toUpperCase() + jewelryType.slice(1)}-Specific Blocks
-                  <span className="text-xs font-normal text-white/60">
-                    ({jewelryBasedCategories.length} categories)
-                  </span>
-                </h2>
-                <div className="space-y-3">
-                  {jewelryBasedCategories.map(category => renderCategory(category))}
+              {/* Jewelry-Based Blocks */}
+              {jewelryBasedCategories.length > 0 && (
+                <div>
+                  <h2 className="mb-3 text-lg font-semibold flex items-center gap-2">
+                    <span className="text-2xl">
+                      {jewelryType === 'ring' && '💍'}
+                      {jewelryType === 'necklace' && '📿'}
+                      {jewelryType === 'earring' && '💎'}
+                      {jewelryType === 'bracelet' && '⌚'}
+                    </span>
+                    {jewelryType.charAt(0).toUpperCase() + jewelryType.slice(1)}-Specific Blocks
+                    <span className="text-xs font-normal text-white/60">
+                      ({jewelryBasedCategories.length} categories)
+                    </span>
+                  </h2>
+                  <div className="space-y-3">
+                    {jewelryBasedCategories.map(category => renderCategory(category))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
             
-            {/* No blocks available */}
-            {categories.length === 0 && (
-              <div className="rounded-lg border border-dashed border-white/20 bg-white/5 p-8 text-center text-white/60">
-                <p className="text-sm">
-                  No blocks available for this combination yet.
-                  <br />
-                  <span className="text-xs">
-                    Try: Women + Ring, Men + Ring, or Women + Necklace
-                  </span>
-                </p>
-              </div>
-            )}
-          </div>
+            </div>
 
-          {/* Right: Prompt Preview */}
-          <div className="space-y-4">
+            {/* Right: Prompt Preview */}
+            <div className="space-y-4 sticky top-6">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">Generated Output</h2>
               <div className="flex gap-2">
@@ -351,12 +352,14 @@ export default function StudioLabPage() {
             )}
           </div>
         </div>
+        )}
       </div>
     </div>
   );
   
   // Helper function to render category
   function renderCategory(category: BlockCategory) {
+    if (!gender || !jewelryType) return null;
     const isExpanded = expandedCategories.has(category.id);
     const selectedBlockId = selections[category.id];
     const categoryBlocks = BLOCK_REGISTRY.getBlocksByCategory(category.id, { gender, jewelryType });
