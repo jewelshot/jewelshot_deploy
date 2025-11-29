@@ -176,19 +176,25 @@ export function buildPromptFromSelections(
 
 /**
  * Build grouped JSON from block selections
- * Groups related categories together (e.g., all hair-* → "hair")
+ * New structure: Gender → Model → Styling → Jewelry Type → Jewelry-Specific
  */
 export function buildGroupedJSON(
   context: BlockContext,
   selections: BlockSelections,
   allBlocks: MicroBlock[]
 ): Record<string, any> {
-  const grouped: Record<string, any> = {
-    context: {
-      gender: context.gender,
-      jewelryType: context.jewelryType,
-    },
+  const json: Record<string, any> = {
+    gender: context.gender,
+    model: {},
+    styling: {},
+    jewelryType: context.jewelryType,
+    'jewelry-specific': {},
   };
+  
+  // Define which groups belong to which top-level category
+  const MODEL_GROUPS = ['skin', 'hair', 'nails', 'makeup', 'expression', 'face'];
+  const STYLING_GROUPS = ['clothing-type', 'styling-upper', 'styling-lower'];
+  const JEWELRY_GROUPS = ['hand', 'neck', 'head', 'arm', 'necklace-styling', 'bracelet-styling'];
   
   // Group prompt fragments by their parent group
   const groups: Record<string, string[]> = {};
@@ -209,17 +215,27 @@ export function buildGroupedJSON(
     groups[groupName].push(block.promptFragment);
   });
   
-  // Combine grouped fragments
+  // Combine grouped fragments and assign to appropriate top-level category
   Object.entries(groups).forEach(([groupName, fragments]) => {
-    if (fragments.length === 1) {
-      // Single fragment - just use it
-      grouped[groupName] = fragments[0];
+    const value = fragments.length === 1 ? fragments[0] : fragments.join(', ');
+    
+    if (MODEL_GROUPS.includes(groupName)) {
+      json.model[groupName] = value;
+    } else if (STYLING_GROUPS.includes(groupName)) {
+      json.styling[groupName] = value;
+    } else if (JEWELRY_GROUPS.includes(groupName)) {
+      json['jewelry-specific'][groupName] = value;
     } else {
-      // Multiple fragments - join with comma
-      grouped[groupName] = fragments.join(', ');
+      // Fallback for uncategorized items
+      json.model[groupName] = value;
     }
   });
   
-  return grouped;
+  // Clean up empty objects
+  if (Object.keys(json.model).length === 0) delete json.model;
+  if (Object.keys(json.styling).length === 0) delete json.styling;
+  if (Object.keys(json['jewelry-specific']).length === 0) delete json['jewelry-specific'];
+  
+  return json;
 }
 

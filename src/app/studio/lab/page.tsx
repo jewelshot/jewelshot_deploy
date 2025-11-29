@@ -32,6 +32,13 @@ export default function StudioLabPage() {
   const [showJsonView, setShowJsonView] = useState(false);
   const [showFaceDetails, setShowFaceDetails] = useState(false); // Toggle for Face Details
   
+  // Accordion states for main sections
+  const [showGenderJewelry, setShowGenderJewelry] = useState(true);
+  const [showWomenFeatures, setShowWomenFeatures] = useState(true);
+  const [showStyling, setShowStyling] = useState(true);
+  const [showFaceDetailsSection, setShowFaceDetailsSection] = useState(false);
+  const [showJewelrySpecific, setShowJewelrySpecific] = useState(true);
+  
   // Get applicable categories based on context
   const categories = useMemo(() => {
     if (!gender || !jewelryType) return [];
@@ -206,118 +213,147 @@ export default function StudioLabPage() {
             </div>
           </div>
           
-            {/* Gender Selector - PRIMARY */}
-            <div>
-              <label className="mb-3 block text-xl font-semibold text-white">
-                1️⃣ Select Gender
-              </label>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => handleGenderChange('women')}
-                  className={`flex-1 rounded-xl border-2 px-8 py-6 text-lg font-semibold transition-all ${
-                    gender === 'women'
-                      ? 'border-purple-500 bg-purple-500/20 text-purple-300 shadow-xl shadow-purple-500/30'
-                      : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20 hover:bg-white/10 hover:text-white'
-                  }`}
-                >
-                  <div className="text-4xl mb-2">👩</div>
-                  Women
-                </button>
-                <button
-                  onClick={() => handleGenderChange('men')}
-                  disabled
-                  className="flex-1 rounded-xl border-2 border-white/10 bg-white/5 px-8 py-6 text-lg font-semibold text-white/30 cursor-not-allowed"
-                >
-                  <div className="text-4xl mb-2">👨</div>
-                  Men
-                  <div className="text-xs mt-1">(Coming Soon)</div>
-                </button>
-              </div>
+            {/* MICRO Gender & Jewelry Type - Accordion */}
+            <div className="rounded-xl border border-white/10 bg-black/30">
+              <button
+                onClick={() => setShowGenderJewelry(!showGenderJewelry)}
+                className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-all rounded-xl"
+              >
+                <div className="flex items-center gap-3">
+                  <Settings className="h-5 w-5 text-blue-400" />
+                  <div className="text-left">
+                    <h3 className="text-sm font-semibold text-white">Gender & Jewelry Type</h3>
+                    <p className="text-xs text-white/50">
+                      {gender ? `${gender === 'women' ? '👩 Women' : '👨 Men'}` : 'Not selected'}
+                      {jewelryType && ` · ${jewelryType === 'ring' ? '💍 Ring' : jewelryType === 'necklace' ? '📿 Necklace' : jewelryType === 'earring' ? '💎 Earring' : '⌚ Bracelet'}`}
+                    </p>
+                  </div>
+                </div>
+                {showGenderJewelry ? <ChevronUp className="h-4 w-4 text-white/40" /> : <ChevronDown className="h-4 w-4 text-white/40" />}
+              </button>
+              
+              {showGenderJewelry && (
+                <div className="px-4 pb-4 space-y-3 border-t border-white/10 pt-3">
+                  {/* Gender - Compact */}
+                  <div>
+                    <label className="block text-xs font-medium text-white/60 mb-2">Gender</label>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleGenderChange('women')}
+                        className={`flex-1 rounded-lg border px-3 py-2 text-xs font-medium transition-all ${
+                          gender === 'women'
+                            ? 'border-purple-500 bg-purple-500/20 text-purple-300'
+                            : 'border-white/20 bg-white/5 text-white/60 hover:border-white/40 hover:text-white'
+                        }`}
+                      >
+                        👩 Women
+                      </button>
+                      <button
+                        disabled
+                        className="flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-white/30 cursor-not-allowed"
+                      >
+                        👨 Men
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Jewelry Type - Compact */}
+                  {gender && (
+                    <div>
+                      <label className="block text-xs font-medium text-white/60 mb-2">Jewelry Type</label>
+                      <div className="grid grid-cols-4 gap-2">
+                        {[
+                          { value: 'ring', label: 'Ring', icon: '💍' },
+                          { value: 'necklace', label: 'Necklace', icon: '📿' },
+                          { value: 'earring', label: 'Earring', icon: '💎', disabled: true },
+                          { value: 'bracelet', label: 'Bracelet', icon: '⌚', disabled: true },
+                        ].map(type => (
+                          <button
+                            key={type.value}
+                            onClick={() => !type.disabled && handleJewelryTypeChange(type.value as JewelryType)}
+                            disabled={type.disabled}
+                            className={`flex flex-col items-center gap-1 rounded-lg border px-2 py-2 text-xs font-medium transition-all ${
+                              type.disabled
+                                ? 'border-white/10 bg-white/5 text-white/30 cursor-not-allowed'
+                                : jewelryType === type.value
+                                ? 'border-blue-500 bg-blue-500/20 text-blue-300'
+                                : 'border-white/20 bg-white/5 text-white/60 hover:border-blue-500/50 hover:text-white'
+                            }`}
+                          >
+                            <span className="text-lg">{type.icon}</span>
+                            <span>{type.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
         </div>
-
-        {/* Jewelry Type Selector - Shows after gender selection, always visible */}
-        {gender && (
-          <div className="mb-6">
-            <label className="mb-3 block text-xl font-semibold text-white">
-              2️⃣ Select Jewelry Type
-            </label>
-            <div className="grid grid-cols-4 gap-3">
-              {[
-                { value: 'ring', label: 'Ring', icon: '💍' },
-                { value: 'necklace', label: 'Necklace', icon: '📿' },
-                { value: 'earring', label: 'Earring', icon: '💎', disabled: true },
-                { value: 'bracelet', label: 'Bracelet', icon: '⌚', disabled: true },
-              ].map(type => (
-                <button
-                  key={type.value}
-                  onClick={() => !type.disabled && handleJewelryTypeChange(type.value as JewelryType)}
-                  disabled={type.disabled}
-                  className={`flex flex-col items-center justify-center gap-2 rounded-xl border-2 px-6 py-6 font-semibold transition-all ${
-                    type.disabled
-                      ? 'border-white/10 bg-white/5 text-white/30 cursor-not-allowed'
-                      : jewelryType === type.value
-                      ? 'border-blue-500 bg-blue-500/20 text-blue-300 shadow-xl shadow-blue-500/30'
-                      : 'border-white/10 bg-white/5 text-white/80 hover:border-blue-500/50 hover:bg-blue-500/10 hover:text-white'
-                  }`}
-                >
-                  <span className="text-3xl">{type.icon}</span>
-                  <span className="text-sm">{type.label}</span>
-                  {type.disabled && (
-                    <span className="text-xs text-white/40">Coming Soon</span>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Block Selection - Shows after both gender and jewelry selected */}
         {gender && jewelryType && (
           <div className="grid grid-cols-1 gap-8 xl:grid-cols-2">
             {/* Left: Block Selection */}
             <div className="space-y-8 w-full">
-              {/* 1️⃣ UNIVERSAL WOMEN FEATURES - Applies to ALL jewelry types */}
+              {/* 1️⃣ UNIVERSAL WOMEN FEATURES - Accordion */}
               {universalWomenCategories.length > 0 && (
-              <div className="rounded-2xl border-2 border-purple-500/30 bg-purple-500/5 p-5">
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/20">
-                    <span className="text-2xl">👩</span>
+              <div className="rounded-2xl border-2 border-purple-500/30 bg-purple-500/5">
+                <button
+                  onClick={() => setShowWomenFeatures(!showWomenFeatures)}
+                  className="w-full flex items-center justify-between p-5 hover:bg-purple-500/10 transition-all rounded-t-2xl"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/20">
+                      <span className="text-2xl">👩</span>
+                    </div>
+                    <div className="text-left">
+                      <h2 className="text-lg font-bold text-white">
+                        Universal Women Features
+                      </h2>
+                      <p className="text-xs text-white/60">
+                        Applies to all jewelry types · {universalWomenCategories.length} categories
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h2 className="text-lg font-bold text-white">
-                      Universal Women Features
-                    </h2>
-                    <p className="text-xs text-white/60">
-                      Applies to all jewelry types · {universalWomenCategories.length} categories
-                    </p>
+                  {showWomenFeatures ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
+                </button>
+                {showWomenFeatures && (
+                  <div className="p-5 pt-0 space-y-3 border-t border-purple-500/20">
+                    {universalWomenCategories.map(category => renderCategory(category))}
                   </div>
-                </div>
-                <div className="space-y-3">
-                  {universalWomenCategories.map(category => renderCategory(category))}
-                </div>
+                )}
               </div>
             )}
             
-              {/* 👗 STYLING - Clothing & Colors */}
+              {/* 👗 STYLING - Accordion */}
               {stylingCategories.length > 0 && (
-              <div className="rounded-2xl border-2 border-orange-500/30 bg-orange-500/5 p-5">
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500/20">
-                    <span className="text-2xl">👗</span>
+              <div className="rounded-2xl border-2 border-orange-500/30 bg-orange-500/5">
+                <button
+                  onClick={() => setShowStyling(!showStyling)}
+                  className="w-full flex items-center justify-between p-5 hover:bg-orange-500/10 transition-all rounded-t-2xl"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500/20">
+                      <span className="text-2xl">👗</span>
+                    </div>
+                    <div className="text-left">
+                      <h2 className="text-lg font-bold text-white">
+                        Styling
+                      </h2>
+                      <p className="text-xs text-white/60">
+                        Clothing, patterns, and colors · {stylingCategories.length} categories
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h2 className="text-lg font-bold text-white">
-                      Styling
-                    </h2>
-                    <p className="text-xs text-white/60">
-                      Clothing, patterns, and colors · {stylingCategories.length} categories
-                    </p>
+                  {showStyling ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
+                </button>
+                {showStyling && (
+                  <div className="p-5 pt-0 space-y-3 border-t border-orange-500/20">
+                    {stylingCategories.map(category => renderCategory(category))}
                   </div>
-                </div>
-                <div className="space-y-3">
-                  {stylingCategories.map(category => renderCategory(category))}
-                </div>
+                )}
               </div>
             )}
             
