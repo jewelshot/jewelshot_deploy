@@ -295,6 +295,225 @@ export const CAMERA_CATEGORIES: BlockCategory[] = [
     },
     required: false,
   },
+  
+  {
+    id: 'composition-rules',
+    name: 'Composition Rules',
+    icon: '📐',
+    description: 'Compositional guidelines for jewelry placement',
+    order: 4,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+];
+
+// ============================================
+// CAMERA BLOCKS - Composition Rules
+// ============================================
+
+const COMPOSITION_RULES_BLOCKS: MicroBlock[] = [
+  // RULE OF THIRDS
+  { 
+    id: 'comp-rule-thirds', 
+    name: 'Rule of Thirds', 
+    categoryId: 'composition-rules', 
+    icon: '⊞', 
+    promptFragment: 'rule of thirds composition, jewelry positioned at intersection points, balanced grid layout', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['thirds', 'grid', 'balanced'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // GOLDEN RATIO
+  { 
+    id: 'comp-golden-ratio', 
+    name: 'Golden Ratio', 
+    categoryId: 'composition-rules', 
+    icon: '🌀', 
+    promptFragment: 'golden ratio composition, Fibonacci spiral, natural eye-flow to jewelry', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['golden', 'fibonacci', 'natural'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // CENTERED SYMMETRY
+  { 
+    id: 'comp-centered', 
+    name: 'Centered Symmetry', 
+    categoryId: 'composition-rules', 
+    icon: '⊕', 
+    promptFragment: 'centered symmetrical composition, jewelry perfectly centered, balanced symmetry', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['centered', 'symmetry', 'balanced'], 
+    level: 'advanced',
+    conflictsWith: ['comp-asymmetry']
+  },
+  
+  // NEGATIVE SPACE
+  { 
+    id: 'comp-negative-space', 
+    name: 'Negative Space', 
+    categoryId: 'composition-rules', 
+    icon: '⬜', 
+    promptFragment: 'negative space composition, minimalist design, jewelry isolated with breathing room', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['negative', 'minimal', 'space'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // LEADING LINES
+  { 
+    id: 'comp-leading-lines', 
+    name: 'Leading Lines', 
+    categoryId: 'composition-rules', 
+    icon: '↗️', 
+    promptFragment: 'leading lines composition, directional elements guiding eye to jewelry', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['lines', 'directional', 'guide'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // FRAME WITHIN FRAME
+  { 
+    id: 'comp-frame-within', 
+    name: 'Frame within Frame', 
+    categoryId: 'composition-rules', 
+    icon: '🖼️', 
+    promptFragment: 'frame within frame composition, natural framing elements highlighting jewelry', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['frame', 'layered', 'depth'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // DIAGONAL DYNAMICS
+  { 
+    id: 'comp-diagonal', 
+    name: 'Diagonal Composition', 
+    categoryId: 'composition-rules', 
+    icon: '⟋', 
+    promptFragment: 'diagonal composition, dynamic angled lines, energetic visual flow to jewelry', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['diagonal', 'dynamic', 'energy'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // BALANCED ASYMMETRY
+  { 
+    id: 'comp-asymmetry', 
+    name: 'Balanced Asymmetry', 
+    categoryId: 'composition-rules', 
+    icon: '⚖️', 
+    promptFragment: 'balanced asymmetrical composition, jewelry off-center but visually balanced', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['asymmetry', 'balance', 'dynamic'], 
+    level: 'advanced',
+    conflictsWith: ['comp-centered']
+  },
+];
+
+// ============================================
+// POST-PRODUCTION CATEGORIES
+// ============================================
+
+export const POST_PRODUCTION_CATEGORIES: BlockCategory[] = [
+  {
+    id: 'post-processing-level',
+    name: 'Processing Level',
+    icon: '✨',
+    description: 'AI editing and retouching intensity',
+    order: 1,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'color-grading',
+    name: 'Color Grading',
+    icon: '🎨',
+    description: 'Color tone and temperature styling',
+    order: 2,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+];
+
+// ============================================
+// CREATIVE DIRECTION CATEGORIES
+// ============================================
+
+export const CREATIVE_DIRECTION_CATEGORIES: BlockCategory[] = [
+  {
+    id: 'presentation-intent',
+    name: 'Presentation Intent',
+    icon: '🎯',
+    description: 'Overall brand and marketing purpose',
+    order: 1,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'mood-atmosphere',
+    name: 'Mood & Atmosphere',
+    icon: '🎭',
+    description: 'Emotional tone and feeling',
+    order: 2,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'jewelry-context',
+    name: 'Jewelry Context',
+    icon: '💎',
+    description: 'How jewelry is featured relative to model',
+    order: 3,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+];
+
+// ============================================
+// LIFESTYLE EXTRAS CATEGORIES (Optional)
+// ============================================
+
+export const LIFESTYLE_EXTRAS_CATEGORIES: BlockCategory[] = [
+  {
+    id: 'props-accessories',
+    name: 'Props & Accessories',
+    icon: '🌸',
+    description: 'Additional lifestyle elements (optional)',
+    order: 1,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
 ];
 
 // ============================================
@@ -1351,6 +1570,536 @@ const FOCUS_DEPTH_BLOCKS: MicroBlock[] = [
 ];
 
 // ============================================
+// POST-PRODUCTION BLOCKS - Processing Level
+// ============================================
+
+const POST_PROCESSING_LEVEL_BLOCKS: MicroBlock[] = [
+  // NATURAL/RAW
+  { 
+    id: 'proc-natural', 
+    name: 'Natural/RAW', 
+    categoryId: 'post-processing-level', 
+    icon: '🌿', 
+    promptFragment: 'natural minimal processing, RAW authentic look, untouched realistic', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['natural', 'raw', 'minimal'], 
+    level: 'advanced',
+    conflictsWith: ['proc-catalog', 'proc-hdr']
+  },
+  
+  // LIGHT RETOUCH
+  { 
+    id: 'proc-light', 
+    name: 'Light Retouch', 
+    categoryId: 'post-processing-level', 
+    icon: '✏️', 
+    promptFragment: 'light retouching, basic color correction, subtle cleanup, natural finish', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['light', 'subtle', 'basic'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // PROFESSIONAL EDIT
+  { 
+    id: 'proc-professional', 
+    name: 'Professional Edit', 
+    categoryId: 'post-processing-level', 
+    icon: '⚡', 
+    promptFragment: 'professional editing, skin smoothing, color grading, polished finish', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['professional', 'polished', 'smooth'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // CATALOG PERFECT
+  { 
+    id: 'proc-catalog', 
+    name: 'Catalog Perfect', 
+    categoryId: 'post-processing-level', 
+    icon: '💎', 
+    promptFragment: 'catalog-perfect retouching, heavy edit, flawless skin, commercial grade polish', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['catalog', 'perfect', 'heavy'], 
+    level: 'advanced',
+    conflictsWith: ['proc-natural']
+  },
+  
+  // HDR ENHANCED
+  { 
+    id: 'proc-hdr', 
+    name: 'HDR Enhanced', 
+    categoryId: 'post-processing-level', 
+    icon: '🌟', 
+    promptFragment: 'HDR enhanced, high dynamic range, rich details, enhanced contrast and clarity', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['hdr', 'enhanced', 'dynamic'], 
+    level: 'advanced',
+    conflictsWith: ['proc-natural']
+  },
+];
+
+// ============================================
+// POST-PRODUCTION BLOCKS - Color Grading
+// ============================================
+
+const COLOR_GRADING_BLOCKS: MicroBlock[] = [
+  // NATURAL BALANCED
+  { 
+    id: 'grade-natural', 
+    name: 'Natural Balanced', 
+    categoryId: 'color-grading', 
+    icon: '⚖️', 
+    promptFragment: 'natural balanced color grading, true-to-life tones, neutral temperature', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['natural', 'balanced', 'neutral'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // WARM GOLDEN
+  { 
+    id: 'grade-warm', 
+    name: 'Warm Golden', 
+    categoryId: 'color-grading', 
+    icon: '🔥', 
+    promptFragment: 'warm golden color grading, cozy amber tones, inviting atmosphere', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['warm', 'golden', 'cozy'], 
+    level: 'advanced',
+    conflictsWith: ['grade-cool']
+  },
+  
+  // COOL BLUE
+  { 
+    id: 'grade-cool', 
+    name: 'Cool Blue', 
+    categoryId: 'color-grading', 
+    icon: '❄️', 
+    promptFragment: 'cool blue color grading, crisp cyan tones, fresh modern atmosphere', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['cool', 'blue', 'crisp'], 
+    level: 'advanced',
+    conflictsWith: ['grade-warm']
+  },
+  
+  // VINTAGE FILM
+  { 
+    id: 'grade-vintage', 
+    name: 'Vintage Film', 
+    categoryId: 'color-grading', 
+    icon: '📷', 
+    promptFragment: 'vintage film color grading, nostalgic tones, slightly desaturated, classic look', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['vintage', 'film', 'nostalgic'], 
+    level: 'advanced',
+    conflictsWith: ['grade-vibrant', 'grade-high-contrast']
+  },
+  
+  // FADED PASTEL
+  { 
+    id: 'grade-pastel', 
+    name: 'Faded Pastel', 
+    categoryId: 'color-grading', 
+    icon: '🌸', 
+    promptFragment: 'faded pastel color grading, soft muted tones, dreamy gentle atmosphere', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['pastel', 'faded', 'soft'], 
+    level: 'advanced',
+    conflictsWith: ['grade-vibrant', 'grade-high-contrast']
+  },
+  
+  // HIGH CONTRAST
+  { 
+    id: 'grade-high-contrast', 
+    name: 'High Contrast', 
+    categoryId: 'color-grading', 
+    icon: '⚫⚪', 
+    promptFragment: 'high contrast color grading, bold blacks and whites, dramatic punch', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['contrast', 'bold', 'dramatic'], 
+    level: 'advanced',
+    conflictsWith: ['grade-vintage', 'grade-pastel']
+  },
+  
+  // MATTE FINISH
+  { 
+    id: 'grade-matte', 
+    name: 'Matte Finish', 
+    categoryId: 'color-grading', 
+    icon: '🎬', 
+    promptFragment: 'matte finish color grading, cinematic look, reduced contrast in shadows', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['matte', 'cinematic', 'film'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // VIBRANT RICH
+  { 
+    id: 'grade-vibrant', 
+    name: 'Vibrant Rich', 
+    categoryId: 'color-grading', 
+    icon: '🌈', 
+    promptFragment: 'vibrant rich color grading, saturated bold colors, energetic vivid tones', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['vibrant', 'rich', 'saturated'], 
+    level: 'advanced',
+    conflictsWith: ['grade-vintage', 'grade-pastel']
+  },
+];
+
+// ============================================
+// CREATIVE DIRECTION BLOCKS - Presentation Intent
+// ============================================
+
+const PRESENTATION_INTENT_BLOCKS: MicroBlock[] = [
+  // CATALOG PRODUCT
+  { 
+    id: 'intent-catalog', 
+    name: 'Catalog Product', 
+    categoryId: 'presentation-intent', 
+    icon: '📋', 
+    promptFragment: 'catalog product photography, clean commercial style, pure product focus, white background preferred', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['catalog', 'commercial', 'clean'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // E-COMMERCE CLEAN
+  { 
+    id: 'intent-ecommerce', 
+    name: 'E-commerce Clean', 
+    categoryId: 'presentation-intent', 
+    icon: '🛍️', 
+    promptFragment: 'e-commerce optimized, web-ready clarity, neutral clean presentation, product-first approach', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['ecommerce', 'web', 'clean'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // EDITORIAL CREATIVE
+  { 
+    id: 'intent-editorial', 
+    name: 'Editorial Creative', 
+    categoryId: 'presentation-intent', 
+    icon: '📰', 
+    promptFragment: 'editorial creative photography, magazine-style artistic, fashion-forward storytelling, creative freedom', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['editorial', 'magazine', 'artistic'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // LIFESTYLE NATURAL
+  { 
+    id: 'intent-lifestyle', 
+    name: 'Lifestyle Natural', 
+    categoryId: 'presentation-intent', 
+    icon: '🌟', 
+    promptFragment: 'lifestyle natural photography, real-life moments, relatable authentic context, human connection', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['lifestyle', 'natural', 'authentic'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // LUXURY CAMPAIGN
+  { 
+    id: 'intent-luxury', 
+    name: 'Luxury Campaign', 
+    categoryId: 'presentation-intent', 
+    icon: '👑', 
+    promptFragment: 'luxury campaign photography, high-end aspirational, dramatic sophisticated, premium brand aesthetic', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['luxury', 'premium', 'dramatic'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+];
+
+// ============================================
+// CREATIVE DIRECTION BLOCKS - Mood & Atmosphere
+// ============================================
+
+const MOOD_ATMOSPHERE_BLOCKS: MicroBlock[] = [
+  // ROMANTIC SOFT
+  { 
+    id: 'mood-romantic', 
+    name: 'Romantic Soft', 
+    categoryId: 'mood-atmosphere', 
+    icon: '💕', 
+    promptFragment: 'romantic soft mood, tender gentle atmosphere, dreamy loving feeling', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['romantic', 'soft', 'gentle'], 
+    level: 'advanced',
+    conflictsWith: ['mood-bold', 'mood-dramatic']
+  },
+  
+  // CONFIDENT BOLD
+  { 
+    id: 'mood-bold', 
+    name: 'Confident Bold', 
+    categoryId: 'mood-atmosphere', 
+    icon: '💪', 
+    promptFragment: 'confident bold mood, strong empowered presence, assertive energy', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['confident', 'bold', 'strong'], 
+    level: 'advanced',
+    conflictsWith: ['mood-romantic', 'mood-minimalist']
+  },
+  
+  // ELEGANT SOPHISTICATED
+  { 
+    id: 'mood-elegant', 
+    name: 'Elegant Sophisticated', 
+    categoryId: 'mood-atmosphere', 
+    icon: '✨', 
+    promptFragment: 'elegant sophisticated mood, refined graceful presence, timeless class', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['elegant', 'sophisticated', 'refined'], 
+    level: 'advanced',
+    conflictsWith: ['mood-playful']
+  },
+  
+  // PLAYFUL FUN
+  { 
+    id: 'mood-playful', 
+    name: 'Playful Fun', 
+    categoryId: 'mood-atmosphere', 
+    icon: '🎉', 
+    promptFragment: 'playful fun mood, lighthearted joyful energy, carefree spirited vibe', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['playful', 'fun', 'joyful'], 
+    level: 'advanced',
+    conflictsWith: ['mood-elegant', 'mood-minimalist', 'mood-dramatic']
+  },
+  
+  // MINIMALIST CALM
+  { 
+    id: 'mood-minimalist', 
+    name: 'Minimalist Calm', 
+    categoryId: 'mood-atmosphere', 
+    icon: '🧘', 
+    promptFragment: 'minimalist calm mood, serene peaceful atmosphere, clean simple tranquility', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['minimalist', 'calm', 'serene'], 
+    level: 'advanced',
+    conflictsWith: ['mood-bold', 'mood-playful', 'mood-dramatic']
+  },
+  
+  // DRAMATIC INTENSE
+  { 
+    id: 'mood-dramatic', 
+    name: 'Dramatic Intense', 
+    categoryId: 'mood-atmosphere', 
+    icon: '⚡', 
+    promptFragment: 'dramatic intense mood, powerful striking presence, bold emotional impact', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['dramatic', 'intense', 'powerful'], 
+    level: 'advanced',
+    conflictsWith: ['mood-romantic', 'mood-minimalist', 'mood-playful']
+  },
+];
+
+// ============================================
+// CREATIVE DIRECTION BLOCKS - Jewelry Context
+// ============================================
+
+const JEWELRY_CONTEXT_BLOCKS: MicroBlock[] = [
+  // JEWELRY HERO
+  { 
+    id: 'context-hero', 
+    name: 'Jewelry Hero', 
+    categoryId: 'jewelry-context', 
+    icon: '💎', 
+    promptFragment: 'jewelry as hero focus, minimal model presence, product completely dominates composition', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['hero', 'product-first', 'dominant'], 
+    level: 'advanced',
+    conflictsWith: ['context-lifestyle']
+  },
+  
+  // BALANCED PRODUCT+MODEL
+  { 
+    id: 'context-balanced', 
+    name: 'Balanced Product+Model', 
+    categoryId: 'jewelry-context', 
+    icon: '⚖️', 
+    promptFragment: 'balanced jewelry and model presence, equal visual weight, harmonious integration', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['balanced', 'equal', 'harmonious'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // LIFESTYLE MOMENT
+  { 
+    id: 'context-lifestyle', 
+    name: 'Lifestyle Moment', 
+    categoryId: 'jewelry-context', 
+    icon: '📸', 
+    promptFragment: 'jewelry within lifestyle moment, natural story context, human experience emphasized, jewelry naturally integrated', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['lifestyle', 'moment', 'story'], 
+    level: 'advanced',
+    conflictsWith: ['context-hero', 'context-detail']
+  },
+  
+  // DETAIL SHOWCASE
+  { 
+    id: 'context-detail', 
+    name: 'Detail Showcase', 
+    categoryId: 'jewelry-context', 
+    icon: '🔍', 
+    promptFragment: 'jewelry detail showcase, craftsmanship highlighted, intricate work displayed, technical excellence focus', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['detail', 'craftsmanship', 'technical'], 
+    level: 'advanced',
+    conflictsWith: ['context-lifestyle']
+  },
+];
+
+// ============================================
+// LIFESTYLE EXTRAS BLOCKS - Props & Accessories
+// ============================================
+
+const PROPS_ACCESSORIES_BLOCKS: MicroBlock[] = [
+  // FRESH FLOWERS
+  { 
+    id: 'props-flowers', 
+    name: 'Fresh Flowers', 
+    categoryId: 'props-accessories', 
+    icon: '🌸', 
+    promptFragment: 'fresh flowers as prop, natural floral accent, soft background element', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['flowers', 'natural', 'romantic'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // COFFEE/BEVERAGE
+  { 
+    id: 'props-coffee', 
+    name: 'Coffee/Beverage', 
+    categoryId: 'props-accessories', 
+    icon: '☕', 
+    promptFragment: 'coffee or beverage prop, lifestyle moment, casual intimate scene', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['coffee', 'lifestyle', 'casual'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // BOOKS/READING
+  { 
+    id: 'props-books', 
+    name: 'Books/Reading', 
+    categoryId: 'props-accessories', 
+    icon: '📚', 
+    promptFragment: 'books as prop, intellectual aesthetic, refined cultured scene', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['books', 'intellectual', 'refined'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // SILK FABRIC
+  { 
+    id: 'props-silk', 
+    name: 'Silk Fabric', 
+    categoryId: 'props-accessories', 
+    icon: '🧵', 
+    promptFragment: 'silk fabric draped, luxurious textile accent, soft elegant texture', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['silk', 'fabric', 'luxury'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // JEWELRY BOX
+  { 
+    id: 'props-box', 
+    name: 'Jewelry Box', 
+    categoryId: 'props-accessories', 
+    icon: '💝', 
+    promptFragment: 'jewelry box as prop, luxury presentation context, gift-giving theme', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['box', 'luxury', 'gift'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // CANDLES
+  { 
+    id: 'props-candles', 
+    name: 'Candles', 
+    categoryId: 'props-accessories', 
+    icon: '🕯️', 
+    promptFragment: 'candles as prop, warm ambient glow, intimate romantic atmosphere', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['candles', 'warm', 'romantic'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // SEASONAL ELEMENTS
+  { 
+    id: 'props-seasonal', 
+    name: 'Seasonal Elements', 
+    categoryId: 'props-accessories', 
+    icon: '🍂', 
+    promptFragment: 'seasonal elements as prop, autumn leaves or winter snow, timely contextual accent', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['seasonal', 'nature', 'timely'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // MINIMAL GEOMETRIC
+  { 
+    id: 'props-geometric', 
+    name: 'Minimal Geometric', 
+    categoryId: 'props-accessories', 
+    icon: '◇', 
+    promptFragment: 'minimal geometric objects as prop, modern clean aesthetic, architectural accent', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['geometric', 'minimal', 'modern'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // LUXURY ACCESSORIES
+  { 
+    id: 'props-luxury-acc', 
+    name: 'Luxury Accessories', 
+    categoryId: 'props-accessories', 
+    icon: '👜', 
+    promptFragment: 'luxury accessories as prop, designer bag or watch, aspirational lifestyle context', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['luxury', 'designer', 'aspirational'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  
+  // NATURAL ELEMENTS
+  { 
+    id: 'props-natural', 
+    name: 'Natural Elements', 
+    categoryId: 'props-accessories', 
+    icon: '🪨', 
+    promptFragment: 'natural elements as prop, stone wood texture, organic earthy aesthetic', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['natural', 'organic', 'earthy'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+];
+
+// ============================================
 // STYLING BLOCKS - Upper Clothing Details
 // ============================================
 
@@ -1966,6 +2715,9 @@ export const WOMEN_ALL_CATEGORIES = [
   ...STYLING_CATEGORIES, // Separate styling group
   ...ENVIRONMENT_CATEGORIES, // Separate environment group
   ...CAMERA_CATEGORIES, // Separate camera group
+  ...POST_PRODUCTION_CATEGORIES, // Separate post-production group
+  ...CREATIVE_DIRECTION_CATEGORIES, // Separate creative direction group
+  ...LIFESTYLE_EXTRAS_CATEGORIES, // Separate lifestyle extras group (optional)
   ...WOMEN_RING_CATEGORIES,
   ...WOMEN_NECKLACE_CATEGORIES,
   ...WOMEN_EARRING_CATEGORIES,
@@ -2055,6 +2807,19 @@ export const WOMEN_ALL_BLOCKS: MicroBlock[] = [
   ...JEWELRY_FRAMING_BLOCKS,
   ...VIEWING_ANGLE_BLOCKS,
   ...FOCUS_DEPTH_BLOCKS,
+  ...COMPOSITION_RULES_BLOCKS,
+  
+  // Post-production blocks
+  ...POST_PROCESSING_LEVEL_BLOCKS,
+  ...COLOR_GRADING_BLOCKS,
+  
+  // Creative direction blocks
+  ...PRESENTATION_INTENT_BLOCKS,
+  ...MOOD_ATMOSPHERE_BLOCKS,
+  ...JEWELRY_CONTEXT_BLOCKS,
+  
+  // Lifestyle extras blocks (optional)
+  ...PROPS_ACCESSORIES_BLOCKS,
   
   // Face Details blocks (Conditional/Toggle)
   ...RACE_ETHNICITY_BLOCKS,

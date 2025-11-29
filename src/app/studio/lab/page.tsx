@@ -38,6 +38,9 @@ export default function StudioLabPage() {
   const [showStyling, setShowStyling] = useState(true);
   const [showEnvironment, setShowEnvironment] = useState(true);
   const [showCamera, setShowCamera] = useState(true);
+  const [showPostProduction, setShowPostProduction] = useState(true);
+  const [showCreativeDirection, setShowCreativeDirection] = useState(true);
+  const [showLifestyleExtras, setShowLifestyleExtras] = useState(false); // Optional, default closed
   const [showFaceDetailsSection, setShowFaceDetailsSection] = useState(false);
   const [showJewelrySpecific, setShowJewelrySpecific] = useState(true);
   
@@ -54,14 +57,30 @@ export default function StudioLabPage() {
   const ENVIRONMENT_CATEGORY_IDS = ['location-background', 'lighting'];
   
   // Camera category IDs (to separate from other features)
-  const CAMERA_CATEGORY_IDS = ['jewelry-framing', 'viewing-angle', 'focus-depth'];
+  const CAMERA_CATEGORY_IDS = ['jewelry-framing', 'viewing-angle', 'focus-depth', 'composition-rules'];
   
-  // Separate WOMEN BODY FEATURES, STYLING, ENVIRONMENT, CAMERA, CONDITIONAL (Face Details), and JEWELRY-SPECIFIC features
+  // Post-production category IDs
+  const POST_PRODUCTION_CATEGORY_IDS = ['post-processing-level', 'color-grading'];
+  
+  // Creative direction category IDs
+  const CREATIVE_DIRECTION_CATEGORY_IDS = ['presentation-intent', 'mood-atmosphere', 'jewelry-context'];
+  
+  // Lifestyle extras category IDs
+  const LIFESTYLE_EXTRAS_CATEGORY_IDS = ['props-accessories'];
+  
+  // Separate WOMEN BODY FEATURES, STYLING, ENVIRONMENT, CAMERA, POST-PRODUCTION, CREATIVE DIRECTION, LIFESTYLE EXTRAS, CONDITIONAL (Face Details), and JEWELRY-SPECIFIC features
   const universalWomenCategories = useMemo(() => {
     return categories.filter(cat => {
-      // Universal WOMEN BODY: Exist across ALL jewelry types & NOT conditional & NOT styling & NOT environment & NOT camera
+      // Universal WOMEN BODY: Exist across ALL jewelry types & NOT conditional & NOT styling & NOT environment & NOT camera & NOT post & NOT creative & NOT lifestyle
       const jewelryTypes = cat.applicableTo.jewelryTypes;
-      return jewelryTypes.length > 1 && !cat.conditional && !STYLING_CATEGORY_IDS.includes(cat.id) && !ENVIRONMENT_CATEGORY_IDS.includes(cat.id) && !CAMERA_CATEGORY_IDS.includes(cat.id);
+      return jewelryTypes.length > 1 && 
+             !cat.conditional && 
+             !STYLING_CATEGORY_IDS.includes(cat.id) && 
+             !ENVIRONMENT_CATEGORY_IDS.includes(cat.id) && 
+             !CAMERA_CATEGORY_IDS.includes(cat.id) &&
+             !POST_PRODUCTION_CATEGORY_IDS.includes(cat.id) &&
+             !CREATIVE_DIRECTION_CATEGORY_IDS.includes(cat.id) &&
+             !LIFESTYLE_EXTRAS_CATEGORY_IDS.includes(cat.id);
     }).sort((a, b) => a.order - b.order);
   }, [categories]);
   
@@ -81,8 +100,29 @@ export default function StudioLabPage() {
   
   const cameraCategories = useMemo(() => {
     return categories.filter(cat => {
-      // Camera: Framing, angle, focus
+      // Camera: Framing, angle, focus, composition
       return CAMERA_CATEGORY_IDS.includes(cat.id);
+    }).sort((a, b) => a.order - b.order);
+  }, [categories]);
+  
+  const postProductionCategories = useMemo(() => {
+    return categories.filter(cat => {
+      // Post-production: Processing level, color grading
+      return POST_PRODUCTION_CATEGORY_IDS.includes(cat.id);
+    }).sort((a, b) => a.order - b.order);
+  }, [categories]);
+  
+  const creativeDirectionCategories = useMemo(() => {
+    return categories.filter(cat => {
+      // Creative direction: Intent, mood, context
+      return CREATIVE_DIRECTION_CATEGORY_IDS.includes(cat.id);
+    }).sort((a, b) => a.order - b.order);
+  }, [categories]);
+  
+  const lifestyleExtrasCategories = useMemo(() => {
+    return categories.filter(cat => {
+      // Lifestyle extras: Props
+      return LIFESTYLE_EXTRAS_CATEGORY_IDS.includes(cat.id);
     }).sort((a, b) => a.order - b.order);
   }, [categories]);
   
@@ -452,6 +492,96 @@ export default function StudioLabPage() {
                 {showCamera && (
                   <div className="p-5 pt-0 space-y-3 border-t border-cyan-500/20">
                     {cameraCategories.map(category => renderCategory(category))}
+                  </div>
+                )}
+              </div>
+            )}
+            
+              {/* ✨ POST-PRODUCTION - Accordion */}
+              {postProductionCategories.length > 0 && (
+              <div className="rounded-2xl border-2 border-pink-500/30 bg-pink-500/5">
+                <button
+                  onClick={() => setShowPostProduction(!showPostProduction)}
+                  className="w-full flex items-center justify-between p-5 hover:bg-pink-500/10 transition-all rounded-t-2xl"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-pink-500/20">
+                      <span className="text-2xl">✨</span>
+                    </div>
+                    <div className="text-left">
+                      <h2 className="text-lg font-bold text-white">
+                        Post-Production
+                      </h2>
+                      <p className="text-xs text-white/60">
+                        Processing level & color grading · {postProductionCategories.length} categories
+                      </p>
+                    </div>
+                  </div>
+                  {showPostProduction ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
+                </button>
+                {showPostProduction && (
+                  <div className="p-5 pt-0 space-y-3 border-t border-pink-500/20">
+                    {postProductionCategories.map(category => renderCategory(category))}
+                  </div>
+                )}
+              </div>
+            )}
+            
+              {/* 🎯 CREATIVE DIRECTION - Accordion */}
+              {creativeDirectionCategories.length > 0 && (
+              <div className="rounded-2xl border-2 border-indigo-500/30 bg-indigo-500/5">
+                <button
+                  onClick={() => setShowCreativeDirection(!showCreativeDirection)}
+                  className="w-full flex items-center justify-between p-5 hover:bg-indigo-500/10 transition-all rounded-t-2xl"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/20">
+                      <span className="text-2xl">🎯</span>
+                    </div>
+                    <div className="text-left">
+                      <h2 className="text-lg font-bold text-white">
+                        Creative Direction
+                      </h2>
+                      <p className="text-xs text-white/60">
+                        Intent, mood & jewelry context · {creativeDirectionCategories.length} categories
+                      </p>
+                    </div>
+                  </div>
+                  {showCreativeDirection ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
+                </button>
+                {showCreativeDirection && (
+                  <div className="p-5 pt-0 space-y-3 border-t border-indigo-500/20">
+                    {creativeDirectionCategories.map(category => renderCategory(category))}
+                  </div>
+                )}
+              </div>
+            )}
+            
+              {/* 🌸 LIFESTYLE EXTRAS - Accordion (Optional) */}
+              {lifestyleExtrasCategories.length > 0 && (
+              <div className="rounded-2xl border-2 border-rose-500/30 bg-rose-500/5">
+                <button
+                  onClick={() => setShowLifestyleExtras(!showLifestyleExtras)}
+                  className="w-full flex items-center justify-between p-5 hover:bg-rose-500/10 transition-all rounded-t-2xl"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-500/20">
+                      <span className="text-2xl">🌸</span>
+                    </div>
+                    <div className="text-left">
+                      <h2 className="text-lg font-bold text-white">
+                        Lifestyle Extras
+                      </h2>
+                      <p className="text-xs text-white/60">
+                        Optional props & accessories · {lifestyleExtrasCategories.length} categories
+                      </p>
+                    </div>
+                  </div>
+                  {showLifestyleExtras ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
+                </button>
+                {showLifestyleExtras && (
+                  <div className="p-5 pt-0 space-y-3 border-t border-rose-500/20">
+                    {lifestyleExtrasCategories.map(category => renderCategory(category))}
                   </div>
                 )}
               </div>

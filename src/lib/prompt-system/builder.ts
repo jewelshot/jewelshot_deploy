@@ -72,6 +72,19 @@ export const CATEGORY_GROUPS: Record<string, string> = {
   'jewelry-framing': 'framing',
   'viewing-angle': 'angle',
   'focus-depth': 'focus',
+  'composition-rules': 'composition',
+  
+  // Post-production groups
+  'post-processing-level': 'processing',
+  'color-grading': 'grading',
+  
+  // Creative direction groups
+  'presentation-intent': 'intent',
+  'mood-atmosphere': 'mood',
+  'jewelry-context': 'context',
+  
+  // Lifestyle extras
+  'props-accessories': 'props',
   
   // Singular categories (no grouping)
   'skin-tone': 'skin',
@@ -198,6 +211,9 @@ export function buildGroupedJSON(
     styling: {},
     environment: {},
     camera: {},
+    'post-production': {},
+    'creative-direction': {},
+    'lifestyle-extras': {},
     jewelryType: context.jewelryType,
     'jewelry-specific': {},
   };
@@ -206,7 +222,10 @@ export function buildGroupedJSON(
   const MODEL_GROUPS = ['skin', 'hair', 'nails', 'makeup', 'expression', 'face'];
   const STYLING_GROUPS = ['clothing-type', 'styling-upper', 'styling-lower'];
   const ENVIRONMENT_GROUPS = ['location', 'lighting'];
-  const CAMERA_GROUPS = ['framing', 'angle', 'focus'];
+  const CAMERA_GROUPS = ['framing', 'angle', 'focus', 'composition'];
+  const POST_PRODUCTION_GROUPS = ['processing', 'grading'];
+  const CREATIVE_DIRECTION_GROUPS = ['intent', 'mood', 'context'];
+  const LIFESTYLE_EXTRAS_GROUPS = ['props'];
   const JEWELRY_GROUPS = ['hand', 'neck', 'head', 'arm', 'necklace-styling', 'bracelet-styling'];
   
   // Group prompt fragments by their parent group
@@ -240,6 +259,12 @@ export function buildGroupedJSON(
       json.environment[groupName] = value;
     } else if (CAMERA_GROUPS.includes(groupName)) {
       json.camera[groupName] = value;
+    } else if (POST_PRODUCTION_GROUPS.includes(groupName)) {
+      json['post-production'][groupName] = value;
+    } else if (CREATIVE_DIRECTION_GROUPS.includes(groupName)) {
+      json['creative-direction'][groupName] = value;
+    } else if (LIFESTYLE_EXTRAS_GROUPS.includes(groupName)) {
+      json['lifestyle-extras'][groupName] = value;
     } else if (JEWELRY_GROUPS.includes(groupName)) {
       json['jewelry-specific'][groupName] = value;
     } else {
@@ -253,6 +278,9 @@ export function buildGroupedJSON(
   if (Object.keys(json.styling).length === 0) delete json.styling;
   if (Object.keys(json.environment).length === 0) delete json.environment;
   if (Object.keys(json.camera).length === 0) delete json.camera;
+  if (Object.keys(json['post-production']).length === 0) delete json['post-production'];
+  if (Object.keys(json['creative-direction']).length === 0) delete json['creative-direction'];
+  if (Object.keys(json['lifestyle-extras']).length === 0) delete json['lifestyle-extras'];
   if (Object.keys(json['jewelry-specific']).length === 0) delete json['jewelry-specific'];
   
   return json;
