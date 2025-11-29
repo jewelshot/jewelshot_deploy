@@ -221,6 +221,38 @@ export const STYLING_CATEGORIES: BlockCategory[] = [
 ];
 
 // ============================================
+// ENVIRONMENT CATEGORIES (Location + Lighting)
+// ============================================
+
+export const ENVIRONMENT_CATEGORIES: BlockCategory[] = [
+  {
+    id: 'location-background',
+    name: 'Location & Background',
+    icon: '📍',
+    description: 'Setting and background environment',
+    order: 1,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'lighting',
+    name: 'Lighting',
+    icon: '💡',
+    description: 'Light source and quality',
+    order: 2,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+];
+
+// ============================================
 // FACE DETAILS CATEGORIES (Conditional/Toggle)
 // ============================================
 
@@ -660,6 +692,364 @@ const CLOTHING_TYPE_BLOCKS: MicroBlock[] = [
     tags: ['strapless', 'formal'], 
     level: 'advanced',
     conflictsWith: ['neckline-round', 'neckline-v-shallow', 'neckline-boat', 'shoulder-covered', 'shoulder-strap']
+  },
+];
+
+// ============================================
+// ENVIRONMENT BLOCKS - Location & Background
+// ============================================
+
+const LOCATION_BACKGROUND_BLOCKS: MicroBlock[] = [
+  // STUDIO BACKGROUNDS
+  { 
+    id: 'loc-studio-white', 
+    name: 'Studio White', 
+    categoryId: 'location-background', 
+    icon: '⬜', 
+    promptFragment: 'clean white studio background, seamless infinity wall', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['studio', 'white', 'clean'], 
+    level: 'advanced',
+    conflictsWith: ['loc-studio-gray', 'loc-studio-black', 'loc-outdoor-garden', 'loc-outdoor-beach', 'loc-outdoor-urban', 'loc-outdoor-forest', 'loc-lifestyle-home', 'loc-lifestyle-cafe', 'loc-lifestyle-office', 'loc-abstract-marble', 'loc-abstract-wood', 'loc-abstract-fabric', 'loc-abstract-bokeh']
+  },
+  { 
+    id: 'loc-studio-gray', 
+    name: 'Studio Gray', 
+    categoryId: 'location-background', 
+    icon: '◽', 
+    promptFragment: 'neutral gray studio background, professional', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['studio', 'gray', 'neutral'], 
+    level: 'advanced',
+    conflictsWith: ['loc-studio-white', 'loc-studio-black', 'loc-outdoor-garden', 'loc-outdoor-beach', 'loc-outdoor-urban', 'loc-outdoor-forest', 'loc-lifestyle-home', 'loc-lifestyle-cafe', 'loc-lifestyle-office', 'loc-abstract-marble', 'loc-abstract-wood', 'loc-abstract-fabric', 'loc-abstract-bokeh']
+  },
+  { 
+    id: 'loc-studio-black', 
+    name: 'Studio Black', 
+    categoryId: 'location-background', 
+    icon: '⬛', 
+    promptFragment: 'dramatic black studio background, high contrast', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['studio', 'black', 'dramatic'], 
+    level: 'advanced',
+    conflictsWith: ['loc-studio-white', 'loc-studio-gray', 'loc-outdoor-garden', 'loc-outdoor-beach', 'loc-outdoor-urban', 'loc-outdoor-forest', 'loc-lifestyle-home', 'loc-lifestyle-cafe', 'loc-lifestyle-office', 'loc-abstract-marble', 'loc-abstract-wood', 'loc-abstract-fabric', 'loc-abstract-bokeh']
+  },
+  { 
+    id: 'loc-studio-cream', 
+    name: 'Studio Cream/Beige', 
+    categoryId: 'location-background', 
+    icon: '🟨', 
+    promptFragment: 'warm cream beige studio background, soft elegant', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['studio', 'cream', 'warm'], 
+    level: 'advanced',
+    conflictsWith: ['loc-studio-white', 'loc-studio-gray', 'loc-studio-black', 'loc-outdoor-garden', 'loc-outdoor-beach', 'loc-outdoor-urban', 'loc-outdoor-forest', 'loc-lifestyle-home', 'loc-lifestyle-cafe', 'loc-lifestyle-office']
+  },
+  { 
+    id: 'loc-studio-pastel', 
+    name: 'Studio Pastel Color', 
+    categoryId: 'location-background', 
+    icon: '🎨', 
+    promptFragment: 'soft pastel colored studio background, dreamy', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['studio', 'pastel', 'colorful'], 
+    level: 'advanced',
+    conflictsWith: ['loc-studio-white', 'loc-studio-gray', 'loc-studio-black', 'loc-outdoor-garden', 'loc-outdoor-beach', 'loc-outdoor-urban', 'loc-outdoor-forest', 'loc-lifestyle-home', 'loc-lifestyle-cafe', 'loc-lifestyle-office']
+  },
+  
+  // OUTDOOR/NATURAL
+  { 
+    id: 'loc-outdoor-garden', 
+    name: 'Garden/Nature', 
+    categoryId: 'location-background', 
+    icon: '🌸', 
+    promptFragment: 'lush garden setting, natural greenery, flowers soft background', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['outdoor', 'nature', 'garden'], 
+    level: 'advanced',
+    conflictsWith: ['loc-studio-white', 'loc-studio-gray', 'loc-studio-black', 'loc-studio-cream', 'loc-studio-pastel', 'loc-outdoor-beach', 'loc-outdoor-urban', 'loc-outdoor-forest', 'loc-lifestyle-home', 'loc-lifestyle-cafe', 'loc-lifestyle-office']
+  },
+  { 
+    id: 'loc-outdoor-beach', 
+    name: 'Beach/Coastal', 
+    categoryId: 'location-background', 
+    icon: '🏖️', 
+    promptFragment: 'beach coastal setting, ocean background, sandy shore', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['outdoor', 'beach', 'coastal'], 
+    level: 'advanced',
+    conflictsWith: ['loc-studio-white', 'loc-studio-gray', 'loc-studio-black', 'loc-studio-cream', 'loc-studio-pastel', 'loc-outdoor-garden', 'loc-outdoor-urban', 'loc-outdoor-forest', 'loc-lifestyle-home', 'loc-lifestyle-cafe', 'loc-lifestyle-office']
+  },
+  { 
+    id: 'loc-outdoor-urban', 
+    name: 'Urban/City', 
+    categoryId: 'location-background', 
+    icon: '🏙️', 
+    promptFragment: 'urban city setting, modern architecture background, street scene', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['outdoor', 'urban', 'city'], 
+    level: 'advanced',
+    conflictsWith: ['loc-studio-white', 'loc-studio-gray', 'loc-studio-black', 'loc-studio-cream', 'loc-studio-pastel', 'loc-outdoor-garden', 'loc-outdoor-beach', 'loc-outdoor-forest', 'loc-lifestyle-home', 'loc-lifestyle-cafe', 'loc-lifestyle-office']
+  },
+  { 
+    id: 'loc-outdoor-forest', 
+    name: 'Forest/Woods', 
+    categoryId: 'location-background', 
+    icon: '🌲', 
+    promptFragment: 'forest woods setting, natural trees, dappled sunlight', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['outdoor', 'forest', 'nature'], 
+    level: 'advanced',
+    conflictsWith: ['loc-studio-white', 'loc-studio-gray', 'loc-studio-black', 'loc-studio-cream', 'loc-studio-pastel', 'loc-outdoor-garden', 'loc-outdoor-beach', 'loc-outdoor-urban', 'loc-lifestyle-home', 'loc-lifestyle-cafe', 'loc-lifestyle-office']
+  },
+  
+  // LIFESTYLE
+  { 
+    id: 'loc-lifestyle-home', 
+    name: 'Home Interior', 
+    categoryId: 'location-background', 
+    icon: '🏠', 
+    promptFragment: 'cozy home interior, comfortable domestic setting', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['lifestyle', 'home', 'interior'], 
+    level: 'advanced',
+    conflictsWith: ['loc-studio-white', 'loc-studio-gray', 'loc-studio-black', 'loc-outdoor-garden', 'loc-outdoor-beach', 'loc-outdoor-urban', 'loc-outdoor-forest', 'loc-lifestyle-cafe', 'loc-lifestyle-office']
+  },
+  { 
+    id: 'loc-lifestyle-cafe', 
+    name: 'Cafe/Restaurant', 
+    categoryId: 'location-background', 
+    icon: '☕', 
+    promptFragment: 'cafe restaurant setting, casual dining ambiance', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['lifestyle', 'cafe', 'dining'], 
+    level: 'advanced',
+    conflictsWith: ['loc-studio-white', 'loc-studio-gray', 'loc-studio-black', 'loc-outdoor-garden', 'loc-outdoor-beach', 'loc-outdoor-urban', 'loc-outdoor-forest', 'loc-lifestyle-home', 'loc-lifestyle-office']
+  },
+  { 
+    id: 'loc-lifestyle-office', 
+    name: 'Office/Workspace', 
+    categoryId: 'location-background', 
+    icon: '💼', 
+    promptFragment: 'modern office workspace, professional business setting', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['lifestyle', 'office', 'professional'], 
+    level: 'advanced',
+    conflictsWith: ['loc-studio-white', 'loc-studio-gray', 'loc-studio-black', 'loc-outdoor-garden', 'loc-outdoor-beach', 'loc-outdoor-urban', 'loc-outdoor-forest', 'loc-lifestyle-home', 'loc-lifestyle-cafe']
+  },
+  
+  // ABSTRACT/TEXTURED
+  { 
+    id: 'loc-abstract-marble', 
+    name: 'Marble Surface', 
+    categoryId: 'location-background', 
+    icon: '⬜', 
+    promptFragment: 'elegant marble surface, luxury stone texture background', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['abstract', 'marble', 'luxury'], 
+    level: 'advanced',
+    conflictsWith: ['loc-studio-white', 'loc-abstract-wood', 'loc-abstract-fabric', 'loc-abstract-bokeh']
+  },
+  { 
+    id: 'loc-abstract-wood', 
+    name: 'Wood Surface', 
+    categoryId: 'location-background', 
+    icon: '🪵', 
+    promptFragment: 'natural wood surface, warm wooden texture background', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['abstract', 'wood', 'natural'], 
+    level: 'advanced',
+    conflictsWith: ['loc-studio-white', 'loc-abstract-marble', 'loc-abstract-fabric', 'loc-abstract-bokeh']
+  },
+  { 
+    id: 'loc-abstract-fabric', 
+    name: 'Fabric/Textile', 
+    categoryId: 'location-background', 
+    icon: '🧵', 
+    promptFragment: 'soft fabric textile background, draped cloth texture', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['abstract', 'fabric', 'soft'], 
+    level: 'advanced',
+    conflictsWith: ['loc-studio-white', 'loc-abstract-marble', 'loc-abstract-wood', 'loc-abstract-bokeh']
+  },
+  { 
+    id: 'loc-abstract-bokeh', 
+    name: 'Bokeh/Blurred', 
+    categoryId: 'location-background', 
+    icon: '✨', 
+    promptFragment: 'soft bokeh blurred background, dreamy out-of-focus lights', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['abstract', 'bokeh', 'dreamy'], 
+    level: 'advanced',
+    conflictsWith: ['loc-studio-white', 'loc-abstract-marble', 'loc-abstract-wood', 'loc-abstract-fabric']
+  },
+];
+
+// ============================================
+// ENVIRONMENT BLOCKS - Lighting
+// ============================================
+
+const LIGHTING_BLOCKS: MicroBlock[] = [
+  // NATURAL LIGHT
+  { 
+    id: 'light-natural-window', 
+    name: 'Window Light', 
+    categoryId: 'lighting', 
+    icon: '🪟', 
+    promptFragment: 'soft natural window light, diffused daylight', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['natural', 'window', 'soft'], 
+    level: 'advanced',
+    conflictsWith: ['light-studio-softbox', 'light-studio-ring', 'light-studio-key-fill', 'light-studio-backlight']
+  },
+  { 
+    id: 'light-natural-golden', 
+    name: 'Golden Hour', 
+    categoryId: 'lighting', 
+    icon: '🌅', 
+    promptFragment: 'warm golden hour sunlight, sunset glow', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['natural', 'golden', 'warm'], 
+    level: 'advanced',
+    conflictsWith: ['light-studio-softbox', 'light-studio-ring', 'light-studio-key-fill', 'light-studio-backlight', 'light-natural-overcast']
+  },
+  { 
+    id: 'light-natural-overcast', 
+    name: 'Overcast/Diffused', 
+    categoryId: 'lighting', 
+    icon: '☁️', 
+    promptFragment: 'soft overcast light, even diffused natural illumination', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['natural', 'overcast', 'diffused'], 
+    level: 'advanced',
+    conflictsWith: ['light-studio-softbox', 'light-studio-ring', 'light-studio-key-fill', 'light-studio-backlight', 'light-natural-golden']
+  },
+  { 
+    id: 'light-natural-direct', 
+    name: 'Direct Sunlight', 
+    categoryId: 'lighting', 
+    icon: '☀️', 
+    promptFragment: 'bright direct sunlight, sharp shadows, high contrast', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['natural', 'direct', 'bright'], 
+    level: 'advanced',
+    conflictsWith: ['light-studio-softbox', 'light-studio-ring', 'light-studio-key-fill', 'light-studio-backlight']
+  },
+  
+  // STUDIO LIGHT
+  { 
+    id: 'light-studio-softbox', 
+    name: 'Studio Softbox', 
+    categoryId: 'lighting', 
+    icon: '📦', 
+    promptFragment: 'professional studio softbox lighting, controlled diffused', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['studio', 'softbox', 'professional'], 
+    level: 'advanced',
+    conflictsWith: ['light-natural-window', 'light-natural-golden', 'light-natural-overcast', 'light-natural-direct', 'light-studio-ring', 'light-studio-key-fill']
+  },
+  { 
+    id: 'light-studio-ring', 
+    name: 'Ring Light', 
+    categoryId: 'lighting', 
+    icon: '💫', 
+    promptFragment: 'ring light setup, even circular illumination', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['studio', 'ring-light', 'even'], 
+    level: 'advanced',
+    conflictsWith: ['light-natural-window', 'light-natural-golden', 'light-natural-overcast', 'light-natural-direct', 'light-studio-softbox', 'light-studio-key-fill']
+  },
+  { 
+    id: 'light-studio-key-fill', 
+    name: 'Key + Fill Light', 
+    categoryId: 'lighting', 
+    icon: '💡', 
+    promptFragment: 'three-point lighting, key fill rim setup, professional studio', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['studio', 'three-point', 'professional'], 
+    level: 'advanced',
+    conflictsWith: ['light-natural-window', 'light-natural-golden', 'light-natural-overcast', 'light-natural-direct', 'light-studio-softbox', 'light-studio-ring']
+  },
+  { 
+    id: 'light-studio-backlight', 
+    name: 'Backlight/Rim', 
+    categoryId: 'lighting', 
+    icon: '✨', 
+    promptFragment: 'dramatic backlight rim lighting, edge glow', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['studio', 'backlight', 'dramatic'], 
+    level: 'advanced',
+    conflictsWith: ['light-natural-window', 'light-natural-golden', 'light-natural-overcast', 'light-natural-direct']
+  },
+  
+  // DRAMATIC/ARTISTIC
+  { 
+    id: 'light-dramatic-side', 
+    name: 'Side Light (Dramatic)', 
+    categoryId: 'lighting', 
+    icon: '◀️', 
+    promptFragment: 'dramatic side lighting, strong shadows, chiaroscuro', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['dramatic', 'side', 'shadow'], 
+    level: 'advanced',
+    conflictsWith: []
+  },
+  { 
+    id: 'light-dramatic-low-key', 
+    name: 'Low-Key (Dark)', 
+    categoryId: 'lighting', 
+    icon: '🌑', 
+    promptFragment: 'low-key dramatic lighting, dark moody atmosphere', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['dramatic', 'low-key', 'dark'], 
+    level: 'advanced',
+    conflictsWith: ['light-dramatic-high-key']
+  },
+  { 
+    id: 'light-dramatic-high-key', 
+    name: 'High-Key (Bright)', 
+    categoryId: 'lighting', 
+    icon: '🌕', 
+    promptFragment: 'high-key bright lighting, airy clean atmosphere', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['dramatic', 'high-key', 'bright'], 
+    level: 'advanced',
+    conflictsWith: ['light-dramatic-low-key']
+  },
+  
+  // AMBIENT
+  { 
+    id: 'light-ambient-warm', 
+    name: 'Warm Ambient', 
+    categoryId: 'lighting', 
+    icon: '🔥', 
+    promptFragment: 'warm ambient lighting, cozy golden tones', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['ambient', 'warm', 'cozy'], 
+    level: 'advanced',
+    conflictsWith: ['light-ambient-cool']
+  },
+  { 
+    id: 'light-ambient-cool', 
+    name: 'Cool Ambient', 
+    categoryId: 'lighting', 
+    icon: '❄️', 
+    promptFragment: 'cool ambient lighting, crisp blue tones', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['ambient', 'cool', 'crisp'], 
+    level: 'advanced',
+    conflictsWith: ['light-ambient-warm']
+  },
+  { 
+    id: 'light-ambient-neutral', 
+    name: 'Neutral Ambient', 
+    categoryId: 'lighting', 
+    icon: '⚪', 
+    promptFragment: 'neutral ambient lighting, balanced natural tones', 
+    applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, 
+    tags: ['ambient', 'neutral', 'balanced'], 
+    level: 'advanced',
+    conflictsWith: []
   },
 ];
 
@@ -1277,6 +1667,7 @@ export const WOMEN_ALL_CATEGORIES = [
   ...WOMEN_UNIVERSAL_CATEGORIES,
   ...WOMEN_FACE_CATEGORIES, // Conditional (toggle)
   ...STYLING_CATEGORIES, // Separate styling group
+  ...ENVIRONMENT_CATEGORIES, // Separate environment group
   ...WOMEN_RING_CATEGORIES,
   ...WOMEN_NECKLACE_CATEGORIES,
   ...WOMEN_EARRING_CATEGORIES,
@@ -1357,6 +1748,10 @@ export const WOMEN_ALL_BLOCKS: MicroBlock[] = [
   ...UPPER_COLOR_BLOCKS,
   ...LOWER_CLOTHING_BLOCKS,
   ...LOWER_COLOR_BLOCKS,
+  
+  // Environment blocks
+  ...LOCATION_BACKGROUND_BLOCKS,
+  ...LIGHTING_BLOCKS,
   
   // Face Details blocks (Conditional/Toggle)
   ...RACE_ETHNICITY_BLOCKS,

@@ -64,6 +64,10 @@ export const CATEGORY_GROUPS: Record<string, string> = {
   'lower-clothing': 'styling-lower',
   'lower-color': 'styling-lower',
   
+  // Environment groups
+  'location-background': 'location',
+  'lighting': 'lighting',
+  
   // Singular categories (no grouping)
   'skin-tone': 'skin',
   'makeup': 'makeup',
@@ -187,6 +191,7 @@ export function buildGroupedJSON(
     gender: context.gender,
     model: {},
     styling: {},
+    environment: {},
     jewelryType: context.jewelryType,
     'jewelry-specific': {},
   };
@@ -194,6 +199,7 @@ export function buildGroupedJSON(
   // Define which groups belong to which top-level category
   const MODEL_GROUPS = ['skin', 'hair', 'nails', 'makeup', 'expression', 'face'];
   const STYLING_GROUPS = ['clothing-type', 'styling-upper', 'styling-lower'];
+  const ENVIRONMENT_GROUPS = ['location', 'lighting'];
   const JEWELRY_GROUPS = ['hand', 'neck', 'head', 'arm', 'necklace-styling', 'bracelet-styling'];
   
   // Group prompt fragments by their parent group
@@ -223,6 +229,8 @@ export function buildGroupedJSON(
       json.model[groupName] = value;
     } else if (STYLING_GROUPS.includes(groupName)) {
       json.styling[groupName] = value;
+    } else if (ENVIRONMENT_GROUPS.includes(groupName)) {
+      json.environment[groupName] = value;
     } else if (JEWELRY_GROUPS.includes(groupName)) {
       json['jewelry-specific'][groupName] = value;
     } else {
@@ -234,6 +242,7 @@ export function buildGroupedJSON(
   // Clean up empty objects
   if (Object.keys(json.model).length === 0) delete json.model;
   if (Object.keys(json.styling).length === 0) delete json.styling;
+  if (Object.keys(json.environment).length === 0) delete json.environment;
   if (Object.keys(json['jewelry-specific']).length === 0) delete json['jewelry-specific'];
   
   return json;
