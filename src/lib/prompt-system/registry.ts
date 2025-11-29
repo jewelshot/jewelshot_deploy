@@ -14,6 +14,10 @@ import {
   WOMEN_BRACELET_CATEGORIES,
   WOMEN_ALL_BLOCKS 
 } from './blocks/women-all';
+import {
+  MEN_ALL_CATEGORIES,
+  MEN_ALL_BLOCKS
+} from './blocks/men-all';
 
 // ============================================
 // REGISTRY
@@ -31,6 +35,10 @@ export class BlockRegistry {
     // Register all women blocks
     WOMEN_ALL_CATEGORIES.forEach(c => this.categories.set(c.id, c));
     WOMEN_ALL_BLOCKS.forEach(b => this.blocks.set(b.id, b));
+    
+    // Register all men blocks
+    MEN_ALL_CATEGORIES.forEach(c => this.categories.set(c.id, c));
+    MEN_ALL_BLOCKS.forEach(b => this.blocks.set(b.id, b));
   }
   
   /**

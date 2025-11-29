@@ -11,16 +11,38 @@ import { MicroBlock, BlockSelections, BlockContext } from './types';
  * Maps individual categories to their parent groups for compact JSON output
  */
 export const CATEGORY_GROUPS: Record<string, string> = {
-  // Hair group
+  // Hair group (Men & Women)
   'hair-length': 'hair',
   'hair-style': 'hair',
   'hair-texture': 'hair',
   'hair-color': 'hair',
   'hair-volume': 'hair',
   
+  // Facial Hair group (Men only)
+  'beard-style': 'facial-hair',
+  'beard-length': 'facial-hair',
+  'beard-color': 'facial-hair',
+  'mustache-style': 'facial-hair',
+  
+  // Body Hair group (Men only)
+  'chest-hair': 'body-hair',
+  'arm-hair': 'body-hair',
+  
+  // Masculine Features group (Men only)
+  'jawline': 'masculine-features',
+  'adams-apple': 'masculine-features',
+  'cheekbones-men': 'masculine-features',
+  'brow-ridge': 'masculine-features',
+  
+  // Hand Details (Men)
+  'vein-prominence': 'hand-details',
+  'hand-structure-men': 'hand-details',
+  'hand-texture': 'hand-details',
+  
   // Nails group
   'nail-type': 'nails',
   'nail-color': 'nails',
+  'nail-type-men': 'nails',
   
   // Face group (all facial features)
   'race-ethnicity': 'face',
@@ -93,6 +115,7 @@ export const CATEGORY_GROUPS: Record<string, string> = {
   'skin-tone': 'skin',
   'makeup': 'makeup',
   'expression': 'expression',
+  'expression-men': 'expression',
   'neck-pose': 'neck',
 };
 
@@ -222,7 +245,7 @@ export function buildGroupedJSON(
   };
   
   // Define which groups belong to which top-level category
-  const MODEL_GROUPS = ['skin', 'hair', 'nails', 'makeup', 'expression', 'face'];
+  const MODEL_GROUPS = ['skin', 'hair', 'nails', 'makeup', 'expression', 'face', 'facial-hair', 'body-hair', 'masculine-features', 'hand-details'];
   const STYLING_GROUPS = ['clothing-type', 'styling-upper', 'styling-lower'];
   const ENVIRONMENT_GROUPS = ['location', 'lighting'];
   const CAMERA_GROUPS = ['framing', 'angle', 'focus', 'composition'];

@@ -323,8 +323,12 @@ export default function StudioLabPage() {
                         👩 Women
                       </button>
                       <button
-                        disabled
-                        className="flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-white/30 cursor-not-allowed"
+                        onClick={() => handleGenderChange('men')}
+                        className={`flex-1 rounded-lg border px-3 py-2 text-xs font-medium transition-all ${
+                          gender === 'men'
+                            ? 'border-blue-500 bg-blue-500/20 text-blue-300'
+                            : 'border-white/20 bg-white/5 text-white/60 hover:border-white/40 hover:text-white'
+                        }`}
                       >
                         👨 Men
                       </button>
@@ -370,20 +374,20 @@ export default function StudioLabPage() {
         <div className="grid grid-cols-1 gap-8 xl:grid-cols-2">
           {/* Left: Block Selection */}
           <div className="space-y-8 w-full">
-            {/* 1️⃣ UNIVERSAL WOMEN FEATURES - Accordion (requires gender & jewelry) */}
+            {/* 1️⃣ UNIVERSAL FEATURES - Accordion (requires gender & jewelry) */}
             {gender && jewelryType && universalWomenCategories.length > 0 && (
-              <div className="rounded-2xl border-2 border-purple-500/30 bg-purple-500/5">
+              <div className={`rounded-2xl border-2 ${gender === 'women' ? 'border-purple-500/30 bg-purple-500/5' : 'border-blue-500/30 bg-blue-500/5'}`}>
                 <button
                   onClick={() => setShowWomenFeatures(!showWomenFeatures)}
-                  className="w-full flex items-center justify-between p-5 hover:bg-purple-500/10 transition-all rounded-t-2xl"
+                  className={`w-full flex items-center justify-between p-5 ${gender === 'women' ? 'hover:bg-purple-500/10' : 'hover:bg-blue-500/10'} transition-all rounded-t-2xl`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/20">
-                      <span className="text-2xl">👩</span>
+                    <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${gender === 'women' ? 'bg-purple-500/20' : 'bg-blue-500/20'}`}>
+                      <span className="text-2xl">{gender === 'women' ? '👩' : '👨'}</span>
                     </div>
                     <div className="text-left">
                       <h2 className="text-lg font-bold text-white">
-                        Universal Women Features
+                        Universal {gender === 'women' ? 'Women' : 'Men'} Features
                       </h2>
                       <p className="text-xs text-white/60">
                         Applies to all jewelry types · {universalWomenCategories.length} categories
@@ -393,7 +397,7 @@ export default function StudioLabPage() {
                   {showWomenFeatures ? <ChevronUp className="h-5 w-5 text-white/40" /> : <ChevronDown className="h-5 w-5 text-white/40" />}
                 </button>
                 {showWomenFeatures && (
-                  <div className="p-5 pt-0 space-y-3 border-t border-purple-500/20">
+                  <div className={`p-5 pt-0 space-y-3 border-t ${gender === 'women' ? 'border-purple-500/20' : 'border-blue-500/20'}`}>
                     {universalWomenCategories.map(category => renderCategory(category))}
                   </div>
                 )}
