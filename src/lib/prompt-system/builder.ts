@@ -57,8 +57,14 @@ export const CATEGORY_GROUPS: Record<string, string> = {
   'sleeve-type': 'bracelet-styling',
   'wrist-exposure': 'bracelet-styling',
   
+  // Styling groups
+  'clothing-type': 'clothing-type',
+  'upper-clothing': 'styling-upper',
+  'upper-color': 'styling-upper',
+  'lower-clothing': 'styling-lower',
+  'lower-color': 'styling-lower',
+  
   // Singular categories (no grouping)
-  'clothing-type': 'clothing',
   'skin-tone': 'skin',
   'makeup': 'makeup',
   'expression': 'expression',

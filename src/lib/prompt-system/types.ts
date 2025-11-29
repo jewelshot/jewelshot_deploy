@@ -62,6 +62,12 @@ export interface BlockCategory {
   
   // Which block IDs trigger auto-show for this conditional category?
   autoShowTriggers?: string[];
+  
+  // Is this a face detail category? (for toggle grouping)
+  isFaceDetail?: boolean;
+  
+  // Parent group for JSON output (e.g., 'hair', 'face', 'necklace-styling')
+  parentGroup?: string;
 }
 
 /**

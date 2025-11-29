@@ -12,25 +12,14 @@ import { BlockCategory, MicroBlock, JewelryType } from '../types';
 // ============================================
 
 export const WOMEN_UNIVERSAL_CATEGORIES: BlockCategory[] = [
-  {
-    id: 'clothing-type',
-    name: 'Clothing Type',
-    icon: '👗',
-    description: 'Base clothing style (affects neckline/sleeve options)',
-    order: 1,
-    applicableTo: {
-      gender: ['women'],
-      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
-    },
-    required: true, // CRITICAL - must be selected first
-  },
+  // Note: Race is in Face Details (conditional)
   
   {
     id: 'skin-tone',
     name: 'Skin Tone',
     icon: '🤎',
     description: 'Skin complexion',
-    order: 2,
+    order: 1,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
@@ -38,54 +27,18 @@ export const WOMEN_UNIVERSAL_CATEGORIES: BlockCategory[] = [
     required: false,
   },
   
-  {
-    id: 'nail-type',
-    name: 'Nail Type',
-    icon: '💅',
-    description: 'Nail shape and style',
-    order: 3,
-    applicableTo: {
-      gender: ['women'],
-      jewelryTypes: ['ring', 'bracelet'],
-    },
-    required: false,
-  },
+  // Face Details (orders 2-12 in WOMEN_FACE_CATEGORIES)
   
+  // HAIR DETAILS (grouped together)
   {
-    id: 'nail-color',
-    name: 'Nail Color',
-    icon: '🎨',
-    description: 'Nail polish color',
-    order: 4,
+    id: 'hair-style',
+    name: 'Hair Style',
+    icon: '💇',
+    description: 'Hairstyle and arrangement',
+    order: 13,
     applicableTo: {
       gender: ['women'],
-      jewelryTypes: ['ring', 'bracelet'],
-    },
-    required: false,
-  },
-  
-  {
-    id: 'makeup',
-    name: 'Makeup',
-    icon: '💄',
-    description: 'Makeup style',
-    order: 5,
-    applicableTo: {
-      gender: ['women'],
-      jewelryTypes: ['necklace', 'earring'],
-    },
-    required: false,
-  },
-  
-  {
-    id: 'expression',
-    name: 'Expression',
-    icon: '😊',
-    description: 'Facial expression',
-    order: 6,
-    applicableTo: {
-      gender: ['women'],
-      jewelryTypes: ['necklace', 'earring'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
     },
     required: false,
   },
@@ -95,46 +48,7 @@ export const WOMEN_UNIVERSAL_CATEGORIES: BlockCategory[] = [
     name: 'Hair Length',
     icon: '📏',
     description: 'Length of hair',
-    order: 7,
-    applicableTo: {
-      gender: ['women'],
-      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
-    },
-    required: false,
-  },
-  
-  {
-    id: 'hair-style',
-    name: 'Hair Style',
-    icon: '💇',
-    description: 'Hairstyle and arrangement',
-    order: 8,
-    applicableTo: {
-      gender: ['women'],
-      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
-    },
-    required: false,
-  },
-  
-  {
-    id: 'hair-texture',
-    name: 'Hair Texture',
-    icon: '🌊',
-    description: 'Hair texture pattern',
-    order: 9,
-    applicableTo: {
-      gender: ['women'],
-      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
-    },
-    required: false,
-  },
-  
-  {
-    id: 'hair-color',
-    name: 'Hair Color',
-    icon: '🎨',
-    description: 'Hair color tone',
-    order: 10,
+    order: 14,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
@@ -147,10 +61,155 @@ export const WOMEN_UNIVERSAL_CATEGORIES: BlockCategory[] = [
     name: 'Hair Volume',
     icon: '✨',
     description: 'Hair thickness and volume',
-    order: 11,
+    order: 15,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'hair-color',
+    name: 'Hair Color',
+    icon: '🎨',
+    description: 'Hair color tone',
+    order: 16,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'hair-texture',
+    name: 'Hair Texture',
+    icon: '🌊',
+    description: 'Hair texture pattern',
+    order: 17,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  // NAIL DETAILS (grouped together)
+  {
+    id: 'nail-type',
+    name: 'Nail Type',
+    icon: '💅',
+    description: 'Nail shape and style',
+    order: 18,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'nail-color',
+    name: 'Nail Color',
+    icon: '🎨',
+    description: 'Nail polish color',
+    order: 19,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'makeup',
+    name: 'Makeup',
+    icon: '💄',
+    description: 'Makeup style',
+    order: 20,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['necklace', 'earring'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'expression',
+    name: 'Expression',
+    icon: '😊',
+    description: 'Facial expression',
+    order: 21,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['necklace', 'earring'],
+    },
+    required: false,
+  },
+  
+  // STYLING SECTION
+  {
+    id: 'clothing-type',
+    name: 'Clothing Type',
+    icon: '👗',
+    description: 'Base clothing style (affects all styling options)',
+    order: 22,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: true,
+  },
+  
+  {
+    id: 'upper-clothing',
+    name: 'Upper Clothing Detail',
+    icon: '👚',
+    description: 'Upper body clothing specifics',
+    order: 23,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'upper-color',
+    name: 'Upper Color',
+    icon: '🎨',
+    description: 'Top clothing color',
+    order: 24,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'lower-clothing',
+    name: 'Lower Clothing',
+    icon: '👖',
+    description: 'Bottom clothing type',
+    order: 25,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'bracelet'], // Only visible for ring/bracelet
+    },
+    required: false,
+  },
+  
+  {
+    id: 'lower-color',
+    name: 'Lower Color',
+    icon: '🎨',
+    description: 'Bottom clothing color',
+    order: 26,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'bracelet'], // Only visible for ring/bracelet
     },
     required: false,
   },
@@ -166,14 +225,14 @@ export const WOMEN_FACE_CATEGORIES: BlockCategory[] = [
     name: 'Race/Ethnicity',
     icon: '🌍',
     description: 'Ethnic background',
-    order: 12,
+    order: 2,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
     },
     required: false,
-    conditional: true, // Hidden until toggled
-    autoShowTriggers: [], // Can be populated with hand poses that show face
+    isFaceDetail: true,
+    parentGroup: 'face',
   },
   
   {
@@ -181,13 +240,14 @@ export const WOMEN_FACE_CATEGORIES: BlockCategory[] = [
     name: 'Face Shape',
     icon: '👤',
     description: 'Overall face structure',
-    order: 13,
+    order: 3,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
     },
     required: false,
-    conditional: true,
+    isFaceDetail: true,
+    parentGroup: 'face',
   },
   
   {
@@ -195,13 +255,14 @@ export const WOMEN_FACE_CATEGORIES: BlockCategory[] = [
     name: 'Eye Color',
     icon: '👁️',
     description: 'Eye color tone',
-    order: 14,
+    order: 4,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
     },
     required: false,
-    conditional: true,
+    isFaceDetail: true,
+    parentGroup: 'face',
   },
   
   {
@@ -209,13 +270,14 @@ export const WOMEN_FACE_CATEGORIES: BlockCategory[] = [
     name: 'Eye Type',
     icon: '👀',
     description: 'Eye shape and structure',
-    order: 15,
+    order: 5,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
     },
     required: false,
-    conditional: true,
+    isFaceDetail: true,
+    parentGroup: 'face',
   },
   
   {
@@ -223,13 +285,14 @@ export const WOMEN_FACE_CATEGORIES: BlockCategory[] = [
     name: 'Eyebrow Style',
     icon: '✏️',
     description: 'Eyebrow shape',
-    order: 16,
+    order: 6,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
     },
     required: false,
-    conditional: true,
+    isFaceDetail: true,
+    parentGroup: 'face',
   },
   
   {
@@ -237,13 +300,14 @@ export const WOMEN_FACE_CATEGORIES: BlockCategory[] = [
     name: 'Eyelash',
     icon: '👁️',
     description: 'Eyelash style',
-    order: 17,
+    order: 7,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
     },
     required: false,
-    conditional: true,
+    isFaceDetail: true,
+    parentGroup: 'face',
   },
   
   {
@@ -251,13 +315,14 @@ export const WOMEN_FACE_CATEGORIES: BlockCategory[] = [
     name: 'Nose Type',
     icon: '👃',
     description: 'Nose shape and structure',
-    order: 18,
+    order: 8,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
     },
     required: false,
-    conditional: true,
+    isFaceDetail: true,
+    parentGroup: 'face',
   },
   
   {
@@ -265,13 +330,14 @@ export const WOMEN_FACE_CATEGORIES: BlockCategory[] = [
     name: 'Lip Type',
     icon: '💋',
     description: 'Lip shape and fullness',
-    order: 19,
+    order: 9,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
     },
     required: false,
-    conditional: true,
+    isFaceDetail: true,
+    parentGroup: 'face',
   },
   
   {
@@ -279,13 +345,14 @@ export const WOMEN_FACE_CATEGORIES: BlockCategory[] = [
     name: 'Lip Color',
     icon: '💄',
     description: 'Lipstick or natural lip color',
-    order: 20,
+    order: 10,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
     },
     required: false,
-    conditional: true,
+    isFaceDetail: true,
+    parentGroup: 'face',
   },
   
   {
@@ -293,13 +360,14 @@ export const WOMEN_FACE_CATEGORIES: BlockCategory[] = [
     name: 'Cheekbones',
     icon: '✨',
     description: 'Cheekbone prominence',
-    order: 21,
+    order: 11,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
     },
     required: false,
-    conditional: true,
+    isFaceDetail: true,
+    parentGroup: 'face',
   },
   
   {
@@ -307,13 +375,14 @@ export const WOMEN_FACE_CATEGORIES: BlockCategory[] = [
     name: 'Chin Type',
     icon: '🗿',
     description: 'Chin shape and structure',
-    order: 22,
+    order: 12,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
     },
     required: false,
-    conditional: true,
+    isFaceDetail: true,
+    parentGroup: 'face',
   },
 ];
 
@@ -587,6 +656,104 @@ const CLOTHING_TYPE_BLOCKS: MicroBlock[] = [
     level: 'advanced',
     conflictsWith: ['neckline-round', 'neckline-v-shallow', 'neckline-boat', 'shoulder-covered', 'shoulder-strap']
   },
+];
+
+// ============================================
+// STYLING BLOCKS - Upper Clothing Details
+// ============================================
+
+const UPPER_CLOTHING_BLOCKS: MicroBlock[] = [
+  // Pattern & Texture
+  { id: 'upper-plain', name: 'Plain/Solid', categoryId: 'upper-clothing', icon: '▪️', promptFragment: 'plain solid fabric', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['plain'], level: 'advanced' },
+  { id: 'upper-striped', name: 'Striped', categoryId: 'upper-clothing', icon: '▬', promptFragment: 'striped pattern', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['pattern'], level: 'advanced' },
+  { id: 'upper-floral', name: 'Floral Print', categoryId: 'upper-clothing', icon: '🌸', promptFragment: 'floral print pattern', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['pattern'], level: 'advanced' },
+  { id: 'upper-polkadot', name: 'Polka Dot', categoryId: 'upper-clothing', icon: '⚪', promptFragment: 'polka dot pattern', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['pattern'], level: 'advanced' },
+  { id: 'upper-checked', name: 'Checked/Plaid', categoryId: 'upper-clothing', icon: '▦', promptFragment: 'checked plaid pattern', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['pattern'], level: 'advanced' },
+  
+  // Material
+  { id: 'upper-cotton', name: 'Cotton', categoryId: 'upper-clothing', icon: '🌿', promptFragment: 'cotton fabric texture', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['material'], level: 'advanced' },
+  { id: 'upper-silk', name: 'Silk/Satin', categoryId: 'upper-clothing', icon: '✨', promptFragment: 'silk satin luxurious sheen', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['material'], level: 'advanced' },
+  { id: 'upper-linen', name: 'Linen', categoryId: 'upper-clothing', icon: '🍃', promptFragment: 'linen natural texture', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['material'], level: 'advanced' },
+  { id: 'upper-knit', name: 'Knit/Wool', categoryId: 'upper-clothing', icon: '🧶', promptFragment: 'knit wool textured', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['material'], level: 'advanced' },
+  { id: 'upper-chiffon', name: 'Chiffon', categoryId: 'upper-clothing', icon: '🎐', promptFragment: 'chiffon lightweight flowing', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['material'], level: 'advanced' },
+];
+
+// ============================================
+// STYLING BLOCKS - Upper Color
+// ============================================
+
+const UPPER_COLOR_BLOCKS: MicroBlock[] = [
+  // Neutrals
+  { id: 'upper-white', name: 'White', categoryId: 'upper-color', icon: '⚪', promptFragment: 'white clean crisp', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['neutral'], level: 'advanced' },
+  { id: 'upper-black', name: 'Black', categoryId: 'upper-color', icon: '⚫', promptFragment: 'black elegant sophisticated', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['neutral'], level: 'advanced' },
+  { id: 'upper-gray', name: 'Gray', categoryId: 'upper-color', icon: '🌫️', promptFragment: 'gray neutral', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['neutral'], level: 'advanced' },
+  { id: 'upper-beige', name: 'Beige/Nude', categoryId: 'upper-color', icon: '🟤', promptFragment: 'beige nude neutral', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['neutral'], level: 'advanced' },
+  { id: 'upper-cream', name: 'Cream/Ivory', categoryId: 'upper-color', icon: '🤍', promptFragment: 'cream ivory soft', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['neutral'], level: 'advanced' },
+  
+  // Warm Colors
+  { id: 'upper-red', name: 'Red', categoryId: 'upper-color', icon: '🔴', promptFragment: 'red vibrant bold', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['warm'], level: 'advanced' },
+  { id: 'upper-burgundy', name: 'Burgundy', categoryId: 'upper-color', icon: '🍷', promptFragment: 'burgundy wine deep rich', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['warm'], level: 'advanced' },
+  { id: 'upper-pink', name: 'Pink', categoryId: 'upper-color', icon: '🩷', promptFragment: 'pink soft feminine', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['warm'], level: 'advanced' },
+  { id: 'upper-coral', name: 'Coral/Peach', categoryId: 'upper-color', icon: '🍑', promptFragment: 'coral peach warm', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['warm'], level: 'advanced' },
+  { id: 'upper-orange', name: 'Orange', categoryId: 'upper-color', icon: '🟠', promptFragment: 'orange vibrant energetic', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['warm'], level: 'advanced' },
+  { id: 'upper-yellow', name: 'Yellow', categoryId: 'upper-color', icon: '🟡', promptFragment: 'yellow bright sunny', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['warm'], level: 'advanced' },
+  
+  // Cool Colors
+  { id: 'upper-blue', name: 'Blue', categoryId: 'upper-color', icon: '🔵', promptFragment: 'blue classic cool', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['cool'], level: 'advanced' },
+  { id: 'upper-navy', name: 'Navy', categoryId: 'upper-color', icon: '🌊', promptFragment: 'navy dark sophisticated', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['cool'], level: 'advanced' },
+  { id: 'upper-green', name: 'Green', categoryId: 'upper-color', icon: '🟢', promptFragment: 'green fresh natural', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['cool'], level: 'advanced' },
+  { id: 'upper-emerald', name: 'Emerald', categoryId: 'upper-color', icon: '💚', promptFragment: 'emerald green rich jewel tone', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['cool'], level: 'advanced' },
+  { id: 'upper-purple', name: 'Purple', categoryId: 'upper-color', icon: '🟣', promptFragment: 'purple regal', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['cool'], level: 'advanced' },
+  { id: 'upper-lavender', name: 'Lavender', categoryId: 'upper-color', icon: '🪻', promptFragment: 'lavender soft pastel', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['cool'], level: 'advanced' },
+  
+  // Earthy/Rich
+  { id: 'upper-brown', name: 'Brown', categoryId: 'upper-color', icon: '🟤', promptFragment: 'brown earthy warm', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['earth'], level: 'advanced' },
+  { id: 'upper-camel', name: 'Camel/Tan', categoryId: 'upper-color', icon: '🐪', promptFragment: 'camel tan neutral warm', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['earth'], level: 'advanced' },
+  { id: 'upper-olive', name: 'Olive', categoryId: 'upper-color', icon: '🫒', promptFragment: 'olive muted green', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['earth'], level: 'advanced' },
+  { id: 'upper-gold', name: 'Gold/Mustard', categoryId: 'upper-color', icon: '🥇', promptFragment: 'gold mustard rich warm', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['metallic'], level: 'advanced' },
+  { id: 'upper-silver', name: 'Silver/Metallic', categoryId: 'upper-color', icon: '🥈', promptFragment: 'silver metallic shimmering', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['metallic'], level: 'advanced' },
+];
+
+// ============================================
+// STYLING BLOCKS - Lower Clothing (Ring/Bracelet only)
+// ============================================
+
+const LOWER_CLOTHING_BLOCKS: MicroBlock[] = [
+  // Pants/Trousers
+  { id: 'lower-jeans', name: 'Jeans', categoryId: 'lower-clothing', icon: '👖', promptFragment: 'denim jeans casual', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'bracelet'] }, tags: ['casual', 'pants'], level: 'advanced' },
+  { id: 'lower-trousers', name: 'Dress Trousers', categoryId: 'lower-clothing', icon: '👔', promptFragment: 'dress trousers formal', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'bracelet'] }, tags: ['formal', 'pants'], level: 'advanced' },
+  { id: 'lower-chinos', name: 'Chinos', categoryId: 'lower-clothing', icon: '👖', promptFragment: 'chinos smart casual', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'bracelet'] }, tags: ['casual', 'pants'], level: 'advanced' },
+  { id: 'lower-leggings', name: 'Leggings', categoryId: 'lower-clothing', icon: '🧘', promptFragment: 'leggings fitted athletic', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'bracelet'] }, tags: ['casual', 'activewear'], level: 'advanced' },
+  
+  // Skirts
+  { id: 'lower-skirt-pencil', name: 'Pencil Skirt', categoryId: 'lower-clothing', icon: '👗', promptFragment: 'pencil skirt fitted professional', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'bracelet'] }, tags: ['formal', 'skirt'], level: 'advanced' },
+  { id: 'lower-skirt-a-line', name: 'A-Line Skirt', categoryId: 'lower-clothing', icon: '👗', promptFragment: 'a-line skirt flared', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'bracelet'] }, tags: ['casual', 'skirt'], level: 'advanced' },
+  { id: 'lower-skirt-midi', name: 'Midi Skirt', categoryId: 'lower-clothing', icon: '👗', promptFragment: 'midi skirt elegant', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'bracelet'] }, tags: ['casual', 'skirt'], level: 'advanced' },
+  { id: 'lower-skirt-maxi', name: 'Maxi Skirt', categoryId: 'lower-clothing', icon: '👗', promptFragment: 'maxi skirt flowing long', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'bracelet'] }, tags: ['casual', 'skirt'], level: 'advanced' },
+];
+
+// ============================================
+// STYLING BLOCKS - Lower Color (Ring/Bracelet only)
+// ============================================
+
+const LOWER_COLOR_BLOCKS: MicroBlock[] = [
+  // Neutrals
+  { id: 'lower-black', name: 'Black', categoryId: 'lower-color', icon: '⚫', promptFragment: 'black bottom', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'bracelet'] }, tags: ['neutral'], level: 'advanced' },
+  { id: 'lower-white', name: 'White', categoryId: 'lower-color', icon: '⚪', promptFragment: 'white bottom', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'bracelet'] }, tags: ['neutral'], level: 'advanced' },
+  { id: 'lower-gray', name: 'Gray', categoryId: 'lower-color', icon: '🌫️', promptFragment: 'gray bottom', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'bracelet'] }, tags: ['neutral'], level: 'advanced' },
+  { id: 'lower-beige', name: 'Beige/Khaki', categoryId: 'lower-color', icon: '🟤', promptFragment: 'beige khaki bottom', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'bracelet'] }, tags: ['neutral'], level: 'advanced' },
+  { id: 'lower-navy', name: 'Navy', categoryId: 'lower-color', icon: '🌊', promptFragment: 'navy bottom', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'bracelet'] }, tags: ['cool'], level: 'advanced' },
+  
+  // Denim
+  { id: 'lower-denim-light', name: 'Light Denim', categoryId: 'lower-color', icon: '👖', promptFragment: 'light wash denim', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'bracelet'] }, tags: ['denim'], level: 'advanced' },
+  { id: 'lower-denim-medium', name: 'Medium Denim', categoryId: 'lower-color', icon: '👖', promptFragment: 'medium wash denim', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'bracelet'] }, tags: ['denim'], level: 'advanced' },
+  { id: 'lower-denim-dark', name: 'Dark Denim', categoryId: 'lower-color', icon: '👖', promptFragment: 'dark wash denim', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'bracelet'] }, tags: ['denim'], level: 'advanced' },
+  
+  // Colors
+  { id: 'lower-brown', name: 'Brown', categoryId: 'lower-color', icon: '🟤', promptFragment: 'brown bottom', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'bracelet'] }, tags: ['earth'], level: 'advanced' },
+  { id: 'lower-olive', name: 'Olive/Green', categoryId: 'lower-color', icon: '🫒', promptFragment: 'olive green bottom', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'bracelet'] }, tags: ['earth'], level: 'advanced' },
+  { id: 'lower-burgundy', name: 'Burgundy', categoryId: 'lower-color', icon: '🍷', promptFragment: 'burgundy wine bottom', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'bracelet'] }, tags: ['warm'], level: 'advanced' },
+  { id: 'lower-blue', name: 'Blue', categoryId: 'lower-color', icon: '🔵', promptFragment: 'blue bottom', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'bracelet'] }, tags: ['cool'], level: 'advanced' },
 ];
 
 const SKIN_TONE_BLOCKS: MicroBlock[] = [
@@ -1144,8 +1311,7 @@ const WRIST_EXPOSURE_BLOCKS: MicroBlock[] = [
 ];
 
 export const WOMEN_ALL_BLOCKS: MicroBlock[] = [
-  // Universal blocks
-  ...CLOTHING_TYPE_BLOCKS,
+  // Universal blocks - Body
   ...SKIN_TONE_BLOCKS,
   ...NAIL_TYPE_BLOCKS,
   ...NAIL_COLOR_BLOCKS,
@@ -1156,6 +1322,13 @@ export const WOMEN_ALL_BLOCKS: MicroBlock[] = [
   ...HAIR_TEXTURE_BLOCKS,
   ...HAIR_COLOR_BLOCKS,
   ...HAIR_VOLUME_BLOCKS,
+  
+  // Universal blocks - Styling
+  ...CLOTHING_TYPE_BLOCKS,
+  ...UPPER_CLOTHING_BLOCKS,
+  ...UPPER_COLOR_BLOCKS,
+  ...LOWER_CLOTHING_BLOCKS,
+  ...LOWER_COLOR_BLOCKS,
   
   // Face Details blocks (Conditional/Toggle)
   ...RACE_ETHNICITY_BLOCKS,
