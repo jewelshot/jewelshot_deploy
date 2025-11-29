@@ -190,6 +190,118 @@ export const WOMEN_FACE_CATEGORIES: BlockCategory[] = [
     required: false,
     conditional: true,
   },
+  
+  {
+    id: 'eye-type',
+    name: 'Eye Type',
+    icon: '👀',
+    description: 'Eye shape and structure',
+    order: 14,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+    conditional: true,
+  },
+  
+  {
+    id: 'eyebrow-style',
+    name: 'Eyebrow Style',
+    icon: '✏️',
+    description: 'Eyebrow shape',
+    order: 15,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+    conditional: true,
+  },
+  
+  {
+    id: 'eyelash',
+    name: 'Eyelash',
+    icon: '👁️',
+    description: 'Eyelash style',
+    order: 16,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+    conditional: true,
+  },
+  
+  {
+    id: 'nose-type',
+    name: 'Nose Type',
+    icon: '👃',
+    description: 'Nose shape and structure',
+    order: 17,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+    conditional: true,
+  },
+  
+  {
+    id: 'lip-type',
+    name: 'Lip Type',
+    icon: '💋',
+    description: 'Lip shape and fullness',
+    order: 18,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+    conditional: true,
+  },
+  
+  {
+    id: 'lip-color',
+    name: 'Lip Color',
+    icon: '💄',
+    description: 'Lipstick or natural lip color',
+    order: 19,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+    conditional: true,
+  },
+  
+  {
+    id: 'cheekbones',
+    name: 'Cheekbones',
+    icon: '✨',
+    description: 'Cheekbone prominence',
+    order: 20,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+    conditional: true,
+  },
+  
+  {
+    id: 'chin-type',
+    name: 'Chin Type',
+    icon: '🗿',
+    description: 'Chin shape and structure',
+    order: 21,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+    conditional: true,
+  },
 ];
 
 // ============================================
@@ -202,7 +314,7 @@ export const WOMEN_RING_CATEGORIES: BlockCategory[] = [
     name: 'Hand Pose',
     icon: '✋',
     description: 'Hand positioning',
-    order: 20,
+    order: 30,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['ring'],
@@ -215,7 +327,7 @@ export const WOMEN_RING_CATEGORIES: BlockCategory[] = [
     name: 'Hand Structure',
     icon: '🖐️',
     description: 'Hand physical features',
-    order: 21,
+    order: 31,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['ring'],
@@ -234,7 +346,7 @@ export const WOMEN_NECKLACE_CATEGORIES: BlockCategory[] = [
     name: 'Neck/Head Pose',
     icon: '👤',
     description: 'Neck and head positioning',
-    order: 30,
+    order: 40,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['necklace'],
@@ -535,6 +647,74 @@ const EYE_COLOR_BLOCKS: MicroBlock[] = [
   { id: 'eye-amber', name: 'Amber', categoryId: 'eye-color', icon: '🟠', promptFragment: 'amber golden eyes', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['amber', 'golden'], level: 'advanced' },
 ];
 
+// Eye Type Blocks
+const EYE_TYPE_BLOCKS: MicroBlock[] = [
+  { id: 'eye-almond', name: 'Almond', categoryId: 'eye-type', icon: '👁️', promptFragment: 'almond shaped eyes', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['almond', 'classic'], level: 'advanced' },
+  { id: 'eye-round', name: 'Round', categoryId: 'eye-type', icon: '⚫', promptFragment: 'round eyes', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['round', 'large'], level: 'advanced' },
+  { id: 'eye-hooded', name: 'Hooded', categoryId: 'eye-type', icon: '👁️', promptFragment: 'hooded eyes', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['hooded', 'deep'], level: 'advanced' },
+  { id: 'eye-monolid', name: 'Monolid', categoryId: 'eye-type', icon: '👁️', promptFragment: 'monolid eyes', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['monolid', 'asian'], level: 'advanced' },
+  { id: 'eye-upturned', name: 'Upturned', categoryId: 'eye-type', icon: '👁️', promptFragment: 'upturned eyes', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['upturned', 'cat-eye'], level: 'advanced' },
+];
+
+// Eyebrow Style Blocks
+const EYEBROW_STYLE_BLOCKS: MicroBlock[] = [
+  { id: 'brow-arched', name: 'Arched', categoryId: 'eyebrow-style', icon: '✏️', promptFragment: 'arched eyebrows', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['arched', 'dramatic'], level: 'advanced' },
+  { id: 'brow-straight', name: 'Straight', categoryId: 'eyebrow-style', icon: '➖', promptFragment: 'straight eyebrows', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['straight', 'bold'], level: 'advanced' },
+  { id: 'brow-rounded', name: 'Rounded', categoryId: 'eyebrow-style', icon: '🌙', promptFragment: 'rounded soft eyebrows', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['rounded', 'soft'], level: 'advanced' },
+  { id: 'brow-angled', name: 'Angled', categoryId: 'eyebrow-style', icon: '📐', promptFragment: 'angled defined eyebrows', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['angled', 'defined'], level: 'advanced' },
+  { id: 'brow-natural', name: 'Natural/Bushy', categoryId: 'eyebrow-style', icon: '🌿', promptFragment: 'natural bushy eyebrows', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['natural', 'bushy'], level: 'advanced' },
+];
+
+// Eyelash Blocks
+const EYELASH_BLOCKS: MicroBlock[] = [
+  { id: 'lash-natural', name: 'Natural', categoryId: 'eyelash', icon: '👁️', promptFragment: 'natural eyelashes', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['natural', 'subtle'], level: 'advanced' },
+  { id: 'lash-thick', name: 'Thick/Voluminous', categoryId: 'eyelash', icon: '💫', promptFragment: 'thick voluminous lashes', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['thick', 'volume'], level: 'advanced' },
+  { id: 'lash-mascara', name: 'Mascara Enhanced', categoryId: 'eyelash', icon: '✨', promptFragment: 'mascara enhanced lashes', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['mascara', 'enhanced'], level: 'advanced' },
+  { id: 'lash-false', name: 'False Lashes', categoryId: 'eyelash', icon: '🦋', promptFragment: 'dramatic false lashes', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['false', 'dramatic'], level: 'advanced' },
+];
+
+// Nose Type Blocks
+const NOSE_TYPE_BLOCKS: MicroBlock[] = [
+  { id: 'nose-button', name: 'Button', categoryId: 'nose-type', icon: '👃', promptFragment: 'button nose small', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['button', 'small'], level: 'advanced' },
+  { id: 'nose-straight', name: 'Straight', categoryId: 'nose-type', icon: '📏', promptFragment: 'straight nose', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['straight', 'classic'], level: 'advanced' },
+  { id: 'nose-aquiline', name: 'Aquiline/Roman', categoryId: 'nose-type', icon: '🏛️', promptFragment: 'aquiline roman nose', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['aquiline', 'prominent'], level: 'advanced' },
+  { id: 'nose-broad', name: 'Broad', categoryId: 'nose-type', icon: '👃', promptFragment: 'broad wide nose', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['broad', 'wide'], level: 'advanced' },
+  { id: 'nose-narrow', name: 'Narrow/Petite', categoryId: 'nose-type', icon: '📍', promptFragment: 'narrow petite nose', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['narrow', 'petite'], level: 'advanced' },
+];
+
+// Lip Type Blocks
+const LIP_TYPE_BLOCKS: MicroBlock[] = [
+  { id: 'lip-full', name: 'Full', categoryId: 'lip-type', icon: '💋', promptFragment: 'full lips', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['full', 'plump'], level: 'advanced' },
+  { id: 'lip-thin', name: 'Thin', categoryId: 'lip-type', icon: '💄', promptFragment: 'thin lips', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['thin', 'delicate'], level: 'advanced' },
+  { id: 'lip-heart', name: 'Heart-Shaped', categoryId: 'lip-type', icon: '❤️', promptFragment: 'heart shaped cupids bow lips', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['heart', 'cupids-bow'], level: 'advanced' },
+  { id: 'lip-bow', name: 'Bow-Shaped', categoryId: 'lip-type', icon: '🎀', promptFragment: 'bow shaped lips', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['bow', 'curved'], level: 'advanced' },
+  { id: 'lip-wide', name: 'Wide', categoryId: 'lip-type', icon: '💋', promptFragment: 'wide lips', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['wide', 'broad'], level: 'advanced' },
+];
+
+// Lip Color Blocks
+const LIP_COLOR_BLOCKS: MicroBlock[] = [
+  { id: 'lip-natural', name: 'Natural', categoryId: 'lip-color', icon: '🌸', promptFragment: 'natural lip color', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['natural', 'bare'], level: 'advanced' },
+  { id: 'lip-nude', name: 'Nude', categoryId: 'lip-color', icon: '🤎', promptFragment: 'nude lipstick', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['nude', 'neutral'], level: 'advanced' },
+  { id: 'lip-pink', name: 'Pink', categoryId: 'lip-color', icon: '🌷', promptFragment: 'pink lipstick', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['pink', 'soft'], level: 'advanced' },
+  { id: 'lip-red', name: 'Red', categoryId: 'lip-color', icon: '🔴', promptFragment: 'red lipstick bold', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['red', 'bold'], level: 'advanced' },
+  { id: 'lip-berry', name: 'Berry/Plum', categoryId: 'lip-color', icon: '🍇', promptFragment: 'berry plum lipstick', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['berry', 'plum'], level: 'advanced' },
+];
+
+// Cheekbones Blocks
+const CHEEKBONES_BLOCKS: MicroBlock[] = [
+  { id: 'cheek-high', name: 'High', categoryId: 'cheekbones', icon: '✨', promptFragment: 'high prominent cheekbones', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['high', 'prominent'], level: 'advanced' },
+  { id: 'cheek-defined', name: 'Defined', categoryId: 'cheekbones', icon: '💎', promptFragment: 'defined sculpted cheekbones', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['defined', 'sculpted'], level: 'advanced' },
+  { id: 'cheek-soft', name: 'Soft/Subtle', categoryId: 'cheekbones', icon: '🌸', promptFragment: 'soft subtle cheekbones', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['soft', 'subtle'], level: 'advanced' },
+];
+
+// Chin Type Blocks
+const CHIN_TYPE_BLOCKS: MicroBlock[] = [
+  { id: 'chin-rounded', name: 'Rounded', categoryId: 'chin-type', icon: '⚫', promptFragment: 'rounded chin', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['rounded', 'soft'], level: 'advanced' },
+  { id: 'chin-pointed', name: 'Pointed', categoryId: 'chin-type', icon: '🔺', promptFragment: 'pointed chin', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['pointed', 'sharp'], level: 'advanced' },
+  { id: 'chin-square', name: 'Square', categoryId: 'chin-type', icon: '⬜', promptFragment: 'square chin', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['square', 'angular'], level: 'advanced' },
+  { id: 'chin-dimpled', name: 'Dimpled', categoryId: 'chin-type', icon: '🕳️', promptFragment: 'dimpled chin cleft', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['dimpled', 'cleft'], level: 'advanced' },
+];
+
 // ============================================
 // EARRING CATEGORIES
 // ============================================
@@ -545,7 +725,7 @@ export const WOMEN_EARRING_CATEGORIES: BlockCategory[] = [
     name: 'Head Position',
     icon: '👤',
     description: 'Head angle for ear visibility',
-    order: 40,
+    order: 50,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['earring'],
@@ -558,7 +738,7 @@ export const WOMEN_EARRING_CATEGORIES: BlockCategory[] = [
     name: 'Hair Position',
     icon: '💇',
     description: 'Hair arrangement around ears',
-    order: 41,
+    order: 51,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['earring'],
@@ -577,7 +757,7 @@ export const WOMEN_BRACELET_CATEGORIES: BlockCategory[] = [
     name: 'Wrist/Arm Pose',
     icon: '🤚',
     description: 'Wrist and arm positioning',
-    order: 50,
+    order: 60,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['bracelet'],
@@ -590,7 +770,7 @@ export const WOMEN_BRACELET_CATEGORIES: BlockCategory[] = [
     name: 'Arm Position',
     icon: '💪',
     description: 'Arm angle and orientation',
-    order: 51,
+    order: 61,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['bracelet'],
@@ -662,6 +842,14 @@ export const WOMEN_ALL_BLOCKS: MicroBlock[] = [
   ...RACE_ETHNICITY_BLOCKS,
   ...FACE_SHAPE_BLOCKS,
   ...EYE_COLOR_BLOCKS,
+  ...EYE_TYPE_BLOCKS,
+  ...EYEBROW_STYLE_BLOCKS,
+  ...EYELASH_BLOCKS,
+  ...NOSE_TYPE_BLOCKS,
+  ...LIP_TYPE_BLOCKS,
+  ...LIP_COLOR_BLOCKS,
+  ...CHEEKBONES_BLOCKS,
+  ...CHIN_TYPE_BLOCKS,
   
   // Ring-specific blocks
   ...HAND_POSE_BLOCKS,
