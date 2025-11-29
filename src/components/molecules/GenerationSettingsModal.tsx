@@ -7,7 +7,8 @@
 
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Settings } from 'lucide-react';
 
 type Gender = 'women' | 'men' | null;
@@ -63,9 +64,15 @@ export function GenerationSettingsModal({
   aspectRatio,
   onAspectRatioChange,
 }: GenerationSettingsModalProps) {
-  if (!isOpen) return null;
+  const [mounted, setMounted] = useState(false);
 
-  return (
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!isOpen || !mounted) return null;
+
+  const modalContent = (
     <>
       {/* Backdrop */}
       <div
@@ -76,7 +83,7 @@ export function GenerationSettingsModal({
 
       {/* Modal */}
       <div
-        className="fixed left-1/2 top-1/2 z-[201] w-full max-w-md -translate-x-1/2 -translate-y-1/2 transform"
+        className="fixed left-1/2 top-1/2 z-[201] w-full max-w-md -translate-x-1/2 -translate-y-1/2 transform px-4"
         role="dialog"
         aria-modal="true"
         aria-labelledby="settings-modal-title"
@@ -190,6 +197,9 @@ export function GenerationSettingsModal({
       </div>
     </>
   );
+
+  // Render modal to document body using portal
+  return createPortal(modalContent, document.body);
 }
 
 export default GenerationSettingsModal;

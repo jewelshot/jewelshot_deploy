@@ -115,19 +115,14 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
         {/* Settings Button - Replaces Configuration Accordion & Aspect Ratio */}
         <button
           onClick={() => setSettingsModalOpen(true)}
-          className="group mb-3 flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2.5 transition-all hover:border-purple-500/30 hover:bg-purple-500/5"
+          className="group mb-3 flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2.5 transition-all hover:border-purple-500/30 hover:bg-purple-500/5"
         >
-          <div className="flex items-center gap-2">
-            <Settings className="h-4 w-4 text-purple-400 transition-transform group-hover:rotate-45" />
-            <div className="text-left">
-              <div className="text-xs font-medium text-white">Settings</div>
-              <div className="text-[10px] text-white/50">
-                {getSettingsSummary()}
-              </div>
+          <Settings className="h-4 w-4 text-purple-400 transition-transform group-hover:rotate-45" />
+          <div className="flex-1 text-left">
+            <div className="text-xs font-medium text-white">Settings</div>
+            <div className="text-[10px] text-white/50">
+              {getSettingsSummary()}
             </div>
-          </div>
-          <div className="text-[10px] text-white/40 group-hover:text-purple-400">
-            Click to edit
           </div>
         </button>
 
