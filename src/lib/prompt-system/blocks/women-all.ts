@@ -935,16 +935,38 @@ const EXPRESSION_BLOCKS: MicroBlock[] = [
 
 // RING SPECIFIC
 const HAND_POSE_BLOCKS: MicroBlock[] = [
+  // ORIGINAL (5 poses)
   { id: 'hand-elegant', name: 'Elegant Extended', categoryId: 'hand-pose', icon: '✋', promptFragment: 'hand elegantly extended, fingers gracefully spread, feminine gesture', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['elegant', 'graceful'], level: 'advanced' },
   { id: 'hand-relaxed', name: 'Relaxed Natural', categoryId: 'hand-pose', icon: '🤚', promptFragment: 'hand relaxed natural position, soft comfortable gesture', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['relaxed', 'natural'], level: 'advanced' },
   { id: 'hand-spread', name: 'Fingers Spread', categoryId: 'hand-pose', icon: '🖐️', promptFragment: 'fingers spread open, hand displayed prominently', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['spread', 'open'], level: 'advanced' },
   { id: 'hand-touching-face', name: 'Touching Face', categoryId: 'hand-pose', icon: '🤗', promptFragment: 'hand gently touching face, intimate delicate gesture', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['touching', 'intimate'], level: 'advanced' },
   { id: 'hand-holding-cup', name: 'Holding Cup', categoryId: 'hand-pose', icon: '☕', promptFragment: 'hand holding coffee cup, casual lifestyle moment', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['holding', 'lifestyle'], level: 'advanced' },
+  
+  // NEW (+10 poses → Total 15)
+  { id: 'hand-fist-soft', name: 'Soft Fist', categoryId: 'hand-pose', icon: '✊', promptFragment: 'hand in soft fist, fingers gently curled, ring prominently displayed', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['fist', 'curled'], level: 'advanced' },
+  { id: 'hand-prayer', name: 'Prayer Pose', categoryId: 'hand-pose', icon: '🙏', promptFragment: 'hands together prayer position, fingers aligned elegantly', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['prayer', 'together'], level: 'advanced' },
+  { id: 'hand-over-hand', name: 'Hand Over Hand', categoryId: 'hand-pose', icon: '🤝', promptFragment: 'one hand resting over the other, stacked gracefully', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['stacked', 'resting'], level: 'advanced' },
+  { id: 'hand-resting-surface', name: 'Resting on Surface', categoryId: 'hand-pose', icon: '🖐️', promptFragment: 'hand resting flat on surface, fingers relaxed', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['resting', 'flat'], level: 'advanced' },
+  { id: 'hand-interlaced', name: 'Fingers Interlaced', categoryId: 'hand-pose', icon: '🤞', promptFragment: 'fingers interlaced together, hands clasped', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['interlaced', 'clasped'], level: 'advanced' },
+  { id: 'hand-near-chest', name: 'Hand Near Chest', categoryId: 'hand-pose', icon: '💝', promptFragment: 'hand placed gently near chest, intimate romantic gesture', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['chest', 'romantic'], level: 'advanced' },
+  { id: 'hand-pointing', name: 'Pointing Gesture', categoryId: 'hand-pose', icon: '👉', promptFragment: 'hand pointing direction, finger extended confidently', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['pointing', 'confident'], level: 'advanced' },
+  { id: 'hand-side-profile', name: 'Side Profile', categoryId: 'hand-pose', icon: '🫱', promptFragment: 'hand shown from side profile, ring visible on finger edge', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['side', 'profile'], level: 'advanced' },
+  { id: 'hand-palm-up', name: 'Palm Up Open', categoryId: 'hand-pose', icon: '🫴', promptFragment: 'palm facing upward open, fingers slightly curled', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['palm', 'open'], level: 'advanced' },
+  { id: 'hand-touching-chin', name: 'Touching Chin', categoryId: 'hand-pose', icon: '🤔', promptFragment: 'hand gently touching chin, thoughtful elegant pose', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['chin', 'thoughtful'], level: 'advanced' },
 ];
 
 const HAND_STRUCTURE_BLOCKS: MicroBlock[] = [
+  // ORIGINAL (2 structures)
   { id: 'hand-delicate', name: 'Delicate Slender', categoryId: 'hand-structure', icon: '🤲', promptFragment: 'delicate slender hands, feminine elegant structure', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['delicate', 'slender'], level: 'advanced' },
   { id: 'hand-smooth', name: 'Smooth Skin', categoryId: 'hand-structure', icon: '✨', promptFragment: 'smooth soft skin, well-groomed hands', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['smooth', 'soft'], level: 'advanced' },
+  
+  // NEW (+6 structures → Total 8)
+  { id: 'hand-long-fingers', name: 'Long Elegant Fingers', categoryId: 'hand-structure', icon: '🫰', promptFragment: 'long elegant fingers, graceful proportions', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['long', 'elegant'], level: 'advanced' },
+  { id: 'hand-defined-knuckles', name: 'Defined Knuckles', categoryId: 'hand-structure', icon: '👊', promptFragment: 'well-defined knuckles, articulate finger joints', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['defined', 'knuckles'], level: 'advanced' },
+  { id: 'hand-subtle-veins', name: 'Subtle Veins Visible', categoryId: 'hand-structure', icon: '🩸', promptFragment: 'subtle veins visible, natural hand anatomy', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['veins', 'natural'], level: 'advanced' },
+  { id: 'hand-youthful', name: 'Youthful Hands', categoryId: 'hand-structure', icon: '🌸', promptFragment: 'youthful hands, plump smooth skin, no age signs', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['youthful', 'young'], level: 'advanced' },
+  { id: 'hand-petite', name: 'Petite Hands', categoryId: 'hand-structure', icon: '🤏', promptFragment: 'petite small hands, delicate proportions', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['petite', 'small'], level: 'advanced' },
+  { id: 'hand-graceful-wrist', name: 'Graceful Wrist', categoryId: 'hand-structure', icon: '💫', promptFragment: 'graceful refined wrist, elegant connection to hand', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['wrist', 'graceful'], level: 'advanced' },
 ];
 
 // NECKLACE SPECIFIC
