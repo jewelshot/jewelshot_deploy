@@ -76,6 +76,32 @@ export const WOMEN_UNIVERSAL_CATEGORIES: BlockCategory[] = [
     },
     required: false,
   },
+  
+  {
+    id: 'hair-style',
+    name: 'Hair Style',
+    icon: '💇',
+    description: 'Hairstyle and arrangement',
+    order: 6,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'], // Universal for all
+    },
+    required: false,
+  },
+  
+  {
+    id: 'hair-color',
+    name: 'Hair Color',
+    icon: '🎨',
+    description: 'Hair color tone',
+    order: 7,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'], // Universal for all
+    },
+    required: false,
+  },
 ];
 
 // ============================================
@@ -126,32 +152,6 @@ export const WOMEN_NECKLACE_CATEGORIES: BlockCategory[] = [
       jewelryTypes: ['necklace'],
     },
     required: true,
-  },
-  
-  {
-    id: 'hair-style',
-    name: 'Hair Style',
-    icon: '💇',
-    description: 'Hair arrangement',
-    order: 21,
-    applicableTo: {
-      gender: ['women'],
-      jewelryTypes: ['necklace'],
-    },
-    required: false,
-  },
-  
-  {
-    id: 'hair-color',
-    name: 'Hair Color',
-    icon: '🎨',
-    description: 'Hair color',
-    order: 22,
-    applicableTo: {
-      gender: ['women'],
-      jewelryTypes: ['necklace'],
-    },
-    required: false,
   },
 ];
 
@@ -360,18 +360,18 @@ const NECK_POSE_BLOCKS: MicroBlock[] = [
 ];
 
 const HAIR_STYLE_BLOCKS: MicroBlock[] = [
-  { id: 'hair-updo-bun', name: 'Updo Bun', categoryId: 'hair-style', icon: '💁', promptFragment: 'hair styled elegant updo bun, neck fully exposed', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['updo', 'bun'], level: 'advanced' },
-  { id: 'hair-side-swept', name: 'Side Swept', categoryId: 'hair-style', icon: '💇', promptFragment: 'hair side-swept over shoulder, romantic asymmetric', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['side-swept', 'romantic'], level: 'advanced' },
-  { id: 'hair-behind', name: 'Behind Shoulders', categoryId: 'hair-style', icon: '🙋', promptFragment: 'hair pulled behind shoulders, neck clear visible', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['behind', 'clear'], level: 'advanced' },
-  { id: 'hair-long-straight', name: 'Long Straight', categoryId: 'hair-style', icon: '💆', promptFragment: 'long straight hair, sleek flowing', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['long', 'straight'], level: 'advanced' },
-  { id: 'hair-long-wavy', name: 'Long Wavy', categoryId: 'hair-style', icon: '🌊', promptFragment: 'long wavy hair, natural flowing curls', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['long', 'wavy'], level: 'advanced' },
+  { id: 'hair-updo-bun', name: 'Updo Bun', categoryId: 'hair-style', icon: '💁', promptFragment: 'elegant updo bun', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['updo', 'bun'], level: 'advanced' },
+  { id: 'hair-side-swept', name: 'Side Swept', categoryId: 'hair-style', icon: '💇', promptFragment: 'side-swept hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['side-swept', 'romantic'], level: 'advanced' },
+  { id: 'hair-behind', name: 'Behind Shoulders', categoryId: 'hair-style', icon: '🙋', promptFragment: 'hair behind shoulders', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['behind', 'clear'], level: 'advanced' },
+  { id: 'hair-long-straight', name: 'Long Straight', categoryId: 'hair-style', icon: '💆', promptFragment: 'long straight hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['long', 'straight'], level: 'advanced' },
+  { id: 'hair-long-wavy', name: 'Long Wavy', categoryId: 'hair-style', icon: '🌊', promptFragment: 'long wavy hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['long', 'wavy'], level: 'advanced' },
 ];
 
 const HAIR_COLOR_BLOCKS: MicroBlock[] = [
-  { id: 'hair-black', name: 'Black', categoryId: 'hair-color', icon: '⬛', promptFragment: 'black hair, deep rich color', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['black', 'dark'], level: 'advanced' },
-  { id: 'hair-brown', name: 'Brown', categoryId: 'hair-color', icon: '🟤', promptFragment: 'brown hair, warm natural tone', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['brown', 'warm'], level: 'advanced' },
-  { id: 'hair-blonde', name: 'Blonde', categoryId: 'hair-color', icon: '🟡', promptFragment: 'blonde hair, light golden tone', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['blonde', 'light'], level: 'advanced' },
-  { id: 'hair-auburn', name: 'Red Auburn', categoryId: 'hair-color', icon: '🟠', promptFragment: 'red auburn hair, rich copper tone', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['red', 'auburn'], level: 'advanced' },
+  { id: 'hair-black', name: 'Black', categoryId: 'hair-color', icon: '⬛', promptFragment: 'black hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['black', 'dark'], level: 'advanced' },
+  { id: 'hair-brown', name: 'Brown', categoryId: 'hair-color', icon: '🟤', promptFragment: 'brown hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['brown', 'warm'], level: 'advanced' },
+  { id: 'hair-blonde', name: 'Blonde', categoryId: 'hair-color', icon: '🟡', promptFragment: 'blonde hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['blonde', 'light'], level: 'advanced' },
+  { id: 'hair-auburn', name: 'Red Auburn', categoryId: 'hair-color', icon: '🟠', promptFragment: 'auburn hair', applicableTo: { gender: ['women'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['red', 'auburn'], level: 'advanced' },
 ];
 
 // ============================================

@@ -65,6 +65,23 @@ export default function StudioLabPage() {
     setGeneratedPrompt('');
   };
 
+  // Handle jewelry type change (without resetting gender)
+  const handleJewelryTypeChange = (newJewelryType: JewelryType) => {
+    setJewelryType(newJewelryType);
+    setSelections({}); // Reset selections when jewelry changes
+    setExpandedCategories(new Set());
+    setGeneratedPrompt('');
+  };
+
+  // Reset all selections
+  const handleResetAll = () => {
+    setGender(null);
+    setJewelryType(null);
+    setSelections({});
+    setExpandedCategories(new Set());
+    setGeneratedPrompt('');
+  };
+
   const handleBlockSelect = (categoryId: string, blockId: string) => {
     setSelections(prev => ({
       ...prev,
@@ -99,10 +116,10 @@ export default function StudioLabPage() {
   const selectedCount = Object.keys(selections).length;
   const totalCategories = categories.length;
   
-  // Build JSON representation of selections
+  // Build simplified JSON representation of selections (only promptFragment)
   const selectionsJson = useMemo(() => {
     if (!gender || !jewelryType) {
-      return JSON.stringify({ message: 'Please select gender first' }, null, 2);
+      return JSON.stringify({ message: 'Please select gender and jewelry type first' }, null, 2);
     }
     
     const json: Record<string, any> = {
@@ -111,24 +128,18 @@ export default function StudioLabPage() {
         jewelryType,
         aspectRatio: '9:16',
       },
-      selections: {},
     };
     
+    // Only include promptFragment values (simplified format)
     Object.entries(selections).forEach(([categoryId, blockId]) => {
       const block = BLOCK_REGISTRY.getBlock(blockId);
-      const category = categories.find(c => c.id === categoryId);
-      
-      if (block && category) {
-        json.selections[categoryId] = {
-          category: category.name,
-          block: block.name,
-          promptFragment: block.promptFragment,
-        };
+      if (block) {
+        json[categoryId] = block.promptFragment;
       }
     });
     
     return JSON.stringify(json, null, 2);
-  }, [gender, jewelryType, selections, categories]);
+  }, [gender, jewelryType, selections]);
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
@@ -148,7 +159,15 @@ export default function StudioLabPage() {
               </div>
             </div>
             
-            <div className="flex items-center gap-2 text-sm">
+            <div className="flex items-center gap-3 text-sm">
+              {(gender || jewelryType) && (
+                <button
+                  onClick={handleResetAll}
+                  className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-2 text-red-400 transition-colors hover:bg-red-500/20 hover:border-red-500/50"
+                >
+                  Reset All
+                </button>
+              )}
               <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-2">
                 <span className="text-white/60">Selections:</span>{' '}
                 <span className="font-medium text-purple-400">
@@ -188,8 +207,8 @@ export default function StudioLabPage() {
             </div>
         </div>
 
-        {/* Jewelry Type Selector - Shows after gender selection */}
-        {gender && !jewelryType && (
+        {/* Jewelry Type Selector - Shows after gender selection, always visible */}
+        {gender && (
           <div className="mb-6">
             <label className="mb-3 block text-xl font-semibold text-white">
               2️⃣ Select Jewelry Type
@@ -203,12 +222,14 @@ export default function StudioLabPage() {
               ].map(type => (
                 <button
                   key={type.value}
-                  onClick={() => !type.disabled && setJewelryType(type.value as JewelryType)}
+                  onClick={() => !type.disabled && handleJewelryTypeChange(type.value as JewelryType)}
                   disabled={type.disabled}
                   className={`flex flex-col items-center justify-center gap-2 rounded-xl border-2 px-6 py-6 font-semibold transition-all ${
                     type.disabled
                       ? 'border-white/10 bg-white/5 text-white/30 cursor-not-allowed'
-                      : 'border-white/10 bg-white/5 text-white/80 hover:border-purple-500/50 hover:bg-purple-500/10 hover:text-white'
+                      : jewelryType === type.value
+                      ? 'border-blue-500 bg-blue-500/20 text-blue-300 shadow-xl shadow-blue-500/30'
+                      : 'border-white/10 bg-white/5 text-white/80 hover:border-blue-500/50 hover:bg-blue-500/10 hover:text-white'
                   }`}
                 >
                   <span className="text-3xl">{type.icon}</span>
