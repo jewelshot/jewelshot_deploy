@@ -51,7 +51,13 @@ export default function StudioLabPage() {
   }, [gender, jewelryType]);
   
   // Styling category IDs (to separate from Women body features)
-  const STYLING_CATEGORY_IDS = ['clothing-type', 'upper-clothing', 'upper-color', 'lower-clothing', 'lower-color'];
+  const STYLING_CATEGORY_IDS = [
+    // Women styling
+    'clothing-type', 'upper-clothing', 'upper-color', 'lower-clothing', 'lower-color',
+    // Men styling
+    'upper-clothing-men', 'neckline-opening-men', 'collar-type-men', 'fit-style-men', 
+    'sleeve-style-men', 'upper-pattern-men', 'upper-color-men', 'lower-clothing-men', 'lower-color-men'
+  ];
   
   // Environment category IDs (to separate from other features)
   const ENVIRONMENT_CATEGORY_IDS = ['location-background', 'lighting'];

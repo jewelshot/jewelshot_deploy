@@ -82,12 +82,23 @@ export const CATEGORY_GROUPS: Record<string, string> = {
   'sleeve-type': 'bracelet-styling',
   'wrist-exposure': 'bracelet-styling',
   
-  // Styling groups
+  // Styling groups (Women)
   'clothing-type': 'clothing-type',
   'upper-clothing': 'styling-upper',
   'upper-color': 'styling-upper',
   'lower-clothing': 'styling-lower',
   'lower-color': 'styling-lower',
+  
+  // Styling groups (Men)
+  'upper-clothing-men': 'styling-upper',
+  'neckline-opening-men': 'styling-upper',
+  'collar-type-men': 'styling-upper',
+  'fit-style-men': 'styling-upper',
+  'sleeve-style-men': 'styling-upper',
+  'upper-pattern-men': 'styling-upper',
+  'upper-color-men': 'styling-upper',
+  'lower-clothing-men': 'styling-lower',
+  'lower-color-men': 'styling-lower',
   
   // Environment groups
   'location-background': 'location',

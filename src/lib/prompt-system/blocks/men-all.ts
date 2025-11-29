@@ -536,10 +536,10 @@ const EXPRESSION_MEN_BLOCKS: MicroBlock[] = [
 ];
 
 // ============================================
-// AGGREGATE ALL MEN BLOCKS
+// AGGREGATE ALL MEN BLOCKS (Universal Features)
 // ============================================
 
-export const MEN_ALL_BLOCKS: MicroBlock[] = [
+const MEN_UNIVERSAL_BLOCKS: MicroBlock[] = [
   ...RACE_ETHNICITY_BLOCKS_MEN,
   ...SKIN_TONE_BLOCKS_MEN,
   ...BEARD_STYLE_BLOCKS,
@@ -564,8 +564,302 @@ export const MEN_ALL_BLOCKS: MicroBlock[] = [
   ...EXPRESSION_MEN_BLOCKS,
 ];
 
-// Export all categories
+// ============================================
+// MEN STYLING CATEGORIES
+// ============================================
+
+export const MEN_STYLING_CATEGORIES: BlockCategory[] = [
+  // Upper Clothing Type
+  {
+    id: 'upper-clothing-men',
+    name: 'Upper Clothing Type',
+    icon: '👔',
+    description: 'Type of upper body clothing',
+    order: 100,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  // Neckline/Opening Type
+  {
+    id: 'neckline-opening-men',
+    name: 'Neckline/Opening',
+    icon: '👕',
+    description: 'Neckline and shirt opening style',
+    order: 101,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  // Collar Type
+  {
+    id: 'collar-type-men',
+    name: 'Collar Type',
+    icon: '🎽',
+    description: 'Shirt collar style',
+    order: 102,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  // Fit & Style
+  {
+    id: 'fit-style-men',
+    name: 'Fit & Style',
+    icon: '📐',
+    description: 'Clothing fit and silhouette',
+    order: 103,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  // Sleeve Style
+  {
+    id: 'sleeve-style-men',
+    name: 'Sleeve Style',
+    icon: '🦾',
+    description: 'Sleeve length and styling',
+    order: 104,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  // Upper Clothing Pattern
+  {
+    id: 'upper-pattern-men',
+    name: 'Upper Clothing Pattern',
+    icon: '🔲',
+    description: 'Pattern on upper clothing',
+    order: 105,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  // Upper Color
+  {
+    id: 'upper-color-men',
+    name: 'Upper Color',
+    icon: '🎨',
+    description: 'Color of upper clothing',
+    order: 106,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  // Lower Clothing
+  {
+    id: 'lower-clothing-men',
+    name: 'Lower Clothing',
+    icon: '👖',
+    description: 'Type of lower body clothing',
+    order: 107,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+  
+  // Lower Color
+  {
+    id: 'lower-color-men',
+    name: 'Lower Color',
+    icon: '🎨',
+    description: 'Color of lower clothing',
+    order: 108,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
+    },
+    required: false,
+  },
+];
+
+// ============================================
+// MEN STYLING BLOCKS
+// ============================================
+
+// Upper Clothing Type Blocks
+const UPPER_CLOTHING_MEN_BLOCKS: MicroBlock[] = [
+  // Casual
+  { id: 'upper-tshirt-men', name: 'T-Shirt', categoryId: 'upper-clothing-men', icon: '👕', promptFragment: 'wearing t-shirt casual', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['casual', 't-shirt'], level: 'advanced', conflictsWith: ['upper-dress-shirt-men', 'upper-blazer-men', 'upper-suit-men'] },
+  { id: 'upper-polo-men', name: 'Polo Shirt', categoryId: 'upper-clothing-men', icon: '👔', promptFragment: 'wearing polo shirt smart casual', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['casual', 'polo'], level: 'advanced', conflictsWith: ['upper-blazer-men', 'upper-suit-men'] },
+  { id: 'upper-henley-men', name: 'Henley', categoryId: 'upper-clothing-men', icon: '👕', promptFragment: 'wearing henley buttoned neckline casual', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['casual', 'henley'], level: 'advanced' },
+  { id: 'upper-long-sleeve-tee-men', name: 'Long Sleeve Tee', categoryId: 'upper-clothing-men', icon: '👕', promptFragment: 'wearing long sleeve t-shirt', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['casual'], level: 'advanced' },
+  
+  // Smart Casual
+  { id: 'upper-dress-shirt-men', name: 'Dress Shirt', categoryId: 'upper-clothing-men', icon: '👔', promptFragment: 'wearing dress shirt formal', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['formal', 'dress-shirt'], level: 'advanced', conflictsWith: ['upper-tshirt-men', 'upper-hoodie-men'] },
+  { id: 'upper-oxford-men', name: 'Oxford Shirt', categoryId: 'upper-clothing-men', icon: '👔', promptFragment: 'wearing oxford button-down shirt', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['smart-casual', 'oxford'], level: 'advanced' },
+  { id: 'upper-flannel-men', name: 'Flannel', categoryId: 'upper-clothing-men', icon: '🪵', promptFragment: 'wearing flannel shirt rugged', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['casual', 'flannel'], level: 'advanced' },
+  { id: 'upper-denim-shirt-men', name: 'Denim Shirt', categoryId: 'upper-clothing-men', icon: '👕', promptFragment: 'wearing denim shirt casual', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['casual', 'denim'], level: 'advanced' },
+  
+  // Formal
+  { id: 'upper-blazer-men', name: 'Blazer', categoryId: 'upper-clothing-men', icon: '🧥', promptFragment: 'wearing blazer jacket formal', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['formal', 'blazer'], level: 'advanced', conflictsWith: ['upper-tshirt-men', 'upper-hoodie-men', 'upper-sweater-men'] },
+  { id: 'upper-suit-men', name: 'Suit Jacket', categoryId: 'upper-clothing-men', icon: '🤵', promptFragment: 'wearing suit jacket formal business', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['formal', 'suit'], level: 'advanced', conflictsWith: ['upper-tshirt-men', 'upper-hoodie-men'] },
+  { id: 'upper-vest-men', name: 'Vest/Waistcoat', categoryId: 'upper-clothing-men', icon: '🦺', promptFragment: 'wearing vest waistcoat formal', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['formal', 'vest'], level: 'advanced' },
+  { id: 'upper-tuxedo-men', name: 'Tuxedo', categoryId: 'upper-clothing-men', icon: '🎩', promptFragment: 'wearing tuxedo black tie formal', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['formal', 'tuxedo'], level: 'advanced' },
+  
+  // Outerwear
+  { id: 'upper-sweater-men', name: 'Sweater', categoryId: 'upper-clothing-men', icon: '🧶', promptFragment: 'wearing sweater cozy', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['casual', 'sweater'], level: 'advanced' },
+  { id: 'upper-cardigan-men', name: 'Cardigan', categoryId: 'upper-clothing-men', icon: '🧥', promptFragment: 'wearing cardigan open front', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['casual', 'cardigan'], level: 'advanced' },
+  { id: 'upper-hoodie-men', name: 'Hoodie', categoryId: 'upper-clothing-men', icon: '🎽', promptFragment: 'wearing hoodie casual streetwear', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['casual', 'hoodie'], level: 'advanced', conflictsWith: ['upper-dress-shirt-men', 'upper-blazer-men', 'upper-suit-men'] },
+  { id: 'upper-bomber-men', name: 'Bomber Jacket', categoryId: 'upper-clothing-men', icon: '🧥', promptFragment: 'wearing bomber jacket casual', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['casual', 'jacket'], level: 'advanced' },
+  { id: 'upper-leather-jacket-men', name: 'Leather Jacket', categoryId: 'upper-clothing-men', icon: '🧥', promptFragment: 'wearing leather jacket edgy', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['casual', 'leather'], level: 'advanced' },
+];
+
+// Neckline/Opening Type Blocks
+const NECKLINE_OPENING_MEN_BLOCKS: MicroBlock[] = [
+  // Basic Necklines
+  { id: 'neck-crew-men', name: 'Crew Neck', categoryId: 'neckline-opening-men', icon: '⭕', promptFragment: 'crew neck round neckline', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['crew', 'round'], level: 'advanced' },
+  { id: 'neck-vneck-men', name: 'V-Neck', categoryId: 'neckline-opening-men', icon: '🔻', promptFragment: 'V-neck showing upper chest', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['v-neck'], level: 'advanced' },
+  { id: 'neck-henley-buttons-men', name: 'Henley Buttons', categoryId: 'neckline-opening-men', icon: '🔘', promptFragment: 'henley button placket neckline', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['henley', 'buttons'], level: 'advanced' },
+  
+  // Shirt Opening Styles
+  { id: 'neck-fully-buttoned-men', name: 'Fully Buttoned', categoryId: 'neckline-opening-men', icon: '🔒', promptFragment: 'shirt fully buttoned formal closed', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['formal', 'closed'], level: 'advanced' },
+  { id: 'neck-top-unbuttoned-men', name: 'Top Button Unbuttoned', categoryId: 'neckline-opening-men', icon: '🔓', promptFragment: 'shirt top button unbuttoned relaxed', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['relaxed'], level: 'advanced' },
+  { id: 'neck-two-unbuttoned-men', name: '2 Buttons Unbuttoned', categoryId: 'neckline-opening-men', icon: '⬇️', promptFragment: 'shirt two buttons unbuttoned casual', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['casual'], level: 'advanced' },
+  { id: 'neck-three-unbuttoned-men', name: '3 Buttons Unbuttoned', categoryId: 'neckline-opening-men', icon: '⬇️⬇️', promptFragment: 'shirt three buttons unbuttoned open chest visible', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['relaxed', 'open'], level: 'advanced' },
+  { id: 'neck-open-collar-men', name: 'Open Collar', categoryId: 'neckline-opening-men', icon: '📖', promptFragment: 'shirt open collar relaxed casual', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['open', 'casual'], level: 'advanced' },
+];
+
+// Collar Type Blocks
+const COLLAR_TYPE_MEN_BLOCKS: MicroBlock[] = [
+  { id: 'collar-spread-men', name: 'Spread Collar', categoryId: 'collar-type-men', icon: '📐', promptFragment: 'spread collar wide formal', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['spread', 'formal'], level: 'advanced' },
+  { id: 'collar-point-men', name: 'Point Collar', categoryId: 'collar-type-men', icon: '📍', promptFragment: 'point collar classic standard', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['point', 'classic'], level: 'advanced' },
+  { id: 'collar-button-down-men', name: 'Button-Down', categoryId: 'collar-type-men', icon: '🔘', promptFragment: 'button-down collar casual', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['button-down', 'casual'], level: 'advanced' },
+  { id: 'collar-mandarin-men', name: 'Mandarin/Band', categoryId: 'collar-type-men', icon: '🎎', promptFragment: 'mandarin collar band collar minimalist', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['mandarin', 'minimal'], level: 'advanced' },
+  { id: 'collar-cutaway-men', name: 'Cutaway Collar', categoryId: 'collar-type-men', icon: '✂️', promptFragment: 'cutaway collar wide spread modern', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['cutaway', 'modern'], level: 'advanced' },
+];
+
+// Fit & Style Blocks
+const FIT_STYLE_MEN_BLOCKS: MicroBlock[] = [
+  { id: 'fit-slim-men', name: 'Slim Fit', categoryId: 'fit-style-men', icon: '📏', promptFragment: 'slim fit tailored close to body', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['slim', 'tailored'], level: 'advanced' },
+  { id: 'fit-tailored-men', name: 'Tailored Fit', categoryId: 'fit-style-men', icon: '✂️', promptFragment: 'tailored fit custom fitted sharp', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['tailored', 'fitted'], level: 'advanced' },
+  { id: 'fit-regular-men', name: 'Regular Fit', categoryId: 'fit-style-men', icon: '📐', promptFragment: 'regular fit classic standard', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['regular', 'classic'], level: 'advanced' },
+  { id: 'fit-relaxed-men', name: 'Relaxed Fit', categoryId: 'fit-style-men', icon: '🌊', promptFragment: 'relaxed fit comfortable loose', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['relaxed', 'loose'], level: 'advanced' },
+  { id: 'fit-oversized-men', name: 'Oversized', categoryId: 'fit-style-men', icon: '⬜', promptFragment: 'oversized fit baggy streetwear', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['oversized', 'baggy'], level: 'advanced' },
+];
+
+// Sleeve Style Blocks
+const SLEEVE_STYLE_MEN_BLOCKS: MicroBlock[] = [
+  { id: 'sleeve-short-men', name: 'Short Sleeve', categoryId: 'sleeve-style-men', icon: '👕', promptFragment: 'short sleeves', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['short'], level: 'advanced' },
+  { id: 'sleeve-long-men', name: 'Long Sleeve', categoryId: 'sleeve-style-men', icon: '👔', promptFragment: 'long sleeves', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['long'], level: 'advanced' },
+  { id: 'sleeve-rolled-men', name: 'Rolled Sleeves', categoryId: 'sleeve-style-men', icon: '🔄', promptFragment: 'sleeves rolled up casual', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['rolled', 'casual'], level: 'advanced' },
+  { id: 'sleeve-three-quarter-men', name: '3/4 Sleeve', categoryId: 'sleeve-style-men', icon: '📏', promptFragment: 'three-quarter sleeves', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['three-quarter'], level: 'advanced' },
+];
+
+// Upper Pattern Blocks
+const UPPER_PATTERN_MEN_BLOCKS: MicroBlock[] = [
+  { id: 'pattern-solid-men', name: 'Solid/Plain', categoryId: 'upper-pattern-men', icon: '⬛', promptFragment: 'solid color no pattern', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['solid', 'plain'], level: 'advanced' },
+  { id: 'pattern-striped-men', name: 'Striped', categoryId: 'upper-pattern-men', icon: '🦓', promptFragment: 'striped pattern vertical lines', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['striped'], level: 'advanced' },
+  { id: 'pattern-checkered-men', name: 'Checkered', categoryId: 'upper-pattern-men', icon: '🏁', promptFragment: 'checkered pattern gingham', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['checkered', 'gingham'], level: 'advanced' },
+  { id: 'pattern-plaid-men', name: 'Plaid', categoryId: 'upper-pattern-men', icon: '🟫', promptFragment: 'plaid pattern tartan', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['plaid', 'tartan'], level: 'advanced' },
+  { id: 'pattern-herringbone-men', name: 'Herringbone', categoryId: 'upper-pattern-men', icon: '〰️', promptFragment: 'herringbone pattern chevron weave', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['herringbone'], level: 'advanced' },
+  { id: 'pattern-windowpane-men', name: 'Windowpane', categoryId: 'upper-pattern-men', icon: '🪟', promptFragment: 'windowpane check pattern', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['windowpane'], level: 'advanced' },
+  { id: 'pattern-pinstripe-men', name: 'Pinstripe', categoryId: 'upper-pattern-men', icon: '📏', promptFragment: 'pinstripe pattern formal', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['pinstripe', 'formal'], level: 'advanced' },
+];
+
+// Upper Color Blocks
+const UPPER_COLOR_MEN_BLOCKS: MicroBlock[] = [
+  // Classic
+  { id: 'upper-col-black-men', name: 'Black', categoryId: 'upper-color-men', icon: '⬛', promptFragment: 'black upper clothing', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['black', 'classic'], level: 'advanced' },
+  { id: 'upper-col-white-men', name: 'White', categoryId: 'upper-color-men', icon: '⬜', promptFragment: 'white upper clothing crisp', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['white', 'classic'], level: 'advanced' },
+  { id: 'upper-col-navy-men', name: 'Navy Blue', categoryId: 'upper-color-men', icon: '🔵', promptFragment: 'navy blue upper clothing', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['navy', 'classic'], level: 'advanced' },
+  { id: 'upper-col-charcoal-men', name: 'Charcoal Gray', categoryId: 'upper-color-men', icon: '⬛', promptFragment: 'charcoal gray upper clothing', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['gray', 'classic'], level: 'advanced' },
+  { id: 'upper-col-gray-men', name: 'Light Gray', categoryId: 'upper-color-men', icon: '⬜', promptFragment: 'light gray upper clothing', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['gray'], level: 'advanced' },
+  
+  // Earth Tones
+  { id: 'upper-col-tan-men', name: 'Tan/Khaki', categoryId: 'upper-color-men', icon: '🟫', promptFragment: 'tan khaki upper clothing', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['tan', 'earth'], level: 'advanced' },
+  { id: 'upper-col-beige-men', name: 'Beige', categoryId: 'upper-color-men', icon: '🟤', promptFragment: 'beige upper clothing neutral', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['beige', 'earth'], level: 'advanced' },
+  { id: 'upper-col-olive-men', name: 'Olive Green', categoryId: 'upper-color-men', icon: '🫒', promptFragment: 'olive green upper clothing', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['olive', 'earth'], level: 'advanced' },
+  { id: 'upper-col-brown-men', name: 'Brown', categoryId: 'upper-color-men', icon: '🤎', promptFragment: 'brown upper clothing', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['brown', 'earth'], level: 'advanced' },
+  { id: 'upper-col-burgundy-men', name: 'Burgundy/Wine', categoryId: 'upper-color-men', icon: '🍷', promptFragment: 'burgundy wine red upper clothing', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['burgundy', 'rich'], level: 'advanced' },
+  
+  // Bold Colors
+  { id: 'upper-col-red-men', name: 'Red', categoryId: 'upper-color-men', icon: '🔴', promptFragment: 'red upper clothing bold', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['red', 'bold'], level: 'advanced' },
+  { id: 'upper-col-blue-men', name: 'Blue', categoryId: 'upper-color-men', icon: '🔵', promptFragment: 'blue upper clothing', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['blue'], level: 'advanced' },
+  { id: 'upper-col-green-men', name: 'Green', categoryId: 'upper-color-men', icon: '🟢', promptFragment: 'green upper clothing', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['green'], level: 'advanced' },
+];
+
+// Lower Clothing Blocks
+const LOWER_CLOTHING_MEN_BLOCKS: MicroBlock[] = [
+  // Jeans
+  { id: 'lower-dark-jeans-men', name: 'Dark Jeans', categoryId: 'lower-clothing-men', icon: '👖', promptFragment: 'wearing dark denim jeans', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['jeans', 'casual'], level: 'advanced' },
+  { id: 'lower-light-jeans-men', name: 'Light Jeans', categoryId: 'lower-clothing-men', icon: '👖', promptFragment: 'wearing light blue jeans', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['jeans', 'casual'], level: 'advanced' },
+  { id: 'lower-distressed-jeans-men', name: 'Distressed Jeans', categoryId: 'lower-clothing-men', icon: '🪡', promptFragment: 'wearing distressed ripped jeans', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['jeans', 'distressed'], level: 'advanced' },
+  { id: 'lower-black-jeans-men', name: 'Black Jeans', categoryId: 'lower-clothing-men', icon: '⬛', promptFragment: 'wearing black jeans', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['jeans', 'black'], level: 'advanced' },
+  
+  // Casual Pants
+  { id: 'lower-chinos-men', name: 'Chinos', categoryId: 'lower-clothing-men', icon: '👖', promptFragment: 'wearing chino pants smart casual', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['chinos', 'smart-casual'], level: 'advanced' },
+  { id: 'lower-cargo-men', name: 'Cargo Pants', categoryId: 'lower-clothing-men', icon: '👖', promptFragment: 'wearing cargo pants utility pockets', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['cargo', 'casual'], level: 'advanced' },
+  { id: 'lower-joggers-men', name: 'Joggers', categoryId: 'lower-clothing-men', icon: '🏃', promptFragment: 'wearing jogger pants athletic', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['joggers', 'athletic'], level: 'advanced' },
+  { id: 'lower-shorts-men', name: 'Shorts', categoryId: 'lower-clothing-men', icon: '🩳', promptFragment: 'wearing shorts casual summer', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['shorts', 'casual'], level: 'advanced' },
+  
+  // Formal Pants
+  { id: 'lower-dress-pants-men', name: 'Dress Pants', categoryId: 'lower-clothing-men', icon: '👔', promptFragment: 'wearing dress pants formal', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['formal', 'dress-pants'], level: 'advanced' },
+  { id: 'lower-suit-trousers-men', name: 'Suit Trousers', categoryId: 'lower-clothing-men', icon: '🤵', promptFragment: 'wearing suit trousers formal business', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['formal', 'suit'], level: 'advanced' },
+];
+
+// Lower Color Blocks
+const LOWER_COLOR_MEN_BLOCKS: MicroBlock[] = [
+  { id: 'lower-col-black-men', name: 'Black', categoryId: 'lower-color-men', icon: '⬛', promptFragment: 'black lower clothing', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['black'], level: 'advanced' },
+  { id: 'lower-col-navy-men', name: 'Navy', categoryId: 'lower-color-men', icon: '🔵', promptFragment: 'navy lower clothing', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['navy'], level: 'advanced' },
+  { id: 'lower-col-gray-men', name: 'Gray', categoryId: 'lower-color-men', icon: '⬜', promptFragment: 'gray lower clothing', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['gray'], level: 'advanced' },
+  { id: 'lower-col-khaki-men', name: 'Khaki/Tan', categoryId: 'lower-color-men', icon: '🟫', promptFragment: 'khaki tan lower clothing', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['khaki', 'tan'], level: 'advanced' },
+  { id: 'lower-col-beige-men', name: 'Beige', categoryId: 'lower-color-men', icon: '🟤', promptFragment: 'beige lower clothing', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['beige'], level: 'advanced' },
+  { id: 'lower-col-olive-men', name: 'Olive', categoryId: 'lower-color-men', icon: '🫒', promptFragment: 'olive green lower clothing', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['olive'], level: 'advanced' },
+  { id: 'lower-col-brown-men', name: 'Brown', categoryId: 'lower-color-men', icon: '🤎', promptFragment: 'brown lower clothing', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['brown'], level: 'advanced' },
+  { id: 'lower-col-denim-men', name: 'Denim Blue', categoryId: 'lower-color-men', icon: '🔵', promptFragment: 'denim blue jeans', applicableTo: { gender: ['men'], jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'] }, tags: ['denim', 'blue'], level: 'advanced' },
+];
+
+// ============================================
+// AGGREGATE MEN STYLING BLOCKS
+// ============================================
+
+const MEN_STYLING_BLOCKS: MicroBlock[] = [
+  ...UPPER_CLOTHING_MEN_BLOCKS,
+  ...NECKLINE_OPENING_MEN_BLOCKS,
+  ...COLLAR_TYPE_MEN_BLOCKS,
+  ...FIT_STYLE_MEN_BLOCKS,
+  ...SLEEVE_STYLE_MEN_BLOCKS,
+  ...UPPER_PATTERN_MEN_BLOCKS,
+  ...UPPER_COLOR_MEN_BLOCKS,
+  ...LOWER_CLOTHING_MEN_BLOCKS,
+  ...LOWER_COLOR_MEN_BLOCKS,
+];
+
+// ============================================
+// EXPORT ALL MEN CATEGORIES & BLOCKS
+// ============================================
+
 export const MEN_ALL_CATEGORIES: BlockCategory[] = [
   ...MEN_UNIVERSAL_CATEGORIES,
+  ...MEN_STYLING_CATEGORIES,
+];
+
+export const MEN_ALL_BLOCKS: MicroBlock[] = [
+  ...MEN_UNIVERSAL_BLOCKS,
+  ...MEN_STYLING_BLOCKS,
 ];
 
