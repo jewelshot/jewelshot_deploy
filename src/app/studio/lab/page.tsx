@@ -339,8 +339,8 @@ export default function StudioLabPage() {
                         {[
                           { value: 'ring', label: 'Ring', icon: '💍' },
                           { value: 'necklace', label: 'Necklace', icon: '📿' },
-                          { value: 'earring', label: 'Earring', icon: '💎', disabled: true },
-                          { value: 'bracelet', label: 'Bracelet', icon: '⌚', disabled: true },
+                          { value: 'earring', label: 'Earring', icon: '💎', disabled: false },
+                          { value: 'bracelet', label: 'Bracelet', icon: '⌚', disabled: false },
                         ].map(type => (
                           <button
                             key={type.value}
@@ -400,8 +400,8 @@ export default function StudioLabPage() {
               </div>
             )}
             
-              {/* 👗 STYLING - Accordion */}
-              {stylingCategories.length > 0 && (
+              {/* 👗 STYLING - Accordion (requires gender & jewelry) */}
+              {gender && jewelryType && stylingCategories.length > 0 && (
               <div className="rounded-2xl border-2 border-orange-500/30 bg-orange-500/5">
                 <button
                   onClick={() => setShowStyling(!showStyling)}
@@ -430,8 +430,8 @@ export default function StudioLabPage() {
               </div>
             )}
             
-              {/* 📍 ENVIRONMENT - Accordion */}
-              {environmentCategories.length > 0 && (
+              {/* 📍 ENVIRONMENT - Accordion (requires gender & jewelry) */}
+              {gender && jewelryType && environmentCategories.length > 0 && (
               <div className="rounded-2xl border-2 border-green-500/30 bg-green-500/5">
                 <button
                   onClick={() => setShowEnvironment(!showEnvironment)}
@@ -460,8 +460,8 @@ export default function StudioLabPage() {
               </div>
             )}
             
-              {/* 📷 CAMERA - Accordion */}
-              {cameraCategories.length > 0 && (
+              {/* 📷 CAMERA - Accordion (requires gender & jewelry) */}
+              {gender && jewelryType && cameraCategories.length > 0 && (
               <div className="rounded-2xl border-2 border-cyan-500/30 bg-cyan-500/5">
                 <button
                   onClick={() => setShowCamera(!showCamera)}
@@ -490,8 +490,8 @@ export default function StudioLabPage() {
               </div>
             )}
             
-              {/* ✨ POST-PRODUCTION - Accordion */}
-              {postProductionCategories.length > 0 && (
+              {/* ✨ POST-PRODUCTION - Accordion (requires gender & jewelry) */}
+              {gender && jewelryType && postProductionCategories.length > 0 && (
               <div className="rounded-2xl border-2 border-pink-500/30 bg-pink-500/5">
                 <button
                   onClick={() => setShowPostProduction(!showPostProduction)}
@@ -520,8 +520,8 @@ export default function StudioLabPage() {
               </div>
             )}
             
-              {/* 🎯 CREATIVE DIRECTION - Accordion */}
-              {creativeDirectionCategories.length > 0 && (
+              {/* 🎯 CREATIVE DIRECTION - Accordion (requires gender & jewelry) */}
+              {gender && jewelryType && creativeDirectionCategories.length > 0 && (
               <div className="rounded-2xl border-2 border-indigo-500/30 bg-indigo-500/5">
                 <button
                   onClick={() => setShowCreativeDirection(!showCreativeDirection)}
@@ -550,8 +550,8 @@ export default function StudioLabPage() {
               </div>
             )}
             
-              {/* 🌸 LIFESTYLE EXTRAS - Accordion (Optional) */}
-              {lifestyleExtrasCategories.length > 0 && (
+              {/* 🌸 LIFESTYLE EXTRAS - Accordion (requires gender & jewelry) */}
+              {gender && jewelryType && lifestyleExtrasCategories.length > 0 && (
               <div className="rounded-2xl border-2 border-rose-500/30 bg-rose-500/5">
                 <button
                   onClick={() => setShowLifestyleExtras(!showLifestyleExtras)}
@@ -580,8 +580,8 @@ export default function StudioLabPage() {
               </div>
             )}
             
-              {/* 🎭 FACE DETAILS - Accordion (Optional) */}
-              {conditionalFaceCategories.length > 0 && (
+              {/* 🎭 FACE DETAILS - Accordion (requires gender & jewelry) */}
+              {gender && jewelryType && conditionalFaceCategories.length > 0 && (
                 <div className="rounded-2xl border-2 border-yellow-500/30 bg-yellow-500/5">
                   <button
                     onClick={() => {
