@@ -147,14 +147,19 @@ export const WOMEN_UNIVERSAL_CATEGORIES: BlockCategory[] = [
     },
     required: false,
   },
-  
-  // STYLING SECTION
+];
+
+// ============================================
+// STYLING CATEGORIES (Separate group - NOT part of Women body features)
+// ============================================
+
+export const STYLING_CATEGORIES: BlockCategory[] = [
   {
     id: 'clothing-type',
     name: 'Clothing Type',
     icon: '👗',
     description: 'Base clothing style (affects all styling options)',
-    order: 22,
+    order: 1,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
@@ -167,7 +172,7 @@ export const WOMEN_UNIVERSAL_CATEGORIES: BlockCategory[] = [
     name: 'Upper Clothing Detail',
     icon: '👚',
     description: 'Upper body clothing specifics',
-    order: 23,
+    order: 2,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
@@ -180,7 +185,7 @@ export const WOMEN_UNIVERSAL_CATEGORIES: BlockCategory[] = [
     name: 'Upper Color',
     icon: '🎨',
     description: 'Top clothing color',
-    order: 24,
+    order: 3,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['ring', 'necklace', 'earring', 'bracelet'],
@@ -193,7 +198,7 @@ export const WOMEN_UNIVERSAL_CATEGORIES: BlockCategory[] = [
     name: 'Lower Clothing',
     icon: '👖',
     description: 'Bottom clothing type',
-    order: 25,
+    order: 4,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['ring', 'bracelet'], // Only visible for ring/bracelet
@@ -206,7 +211,7 @@ export const WOMEN_UNIVERSAL_CATEGORIES: BlockCategory[] = [
     name: 'Lower Color',
     icon: '🎨',
     description: 'Bottom clothing color',
-    order: 26,
+    order: 5,
     applicableTo: {
       gender: ['women'],
       jewelryTypes: ['ring', 'bracelet'], // Only visible for ring/bracelet
@@ -1271,6 +1276,7 @@ export const WOMEN_BRACELET_CATEGORIES: BlockCategory[] = [
 export const WOMEN_ALL_CATEGORIES = [
   ...WOMEN_UNIVERSAL_CATEGORIES,
   ...WOMEN_FACE_CATEGORIES, // Conditional (toggle)
+  ...STYLING_CATEGORIES, // Separate styling group
   ...WOMEN_RING_CATEGORIES,
   ...WOMEN_NECKLACE_CATEGORIES,
   ...WOMEN_EARRING_CATEGORIES,

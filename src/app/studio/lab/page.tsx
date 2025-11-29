@@ -38,12 +38,22 @@ export default function StudioLabPage() {
     return BLOCK_REGISTRY.getCategories({ gender, jewelryType });
   }, [gender, jewelryType]);
   
-  // Separate UNIVERSAL, CONDITIONAL (Face Details), and JEWELRY-SPECIFIC features
+  // Styling category IDs (to separate from Women body features)
+  const STYLING_CATEGORY_IDS = ['clothing-type', 'upper-clothing', 'upper-color', 'lower-clothing', 'lower-color'];
+  
+  // Separate WOMEN BODY FEATURES, STYLING, CONDITIONAL (Face Details), and JEWELRY-SPECIFIC features
   const universalWomenCategories = useMemo(() => {
     return categories.filter(cat => {
-      // Universal: Exist across ALL jewelry types (skin tone, general features) & NOT conditional
+      // Universal WOMEN BODY: Exist across ALL jewelry types & NOT conditional & NOT styling
       const jewelryTypes = cat.applicableTo.jewelryTypes;
-      return jewelryTypes.length > 1 && !cat.conditional;
+      return jewelryTypes.length > 1 && !cat.conditional && !STYLING_CATEGORY_IDS.includes(cat.id);
+    }).sort((a, b) => a.order - b.order);
+  }, [categories]);
+  
+  const stylingCategories = useMemo(() => {
+    return categories.filter(cat => {
+      // Styling: Clothing-related categories
+      return STYLING_CATEGORY_IDS.includes(cat.id);
     }).sort((a, b) => a.order - b.order);
   }, [categories]);
   
@@ -285,6 +295,28 @@ export default function StudioLabPage() {
                 </div>
                 <div className="space-y-3">
                   {universalWomenCategories.map(category => renderCategory(category))}
+                </div>
+              </div>
+            )}
+            
+              {/* 👗 STYLING - Clothing & Colors */}
+              {stylingCategories.length > 0 && (
+              <div className="rounded-2xl border-2 border-orange-500/30 bg-orange-500/5 p-5">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500/20">
+                    <span className="text-2xl">👗</span>
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-white">
+                      Styling
+                    </h2>
+                    <p className="text-xs text-white/60">
+                      Clothing, patterns, and colors · {stylingCategories.length} categories
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  {stylingCategories.map(category => renderCategory(category))}
                 </div>
               </div>
             )}
