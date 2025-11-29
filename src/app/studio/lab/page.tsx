@@ -10,7 +10,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Settings, ChevronDown, ChevronUp, Zap, Code } from 'lucide-react';
 import { BLOCK_REGISTRY } from '@/lib/prompt-system/registry';
-import { buildPromptFromSelections } from '@/lib/prompt-system/builder';
+import { buildPromptFromSelections, buildGroupedJSON } from '@/lib/prompt-system/builder';
 import type { BlockSelections, Gender, JewelryType, BlockCategory } from '@/lib/prompt-system/types';
 
 export default function StudioLabPage() {
@@ -130,23 +130,15 @@ export default function StudioLabPage() {
       return JSON.stringify({ message: 'Please select gender and jewelry type first' }, null, 2);
     }
     
-    const json: Record<string, any> = {
-      context: {
-        gender,
-        jewelryType,
-        aspectRatio: '9:16',
-      },
-    };
+    // Use new grouped JSON builder
+    const allBlocks = BLOCK_REGISTRY.getBlocks({ gender, jewelryType });
+    const groupedJson = buildGroupedJSON(
+      { gender, jewelryType },
+      selections,
+      allBlocks
+    );
     
-    // Only include promptFragment values (simplified format)
-    Object.entries(selections).forEach(([categoryId, blockId]) => {
-      const block = BLOCK_REGISTRY.getBlock(blockId);
-      if (block) {
-        json[categoryId] = block.promptFragment;
-      }
-    });
-    
-    return JSON.stringify(json, null, 2);
+    return JSON.stringify(groupedJson, null, 2);
   }, [gender, jewelryType, selections]);
 
   return (

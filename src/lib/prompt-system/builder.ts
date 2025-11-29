@@ -6,6 +6,54 @@
 
 import { MicroBlock, BlockSelections, BlockContext } from './types';
 
+/**
+ * Category to Group Mapping
+ * Maps individual categories to their parent groups for compact JSON output
+ */
+export const CATEGORY_GROUPS: Record<string, string> = {
+  // Hair group
+  'hair-length': 'hair',
+  'hair-style': 'hair',
+  'hair-texture': 'hair',
+  'hair-color': 'hair',
+  'hair-volume': 'hair',
+  
+  // Nails group
+  'nail-type': 'nails',
+  'nail-color': 'nails',
+  
+  // Face group (all facial features)
+  'race-ethnicity': 'face',
+  'face-shape': 'face',
+  'eye-color': 'face',
+  'eye-type': 'face',
+  'eyebrow-style': 'face',
+  'eyelash': 'face',
+  'nose-type': 'face',
+  'lip-type': 'face',
+  'lip-color': 'face',
+  'cheekbones': 'face',
+  'chin-type': 'face',
+  
+  // Hand group (ring-specific)
+  'hand-pose': 'hand',
+  'hand-structure': 'hand',
+  
+  // Head group (earring-specific)
+  'head-position': 'head',
+  'hair-position': 'head',
+  
+  // Arm group (bracelet-specific)
+  'wrist-pose': 'arm',
+  'arm-position': 'arm',
+  
+  // Singular categories (no grouping)
+  'skin-tone': 'skin',
+  'makeup': 'makeup',
+  'expression': 'expression',
+  'neck-pose': 'neck',
+};
+
 export class PromptBuilder {
   private fragments: string[] = [];
   
@@ -107,5 +155,54 @@ export function buildPromptFromSelections(
   builder.addQuality(aspectRatio);
   
   return builder.build();
+}
+
+/**
+ * Build grouped JSON from block selections
+ * Groups related categories together (e.g., all hair-* → "hair")
+ */
+export function buildGroupedJSON(
+  context: BlockContext,
+  selections: BlockSelections,
+  allBlocks: MicroBlock[]
+): Record<string, any> {
+  const grouped: Record<string, any> = {
+    context: {
+      gender: context.gender,
+      jewelryType: context.jewelryType,
+    },
+  };
+  
+  // Group prompt fragments by their parent group
+  const groups: Record<string, string[]> = {};
+  
+  Object.entries(selections).forEach(([categoryId, blockId]) => {
+    const block = allBlocks.find(b => b.id === blockId);
+    if (!block) return;
+    
+    // Get the group name for this category
+    const groupName = CATEGORY_GROUPS[categoryId] || categoryId;
+    
+    // Initialize group array if needed
+    if (!groups[groupName]) {
+      groups[groupName] = [];
+    }
+    
+    // Add prompt fragment to group
+    groups[groupName].push(block.promptFragment);
+  });
+  
+  // Combine grouped fragments
+  Object.entries(groups).forEach(([groupName, fragments]) => {
+    if (fragments.length === 1) {
+      // Single fragment - just use it
+      grouped[groupName] = fragments[0];
+    } else {
+      // Multiple fragments - join with comma
+      grouped[groupName] = fragments.join(', ');
+    }
+  });
+  
+  return grouped;
 }
 
