@@ -353,6 +353,58 @@ export const WOMEN_NECKLACE_CATEGORIES: BlockCategory[] = [
     },
     required: true,
   },
+  
+  {
+    id: 'neckline',
+    name: 'Neckline Type',
+    icon: '👗',
+    description: 'Clothing neckline style',
+    order: 41,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['necklace'],
+    },
+    required: true,
+  },
+  
+  {
+    id: 'decolletage',
+    name: 'Décolletage',
+    icon: '✨',
+    description: 'Chest area visibility',
+    order: 42,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['necklace'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'shoulder-position',
+    name: 'Shoulder Position',
+    icon: '👚',
+    description: 'Shoulder coverage',
+    order: 43,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['necklace'],
+    },
+    required: false,
+  },
+  
+  {
+    id: 'collarbone',
+    name: 'Collarbone',
+    icon: '💎',
+    description: 'Collarbone prominence',
+    order: 44,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['necklace'],
+    },
+    required: false,
+  },
 ];
 
 // ============================================
@@ -552,11 +604,51 @@ const HAND_STRUCTURE_BLOCKS: MicroBlock[] = [
 
 // NECKLACE SPECIFIC
 const NECK_POSE_BLOCKS: MicroBlock[] = [
-  { id: 'neck-straight', name: 'Straight Forward', categoryId: 'neck-pose', icon: '⬆️', promptFragment: 'neck straight forward, head centered, elegant posture', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['straight', 'centered'], level: 'advanced' },
-  { id: 'neck-turn-left', name: 'Slight Turn Left', categoryId: 'neck-pose', icon: '↖️', promptFragment: 'head slight turn left, neck gracefully angled', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['turn', 'left'], level: 'advanced' },
-  { id: 'neck-turn-right', name: 'Slight Turn Right', categoryId: 'neck-pose', icon: '↗️', promptFragment: 'head slight turn right, neck gracefully angled', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['turn', 'right'], level: 'advanced' },
-  { id: 'neck-chin-up', name: 'Chin Up', categoryId: 'neck-pose', icon: '⬆️', promptFragment: 'chin lifted upward, neck elongated elegant', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['chin-up', 'elongated'], level: 'advanced' },
-  { id: 'neck-chin-down', name: 'Chin Down', categoryId: 'neck-pose', icon: '⬇️', promptFragment: 'chin tilted down, intimate gentle angle', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['chin-down', 'intimate'], level: 'advanced' },
+  { id: 'neck-straight', name: 'Straight Forward', categoryId: 'neck-pose', icon: '⬆️', promptFragment: 'neck straight forward head centered', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['straight', 'centered'], level: 'advanced' },
+  { id: 'neck-turn-left', name: 'Slight Turn Left', categoryId: 'neck-pose', icon: '↖️', promptFragment: 'head slight turn left neck angled', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['turn', 'left'], level: 'advanced' },
+  { id: 'neck-turn-right', name: 'Slight Turn Right', categoryId: 'neck-pose', icon: '↗️', promptFragment: 'head slight turn right neck angled', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['turn', 'right'], level: 'advanced' },
+  { id: 'neck-chin-up', name: 'Chin Up', categoryId: 'neck-pose', icon: '⬆️', promptFragment: 'chin lifted upward neck elongated', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['chin-up', 'elongated'], level: 'advanced' },
+  { id: 'neck-chin-down', name: 'Chin Down', categoryId: 'neck-pose', icon: '⬇️', promptFragment: 'chin tilted down gentle angle', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['chin-down', 'intimate'], level: 'advanced' },
+];
+
+// ============================================
+// NECKLACE STYLING BLOCKS
+// ============================================
+
+// Neckline Type Blocks
+const NECKLINE_BLOCKS: MicroBlock[] = [
+  { id: 'neckline-v-shallow', name: 'V-Neck (Shallow)', categoryId: 'neckline', icon: 'Ⓥ', promptFragment: 'shallow v-neck modest', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['v-neck', 'shallow'], level: 'advanced' },
+  { id: 'neckline-v-deep', name: 'V-Neck (Deep)', categoryId: 'neckline', icon: 'Ⓥ', promptFragment: 'deep v-neck plunging', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['v-neck', 'deep'], level: 'advanced' },
+  { id: 'neckline-round', name: 'Round/Crew', categoryId: 'neckline', icon: '⭕', promptFragment: 'round crew neckline classic', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['round', 'crew'], level: 'advanced' },
+  { id: 'neckline-scoop', name: 'Scoop Neck', categoryId: 'neckline', icon: '🌙', promptFragment: 'scoop neckline curved', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['scoop', 'curved'], level: 'advanced' },
+  { id: 'neckline-off-shoulder', name: 'Off-Shoulder', categoryId: 'neckline', icon: '👚', promptFragment: 'off-shoulder neckline bare shoulders', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['off-shoulder', 'bare'], level: 'advanced' },
+  { id: 'neckline-strapless', name: 'Strapless', categoryId: 'neckline', icon: '👗', promptFragment: 'strapless neckline shoulders exposed', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['strapless', 'exposed'], level: 'advanced' },
+  { id: 'neckline-boat', name: 'Boat Neck', categoryId: 'neckline', icon: '⛵', promptFragment: 'boat neck wide horizontal', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['boat', 'wide'], level: 'advanced' },
+  { id: 'neckline-sweetheart', name: 'Sweetheart', categoryId: 'neckline', icon: '💕', promptFragment: 'sweetheart neckline heart shaped', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['sweetheart', 'heart'], level: 'advanced' },
+  { id: 'neckline-halter', name: 'Halter', categoryId: 'neckline', icon: '🎀', promptFragment: 'halter neckline neck tie', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['halter', 'tie'], level: 'advanced' },
+  { id: 'neckline-square', name: 'Square Neck', categoryId: 'neckline', icon: '⬜', promptFragment: 'square neckline structured', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['square', 'structured'], level: 'advanced' },
+];
+
+// Décolletage Visibility Blocks
+const DECOLLETAGE_BLOCKS: MicroBlock[] = [
+  { id: 'decol-visible', name: 'Fully Visible', categoryId: 'decolletage', icon: '✨', promptFragment: 'décolletage fully visible prominent', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['visible', 'prominent'], level: 'advanced' },
+  { id: 'decol-partial', name: 'Partially Visible', categoryId: 'decolletage', icon: '◐', promptFragment: 'décolletage partially visible subtle', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['partial', 'subtle'], level: 'advanced' },
+  { id: 'decol-covered', name: 'Covered', categoryId: 'decolletage', icon: '⬛', promptFragment: 'décolletage covered modest', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['covered', 'modest'], level: 'advanced' },
+];
+
+// Shoulder Position Blocks
+const SHOULDER_POSITION_BLOCKS: MicroBlock[] = [
+  { id: 'shoulder-both', name: 'Both Visible', categoryId: 'shoulder-position', icon: '👚', promptFragment: 'both shoulders visible exposed', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['both', 'visible'], level: 'advanced' },
+  { id: 'shoulder-one', name: 'One Shoulder', categoryId: 'shoulder-position', icon: '💃', promptFragment: 'one shoulder exposed asymmetric', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['one', 'asymmetric'], level: 'advanced' },
+  { id: 'shoulder-covered', name: 'Covered', categoryId: 'shoulder-position', icon: '👔', promptFragment: 'shoulders covered modest', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['covered', 'modest'], level: 'advanced' },
+  { id: 'shoulder-strap', name: 'Thin Straps', categoryId: 'shoulder-position', icon: '🎀', promptFragment: 'thin shoulder straps delicate', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['straps', 'delicate'], level: 'advanced' },
+];
+
+// Collarbone Prominence Blocks
+const COLLARBONE_BLOCKS: MicroBlock[] = [
+  { id: 'collarbone-prominent', name: 'Prominent', categoryId: 'collarbone', icon: '💎', promptFragment: 'prominent defined collarbone', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['prominent', 'defined'], level: 'advanced' },
+  { id: 'collarbone-subtle', name: 'Subtle', categoryId: 'collarbone', icon: '✨', promptFragment: 'subtle collarbone soft', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['subtle', 'soft'], level: 'advanced' },
+  { id: 'collarbone-hidden', name: 'Hidden', categoryId: 'collarbone', icon: '⬛', promptFragment: 'collarbone hidden covered', applicableTo: { gender: ['women'], jewelryTypes: ['necklace'] }, tags: ['hidden', 'covered'], level: 'advanced' },
 ];
 
 // Hair Length Blocks
@@ -857,6 +949,10 @@ export const WOMEN_ALL_BLOCKS: MicroBlock[] = [
   
   // Necklace-specific blocks
   ...NECK_POSE_BLOCKS,
+  ...NECKLINE_BLOCKS,
+  ...DECOLLETAGE_BLOCKS,
+  ...SHOULDER_POSITION_BLOCKS,
+  ...COLLARBONE_BLOCKS,
   
   // Earring-specific blocks
   ...HEAD_POSITION_BLOCKS,

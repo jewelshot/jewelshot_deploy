@@ -47,6 +47,12 @@ export const CATEGORY_GROUPS: Record<string, string> = {
   'wrist-pose': 'arm',
   'arm-position': 'arm',
   
+  // Necklace styling group
+  'neckline': 'necklace-styling',
+  'decolletage': 'necklace-styling',
+  'shoulder-position': 'necklace-styling',
+  'collarbone': 'necklace-styling',
+  
   // Singular categories (no grouping)
   'skin-tone': 'skin',
   'makeup': 'makeup',
