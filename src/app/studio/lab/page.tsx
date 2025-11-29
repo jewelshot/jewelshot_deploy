@@ -185,6 +185,24 @@ export default function StudioLabPage() {
       allBlocks
     );
     
+    // Debug: Check for unmapped categories
+    const unmappedCategories: string[] = [];
+    Object.keys(selections).forEach(categoryId => {
+      const block = allBlocks.find(b => b.id === selections[categoryId]);
+      if (block && !Object.keys(groupedJson).some(key => {
+        if (typeof groupedJson[key] === 'object' && groupedJson[key] !== null) {
+          return JSON.stringify(groupedJson[key]).includes(block.promptFragment);
+        }
+        return false;
+      })) {
+        unmappedCategories.push(categoryId);
+      }
+    });
+    
+    if (unmappedCategories.length > 0) {
+      groupedJson['_debug_unmapped_categories'] = unmappedCategories;
+    }
+    
     return JSON.stringify(groupedJson, null, 2);
   }, [gender, jewelryType, selections]);
 
@@ -526,11 +544,33 @@ export default function StudioLabPage() {
               </>
             ) : (
               // JSON View
-              <div className="rounded-lg border border-white/10 bg-white/5 p-4 max-h-[600px] overflow-y-auto">
-                <pre className="whitespace-pre-wrap text-xs text-green-400 font-mono leading-relaxed">
-                  {selectionsJson}
-                </pre>
-              </div>
+              <>
+                <div className="rounded-lg border border-white/10 bg-white/5 p-4 max-h-[600px] overflow-y-auto">
+                  <pre className="whitespace-pre-wrap text-xs text-green-400 font-mono leading-relaxed">
+                    {selectionsJson}
+                  </pre>
+                </div>
+                
+                {/* Generate Prompt Button in JSON View */}
+                {selectedCount > 0 && (
+                  <button
+                    onClick={() => {
+                      const allBlocks = BLOCK_REGISTRY.getBlocks({ gender: gender!, jewelryType: jewelryType! });
+                      const prompt = buildPromptFromSelections(
+                        { gender: gender!, jewelryType: jewelryType! },
+                        selections,
+                        allBlocks,
+                        '9:16'
+                      );
+                      setGeneratedPrompt(prompt);
+                    }}
+                    className="w-full mt-4 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 px-6 py-3 font-semibold text-white shadow-xl transition-all hover:shadow-2xl hover:shadow-purple-500/50 disabled:cursor-not-allowed disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    <Zap className="h-5 w-5" />
+                    Generate Full Prompt
+                  </button>
+                )}
+              </>
             )}
 
             {/* Selected Blocks Summary */}
