@@ -8,9 +8,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { Settings } from 'lucide-react';
 import { useSidebarStore } from '@/store/sidebarStore';
-import { ConfigurationAccordion } from '@/components/molecules/ConfigurationAccordion';
+import { GenerationSettingsModal } from '@/components/molecules/GenerationSettingsModal';
 import { QuickModeContent } from '@/components/molecules/QuickModeContent';
 import { SelectiveModeContent } from '@/components/molecules/SelectiveModeContent';
 import { AdvancedModeContent } from '@/components/molecules/AdvancedModeContent';
@@ -24,31 +24,6 @@ type Gender = 'women' | 'men' | null;
 type JewelryType = 'ring' | 'necklace' | 'earring' | 'bracelet' | null;
 type Mode = 'quick' | 'selective' | 'advanced';
 
-// Dropdown options
-const genderOptions = [
-  { value: 'women', label: 'Women' },
-  { value: 'men', label: 'Men' },
-];
-
-const jewelryOptions = [
-  { value: 'ring', label: 'Ring' },
-  { value: 'necklace', label: 'Necklace' },
-  { value: 'bracelet', label: 'Bracelet' },
-  { value: 'earring', label: 'Earring' },
-];
-
-// Aspect ratio options
-const aspectRatioOptions = [
-  { value: '1:1', label: '1:1', description: 'Square' },
-  { value: '4:5', label: '4:5', description: 'Portrait' },
-  { value: '3:4', label: '3:4', description: 'Classic' },
-  { value: '2:3', label: '2:3', description: 'Standard' },
-  { value: '9:16', label: '9:16', description: 'Story' },
-  { value: '16:9', label: '16:9', description: 'Landscape' },
-  { value: '21:9', label: '21:9', description: 'Ultrawide' },
-  { value: '4:3', label: '4:3', description: 'Classic' },
-];
-
 interface RightSidebarProps {
   onGenerateWithPreset?: (prompt: string, aspectRatio?: string) => void;
 }
@@ -61,9 +36,9 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
   const [jewelryType, setJewelryType] = useState<JewelryType>(null);
   const [aspectRatio, setAspectRatio] = useState<string>('9:16'); // Default: 9:16
   const [activeMode, setActiveMode] = useState<Mode>('quick');
-  const [isAspectRatioOpen, setIsAspectRatioOpen] = useState<boolean>(true); // Start open
 
-  // Modal state
+  // Modal states
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [confirmModal, setConfirmModal] = useState<{
     show: boolean;
     presetName: string;
@@ -123,74 +98,38 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
     }
   };
 
+  // Helper to get current settings summary
+  const getSettingsSummary = () => {
+    const parts: string[] = [];
+    if (gender) parts.push(gender === 'women' ? 'Women' : 'Men');
+    if (jewelryType) parts.push(jewelryType.charAt(0).toUpperCase() + jewelryType.slice(1));
+    parts.push(aspectRatio);
+    return parts.join(' · ');
+  };
+
   return (
     <aside
       className={`fixed bottom-0 right-0 top-0 z-[100] w-[260px] border-l border-[rgba(139,92,246,0.15)] bg-[rgba(10,10,10,0.7)] shadow-[-4px_0_24px_rgba(0,0,0,0.3)] backdrop-blur-[24px] backdrop-saturate-[200%] transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)] ${rightOpen ? 'translate-x-0' : 'translate-x-full'}`}
     >
       <div className="sidebar-scroll flex h-full flex-col overflow-y-auto px-4 py-3">
-        {/* Configuration Accordion */}
-        <div className="mb-2">
-          <ConfigurationAccordion
-            gender={gender}
-            jewelryType={jewelryType}
-            onGenderChange={(value) => setGender(value as Gender)}
-            onJewelryChange={(value) => setJewelryType(value as JewelryType)}
-            genderOptions={genderOptions}
-            jewelryOptions={jewelryOptions}
-          />
-        </div>
-
-        {/* Aspect Ratio Selection - Accordion */}
-        <div className="mb-2 rounded-lg border border-white/10 bg-white/[0.02]">
-          {/* Header - Always visible */}
-          <button
-            onClick={() => setIsAspectRatioOpen(!isAspectRatioOpen)}
-            className="flex w-full items-center justify-between px-2.5 py-2 text-left transition-colors hover:bg-white/[0.05]"
-          >
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs">📐</span>
-              <span className="text-[11px] font-medium text-white/90">
-                Aspect Ratio
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-[9px] text-white/40">{aspectRatio}</span>
-              <ChevronDown
-                className={`h-3.5 w-3.5 text-white/40 transition-transform duration-200 ${
-                  isAspectRatioOpen ? 'rotate-180' : ''
-                }`}
-              />
-            </div>
-          </button>
-
-          {/* Content - Collapsible */}
-          {isAspectRatioOpen && (
-            <div className="border-t border-white/5 p-2">
-              <div className="grid grid-cols-4 gap-1">
-                {aspectRatioOptions.map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => {
-                      setAspectRatio(option.value);
-                      // Auto-minimize after selection
-                      setIsAspectRatioOpen(false);
-                    }}
-                    className={`rounded border px-1.5 py-1 text-[9px] font-medium transition-all duration-200 ${
-                      aspectRatio === option.value
-                        ? 'border-purple-500/50 bg-purple-500/20 text-purple-300'
-                        : 'border-white/10 bg-white/[0.02] text-white/60 hover:border-white/20 hover:bg-white/[0.05] hover:text-white'
-                    }`}
-                  >
-                    <div className="font-semibold">{option.label}</div>
-                    <div className="text-[7px] text-white/40">
-                      {option.description}
-                    </div>
-                  </button>
-                ))}
+        {/* Settings Button - Replaces Configuration Accordion & Aspect Ratio */}
+        <button
+          onClick={() => setSettingsModalOpen(true)}
+          className="group mb-3 flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2.5 transition-all hover:border-purple-500/30 hover:bg-purple-500/5"
+        >
+          <div className="flex items-center gap-2">
+            <Settings className="h-4 w-4 text-purple-400 transition-transform group-hover:rotate-45" />
+            <div className="text-left">
+              <div className="text-xs font-medium text-white">Settings</div>
+              <div className="text-[10px] text-white/50">
+                {getSettingsSummary()}
               </div>
             </div>
-          )}
-        </div>
+          </div>
+          <div className="text-[10px] text-white/40 group-hover:text-purple-400">
+            Click to edit
+          </div>
+        </button>
 
         {/* Divider */}
         <div className="my-2 h-px bg-white/5" />
@@ -265,6 +204,18 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
             onCancel={() => setConfirmModal(null)}
           />
         )}
+
+        {/* Generation Settings Modal */}
+        <GenerationSettingsModal
+          isOpen={settingsModalOpen}
+          onClose={() => setSettingsModalOpen(false)}
+          gender={gender}
+          onGenderChange={(value) => setGender(value)}
+          jewelryType={jewelryType}
+          onJewelryChange={(value) => setJewelryType(value)}
+          aspectRatio={aspectRatio}
+          onAspectRatioChange={setAspectRatio}
+        />
       </div>
     </aside>
   );
