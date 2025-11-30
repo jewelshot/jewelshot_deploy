@@ -693,6 +693,32 @@ export const WOMEN_FACE_CATEGORIES: BlockCategory[] = [
 
 export const WOMEN_RING_CATEGORIES: BlockCategory[] = [
   {
+    id: 'hand-selection',
+    name: 'Hand Selection',
+    icon: '👋',
+    description: 'Which hand wears the ring',
+    order: 29,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring'],
+    },
+    required: true,
+  },
+  
+  {
+    id: 'finger-selection',
+    name: 'Finger Selection',
+    icon: '💍',
+    description: 'Which finger wears the ring',
+    order: 29.5,
+    applicableTo: {
+      gender: ['women'],
+      jewelryTypes: ['ring'],
+    },
+    required: true,
+  },
+  
+  {
     id: 'hand-pose',
     name: 'Hand Pose',
     icon: '✋',
@@ -2401,6 +2427,21 @@ const EXPRESSION_BLOCKS: MicroBlock[] = [
 ];
 
 // RING SPECIFIC
+const HAND_SELECTION_BLOCKS: MicroBlock[] = [
+  { id: 'hand-left', name: 'Left Hand', categoryId: 'hand-selection', icon: '🖐️', promptFragment: 'left hand wearing ring', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['left', 'hand'], level: 'advanced' },
+  { id: 'hand-right', name: 'Right Hand', categoryId: 'hand-selection', icon: '🤚', promptFragment: 'right hand wearing ring', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['right', 'hand'], level: 'advanced' },
+  { id: 'hand-both', name: 'Both Hands', categoryId: 'hand-selection', icon: '👐', promptFragment: 'both hands wearing rings, matching pair', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['both', 'pair'], level: 'advanced' },
+];
+
+const FINGER_SELECTION_BLOCKS: MicroBlock[] = [
+  { id: 'finger-thumb', name: 'Thumb', categoryId: 'finger-selection', icon: '👍', promptFragment: 'ring on thumb, bold statement', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['thumb', 'bold'], level: 'advanced' },
+  { id: 'finger-index', name: 'Index Finger', categoryId: 'finger-selection', icon: '☝️', promptFragment: 'ring on index finger, confident placement', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['index', 'statement'], level: 'advanced' },
+  { id: 'finger-middle', name: 'Middle Finger', categoryId: 'finger-selection', icon: '🖕', promptFragment: 'ring on middle finger, center position', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['middle', 'center'], level: 'advanced' },
+  { id: 'finger-ring', name: 'Ring Finger', categoryId: 'finger-selection', icon: '💍', promptFragment: 'ring on ring finger, classic traditional placement', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['ring-finger', 'traditional', 'wedding'], level: 'advanced' },
+  { id: 'finger-pinky', name: 'Pinky', categoryId: 'finger-selection', icon: '🤙', promptFragment: 'ring on pinky finger, delicate elegant', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['pinky', 'delicate'], level: 'advanced' },
+  { id: 'finger-multiple', name: 'Multiple Fingers', categoryId: 'finger-selection', icon: '🤘', promptFragment: 'rings on multiple fingers, stacked layered look', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['multiple', 'stacked'], level: 'advanced' },
+];
+
 const HAND_POSE_BLOCKS: MicroBlock[] = [
   // ORIGINAL (5 poses)
   { id: 'hand-elegant', name: 'Elegant Extended', categoryId: 'hand-pose', icon: '✋', promptFragment: 'hand elegantly extended, fingers gracefully spread, feminine gesture', applicableTo: { gender: ['women'], jewelryTypes: ['ring'] }, tags: ['elegant', 'graceful'], level: 'advanced' },
@@ -2908,6 +2949,8 @@ export const WOMEN_ALL_BLOCKS: MicroBlock[] = [
   ...CHIN_TYPE_BLOCKS,
   
   // Ring-specific blocks
+  ...HAND_SELECTION_BLOCKS,
+  ...FINGER_SELECTION_BLOCKS,
   ...HAND_POSE_BLOCKS,
   ...HAND_STRUCTURE_BLOCKS,
   

@@ -1225,6 +1225,32 @@ const MEN_LIFESTYLE_EXTRAS_BLOCKS: MicroBlock[] = [
 // ===== RING-SPECIFIC =====
 export const MEN_RING_CATEGORIES: BlockCategory[] = [
   {
+    id: 'hand-selection-men-ring',
+    name: 'Hand Selection',
+    icon: '👋',
+    description: 'Which hand wears the ring',
+    order: 699,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['ring'],
+    },
+    required: true,
+  },
+  
+  {
+    id: 'finger-selection-men-ring',
+    name: 'Finger Selection',
+    icon: '💍',
+    description: 'Which finger wears the ring',
+    order: 699.5,
+    applicableTo: {
+      gender: ['men'],
+      jewelryTypes: ['ring'],
+    },
+    required: true,
+  },
+  
+  {
     id: 'hand-pose-men-ring',
     name: 'Hand Pose',
     icon: '✋',
@@ -1249,6 +1275,22 @@ export const MEN_RING_CATEGORIES: BlockCategory[] = [
     },
     required: false,
   },
+];
+
+// Ring-Specific Hand Selection Blocks (Masculine)
+const HAND_SELECTION_MEN_RING_BLOCKS: MicroBlock[] = [
+  { id: 'hand-left-men', name: 'Left Hand', categoryId: 'hand-selection-men-ring', icon: '🖐️', promptFragment: 'left hand wearing ring masculine', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['left', 'hand'], level: 'advanced' },
+  { id: 'hand-right-men', name: 'Right Hand', categoryId: 'hand-selection-men-ring', icon: '🤚', promptFragment: 'right hand wearing ring masculine', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['right', 'hand'], level: 'advanced' },
+  { id: 'hand-both-men', name: 'Both Hands', categoryId: 'hand-selection-men-ring', icon: '👐', promptFragment: 'both hands wearing rings, matching pair masculine', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['both', 'pair'], level: 'advanced' },
+];
+
+const FINGER_SELECTION_MEN_RING_BLOCKS: MicroBlock[] = [
+  { id: 'finger-thumb-men', name: 'Thumb', categoryId: 'finger-selection-men-ring', icon: '👍', promptFragment: 'ring on thumb, bold masculine statement', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['thumb', 'bold'], level: 'advanced' },
+  { id: 'finger-index-men', name: 'Index Finger', categoryId: 'finger-selection-men-ring', icon: '☝️', promptFragment: 'ring on index finger, powerful confident placement', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['index', 'power'], level: 'advanced' },
+  { id: 'finger-middle-men', name: 'Middle Finger', categoryId: 'finger-selection-men-ring', icon: '🖕', promptFragment: 'ring on middle finger, center dominant position', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['middle', 'center'], level: 'advanced' },
+  { id: 'finger-ring-men', name: 'Ring Finger', categoryId: 'finger-selection-men-ring', icon: '💍', promptFragment: 'ring on ring finger, classic traditional placement wedding band', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['ring-finger', 'traditional', 'wedding'], level: 'advanced' },
+  { id: 'finger-pinky-men', name: 'Pinky', categoryId: 'finger-selection-men-ring', icon: '🤙', promptFragment: 'ring on pinky finger, luxury sophisticated signet', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['pinky', 'luxury', 'signet'], level: 'advanced' },
+  { id: 'finger-multiple-men', name: 'Multiple Fingers', categoryId: 'finger-selection-men-ring', icon: '🤘', promptFragment: 'rings on multiple fingers, layered bold masculine look', applicableTo: { gender: ['men'], jewelryTypes: ['ring'] }, tags: ['multiple', 'bold'], level: 'advanced' },
 ];
 
 // Ring-Specific Hand Pose Blocks (Masculine)
@@ -1509,6 +1551,8 @@ const WRIST_EXPOSURE_MEN_BLOCKS: MicroBlock[] = [
 // ============================================
 
 const MEN_RING_BLOCKS: MicroBlock[] = [
+  ...HAND_SELECTION_MEN_RING_BLOCKS,
+  ...FINGER_SELECTION_MEN_RING_BLOCKS,
   ...HAND_POSE_MEN_RING_BLOCKS,
   ...HAND_STRUCTURE_RING_MEN_BLOCKS,
 ];

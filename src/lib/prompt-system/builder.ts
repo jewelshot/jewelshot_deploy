@@ -58,10 +58,14 @@ export const CATEGORY_GROUPS: Record<string, string> = {
   'chin-type': 'face',
   
   // Hand group (ring-specific - women)
+  'hand-selection': 'hand',
+  'finger-selection': 'hand',
   'hand-pose': 'hand',
   'hand-structure': 'hand',
   
   // Hand group (ring-specific - men)
+  'hand-selection-men-ring': 'hand',
+  'finger-selection-men-ring': 'hand',
   'hand-pose-men-ring': 'hand',
   'hand-structure-ring-men': 'hand',
   
