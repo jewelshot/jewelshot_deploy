@@ -6,7 +6,7 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Sparkles, Copy, Check, Code, Settings } from 'lucide-react';
 import { getQuickPresets, type QuickPreset } from '@/lib/prompt-system/quick-presets';
 import { BLOCK_REGISTRY } from '@/lib/prompt-system/registry';
@@ -14,6 +14,17 @@ import { buildPromptFromSelections, buildGroupedJSON } from '@/lib/prompt-system
 import type { Gender, JewelryType } from '@/lib/prompt-system/types';
 
 export default function PresetsPage() {
+  // Enable body scroll for presets page (override globals.css)
+  useEffect(() => {
+    document.body.style.overflow = 'auto';
+    document.body.style.height = 'auto';
+    
+    return () => {
+      document.body.style.overflow = 'hidden';
+      document.body.style.height = '100vh';
+    };
+  }, []);
+
   const [gender, setGender] = useState<Gender | null>(null);
   const [jewelryType, setJewelryType] = useState<JewelryType | null>(null);
   const [selectedPreset, setSelectedPreset] = useState<QuickPreset | null>(null);
