@@ -8,7 +8,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Settings, ChevronDown, ChevronUp, Zap, Code, Shuffle } from 'lucide-react';
+import { Settings, ChevronDown, ChevronUp, Zap, Code, Shuffle, Copy, Check } from 'lucide-react';
 import { BLOCK_REGISTRY } from '@/lib/prompt-system/registry';
 import { buildPromptFromSelections, buildGroupedJSON } from '@/lib/prompt-system/builder';
 import type { BlockSelections, Gender, JewelryType, BlockCategory } from '@/lib/prompt-system/types';
@@ -31,6 +31,7 @@ export default function StudioLabPage() {
   const [generatedPrompt, setGeneratedPrompt] = useState<string>('');
   const [showJsonView, setShowJsonView] = useState(false);
   const [showFaceDetails, setShowFaceDetails] = useState(false); // Toggle for Face Details
+  const [copiedJson, setCopiedJson] = useState(false); // Track if JSON was copied
   
   // Accordion states for main sections
   const [showGenderJewelry, setShowGenderJewelry] = useState(true);
@@ -223,6 +224,19 @@ export default function StudioLabPage() {
     const categoryIds = allCategories.map(cat => cat.id);
     
     randomizeCategories(categoryIds);
+  };
+
+  /**
+   * Copy JSON to clipboard
+   */
+  const copyJsonToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(selectionsJson);
+      setCopiedJson(true);
+      setTimeout(() => setCopiedJson(false), 2000); // Reset after 2 seconds
+    } catch (err) {
+      console.error('Failed to copy JSON:', err);
+    }
   };
 
   const handleBlockSelect = (categoryId: string, blockId: string) => {
@@ -892,10 +906,34 @@ export default function StudioLabPage() {
             ) : (
               // JSON View
               <>
-                <div className="rounded-lg border border-white/10 bg-white/5 p-4 max-h-[600px] overflow-y-auto">
-                  <pre className="whitespace-pre-wrap text-xs text-green-400 font-mono leading-relaxed">
-                    {selectionsJson}
-                  </pre>
+                <div className="rounded-lg border border-white/10 bg-white/5 overflow-hidden">
+                  {/* JSON Header with Copy Button */}
+                  <div className="flex items-center justify-between p-3 border-b border-white/10 bg-white/5">
+                    <div className="text-sm font-medium text-white/80">JSON Output</div>
+                    <button
+                      onClick={copyJsonToClipboard}
+                      className="flex items-center gap-1.5 rounded-lg border border-green-500/30 bg-green-500/10 px-3 py-1.5 text-sm text-green-400 transition-colors hover:bg-green-500/20"
+                    >
+                      {copiedJson ? (
+                        <>
+                          <Check className="h-3.5 w-3.5" />
+                          Copied!
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-3.5 w-3.5" />
+                          Copy JSON
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  
+                  {/* JSON Content */}
+                  <div className="p-4 max-h-[600px] overflow-y-auto">
+                    <pre className="whitespace-pre-wrap text-xs text-green-400 font-mono leading-relaxed">
+                      {selectionsJson}
+                    </pre>
+                  </div>
                 </div>
                 
                 {/* Generate Prompt Button in JSON View */}
