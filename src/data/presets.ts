@@ -33,6 +33,17 @@ export const PRESET_CATEGORIES: PresetCategory[] = [
         negativePrompt:
           'pale gold, desaturated color, flat color, cold color tone, greenish gold, brassy gold, wrong metal color, flat lighting, loss of shadow detail, over-smoothed metal, plastic look, dead stones, cloudy stones, windowing in gems, black stones, photographer reflection, camera reflection, overexposed, blown out highlights, washed out, harsh glare, blurry, noisy, grainy, low resolution, melting details, altered design, added stones',
       },
+      {
+        id: '14k-yellow-gold',
+        title: '14K Yellow Gold',
+        description: 'Vibrant rich 14k yellow gold with bright warm tones',
+        imagePath: '/presets/14k-yellow-gold.webp',
+        categoryId: 'white-backgrounds',
+        prompt:
+          'commercial jewelry photography, luxury product master shot, close-up macro, luxurious rich 14k yellow gold, vibrant warm tones, highly saturated gold, bright golden hue, accurate material rendering, realistic metal shading, preserved inner shank gradients, deep ambient occlusion, three-dimensional depth, soft shadow transitions on metal curve, structural integrity, preserved intricate motifs, high polish finish with depth, distinct stone facets, gemstone brilliance, light dispersion, fire and scintillation, realistic diamond rendering (if present), soft diffused studio lighting, controlled highlights, invisible photographer, pure white background, soft drop shadow, 8k, ultra detailed, pristine, high fidelity',
+        negativePrompt:
+          'deep orange gold, reddish gold, copper tone, bronze tone, pale gold, desaturated color, flat color, cold color tone, greenish gold, brassy gold, wrong metal color, flat lighting, loss of shadow detail, over-smoothed metal, plastic look, dead stones, cloudy stones, windowing in gems, black stones, photographer reflection, camera reflection, overexposed, blown out highlights, washed out, harsh glare, blurry, noisy, grainy, low resolution, melting details, altered design, added stones',
+      },
     ],
   },
   {
