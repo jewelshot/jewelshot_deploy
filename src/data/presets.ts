@@ -66,6 +66,17 @@ export const PRESET_CATEGORIES: PresetCategory[] = [
         negativePrompt:
           'yellow gold, brassy tone, warm color cast, sepia tone, tarnished silver, black oxidation, dull grey metal, matte finish, pale gold, greenish tint, wrong metal color, flat lighting, loss of shadow detail, over-smoothed metal, plastic look, dead stones, cloudy stones, windowing in gems, black stones, photographer reflection, camera reflection, overexposed, blown out highlights, washed out, harsh glare, blurry, noisy, grainy, low resolution, melting details, altered design, added stones',
       },
+      {
+        id: 'rose-gold',
+        title: 'Rose Gold',
+        description: 'Elegant 18k rose gold with vibrant coppery pink tones',
+        imagePath: '/presets/rose-gold.webp',
+        categoryId: 'white-backgrounds',
+        prompt:
+          'commercial jewelry photography, luxury product master shot, close-up macro, luxurious rich 18k rose gold, vibrant coppery pink tones, soft warm blush hue, elegant rose lustre, highly saturated rose gold, accurate material rendering, realistic metal shading, preserved inner shank gradients, deep ambient occlusion, three-dimensional depth, soft shadow transitions on metal curve, structural integrity, preserved intricate motifs, high polish finish with depth, distinct stone facets, gemstone brilliance, light dispersion, fire and scintillation, realistic diamond rendering (if present), soft diffused studio lighting, controlled highlights, invisible photographer, pure white background, soft drop shadow, 8k, ultra detailed, pristine, high fidelity',
+        negativePrompt:
+          'yellow gold, silver, white gold, intense red, rusty copper, oxidised copper, orange tone, brassy tone, pale pink, desaturated color, flat color, cold color tone, greenish tint, wrong metal color, flat lighting, loss of shadow detail, over-smoothed metal, plastic look, dead stones, cloudy stones, windowing in gems, black stones, photographer reflection, camera reflection, overexposed, blown out highlights, washed out, harsh glare, blurry, noisy, grainy, low resolution, melting details, altered design, added stones',
+      },
     ],
   },
   {
