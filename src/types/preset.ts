@@ -10,6 +10,7 @@ export interface Preset {
   imagePath: string;
   categoryId: string;
   prompt?: string; // The AI prompt associated with this preset
+  negativePrompt?: string; // Negative prompt to avoid unwanted elements
 }
 
 export interface PresetCategory {

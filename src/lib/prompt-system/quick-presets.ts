@@ -244,3 +244,4 @@ export function getQuickPresets(gender: Gender, jewelryType: JewelryType): Quick
   return QUICK_PRESETS_BY_TYPE[gender]?.[jewelryType] || [];
 }
 
+
