@@ -26,10 +26,11 @@ type Gender = 'women' | 'men' | null;
 type JewelryType = 'ring' | 'necklace' | 'earring' | 'bracelet' | null;
 type Mode = 'quick' | 'selective' | 'advanced';
 
-// Custom event for image upload
+// Custom events for image upload/close
 declare global {
   interface WindowEventMap {
     'jewelshot:imageUploaded': CustomEvent<{ fileName?: string; imageUrl?: string }>;
+    'jewelshot:imageClosed': CustomEvent;
   }
 }
 
@@ -101,9 +102,16 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
       }
     };
 
+    const handleImageClosed = () => {
+      logger.info('Image closed event received');
+      setThumbnailUrl(null);
+    };
+
     window.addEventListener('jewelshot:imageUploaded', handleImageUpload);
+    window.addEventListener('jewelshot:imageClosed', handleImageClosed);
     return () => {
       window.removeEventListener('jewelshot:imageUploaded', handleImageUpload);
+      window.removeEventListener('jewelshot:imageClosed', handleImageClosed);
     };
   }, []);
 
@@ -242,18 +250,21 @@ ${confirmModal.libraryNegativePrompt}`;
         >
           {/* Thumbnail with gradient fade - positioned on the right */}
           {thumbnailUrl && (
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-24">
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-28">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={thumbnailUrl}
                 alt=""
-                className="h-full w-full object-cover"
+                className="h-full w-full scale-150 object-contain transition-transform duration-300 group-hover:scale-[1.7]"
+                style={{
+                  objectPosition: 'center center',
+                }}
               />
               {/* Gradient overlay - fades from left (opaque) to right (transparent) */}
               <div 
                 className="absolute inset-0"
                 style={{
-                  background: 'linear-gradient(to right, rgba(10,10,10,1) 0%, rgba(10,10,10,0.9) 20%, rgba(10,10,10,0.5) 60%, rgba(10,10,10,0) 100%)',
+                  background: 'linear-gradient(to right, rgba(10,10,10,1) 0%, rgba(10,10,10,0.95) 15%, rgba(10,10,10,0.7) 40%, rgba(10,10,10,0.3) 70%, rgba(10,10,10,0.1) 100%)',
                 }}
               />
             </div>

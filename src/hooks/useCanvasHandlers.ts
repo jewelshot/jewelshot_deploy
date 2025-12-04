@@ -271,6 +271,12 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+    
+    // 🎯 Dispatch image closed event for thumbnail cleanup
+    const closeEvent = new CustomEvent('jewelshot:imageClosed');
+    window.dispatchEvent(closeEvent);
+    logger.info('📢 Image closed event dispatched');
+    
     // Navigate to studio without query params
     router.replace('/studio', { scroll: false });
     logger.info('Image closed');
