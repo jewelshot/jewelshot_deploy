@@ -38,8 +38,23 @@ import { processTurntable } from './turntable';
 export async function processAIJob(data: AIJobData): Promise<AIJobResult> {
   const startTime = Date.now();
   
+  console.log(`[AIProcessor] Starting ${data.operation} for user ${data.userId}`);
+  
   // Get next API key from pool
-  const apiKey = getNextApiKey();
+  let apiKey: string;
+  try {
+    apiKey = getNextApiKey();
+    console.log(`[AIProcessor] Got API key (length: ${apiKey?.length || 0})`);
+  } catch (keyError) {
+    console.error('[AIProcessor] Failed to get API key:', keyError);
+    return {
+      success: false,
+      error: {
+        message: keyError instanceof Error ? keyError.message : 'Failed to get API key',
+        code: 'API_KEY_ERROR',
+      },
+    };
+  }
   
   logger.debug(`Processing ${data.operation} for user ${data.userId}`);
 

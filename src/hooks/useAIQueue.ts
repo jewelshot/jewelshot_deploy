@@ -1,8 +1,10 @@
 /**
- * AI Queue Hook
+ * AI Queue Hook - SYNCHRONOUS VERSION
  * 
- * React hook for submitting jobs to the queue and polling for results
- * Replaces direct API calls to individual endpoints
+ * React hook for submitting jobs to the AI API
+ * Now uses synchronous processing - no queue polling needed
+ * 
+ * Jobs complete immediately in /api/ai/submit response
  */
 
 'use client';
@@ -33,6 +35,9 @@ interface JobStatus {
   };
 }
 
+// Timeout for synchronous requests (2 minutes)
+const REQUEST_TIMEOUT = 120000;
+
 // ============================================
 // HOOK
 // ============================================
@@ -40,71 +45,78 @@ interface JobStatus {
 export function useAIQueue() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState<number>(0);
-  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
   const { handleError } = useApiError();
 
   // ============================================
-  // SUBMIT JOB
+  // SUBMIT JOB (SYNCHRONOUS)
   // ============================================
 
   const submitJob = useCallback(async (params: SubmitJobParams) => {
     try {
+      // Create abort controller for timeout
+      abortControllerRef.current = new AbortController();
+      const timeoutId = setTimeout(() => {
+        abortControllerRef.current?.abort();
+      }, REQUEST_TIMEOUT);
+
       const response = await fetch('/api/ai/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(params),
+        signal: abortControllerRef.current.signal,
       });
+
+      clearTimeout(timeoutId);
 
       const data = await response.json();
 
       if (!response.ok) {
         // Use standardized error from API
-        throw data;
+        throw new Error(data.message || data.error || 'AI processing failed');
       }
 
+      // Synchronous response - result is directly in data
       return {
-        jobId: data.jobId,
-        status: data.status,
-        priority: data.priority,
-        queuePosition: data.queuePosition,
-        creditReservation: data.creditReservation,
+        jobId: data.jobId || `sync-${Date.now()}`,
+        status: data.status || 'completed',
+        result: data.result,
+        operation: data.operation,
+        metadata: data.metadata,
       };
     } catch (error: any) {
       console.error('[useAIQueue] Submit error:', error);
+      
+      if (error.name === 'AbortError') {
+        throw new Error('Request timed out. AI processing is taking longer than expected. Please try again.');
+      }
+      
       throw error;
     }
   }, []);
 
   // ============================================
-  // GET STATUS
+  // GET STATUS (DEPRECATED - synchronous mode)
   // ============================================
 
   const getStatus = useCallback(async (jobId: string): Promise<JobStatus> => {
-    try {
-      const response = await fetch(`/api/ai/status/${jobId}`);
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to get job status');
-      }
-
-      return {
-        jobId: data.jobId,
-        state: data.state,
-        progress: data.progress,
-        result: data.result,
-        error: data.error,
-      };
-    } catch (error: any) {
-      console.error('[useAIQueue] Status error:', error);
-      throw error;
-    }
+    // In synchronous mode, status is not needed
+    // Jobs complete immediately in submit response
+    console.warn('[useAIQueue] getStatus called but synchronous mode is active');
+    
+    return {
+      jobId,
+      state: 'completed',
+      progress: 100,
+      result: null,
+      error: undefined,
+    };
   }, []);
 
   // ============================================
-  // POLL FOR RESULT
+  // POLL FOR RESULT (DEPRECATED - synchronous mode)
   // ============================================
 
   const pollForResult = useCallback(
@@ -116,75 +128,30 @@ export function useAIQueue() {
         onProgress?: (status: JobStatus) => void;
       }
     ): Promise<any> => {
-      const interval = options?.interval || 2000; // 2 seconds
-      const maxAttempts = options?.maxAttempts || 150; // 5 minutes max
-      let attempts = 0;
-
-      return new Promise((resolve, reject) => {
-        const poll = async () => {
-          try {
-            attempts++;
-
-            if (attempts > maxAttempts) {
-              clearInterval(pollingIntervalRef.current!);
-              reject(new Error('Polling timeout'));
-              return;
-            }
-
-            const status = await getStatus(jobId);
-
-            // Call progress callback
-            if (options?.onProgress) {
-              options.onProgress(status);
-            }
-
-            // Update progress
-            if (typeof status.progress === 'number') {
-              setProgress(status.progress);
-            }
-
-            // Check if completed
-            if (status.state === 'completed') {
-              clearInterval(pollingIntervalRef.current!);
-              setIsProcessing(false);
-              setProgress(100);
-              resolve(status.result);
-              return;
-            }
-
-            // Check if failed
-            if (status.state === 'failed') {
-              clearInterval(pollingIntervalRef.current!);
-              setIsProcessing(false);
-              reject(new Error(status.error?.message || 'Job failed'));
-              return;
-            }
-
-            // Continue polling if waiting or active
-          } catch (error) {
-            console.error('[useAIQueue] Polling error:', error);
-            clearInterval(pollingIntervalRef.current!);
-            setIsProcessing(false);
-            reject(error);
-          }
-        };
-
-        // Start polling
-        setIsProcessing(true);
-        setProgress(0);
-        poll(); // First poll immediately
-        pollingIntervalRef.current = setInterval(poll, interval);
-      });
+      // In synchronous mode, polling is not needed
+      // Return immediately as jobs complete in submit response
+      console.warn('[useAIQueue] pollForResult called but synchronous mode is active');
+      
+      if (options?.onProgress) {
+        options.onProgress({
+          jobId,
+          state: 'completed',
+          progress: 100,
+        });
+      }
+      
+      return null;
     },
-    [getStatus]
+    []
   );
 
   // ============================================
-  // SUBMIT AND WAIT
+  // SUBMIT AND WAIT (SYNCHRONOUS)
   // ============================================
 
   /**
-   * Submit job and wait for result (combines submit + poll)
+   * Submit job and wait for result
+   * In synchronous mode, this completes immediately
    */
   const submitAndWait = useCallback(
     async (
@@ -196,48 +163,67 @@ export function useAIQueue() {
       }
     ): Promise<any> => {
       try {
-        // Submit job
-        const { jobId } = await submitJob(params);
+        setIsProcessing(true);
+        setProgress(10);
 
-        // Poll for result
-        const result = await pollForResult(jobId, options);
+        // Call progress callback with "processing" status
+        if (options?.onProgress) {
+          options.onProgress({
+            jobId: 'pending',
+            state: 'active',
+            progress: 10,
+          });
+        }
 
-        return result;
+        // Submit job - synchronous, result comes back directly
+        setProgress(30);
+        const response = await submitJob(params);
+        setProgress(90);
+
+        // Call progress callback with "completed" status
+        if (options?.onProgress) {
+          options.onProgress({
+            jobId: response.jobId,
+            state: 'completed',
+            progress: 100,
+            result: response.result,
+          });
+        }
+
+        setProgress(100);
+        setIsProcessing(false);
+
+        // Return the result directly
+        return response.result;
       } catch (error: any) {
+        setIsProcessing(false);
+        setProgress(0);
+        
         // Use standardized error handler
         handleError(error);
         throw error;
       }
     },
-    [submitJob, pollForResult]
+    [submitJob, handleError]
   );
 
   // ============================================
-  // CANCEL JOB
+  // CANCEL JOB (LIMITED IN SYNCHRONOUS MODE)
   // ============================================
 
   const cancelJob = useCallback(async (jobId: string) => {
     try {
-      // Clear polling interval
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
-      }
-
-      // Call cancel endpoint
-      const response = await fetch(`/api/ai/cancel/${jobId}`, {
-        method: 'POST',
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to cancel job');
+      // Abort current request if any
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
       }
 
       setIsProcessing(false);
       setProgress(0);
 
-      return data;
+      // In synchronous mode, jobs can't be cancelled after submission
+      // But we can abort the current request
+      return { cancelled: true, message: 'Request aborted' };
     } catch (error: any) {
       console.error('[useAIQueue] Cancel error:', error);
       throw error;
@@ -249,8 +235,8 @@ export function useAIQueue() {
   // ============================================
 
   const cleanup = useCallback(() => {
-    if (pollingIntervalRef.current) {
-      clearInterval(pollingIntervalRef.current);
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
     }
     setIsProcessing(false);
     setProgress(0);
@@ -274,5 +260,4 @@ export function useAIQueue() {
     cleanup,
   };
 }
-
 

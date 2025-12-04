@@ -1,13 +1,14 @@
 /**
  * AI Job Status Endpoint
  * 
- * Check status of a queued/processing job
- * Returns job state, progress, and result (if completed)
+ * DEPRECATED: Synchronous processing no longer uses queue polling
+ * This endpoint returns "not found" for all requests
+ * 
+ * Note: BullMQ/Redis is not available in Vercel serverless
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getAllQueues } from '@/lib/queue/queues';
 
 // ============================================
 // GET /api/ai/status/[jobId]
@@ -32,84 +33,39 @@ export async function GET(
       );
     }
 
-    // ============================================
-    // FIND JOB
-    // ============================================
-    
     const { jobId } = await params;
-    const queues = getAllQueues();
     
-    let job = null;
-    let queueName = '';
+    // ============================================
+    // SYNCHRONOUS MODE - Queue polling disabled
+    // ============================================
     
-    // Check all queues for the job
-    for (const queue of queues) {
-      const foundJob = await queue.getJob(jobId);
-      if (foundJob) {
-        job = foundJob;
-        queueName = queue.name;
-        break;
-      }
+    // In synchronous mode, jobs complete immediately in /api/ai/submit
+    // This endpoint is kept for backwards compatibility but returns "not found"
+    console.log(`[API] Status check for ${jobId} - synchronous mode, no queue`);
+    
+    // Check if this is a synchronous job (starts with "sync-")
+    if (jobId.startsWith('sync-')) {
+      return NextResponse.json({
+        jobId,
+        state: 'completed',
+        message: 'Synchronous jobs complete immediately. Check submit response.',
+        result: null,
+      });
     }
 
-    if (!job) {
-      return NextResponse.json(
-        { error: 'Job not found' },
-        { status: 404 }
-      );
-    }
-
-    // ============================================
-    // AUTHORIZATION
-    // ============================================
-    
-    // Verify job belongs to requesting user
-    if (job.data.userId !== user.id) {
-      return NextResponse.json(
-        { error: 'Forbidden' },
-        { status: 403 }
-      );
-    }
-
-    // ============================================
-    // GET JOB STATE
-    // ============================================
-    
-    const state = await job.getState();
-    const progress = job.progress;
-    const returnvalue = job.returnvalue;
-    const failedReason = job.failedReason;
-    const attemptsMade = job.attemptsMade;
-
-    // ============================================
-    // RESPONSE
-    // ============================================
-    
-    return NextResponse.json({
-      jobId: job.id,
-      state, // 'waiting' | 'active' | 'completed' | 'failed' | 'delayed'
-      progress,
-      queueName,
-      operation: job.data.operation,
-      priority: job.data.priority,
-      attemptsMade,
-      timestamp: job.timestamp,
-      processedOn: job.processedOn,
-      finishedOn: job.finishedOn,
-      // Only include result if completed
-      result: state === 'completed' ? returnvalue : null,
-      // Only include error if failed
-      error: state === 'failed' ? {
-        message: failedReason,
-        attempts: attemptsMade,
-      } : null,
-    });
+    return NextResponse.json(
+      { 
+        error: 'Job not found',
+        message: 'Queue-based jobs are not supported. Use synchronous mode.',
+      },
+      { status: 404 }
+    );
   } catch (error: any) {
-    console.error('[API] Error fetching job status:', error);
+    console.error('[API] Error in status endpoint:', error);
     
     return NextResponse.json(
       {
-        error: 'Failed to fetch job status',
+        error: 'Status check failed',
         details: error.message,
       },
       { status: 500 }

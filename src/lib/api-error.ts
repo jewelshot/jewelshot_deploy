@@ -173,12 +173,13 @@ export function withErrorHandling<T = any>(
         }
       }
 
-      // Default to internal error
+      // Default to internal error - always include message for debugging
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('[API] Internal error details:', errorMessage);
+      
       return createApiError(
         ApiErrorCode.INTERNAL_ERROR,
-        process.env.NODE_ENV === 'development' 
-          ? (error as Error).message 
-          : undefined
+        errorMessage // Always show error message for better debugging
       );
     }
   };
