@@ -303,7 +303,8 @@ export default function StudioLabPage() {
     const groupedJson = buildGroupedJSON(
       { gender, jewelryType },
       selections,
-      allBlocks
+      allBlocks,
+      '9:16' // Default aspect ratio for lab
     );
     
     // Debug: Check for unmapped categories

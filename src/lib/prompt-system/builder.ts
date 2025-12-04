@@ -281,15 +281,20 @@ export function buildPromptFromSelections(
 
 /**
  * Build grouped JSON from block selections
- * New structure: Gender → Model → Styling → Jewelry Type → Jewelry-Specific
+ * New structure: Generation Settings → Gender → Model → Styling → Jewelry Type → Jewelry-Specific
  */
 export function buildGroupedJSON(
   context: BlockContext,
   selections: BlockSelections,
-  allBlocks: MicroBlock[]
+  allBlocks: MicroBlock[],
+  aspectRatio: string = '9:16'
 ): Record<string, any> {
   const json: Record<string, any> = {
-    gender: context.gender,
+    generationSettings: {
+      gender: context.gender,
+      jewelryType: context.jewelryType,
+      aspectRatio: aspectRatio,
+    },
     model: {},
     styling: {},
     environment: {},
@@ -297,7 +302,6 @@ export function buildGroupedJSON(
     'post-production': {},
     'creative-direction': {},
     'lifestyle-extras': {},
-    jewelryType: context.jewelryType,
     'jewelry-specific': {},
   };
   
@@ -356,7 +360,7 @@ export function buildGroupedJSON(
     }
   });
   
-  // Clean up empty objects
+  // Clean up empty objects (keep generationSettings always)
   if (Object.keys(json.model).length === 0) delete json.model;
   if (Object.keys(json.styling).length === 0) delete json.styling;
   if (Object.keys(json.environment).length === 0) delete json.environment;
@@ -367,5 +371,48 @@ export function buildGroupedJSON(
   if (Object.keys(json['jewelry-specific']).length === 0) delete json['jewelry-specific'];
   
   return json;
+}
+
+/**
+ * Build API-ready prompt with generation settings prefix
+ * For sending to nano-banana edit API
+ */
+export function buildAPIPrompt(
+  context: BlockContext,
+  selections: BlockSelections,
+  allBlocks: MicroBlock[],
+  aspectRatio: string = '9:16'
+): { prompt: string; aspectRatio: string } {
+  const builder = new PromptBuilder();
+  
+  // Generation settings header
+  builder.addCore(
+    `[GENERATION SETTINGS]
+Gender: ${context.gender}
+Jewelry Type: ${context.jewelryType}
+Aspect Ratio: ${aspectRatio}
+
+[PROMPT]
+Professional ${context.gender}'s ${context.jewelryType} photography`
+  );
+  
+  // Preservation rules
+  builder.addPreservation();
+  
+  // Add selected blocks
+  Object.values(selections).forEach(blockId => {
+    const block = allBlocks.find(b => b.id === blockId);
+    if (block) {
+      builder.addBlock(block);
+    }
+  });
+  
+  // Quality
+  builder.addQuality(aspectRatio);
+  
+  return {
+    prompt: builder.build(),
+    aspectRatio: aspectRatio
+  };
 }
 

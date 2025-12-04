@@ -1,19 +1,34 @@
 /**
  * Studio Presets - Quick Preset Library
  * 
- * Ready-made prompt combinations
+ * Ready-made prompt combinations with generation settings
  */
 
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Sparkles, Copy, Check, Code, Settings } from 'lucide-react';
+import { Sparkles, Copy, Check, Code, Settings, ArrowRight, Ratio } from 'lucide-react';
 import { getQuickPresets, type QuickPreset } from '@/lib/prompt-system/quick-presets';
 import { BLOCK_REGISTRY } from '@/lib/prompt-system/registry';
-import { buildPromptFromSelections, buildGroupedJSON } from '@/lib/prompt-system/builder';
+import { buildPromptFromSelections, buildGroupedJSON, buildAPIPrompt } from '@/lib/prompt-system/builder';
 import type { Gender, JewelryType } from '@/lib/prompt-system/types';
+import { saveGenerationSettings } from '@/lib/generation-settings-storage';
+import { useRouter } from 'next/navigation';
+
+// Aspect ratio options
+const ASPECT_RATIOS = [
+  { value: '9:16', label: '9:16', description: 'Vertical (Stories)' },
+  { value: '4:5', label: '4:5', description: 'Vertical (Instagram)' },
+  { value: '1:1', label: '1:1', description: 'Square' },
+  { value: '4:3', label: '4:3', description: 'Standard' },
+  { value: '3:2', label: '3:2', description: 'Classic' },
+  { value: '16:9', label: '16:9', description: 'Widescreen' },
+  { value: '21:9', label: '21:9', description: 'Ultrawide' },
+];
 
 export default function PresetsPage() {
+  const router = useRouter();
+  
   // Enable body scroll for presets page (override globals.css)
   useEffect(() => {
     document.body.style.overflow = 'auto';
@@ -27,9 +42,11 @@ export default function PresetsPage() {
 
   const [gender, setGender] = useState<Gender | null>(null);
   const [jewelryType, setJewelryType] = useState<JewelryType | null>(null);
+  const [aspectRatio, setAspectRatio] = useState<string>('9:16');
   const [selectedPreset, setSelectedPreset] = useState<QuickPreset | null>(null);
   const [showJsonView, setShowJsonView] = useState(false);
   const [copiedJson, setCopiedJson] = useState(false);
+  const [copiedPrompt, setCopiedPrompt] = useState(false);
 
   // Get presets based on selection
   const presets = useMemo(() => {
@@ -37,23 +54,76 @@ export default function PresetsPage() {
     return getQuickPresets(gender, jewelryType);
   }, [gender, jewelryType]);
 
+  // Build prompt with generation settings
+  const builtPrompt = useMemo(() => {
+    if (!selectedPreset || !gender || !jewelryType) return '';
+    const allBlocks = BLOCK_REGISTRY.getBlocks({ gender, jewelryType });
+    const { prompt } = buildAPIPrompt(
+      { gender, jewelryType },
+      selectedPreset.selections,
+      allBlocks,
+      aspectRatio
+    );
+    return prompt;
+  }, [selectedPreset, gender, jewelryType, aspectRatio]);
+
+  // Build JSON with generation settings
+  const builtJson = useMemo(() => {
+    if (!selectedPreset || !gender || !jewelryType) return null;
+    const allBlocks = BLOCK_REGISTRY.getBlocks({ gender, jewelryType });
+    return buildGroupedJSON(
+      { gender, jewelryType },
+      selectedPreset.selections,
+      allBlocks,
+      aspectRatio
+    );
+  }, [selectedPreset, gender, jewelryType, aspectRatio]);
+
   // Copy JSON to clipboard
   const copyJsonToClipboard = async () => {
-    if (!selectedPreset || !gender || !jewelryType) return;
+    if (!builtJson) return;
     
     try {
-      const allBlocks = BLOCK_REGISTRY.getBlocks({ gender, jewelryType });
-      const groupedJson = buildGroupedJSON(
-        { gender, jewelryType },
-        selectedPreset.selections,
-        allBlocks
-      );
-      await navigator.clipboard.writeText(JSON.stringify(groupedJson, null, 2));
+      await navigator.clipboard.writeText(JSON.stringify(builtJson, null, 2));
       setCopiedJson(true);
       setTimeout(() => setCopiedJson(false), 2000);
     } catch (err) {
       console.error('Failed to copy JSON:', err);
     }
+  };
+
+  // Copy Prompt to clipboard
+  const copyPromptToClipboard = async () => {
+    if (!builtPrompt) return;
+    
+    try {
+      await navigator.clipboard.writeText(builtPrompt);
+      setCopiedPrompt(true);
+      setTimeout(() => setCopiedPrompt(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy prompt:', err);
+    }
+  };
+
+  // Use preset in Studio
+  const handleUseInStudio = () => {
+    if (!gender || !jewelryType || !selectedPreset) return;
+    
+    // Save generation settings
+    saveGenerationSettings({
+      gender,
+      jewelryType,
+      aspectRatio,
+      applyToAll: true,
+      timestamp: Date.now(),
+    });
+
+    // Save preset prompt to sessionStorage for Studio to pick up
+    sessionStorage.setItem('jewelshot_preset_prompt', builtPrompt);
+    sessionStorage.setItem('jewelshot_preset_name', selectedPreset.name);
+    
+    // Navigate to Studio
+    router.push('/studio');
   };
 
   return (
@@ -72,12 +142,15 @@ export default function PresetsPage() {
           </div>
         </div>
 
-        {/* Gender & Jewelry Type Selection */}
+        {/* Generation Settings */}
         <div className="mb-8 rounded-2xl border border-purple-500/30 bg-purple-500/5 p-8">
-          <h2 className="text-xl font-semibold mb-6">Select Gender & Jewelry Type</h2>
+          <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+            <Settings className="h-5 w-5 text-purple-400" />
+            Generation Settings
+          </h2>
           
           {/* Gender Selection */}
-          <div className="mb-8">
+          <div className="mb-6">
             <label className="block text-sm font-medium text-white/80 mb-3">Gender</label>
             <div className="grid grid-cols-2 gap-4 max-w-md">
               <button
@@ -115,7 +188,7 @@ export default function PresetsPage() {
 
           {/* Jewelry Type Selection */}
           {gender && (
-            <div>
+            <div className="mb-6">
               <label className="block text-sm font-medium text-white/80 mb-3">Jewelry Type</label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl">
                 <button
@@ -177,6 +250,35 @@ export default function PresetsPage() {
               </div>
             </div>
           )}
+
+          {/* Aspect Ratio Selection */}
+          {gender && jewelryType && (
+            <div>
+              <label className="block text-sm font-medium text-white/80 mb-3 flex items-center gap-2">
+                <Ratio className="h-4 w-4" />
+                Aspect Ratio
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {ASPECT_RATIOS.map((ratio) => (
+                  <button
+                    key={ratio.value}
+                    onClick={() => setAspectRatio(ratio.value)}
+                    className={`px-4 py-2 rounded-lg border transition-all text-sm ${
+                      aspectRatio === ratio.value
+                        ? 'border-purple-500 bg-purple-500/20 text-purple-300'
+                        : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20 hover:bg-white/10'
+                    }`}
+                    title={ratio.description}
+                  >
+                    {ratio.label}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-white/40 mt-2">
+                Selected: {ASPECT_RATIOS.find(r => r.value === aspectRatio)?.description}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Presets Grid */}
@@ -236,7 +338,9 @@ export default function PresetsPage() {
                   {/* Header */}
                   <div className="p-5 border-b border-white/10">
                     <h3 className="font-semibold text-lg mb-1">{selectedPreset.name}</h3>
-                    <p className="text-sm text-white/60">Prompt Preview</p>
+                    <p className="text-sm text-white/60">
+                      {gender} · {jewelryType} · {aspectRatio}
+                    </p>
                   </div>
 
                   {/* View Toggle */}
@@ -266,19 +370,31 @@ export default function PresetsPage() {
                   </div>
 
                   {/* Content */}
-                  <div className="p-5 max-h-[600px] overflow-y-auto">
+                  <div className="p-5 max-h-[400px] overflow-y-auto">
                     {!showJsonView ? (
-                      <pre className="whitespace-pre-wrap text-sm text-white/80 font-mono leading-relaxed">
-                        {(() => {
-                          const allBlocks = BLOCK_REGISTRY.getBlocks({ gender, jewelryType });
-                          return buildPromptFromSelections(
-                            { gender, jewelryType },
-                            selectedPreset.selections,
-                            allBlocks,
-                            '9:16'
-                          );
-                        })()}
-                      </pre>
+                      <>
+                        <div className="flex items-center justify-end mb-3">
+                          <button
+                            onClick={copyPromptToClipboard}
+                            className="flex items-center gap-1.5 rounded-lg border border-purple-500/30 bg-purple-500/10 px-3 py-1.5 text-sm text-purple-400 transition-colors hover:bg-purple-500/20"
+                          >
+                            {copiedPrompt ? (
+                              <>
+                                <Check className="h-3.5 w-3.5" />
+                                Copied!
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="h-3.5 w-3.5" />
+                                Copy Prompt
+                              </>
+                            )}
+                          </button>
+                        </div>
+                        <pre className="whitespace-pre-wrap text-sm text-white/80 font-mono leading-relaxed">
+                          {builtPrompt}
+                        </pre>
+                      </>
                     ) : (
                       <>
                         <div className="flex items-center justify-end mb-3">
@@ -300,18 +416,24 @@ export default function PresetsPage() {
                           </button>
                         </div>
                         <pre className="whitespace-pre-wrap text-xs text-green-400 font-mono leading-relaxed">
-                          {(() => {
-                            const allBlocks = BLOCK_REGISTRY.getBlocks({ gender, jewelryType });
-                            const groupedJson = buildGroupedJSON(
-                              { gender, jewelryType },
-                              selectedPreset.selections,
-                              allBlocks
-                            );
-                            return JSON.stringify(groupedJson, null, 2);
-                          })()}
+                          {builtJson ? JSON.stringify(builtJson, null, 2) : '{}'}
                         </pre>
                       </>
                     )}
+                  </div>
+
+                  {/* Action Button */}
+                  <div className="p-4 border-t border-white/10 bg-white/5">
+                    <button
+                      onClick={handleUseInStudio}
+                      className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-3 font-semibold text-white transition-all hover:from-purple-500 hover:to-pink-500 hover:shadow-lg hover:shadow-purple-500/30"
+                    >
+                      Use in Studio
+                      <ArrowRight className="h-5 w-5" />
+                    </button>
+                    <p className="text-xs text-white/40 text-center mt-2">
+                      Opens Studio with this preset ready to generate
+                    </p>
                   </div>
                 </div>
               </div>
@@ -322,4 +444,3 @@ export default function PresetsPage() {
     </div>
   );
 }
-
