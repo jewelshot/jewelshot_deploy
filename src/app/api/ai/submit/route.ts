@@ -122,8 +122,27 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     
     console.log(`[API] Processing ${operation} synchronously for user ${user.id}`);
     console.log(`[API] Credits reserved: ${creditReservation.amount} (Transaction: ${creditReservation.transactionId})`);
-    console.log(`[API] FAL_KEY exists: ${!!process.env.FAL_KEY}`);
-    console.log(`[API] FAL_AI_KEY_1 exists: ${!!process.env.FAL_AI_KEY_1}`);
+    
+    // Check for FAL API key before processing
+    const hasFalKey = !!(process.env.FAL_KEY || process.env.FAL_AI_KEY_1);
+    console.log(`[API] FAL API key configured: ${hasFalKey}`);
+    
+    if (!hasFalKey) {
+      console.error('[API] No FAL API key configured!');
+      // Refund credits since we can't process
+      try {
+        await refundCredit(creditReservation.transactionId);
+      } catch (e) {
+        console.error('[API] Failed to refund credits:', e);
+      }
+      return NextResponse.json(
+        {
+          error: 'AI service not configured',
+          message: 'FAL.AI API key is not configured. Please contact support.',
+        },
+        { status: 503 }
+      );
+    }
 
     try {
       // Process the job immediately (synchronous)

@@ -246,11 +246,13 @@ export async function generateImage(
 
     // Handle failed status
     if (response.status === 'failed' || response.state === 'failed') {
-      throw new Error(response.error?.message || 'Generation failed');
+      const errorMsg = response.error?.message || response.message || 'Generation failed';
+      throw new Error(errorMsg);
     }
 
     // Unexpected response
-    throw new Error('Unexpected response from server');
+    console.error('[FAL.AI] Unexpected response:', JSON.stringify(response));
+    throw new Error(response.message || 'Unexpected response from server');
 
   } catch (error) {
     logger.error('❌ Generation failed:', error);
@@ -347,11 +349,13 @@ export async function editImage(
 
     // Handle failed status
     if (response.status === 'failed' || response.state === 'failed') {
-      throw new Error(response.error?.message || 'Edit failed');
+      const errorMsg = response.error?.message || response.message || 'Edit failed';
+      throw new Error(errorMsg);
     }
 
     // Unexpected response
-    throw new Error('Unexpected response from server');
+    console.error('[FAL.AI] Unexpected response:', JSON.stringify(response));
+    throw new Error(response.message || 'Unexpected response from server');
 
   } catch (error) {
     logger.error('❌ Edit failed:', error);
