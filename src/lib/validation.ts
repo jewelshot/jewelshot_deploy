@@ -179,9 +179,22 @@ export const validateImageFile = (
 
 /**
  * Aspect Ratio Validation
+ * Supports all nano-banana API aspect ratios
  */
 export const validateAspectRatio = (value: any, fieldName: string = 'aspect_ratio') => {
-  const validAspectRatios = ['1:1', '16:9', '9:16', '4:3', '3:4', '21:9'] as const;
+  const validAspectRatios = [
+    'auto',    // nano-banana default
+    '1:1',     // Square
+    '4:5',     // Instagram Portrait
+    '5:4',     // Instagram Landscape
+    '3:4',     // Portrait
+    '4:3',     // Standard
+    '2:3',     // Portrait Classic
+    '3:2',     // Landscape Classic
+    '9:16',    // Vertical/Stories
+    '16:9',    // Widescreen
+    '21:9',    // Ultrawide
+  ] as const;
   return validateEnum(value, fieldName, validAspectRatios, false);
 };
 
@@ -195,13 +208,13 @@ export const validateAIParams = (operation: string, params: any) => {
 
   switch (operation) {
     case 'generate':
-      validateString(params.prompt, 'prompt', { required: true, minLength: 3, maxLength: 1000 });
+      validateString(params.prompt, 'prompt', { required: true, minLength: 3, maxLength: 4000 }); // Increased for preset prompts
       validateAspectRatio(params.aspect_ratio);
       break;
 
     case 'edit':
       validateUrl(params.image_url, 'image_url', true);
-      validateString(params.prompt, 'prompt', { required: true, minLength: 3, maxLength: 1000 });
+      validateString(params.prompt, 'prompt', { required: true, minLength: 3, maxLength: 4000 }); // Increased for preset prompts with negative prompts
       validateAspectRatio(params.aspect_ratio);
       break;
 
