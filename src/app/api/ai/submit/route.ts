@@ -187,10 +187,17 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
         console.error('[API] Failed to refund credits:', refundError);
       }
 
+      // Extract error message properly
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : typeof error === 'string' 
+          ? error 
+          : 'Unknown error occurred';
+
       return NextResponse.json(
         {
           error: 'AI processing failed',
-          message: error.message || 'Unknown error',
+          message: errorMessage,
         },
         { status: 500 }
       );

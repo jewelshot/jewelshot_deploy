@@ -218,10 +218,13 @@ export async function generateImage(
     );
 
     if (!submitResponse.ok) {
-      const error = await submitResponse.json().catch(() => ({
+      const errorData = await submitResponse.json().catch(() => ({
         error: `HTTP ${submitResponse.status}: ${submitResponse.statusText}`,
       }));
-      throw new Error(error.error || error.message || 'Failed to generate image');
+      const errorMessage = typeof errorData === 'string' 
+        ? errorData 
+        : errorData.message || errorData.error || 'Failed to generate image';
+      throw new Error(errorMessage);
     }
 
     const response = await submitResponse.json();
@@ -316,10 +319,13 @@ export async function editImage(
     );
 
     if (!submitResponse.ok) {
-      const error = await submitResponse.json().catch(() => ({
+      const errorData = await submitResponse.json().catch(() => ({
         error: `HTTP ${submitResponse.status}: ${submitResponse.statusText}`,
       }));
-      throw new Error(error.error || error.message || 'Failed to edit image');
+      const errorMessage = typeof errorData === 'string' 
+        ? errorData 
+        : errorData.message || errorData.error || 'Failed to edit image';
+      throw new Error(errorMessage);
     }
 
     const response = await submitResponse.json();

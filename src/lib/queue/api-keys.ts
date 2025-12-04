@@ -28,16 +28,28 @@ if (typeof window === 'undefined') {
  * Load all available FAL.AI API keys from environment
  * Filters out undefined/empty keys
  */
-const API_KEYS = [
-  process.env.FAL_AI_KEY_1,
-  process.env.FAL_AI_KEY_2,
-  process.env.FAL_AI_KEY_3,
-  process.env.FAL_AI_KEY_4,
-  process.env.FAL_AI_KEY_5,
-].filter((key): key is string => Boolean(key));
+/**
+ * Load all available FAL.AI API keys from environment
+ * Also checks for FAL_KEY (single key setup)
+ */
+const loadApiKeys = (): string[] => {
+  const keys = [
+    process.env.FAL_KEY, // Single key (common setup)
+    process.env.FAL_AI_KEY_1,
+    process.env.FAL_AI_KEY_2,
+    process.env.FAL_AI_KEY_3,
+    process.env.FAL_AI_KEY_4,
+    process.env.FAL_AI_KEY_5,
+  ].filter((key): key is string => Boolean(key));
+  
+  return keys;
+};
 
-if (API_KEYS.length === 0) {
-  throw new Error('No FAL.AI API keys found. Set at least FAL_AI_KEY_1 in environment variables.');
+const API_KEYS = loadApiKeys();
+
+// Log warning instead of throwing during build
+if (API_KEYS.length === 0 && typeof window === 'undefined') {
+  console.warn('[API Keys] No FAL.AI API keys found. Set FAL_KEY or FAL_AI_KEY_1 in environment variables.');
 }
 
 // ============================================
@@ -51,8 +63,13 @@ let currentIndex = 0;
  * Distributes load evenly across all available keys
  * 
  * @returns {string} Next API key in rotation
+ * @throws {Error} If no API keys are configured
  */
 export function getNextApiKey(): string {
+  if (API_KEYS.length === 0) {
+    throw new Error('No FAL.AI API keys configured. Please set FAL_KEY or FAL_AI_KEY_1 environment variable.');
+  }
+  
   const key = API_KEYS[currentIndex];
   currentIndex = (currentIndex + 1) % API_KEYS.length;
   
