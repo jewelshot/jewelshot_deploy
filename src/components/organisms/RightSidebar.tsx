@@ -29,7 +29,7 @@ type Mode = 'quick' | 'selective' | 'advanced';
 // Custom event for image upload
 declare global {
   interface WindowEventMap {
-    'jewelshot:imageUploaded': CustomEvent;
+    'jewelshot:imageUploaded': CustomEvent<{ fileName?: string; imageUrl?: string }>;
   }
 }
 
@@ -49,6 +49,9 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
   // Modal states
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const [isSettingsRequired, setIsSettingsRequired] = useState(false);
+  
+  // Thumbnail state for canvas image preview
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const [confirmModal, setConfirmModal] = useState<{
     show: boolean;
     presetName: string;
@@ -72,8 +75,14 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
 
   // Listen for image upload events
   useEffect(() => {
-    const handleImageUpload = () => {
+    const handleImageUpload = (event: CustomEvent<{ fileName?: string; imageUrl?: string }>) => {
       logger.info('Image uploaded event received');
+      
+      // Update thumbnail if image URL is provided
+      if (event.detail?.imageUrl) {
+        setThumbnailUrl(event.detail.imageUrl);
+        logger.info('Thumbnail URL updated');
+      }
       
       // Check if we should apply saved settings or show modal
       const savedSettings = loadGenerationSettings();
@@ -226,13 +235,33 @@ ${confirmModal.libraryNegativePrompt}`;
       className={`fixed bottom-0 right-0 top-0 z-[100] w-[260px] border-l border-[rgba(139,92,246,0.15)] bg-[rgba(10,10,10,0.7)] shadow-[-4px_0_24px_rgba(0,0,0,0.3)] backdrop-blur-[24px] backdrop-saturate-[200%] transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)] ${rightOpen ? 'translate-x-0' : 'translate-x-full'}`}
     >
       <div className="sidebar-scroll flex h-full flex-col overflow-y-auto px-4 py-3">
-        {/* Settings Button - Replaces Configuration Accordion & Aspect Ratio */}
+        {/* Settings Button with Thumbnail Preview */}
         <button
           onClick={handleSettingsButtonClick}
-          className="group mb-3 flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2.5 transition-all hover:border-purple-500/30 hover:bg-purple-500/5"
+          className="group relative mb-3 flex items-center gap-2 overflow-hidden rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2.5 transition-all hover:border-purple-500/30 hover:bg-purple-500/5"
         >
-          <Settings className="h-4 w-4 text-purple-400 transition-transform group-hover:rotate-45" />
-          <div className="flex-1 text-left">
+          {/* Thumbnail with gradient fade - positioned on the right */}
+          {thumbnailUrl && (
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-24">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={thumbnailUrl}
+                alt=""
+                className="h-full w-full object-cover"
+              />
+              {/* Gradient overlay - fades from left (opaque) to right (transparent) */}
+              <div 
+                className="absolute inset-0"
+                style={{
+                  background: 'linear-gradient(to right, rgba(10,10,10,1) 0%, rgba(10,10,10,0.9) 20%, rgba(10,10,10,0.5) 60%, rgba(10,10,10,0) 100%)',
+                }}
+              />
+            </div>
+          )}
+          
+          {/* Content - stays on top */}
+          <Settings className="relative z-10 h-4 w-4 text-purple-400 transition-transform group-hover:rotate-45" />
+          <div className="relative z-10 flex-1 text-left">
             <div className="text-xs font-medium text-white">Settings</div>
             <div className="text-[10px] text-white/50">
               {getSettingsSummary()}

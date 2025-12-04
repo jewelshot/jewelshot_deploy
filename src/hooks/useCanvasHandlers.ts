@@ -196,7 +196,10 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
             
             // 🎯 NEW: Dispatch image upload event for settings modal
             const uploadEvent = new CustomEvent('jewelshot:imageUploaded', {
-              detail: { fileName: processedFile.name },
+              detail: { 
+                fileName: processedFile.name,
+                imageUrl: result, // Include image URL for thumbnail preview
+              },
             });
             window.dispatchEvent(uploadEvent);
             logger.info('📢 Image upload event dispatched');
