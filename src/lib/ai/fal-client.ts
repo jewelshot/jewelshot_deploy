@@ -1,14 +1,13 @@
 /**
  * ============================================================================
- * FAL.AI CLIENT - QUEUE-BASED IMPLEMENTATION
+ * FAL.AI CLIENT - SYNCHRONOUS IMPLEMENTATION
  * ============================================================================
  *
- * Client-side wrapper that submits jobs to queue system
- * Uses atomic credit system (reserve/confirm/refund)
+ * Client-side wrapper that submits jobs to API
+ * Now uses synchronous processing - no queue polling needed
  *
- * NEW ROUTES:
- * - /api/ai/submit - Submit job to queue
- * - /api/ai/status/[jobId] - Poll for result
+ * ROUTES:
+ * - /api/ai/submit - Submit and process job (synchronous)
  */
 
 import { createScopedLogger } from '@/lib/logger';
@@ -27,6 +26,7 @@ export interface GenerateInput {
   num_images?: number;
   output_format?: 'jpeg' | 'png' | 'webp';
   aspect_ratio?:
+    | 'auto'
     | '21:9'
     | '1:1'
     | '4:3'
@@ -48,6 +48,7 @@ export interface EditInput {
   num_images?: number;
   output_format?: 'jpeg' | 'png' | 'webp';
   aspect_ratio?:
+    | 'auto'
     | '21:9'
     | '1:1'
     | '4:3'
@@ -98,8 +99,8 @@ const getApiBaseUrl = (): string => {
 
 const API_BASE_URL = getApiBaseUrl();
 
-// Timeout configuration
-const REQUEST_TIMEOUT = 45000; // 45 seconds (FAL.AI can take 20-30s)
+// Timeout configuration - increased for synchronous processing
+const REQUEST_TIMEOUT = 120000; // 2 minutes (FAL.AI can take 30-60s)
 const RETRY_ATTEMPTS = 2; // Retry failed requests twice
 const RETRY_DELAY = 2000; // Wait 2s between retries
 
@@ -175,7 +176,7 @@ async function retry<T>(
 // ============================================================================
 
 /**
- * Generate image from text prompt (via QUEUE SYSTEM)
+ * Generate image from text prompt (SYNCHRONOUS)
  *
  * @example
  * ```ts
@@ -193,9 +194,9 @@ export async function generateImage(
   if (onProgress) onProgress('INITIALIZING', 'Starting generation...');
 
   try {
-    if (onProgress) onProgress('SUBMITTING', 'Submitting to queue...');
+    if (onProgress) onProgress('GENERATING', 'Processing with AI...');
 
-    // Submit job to queue
+    // Submit job - synchronous processing
     const submitResponse = await fetchWithTimeout(
       `${API_BASE_URL}/api/ai/submit`,
       {
@@ -220,48 +221,34 @@ export async function generateImage(
       const error = await submitResponse.json().catch(() => ({
         error: `HTTP ${submitResponse.status}: ${submitResponse.statusText}`,
       }));
-      throw new Error(error.error || 'Failed to submit job');
+      throw new Error(error.error || error.message || 'Failed to generate image');
     }
 
-    const { jobId } = await submitResponse.json();
+    const response = await submitResponse.json();
 
-    if (onProgress) onProgress('QUEUED', 'Waiting for processing...');
-
-    // Poll for result
-    let attempts = 0;
-    const maxAttempts = 150; // 5 minutes max (2s * 150)
-    
-    while (attempts < maxAttempts) {
-      await new Promise(resolve => setTimeout(resolve, 2000)); // 2s interval
-      attempts++;
-
-      const statusResponse = await fetch(`${API_BASE_URL}/api/ai/status/${jobId}`);
-      const status = await statusResponse.json();
-
-      if (status.state === 'active') {
-        if (onProgress) onProgress('GENERATING', 'Processing with AI...');
-      }
-
-      if (status.state === 'completed' && status.result) {
-        if (onProgress) onProgress('COMPLETED', 'Generation complete!');
-        logger.info('✅ Generation successful (via queue)');
-        
-        // Map queue result to old FalOutput format
-        return {
-          images: [{
-            url: status.result.data.imageUrl,
-            width: status.result.data.width,
-            height: status.result.data.height,
-          }],
-        };
-      }
-
-      if (status.state === 'failed') {
-        throw new Error(status.error?.message || 'Generation failed');
-      }
+    // Synchronous response - result is directly in response
+    if (response.status === 'completed' && response.result) {
+      if (onProgress) onProgress('COMPLETED', 'Generation complete!');
+      logger.info('✅ Generation successful');
+      
+      // Map result to FalOutput format
+      return {
+        images: [{
+          url: response.result.data.imageUrl,
+          width: response.result.data.width,
+          height: response.result.data.height,
+        }],
+      };
     }
 
-    throw new Error('Generation timeout - job took too long');
+    // Handle failed status
+    if (response.status === 'failed' || response.state === 'failed') {
+      throw new Error(response.error?.message || 'Generation failed');
+    }
+
+    // Unexpected response
+    throw new Error('Unexpected response from server');
+
   } catch (error) {
     logger.error('❌ Generation failed:', error);
 
@@ -286,7 +273,7 @@ export async function generateImage(
 // ============================================================================
 
 /**
- * Edit existing image with AI (via QUEUE SYSTEM)
+ * Edit existing image with AI (SYNCHRONOUS)
  *
  * @example
  * ```ts
@@ -304,9 +291,9 @@ export async function editImage(
   if (onProgress) onProgress('UPLOADING', 'Preparing image...');
 
   try {
-    if (onProgress) onProgress('SUBMITTING', 'Submitting to queue...');
+    if (onProgress) onProgress('EDITING', 'Processing with AI...');
 
-    // Submit job to queue
+    // Submit job - synchronous processing
     const submitResponse = await fetchWithTimeout(
       `${API_BASE_URL}/api/ai/submit`,
       {
@@ -332,48 +319,34 @@ export async function editImage(
       const error = await submitResponse.json().catch(() => ({
         error: `HTTP ${submitResponse.status}: ${submitResponse.statusText}`,
       }));
-      throw new Error(error.error || 'Failed to submit job');
+      throw new Error(error.error || error.message || 'Failed to edit image');
     }
 
-    const { jobId } = await submitResponse.json();
+    const response = await submitResponse.json();
 
-    if (onProgress) onProgress('QUEUED', 'Waiting for processing...');
-
-    // Poll for result
-    let attempts = 0;
-    const maxAttempts = 150; // 5 minutes max (2s * 150)
-    
-    while (attempts < maxAttempts) {
-      await new Promise(resolve => setTimeout(resolve, 2000)); // 2s interval
-      attempts++;
-
-      const statusResponse = await fetch(`${API_BASE_URL}/api/ai/status/${jobId}`);
-      const status = await statusResponse.json();
-
-      if (status.state === 'active') {
-        if (onProgress) onProgress('EDITING', 'Processing with AI...');
-      }
-
-      if (status.state === 'completed' && status.result) {
-        if (onProgress) onProgress('COMPLETED', 'Edit complete!');
-        logger.info('✅ Edit successful (via queue)');
-        
-        // Map queue result to old FalOutput format
-        return {
-          images: [{
-            url: status.result.data.imageUrl,
-            width: status.result.data.width,
-            height: status.result.data.height,
-          }],
-        };
-      }
-
-      if (status.state === 'failed') {
-        throw new Error(status.error?.message || 'Edit failed');
-      }
+    // Synchronous response - result is directly in response
+    if (response.status === 'completed' && response.result) {
+      if (onProgress) onProgress('COMPLETED', 'Edit complete!');
+      logger.info('✅ Edit successful');
+      
+      // Map result to FalOutput format
+      return {
+        images: [{
+          url: response.result.data.imageUrl,
+          width: response.result.data.width,
+          height: response.result.data.height,
+        }],
+      };
     }
 
-    throw new Error('Edit timeout - job took too long');
+    // Handle failed status
+    if (response.status === 'failed' || response.state === 'failed') {
+      throw new Error(response.error?.message || 'Edit failed');
+    }
+
+    // Unexpected response
+    throw new Error('Unexpected response from server');
+
   } catch (error) {
     logger.error('❌ Edit failed:', error);
 

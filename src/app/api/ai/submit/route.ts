@@ -2,17 +2,17 @@
  * AI Job Submission Endpoint
  * 
  * Unified endpoint for all AI operations
- * Accepts job request, adds to queue, returns jobId
+ * Synchronous processing - processes immediately and returns result
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getQueueByPriority } from '@/lib/queue/queues';
 import { AIOperation, JobPriority } from '@/lib/queue/types';
-import { reserveCredit, getAvailableCredits } from '@/lib/credit-manager';
+import { reserveCredit, getAvailableCredits, confirmCredit, refundCredit } from '@/lib/credit-manager';
 import { aiRateLimit, checkRateLimit } from '@/lib/rate-limit';
 import { createApiError, ApiErrorCode, withErrorHandling } from '@/lib/api-error';
 import { validateAIParams, ValidationError } from '@/lib/validation';
+import { processAIJob } from '@/lib/queue/processors/ai-processor';
 
 // ============================================
 // POST /api/ai/submit
@@ -115,36 +115,15 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     }
 
     // ============================================
-    // RATE LIMITING (Per User)
+    // SYNCHRONOUS PROCESSING
     // ============================================
     
-    // TODO: Implement rate limiting check
-    // const isAllowed = await checkUserRateLimit(user.id, priority);
-    // if (!isAllowed) {
-    //   // Refund credits if rate limited
-    //   await refundCredit(creditReservation.transactionId);
-    //   return NextResponse.json(
-    //     { error: 'Rate limit exceeded. Please try again later.' },
-    //     { status: 429 }
-    //   );
-    // }
+    console.log(`[API] Processing ${operation} synchronously for user ${user.id}`);
+    console.log(`[API] Credits reserved: ${creditReservation.amount} (Transaction: ${creditReservation.transactionId})`);
 
-    // ============================================
-    // ADD TO QUEUE
-    // ============================================
-    
-    const queue = getQueueByPriority(priority);
-    
-    if (!queue) {
-      return NextResponse.json(
-        { error: 'Queue system not configured. Please contact support.' },
-        { status: 503 }
-      );
-    }
-    
-    const job = await queue.add(
-      operation,
-      {
+    try {
+      // Process the job immediately (synchronous)
+      const result = await processAIJob({
         userId: user.id,
         operation,
         params,
@@ -154,29 +133,66 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
           creditTransactionId: creditReservation.transactionId,
           submittedAt: new Date().toISOString(),
         },
-      },
-      {
-        // Job-specific options (override defaults if needed)
-        // timeout: priority === 'urgent' ? 60000 : undefined,
+      });
+
+      if (result.success) {
+        // Confirm credit deduction
+        try {
+          await confirmCredit(creditReservation.transactionId);
+          console.log(`[API] Credits confirmed for transaction ${creditReservation.transactionId}`);
+        } catch (creditError) {
+          console.error('[API] Failed to confirm credits:', creditError);
+        }
+
+        // Return successful result
+        return NextResponse.json({
+          jobId: `sync-${Date.now()}`,
+          status: 'completed',
+          state: 'completed',
+          priority,
+          operation,
+          result: result,
+          creditReservation: {
+            transactionId: creditReservation.transactionId,
+            amount: creditReservation.amount,
+          },
+        });
+      } else {
+        // Processing failed - refund credits
+        try {
+          await refundCredit(creditReservation.transactionId);
+          console.log(`[API] Credits refunded for failed job ${creditReservation.transactionId}`);
+        } catch (refundError) {
+          console.error('[API] Failed to refund credits:', refundError);
+        }
+
+        return NextResponse.json(
+          {
+            jobId: `sync-${Date.now()}`,
+            status: 'failed',
+            state: 'failed',
+            error: result.error || { message: 'Processing failed' },
+          },
+          { status: 500 }
+        );
       }
-    );
+    } catch (error: any) {
+      console.error('[API] Synchronous processing error:', error);
+      
+      // Refund credits on error
+      try {
+        await refundCredit(creditReservation.transactionId);
+        console.log(`[API] Credits refunded due to error ${creditReservation.transactionId}`);
+      } catch (refundError) {
+        console.error('[API] Failed to refund credits:', refundError);
+      }
 
-    console.log(`[API] Job ${job.id} submitted to ${priority} queue by user ${user.id}`);
-    console.log(`[API] Credits reserved: ${creditReservation.amount} (Transaction: ${creditReservation.transactionId})`);
-
-    // ============================================
-    // RESPONSE
-    // ============================================
-    
-    return NextResponse.json({
-      jobId: job.id,
-      status: 'queued',
-      priority,
-      operation,
-      creditReservation: {
-        transactionId: creditReservation.transactionId,
-        amount: creditReservation.amount,
-      },
-    });
+      return NextResponse.json(
+        {
+          error: 'AI processing failed',
+          message: error.message || 'Unknown error',
+        },
+        { status: 500 }
+      );
+    }
 });
-
