@@ -19,6 +19,8 @@ import { processAIJob } from '@/lib/queue/processors/ai-processor';
 // ============================================
 
 export const POST = withErrorHandling(async (request: NextRequest) => {
+    console.log('[API/submit] Request received');
+    
     // ============================================
     // AUTHENTICATION
     // ============================================
@@ -120,6 +122,8 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     
     console.log(`[API] Processing ${operation} synchronously for user ${user.id}`);
     console.log(`[API] Credits reserved: ${creditReservation.amount} (Transaction: ${creditReservation.transactionId})`);
+    console.log(`[API] FAL_KEY exists: ${!!process.env.FAL_KEY}`);
+    console.log(`[API] FAL_AI_KEY_1 exists: ${!!process.env.FAL_AI_KEY_1}`);
 
     try {
       // Process the job immediately (synchronous)

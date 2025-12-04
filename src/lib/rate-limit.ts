@@ -275,14 +275,21 @@ export async function checkRateLimit(
     return { success: true };
   }
 
-  const { success, limit, remaining, reset } = await limiter.limit(identifier);
+  try {
+    const { success, limit, remaining, reset } = await limiter.limit(identifier);
 
-  return {
-    success,
-    limit,
-    remaining,
-    reset,
-  };
+    return {
+      success,
+      limit,
+      remaining,
+      reset,
+    };
+  } catch (error) {
+    // If Redis fails (e.g., rate limit exceeded), allow request to proceed
+    // This prevents Redis issues from blocking all requests
+    console.warn('[RateLimit] Redis error, allowing request:', error instanceof Error ? error.message : 'Unknown error');
+    return { success: true };
+  }
 }
 
 /**
@@ -307,14 +314,20 @@ export async function checkRateLimitEnhanced(
     return { success: true, type, identifier };
   }
 
-  const { success, limit, remaining, reset } = await limiter.limit(identifier);
+  try {
+    const { success, limit, remaining, reset } = await limiter.limit(identifier);
 
-  return {
-    success,
-    limit,
-    remaining,
-    reset,
-    type,
-    identifier,
-  };
+    return {
+      success,
+      limit,
+      remaining,
+      reset,
+      type,
+      identifier,
+    };
+  } catch (error) {
+    // If Redis fails, allow request to proceed
+    console.warn('[RateLimit] Redis error in enhanced check:', error instanceof Error ? error.message : 'Unknown error');
+    return { success: true, type, identifier };
+  }
 }
