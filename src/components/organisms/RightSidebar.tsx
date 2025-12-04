@@ -16,6 +16,7 @@ import { SelectiveModeContent } from '@/components/molecules/SelectiveModeConten
 import { AdvancedModeContent } from '@/components/molecules/AdvancedModeContent';
 import { PresetConfirmModal } from '@/components/molecules/PresetConfirmModal';
 import { presetPrompts } from '@/lib/preset-prompts';
+import { getPresetById } from '@/data/presets';
 import { createScopedLogger } from '@/lib/logger';
 import { loadGenerationSettings, areSettingsComplete, type GenerationSettings } from '@/lib/generation-settings-storage';
 
@@ -53,6 +54,9 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
     presetName: string;
     presetId: string;
     requiresModel: boolean;
+    isLibraryPreset: boolean;
+    libraryPrompt?: string;
+    libraryNegativePrompt?: string;
   } | null>(null);
 
   // Load saved settings on mount
@@ -94,21 +98,39 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
     };
   }, []);
 
-  // Handle preset selection (no restrictions - always allow)
+  // Handle preset selection - supports both presetPrompts and Library presets
   const handlePresetSelect = (presetId: string) => {
-    const preset = presetPrompts[presetId];
-    if (!preset) {
-      logger.error('RightSidebar: Preset not found:', presetId);
+    // First check presetPrompts (legacy/built-in presets)
+    const legacyPreset = presetPrompts[presetId];
+    if (legacyPreset) {
+      logger.info('RightSidebar: Found legacy preset:', presetId);
+      setConfirmModal({
+        show: true,
+        presetName: legacyPreset.name,
+        presetId,
+        requiresModel: legacyPreset.requiresModel,
+        isLibraryPreset: false,
+      });
       return;
     }
 
-    // Show confirmation modal (jewelry selection can happen in modal if needed)
-    setConfirmModal({
-      show: true,
-      presetName: preset.name,
-      presetId,
-      requiresModel: preset.requiresModel,
-    });
+    // Then check Library presets (from presets.ts / PRESET_CATEGORIES)
+    const libraryPreset = getPresetById(presetId);
+    if (libraryPreset) {
+      logger.info('RightSidebar: Found library preset:', presetId, libraryPreset.title);
+      setConfirmModal({
+        show: true,
+        presetName: libraryPreset.title,
+        presetId,
+        requiresModel: false, // Library presets don't require model
+        isLibraryPreset: true,
+        libraryPrompt: libraryPreset.prompt,
+        libraryNegativePrompt: libraryPreset.negativePrompt,
+      });
+      return;
+    }
+
+    logger.error('RightSidebar: Preset not found in any source:', presetId);
   };
 
   // Handle generation confirmation
@@ -119,30 +141,62 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
     const finalJewelryType = selectedJewelryType || jewelryType;
 
     if (!finalJewelryType) {
-      // This shouldn't happen if modal handles it correctly
       logger.error('RightSidebar: No jewelry type provided');
       return;
     }
 
-    const preset = presetPrompts[confirmModal.presetId];
-    if (!preset) {
-      logger.error('RightSidebar: Preset not found during generation:', confirmModal.presetId);
-      setConfirmModal(null);
-      return;
-    }
+    let finalPrompt: string;
 
-    const prompt = preset.buildPrompt(
-      finalJewelryType,
-      gender || undefined,
-      aspectRatio
-    );
+    if (confirmModal.isLibraryPreset) {
+      // Library preset - build prompt with generation settings header
+      const settingsHeader = `[GENERATION SETTINGS]
+Gender: ${gender || 'not specified'}
+Jewelry Type: ${finalJewelryType}
+Aspect Ratio: ${aspectRatio}
+
+[PROMPT]
+`;
+      finalPrompt = settingsHeader + (confirmModal.libraryPrompt || '');
+      
+      // Add negative prompt if exists
+      if (confirmModal.libraryNegativePrompt) {
+        finalPrompt += `
+
+--no
+${confirmModal.libraryNegativePrompt}`;
+      }
+
+      logger.info('RightSidebar: Built library preset prompt with settings');
+    } else {
+      // Legacy preset - use buildPrompt method
+      const preset = presetPrompts[confirmModal.presetId];
+      if (!preset) {
+        logger.error('RightSidebar: Legacy preset not found during generation:', confirmModal.presetId);
+        setConfirmModal(null);
+        return;
+      }
+
+      finalPrompt = preset.buildPrompt(
+        finalJewelryType,
+        gender || undefined,
+        aspectRatio
+      );
+    }
 
     // Close modal
     setConfirmModal(null);
 
     // Trigger generation with aspect ratio
     if (onGenerateWithPreset) {
-      onGenerateWithPreset(prompt, aspectRatio);
+      logger.info('RightSidebar: Triggering generation', { 
+        presetName: confirmModal.presetName,
+        jewelryType: finalJewelryType,
+        aspectRatio,
+        promptLength: finalPrompt.length 
+      });
+      onGenerateWithPreset(finalPrompt, aspectRatio);
+    } else {
+      logger.warn('RightSidebar: onGenerateWithPreset callback not provided');
     }
   };
 
