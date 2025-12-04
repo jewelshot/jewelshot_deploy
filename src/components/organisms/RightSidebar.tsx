@@ -248,9 +248,9 @@ ${confirmModal.libraryNegativePrompt}`;
           onClick={handleSettingsButtonClick}
           className="group relative mb-3 flex items-center gap-2 overflow-hidden rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2.5 transition-all hover:border-purple-500/30 hover:bg-purple-500/5"
         >
-          {/* Thumbnail with gradient fade - positioned on the right */}
+          {/* Thumbnail with gradient fade - positioned on the right, fades to left */}
           {thumbnailUrl && (
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-28">
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-32">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={thumbnailUrl}
@@ -260,11 +260,11 @@ ${confirmModal.libraryNegativePrompt}`;
                   objectPosition: 'center center',
                 }}
               />
-              {/* Gradient overlay - fades from left (opaque) to right (transparent) */}
+              {/* Gradient overlay - thumbnail visible on right, fades to left */}
               <div 
                 className="absolute inset-0"
                 style={{
-                  background: 'linear-gradient(to right, rgba(10,10,10,1) 0%, rgba(10,10,10,0.95) 15%, rgba(10,10,10,0.7) 40%, rgba(10,10,10,0.3) 70%, rgba(10,10,10,0.1) 100%)',
+                  background: 'linear-gradient(to left, transparent 0%, rgba(10,10,10,0.2) 20%, rgba(10,10,10,0.6) 50%, rgba(10,10,10,0.9) 75%, rgba(10,10,10,1) 100%)',
                 }}
               />
             </div>
