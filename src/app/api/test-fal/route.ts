@@ -65,13 +65,14 @@ export async function POST(request: NextRequest) {
 
     // Extract image URL from response
     let outputImageUrl = null;
+    const data = result.data as any;
     
-    if (result.data?.image?.url) {
-      outputImageUrl = result.data.image.url;
-    } else if (result.data?.images?.[0]?.url) {
-      outputImageUrl = result.data.images[0].url;
-    } else if (result.data?.imageUrl) {
-      outputImageUrl = result.data.imageUrl;
+    if (data?.images?.[0]?.url) {
+      outputImageUrl = data.images[0].url;
+    } else if (data?.image?.url) {
+      outputImageUrl = data.image.url;
+    } else if (data?.imageUrl) {
+      outputImageUrl = data.imageUrl;
     }
 
     console.log('[TEST-FAL] Output image URL:', outputImageUrl);
