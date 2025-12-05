@@ -250,21 +250,19 @@ ${confirmModal.libraryNegativePrompt}`;
         >
           {/* Thumbnail with gradient fade - positioned on the right, fades to left */}
           {thumbnailUrl && (
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-32">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={thumbnailUrl}
-                alt=""
-                className="h-full w-full scale-150 object-contain transition-transform duration-300 group-hover:scale-[1.7]"
+            <div className="pointer-events-none absolute inset-y-0 right-0 z-0 w-32 overflow-hidden">
+              {/* Thumbnail image */}
+              <div 
+                className="absolute inset-0 scale-125 bg-cover bg-center transition-transform duration-300 group-hover:scale-150"
                 style={{
-                  objectPosition: 'center center',
+                  backgroundImage: `url(${thumbnailUrl})`,
                 }}
               />
-              {/* Gradient overlay - thumbnail visible on right, fades to left */}
+              {/* Gradient overlay - fades from right (visible) to left (hidden) */}
               <div 
                 className="absolute inset-0"
                 style={{
-                  background: 'linear-gradient(to left, transparent 0%, rgba(10,10,10,0.2) 20%, rgba(10,10,10,0.6) 50%, rgba(10,10,10,0.9) 75%, rgba(10,10,10,1) 100%)',
+                  background: 'linear-gradient(to left, transparent 0%, transparent 30%, rgba(10,10,10,0.5) 60%, rgba(10,10,10,1) 100%)',
                 }}
               />
             </div>
