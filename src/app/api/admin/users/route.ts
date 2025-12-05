@@ -22,7 +22,7 @@ export const GET = withAdminAuth(
 
   try {
     // Get users with credits
-    let query = supabase
+    const query = supabase
       .from('user_credits')
       .select(`
         user_id,

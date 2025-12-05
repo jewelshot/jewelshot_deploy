@@ -65,7 +65,7 @@ export function DashboardContent() {
           .eq('user_id', user.id);
 
         // Get recent images (last 6)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const { data: recentImages } = (await supabase
           .from('images')
           .select('*')
@@ -74,7 +74,7 @@ export function DashboardContent() {
           .limit(6)) as { data: any };
 
         // Get total storage
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const { data: images } = (await supabase
           .from('images')
           .select('size')

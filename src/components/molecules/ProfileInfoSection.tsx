@@ -49,7 +49,7 @@ export function ProfileInfoSection() {
 
         if (user) {
           // Try to get profile from profiles table
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+           
           const { data: profileData } = (await supabase
             .from('profiles')
             .select('full_name, avatar_url, bio')

@@ -84,7 +84,7 @@ export function UsageStatsSection() {
           .eq('user_id', user.id);
 
         // Get total storage (sum of sizes)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const { data: images } = (await supabase
           .from('images')
           .select('size')
@@ -101,7 +101,7 @@ export function UsageStatsSection() {
         );
 
         // Get credits history from user_credits table
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const { data: creditData } = (await supabase
           .from('user_credits')
           .select('total_spent')
