@@ -1,19 +1,23 @@
 import { useState, useMemo, useEffect } from 'react';
-import { ChevronDown, Library } from 'lucide-react';
+import { ChevronDown, Library, Filter } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { PresetCard } from '@/components/atoms/PresetCard';
 import { usePresetLibraryStore } from '@/store/presetLibraryStore';
-import { PRESET_CATEGORIES, getPresetById } from '@/data/presets';
+import { PRESET_CATEGORIES, getPresetById, presetMatchesFilter } from '@/data/presets';
+import { Gender, JewelryType } from '@/lib/generation-settings-storage';
 
 interface QuickModeContentProps {
   onPresetSelect: (presetName: string) => void;
+  gender?: Gender;
+  jewelryType?: JewelryType;
 }
 
 /**
  * QuickModeContent - Quick presets organized by categories
  * Shows visual preset cards based on user's Library selection
+ * Filters presets based on Generation Settings (gender/jewelryType)
  */
-export function QuickModeContent({ onPresetSelect }: QuickModeContentProps) {
+export function QuickModeContent({ onPresetSelect, gender, jewelryType }: QuickModeContentProps) {
   const router = useRouter();
   const { selectedPresets, cleanupInvalidPresets } = usePresetLibraryStore();
 
@@ -22,12 +26,15 @@ export function QuickModeContent({ onPresetSelect }: QuickModeContentProps) {
     cleanupInvalidPresets();
   }, [cleanupInvalidPresets]);
 
-  // Group selected presets by category
-  const presetsByCategory = useMemo(() => {
+  // Group selected presets by category (with filtering)
+  const { presetsByCategory, filteredCount, totalCount } = useMemo(() => {
     const grouped = new Map<
       string,
       Array<{ id: string; title: string; imagePath: string }>
     >();
+    
+    let filtered = 0;
+    let total = 0;
 
     selectedPresets.forEach((selected) => {
       const preset = getPresetById(selected.presetId);
@@ -36,6 +43,18 @@ export function QuickModeContent({ onPresetSelect }: QuickModeContentProps) {
       );
 
       if (preset && category) {
+        total++;
+        
+        // Apply gender/jewelryType filter
+        const genderFilter = gender || undefined;
+        const jewelryFilter = jewelryType || undefined;
+        
+        if (!presetMatchesFilter(preset, genderFilter, jewelryFilter)) {
+          return; // Skip this preset
+        }
+        
+        filtered++;
+        
         if (!grouped.has(category.id)) {
           grouped.set(category.id, []);
         }
@@ -47,8 +66,8 @@ export function QuickModeContent({ onPresetSelect }: QuickModeContentProps) {
       }
     });
 
-    return grouped;
-  }, [selectedPresets]);
+    return { presetsByCategory: grouped, filteredCount: filtered, totalCount: total };
+  }, [selectedPresets, gender, jewelryType]);
 
   // Accordion states
   const [openCategories, setOpenCategories] = useState<Set<string>>(
@@ -88,19 +107,38 @@ export function QuickModeContent({ onPresetSelect }: QuickModeContentProps) {
     );
   }
 
+  // Check if filter is active
+  const isFilterActive = !!(gender || jewelryType);
+  const isFiltered = isFilterActive && filteredCount < totalCount;
+
   return (
     <div className="space-y-2">
       {/* Header with Library link */}
       <div className="flex items-center justify-between">
-        <p className="text-[9px] text-white/40">
-          Your selected presets ({selectedPresets.length})
-        </p>
+        <div className="flex items-center gap-1.5">
+          <p className="text-[9px] text-white/40">
+            {isFiltered ? (
+              <>
+                <Filter className="mr-1 inline h-3 w-3 text-purple-400" />
+                {filteredCount}/{totalCount} presets
+              </>
+            ) : (
+              `Your presets (${selectedPresets.length})`
+            )}
+          </p>
+          {isFilterActive && (
+            <span className="rounded-full bg-purple-500/20 px-1.5 py-0.5 text-[8px] text-purple-300">
+              {gender === 'women' ? '👩' : gender === 'men' ? '👨' : ''}
+              {jewelryType ? ` ${jewelryType}` : ''}
+            </span>
+          )}
+        </div>
         <button
           onClick={() => router.push('/library')}
           className="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[9px] text-purple-400 transition-colors hover:bg-purple-500/10"
         >
           <Library className="h-3 w-3" />
-          <span>Edit Library</span>
+          <span>Edit</span>
         </button>
       </div>
 

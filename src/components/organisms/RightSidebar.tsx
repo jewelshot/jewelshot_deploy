@@ -320,7 +320,11 @@ ${confirmModal.libraryNegativePrompt}`;
         {/* Mode Content - Always Active */}
         <div className="flex-1 overflow-y-auto transition-all duration-300">
           {activeMode === 'quick' && (
-            <QuickModeContent onPresetSelect={handlePresetSelect} />
+            <QuickModeContent 
+              onPresetSelect={handlePresetSelect}
+              gender={gender}
+              jewelryType={jewelryType}
+            />
           )}
           {activeMode === 'selective' && (
             <SelectiveModeContent
