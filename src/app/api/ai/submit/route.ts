@@ -158,6 +158,8 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
         },
       });
 
+      console.log(`[API] ProcessAIJob result:`, JSON.stringify(result, null, 2));
+      
       if (result.success) {
         // Confirm credit deduction
         try {
@@ -182,6 +184,8 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
         });
       } else {
         // Processing failed - refund credits
+        console.error(`[API] Job failed with error:`, result.error);
+        
         try {
           await refundCredit(creditReservation.transactionId);
           console.log(`[API] Credits refunded for failed job ${creditReservation.transactionId}`);

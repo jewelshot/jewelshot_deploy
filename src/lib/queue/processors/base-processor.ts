@@ -31,20 +31,27 @@ export async function processFalAI(
       credentials: apiKey,
     });
 
+    console.log(`[FAL.AI] Starting request to ${modelId}`);
+    console.log(`[FAL.AI] Input keys:`, Object.keys(input));
+    
     // Subscribe to model with logs enabled
     const result = await fal.subscribe(modelId, {
       input,
       logs: true,
       onQueueUpdate: (update) => {
-        if (process.env.NODE_ENV === 'development') {
-          console.log(`[FAL.AI] Queue update:`, update.status);
-        }
+        console.log(`[FAL.AI] Queue update:`, update.status);
       },
     });
 
+    console.log(`[FAL.AI] Raw response received`);
+    console.log(`[FAL.AI] Response data keys:`, result.data ? Object.keys(result.data) : 'NO DATA');
+    
     // Normalize response format
     // FAL.AI returns different formats, normalize to { imageUrl, ... }
     const normalizedData = normalizeResponse(result.data);
+    
+    console.log(`[FAL.AI] Normalized data keys:`, Object.keys(normalizedData));
+    console.log(`[FAL.AI] Has imageUrl:`, !!normalizedData.imageUrl);
 
     // Return successful result
     return {
