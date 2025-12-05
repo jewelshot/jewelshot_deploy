@@ -3,6 +3,9 @@
  * Defines the structure for AI image generation presets
  */
 
+export type PresetGender = 'women' | 'men' | 'all';
+export type PresetJewelryType = 'ring' | 'necklace' | 'earring' | 'bracelet' | 'all';
+
 export interface Preset {
   id: string;
   title: string;
@@ -11,6 +14,8 @@ export interface Preset {
   categoryId: string;
   prompt?: string; // The AI prompt associated with this preset
   negativePrompt?: string; // Negative prompt to avoid unwanted elements
+  gender?: PresetGender; // 'women', 'men', or 'all' (default: 'all')
+  jewelryType?: PresetJewelryType; // 'ring', 'necklace', 'earring', 'bracelet', or 'all' (default: 'all')
 }
 
 export interface PresetCategory {

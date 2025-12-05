@@ -1,9 +1,12 @@
-import { PresetCategory, Preset } from '@/types/preset';
+import { PresetCategory, Preset, PresetGender, PresetJewelryType } from '@/types/preset';
 
 /**
  * Master Preset Library
  * All available presets organized by category
  * ONLY includes presets with actual images in public/presets/
+ * 
+ * gender: 'women' | 'men' | 'all' (default: 'all' - uygulanabilir tüm cinsiyetler)
+ * jewelryType: 'ring' | 'necklace' | 'earring' | 'bracelet' | 'all' (default: 'all')
  */
 export const PRESET_CATEGORIES: PresetCategory[] = [
   {
@@ -185,4 +188,71 @@ export function getPresetById(presetId: string): Preset | undefined {
     if (preset) return preset;
   }
   return undefined;
+}
+
+/**
+ * Filter presets by gender and jewelry type
+ * 
+ * @param gender - 'women' | 'men' | undefined (undefined = show all)
+ * @param jewelryType - 'ring' | 'necklace' | 'earring' | 'bracelet' | undefined
+ * @returns Filtered preset categories with matching presets
+ */
+export function filterPresets(
+  gender?: PresetGender,
+  jewelryType?: PresetJewelryType
+): PresetCategory[] {
+  return PRESET_CATEGORIES.map((category) => ({
+    ...category,
+    presets: category.presets.filter((preset) => {
+      // Gender filter
+      const genderMatch = 
+        !gender || // No filter = show all
+        !preset.gender || // Preset has no gender = show for all
+        preset.gender === 'all' || // Preset is for all genders
+        preset.gender === gender; // Exact match
+
+      // Jewelry type filter
+      const jewelryMatch = 
+        !jewelryType || // No filter = show all
+        !preset.jewelryType || // Preset has no type = show for all
+        preset.jewelryType === 'all' || // Preset is for all types
+        preset.jewelryType === jewelryType; // Exact match
+
+      return genderMatch && jewelryMatch;
+    }),
+  })).filter((category) => category.presets.length > 0); // Remove empty categories
+}
+
+/**
+ * Get all presets as flat array (filtered)
+ */
+export function getAllPresets(
+  gender?: PresetGender,
+  jewelryType?: PresetJewelryType
+): Preset[] {
+  const filtered = filterPresets(gender, jewelryType);
+  return filtered.flatMap((category) => category.presets);
+}
+
+/**
+ * Check if a preset matches the given filters
+ */
+export function presetMatchesFilter(
+  preset: Preset,
+  gender?: PresetGender,
+  jewelryType?: PresetJewelryType
+): boolean {
+  const genderMatch = 
+    !gender || 
+    !preset.gender || 
+    preset.gender === 'all' || 
+    preset.gender === gender;
+
+  const jewelryMatch = 
+    !jewelryType || 
+    !preset.jewelryType || 
+    preset.jewelryType === 'all' || 
+    preset.jewelryType === jewelryType;
+
+  return genderMatch && jewelryMatch;
 }
