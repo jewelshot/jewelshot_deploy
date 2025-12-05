@@ -51,9 +51,9 @@ export async function POST(request: NextRequest) {
     // Direct FAL.AI call
     const result = await fal.subscribe('fal-ai/nano-banana/edit', {
       input: {
-        image_url: imageUrl,
+        image_urls: [imageUrl],
         prompt: prompt,
-      },
+      } as any,
       logs: true,
       onQueueUpdate: (update) => {
         console.log('[TEST-FAL] Queue status:', update.status);
