@@ -1,4 +1,3 @@
-import { Trash2 } from 'lucide-react';
 import { BatchImageCard } from '@/components/atoms/BatchImageCard';
 
 export interface BatchImage {
@@ -43,54 +42,35 @@ export function BatchImageGrid({
 
   return (
     <div className="space-y-3">
-      {/* Header with Status Summary */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <p className="text-xs text-white/60">
-            {images.length} {images.length === 1 ? 'image' : 'images'}
-          </p>
-          
-          {/* Status badges - only show when processing or has results */}
-          {(isProcessing || completedCount > 0 || failedCount > 0) && (
-            <div className="flex items-center gap-2">
-              {pendingCount > 0 && (
-                <span className="flex items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/60">
-                  <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
-                  {pendingCount} waiting
-                </span>
-              )}
-              {processingCount > 0 && (
-                <span className="flex items-center gap-1 rounded-full bg-blue-500/20 px-2 py-0.5 text-[10px] text-blue-400">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-blue-400" />
-                  {processingCount} processing
-                </span>
-              )}
-              {completedCount > 0 && (
-                <span className="flex items-center gap-1 rounded-full bg-green-500/20 px-2 py-0.5 text-[10px] text-green-400">
-                  <span className="h-1.5 w-1.5 rounded-full bg-green-400" />
-                  {completedCount} done
-                </span>
-              )}
-              {failedCount > 0 && (
-                <span className="flex items-center gap-1 rounded-full bg-red-500/20 px-2 py-0.5 text-[10px] text-red-400">
-                  <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
-                  {failedCount} failed
-                </span>
-              )}
-            </div>
+      {/* Status badges - only show when processing or has results */}
+      {(isProcessing || completedCount > 0 || failedCount > 0) && (
+        <div className="flex items-center gap-2">
+          {pendingCount > 0 && (
+            <span className="flex items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/60">
+              <span className="h-1.5 w-1.5 rounded-full bg-white/40" />
+              {pendingCount} waiting
+            </span>
+          )}
+          {processingCount > 0 && (
+            <span className="flex items-center gap-1 rounded-full bg-blue-500/20 px-2 py-0.5 text-[10px] text-blue-400">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-blue-400" />
+              {processingCount} processing
+            </span>
+          )}
+          {completedCount > 0 && (
+            <span className="flex items-center gap-1 rounded-full bg-green-500/20 px-2 py-0.5 text-[10px] text-green-400">
+              <span className="h-1.5 w-1.5 rounded-full bg-green-400" />
+              {completedCount} done
+            </span>
+          )}
+          {failedCount > 0 && (
+            <span className="flex items-center gap-1 rounded-full bg-red-500/20 px-2 py-0.5 text-[10px] text-red-400">
+              <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
+              {failedCount} failed
+            </span>
           )}
         </div>
-
-        {pendingCount > 0 && !isProcessing && (
-          <button
-            onClick={onClearAll}
-            className="flex items-center gap-1.5 rounded-md px-2 py-1 text-xs text-red-400 transition-colors hover:bg-red-500/10"
-          >
-            <Trash2 className="h-3 w-3" />
-            <span>Remove All</span>
-          </button>
-        )}
-      </div>
+      )}
 
       {/* Image Grid */}
       <div className="grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8">

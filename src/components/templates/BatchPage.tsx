@@ -26,6 +26,7 @@ export interface SelectedBatchPreset {
   id: string;
   name: string;
   prompt: string;
+  image?: string; // Preset thumbnail image path
 }
 
 // Dynamic imports matching Studio page
@@ -64,7 +65,7 @@ export function BatchPage() {
   const [batchPrompt, setBatchPrompt] = useState('');
   const [batchName, setBatchName] = useState('');
   const [presetName, setPresetName] = useState(''); // Store preset name (not prompt)
-  const [aspectRatio, setAspectRatio] = useState<string>('auto'); // Default to 'auto' (Nano Banana recommended)
+  const [aspectRatio, setAspectRatio] = useState<string>(''); // Empty - required selection
   const [isProcessing, setIsProcessing] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isCustomPrompt, setIsCustomPrompt] = useState(false); // Track if user typed custom prompt
@@ -251,8 +252,17 @@ export function BatchPage() {
         return;
       }
       
-      // Add to selection
-      setSelectedPresets(prev => [...prev, { id, name: presetName, prompt }]);
+      // Get preset image if available
+      let presetImage: string | undefined;
+      if (presetId) {
+        const preset = getPresetById(presetId);
+        if (preset?.image) {
+          presetImage = preset.image;
+        }
+      }
+      
+      // Add to selection with image
+      setSelectedPresets(prev => [...prev, { id, name: presetName, prompt, image: presetImage }]);
       if (ratio) setAspectRatio(ratio);
       toast.success(`Added "${presetName}" to batch`);
     },
