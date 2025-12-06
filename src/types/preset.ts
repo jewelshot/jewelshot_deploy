@@ -5,6 +5,7 @@
 
 export type PresetGender = 'women' | 'men' | 'all';
 export type PresetJewelryType = 'ring' | 'necklace' | 'earring' | 'bracelet' | 'all';
+export type PresetTab = 'women' | 'men' | 'studio';
 
 export interface Preset {
   id: string;
@@ -16,6 +17,7 @@ export interface Preset {
   negativePrompt?: string; // Negative prompt to avoid unwanted elements
   gender?: PresetGender; // 'women', 'men', or 'all' (default: 'all')
   jewelryType?: PresetJewelryType; // 'ring', 'necklace', 'earring', 'bracelet', or 'all' (default: 'all')
+  tab?: PresetTab; // 'women' (on-model female), 'men' (on-model male), 'studio' (product only)
 }
 
 export interface PresetCategory {

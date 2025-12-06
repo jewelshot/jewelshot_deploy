@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Check, Info, Sparkles, Filter } from 'lucide-react';
-import { PRESET_CATEGORIES, filterPresets } from '@/data/presets';
+import { Search, Check, Info, Sparkles } from 'lucide-react';
+import { PRESET_CATEGORIES, filterPresetsByTab, getDefaultTab } from '@/data/presets';
 import { usePresetLibraryStore } from '@/store/presetLibraryStore';
-import { PresetCategory, PresetGender, PresetJewelryType } from '@/types/preset';
+import { PresetCategory, PresetTab } from '@/types/preset';
 import { toast } from 'sonner';
 import { createScopedLogger } from '@/lib/logger';
 import { useSidebarStore } from '@/store/sidebarStore';
@@ -12,19 +12,25 @@ import { loadGenerationSettings } from '@/lib/generation-settings-storage';
 
 const logger = createScopedLogger('Library');
 
+// Tab definitions
+const TABS: { id: PresetTab; label: string; emoji: string; description: string }[] = [
+  { id: 'women', label: 'Women', emoji: '👩', description: 'On-model presets for women' },
+  { id: 'men', label: 'Men', emoji: '👨', description: 'On-model presets for men' },
+  { id: 'studio', label: 'Studio Shots', emoji: '💎', description: 'Product-only presets' },
+];
+
 /**
  * Library Content
- * Main content area for preset library with all bars integration
+ * Main content area for preset library with tab-based organization
+ * Tabs: Women (on-model), Men (on-model), Studio Shots (product only)
  */
 export function LibraryContent() {
   const { leftOpen, rightOpen, topOpen, bottomOpen } = useSidebarStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   
-  // Gender & Jewelry Type filters
-  const [genderFilter, setGenderFilter] = useState<PresetGender | 'all'>('all');
-  const [jewelryTypeFilter, setJewelryTypeFilter] = useState<PresetJewelryType | 'all'>('all');
-  const [useGenerationSettings, setUseGenerationSettings] = useState(false);
+  // Active tab state
+  const [activeTab, setActiveTab] = useState<PresetTab>('studio');
 
   const {
     selectedPresets,
@@ -38,24 +44,20 @@ export function LibraryContent() {
 
   const selectedCount = getSelectedPresetsCount();
 
-  // Load Generation Settings on mount
+  // Load Generation Settings on mount and set default tab
   useEffect(() => {
     const settings = loadGenerationSettings();
-    if (settings?.gender && settings?.jewelryType) {
-      // Auto-apply generation settings as default filter
-      setGenderFilter(settings.gender);
-      setJewelryTypeFilter(settings.jewelryType);
-      setUseGenerationSettings(true);
+    if (settings?.gender) {
+      const defaultTab = getDefaultTab(settings.gender);
+      setActiveTab(defaultTab);
+      logger.info(`Auto-selected tab: ${defaultTab} based on Generation Settings`);
     }
   }, []);
 
-  // Filter categories based on search, category, gender, and jewelry type
+  // Filter categories based on active tab, search, and category
   const filteredCategories = useMemo(() => {
-    // First apply gender/jewelryType filter
-    const genderValue = genderFilter === 'all' ? undefined : genderFilter;
-    const jewelryValue = jewelryTypeFilter === 'all' ? undefined : jewelryTypeFilter;
-    
-    let categories = filterPresets(genderValue, jewelryValue);
+    // First filter by tab
+    let categories = filterPresetsByTab(activeTab);
 
     // Filter by selected category
     if (selectedCategory !== 'all') {
@@ -78,27 +80,16 @@ export function LibraryContent() {
     }
 
     return categories;
-  }, [searchQuery, selectedCategory, genderFilter, jewelryTypeFilter]);
-  
-  // Sync with Generation Settings button
-  const syncWithGenerationSettings = () => {
-    const settings = loadGenerationSettings();
-    if (settings?.gender && settings?.jewelryType) {
-      setGenderFilter(settings.gender);
-      setJewelryTypeFilter(settings.jewelryType);
-      setUseGenerationSettings(true);
-      toast.success(`Filtered: ${settings.gender === 'women' ? 'Women' : 'Men'} ${settings.jewelryType}`);
-    } else {
-      toast.error('No Generation Settings configured. Please set them in Studio first.');
-    }
-  };
-  
-  // Clear filters
-  const clearFilters = () => {
-    setGenderFilter('all');
-    setJewelryTypeFilter('all');
-    setUseGenerationSettings(false);
-  };
+  }, [searchQuery, selectedCategory, activeTab]);
+
+  // Get preset count for each tab
+  const tabCounts = useMemo(() => {
+    return TABS.reduce((acc, tab) => {
+      const categories = filterPresetsByTab(tab.id);
+      acc[tab.id] = categories.reduce((sum, cat) => sum + cat.presets.length, 0);
+      return acc;
+    }, {} as Record<PresetTab, number>);
+  }, []);
 
   const handlePresetToggle = (presetId: string, categoryId: string) => {
     if (isPresetSelected(presetId)) {
@@ -152,101 +143,63 @@ export function LibraryContent() {
           </div>
         </div>
 
-        {/* Search and Filters */}
-        <div className="mt-6 flex flex-col gap-3">
-          {/* Row 1: Search + Category */}
-          <div className="flex flex-col gap-3 sm:flex-row">
-            {/* Search */}
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
-              <input
-                type="text"
-                placeholder="Search presets..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-10 w-full rounded-lg border border-white/10 bg-white/5 pl-10 pr-4 text-sm text-white placeholder:text-white/40 focus:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
-              />
-            </div>
-
-            {/* Category Filter */}
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="h-10 rounded-lg border border-white/10 bg-white/5 px-4 text-sm text-white focus:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
-            >
-              <option value="all">All Categories</option>
-              {PRESET_CATEGORIES.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Row 2: Gender + Jewelry Type + Sync Button */}
-          <div className="flex flex-wrap items-center gap-3">
-            {/* Gender Filter */}
-            <select
-              value={genderFilter}
-              onChange={(e) => {
-                setGenderFilter(e.target.value as PresetGender | 'all');
-                setUseGenerationSettings(false);
-              }}
-              className="h-10 rounded-lg border border-white/10 bg-white/5 px-4 text-sm text-white focus:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
-            >
-              <option value="all">All Genders</option>
-              <option value="women">👩 Women</option>
-              <option value="men">👨 Men</option>
-            </select>
-
-            {/* Jewelry Type Filter */}
-            <select
-              value={jewelryTypeFilter}
-              onChange={(e) => {
-                setJewelryTypeFilter(e.target.value as PresetJewelryType | 'all');
-                setUseGenerationSettings(false);
-              }}
-              className="h-10 rounded-lg border border-white/10 bg-white/5 px-4 text-sm text-white focus:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
-            >
-              <option value="all">All Jewelry</option>
-              <option value="ring">💍 Ring</option>
-              <option value="necklace">📿 Necklace</option>
-              <option value="earring">✨ Earring</option>
-              <option value="bracelet">⌚ Bracelet</option>
-            </select>
-
-            {/* Sync with Generation Settings */}
-            <button
-              onClick={syncWithGenerationSettings}
-              className={`flex h-10 items-center gap-2 rounded-lg border px-4 text-sm transition-all ${
-                useGenerationSettings
-                  ? 'border-purple-500/50 bg-purple-500/20 text-purple-300'
-                  : 'border-white/10 bg-white/5 text-white/70 hover:border-purple-500/30 hover:bg-purple-500/10'
-              }`}
-            >
-              <Filter className="h-4 w-4" />
-              <span className="hidden sm:inline">Sync with Settings</span>
-            </button>
-
-            {/* Clear Filters */}
-            {(genderFilter !== 'all' || jewelryTypeFilter !== 'all') && (
+        {/* Tab Navigation */}
+        <div className="mt-6">
+          <div className="flex gap-1 rounded-xl border border-white/10 bg-white/[0.02] p-1">
+            {TABS.map((tab) => (
               <button
-                onClick={clearFilters}
-                className="h-10 rounded-lg border border-white/10 bg-white/5 px-4 text-sm text-white/50 hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300"
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition-all ${
+                  activeTab === tab.id
+                    ? 'bg-purple-500/20 text-purple-300 shadow-lg'
+                    : 'text-white/60 hover:bg-white/5 hover:text-white/80'
+                }`}
               >
-                Clear
+                <span className="text-lg">{tab.emoji}</span>
+                <span>{tab.label}</span>
+                <span className={`rounded-full px-2 py-0.5 text-xs ${
+                  activeTab === tab.id 
+                    ? 'bg-purple-500/30 text-purple-200' 
+                    : 'bg-white/10 text-white/40'
+                }`}>
+                  {tabCounts[tab.id]}
+                </span>
               </button>
-            )}
-
-            {/* Active Filter Badge */}
-            {(genderFilter !== 'all' || jewelryTypeFilter !== 'all') && (
-              <div className="rounded-full bg-purple-500/20 px-3 py-1 text-xs text-purple-300">
-                {genderFilter !== 'all' && (genderFilter === 'women' ? 'Women' : 'Men')}
-                {genderFilter !== 'all' && jewelryTypeFilter !== 'all' && ' · '}
-                {jewelryTypeFilter !== 'all' && jewelryTypeFilter.charAt(0).toUpperCase() + jewelryTypeFilter.slice(1)}
-              </div>
-            )}
+            ))}
           </div>
+          <p className="mt-2 text-center text-xs text-white/40">
+            {TABS.find(t => t.id === activeTab)?.description}
+          </p>
+        </div>
+
+        {/* Search and Category Filter */}
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+          {/* Search */}
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
+            <input
+              type="text"
+              placeholder="Search presets..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="h-10 w-full rounded-lg border border-white/10 bg-white/5 pl-10 pr-4 text-sm text-white placeholder:text-white/40 focus:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+            />
+          </div>
+
+          {/* Category Filter */}
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="h-10 rounded-lg border border-white/10 bg-white/5 px-4 text-sm text-white focus:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+          >
+            <option value="all">All Categories</option>
+            {filteredCategories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.emoji} {cat.name}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 

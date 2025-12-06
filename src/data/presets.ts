@@ -1,11 +1,12 @@
-import { PresetCategory, Preset, PresetGender, PresetJewelryType } from '@/types/preset';
+import { PresetCategory, Preset, PresetGender, PresetJewelryType, PresetTab } from '@/types/preset';
 
 /**
  * Master Preset Library
  * All available presets organized by category
  * ONLY includes presets with actual images in public/presets/
  * 
- * gender: 'women' | 'men' | 'all' (default: 'all' - uygulanabilir tüm cinsiyetler)
+ * tab: 'women' (kadın mankenli), 'men' (erkek mankenli), 'studio' (sadece ürün)
+ * gender: 'women' | 'men' | 'all' (default: 'all')
  * jewelryType: 'ring' | 'necklace' | 'earring' | 'bracelet' | 'all' (default: 'all')
  */
 export const PRESET_CATEGORIES: PresetCategory[] = [
@@ -22,6 +23,7 @@ export const PRESET_CATEGORIES: PresetCategory[] = [
         description: 'Amazon/eBay style white background',
         imagePath: '/presets/e-commerce.webp',
         categoryId: 'white-backgrounds',
+        tab: 'studio',
         prompt:
           'e-commerce product photo, white background, centered composition, even lighting',
       },
@@ -31,6 +33,7 @@ export const PRESET_CATEGORIES: PresetCategory[] = [
         description: 'Luxurious deep 18k yellow gold with rich warm tones',
         imagePath: '/presets/18k-yellow-gold.webp',
         categoryId: 'white-backgrounds',
+        tab: 'studio',
         prompt:
           'commercial jewelry photography, luxury product master shot, close-up macro, luxurious deep 18k yellow gold, rich warm tones, highly saturated gold, vibrant golden hue, accurate material rendering, realistic metal shading, preserved inner shank gradients, deep ambient occlusion, three-dimensional depth, soft shadow transitions on metal curve, structural integrity, preserved intricate motifs, high polish finish with depth, distinct stone facets, gemstone brilliance, light dispersion, fire and scintillation, realistic diamond rendering (if present), soft diffused studio lighting, controlled highlights, invisible photographer, pure white background, soft drop shadow, 8k, ultra detailed, pristine, high fidelity',
         negativePrompt:
@@ -42,6 +45,7 @@ export const PRESET_CATEGORIES: PresetCategory[] = [
         description: 'Vibrant rich 14k yellow gold with bright warm tones',
         imagePath: '/presets/14k-yellow-gold.webp',
         categoryId: 'white-backgrounds',
+        tab: 'studio',
         prompt:
           'commercial jewelry photography, luxury product master shot, close-up macro, luxurious rich 14k yellow gold, vibrant warm tones, highly saturated gold, bright golden hue, accurate material rendering, realistic metal shading, preserved inner shank gradients, deep ambient occlusion, three-dimensional depth, soft shadow transitions on metal curve, structural integrity, preserved intricate motifs, high polish finish with depth, distinct stone facets, gemstone brilliance, light dispersion, fire and scintillation, realistic diamond rendering (if present), soft diffused studio lighting, controlled highlights, invisible photographer, pure white background, soft drop shadow, 8k, ultra detailed, pristine, high fidelity',
         negativePrompt:
@@ -53,6 +57,7 @@ export const PRESET_CATEGORIES: PresetCategory[] = [
         description: 'Intense deep 22k yellow gold with majestic golden hue',
         imagePath: '/presets/22k-yellow-gold.webp',
         categoryId: 'white-backgrounds',
+        tab: 'studio',
         prompt:
           'commercial jewelry photography, luxury product master shot, close-up macro, luxurious deep 22k yellow gold, intense yellow-orange tones, deepest saturated gold, rich majestic golden hue, accurate material rendering, realistic metal shading, preserved inner shank gradients, deep ambient occlusion, three-dimensional depth, soft shadow transitions on metal curve, structural integrity, preserved intricate motifs, high polish finish with depth, distinct stone facets, gemstone brilliance, light dispersion, fire and scintillation, realistic diamond rendering (if present), soft diffused studio lighting, controlled highlights, invisible photographer, pure white background, soft drop shadow, 8k, ultra detailed, pristine, high fidelity',
         negativePrompt:
@@ -64,6 +69,7 @@ export const PRESET_CATEGORIES: PresetCategory[] = [
         description: 'Luxurious 14k white gold with chrome-like rhodium finish',
         imagePath: '/presets/white-gold.webp',
         categoryId: 'white-backgrounds',
+        tab: 'studio',
         prompt:
           'commercial jewelry photography, luxury product master shot, close-up macro, luxurious 14k white gold, bright neutral silver tones, high polish rhodium finish, chrome-like luster, clean white metal, accurate material rendering, realistic metal shading, preserved inner shank gradients, deep ambient occlusion, three-dimensional depth, soft shadow transitions on metal curve, structural integrity, preserved intricate motifs, high polish finish with depth, distinct stone facets, gemstone brilliance, light dispersion, fire and scintillation, realistic diamond rendering (if present), soft diffused studio lighting, controlled highlights, invisible photographer, pure white background, soft drop shadow, 8k, ultra detailed, pristine, high fidelity',
         negativePrompt:
@@ -75,6 +81,7 @@ export const PRESET_CATEGORIES: PresetCategory[] = [
         description: 'Elegant 18k rose gold with vibrant coppery pink tones',
         imagePath: '/presets/rose-gold.webp',
         categoryId: 'white-backgrounds',
+        tab: 'studio',
         prompt:
           'commercial jewelry photography, luxury product master shot, close-up macro, luxurious rich 18k rose gold, vibrant coppery pink tones, soft warm blush hue, elegant rose lustre, highly saturated rose gold, accurate material rendering, realistic metal shading, preserved inner shank gradients, deep ambient occlusion, three-dimensional depth, soft shadow transitions on metal curve, structural integrity, preserved intricate motifs, high polish finish with depth, distinct stone facets, gemstone brilliance, light dispersion, fire and scintillation, realistic diamond rendering (if present), soft diffused studio lighting, controlled highlights, invisible photographer, pure white background, soft drop shadow, 8k, ultra detailed, pristine, high fidelity',
         negativePrompt:
@@ -95,6 +102,7 @@ export const PRESET_CATEGORIES: PresetCategory[] = [
         description: 'Traditional still life with natural elements',
         imagePath: '/presets/still-life.webp',
         categoryId: 'still-life',
+        tab: 'studio',
         prompt:
           'still life product photography, natural elements, soft natural lighting, artistic composition',
       },
@@ -112,8 +120,10 @@ export const PRESET_CATEGORIES: PresetCategory[] = [
         description: 'Professional model shot with jewelry',
         imagePath: '/presets/on-model.webp',
         categoryId: 'on-model',
+        tab: 'women',
+        gender: 'women',
         prompt:
-          'professional model wearing jewelry, elegant pose, soft studio lighting, neutral background',
+          'professional female model wearing jewelry, elegant pose, soft studio lighting, neutral background',
       },
     ],
   },
@@ -129,8 +139,10 @@ export const PRESET_CATEGORIES: PresetCategory[] = [
         description: 'Natural daily life setting',
         imagePath: '/presets/lifestyle.webp',
         categoryId: 'lifestyle',
+        tab: 'women',
+        gender: 'women',
         prompt:
-          'lifestyle product photography, natural setting, authentic moment, soft natural light',
+          'lifestyle jewelry photography, female model, natural setting, authentic moment, soft natural light',
       },
     ],
   },
@@ -146,6 +158,7 @@ export const PRESET_CATEGORIES: PresetCategory[] = [
         description: 'Timeless luxury aesthetic',
         imagePath: '/presets/luxury.webp',
         categoryId: 'luxury',
+        tab: 'studio',
         prompt:
           'luxury product photography, premium materials, elegant composition, soft dramatic lighting',
       },
@@ -155,6 +168,7 @@ export const PRESET_CATEGORIES: PresetCategory[] = [
         description: 'High-fashion editorial luxury style',
         imagePath: '/presets/luxury-editorial.webp',
         categoryId: 'luxury',
+        tab: 'studio',
         prompt:
           'luxury editorial photography, high-fashion styling, dramatic lighting, premium aesthetic',
       },
@@ -172,6 +186,7 @@ export const PRESET_CATEGORIES: PresetCategory[] = [
         description: 'Sharp focus on details',
         imagePath: '/presets/close-up.webp',
         categoryId: 'close-up',
+        tab: 'studio',
         prompt:
           'macro close-up product photography, sharp focus, detailed craftsmanship, clean background',
       },
@@ -255,4 +270,31 @@ export function presetMatchesFilter(
     preset.jewelryType === jewelryType;
 
   return genderMatch && jewelryMatch;
+}
+
+/**
+ * Filter presets by tab (women, men, studio)
+ */
+export function filterPresetsByTab(tab: PresetTab): PresetCategory[] {
+  return PRESET_CATEGORIES.map((category) => ({
+    ...category,
+    presets: category.presets.filter((preset) => {
+      // If preset has no tab, default behavior:
+      // - 'studio' tab shows presets without tab or with tab='studio'
+      // - 'women'/'men' tabs only show presets with matching tab
+      if (!preset.tab) {
+        return tab === 'studio'; // Default to studio if no tab specified
+      }
+      return preset.tab === tab;
+    }),
+  })).filter((category) => category.presets.length > 0);
+}
+
+/**
+ * Get default tab based on generation settings gender
+ */
+export function getDefaultTab(gender?: PresetGender | null): PresetTab {
+  if (gender === 'women') return 'women';
+  if (gender === 'men') return 'men';
+  return 'studio';
 }
