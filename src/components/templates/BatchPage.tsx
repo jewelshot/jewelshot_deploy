@@ -460,7 +460,7 @@ export function BatchPage() {
           setImages(prevImages => {
             return prevImages.map(img => {
               // Find matching image from API by original filename
-              const apiImage = data.images.find((apiImg: { filename: string }) => 
+              const apiImage = data.images.find((apiImg: { id: string; filename: string }) => 
                 img.file?.name === apiImg.filename || img.id === apiImg.id
               );
               
