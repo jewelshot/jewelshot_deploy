@@ -303,6 +303,14 @@ export async function POST(
       .eq('batch_project_id', batchProjectId)
       .eq('status', 'pending');
 
+    // Get all images with their current status for UI update
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: allImages } = await (supabase as any)
+      .from('batch_images')
+      .select('id, original_filename, status, result_url, error_message')
+      .eq('batch_project_id', batchProjectId)
+      .order('created_at', { ascending: true });
+
     // Check if batch is complete
     if (remainingCount === 0) {
       logger.info('Batch processing complete, sending email', { batchId: batchProjectId });
@@ -334,10 +342,42 @@ export async function POST(
       }
     }
 
+    // Get total count for progress
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { count: totalCount } = await (supabase as any)
+      .from('batch_images')
+      .select('*', { count: 'exact', head: true })
+      .eq('batch_project_id', batchProjectId);
+
+    const completedCount = allImages?.filter((img: { status: string }) => img.status === 'completed').length || 0;
+    const failedCount = allImages?.filter((img: { status: string }) => img.status === 'failed').length || 0;
+    const processingCount = allImages?.filter((img: { status: string }) => img.status === 'processing').length || 0;
+
     return NextResponse.json({
       done: remainingCount === 0,
       processed: 1,
       remaining: remainingCount || 0,
+      // New: detailed progress info
+      progress: {
+        total: totalCount || 0,
+        completed: completedCount,
+        failed: failedCount,
+        processing: processingCount,
+        pending: remainingCount || 0,
+      },
+      // New: current processing image info
+      currentImage: {
+        id: imageToProcess.id,
+        filename: imageToProcess.original_filename,
+      },
+      // New: all images status for UI update
+      images: allImages?.map((img: { id: string; original_filename: string; status: string; result_url?: string; error_message?: string }) => ({
+        id: img.id,
+        filename: img.original_filename,
+        status: img.status,
+        resultUrl: img.result_url,
+        error: img.error_message,
+      })) || [],
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown';

@@ -1,4 +1,4 @@
-import { X, Check } from 'lucide-react';
+import { X, Check, AlertCircle, Loader2 } from 'lucide-react';
 import { createScopedLogger } from '@/lib/logger';
 const logger = createScopedLogger('BatchImageCard');
 
@@ -36,17 +36,10 @@ export function BatchImageCard({
   }
 
   const statusColors = {
-    pending: 'border-white/10',
-    processing: 'border-blue-500/50 bg-blue-500/5',
-    completed: 'border-green-500/50 bg-green-500/5',
-    failed: 'border-red-500/50 bg-red-500/5',
-  };
-
-  const statusIcons = {
-    pending: '⏸',
-    processing: '⏳',
-    completed: '✓',
-    failed: '✕',
+    pending: 'border-white/10 hover:border-white/20',
+    processing: 'border-blue-500/50 ring-2 ring-blue-500/20',
+    completed: 'border-green-500/50 hover:border-green-500/70',
+    failed: 'border-red-500/50 hover:border-red-500/70',
   };
 
   const formatSize = (bytes: number) => {
@@ -60,7 +53,7 @@ export function BatchImageCard({
   return (
     <div
       className={`group relative overflow-hidden rounded-lg border ${statusColors[status]} bg-white/[0.02] transition-all duration-200 ${
-        isClickable ? 'cursor-pointer hover:border-green-500/70 hover:bg-green-500/10' : ''
+        isClickable ? 'cursor-pointer hover:bg-green-500/10' : ''
       }`}
       onClick={() => isClickable && onClick?.(id, preview)}
     >
@@ -71,9 +64,39 @@ export function BatchImageCard({
           src={preview}
           alt={file.name}
           fill
-          className="object-cover"
+          className={`object-cover transition-all duration-300 ${
+            status === 'processing' ? 'scale-105 blur-[1px]' : ''
+          }`}
           unoptimized
         />
+
+        {/* Processing Overlay */}
+        {status === 'processing' && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px]">
+            <div className="flex flex-col items-center gap-1">
+              <Loader2 className="h-6 w-6 animate-spin text-blue-400" />
+              <span className="text-[10px] font-medium text-white">Processing</span>
+            </div>
+          </div>
+        )}
+
+        {/* Completed Overlay - subtle green tint */}
+        {status === 'completed' && (
+          <div className="absolute inset-0 flex items-center justify-center bg-green-500/0 transition-colors group-hover:bg-green-500/20">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-500 shadow-lg shadow-green-500/50">
+              <Check className="h-5 w-5 text-white" />
+            </div>
+          </div>
+        )}
+
+        {/* Failed Overlay */}
+        {status === 'failed' && (
+          <div className="absolute inset-0 flex items-center justify-center bg-red-500/20">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-500 shadow-lg shadow-red-500/50">
+              <AlertCircle className="h-5 w-5 text-white" />
+            </div>
+          </div>
+        )}
 
         {/* Remove Button - Only for pending */}
         {status === 'pending' && (
@@ -89,15 +112,15 @@ export function BatchImageCard({
           </button>
         )}
 
-        {/* Status Icon - Only for processing and failed */}
-        {(status === 'processing' || status === 'failed') && (
-          <div className="absolute left-1 top-1 flex h-6 w-6 items-center justify-center rounded-md bg-black/60 backdrop-blur-sm">
-            <span className="text-xs">{statusIcons[status]}</span>
+        {/* Queue position badge for pending (when others are processing) */}
+        {status === 'pending' && (
+          <div className="absolute bottom-1 left-1 rounded bg-white/10 px-1.5 py-0.5 text-[9px] text-white/60 backdrop-blur-sm">
+            Waiting
           </div>
         )}
       </div>
 
-      {/* File Info - Always visible but different for pending/processing */}
+      {/* File Info */}
       <div className="p-1.5">
         <div className="flex items-center justify-between gap-1">
           <p
@@ -107,31 +130,27 @@ export function BatchImageCard({
             {file.name}
           </p>
           
-          {/* Green checkmark for completed */}
+          {/* Status icon in info bar */}
           {status === 'completed' && (
             <Check className="h-3 w-3 flex-shrink-0 text-green-500" />
+          )}
+          {status === 'failed' && (
+            <AlertCircle className="h-3 w-3 flex-shrink-0 text-red-500" />
           )}
         </div>
         
         {/* Mini Progress Bar - Only for processing */}
         {status === 'processing' && (
-          <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-white/10">
+          <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
             <div
-              className="h-full bg-green-500 transition-all duration-300"
-              style={{ width: `${progress}%` }}
+              className="h-full rounded-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300"
+              style={{ width: `${Math.max(progress, 20)}%` }}
             />
           </div>
         )}
         
-        {/* File size for non-completed states */}
-        {status !== 'completed' && (
-          <p className="text-[8px] text-white/40">{formatSize(file.size)}</p>
-        )}
-        
-        {/* File size for completed - below filename */}
-        {status === 'completed' && (
-          <p className="text-[8px] text-white/40">{formatSize(file.size)}</p>
-        )}
+        {/* File size */}
+        <p className="text-[8px] text-white/40">{formatSize(file.size)}</p>
       </div>
     </div>
   );

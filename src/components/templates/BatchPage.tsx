@@ -443,18 +443,64 @@ export function BatchPage() {
         const data = await response.json();
         logger.debug('Batch: Poll result:', data);
 
+        // Update progress from API response
+        if (data.progress) {
+          const { total, completed, failed, processing } = data.progress;
+          const current = completed + failed;
+          setCurrentProgress({
+            current,
+            total,
+            currentImage: data.currentImage?.filename || '',
+            currentPreset: presetName || selectedPresets[0]?.name || '',
+          });
+        }
+
+        // Update images status from API response
+        if (data.images && Array.isArray(data.images)) {
+          setImages(prevImages => {
+            return prevImages.map(img => {
+              // Find matching image from API by original filename
+              const apiImage = data.images.find((apiImg: { filename: string }) => 
+                img.file?.name === apiImg.filename || img.id === apiImg.id
+              );
+              
+              if (apiImage) {
+                return {
+                  ...img,
+                  status: apiImage.status as 'pending' | 'processing' | 'completed' | 'failed',
+                  result: apiImage.resultUrl || img.result,
+                  error: apiImage.error || img.error,
+                  progress: apiImage.status === 'processing' ? 50 : 
+                           apiImage.status === 'completed' ? 100 : 
+                           img.progress || 0,
+                };
+              }
+              return img;
+            });
+          });
+        }
+
         // Check if batch is done
         if (data.done) {
           clearInterval(pollInterval);
           setIsProcessing(false);
-          toast.success('🎉 Batch processing completed!');
+          
+          const completedCount = data.progress?.completed || 0;
+          const failedCount = data.progress?.failed || 0;
+          
+          if (failedCount > 0) {
+            toast.success(`🎉 Batch completed! ${completedCount} successful, ${failedCount} failed`);
+          } else {
+            toast.success(`🎉 Batch processing completed! All ${completedCount} images processed`);
+          }
           logger.debug('Batch: All images processed!');
           
           // Clear batch state
           clearBatchState();
           
-          // Optionally navigate to gallery
-          // router.push('/gallery');
+          // Refresh credits
+          fetchCredits();
+          
           return;
         }
 
@@ -473,7 +519,7 @@ export function BatchPage() {
 
     // Save interval ID for cleanup
     (window as any).__batchPollInterval = pollInterval;
-  }, [router]);
+  }, [presetName, selectedPresets, fetchCredits]);
 
   // Cleanup polling on unmount
   useEffect(() => {

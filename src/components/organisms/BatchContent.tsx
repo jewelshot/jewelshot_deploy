@@ -184,25 +184,66 @@ export function BatchContent({
             </div>
           )}
           
-          {/* Progress Bar (when processing) */}
+          {/* Enhanced Progress Section (when processing) */}
           {isProcessing && currentProgress && currentProgress.total > 0 && (
-            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-              <div className="mb-2 flex items-center justify-between text-sm">
-                <span className="text-white/60">
-                  {currentProgress.currentImage && currentProgress.currentPreset 
-                    ? `Processing: ${currentProgress.currentImage} → ${currentProgress.currentPreset}`
-                    : 'Processing...'}
-                </span>
-                <span className="text-white">
-                  {currentProgress.current}/{currentProgress.total}
-                </span>
+            <div className="rounded-xl border border-purple-500/30 bg-gradient-to-r from-purple-500/10 to-blue-500/10 p-5">
+              {/* Header */}
+              <div className="mb-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-500/20">
+                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-purple-400 border-t-transparent" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-white">Processing Batch</h3>
+                    <p className="text-sm text-white/60">
+                      {currentProgress.currentImage 
+                        ? `Current: ${currentProgress.currentImage}`
+                        : 'Preparing next image...'}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-white">
+                    {currentProgress.current}<span className="text-white/40">/{currentProgress.total}</span>
+                  </div>
+                  <div className="text-sm text-white/60">
+                    {Math.round((currentProgress.current / currentProgress.total) * 100)}% complete
+                  </div>
+                </div>
               </div>
-              <div className="h-2 overflow-hidden rounded-full bg-white/10">
+              
+              {/* Progress Bar */}
+              <div className="relative h-3 overflow-hidden rounded-full bg-white/10">
                 <div 
-                  className="h-full rounded-full bg-purple-500 transition-all duration-300"
+                  className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-500"
                   style={{ width: `${(currentProgress.current / currentProgress.total) * 100}%` }}
                 />
+                {/* Animated shine effect */}
+                <div 
+                  className="absolute inset-y-0 left-0 w-full animate-pulse rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                  style={{ 
+                    width: `${(currentProgress.current / currentProgress.total) * 100}%`,
+                    animationDuration: '2s'
+                  }}
+                />
               </div>
+              
+              {/* Preset info */}
+              {currentProgress.currentPreset && (
+                <div className="mt-3 flex items-center gap-2 text-sm text-white/50">
+                  <span>Preset:</span>
+                  <span className="rounded-md bg-white/10 px-2 py-0.5 text-white/80">
+                    {currentProgress.currentPreset}
+                  </span>
+                </div>
+              )}
+              
+              {/* Estimated time remaining */}
+              {currentProgress.current > 0 && (
+                <div className="mt-2 text-xs text-white/40">
+                  ~{Math.ceil((currentProgress.total - currentProgress.current) * 15 / 60)} min remaining
+                </div>
+              )}
             </div>
           )}
 
