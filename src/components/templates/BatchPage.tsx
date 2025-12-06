@@ -256,8 +256,8 @@ export function BatchPage() {
       let presetImage: string | undefined;
       if (presetId) {
         const preset = getPresetById(presetId);
-        if (preset?.image) {
-          presetImage = preset.image;
+        if (preset?.imagePath) {
+          presetImage = preset.imagePath;
         }
       }
       
