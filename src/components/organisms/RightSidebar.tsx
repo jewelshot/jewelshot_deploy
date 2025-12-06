@@ -35,7 +35,7 @@ declare global {
 }
 
 interface RightSidebarProps {
-  onGenerateWithPreset?: (prompt: string, aspectRatio?: string) => void;
+  onGenerateWithPreset?: (prompt: string, aspectRatio?: string, presetName?: string, presetId?: string) => void;
 }
 
 export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
@@ -203,15 +203,16 @@ ${confirmModal.libraryNegativePrompt}`;
     // Close modal
     setConfirmModal(null);
 
-    // Trigger generation with aspect ratio
+    // Trigger generation with aspect ratio, preset name and ID
     if (onGenerateWithPreset) {
       logger.info('RightSidebar: Triggering generation', { 
         presetName: confirmModal.presetName,
+        presetId: confirmModal.presetId,
         jewelryType: finalJewelryType,
         aspectRatio,
         promptLength: finalPrompt.length 
       });
-      onGenerateWithPreset(finalPrompt, aspectRatio);
+      onGenerateWithPreset(finalPrompt, aspectRatio, confirmModal.presetName, confirmModal.presetId);
     } else {
       logger.warn('RightSidebar: onGenerateWithPreset callback not provided');
     }

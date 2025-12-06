@@ -17,8 +17,16 @@ import {
   clearBatchState,
   type BatchImageState,
 } from '@/lib/batch-state-storage';
+import { getPresetById } from '@/data/presets';
 
 const logger = createScopedLogger('BatchPage');
+
+// Selected preset for batch processing
+export interface SelectedBatchPreset {
+  id: string;
+  name: string;
+  prompt: string;
+}
 
 // Dynamic imports matching Studio page
 const Sidebar = dynamic(() => import('@/components/organisms/Sidebar'), {
@@ -60,6 +68,10 @@ export function BatchPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isCustomPrompt, setIsCustomPrompt] = useState(false); // Track if user typed custom prompt
+  
+  // Multi-preset selection for matrix processing
+  const [selectedPresets, setSelectedPresets] = useState<SelectedBatchPreset[]>([]);
+  const [currentProgress, setCurrentProgress] = useState({ current: 0, total: 0, currentImage: '', currentPreset: '' });
 
   // Fetch credits on mount
   useEffect(() => {
@@ -227,39 +239,89 @@ export function BatchPage() {
     setShowConfirmModal(true);
   }, [images, credits]);
 
-  // Handle preset from RightSidebar (show preset name, not prompt)
-  const handleGenerateWithPreset = useCallback(
-    (prompt: string, ratio?: string, name?: string) => {
-      if (images.length === 0) {
-        toast.error('Please upload images first');
+  // Handle adding preset to selection (multi-preset mode)
+  const handleAddPreset = useCallback(
+    (prompt: string, ratio?: string, name?: string, presetId?: string) => {
+      const id = presetId || `custom-${Date.now()}`;
+      const presetName = name || 'Custom Preset';
+      
+      // Check if already selected
+      if (selectedPresets.some(p => p.id === id)) {
+        toast.info(`"${presetName}" is already selected`);
         return;
       }
-
-      // Check credits
-      if (credits < images.length) {
-        toast.error(`Insufficient credits. You need ${images.length} credits, but have ${credits}.`);
-        return;
-      }
-
-      setBatchPrompt(prompt); // Store the actual prompt for API
-      setPresetName(name || 'Selected Preset'); // Store preset name for display
-      setIsCustomPrompt(false); // Mark as preset
-      if (ratio) setAspectRatio(ratio); // Use preset's aspect ratio if provided
-      setShowConfirmModal(true);
+      
+      // Add to selection
+      setSelectedPresets(prev => [...prev, { id, name: presetName, prompt }]);
+      if (ratio) setAspectRatio(ratio);
+      toast.success(`Added "${presetName}" to batch`);
     },
-    [images, credits]
+    [selectedPresets]
+  );
+  
+  // Handle removing preset from selection
+  const handleRemovePreset = useCallback((presetId: string) => {
+    setSelectedPresets(prev => prev.filter(p => p.id !== presetId));
+  }, []);
+  
+  // Handle clearing all selected presets
+  const handleClearPresets = useCallback(() => {
+    setSelectedPresets([]);
+  }, []);
+  
+  // Handle starting matrix batch processing
+  const handleStartMatrixBatch = useCallback(() => {
+    if (images.length === 0) {
+      toast.error('Please upload images first');
+      return;
+    }
+    
+    if (selectedPresets.length === 0) {
+      toast.error('Please select at least one preset');
+      return;
+    }
+    
+    // Calculate total operations: images × presets
+    const totalOperations = images.length * selectedPresets.length;
+    
+    // Check credits
+    if (credits < totalOperations) {
+      toast.error(`Insufficient credits. You need ${totalOperations} credits (${images.length} images × ${selectedPresets.length} presets), but have ${credits}.`);
+      return;
+    }
+    
+    // Set combined preset names for display
+    const presetNames = selectedPresets.map(p => p.name).join(', ');
+    setPresetName(presetNames);
+    setIsCustomPrompt(false);
+    setShowConfirmModal(true);
+  }, [images, selectedPresets, credits]);
+  
+  // Legacy: Handle preset from RightSidebar (single preset - backward compatible)
+  const handleGenerateWithPreset = useCallback(
+    (prompt: string, ratio?: string, name?: string, presetId?: string) => {
+      // In multi-preset mode, add to selection instead of starting immediately
+      handleAddPreset(prompt, ratio, name, presetId);
+    },
+    [handleAddPreset]
   );
 
-  // Handle confirm batch processing (BACKGROUND PROCESSING VERSION)
+  // Handle confirm batch processing (MATRIX PROCESSING VERSION)
   const handleConfirmBatch = useCallback(async () => {
     setShowConfirmModal(false);
     setIsProcessing(true);
 
-    // Capture current prompt (closure issue fix)
-    const currentBatchPrompt = batchPrompt || 'enhance the image quality and details';
+    // Determine presets to use
+    const presetsToProcess = selectedPresets.length > 0 
+      ? selectedPresets 
+      : [{ id: 'single', name: presetName || 'Custom', prompt: batchPrompt || 'enhance the image quality and details' }];
+    
     const currentAspectRatio = aspectRatio || 'auto';
+    const totalOperations = images.length * presetsToProcess.length;
+    
+    setCurrentProgress({ current: 0, total: totalOperations, currentImage: '', currentPreset: '' });
 
-    // 🚀 STEP 1: Create batch project in Supabase
+    // 🚀 STEP 1: Create batch project in Supabase (with matrix info)
     let batchProjectId: string | null = null;
     try {
       const response = await fetch('/api/batch/create', {
@@ -268,7 +330,8 @@ export function BatchPage() {
         body: JSON.stringify({
           name: batchName || `Batch ${new Date().toLocaleString()}`,
           totalImages: images.length,
-          prompt: currentBatchPrompt,
+          totalOperations, // New: total matrix operations
+          presets: presetsToProcess, // New: all presets to apply
           aspectRatio: currentAspectRatio,
         }),
       });
@@ -461,6 +524,11 @@ export function BatchPage() {
         isProcessing={isProcessing}
         aspectRatio={aspectRatio}
         onAspectRatioChange={setAspectRatio}
+        selectedPresets={selectedPresets}
+        onRemovePreset={handleRemovePreset}
+        onClearPresets={handleClearPresets}
+        onStartMatrixBatch={handleStartMatrixBatch}
+        currentProgress={currentProgress}
       />
 
       {/* Batch Confirm Modal */}
@@ -469,6 +537,7 @@ export function BatchPage() {
         onConfirm={handleConfirmBatch}
         onCancel={() => setShowConfirmModal(false)}
         imageCount={images.length}
+        presetCount={selectedPresets.length}
         prompt={isCustomPrompt ? batchPrompt : undefined}
         presetName={!isCustomPrompt ? presetName : undefined}
         aspectRatio={aspectRatio}

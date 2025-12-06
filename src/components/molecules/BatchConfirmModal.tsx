@@ -7,6 +7,7 @@ interface BatchConfirmModalProps {
   onConfirm: () => void;
   onCancel: () => void;
   imageCount: number;
+  presetCount?: number; // For matrix processing
   prompt?: string;
   presetName?: string; // If preset is used, show name instead of prompt
   aspectRatio?: string; // Show selected aspect ratio
@@ -20,10 +21,12 @@ export function BatchConfirmModal({
   onConfirm,
   onCancel,
   imageCount,
+  presetCount = 1,
   prompt,
   presetName,
   aspectRatio,
 }: BatchConfirmModalProps) {
+  const totalOperations = imageCount * presetCount;
   if (!isOpen) return null;
 
   // Determine what to show: preset name or custom prompt
@@ -51,13 +54,31 @@ export function BatchConfirmModal({
 
         {/* Content */}
         <div className="space-y-4 p-6">
-          <p className="text-sm text-white/80">
-            You are about to process{' '}
-            <span className="font-semibold text-purple-400">{imageCount} images</span>{' '}
-            with AI. This will:
-          </p>
+          {presetCount > 1 ? (
+            <p className="text-sm text-white/80">
+              You are about to process{' '}
+              <span className="font-semibold text-purple-400">{imageCount} images</span>{' '}
+              with{' '}
+              <span className="font-semibold text-purple-400">{presetCount} presets</span>{' '}
+              ({totalOperations} total outputs). This will:
+            </p>
+          ) : (
+            <p className="text-sm text-white/80">
+              You are about to process{' '}
+              <span className="font-semibold text-purple-400">{imageCount} images</span>{' '}
+              with AI. This will:
+            </p>
+          )}
 
           <ul className="space-y-2 text-sm text-white/60">
+            {presetCount > 1 && (
+              <li className="flex items-start gap-2">
+                <span className="mt-0.5 text-purple-400">•</span>
+                <span>
+                  Apply each preset to every image ({imageCount} × {presetCount} = {totalOperations} outputs)
+                </span>
+              </li>
+            )}
             <li className="flex items-start gap-2">
               <span className="mt-0.5 text-purple-400">•</span>
               <span>
@@ -67,13 +88,13 @@ export function BatchConfirmModal({
             <li className="flex items-start gap-2">
               <span className="mt-0.5 text-purple-400">•</span>
               <span>
-                Use {imageCount} credits (1 credit per image)
+                Use {totalOperations} credits (1 credit per output)
               </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="mt-0.5 text-purple-400">•</span>
               <span>
-                Take approximately {Math.ceil(imageCount * 0.5)} minutes to complete
+                Take approximately {Math.ceil(totalOperations * 0.5)} minutes to complete
               </span>
             </li>
           </ul>

@@ -5,6 +5,7 @@ import { UploadZone } from '@/components/molecules/UploadZone';
 import { BatchImageGrid } from '@/components/molecules/BatchImageGrid';
 import { BatchPromptControl } from '@/components/molecules/BatchPromptControl';
 import type { BatchImage } from '@/components/molecules/BatchImageGrid';
+import type { SelectedBatchPreset } from '@/components/templates/BatchPage';
 
 interface BatchContentProps {
   images: BatchImage[];
@@ -20,6 +21,12 @@ interface BatchContentProps {
   isProcessing?: boolean;
   aspectRatio?: string;
   onAspectRatioChange?: (ratio: string) => void;
+  // Multi-preset support
+  selectedPresets?: SelectedBatchPreset[];
+  onRemovePreset?: (id: string) => void;
+  onClearPresets?: () => void;
+  onStartMatrixBatch?: () => void;
+  currentProgress?: { current: number; total: number; currentImage: string; currentPreset: string };
 }
 
 /**
@@ -39,6 +46,11 @@ export function BatchContent({
   isProcessing = false,
   aspectRatio,
   onAspectRatioChange,
+  selectedPresets = [],
+  onRemovePreset,
+  onClearPresets,
+  onStartMatrixBatch,
+  currentProgress,
 }: BatchContentProps) {
   const { leftOpen, rightOpen, topOpen, bottomOpen } = useSidebarStore();
 
@@ -115,6 +127,84 @@ export function BatchContent({
               )}
             </div>
           </div>
+
+          {/* Selected Presets Section */}
+          {selectedPresets.length > 0 && (
+            <div className="rounded-xl border border-purple-500/20 bg-purple-500/5 p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-white">Selected Presets</span>
+                  <span className="rounded-full bg-purple-500/20 px-2 py-0.5 text-xs text-purple-300">
+                    {selectedPresets.length}
+                  </span>
+                </div>
+                <button
+                  onClick={onClearPresets}
+                  className="text-xs text-white/50 transition-colors hover:text-red-400"
+                  disabled={disabled}
+                >
+                  Clear All
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {selectedPresets.map((preset) => (
+                  <div
+                    key={preset.id}
+                    className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5"
+                  >
+                    <span className="text-sm text-white">{preset.name}</span>
+                    <button
+                      onClick={() => onRemovePreset?.(preset.id)}
+                      className="text-white/40 transition-colors hover:text-red-400"
+                      disabled={disabled}
+                    >
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Matrix Summary */}
+              {images.length > 0 && (
+                <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-3">
+                  <div className="text-sm text-white/60">
+                    <span className="text-white">{images.length}</span> images × <span className="text-white">{selectedPresets.length}</span> presets = <span className="font-medium text-purple-400">{images.length * selectedPresets.length} outputs</span>
+                  </div>
+                  <button
+                    onClick={onStartMatrixBatch}
+                    disabled={disabled || isProcessing}
+                    className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {isProcessing ? 'Processing...' : `Start Batch (${images.length * selectedPresets.length} credits)`}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* Progress Bar (when processing) */}
+          {isProcessing && currentProgress && currentProgress.total > 0 && (
+            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+              <div className="mb-2 flex items-center justify-between text-sm">
+                <span className="text-white/60">
+                  {currentProgress.currentImage && currentProgress.currentPreset 
+                    ? `Processing: ${currentProgress.currentImage} → ${currentProgress.currentPreset}`
+                    : 'Processing...'}
+                </span>
+                <span className="text-white">
+                  {currentProgress.current}/{currentProgress.total}
+                </span>
+              </div>
+              <div className="h-2 overflow-hidden rounded-full bg-white/10">
+                <div 
+                  className="h-full rounded-full bg-purple-500 transition-all duration-300"
+                  style={{ width: `${(currentProgress.current / currentProgress.total) * 100}%` }}
+                />
+              </div>
+            </div>
+          )}
 
           {/* Upload Zone */}
           <UploadZone
