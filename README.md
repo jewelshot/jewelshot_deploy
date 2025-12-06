@@ -347,3 +347,4 @@ See [STAGING_ENVIRONMENT.md](./STAGING_ENVIRONMENT.md) for complete setup guide.
 
 Built with ❤️ by **Jewelshot Team**  
 **Last Updated:** November 28, 2025
+
