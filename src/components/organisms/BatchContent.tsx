@@ -128,16 +128,25 @@ export function BatchContent({
             </div>
           </div>
 
-          {/* Selected Presets Section */}
-          {selectedPresets.length > 0 && (
-            <div className="rounded-xl border border-purple-500/20 bg-purple-500/5 p-4">
-              <div className="mb-3 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-white">Selected Presets</span>
+          {/* Selected Presets Section - Always visible */}
+          <div className={`rounded-xl border p-4 transition-all ${
+            selectedPresets.length > 0 
+              ? 'border-purple-500/30 bg-gradient-to-r from-purple-500/10 to-blue-500/5' 
+              : 'border-white/10 border-dashed bg-white/[0.02]'
+          }`}>
+            <div className="mb-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <svg className="h-5 w-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+                <span className="text-sm font-medium text-white">Selected Presets</span>
+                {selectedPresets.length > 0 && (
                   <span className="rounded-full bg-purple-500/20 px-2 py-0.5 text-xs text-purple-300">
                     {selectedPresets.length}
                   </span>
-                </div>
+                )}
+              </div>
+              {selectedPresets.length > 0 && (
                 <button
                   onClick={onClearPresets}
                   className="text-xs text-white/50 transition-colors hover:text-red-400"
@@ -145,17 +154,39 @@ export function BatchContent({
                 >
                   Clear All
                 </button>
+              )}
+            </div>
+            
+            {/* Empty State */}
+            {selectedPresets.length === 0 && (
+              <div className="flex items-center gap-3 rounded-lg border border-white/5 bg-white/[0.02] px-4 py-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-500/10">
+                  <svg className="h-4 w-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm text-white/60">No presets selected</p>
+                  <p className="text-xs text-white/40">Click presets in the right panel to add them here</p>
+                </div>
               </div>
+            )}
+            
+            {/* Selected Presets List */}
+            {selectedPresets.length > 0 && (
               <div className="flex flex-wrap gap-2">
-                {selectedPresets.map((preset) => (
+                {selectedPresets.map((preset, index) => (
                   <div
                     key={preset.id}
-                    className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5"
+                    className="group flex items-center gap-2 rounded-lg border border-purple-500/20 bg-purple-500/10 px-3 py-2 transition-all hover:border-purple-500/40"
                   >
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-purple-500/30 text-[10px] font-medium text-purple-300">
+                      {index + 1}
+                    </span>
                     <span className="text-sm text-white">{preset.name}</span>
                     <button
                       onClick={() => onRemovePreset?.(preset.id)}
-                      className="text-white/40 transition-colors hover:text-red-400"
+                      className="ml-1 text-white/40 transition-colors hover:text-red-400"
                       disabled={disabled}
                     >
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -165,24 +196,42 @@ export function BatchContent({
                   </div>
                 ))}
               </div>
-              
-              {/* Matrix Summary */}
-              {images.length > 0 && (
-                <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-3">
-                  <div className="text-sm text-white/60">
-                    <span className="text-white">{images.length}</span> images × <span className="text-white">{selectedPresets.length}</span> presets = <span className="font-medium text-purple-400">{images.length * selectedPresets.length} outputs</span>
-                  </div>
-                  <button
-                    onClick={onStartMatrixBatch}
-                    disabled={disabled || isProcessing}
-                    className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-500 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    {isProcessing ? 'Processing...' : `Start Batch (${images.length * selectedPresets.length} credits)`}
-                  </button>
+            )}
+            
+            {/* Matrix Summary & Start Button */}
+            {selectedPresets.length > 0 && (
+              <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-4">
+                <div className="text-sm">
+                  {images.length > 0 ? (
+                    <span className="text-white/60">
+                      <span className="font-medium text-white">{images.length}</span> images × <span className="font-medium text-white">{selectedPresets.length}</span> presets = <span className="font-semibold text-purple-400">{images.length * selectedPresets.length} outputs</span>
+                    </span>
+                  ) : (
+                    <span className="text-white/40">Upload images below to start</span>
+                  )}
                 </div>
-              )}
-            </div>
-          )}
+                <button
+                  onClick={onStartMatrixBatch}
+                  disabled={disabled || isProcessing || images.length === 0}
+                  className="rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-purple-500/25 transition-all hover:from-purple-500 hover:to-blue-500 hover:shadow-purple-500/40 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+                >
+                  {isProcessing ? (
+                    <span className="flex items-center gap-2">
+                      <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      Processing...
+                    </span>
+                  ) : images.length > 0 ? (
+                    `Start Batch (${images.length * selectedPresets.length} credits)`
+                  ) : (
+                    'Upload Images First'
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
           
           {/* Enhanced Progress Section (when processing) */}
           {isProcessing && currentProgress && currentProgress.total > 0 && (

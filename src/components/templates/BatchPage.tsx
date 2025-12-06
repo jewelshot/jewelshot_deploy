@@ -548,8 +548,8 @@ export function BatchPage() {
       <Sidebar />
       <SidebarToggle />
 
-      {/* Right Sidebar - Preset selection */}
-      <RightSidebar onGenerateWithPreset={handleGenerateWithPreset} />
+      {/* Right Sidebar - Preset selection (batch mode: no confirmation modal) */}
+      <RightSidebar mode="batch" onGenerateWithPreset={handleGenerateWithPreset} />
       <RightSidebarToggle />
 
       {/* Bottom Bar */}

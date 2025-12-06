@@ -35,10 +35,12 @@ declare global {
 }
 
 interface RightSidebarProps {
+  /** Mode: 'studio' shows confirmation modal, 'batch' adds preset directly */
+  mode?: 'studio' | 'batch';
   onGenerateWithPreset?: (prompt: string, aspectRatio?: string, presetName?: string, presetId?: string) => void;
 }
 
-export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
+export function RightSidebar({ mode = 'studio', onGenerateWithPreset }: RightSidebarProps) {
   const { rightOpen } = useSidebarStore();
 
   // Selection states
@@ -120,7 +122,20 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
     // First check presetPrompts (legacy/built-in presets)
     const legacyPreset = presetPrompts[presetId];
     if (legacyPreset) {
-      logger.info('RightSidebar: Found legacy preset:', presetId);
+      logger.info('RightSidebar: Found legacy preset:', presetId, 'mode:', mode);
+      
+      // BATCH MODE: Add preset directly without confirmation
+      if (mode === 'batch') {
+        const prompt = legacyPreset.buildPrompt(
+          jewelryType || 'ring',
+          gender || undefined,
+          aspectRatio
+        );
+        onGenerateWithPreset?.(prompt, aspectRatio, legacyPreset.name, presetId);
+        return;
+      }
+      
+      // STUDIO MODE: Show confirmation modal
       setConfirmModal({
         show: true,
         presetName: legacyPreset.name,
@@ -134,7 +149,29 @@ export function RightSidebar({ onGenerateWithPreset }: RightSidebarProps) {
     // Then check Library presets (from presets.ts / PRESET_CATEGORIES)
     const libraryPreset = getPresetById(presetId);
     if (libraryPreset) {
-      logger.info('RightSidebar: Found library preset:', presetId, libraryPreset.title);
+      logger.info('RightSidebar: Found library preset:', presetId, libraryPreset.title, 'mode:', mode);
+      
+      // BATCH MODE: Add preset directly without confirmation
+      if (mode === 'batch') {
+        const settingsHeader = `[GENERATION SETTINGS]
+Gender: ${gender || 'not specified'}
+Jewelry Type: ${jewelryType || 'ring'}
+Aspect Ratio: ${aspectRatio}
+
+[PROMPT]
+`;
+        let prompt = settingsHeader + (libraryPreset.prompt || '');
+        if (libraryPreset.negativePrompt) {
+          prompt += `
+
+--no
+${libraryPreset.negativePrompt}`;
+        }
+        onGenerateWithPreset?.(prompt, aspectRatio, libraryPreset.title, presetId);
+        return;
+      }
+      
+      // STUDIO MODE: Show confirmation modal
       setConfirmModal({
         show: true,
         presetName: libraryPreset.title,
