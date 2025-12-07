@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Check, Sparkles } from 'lucide-react';
-import { PRESET_CATEGORIES, filterPresetsByTab, getDefaultTab } from '@/data/presets';
+import { Search, Check, Sparkles, Heart, Bookmark } from 'lucide-react';
+import { PRESET_CATEGORIES, filterPresetsByTab, getDefaultTab, getPresetById } from '@/data/presets';
 import { usePresetLibraryStore } from '@/store/presetLibraryStore';
-import { PresetCategory, PresetTab } from '@/types/preset';
+import { PresetCategory, PresetTab, Preset } from '@/types/preset';
 import { toast } from 'sonner';
 import { createScopedLogger } from '@/lib/logger';
 import { useSidebarStore } from '@/store/sidebarStore';
@@ -17,6 +17,8 @@ const TABS: { id: PresetTab; label: string }[] = [
   { id: 'women', label: 'Women' },
   { id: 'men', label: 'Men' },
   { id: 'studio', label: 'Products' },
+  { id: 'saved', label: 'Saved' },
+  { id: 'favorites', label: 'Favorites' },
 ];
 
 /**
@@ -34,15 +36,20 @@ export function LibraryContent() {
 
   const {
     selectedPresets,
+    favoritePresets,
     maxPresets,
     addPreset,
     removePreset,
     isPresetSelected,
     getSelectedPresetsCount,
     canAddMorePresets,
+    toggleFavorite,
+    isFavorite,
+    getFavoriteCount,
   } = usePresetLibraryStore();
 
   const selectedCount = getSelectedPresetsCount();
+  const favoriteCount = getFavoriteCount();
 
   // Load Generation Settings on mount and set default tab
   useEffect(() => {
@@ -56,7 +63,50 @@ export function LibraryContent() {
 
   // Filter categories based on active tab, search, and category
   const filteredCategories = useMemo(() => {
-    // First filter by tab
+    // Handle special tabs
+    if (activeTab === 'saved') {
+      if (!savedPresetsCategory) return [];
+      let categories = [savedPresetsCategory];
+      
+      // Filter by search query
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        categories = categories
+          .map((cat) => ({
+            ...cat,
+            presets: cat.presets.filter(
+              (preset) =>
+                preset.title.toLowerCase().includes(query) ||
+                preset.description?.toLowerCase().includes(query)
+            ),
+          }))
+          .filter((cat) => cat.presets.length > 0);
+      }
+      return categories;
+    }
+    
+    if (activeTab === 'favorites') {
+      if (!favoritePresetsCategory) return [];
+      let categories = [favoritePresetsCategory];
+      
+      // Filter by search query
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        categories = categories
+          .map((cat) => ({
+            ...cat,
+            presets: cat.presets.filter(
+              (preset) =>
+                preset.title.toLowerCase().includes(query) ||
+                preset.description?.toLowerCase().includes(query)
+            ),
+          }))
+          .filter((cat) => cat.presets.length > 0);
+      }
+      return categories;
+    }
+    
+    // Regular tabs (women, men, studio)
     let categories = filterPresetsByTab(activeTab);
 
     // Filter by selected category
@@ -80,16 +130,56 @@ export function LibraryContent() {
     }
 
     return categories;
-  }, [searchQuery, selectedCategory, activeTab]);
+  }, [searchQuery, selectedCategory, activeTab, savedPresetsCategory, favoritePresetsCategory]);
 
   // Get preset count for each tab
   const tabCounts = useMemo(() => {
     return TABS.reduce((acc, tab) => {
-      const categories = filterPresetsByTab(tab.id);
-      acc[tab.id] = categories.reduce((sum, cat) => sum + cat.presets.length, 0);
+      if (tab.id === 'saved') {
+        acc[tab.id] = selectedPresets.length;
+      } else if (tab.id === 'favorites') {
+        acc[tab.id] = favoritePresets.length;
+      } else {
+        const categories = filterPresetsByTab(tab.id);
+        acc[tab.id] = categories.reduce((sum, cat) => sum + cat.presets.length, 0);
+      }
       return acc;
     }, {} as Record<PresetTab, number>);
-  }, []);
+  }, [selectedPresets.length, favoritePresets.length]);
+  
+  // Get saved presets as a virtual category
+  const savedPresetsCategory = useMemo((): PresetCategory | null => {
+    if (selectedPresets.length === 0) return null;
+    
+    const presets = selectedPresets
+      .map(sp => getPresetById(sp.presetId))
+      .filter((p): p is Preset => p !== null);
+    
+    return {
+      id: 'saved',
+      name: 'Your Saved Presets',
+      emoji: '📌',
+      description: 'Presets you\'ve added to your Quick Presets panel',
+      presets,
+    };
+  }, [selectedPresets]);
+  
+  // Get favorite presets as a virtual category
+  const favoritePresetsCategory = useMemo((): PresetCategory | null => {
+    if (favoritePresets.length === 0) return null;
+    
+    const presets = favoritePresets
+      .map(id => getPresetById(id))
+      .filter((p): p is Preset => p !== null);
+    
+    return {
+      id: 'favorites',
+      name: 'Your Favorites',
+      emoji: '❤️',
+      description: 'Presets you\'ve marked as favorites',
+      presets,
+    };
+  }, [favoritePresets]);
 
   const handlePresetToggle = (presetId: string, categoryId: string) => {
     if (isPresetSelected(presetId)) {
@@ -188,19 +278,21 @@ export function LibraryContent() {
             />
           </div>
 
-          {/* Category Filter */}
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="h-10 rounded-lg border border-white/10 bg-white/5 px-4 text-sm text-white focus:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
-          >
-            <option value="all">All Categories</option>
-            {filteredCategories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
+          {/* Category Filter - only for regular tabs */}
+          {activeTab !== 'saved' && activeTab !== 'favorites' && (
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="h-10 rounded-lg border border-white/10 bg-white/5 px-4 text-sm text-white focus:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+            >
+              <option value="all">All Categories</option>
+              {PRESET_CATEGORIES.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
       </div>
 
@@ -208,13 +300,37 @@ export function LibraryContent() {
       <div className="space-y-8">
         {filteredCategories.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <Sparkles className="mb-4 h-12 w-12 text-white/20" />
-            <h3 className="text-lg font-medium text-white/60">
-              No presets found
-            </h3>
-            <p className="mt-1 text-sm text-white/40">
-              Try adjusting your search or filters
-            </p>
+            {activeTab === 'saved' ? (
+              <>
+                <Bookmark className="mb-4 h-12 w-12 text-white/20" />
+                <h3 className="text-lg font-medium text-white/60">
+                  No saved presets yet
+                </h3>
+                <p className="mt-1 text-sm text-white/40">
+                  Click on any preset to add it to your Quick Presets panel
+                </p>
+              </>
+            ) : activeTab === 'favorites' ? (
+              <>
+                <Heart className="mb-4 h-12 w-12 text-white/20" />
+                <h3 className="text-lg font-medium text-white/60">
+                  No favorites yet
+                </h3>
+                <p className="mt-1 text-sm text-white/40">
+                  Click the heart icon on any preset to add it to favorites
+                </p>
+              </>
+            ) : (
+              <>
+                <Sparkles className="mb-4 h-12 w-12 text-white/20" />
+                <h3 className="text-lg font-medium text-white/60">
+                  No presets found
+                </h3>
+                <p className="mt-1 text-sm text-white/40">
+                  Try adjusting your search or filters
+                </p>
+              </>
+            )}
           </div>
         ) : (
           filteredCategories.map((category) => (
@@ -224,6 +340,8 @@ export function LibraryContent() {
               onPresetToggle={handlePresetToggle}
               isPresetSelected={isPresetSelected}
               getPresetOrder={getPresetOrder}
+              onFavoriteToggle={toggleFavorite}
+              isFavorite={isFavorite}
             />
           ))
         )}
@@ -240,6 +358,8 @@ interface CategorySectionProps {
   onPresetToggle: (presetId: string, categoryId: string) => void;
   isPresetSelected: (presetId: string) => boolean;
   getPresetOrder: (presetId: string) => number;
+  onFavoriteToggle: (presetId: string) => void;
+  isFavorite: (presetId: string) => boolean;
 }
 
 function CategorySection({
@@ -247,6 +367,8 @@ function CategorySection({
   onPresetToggle,
   isPresetSelected,
   getPresetOrder,
+  onFavoriteToggle,
+  isFavorite,
 }: CategorySectionProps) {
   return (
     <div className="space-y-4">
@@ -260,55 +382,60 @@ function CategorySection({
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {category.presets.map((preset) => {
           const isSelected = isPresetSelected(preset.id);
+          const isFav = isFavorite(preset.id);
           const order = getPresetOrder(preset.id);
 
           return (
-            <button
+            <div
               key={preset.id}
-              onClick={() => onPresetToggle(preset.id, category.id)}
               className="group relative overflow-hidden rounded-lg border border-white/10 bg-white/[0.02] transition-all hover:border-purple-500/50 hover:bg-white/[0.05]"
             >
-              {/* Image */}
-              <div className="relative aspect-square overflow-hidden bg-white/5">
-                <img
-                  src={preset.imagePath}
-                  alt={preset.title}
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  onError={(e) => {
-                    // Fallback if image doesn't exist
-                    (e.target as HTMLImageElement).src =
-                      'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"%3E%3Crect fill="%23111" width="200" height="200"/%3E%3Ctext x="50%25" y="50%25" font-size="14" fill="%23666" text-anchor="middle" dy=".3em"%3EPreview%3C/text%3E%3C/svg%3E';
-                  }}
-                />
+              {/* Clickable area for selection */}
+              <button
+                onClick={() => onPresetToggle(preset.id, category.id)}
+                className="w-full text-left"
+              >
+                {/* Image */}
+                <div className="relative aspect-square overflow-hidden bg-white/5">
+                  <img
+                    src={preset.imagePath}
+                    alt={preset.title}
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src =
+                        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"%3E%3Crect fill="%23111" width="200" height="200"/%3E%3Ctext x="50%25" y="50%25" font-size="14" fill="%23666" text-anchor="middle" dy=".3em"%3EPreview%3C/text%3E%3C/svg%3E';
+                    }}
+                  />
 
-                {/* Selected Overlay */}
-                {isSelected && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-purple-500/20 backdrop-blur-[2px]">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-500">
-                      <Check className="h-6 w-6 text-white" />
+                  {/* Selected Overlay */}
+                  {isSelected && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-purple-500/20 backdrop-blur-[2px]">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-500">
+                        <Check className="h-6 w-6 text-white" />
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {/* Hover Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-              </div>
+                  {/* Hover Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                </div>
 
-              {/* Info */}
-              <div className="p-3">
-                <h3 className="text-sm font-medium text-white">
-                  {preset.title}
-                </h3>
-                {preset.description && (
-                  <p className="mt-1 line-clamp-2 text-xs text-white/50">
-                    {preset.description}
-                  </p>
-                )}
-              </div>
+                {/* Info */}
+                <div className="p-3">
+                  <h3 className="text-sm font-medium text-white">
+                    {preset.title}
+                  </h3>
+                  {preset.description && (
+                    <p className="mt-1 line-clamp-2 text-xs text-white/50">
+                      {preset.description}
+                    </p>
+                  )}
+                </div>
+              </button>
 
               {/* Selection Order Badge (Top-Left) */}
               {isSelected && order > 0 && (
-                <div className="absolute left-2 top-2">
+                <div className="absolute left-2 top-2 pointer-events-none">
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg ring-2 ring-white/20">
                     <span className="text-sm font-bold text-white">
                       {order}
@@ -317,15 +444,30 @@ function CategorySection({
                 </div>
               )}
 
-              {/* Check Mark Badge (Top-Right) */}
+              {/* Favorite Button (Top-Right) */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onFavoriteToggle(preset.id);
+                }}
+                className={`absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full transition-all ${
+                  isFav 
+                    ? 'bg-red-500 text-white' 
+                    : 'bg-black/40 text-white/60 opacity-0 group-hover:opacity-100 hover:bg-black/60 hover:text-white'
+                }`}
+              >
+                <Heart className={`h-4 w-4 ${isFav ? 'fill-current' : ''}`} />
+              </button>
+
+              {/* Selected Check (Bottom-Right of image) */}
               {isSelected && (
-                <div className="absolute right-2 top-2">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-purple-500/90">
+                <div className="absolute bottom-[60px] right-2 pointer-events-none">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-purple-500/90 shadow-lg">
                     <Check className="h-4 w-4 text-white" />
                   </div>
                 </div>
               )}
-            </button>
+            </div>
           );
         })}
       </div>

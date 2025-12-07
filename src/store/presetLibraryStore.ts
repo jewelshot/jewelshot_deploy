@@ -8,10 +8,11 @@ const logger = createScopedLogger('PresetLibraryStore');
 
 interface PresetLibraryState {
   selectedPresets: SelectedPreset[];
+  favoritePresets: string[]; // Array of preset IDs
   maxPresets: number;
   isLoading: boolean;
 
-  // Actions
+  // Selection Actions
   addPreset: (presetId: string, categoryId: string) => void;
   removePreset: (presetId: string) => void;
   isPresetSelected: (presetId: string) => boolean;
@@ -20,6 +21,11 @@ interface PresetLibraryState {
   getSelectedPresetsByCategory: (categoryId: string) => SelectedPreset[];
   getSelectedPresetsCount: () => number;
   canAddMorePresets: () => boolean;
+  
+  // Favorite Actions
+  toggleFavorite: (presetId: string) => void;
+  isFavorite: (presetId: string) => boolean;
+  getFavoriteCount: () => number;
 }
 
 const DEFAULT_MAX_PRESETS = 12; // Free tier limit
@@ -28,6 +34,7 @@ export const usePresetLibraryStore = create<PresetLibraryState>()(
   persist(
     (set, get) => ({
       selectedPresets: [],
+      favoritePresets: [],
       maxPresets: DEFAULT_MAX_PRESETS,
       isLoading: false,
 
@@ -107,10 +114,38 @@ export const usePresetLibraryStore = create<PresetLibraryState>()(
         const state = get();
         return state.selectedPresets.length < state.maxPresets;
       },
+
+      // Favorite Actions
+      toggleFavorite: (presetId: string) => {
+        const state = get();
+        const isFav = state.favoritePresets.includes(presetId);
+        
+        if (isFav) {
+          set({
+            favoritePresets: state.favoritePresets.filter(id => id !== presetId),
+          });
+          logger.info('Preset removed from favorites:', presetId);
+        } else {
+          set({
+            favoritePresets: [...state.favoritePresets, presetId],
+          });
+          logger.info('Preset added to favorites:', presetId);
+        }
+      },
+
+      isFavorite: (presetId: string) => {
+        const state = get();
+        return state.favoritePresets.includes(presetId);
+      },
+
+      getFavoriteCount: () => {
+        const state = get();
+        return state.favoritePresets.length;
+      },
     }),
     {
       name: 'jewelshot-preset-library',
-      version: 1,
+      version: 2, // Increment version for new structure
     }
   )
 );

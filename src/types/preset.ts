@@ -5,7 +5,7 @@
 
 export type PresetGender = 'women' | 'men' | 'all';
 export type PresetJewelryType = 'ring' | 'necklace' | 'earring' | 'bracelet' | 'all';
-export type PresetTab = 'women' | 'men' | 'studio';
+export type PresetTab = 'women' | 'men' | 'studio' | 'saved' | 'favorites';
 
 export interface Preset {
   id: string;
