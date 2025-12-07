@@ -60,6 +60,40 @@ export function LibraryContent() {
       logger.info(`Auto-selected tab: ${defaultTab} based on Generation Settings`);
     }
   }, []);
+  
+  // Get saved presets as a virtual category
+  const savedPresetsCategory = useMemo((): PresetCategory | null => {
+    if (selectedPresets.length === 0) return null;
+    
+    const presets = selectedPresets
+      .map(sp => getPresetById(sp.presetId))
+      .filter((p): p is Preset => p !== null);
+    
+    return {
+      id: 'saved',
+      name: 'Your Saved Presets',
+      emoji: '📌',
+      description: 'Presets you\'ve added to your Quick Presets panel',
+      presets,
+    };
+  }, [selectedPresets]);
+  
+  // Get favorite presets as a virtual category
+  const favoritePresetsCategory = useMemo((): PresetCategory | null => {
+    if (favoritePresets.length === 0) return null;
+    
+    const presets = favoritePresets
+      .map(id => getPresetById(id))
+      .filter((p): p is Preset => p !== null);
+    
+    return {
+      id: 'favorites',
+      name: 'Your Favorites',
+      emoji: '❤️',
+      description: 'Presets you\'ve marked as favorites',
+      presets,
+    };
+  }, [favoritePresets]);
 
   // Filter categories based on active tab, search, and category
   const filteredCategories = useMemo(() => {
@@ -146,40 +180,6 @@ export function LibraryContent() {
       return acc;
     }, {} as Record<PresetTab, number>);
   }, [selectedPresets.length, favoritePresets.length]);
-  
-  // Get saved presets as a virtual category
-  const savedPresetsCategory = useMemo((): PresetCategory | null => {
-    if (selectedPresets.length === 0) return null;
-    
-    const presets = selectedPresets
-      .map(sp => getPresetById(sp.presetId))
-      .filter((p): p is Preset => p !== null);
-    
-    return {
-      id: 'saved',
-      name: 'Your Saved Presets',
-      emoji: '📌',
-      description: 'Presets you\'ve added to your Quick Presets panel',
-      presets,
-    };
-  }, [selectedPresets]);
-  
-  // Get favorite presets as a virtual category
-  const favoritePresetsCategory = useMemo((): PresetCategory | null => {
-    if (favoritePresets.length === 0) return null;
-    
-    const presets = favoritePresets
-      .map(id => getPresetById(id))
-      .filter((p): p is Preset => p !== null);
-    
-    return {
-      id: 'favorites',
-      name: 'Your Favorites',
-      emoji: '❤️',
-      description: 'Presets you\'ve marked as favorites',
-      presets,
-    };
-  }, [favoritePresets]);
 
   const handlePresetToggle = (presetId: string, categoryId: string) => {
     if (isPresetSelected(presetId)) {
