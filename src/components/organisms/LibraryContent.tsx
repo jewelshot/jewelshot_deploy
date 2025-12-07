@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Check, Info, Sparkles } from 'lucide-react';
+import { Search, Check, Sparkles } from 'lucide-react';
 import { PRESET_CATEGORIES, filterPresetsByTab, getDefaultTab } from '@/data/presets';
 import { usePresetLibraryStore } from '@/store/presetLibraryStore';
 import { PresetCategory, PresetTab } from '@/types/preset';
@@ -13,10 +13,10 @@ import { loadGenerationSettings } from '@/lib/generation-settings-storage';
 const logger = createScopedLogger('Library');
 
 // Tab definitions
-const TABS: { id: PresetTab; label: string; emoji: string; description: string }[] = [
-  { id: 'women', label: 'Women', emoji: '👩', description: 'On-model presets for women' },
-  { id: 'men', label: 'Men', emoji: '👨', description: 'On-model presets for men' },
-  { id: 'studio', label: 'Studio Shots', emoji: '💎', description: 'Product-only presets' },
+const TABS: { id: PresetTab; label: string }[] = [
+  { id: 'women', label: 'Women' },
+  { id: 'men', label: 'Men' },
+  { id: 'studio', label: 'Products' },
 ];
 
 /**
@@ -145,32 +145,33 @@ export function LibraryContent() {
 
         {/* Tab Navigation */}
         <div className="mt-6">
-          <div className="flex gap-1 rounded-xl border border-white/10 bg-white/[0.02] p-1">
+          <div className="relative flex border-b border-white/10">
             {TABS.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition-all ${
+                className={`relative flex-1 px-6 py-3 text-sm font-medium transition-all ${
                   activeTab === tab.id
-                    ? 'bg-purple-500/20 text-purple-300 shadow-lg'
-                    : 'text-white/60 hover:bg-white/5 hover:text-white/80'
+                    ? 'text-white'
+                    : 'text-white/50 hover:text-white/70'
                 }`}
               >
-                <span className="text-lg">{tab.emoji}</span>
                 <span>{tab.label}</span>
-                <span className={`rounded-full px-2 py-0.5 text-xs ${
+                <span className={`ml-2 rounded-full px-2 py-0.5 text-xs ${
                   activeTab === tab.id 
-                    ? 'bg-purple-500/30 text-purple-200' 
-                    : 'bg-white/10 text-white/40'
+                    ? 'bg-purple-500/30 text-purple-300' 
+                    : 'bg-white/5 text-white/40'
                 }`}>
                   {tabCounts[tab.id]}
                 </span>
+                
+                {/* Active indicator line */}
+                {activeTab === tab.id && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500 to-blue-500" />
+                )}
               </button>
             ))}
           </div>
-          <p className="mt-2 text-center text-xs text-white/40">
-            {TABS.find(t => t.id === activeTab)?.description}
-          </p>
         </div>
 
         {/* Search and Category Filter */}
@@ -196,24 +197,10 @@ export function LibraryContent() {
             <option value="all">All Categories</option>
             {filteredCategories.map((cat) => (
               <option key={cat.id} value={cat.id}>
-                {cat.emoji} {cat.name}
+                {cat.name}
               </option>
             ))}
           </select>
-        </div>
-      </div>
-
-      {/* Info Banner */}
-      <div className="mb-6">
-        <div className="flex items-start gap-3 rounded-lg border border-purple-500/20 bg-purple-500/10 p-4">
-          <Info className="mt-0.5 h-5 w-5 shrink-0 text-purple-400" />
-          <div className="text-sm text-white/70">
-            <strong className="text-white">How it works:</strong> Click on any
-            preset to add it to your Quick Presets panel. Your selections are{' '}
-            <strong className="text-white">automatically saved</strong> and will
-            appear in Studio and Batch pages (right sidebar). You can select up
-            to {maxPresets} presets.
-          </div>
         </div>
       </div>
 
@@ -264,12 +251,9 @@ function CategorySection({
   return (
     <div className="space-y-4">
       {/* Category Header */}
-      <div className="flex items-center gap-3">
-        <span className="text-2xl">{category.emoji}</span>
-        <div>
-          <h2 className="text-xl font-semibold text-white">{category.name}</h2>
-          <p className="text-sm text-white/50">{category.description}</p>
-        </div>
+      <div className="border-l-2 border-purple-500/50 pl-4">
+        <h2 className="text-lg font-semibold text-white">{category.name}</h2>
+        <p className="text-sm text-white/40">{category.description}</p>
       </div>
 
       {/* Preset Grid */}
