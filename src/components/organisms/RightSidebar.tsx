@@ -12,8 +12,6 @@ import { Settings } from 'lucide-react';
 import { useSidebarStore } from '@/store/sidebarStore';
 import { GenerationSettingsModal } from '@/components/molecules/GenerationSettingsModal';
 import { QuickModeContent } from '@/components/molecules/QuickModeContent';
-import { SelectiveModeContent } from '@/components/molecules/SelectiveModeContent';
-import { AdvancedModeContent } from '@/components/molecules/AdvancedModeContent';
 import { PresetConfirmModal } from '@/components/molecules/PresetConfirmModal';
 import { presetPrompts } from '@/lib/preset-prompts';
 import { getPresetById } from '@/data/presets';
@@ -24,7 +22,6 @@ const logger = createScopedLogger('RightSidebar');
 
 type Gender = 'women' | 'men' | null;
 type JewelryType = 'ring' | 'necklace' | 'earring' | 'bracelet' | null;
-type Mode = 'quick' | 'selective' | 'advanced';
 
 // Custom events for image upload/close
 declare global {
@@ -47,7 +44,6 @@ export function RightSidebar({ mode = 'studio', onGenerateWithPreset }: RightSid
   const [gender, setGender] = useState<Gender>(null);
   const [jewelryType, setJewelryType] = useState<JewelryType>(null);
   const [aspectRatio, setAspectRatio] = useState<string>('9:16'); // Default: 9:16
-  const [activeMode, setActiveMode] = useState<Mode>('quick');
 
   // Modal states
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
@@ -319,67 +315,18 @@ ${confirmModal.libraryNegativePrompt}`;
         {/* Divider */}
         <div className="my-2 h-px bg-white/5" />
 
-        {/* Mode Tabs - Ultra Compact - Always Active */}
-        <div className="mb-2">
-          <div className="flex gap-0.5 rounded-md border border-white/10 bg-white/[0.02] p-0.5 transition-all duration-300">
-            <button
-              onClick={() => setActiveMode('quick')}
-              className={`flex-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-all duration-200 ${
-                activeMode === 'quick'
-                  ? 'bg-purple-500/20 text-purple-300'
-                  : 'text-white/60 hover:text-white'
-              }`}
-            >
-              Quick
-            </button>
-            <button
-              onClick={() => setActiveMode('selective')}
-              className={`flex-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-all duration-200 ${
-                activeMode === 'selective'
-                  ? 'bg-purple-500/20 text-purple-300'
-                  : 'text-white/60 hover:text-white'
-              }`}
-            >
-              Select
-            </button>
-            <button
-              onClick={() => setActiveMode('advanced')}
-              className={`flex-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-all duration-200 ${
-                activeMode === 'advanced'
-                  ? 'bg-purple-500/20 text-purple-300'
-                  : 'text-white/60 hover:text-white'
-              }`}
-            >
-              Adv
-            </button>
-          </div>
+        {/* Quick Presets Section Header */}
+        <div className="mb-2 flex items-center justify-between">
+          <h3 className="text-xs font-medium text-white/70">Quick Presets</h3>
         </div>
 
-        {/* Mode Content - Always Active */}
-        <div className="flex-1 overflow-y-auto transition-all duration-300">
-          {activeMode === 'quick' && (
-            <QuickModeContent 
-              onPresetSelect={handlePresetSelect}
-              gender={gender}
-              jewelryType={jewelryType}
-            />
-          )}
-          {activeMode === 'selective' && (
-            <SelectiveModeContent
-              gender={gender}
-              jewelryType={jewelryType}
-              aspectRatio={aspectRatio}
-              onGenerate={onGenerateWithPreset}
-            />
-          )}
-          {activeMode === 'advanced' && (
-            <AdvancedModeContent
-              gender={gender}
-              jewelryType={jewelryType}
-              aspectRatio={aspectRatio}
-              onGenerate={onGenerateWithPreset}
-            />
-          )}
+        {/* Quick Mode Content */}
+        <div className="flex-1 overflow-y-auto">
+          <QuickModeContent 
+            onPresetSelect={handlePresetSelect}
+            gender={gender}
+            jewelryType={jewelryType}
+          />
         </div>
 
         {/* Confirmation Modal */}
