@@ -30,6 +30,17 @@ export async function POST(
     }
 
     const { id: batchProjectId } = await params;
+    
+    // Parse optional preset info from body
+    let presetId: string | null = null;
+    let presetName: string | null = null;
+    try {
+      const body = await request.json();
+      presetId = body.presetId || null;
+      presetName = body.presetName || null;
+    } catch {
+      // Body is optional, ignore parse errors
+    }
 
     // Verify project ownership
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -273,7 +284,7 @@ export async function POST(
 
     const editedImageUrl = data.images[0].url;
 
-    // Update image status to 'completed'
+    // Update image status to 'completed' with preset info
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (supabase as any)
       .from('batch_images')
@@ -281,6 +292,8 @@ export async function POST(
         status: 'completed',
         result_url: editedImageUrl,
         completed_at: new Date().toISOString(),
+        preset_id: presetId,
+        preset_name: presetName,
       })
       .eq('id', imageToProcess.id);
 

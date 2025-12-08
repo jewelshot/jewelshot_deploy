@@ -434,12 +434,20 @@ export function BatchPage() {
   // 🔄 Background Processing Poll Loop
   const startBackgroundProcessing = useCallback((projectId: string) => {
     logger.debug('Batch: Starting background processing loop for:', projectId);
+    
+    // Get current preset info for tracking
+    const currentPreset = selectedPresets[0] || null;
 
     const pollInterval = setInterval(async () => {
       try {
-        // Call process-next API
+        // Call process-next API with preset info
         const response = await fetch(`/api/batch/${projectId}/process-next`, {
           method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            presetId: currentPreset?.id || null,
+            presetName: currentPreset?.name || presetName || null,
+          }),
         });
 
         if (!response.ok) {
