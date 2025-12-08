@@ -42,6 +42,9 @@ export interface Database {
           size: number;
           prompt: string | null;
           style: string | null;
+          preset_id: string | null;
+          preset_name: string | null;
+          batch_id: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -54,6 +57,9 @@ export interface Database {
           size: number;
           prompt?: string | null;
           style?: string | null;
+          preset_id?: string | null;
+          preset_name?: string | null;
+          batch_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -66,6 +72,9 @@ export interface Database {
           size?: number;
           prompt?: string | null;
           style?: string | null;
+          preset_id?: string | null;
+          preset_name?: string | null;
+          batch_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };
