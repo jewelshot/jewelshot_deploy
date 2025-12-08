@@ -10,6 +10,8 @@ export interface GalleryImage {
   createdAt?: Date;
   type?: 'ai-edited' | 'manual';
   prompt?: string; // AI prompt
+  presetId?: string | null; // Preset ID used to generate
+  presetName?: string | null; // Human-readable preset name
 }
 
 interface GalleryGridProps {
@@ -76,6 +78,8 @@ export function GalleryGrid({
           alt={image.alt}
           createdAt={image.createdAt}
           prompt={image.prompt}
+          presetId={image.presetId}
+          presetName={image.presetName}
           isFavorite={isFavorite ? isFavorite(image.id) : false}
           favoriteOrder={getFavoriteOrder ? getFavoriteOrder(image.id) : 0}
           hasMetadata={hasMetadata ? hasMetadata(image.id) : false}

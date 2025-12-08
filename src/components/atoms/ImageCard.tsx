@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Star, Edit3, Eye, Palette, Download, Trash2 } from 'lucide-react';
+import { Star, Edit3, Eye, Palette, Download, Trash2, Sparkles } from 'lucide-react';
 import { useImageMetadataStore } from '@/store/imageMetadataStore';
 
 interface ImageCardProps {
@@ -12,6 +12,8 @@ interface ImageCardProps {
   alt?: string;
   createdAt?: Date;
   prompt?: string; // AI prompt for modal
+  presetId?: string | null; // Preset ID used to generate this image
+  presetName?: string | null; // Human-readable preset name
   isFavorite?: boolean;
   favoriteOrder?: number;
   hasMetadata?: boolean;
@@ -30,6 +32,8 @@ export function ImageCard({
   alt = 'Gallery image',
   createdAt,
   prompt,
+  presetId,
+  presetName,
   isFavorite = false,
   favoriteOrder = 0,
   hasMetadata = false,
@@ -195,7 +199,20 @@ export function ImageCard({
         )}
       </div>
 
-        {/* Date Badge */}
+        {/* Preset Badge - Bottom Left */}
+        {presetName && (
+          <div 
+            className="absolute bottom-2 left-2 flex max-w-[60%] items-center gap-1 rounded-full bg-purple-500/80 px-2 py-1 backdrop-blur-sm transition-all"
+            title={presetName}
+          >
+            <Sparkles className="h-3 w-3 flex-shrink-0 text-white" />
+            <span className="truncate text-xs font-medium text-white">
+              {presetName}
+            </span>
+          </div>
+        )}
+
+        {/* Date Badge - Bottom Right */}
         {createdAt && (
           <div
             className="absolute bottom-2 right-2 rounded-full bg-black/60 px-2 py-1 text-xs text-white backdrop-blur-sm"
