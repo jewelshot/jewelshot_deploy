@@ -20,6 +20,8 @@ export interface SavedImage {
   type: 'ai-edited' | 'manual';
   prompt?: string; // Optional AI prompt
   style?: string; // Optional style info
+  presetId?: string | null; // Preset ID used to generate
+  presetName?: string | null; // Human-readable preset name
 }
 
 const STORAGE_KEY = 'jewelshot_gallery_images';
@@ -85,6 +87,8 @@ async function getSupabaseImages(): Promise<SavedImage[]> {
         type: (img.style ? 'ai-edited' : 'manual') as 'ai-edited' | 'manual',
         prompt: img.prompt || undefined,
         style: img.style || undefined,
+        presetId: img.preset_id || undefined,
+        presetName: img.preset_name || undefined,
       })) || []
     );
   } catch (error) {
@@ -121,7 +125,13 @@ export async function saveImageToGallery(
   src: string,
   alt: string,
   type: 'ai-edited' | 'manual' = 'manual',
-  options?: { prompt?: string; style?: string; fileSize?: number }
+  options?: { 
+    prompt?: string; 
+    style?: string; 
+    fileSize?: number;
+    presetId?: string | null;
+    presetName?: string | null;
+  }
 ): Promise<SavedImage> {
   const authenticated = await isAuthenticated();
 
@@ -139,7 +149,13 @@ async function saveToSupabase(
   src: string,
   alt: string,
   type: 'ai-edited' | 'manual',
-  options?: { prompt?: string; style?: string; fileSize?: number }
+  options?: { 
+    prompt?: string; 
+    style?: string; 
+    fileSize?: number;
+    presetId?: string | null;
+    presetName?: string | null;
+  }
 ): Promise<SavedImage> {
   try {
     const supabase = createClient();
@@ -204,6 +220,8 @@ async function saveToSupabase(
       size: actualFileSize,
       prompt: options?.prompt || null,
       style: options?.style || null,
+      preset_id: options?.presetId || null,
+      preset_name: options?.presetName || null,
     };
 
     // Type assertion needed due to Supabase client not inferring Database types correctly
@@ -238,6 +256,8 @@ async function saveToSupabase(
       type,
       prompt: data.prompt || undefined,
       style: data.style || undefined,
+      presetId: data.preset_id || undefined,
+      presetName: data.preset_name || undefined,
     };
   } catch (error) {
     logger.error('Error saving to Supabase:', error);

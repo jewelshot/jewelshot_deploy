@@ -67,6 +67,8 @@ export function GalleryNew() {
         alt: img.alt,
         type: img.type || 'manual',
         createdAt: img.createdAt,
+        presetId: img.presetId,
+        presetName: img.presetName,
       }));
       setImages(galleryImages);
       logger.info('Images loaded', { count: galleryImages.length });
