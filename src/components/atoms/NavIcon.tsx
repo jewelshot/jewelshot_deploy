@@ -14,7 +14,7 @@ interface NavIconProps {
 export function NavIcon({ icon: Icon, active = false }: NavIconProps) {
   return (
     <Icon
-      className={`duration-400 h-[18px] w-[18px] transition-opacity ${active ? 'opacity-100' : 'opacity-80 group-hover:opacity-100'}`}
+      className={`h-4 w-4 transition-colors ${active ? 'text-white' : 'text-white/60 group-hover:text-white/90'}`}
     />
   );
 }

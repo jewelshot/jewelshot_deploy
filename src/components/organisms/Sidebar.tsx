@@ -80,60 +80,27 @@ export function Sidebar() {
     };
   }, []);
 
-  // Main navigation items (dynamic)
+  // Main navigation items
   const mainNavItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard', shortcut: '⌘D' },
-    {
-      icon: Palette,
-      label: 'Studio',
-      href: '/studio',
-      badge: { variant: 'new' as const },
-    },
-    {
-      icon: Layers,
-      label: 'Batch',
-      href: '/batch',
-      badge: { variant: 'new' as const },
-    },
+    { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
+    { icon: Palette, label: 'Studio', href: '/studio' },
+    { icon: Layers, label: 'Batch', href: '/batch' },
     {
       icon: Image,
       label: 'Gallery',
       href: '/gallery',
-      badge:
-        galleryCount > 0
-          ? { variant: 'count' as const, count: galleryCount }
-          : undefined,
+      badge: galleryCount > 0
+        ? { variant: 'count' as const, count: galleryCount }
+        : undefined,
     },
-    {
-      icon: Library,
-      label: 'Library',
-      href: '/library',
-      badge: { variant: 'new' as const },
-    },
-    {
-      icon: FileText,
-      label: 'Catalogue',
-      href: '/catalogue',
-      badge: { variant: 'new' as const },
-    },
-    {
-      icon: User,
-      label: 'Profile',
-      href: '/profile',
-      badge: { variant: 'new' as const },
-    },
-    // Removed: Projects page not yet implemented
-    // {
-    //   icon: FolderOpen,
-    //   label: 'Projects',
-    //   href: '/projects',
-    //   badge: { variant: 'count' as const, count: 3 },
-    // },
+    { icon: Library, label: 'Presets', href: '/library' },
+    { icon: FileText, label: 'Catalogue', href: '/catalogue' },
+    { icon: User, label: 'Profile', href: '/profile' },
   ];
 
   return (
     <aside
-      className={`fixed bottom-0 left-0 top-0 z-[100] w-[260px] border-r border-[rgba(139,92,246,0.15)] bg-[rgba(10,10,10,0.7)] shadow-[4px_0_24px_rgba(0,0,0,0.3)] backdrop-blur-[24px] backdrop-saturate-[200%] transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)] ${leftOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      className={`fixed bottom-0 left-0 top-0 z-[100] w-[240px] border-r border-white/[0.06] bg-[#0a0a0a]/90 backdrop-blur-xl transition-transform duration-300 ease-out ${leftOpen ? 'translate-x-0' : '-translate-x-full'}`}
     >
       {/* Sidebar Content */}
       <div className="sidebar-scroll flex h-full flex-col overflow-y-auto px-4 py-3">
@@ -141,7 +108,7 @@ export function Sidebar() {
         <SidebarLogo />
 
         {/* Divider */}
-        <div className="-mx-4 my-3 h-px bg-gradient-to-r from-transparent via-[rgba(139,92,246,0.25)] to-transparent" />
+        <div className="my-4 h-px bg-white/[0.06]" />
 
         {/* Main Navigation */}
         <nav className="mb-2 flex flex-col gap-1">
