@@ -89,12 +89,11 @@ export function UserProfile() {
 
   if (!user) {
     return (
-      <div className="mt-auto flex items-center gap-3 rounded-2xl border border-[rgba(139,92,246,0.2)] bg-[rgba(10,10,10,0.6)] p-3.5 backdrop-blur-md">
-        <div className="h-10 w-10 animate-pulse rounded-full bg-white/10" />
-        <div className="flex-1 space-y-2">
-          <div className="h-3 w-24 animate-pulse rounded bg-white/10" />
-          <div className="h-2 w-32 animate-pulse rounded bg-white/10" />
-          <div className="mt-1.5 h-2 w-16 animate-pulse rounded bg-white/10" />
+      <div className="mt-auto flex items-center gap-3 rounded-lg p-2">
+        <div className="h-8 w-8 animate-pulse rounded-full bg-white/10" />
+        <div className="flex-1 space-y-1.5">
+          <div className="h-3 w-20 animate-pulse rounded bg-white/10" />
+          <div className="h-2 w-16 animate-pulse rounded bg-white/10" />
         </div>
       </div>
     );
@@ -105,74 +104,40 @@ export function UserProfile() {
       {/* User Profile Button */}
       <button
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-        className="flex w-full items-center gap-3 rounded-2xl border border-[rgba(139,92,246,0.2)] bg-[rgba(10,10,10,0.6)] p-3.5 backdrop-blur-md transition-all duration-300 hover:border-purple-500/40 hover:bg-[rgba(10,10,10,0.8)]"
+        className="flex w-full items-center gap-3 rounded-lg p-2 transition-colors hover:bg-white/[0.04]"
         disabled={isLoggingOut}
       >
-        {/* Avatar with Online Indicator */}
-        <div className="relative">
+        {/* Avatar */}
+        <div className="relative flex-shrink-0">
           {user.avatar && user.avatar.startsWith('http') ? (
-            <div className="relative h-10 w-10">
-              <img
-                src={user.avatar}
-                alt={user.name}
-                className="h-10 w-10 rounded-full object-cover"
-              />
-              <OnlineIndicator online={true} />
-            </div>
+            <img
+              src={user.avatar}
+              alt={user.name}
+              className="h-8 w-8 rounded-full object-cover"
+            />
           ) : (
-            <div className="relative">
-              <Avatar content={user.avatar} size="md" />
-              <OnlineIndicator online={true} />
-            </div>
+            <Avatar content={user.avatar} size="sm" />
           )}
+          <OnlineIndicator online={true} />
         </div>
 
-        {/* User Info & Credits */}
-        <div className="flex-1">
-          <UserInfo name={user.name} status={user.email} />
-
-          {/* 💎 Credits & AI Requests Display - Integrated Below User Info */}
-          <div className="mt-1.5 flex items-center gap-3">
-            {/* Credits */}
-            <div className="flex items-center gap-1.5">
-              <div className="text-[10px] font-medium text-white/40">
-                Credits:
-              </div>
-              {creditsLoading ? (
-                <div className="h-3 w-8 animate-pulse rounded bg-white/10" />
-              ) : (
-                <div
-                  className={`text-xs font-bold ${
-                    credits === 0
-                      ? 'text-red-400'
-                      : credits <= 3
-                        ? 'text-yellow-400'
-                        : 'bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent'
-                  }`}
-                >
-                  {credits}
-                </div>
-              )}
-            </div>
-
-            {/* Divider */}
-            <div className="h-3 w-px bg-white/10" />
-
-            {/* AI Requests */}
-            <div className="flex items-center gap-1.5">
-              <div className="text-[10px] font-medium text-white/40">AI:</div>
-              <div
-                className={`text-xs font-bold tabular-nums ${
-                  aiRequests === 0
-                    ? 'text-red-400'
-                    : aiRequests <= 2
-                      ? 'text-yellow-400'
-                      : 'text-green-400'
-                }`}
-              >
-                {aiRequests}/5
-              </div>
-            </div>
+        {/* User Info */}
+        <div className="flex-1 text-left">
+          <UserInfo name={user.name} plan="Free" />
+          
+          {/* Credits Display */}
+          <div className="mt-1 flex items-center gap-2 text-[11px]">
+            {creditsLoading ? (
+              <span className="text-white/40">Loading...</span>
+            ) : (
+              <span className={credits === 0 ? 'text-red-400' : credits <= 3 ? 'text-yellow-400' : 'text-white/50'}>
+                {credits} credits
+              </span>
+            )}
+            <span className="text-white/20">•</span>
+            <span className={aiRequests === 0 ? 'text-red-400' : aiRequests <= 2 ? 'text-yellow-400' : 'text-white/50'}>
+              {aiRequests}/5 AI
+            </span>
           </div>
         </div>
 

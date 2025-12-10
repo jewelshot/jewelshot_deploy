@@ -6,16 +6,24 @@ interface UserInfoProps {
    */
   name: string;
   /**
-   * User status or role
+   * User plan type
    */
-  status: string;
+  plan?: 'Free' | 'Pro' | 'Team';
 }
 
-export function UserInfo({ name, status }: UserInfoProps) {
+export function UserInfo({ name, plan = 'Free' }: UserInfoProps) {
+  const planColors = {
+    Free: 'bg-white/10 text-white/60',
+    Pro: 'bg-purple-500/20 text-purple-400',
+    Team: 'bg-blue-500/20 text-blue-400',
+  };
+
   return (
-    <div className="flex-1">
-      <div className="text-[13px] font-semibold text-white">{name}</div>
-      <div className="text-[11px] text-[rgba(139,92,246,0.7)]">{status}</div>
+    <div className="flex items-center gap-2">
+      <span className="text-[13px] font-medium text-white">{name}</span>
+      <span className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${planColors[plan]}`}>
+        {plan}
+      </span>
     </div>
   );
 }
