@@ -120,7 +120,6 @@ export function Sidebar() {
               href={item.href}
               active={pathname === item.href}
               badge={item.badge}
-              shortcut={item.shortcut}
               animationDelay={100 + index * 50}
             />
           ))}
