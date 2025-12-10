@@ -100,7 +100,7 @@ export function Sidebar() {
 
   return (
     <aside
-      className={`fixed bottom-0 left-0 top-0 z-[100] w-[240px] border-r border-white/[0.06] bg-[#0a0a0a]/90 backdrop-blur-xl transition-transform duration-300 ease-out ${leftOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      className={`fixed bottom-0 left-0 top-0 z-[100] w-[240px] border-r border-white/[0.06] bg-[#0a0a0a]/90 backdrop-blur-xl transition-transform duration-500 ease-in-out ${leftOpen ? 'translate-x-0' : '-translate-x-full'}`}
     >
       {/* Sidebar Content */}
       <div className="sidebar-scroll flex h-full flex-col overflow-y-auto px-4 py-3">
