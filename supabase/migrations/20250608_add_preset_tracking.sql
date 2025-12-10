@@ -82,3 +82,4 @@ COMMENT ON COLUMN public.images.batch_id IS 'Reference to batch_projects if this
 -- FROM information_schema.columns 
 -- WHERE table_name = 'batch_images' AND column_name IN ('preset_id', 'preset_name');
 
+

@@ -13,7 +13,7 @@ import ErrorBoundary from '@/components/organisms/ErrorBoundary';
 import GalleryFallback from '@/components/molecules/GalleryFallback';
 import { useBreakpoint } from '@/hooks/useMediaQuery';
 import MobileGallery from '@/components/organisms/MobileGallery';
-import SkipLink from '@/components/atoms/SkipLink';
+// SkipLink removed - accessibility feature not needed for this UI
 
 // Dynamic imports for heavy components
 const GalleryContent = dynamic(
@@ -42,10 +42,6 @@ export default function GalleryPage() {
   // Desktop: Full gallery with sidebar
   return (
     <>
-      {/* Skip Links for Accessibility */}
-      <SkipLink href="#gallery-content">Skip to gallery</SkipLink>
-      <SkipLink href="#gallery-search">Skip to search</SkipLink>
-      
       {/* Aurora Background */}
       <AuroraBackground />
 

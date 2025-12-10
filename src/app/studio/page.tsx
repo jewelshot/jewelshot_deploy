@@ -15,7 +15,7 @@ import ErrorBoundary from '@/components/organisms/ErrorBoundary';
 import CanvasFallback from '@/components/molecules/CanvasFallback';
 import { useBreakpoint } from '@/hooks/useMediaQuery';
 import MobileStudio from '@/components/organisms/MobileStudio';
-import SkipLink from '@/components/atoms/SkipLink';
+// SkipLink removed - accessibility feature not needed for this UI
 
 // Dynamic imports for heavy components
 const Canvas = dynamic(() => import('@/components/organisms/Canvas'), {
@@ -76,10 +76,6 @@ export default function StudioPage() {
   // Desktop: Full studio
   return (
     <>
-      {/* Skip Links for Accessibility */}
-      <SkipLink href="#main-content">Skip to main content</SkipLink>
-      <SkipLink href="#ai-controls">Skip to AI controls</SkipLink>
-      
       {/* Aurora Background */}
       <AuroraBackground />
 
