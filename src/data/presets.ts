@@ -10,7 +10,42 @@ import { PresetCategory, Preset, PresetGender, PresetJewelryType, PresetTab } fr
  * jewelryType: 'ring' | 'necklace' | 'earring' | 'bracelet' | 'all' (default: 'all')
  */
 export const PRESET_CATEGORIES: PresetCategory[] = [
-  // Presets will be added here
+  // ========================================
+  // ON MODEL - Women
+  // ========================================
+  {
+    id: 'on-model',
+    name: 'On Model',
+    emoji: '',
+    description: 'Professional model photography showcasing how jewelry looks when worn',
+    presets: [
+      // RINGS - Women
+      {
+        id: 'on-model-ring-women-elegant-hand',
+        title: 'Elegant Hand - Soft Light',
+        description: 'Clean lifestyle shot with relaxed hand pose on cream fabric',
+        imagePath: '/presets/on-model-ring-elegant.webp',
+        categoryId: 'on-model',
+        tab: 'women',
+        gender: 'women',
+        jewelryType: 'ring',
+        prompt: `Jewelry Photography, Clean, Soft Light, Lifestyle, Detail-Oriented style.
+
+Subject: Gold ring with thin zig-zag band, worn on the ring finger of the model's right hand, sharp focus on the hand and ring.
+
+Model: Woman's hand and lower forearm (cropped), light/fair skin tone, oval shape nails, short to medium length, natural light pink/nude polish manicure, hand slightly relaxed, fingers gently spread, viewed from the back/side with knuckles visible.
+
+Lighting: Softbox/Natural diffused light, side/top-side direction, high key bright and airy, very soft minimal shadows, elegant gentle high-end mood.
+
+Background: Off-white/cream linen or soft cotton fabric (jacket/blazer lapel area), monochromatic light tones (gold, cream, nude), shallow depth of field with bokeh effect blurring the fabric background slightly.
+
+Composition: Close-up macro/detail shot, hand occupying the central/lower portion of the frame.
+
+Technical: Macro or short telephoto lens for shallow DoF, slightly warm color grading, high contrast but not harsh, desaturated except for gold and skin tones, high resolution professional quality.`,
+        negativePrompt: 'harsh shadows, dark background, cluttered composition, busy patterns, oversaturated colors, cold tones, blurry ring, unfocused jewelry, chipped nail polish, dirty nails, wrinkled skin, visible veins, low quality, grainy, noisy',
+      },
+    ],
+  },
 ];
 
 /**
