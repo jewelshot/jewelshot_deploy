@@ -116,7 +116,7 @@ export function NoCreditsModal({
             <button
               onClick={() => {
                 alert(
-                  '🚀 Payment integration coming soon!\n\nCredits will be available for purchase shortly.'
+                  'Payment integration coming soon!\n\nCredits will be available for purchase shortly.'
                 );
               }}
               className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 p-[1px] font-bold text-white shadow-lg shadow-purple-500/50 transition-all hover:shadow-xl active:scale-95"

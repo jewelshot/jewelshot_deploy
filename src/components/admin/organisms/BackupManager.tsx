@@ -63,10 +63,10 @@ export function BackupManager() {
       if (!res.ok) throw new Error('Failed to trigger backup');
 
       const data = await res.json();
-      alert(`✅ ${data.message}\n\n${data.note}`);
+      alert(`${data.message}\n\n${data.note}`);
       fetchBackups();
     } catch (error: any) {
-      alert(`❌ Failed to trigger backup: ${error.message}`);
+      alert(`Failed to trigger backup: ${error.message}`);
     } finally {
       setTriggering(false);
     }
@@ -222,7 +222,7 @@ export function BackupManager() {
 
       {/* Help Section */}
       <div className="rounded-lg border border-white/10 bg-white/5 p-4">
-        <h3 className="font-semibold text-white">💡 Backup Information</h3>
+        <h3 className="font-semibold text-white">Backup Information</h3>
         <ul className="mt-3 space-y-2 text-sm text-white/80">
           <li>• <strong>Automated backups</strong> run daily on Supabase Pro plan</li>
           <li>• <strong>Manual backups</strong> can be triggered anytime for important changes</li>

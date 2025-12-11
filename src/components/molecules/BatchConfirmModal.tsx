@@ -115,7 +115,7 @@ export function BatchConfirmModal({
 
           <div className="rounded-lg border border-yellow-500/20 bg-yellow-500/5 p-3">
             <p className="text-xs text-yellow-400">
-              ⚠️ This process cannot be undone. Make sure you have enough credits.
+              This process cannot be undone. Make sure you have enough credits.
             </p>
           </div>
         </div>

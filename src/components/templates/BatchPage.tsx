@@ -352,7 +352,7 @@ export function BatchPage() {
         // Check if it's a migration issue (500 error)
         if (response.status === 500) {
           logger.error('Batch: ❌ Database migration required!');
-          toast.error('⚠️ Database setup required! Redirecting...');
+          toast.error('Database setup required! Redirecting...');
           setIsProcessing(false);
           
           // Redirect to setup page after 2 seconds
@@ -507,9 +507,9 @@ export function BatchPage() {
           const failedCount = data.progress?.failed || 0;
           
           if (failedCount > 0) {
-            toast.success(`🎉 Batch completed! ${completedCount} successful, ${failedCount} failed`);
+            toast.success(`Batch completed! ${completedCount} successful, ${failedCount} failed`);
           } else {
-            toast.success(`🎉 Batch processing completed! All ${completedCount} images processed`);
+            toast.success(`Batch processing completed! All ${completedCount} images processed`);
           }
           logger.debug('Batch: All images processed!');
           

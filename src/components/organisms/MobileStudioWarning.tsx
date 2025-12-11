@@ -107,7 +107,7 @@ export function MobileStudioWarning({
           {/* Info note */}
           <div className="mt-6 rounded-xl border border-purple-500/20 bg-purple-500/5 p-4">
             <p className="text-center text-xs text-purple-300">
-              💡 <strong>Tip:</strong> Access from a computer for canvas tools,
+              <strong>Tip:</strong> Access from a computer for canvas tools,
               advanced filters, and professional editing features.
             </p>
           </div>

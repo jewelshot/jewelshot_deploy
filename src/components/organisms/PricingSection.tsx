@@ -161,7 +161,7 @@ export function PricingSection() {
         {/* Money-back guarantee */}
         <div className="mt-12 text-center">
           <p className="text-sm text-white/60">
-            ✨ 14-day money-back guarantee • No credit card required for free
+            14-day money-back guarantee • No credit card required for free
             plan
           </p>
         </div>

@@ -39,13 +39,11 @@ export function GalleryToolbar({
             label="AI Edited"
             active={activeFilter === 'ai-edited'}
             onClick={() => onFilterChange('ai-edited')}
-            icon="✨"
           />
           <FilterChip
             label="Manual"
             active={activeFilter === 'manual'}
             onClick={() => onFilterChange('manual')}
-            icon="🎨"
           />
         </div>
 

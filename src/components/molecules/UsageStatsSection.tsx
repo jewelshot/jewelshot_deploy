@@ -51,17 +51,17 @@ export function UsageStatsSection() {
       if (response.ok) {
         const data = await response.json();
         logger.info('Added 10 credits. New balance:', data.balance);
-        toast.success(`✅ Added 10 credits! Balance: ${data.balance}`);
+        toast.success(`Added 10 credits! Balance: ${data.balance}`);
         // Refresh credits
         await fetchCredits();
       } else {
         const error = await response.json();
         logger.error('Failed to add credits:', error);
-        toast.error(`❌ Failed: ${error.error}`);
+        toast.error(`Failed: ${error.error}`);
       }
     } catch (error) {
       logger.error('Error adding test credits:', error);
-      toast.error('❌ Network error');
+      toast.error('Network error');
     } finally {
       setAddingCredits(false);
     }
@@ -201,7 +201,7 @@ export function UsageStatsSection() {
       <div className="mb-6 rounded-2xl border border-yellow-500/30 bg-yellow-500/5 p-4 backdrop-blur-sm">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-semibold text-yellow-400">⚠️ Test Mode</p>
+            <p className="text-sm font-semibold text-yellow-400">Test Mode</p>
             <p className="text-xs text-white/60">Click to add 10 credits (for testing only)</p>
           </div>
           <button

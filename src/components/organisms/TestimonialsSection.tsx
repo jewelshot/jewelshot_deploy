@@ -13,7 +13,7 @@ export function TestimonialsSection() {
       name: 'Sarah Johnson',
       role: 'Jewelry Designer',
       company: 'Luxe Jewelry Co.',
-      image: '💎',
+      image: 'LJ',
       rating: 5,
       content:
         'Jewelshot has transformed how we present our products online. The AI-powered editing saves us hours of work, and the quality is simply outstanding. Our conversion rates have increased by 40%!',
@@ -22,7 +22,7 @@ export function TestimonialsSection() {
       name: 'Michael Chen',
       role: 'E-commerce Manager',
       company: 'Diamond & Gold',
-      image: '✨',
+      image: 'DG',
       rating: 5,
       content:
         'We used to spend $500 per photoshoot. Now we create stunning product images in minutes. The ROI is incredible. This tool is a game-changer for any jewelry business.',
@@ -31,7 +31,7 @@ export function TestimonialsSection() {
       name: 'Emma Rodriguez',
       role: 'Marketing Director',
       company: 'Artisan Jewels',
-      image: '🌟',
+      image: 'AJ',
       rating: 5,
       content:
         'The quality rivals professional studio photography. Our customers can&apos;t tell the difference. It&apos;s made our social media presence so much more polished and professional.',

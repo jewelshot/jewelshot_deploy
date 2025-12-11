@@ -79,13 +79,13 @@ export function HeroSection() {
           <div className="flex items-center gap-3">
             <div className="flex -space-x-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#0a0a0a] bg-gradient-to-br from-purple-400 to-purple-600 font-bold text-white shadow-lg">
-                ✨
+                AI
               </div>
               <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#0a0a0a] bg-gradient-to-br from-pink-400 to-pink-600 font-bold text-white shadow-lg">
-                💎
+                LX
               </div>
               <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#0a0a0a] bg-gradient-to-br from-blue-400 to-blue-600 font-bold text-white shadow-lg">
-                🌟
+                JS
               </div>
             </div>
             <div className="text-left">

@@ -318,7 +318,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
       logger.info('[Canvas] Video generated, opening modal');
       queueMicrotask(() => {
         setShowVideoModal(true);
-        toastManager.success('✅ Video generated successfully!');
+        toastManager.success('Video generated successfully!');
       });
     }
   }, [videoUrl, showVideoModal]);
@@ -327,7 +327,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
   useEffect(() => {
     if (videoError) {
       logger.error('[Canvas] Video generation failed:', videoError);
-      toastManager.error(`❌ Video generation failed: ${videoError}`);
+      toastManager.error(`Video generation failed: ${videoError}`);
     }
   }, [videoError]);
 
@@ -382,7 +382,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
         setUploadedImage(upscaledImageUrl);
         setViewMode('side-by-side'); // Enable comparison view
         toastManager.success(
-          '✅ Image upscaled successfully! Compare with original.'
+          'Image upscaled successfully! Compare with original.'
         );
       });
     }
@@ -392,7 +392,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
   useEffect(() => {
     if (upscaleError) {
       logger.error('[Canvas] Image upscale failed:', upscaleError);
-      toastManager.error(`❌ Upscale failed: ${upscaleError}`);
+      toastManager.error(`Upscale failed: ${upscaleError}`);
     }
   }, [upscaleError]);
 
@@ -447,7 +447,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
         setUploadedImage(removedBgImageUrl);
         setViewMode('side-by-side'); // Enable comparison view
         toastManager.success(
-          '✅ Background removed successfully! Compare with original.'
+          'Background removed successfully! Compare with original.'
         );
       });
     }
@@ -457,7 +457,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
   useEffect(() => {
     if (removeBgError) {
       logger.error('[Canvas] Background removal failed:', removeBgError);
-      toastManager.error(`❌ Remove background failed: ${removeBgError}`);
+      toastManager.error(`Remove background failed: ${removeBgError}`);
     }
   }, [removeBgError]);
 
@@ -505,7 +505,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
       if (result?.url) {
         setUploadedImage(result.url);
         setViewMode('side-by-side');
-        toastManager.success('✅ Rotated left');
+        toastManager.success('Rotated left');
       }
     } catch (err) {
       logger.error('[Canvas] Rotate left failed:', err);
@@ -565,7 +565,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
       if (result?.url) {
         setUploadedImage(result.url);
         setViewMode('side-by-side');
-        toastManager.success('✅ Rotated right');
+        toastManager.success('Rotated right');
       }
     } catch (err) {
       logger.error('[Canvas] Rotate right failed:', err);
@@ -625,7 +625,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
       if (result?.url) {
         setUploadedImage(result.url);
         setViewMode('side-by-side');
-        toastManager.success('✅ Close-up created');
+        toastManager.success('Close-up created');
       }
     } catch (err) {
       logger.error('[Canvas] Close-up failed:', err);
@@ -645,7 +645,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
   useEffect(() => {
     if (cameraError) {
       logger.error('[Canvas] Camera control failed:', cameraError);
-      toastManager.error(`❌ Camera control failed: ${cameraError}`);
+      toastManager.error(`Camera control failed: ${cameraError}`);
     }
   }, [cameraError]);
 
@@ -698,7 +698,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
       queueMicrotask(() => {
         setUploadedImage(gemstoneEnhancedImageUrl);
         setViewMode('side-by-side'); // Enable comparison view
-        toastManager.success('✅ Gemstones enhanced! Compare with original.');
+        toastManager.success('Gemstones enhanced! Compare with original.');
       });
     }
   }, [gemstoneEnhancedImageUrl, setUploadedImage, setViewMode]);
@@ -711,7 +711,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
         gemstoneEnhanceError
       );
       toastManager.error(
-        `❌ Gemstone enhancement failed: ${gemstoneEnhanceError}`
+        `Gemstone enhancement failed: ${gemstoneEnhanceError}`
       );
     }
   }, [gemstoneEnhanceError]);
@@ -772,7 +772,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
       queueMicrotask(() => {
         setUploadedImage(metalRecoloredImageUrl);
         setViewMode('side-by-side'); // Enable comparison view
-        toastManager.success('✅ Metal color changed! Compare with original.');
+        toastManager.success('Metal color changed! Compare with original.');
       });
     }
   }, [metalRecoloredImageUrl, setUploadedImage, setViewMode]);
@@ -781,7 +781,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
   useEffect(() => {
     if (metalRecolorError) {
       logger.error('[Canvas] Metal recolor failed:', metalRecolorError);
-      toastManager.error(`❌ Metal recolor failed: ${metalRecolorError}`);
+      toastManager.error(`Metal recolor failed: ${metalRecolorError}`);
     }
   }, [metalRecolorError]);
 
@@ -833,7 +833,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
         setUploadedImage(metalPolishedImageUrl);
         setViewMode('side-by-side'); // Enable comparison view
         toastManager.success(
-          '✅ Metal polished to perfection! Compare with original.'
+          'Metal polished to perfection! Compare with original.'
         );
       });
     }
@@ -843,7 +843,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
   useEffect(() => {
     if (metalPolishError) {
       logger.error('[Canvas] Metal polish failed:', metalPolishError);
-      toastManager.error(`❌ Metal polish failed: ${metalPolishError}`);
+      toastManager.error(`Metal polish failed: ${metalPolishError}`);
     }
   }, [metalPolishError]);
 
@@ -895,7 +895,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
         setUploadedImage(lightEnhancedImageUrl);
         setViewMode('side-by-side');
         toastManager.success(
-          '✅ Natural lighting added! Compare with original.'
+          'Natural lighting added! Compare with original.'
         );
       });
     }
@@ -905,7 +905,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
   useEffect(() => {
     if (naturalLightError) {
       logger.error('[Canvas] Natural light failed:', naturalLightError);
-      toastManager.error(`❌ Natural light failed: ${naturalLightError}`);
+      toastManager.error(`Natural light failed: ${naturalLightError}`);
     }
   }, [naturalLightError]);
 
@@ -953,7 +953,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
       // Open video in modal (reuse existing VideoPlayerModal)
       setCurrentVideoUrl(turntableVideoUrl);
       setShowVideoModal(true);
-      toastManager.success('✅ 360° turntable video ready!');
+      toastManager.success('360° turntable video ready!');
     }
   }, [turntableVideoUrl]);
 
@@ -961,7 +961,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
   useEffect(() => {
     if (turntableVideoError) {
       logger.error('[Canvas] Turntable video failed:', turntableVideoError);
-      toastManager.error(`❌ Turntable video failed: ${turntableVideoError}`);
+      toastManager.error(`Turntable video failed: ${turntableVideoError}`);
     }
   }, [turntableVideoError]);
 

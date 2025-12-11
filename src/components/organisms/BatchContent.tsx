@@ -229,7 +229,7 @@ export function BatchContent({
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center">
-                          <span className="text-3xl text-purple-400/50">✨</span>
+                          <span className="text-sm text-purple-400/50">Preview</span>
                         </div>
                       )}
                       

@@ -497,19 +497,19 @@ export function CanvasNew({ onPresetPrompt }: CanvasProps) {
               Upload Image (Ctrl+O)
             </button>
             <div className="mt-6 rounded-lg bg-green-500/20 p-4 text-sm text-green-400 text-left">
-              ✅ Upload + Zoom + Pan (mouse drag)
+              Upload + Zoom + Pan (mouse drag)
               <br />
-              ✅ Filters (Brightness, Contrast, Saturation, Temperature, etc.)
+              Filters (Brightness, Contrast, Saturation, Temperature, etc.)
               <br />
-              ✅ Transforms (Rotate, Flip)
+              Transforms (Rotate, Flip)
               <br />
-              ✅ AI Tools (Remove Background, Upscale 2x)
+              AI Tools (Remove Background, Upscale 2x)
               <br />
-              ✅ History (Undo/Redo with Ctrl+Z/Y)
+              History (Undo/Redo with Ctrl+Z/Y)
               <br />
-              ✅ Save & Download (Ctrl+S/D)
+              Save & Download (Ctrl+S/D)
               <br />
-              ✅ Keyboard Shortcuts (Press ?)
+              Keyboard Shortcuts (Press ?)
             </div>
             <p className="mt-4 text-xs text-white/50">
               650 lines • Modular • Maintainable • Feature-complete

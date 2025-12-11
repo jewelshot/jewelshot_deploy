@@ -157,7 +157,7 @@ export function SelectiveModeContent({
       <div>
         <div className="mb-1.5 flex items-center justify-between">
           <span className="text-[9px] font-medium uppercase tracking-wide text-white/60">
-            💎 Lighting Style
+            Lighting Style
           </span>
           {selectedLighting && (
             <span className="text-[8px] text-purple-400">✓ Selected</span>
