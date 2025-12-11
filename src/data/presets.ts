@@ -29,9 +29,9 @@ export const PRESET_CATEGORIES: PresetCategory[] = [
         tab: 'women',
         gender: 'women',
         jewelryType: 'ring',
-        prompt: `Jewelry Photography, Clean, Soft Light, Lifestyle, Detail-Oriented style.
+        prompt: `Jewelry Photography, Clean, Soft Light, Lifestyle, Detail-Oriented, High Fidelity Replication, Constraint-Based style.
 
-Subject: Gold ring with thin zig-zag band, worn on the ring finger of the model's right hand, sharp focus on the hand and ring.
+Subject: Gold ring with thin zig-zag band. MANDATORY: Worn STRICTLY on the ring finger (4th digit) of the model's right hand. CRITICAL: Snug and perfect fit with ZERO visible gap between the ring metal and the skin. STRICTLY PRESERVE the exact zig-zag band design - NO alteration, deformation, or modification to the ring's pattern is allowed. Pin-sharp focus on the hand and ring.
 
 Model: Woman's hand and lower forearm (cropped), light/fair skin tone, oval shape nails, short to medium length, natural light pink/nude polish manicure, hand slightly relaxed, fingers gently spread, viewed from the back/side with knuckles visible.
 
@@ -42,7 +42,7 @@ Background: Off-white/cream linen or soft cotton fabric (jacket/blazer lapel are
 Composition: Close-up macro/detail shot, hand occupying the central/lower portion of the frame.
 
 Technical: Macro or short telephoto lens for shallow DoF, slightly warm color grading, high contrast but not harsh, desaturated except for gold and skin tones, high resolution professional quality.`,
-        negativePrompt: 'harsh shadows, dark background, cluttered composition, busy patterns, oversaturated colors, cold tones, blurry ring, unfocused jewelry, chipped nail polish, dirty nails, wrinkled skin, visible veins, low quality, grainy, noisy',
+        negativePrompt: 'ring on wrong finger, loose ring, gap between ring and skin, altered ring design, deformed pattern, modified zig-zag, harsh shadows, dark background, cluttered composition, busy patterns, oversaturated colors, cold tones, blurry ring, unfocused jewelry, chipped nail polish, dirty nails, wrinkled skin, visible veins, low quality, grainy, noisy',
       },
     ],
   },
