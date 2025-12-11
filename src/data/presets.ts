@@ -16,7 +16,7 @@ export const PRESET_CATEGORIES: PresetCategory[] = [
   {
     id: 'white-backgrounds',
     name: 'White Backgrounds',
-    emoji: '⚪',
+    emoji: '',
     description: 'Clean, professional white background shots perfect for e-commerce',
     presets: [
       {
@@ -98,7 +98,7 @@ export const PRESET_CATEGORIES: PresetCategory[] = [
   {
     id: 'still-life',
     name: 'Still Life',
-    emoji: '🎨',
+    emoji: '',
     description: 'Artistic still life compositions with natural props and lighting',
     presets: [
       {
@@ -120,7 +120,7 @@ export const PRESET_CATEGORIES: PresetCategory[] = [
   {
     id: 'on-model',
     name: 'On Model',
-    emoji: '👤',
+    emoji: '',
     description: 'Professional model photography showcasing how jewelry looks when worn',
     presets: [
       // RINGS - Women
@@ -191,7 +191,7 @@ export const PRESET_CATEGORIES: PresetCategory[] = [
   {
     id: 'lifestyle',
     name: 'Lifestyle',
-    emoji: '🌿',
+    emoji: '',
     description: 'Natural, candid moments showing jewelry in everyday contexts',
     presets: [
       // RINGS - Women Lifestyle
@@ -262,7 +262,7 @@ export const PRESET_CATEGORIES: PresetCategory[] = [
   {
     id: 'luxury',
     name: 'Luxury',
-    emoji: '💎',
+    emoji: '',
     description: 'Premium, sophisticated imagery emphasizing high-end appeal',
     presets: [
       {
@@ -319,7 +319,7 @@ export const PRESET_CATEGORIES: PresetCategory[] = [
   {
     id: 'close-up',
     name: 'Close-Up Details',
-    emoji: '🔍',
+    emoji: '',
     description: 'Macro photography highlighting craftsmanship and details',
     presets: [
       {

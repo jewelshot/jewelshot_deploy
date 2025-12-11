@@ -35,10 +35,10 @@ const STYLE_FILTERS = [
 // Jewelry type filter options
 const JEWELRY_FILTERS = [
   { id: 'all', label: 'All Jewelry' },
-  { id: 'ring', label: '💍 Rings' },
-  { id: 'necklace', label: '📿 Necklaces' },
-  { id: 'earring', label: '💎 Earrings' },
-  { id: 'bracelet', label: '⌚ Bracelets' },
+  { id: 'ring', label: 'Rings' },
+  { id: 'necklace', label: 'Necklaces' },
+  { id: 'earring', label: 'Earrings' },
+  { id: 'bracelet', label: 'Bracelets' },
 ];
 
 /**
@@ -102,7 +102,7 @@ export function LibraryContent() {
     return {
       id: 'saved',
       name: 'Your Saved Presets',
-      emoji: '📌',
+      emoji: '',
       description: 'Presets you\'ve added to your Quick Presets panel',
       presets,
     };
@@ -119,7 +119,7 @@ export function LibraryContent() {
     return {
       id: 'favorites',
       name: 'Your Favorites',
-      emoji: '❤️',
+      emoji: '',
       description: 'Presets you\'ve marked as favorites',
       presets,
     };

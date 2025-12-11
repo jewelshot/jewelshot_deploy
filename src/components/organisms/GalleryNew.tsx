@@ -228,7 +228,7 @@ export function GalleryNew() {
               : 'bg-white/10 text-white/70 hover:bg-white/20'
           }`}
         >
-          ⭐ Favorites ({favorites.length})
+          Favorites ({favorites.length})
         </button>
         <button
           onClick={() => setActiveTab('batches')}
@@ -322,7 +322,7 @@ export function GalleryNew() {
       
       {/* Status Footer */}
       <div className="border-t border-white/10 bg-black/50 px-6 py-3 text-sm text-white/70">
-        Modular Gallery Phase 2 ✅ • {filteredImages.length} images
+        {filteredImages.length} images
         {filteredImages.length !== images.length && ` (${images.length} total)`}
         {activeTab === 'favorites' && ` • ${favorites.length} favorites`}
       </div>

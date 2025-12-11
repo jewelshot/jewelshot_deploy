@@ -127,7 +127,7 @@ function GalleryLegacy() {
           }));
           setImages(restoredImages);
           setIsLoading(false);
-          logger.info('✅ Gallery loaded from cache (instant)');
+          logger.info('Gallery loaded from cache (instant)');
         } catch (error) {
           logger.error('Failed to parse gallery cache:', error);
         }
@@ -148,12 +148,12 @@ function GalleryLegacy() {
         // Only cache if under 5MB (sessionStorage limit)
         if (sizeInMB < 5) {
           sessionStorage.setItem('jewelshot_gallery_cache', cacheString);
-          logger.info('✅ Gallery cache updated', {
+          logger.info('Gallery cache updated', {
             imageCount: cacheData.length,
             sizeMB: sizeInMB.toFixed(2),
           });
         } else {
-          logger.warn('⚠️ Gallery cache too large, skipping', {
+          logger.warn('Gallery cache too large, skipping', {
             sizeMB: sizeInMB.toFixed(2),
           });
           sessionStorage.removeItem('jewelshot_gallery_cache');
@@ -163,7 +163,7 @@ function GalleryLegacy() {
           error instanceof DOMException &&
           error.name === 'QuotaExceededError'
         ) {
-          logger.error('❌ sessionStorage quota exceeded, clearing cache');
+          logger.error('sessionStorage quota exceeded, clearing cache');
           sessionStorage.removeItem('jewelshot_gallery_cache');
         } else {
           logger.error('Failed to update gallery cache:', error);
@@ -195,7 +195,7 @@ function GalleryLegacy() {
         const data = await response.json();
         setBatchProjects(data.projects || []);
         logger.info(
-          `✅ Loaded ${data.projects?.length || 0} batch projects from Supabase`
+          `Loaded ${data.projects?.length || 0} batch projects from Supabase`
         );
       } catch (error) {
         logger.error('Failed to load batch projects:', error);
@@ -803,7 +803,7 @@ function GalleryLegacy() {
                 allFilteredAndSortedImages.length > 20 && (
                   <div className="flex justify-center py-8">
                     <p className="text-sm text-white/40">
-                      ✓ All {allFilteredAndSortedImages.length} images loaded
+                      All {allFilteredAndSortedImages.length} images loaded
                     </p>
                   </div>
                 )}
