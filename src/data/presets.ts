@@ -44,6 +44,19 @@ Composition: Close-up macro/detail shot, hand occupying the central/lower portio
 Technical: Macro or short telephoto lens for shallow DoF, slightly warm color grading, high contrast but not harsh, desaturated except for gold and skin tones, high resolution professional quality.`,
         negativePrompt: 'ring on wrong finger, loose ring, gap between ring and skin, altered ring design, deformed pattern, modified zig-zag, harsh shadows, dark background, cluttered composition, busy patterns, oversaturated colors, cold tones, blurry ring, unfocused jewelry, chipped nail polish, dirty nails, wrinkled skin, visible veins, low quality, grainy, noisy',
       },
+      // RINGS - Women - Gold Wrap Ring
+      {
+        id: 'on-model-ring-women-gold-wrap',
+        title: 'Gold Wrap Ring - Macro Detail',
+        description: 'Close-up macro shot with realistic skin indentation and snug fit',
+        imagePath: '/presets/on-model-ring-gold-wrap.webp',
+        categoryId: 'on-model',
+        tab: 'women',
+        gender: 'women',
+        jewelryType: 'ring',
+        prompt: `close-up macro shot of young woman's hand, elegant youthful hand pose slightly turned, relaxed fingers gently curled, thumb resting by the index finger, wearing the input gold wrap-style jewelry ring with teardrop ends specifically on the fourth ring finger (proximal phalanx), smooth soft skin texture, airbrushed skin finish, slender fingers, well-manicured short nails, pale neutral nude nail polish, ring has a perfect snug fit, visible realistic skin indentation and compression around the thick ring band, heavy metal weight simulation, no gaps between ring and finger, soft diffused studio lighting from the left, warm neutral light tones, cinematic atmosphere, shallow depth of field, sharp focus on the ring and surrounding skin, blurred soft cream beige fabric folds background, creamy bokeh, high resolution, 8k detail, photorealistic, vertical composition, luxury jewelry photography`,
+        negativePrompt: 'straight fingers, open palm, flat hand, fingers spread apart, fist, holding object, ring on middle finger, ring on index finger, ring on thumb, ring on pinky finger, jewelry on wrong finger, floating ring, loose fit, gap between finger and ring, oversized ring, changing ring design, altering jewelry shape, generic ring, thin ring band, old hands, aged hands, wrinkled skin, prominent veins, dry skin, textured skin, hairy skin, masculine hands, thick fingers, sausage fingers, chubby hands, deformed hands, bad anatomy, unnatural pose, dirty nails, bright nail polish, messy background, harsh lighting, deep shadows, overexposed, grainy, noise, low resolution, cartoon, cgi, sketch',
+      },
     ],
   },
 ];
