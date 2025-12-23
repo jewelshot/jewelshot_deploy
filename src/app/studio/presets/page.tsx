@@ -2,18 +2,21 @@
  * Studio Presets - Quick Preset Library
  * 
  * Ready-made prompt combinations with generation settings
+ * 
+ * ⚠️ ADMIN ONLY - This page requires admin privileges
  */
 
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Sparkles, Copy, Check, Code, Settings, ArrowRight, Ratio } from 'lucide-react';
+import { Sparkles, Copy, Check, Code, Settings, ArrowRight, Ratio, ShieldAlert, Loader2 } from 'lucide-react';
 import { getQuickPresets, type QuickPreset } from '@/lib/prompt-system/quick-presets';
 import { BLOCK_REGISTRY } from '@/lib/prompt-system/registry';
 import { buildPromptFromSelections, buildGroupedJSON, buildAPIPrompt } from '@/lib/prompt-system/builder';
 import type { Gender, JewelryType } from '@/lib/prompt-system/types';
 import { saveGenerationSettings } from '@/lib/generation-settings-storage';
 import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 // Aspect ratio options
 const ASPECT_RATIOS = [
@@ -28,6 +31,58 @@ const ASPECT_RATIOS = [
 
 export default function PresetsPage() {
   const router = useRouter();
+  
+  // Admin authentication state
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  // Check admin access on mount
+  useEffect(() => {
+    async function checkAdminAccess() {
+      try {
+        const supabase = createClient();
+        
+        // Get current user
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        
+        if (userError || !user) {
+          setAuthError('Please log in to access this page');
+          setIsLoading(false);
+          return;
+        }
+        
+        // Check if user has admin role
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        
+        if (profileError || !profile) {
+          setAuthError('Failed to verify permissions');
+          setIsLoading(false);
+          return;
+        }
+        
+        // Check role
+        const userRole = (profile as { role: string }).role;
+        if (userRole === 'admin' || userRole === 'superadmin') {
+          setIsAdmin(true);
+        } else {
+          setAuthError('Admin access required');
+        }
+        
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Admin check error:', error);
+        setAuthError('Authentication failed');
+        setIsLoading(false);
+      }
+    }
+    
+    checkAdminAccess();
+  }, []);
   
   // Enable body scroll for presets page (override globals.css)
   useEffect(() => {
@@ -126,6 +181,41 @@ export default function PresetsPage() {
     router.push('/studio');
   };
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 text-purple-400 animate-spin mx-auto mb-4" />
+          <p className="text-white/60">Checking permissions...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Unauthorized state
+  if (!isAdmin || authError) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center p-6">
+        <div className="max-w-md text-center">
+          <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-red-500/10 mx-auto mb-6">
+            <ShieldAlert className="h-10 w-10 text-red-400" />
+          </div>
+          <h1 className="text-3xl font-bold mb-4">Access Denied</h1>
+          <p className="text-white/60 mb-6">
+            {authError || 'You do not have permission to access this page. Admin privileges are required.'}
+          </p>
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 font-semibold transition-colors"
+          >
+            Return to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white p-6">
       <div className="mx-auto max-w-7xl">
@@ -136,7 +226,12 @@ export default function PresetsPage() {
               <Sparkles className="h-6 w-6 text-purple-400" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold">Quick Presets</h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-3xl font-bold">Quick Presets</h1>
+                <span className="px-2 py-0.5 text-xs font-semibold bg-red-500/20 text-red-400 rounded-full">
+                  ADMIN
+                </span>
+              </div>
               <p className="text-white/60">Ready-made prompt combinations</p>
             </div>
           </div>
