@@ -59,6 +59,29 @@ Technical: Macro or short telephoto lens for shallow DoF, slightly warm color gr
       },
     ],
   },
+  // ========================================
+  // HIGH-KEY - Women
+  // ========================================
+  {
+    id: 'high-key',
+    name: 'High-Key',
+    emoji: '',
+    description: 'Bright, clean high-key studio photography with pure white backgrounds',
+    presets: [
+      {
+        id: 'high-key-ring-women-gentle-smile',
+        title: 'Gentle Smile - Ring Finger',
+        description: 'Elegant hand near jawline with gentle smile, pure white background',
+        imagePath: '/presets/high-key-ring-gentle-smile.webp',
+        categoryId: 'high-key',
+        tab: 'women',
+        gender: 'women',
+        jewelryType: 'ring',
+        prompt: `(masterpiece, best quality, 8k, photorealistic:1.3), commercial jewelry photography, high-key studio lighting, pure white background, anonymous cropped shot, focus on female hand and lower face, elegant hand holding empty ring finger up near jawline, chin and lower lip visible with a gentle smile, wearing white silk blouse, natural clean skin texture, minimalist, sharp focus on finger, clean manicure, soft happy mood`,
+        negativePrompt: '(full face shot:1.6), eyes, nose, complete face visible, portrait, (naked:1.5), topless, cleavage, (ring:1.7), (jewelry:1.6), (wearing ring:1.6), bracelet, watch, (Nano Banana marker icon:1.7), watermark, text, logo, branding, heavy makeup, strange hairstyles, bald, bad anatomy, bad hands, missing fingers, extra fingers, strong shadows, dark background, grainy, cartoon, 3d render, plastic skin, robot, serious expression, frowning',
+      },
+    ],
+  },
 ];
 
 /**
