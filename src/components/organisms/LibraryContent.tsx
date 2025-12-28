@@ -368,24 +368,22 @@ export function LibraryContent() {
             </button>
           ))}
 
-          {/* Divider */}
-          <div className="h-4 w-px bg-white/[0.06] flex-shrink-0" />
+        </div>
 
-          {/* Search - Flexible width */}
-          <div className="relative flex-1 min-w-[120px]">
-            <Search className="absolute left-2 top-1/2 h-3 w-3 -translate-y-1/2 text-white/25" />
+        {/* Search Row - Separate line, aligned with filters */}
+        <div className="mt-2.5 flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-2.5 top-1/2 h-3 w-3 -translate-y-1/2 text-white/25" />
             <input
               type="text"
-              placeholder="Search..."
+              placeholder="Search presets..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-7 w-full rounded border border-white/[0.06] bg-white/[0.02] pl-7 pr-2 text-[11px] text-white/70 placeholder:text-white/25 focus:border-white/15 focus:outline-none"
+              className="h-7 w-full rounded border border-white/[0.06] bg-white/[0.02] pl-8 pr-3 text-[11px] text-white/70 placeholder:text-white/25 focus:border-white/15 focus:outline-none transition-colors"
             />
           </div>
-
-          {/* Results Count */}
-          <span className="flex-shrink-0 text-[10px] text-white/25">
-            {currentPresetCount}
+          <span className="flex-shrink-0 text-[10px] text-white/30">
+            {currentPresetCount} result{currentPresetCount !== 1 ? 's' : ''}
           </span>
         </div>
       </div>
