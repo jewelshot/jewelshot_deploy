@@ -250,7 +250,7 @@ export function LibraryContent() {
 
   return (
     <div
-      className="fixed z-10 flex flex-col gap-4 overflow-y-auto overflow-x-hidden p-6 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
+      className="fixed z-10 flex flex-col overflow-hidden transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
       style={{
         left: leftOpen ? '260px' : '16px',
         right: rightOpen ? '276px' : '16px',
@@ -258,8 +258,8 @@ export function LibraryContent() {
         bottom: bottomOpen ? '64px' : '16px',
       }}
     >
-      {/* Header */}
-      <div>
+      {/* Header - Fixed, no scroll */}
+      <div className="flex-shrink-0 p-6 pb-4">
         {/* Title Row */}
         <div className="flex items-center justify-between">
           <h1 className="text-lg font-medium text-white/80">Preset Library</h1>
@@ -388,8 +388,9 @@ export function LibraryContent() {
         </div>
       </div>
 
-      {/* Preset Categories */}
-      <div className="space-y-8">
+      {/* Preset Categories - Scrollable */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-6 pb-6">
+        <div className="space-y-6">
         {filteredCategories.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             {specialTab === 'saved' ? (
@@ -437,6 +438,7 @@ export function LibraryContent() {
             />
           ))
         )}
+        </div>
       </div>
     </div>
   );
