@@ -260,39 +260,28 @@ export function LibraryContent() {
     >
       {/* Header */}
       <div>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold text-white/90">
-              Preset Library
-            </h1>
-            <p className="mt-0.5 text-xs text-white/40">
-              Choose presets for your Quick Presets panel
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="rounded-md border border-white/10 bg-white/[0.03] px-3 py-1.5">
-              <span className="text-[10px] text-white/40 uppercase tracking-wider">Selected</span>
-              <span className="ml-2 text-sm font-medium text-white/80">
-                {selectedCount}/{maxPresets}
-              </span>
-            </div>
-          </div>
+        {/* Title Row */}
+        <div className="flex items-center justify-between">
+          <h1 className="text-lg font-medium text-white/80">Preset Library</h1>
+          <span className="text-[10px] text-white/30">
+            {selectedCount}/{maxPresets} selected
+          </span>
         </div>
 
-        {/* Filter Controls - Compact inline layout */}
-        <div className="mt-5 flex flex-wrap items-center gap-3">
+        {/* Filter Controls - All in one row with search */}
+        <div className="mt-3 flex items-center gap-2">
           {/* Jewelry Type Dropdown - Fixed width */}
-          <div className="relative" onClick={(e) => e.stopPropagation()}>
+          <div className="relative flex-shrink-0" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setShowDropdown(!showDropdown)}
-              className="flex w-[160px] items-center justify-between gap-2 rounded-md border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-white/80 transition-all hover:border-white/20 hover:bg-white/[0.06]"
+              className="flex w-[140px] items-center justify-between gap-1.5 rounded-md border border-white/[0.08] bg-white/[0.03] px-2.5 py-1.5 text-[11px] text-white/70 transition-all hover:border-white/15 hover:bg-white/[0.05]"
             >
               <span className="truncate">{JEWELRY_OPTIONS.find(o => o.id === jewelryType)?.label || 'All Jewelry'}</span>
-              <ChevronDown className={`h-3 w-3 flex-shrink-0 text-white/40 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`h-3 w-3 flex-shrink-0 text-white/30 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
             </button>
             
             {showDropdown && (
-              <div className="absolute top-full left-0 z-50 mt-1 w-[160px] rounded-md border border-white/10 bg-[#141414] py-0.5 shadow-xl backdrop-blur-xl">
+              <div className="absolute top-full left-0 z-50 mt-1 w-[140px] rounded-md border border-white/10 bg-[#141414] py-0.5 shadow-xl backdrop-blur-xl">
                 {JEWELRY_OPTIONS.map((option) => (
                   <button
                     key={option.id}
@@ -301,10 +290,10 @@ export function LibraryContent() {
                       setShowDropdown(false);
                       setSpecialTab(null);
                     }}
-                    className={`w-full px-3 py-1.5 text-left text-xs transition-colors ${
+                    className={`w-full px-2.5 py-1.5 text-left text-[11px] transition-colors ${
                       jewelryType === option.id
                         ? 'bg-white/10 text-white'
-                        : 'text-white/60 hover:bg-white/5 hover:text-white/80'
+                        : 'text-white/50 hover:bg-white/5 hover:text-white/70'
                     }`}
                   >
                     {option.label}
@@ -315,10 +304,10 @@ export function LibraryContent() {
           </div>
 
           {/* Divider */}
-          <div className="h-5 w-px bg-white/[0.06]" />
+          <div className="h-4 w-px bg-white/[0.06] flex-shrink-0" />
 
           {/* Gender Segmented Control */}
-          <div className="inline-flex rounded-md border border-white/[0.06] bg-white/[0.02] p-0.5">
+          <div className="inline-flex flex-shrink-0 rounded border border-white/[0.06] bg-white/[0.02] p-0.5">
             {GENDER_OPTIONS.map((option) => (
               <button
                 key={option.id}
@@ -326,10 +315,10 @@ export function LibraryContent() {
                   setGenderFilter(option.id);
                   setSpecialTab(null);
                 }}
-                className={`rounded px-2.5 py-1 text-xs font-medium transition-all ${
+                className={`rounded-sm px-2 py-1 text-[11px] font-medium transition-all ${
                   genderFilter === option.id
                     ? 'bg-white/10 text-white'
-                    : 'text-white/40 hover:text-white/60'
+                    : 'text-white/35 hover:text-white/50'
                 }`}
               >
                 {option.label}
@@ -338,10 +327,10 @@ export function LibraryContent() {
           </div>
 
           {/* Divider */}
-          <div className="h-5 w-px bg-white/[0.06]" />
+          <div className="h-4 w-px bg-white/[0.06] flex-shrink-0" />
 
           {/* Shot Type Segmented Control */}
-          <div className="inline-flex rounded-md border border-white/[0.06] bg-white/[0.02] p-0.5">
+          <div className="inline-flex flex-shrink-0 rounded border border-white/[0.06] bg-white/[0.02] p-0.5">
             {SHOT_TYPE_OPTIONS.map((option) => (
               <button
                 key={option.id}
@@ -349,10 +338,10 @@ export function LibraryContent() {
                   setShotType(option.id);
                   setSpecialTab(null);
                 }}
-                className={`rounded px-2.5 py-1 text-xs font-medium transition-all ${
+                className={`rounded-sm px-2 py-1 text-[11px] font-medium transition-all ${
                   shotType === option.id
                     ? 'bg-white/10 text-white'
-                    : 'text-white/40 hover:text-white/60'
+                    : 'text-white/35 hover:text-white/50'
                 }`}
               >
                 {option.label}
@@ -361,41 +350,43 @@ export function LibraryContent() {
           </div>
 
           {/* Divider */}
-          <div className="h-5 w-px bg-white/[0.06]" />
+          <div className="h-4 w-px bg-white/[0.06] flex-shrink-0" />
 
           {/* Saved/Favorites Buttons */}
           {SPECIAL_TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setSpecialTab(specialTab === tab.id ? null : tab.id)}
-              className={`flex items-center gap-1.5 rounded-md px-2 py-1 text-xs transition-all ${
+              className={`flex flex-shrink-0 items-center gap-1 rounded px-1.5 py-1 text-[11px] transition-all ${
                 specialTab === tab.id
                   ? 'bg-white/10 text-white'
-                  : 'text-white/40 hover:bg-white/5 hover:text-white/60'
+                  : 'text-white/35 hover:bg-white/5 hover:text-white/50'
               }`}
             >
               {tab.id === 'saved' ? <Bookmark className="h-3 w-3" /> : <Heart className="h-3 w-3" />}
-              <span className="text-white/50">{specialTabCounts[tab.id]}</span>
+              <span>{specialTabCounts[tab.id]}</span>
             </button>
           ))}
-        </div>
 
-        {/* Search */}
-        <div className="mt-4">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-white/30" />
+          {/* Divider */}
+          <div className="h-4 w-px bg-white/[0.06] flex-shrink-0" />
+
+          {/* Search - Flexible width */}
+          <div className="relative flex-1 min-w-[120px]">
+            <Search className="absolute left-2 top-1/2 h-3 w-3 -translate-y-1/2 text-white/25" />
             <input
               type="text"
-              placeholder="Search presets..."
+              placeholder="Search..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-8 w-full max-w-xs rounded-md border border-white/[0.06] bg-white/[0.02] pl-8 pr-3 text-xs text-white/80 placeholder:text-white/30 focus:border-white/20 focus:outline-none"
+              className="h-7 w-full rounded border border-white/[0.06] bg-white/[0.02] pl-7 pr-2 text-[11px] text-white/70 placeholder:text-white/25 focus:border-white/15 focus:outline-none"
             />
-            {/* Results Count - Inline */}
-            <span className="absolute right-0 top-1/2 -translate-y-1/2 text-[10px] text-white/30">
-              {currentPresetCount} preset{currentPresetCount !== 1 ? 's' : ''}
-            </span>
           </div>
+
+          {/* Results Count */}
+          <span className="flex-shrink-0 text-[10px] text-white/25">
+            {currentPresetCount}
+          </span>
         </div>
       </div>
 
