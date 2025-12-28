@@ -279,13 +279,13 @@ export function LibraryContent() {
           </div>
         </div>
 
-        {/* Filter Controls */}
-        <div className="mt-6 space-y-4">
-          {/* Row 1: Jewelry Type Dropdown */}
-          <div className="relative inline-block" onClick={(e) => e.stopPropagation()}>
+        {/* Filter Controls - All in one row */}
+        <div className="mt-6 flex flex-wrap items-center gap-4">
+          {/* Jewelry Type Dropdown */}
+          <div className="relative" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setShowDropdown(!showDropdown)}
-              className="flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2.5 text-sm font-medium text-white transition-all hover:border-white/30 hover:bg-white/10"
+              className="flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-medium text-white transition-all hover:border-white/30 hover:bg-white/10"
             >
               <span>{JEWELRY_OPTIONS.find(o => o.id === jewelryType)?.label || 'All Jewelry Types'}</span>
               <ChevronDown className={`h-4 w-4 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
@@ -314,76 +314,76 @@ export function LibraryContent() {
             )}
           </div>
 
-          {/* Row 2: Gender Segmented Control */}
-          <div>
-            <div className="mb-2 text-xs font-medium uppercase tracking-wider text-white/40">Gender</div>
-            <div className="inline-flex rounded-lg border border-white/10 bg-white/5 p-1">
-              {GENDER_OPTIONS.map((option) => (
-                <button
-                  key={option.id}
-                  onClick={() => {
-                    setGenderFilter(option.id);
-                    setSpecialTab(null);
-                  }}
-                  className={`rounded-md px-4 py-2 text-sm font-medium transition-all ${
-                    genderFilter === option.id
-                      ? 'bg-purple-500 text-white shadow-lg'
-                      : 'text-white/60 hover:text-white/80'
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
+          {/* Divider */}
+          <div className="h-8 w-px bg-white/10" />
 
-          {/* Row 3: Shot Type Segmented Control */}
-          <div>
-            <div className="mb-2 text-xs font-medium uppercase tracking-wider text-white/40">Shot Type</div>
-            <div className="inline-flex rounded-lg border border-white/10 bg-white/5 p-1">
-              {SHOT_TYPE_OPTIONS.map((option) => (
-                <button
-                  key={option.id}
-                  onClick={() => {
-                    setShotType(option.id);
-                    setSpecialTab(null);
-                  }}
-                  className={`rounded-md px-4 py-2 text-sm font-medium transition-all ${
-                    shotType === option.id
-                      ? 'bg-blue-500 text-white shadow-lg'
-                      : 'text-white/60 hover:text-white/80'
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Row 4: Special Tabs (Saved/Favorites) */}
-          <div className="flex items-center gap-2 border-t border-white/10 pt-4">
-            {SPECIAL_TABS.map((tab) => (
+          {/* Gender Segmented Control */}
+          <div className="inline-flex rounded-lg border border-white/10 bg-white/5 p-1">
+            {GENDER_OPTIONS.map((option) => (
               <button
-                key={tab.id}
-                onClick={() => setSpecialTab(specialTab === tab.id ? null : tab.id)}
-                className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
-                  specialTab === tab.id
-                    ? 'bg-white/10 text-white ring-1 ring-white/20'
-                    : 'text-white/50 hover:bg-white/5 hover:text-white/70'
+                key={option.id}
+                onClick={() => {
+                  setGenderFilter(option.id);
+                  setSpecialTab(null);
+                }}
+                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-all ${
+                  genderFilter === option.id
+                    ? 'bg-purple-500 text-white shadow-lg'
+                    : 'text-white/60 hover:text-white/80'
                 }`}
               >
-                {tab.id === 'saved' ? <Bookmark className="h-4 w-4" /> : <Heart className="h-4 w-4" />}
-                <span>{tab.label}</span>
-                <span className={`rounded-full px-2 py-0.5 text-xs ${
-                  specialTab === tab.id 
-                    ? 'bg-purple-500/30 text-purple-300' 
-                    : 'bg-white/5 text-white/40'
-                }`}>
-                  {specialTabCounts[tab.id]}
-                </span>
+                {option.label}
               </button>
             ))}
           </div>
+
+          {/* Divider */}
+          <div className="h-8 w-px bg-white/10" />
+
+          {/* Shot Type Segmented Control */}
+          <div className="inline-flex rounded-lg border border-white/10 bg-white/5 p-1">
+            {SHOT_TYPE_OPTIONS.map((option) => (
+              <button
+                key={option.id}
+                onClick={() => {
+                  setShotType(option.id);
+                  setSpecialTab(null);
+                }}
+                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-all ${
+                  shotType === option.id
+                    ? 'bg-blue-500 text-white shadow-lg'
+                    : 'text-white/60 hover:text-white/80'
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Divider */}
+          <div className="h-8 w-px bg-white/10" />
+
+          {/* Saved/Favorites Buttons */}
+          {SPECIAL_TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setSpecialTab(specialTab === tab.id ? null : tab.id)}
+              className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-all ${
+                specialTab === tab.id
+                  ? 'bg-white/10 text-white ring-1 ring-white/20'
+                  : 'text-white/50 hover:bg-white/5 hover:text-white/70'
+              }`}
+            >
+              {tab.id === 'saved' ? <Bookmark className="h-4 w-4" /> : <Heart className="h-4 w-4" />}
+              <span className={`rounded-full px-1.5 py-0.5 text-xs ${
+                specialTab === tab.id 
+                  ? 'bg-purple-500/30 text-purple-300' 
+                  : 'bg-white/5 text-white/40'
+              }`}>
+                {specialTabCounts[tab.id]}
+              </span>
+            </button>
+          ))}
         </div>
 
         {/* Search */}
