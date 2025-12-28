@@ -24,6 +24,7 @@ import {
   Palette,
   Image,
   Layers,
+  Library,
   FileText,
   User,
 } from 'lucide-react';
@@ -80,7 +81,6 @@ export function Sidebar() {
   }, []);
 
   // Main navigation items
-  // Note: Presets/Library removed from nav - accessible via admin only at /studio/presets
   const mainNavItems = [
     { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
     { icon: Palette, label: 'Studio', href: '/studio' },
@@ -93,6 +93,7 @@ export function Sidebar() {
         ? { variant: 'count' as const, count: galleryCount }
         : undefined,
     },
+    { icon: Library, label: 'Library', href: '/library' },
     { icon: FileText, label: 'Catalogue', href: '/catalogue' },
     { icon: User, label: 'Profile', href: '/profile' },
   ];
