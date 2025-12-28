@@ -260,39 +260,39 @@ export function LibraryContent() {
     >
       {/* Header */}
       <div>
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-[rgba(196,181,253,1)]">
+            <h1 className="text-2xl font-semibold text-white/90">
               Preset Library
             </h1>
-            <p className="mt-1 text-sm text-[rgba(196,181,253,0.6)]">
+            <p className="mt-0.5 text-xs text-white/40">
               Choose presets for your Quick Presets panel
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="rounded-lg border border-purple-500/30 bg-purple-500/10 px-4 py-2">
-              <span className="text-xs text-purple-300/60">Selected:</span>{' '}
-              <span className="text-lg font-semibold text-purple-300">
+          <div className="flex items-center gap-2">
+            <div className="rounded-md border border-white/10 bg-white/[0.03] px-3 py-1.5">
+              <span className="text-[10px] text-white/40 uppercase tracking-wider">Selected</span>
+              <span className="ml-2 text-sm font-medium text-white/80">
                 {selectedCount}/{maxPresets}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Filter Controls - All in one row */}
-        <div className="mt-6 flex flex-wrap items-center gap-4">
-          {/* Jewelry Type Dropdown */}
+        {/* Filter Controls - Compact inline layout */}
+        <div className="mt-5 flex flex-wrap items-center gap-3">
+          {/* Jewelry Type Dropdown - Fixed width */}
           <div className="relative" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setShowDropdown(!showDropdown)}
-              className="flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-medium text-white transition-all hover:border-white/30 hover:bg-white/10"
+              className="flex w-[160px] items-center justify-between gap-2 rounded-md border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-white/80 transition-all hover:border-white/20 hover:bg-white/[0.06]"
             >
-              <span>{JEWELRY_OPTIONS.find(o => o.id === jewelryType)?.label || 'All Jewelry Types'}</span>
-              <ChevronDown className={`h-4 w-4 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
+              <span className="truncate">{JEWELRY_OPTIONS.find(o => o.id === jewelryType)?.label || 'All Jewelry'}</span>
+              <ChevronDown className={`h-3 w-3 flex-shrink-0 text-white/40 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
             </button>
             
             {showDropdown && (
-              <div className="absolute top-full left-0 z-50 mt-1 min-w-[200px] rounded-lg border border-white/10 bg-[#1a1a1a] py-1 shadow-xl">
+              <div className="absolute top-full left-0 z-50 mt-1 w-[160px] rounded-md border border-white/10 bg-[#141414] py-0.5 shadow-xl backdrop-blur-xl">
                 {JEWELRY_OPTIONS.map((option) => (
                   <button
                     key={option.id}
@@ -301,10 +301,10 @@ export function LibraryContent() {
                       setShowDropdown(false);
                       setSpecialTab(null);
                     }}
-                    className={`w-full px-4 py-2 text-left text-sm transition-colors ${
+                    className={`w-full px-3 py-1.5 text-left text-xs transition-colors ${
                       jewelryType === option.id
-                        ? 'bg-purple-500/20 text-purple-300'
-                        : 'text-white/70 hover:bg-white/5 hover:text-white'
+                        ? 'bg-white/10 text-white'
+                        : 'text-white/60 hover:bg-white/5 hover:text-white/80'
                     }`}
                   >
                     {option.label}
@@ -315,10 +315,10 @@ export function LibraryContent() {
           </div>
 
           {/* Divider */}
-          <div className="h-8 w-px bg-white/10" />
+          <div className="h-5 w-px bg-white/[0.06]" />
 
           {/* Gender Segmented Control */}
-          <div className="inline-flex rounded-lg border border-white/10 bg-white/5 p-1">
+          <div className="inline-flex rounded-md border border-white/[0.06] bg-white/[0.02] p-0.5">
             {GENDER_OPTIONS.map((option) => (
               <button
                 key={option.id}
@@ -326,10 +326,10 @@ export function LibraryContent() {
                   setGenderFilter(option.id);
                   setSpecialTab(null);
                 }}
-                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-all ${
+                className={`rounded px-2.5 py-1 text-xs font-medium transition-all ${
                   genderFilter === option.id
-                    ? 'bg-purple-500 text-white shadow-lg'
-                    : 'text-white/60 hover:text-white/80'
+                    ? 'bg-white/10 text-white'
+                    : 'text-white/40 hover:text-white/60'
                 }`}
               >
                 {option.label}
@@ -338,10 +338,10 @@ export function LibraryContent() {
           </div>
 
           {/* Divider */}
-          <div className="h-8 w-px bg-white/10" />
+          <div className="h-5 w-px bg-white/[0.06]" />
 
           {/* Shot Type Segmented Control */}
-          <div className="inline-flex rounded-lg border border-white/10 bg-white/5 p-1">
+          <div className="inline-flex rounded-md border border-white/[0.06] bg-white/[0.02] p-0.5">
             {SHOT_TYPE_OPTIONS.map((option) => (
               <button
                 key={option.id}
@@ -349,10 +349,10 @@ export function LibraryContent() {
                   setShotType(option.id);
                   setSpecialTab(null);
                 }}
-                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-all ${
+                className={`rounded px-2.5 py-1 text-xs font-medium transition-all ${
                   shotType === option.id
-                    ? 'bg-blue-500 text-white shadow-lg'
-                    : 'text-white/60 hover:text-white/80'
+                    ? 'bg-white/10 text-white'
+                    : 'text-white/40 hover:text-white/60'
                 }`}
               >
                 {option.label}
@@ -361,27 +361,21 @@ export function LibraryContent() {
           </div>
 
           {/* Divider */}
-          <div className="h-8 w-px bg-white/10" />
+          <div className="h-5 w-px bg-white/[0.06]" />
 
           {/* Saved/Favorites Buttons */}
           {SPECIAL_TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setSpecialTab(specialTab === tab.id ? null : tab.id)}
-              className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-all ${
+              className={`flex items-center gap-1.5 rounded-md px-2 py-1 text-xs transition-all ${
                 specialTab === tab.id
-                  ? 'bg-white/10 text-white ring-1 ring-white/20'
-                  : 'text-white/50 hover:bg-white/5 hover:text-white/70'
+                  ? 'bg-white/10 text-white'
+                  : 'text-white/40 hover:bg-white/5 hover:text-white/60'
               }`}
             >
-              {tab.id === 'saved' ? <Bookmark className="h-4 w-4" /> : <Heart className="h-4 w-4" />}
-              <span className={`rounded-full px-1.5 py-0.5 text-xs ${
-                specialTab === tab.id 
-                  ? 'bg-purple-500/30 text-purple-300' 
-                  : 'bg-white/5 text-white/40'
-              }`}>
-                {specialTabCounts[tab.id]}
-              </span>
+              {tab.id === 'saved' ? <Bookmark className="h-3 w-3" /> : <Heart className="h-3 w-3" />}
+              <span className="text-white/50">{specialTabCounts[tab.id]}</span>
             </button>
           ))}
         </div>
@@ -389,20 +383,19 @@ export function LibraryContent() {
         {/* Search */}
         <div className="mt-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
+            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-white/30" />
             <input
               type="text"
               placeholder="Search presets..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-10 w-full rounded-lg border border-white/10 bg-white/5 pl-10 pr-4 text-sm text-white placeholder:text-white/40 focus:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+              className="h-8 w-full max-w-xs rounded-md border border-white/[0.06] bg-white/[0.02] pl-8 pr-3 text-xs text-white/80 placeholder:text-white/30 focus:border-white/20 focus:outline-none"
             />
+            {/* Results Count - Inline */}
+            <span className="absolute right-0 top-1/2 -translate-y-1/2 text-[10px] text-white/30">
+              {currentPresetCount} preset{currentPresetCount !== 1 ? 's' : ''}
+            </span>
           </div>
-        </div>
-
-        {/* Results Count */}
-        <div className="mt-3 text-sm text-white/40">
-          {currentPresetCount} preset{currentPresetCount !== 1 ? 's' : ''} found
         </div>
       </div>
 
@@ -481,15 +474,15 @@ function CategorySection({
   isFavorite,
 }: CategorySectionProps) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Category Header */}
-      <div className="border-l-2 border-purple-500/50 pl-4">
-        <h2 className="text-lg font-semibold text-white">{category.name}</h2>
-        <p className="text-sm text-white/40">{category.description}</p>
+      <div className="border-l border-white/20 pl-3">
+        <h2 className="text-sm font-medium text-white/80">{category.name}</h2>
+        <p className="text-xs text-white/30">{category.description}</p>
       </div>
 
-      {/* Preset Grid */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+      {/* Preset Grid - More compact */}
+      <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
         {category.presets.map((preset) => {
           const isSelected = isPresetSelected(preset.id);
           const isFav = isFavorite(preset.id);
@@ -498,7 +491,11 @@ function CategorySection({
           return (
             <div
               key={preset.id}
-              className="group relative overflow-hidden rounded-lg border border-white/10 bg-white/[0.02] transition-all hover:border-purple-500/50 hover:bg-white/[0.05]"
+              className={`group relative overflow-hidden rounded-lg border transition-all ${
+                isSelected
+                  ? 'border-white/20 bg-white/[0.04]'
+                  : 'border-white/[0.06] bg-white/[0.02] hover:border-white/15 hover:bg-white/[0.04]'
+              }`}
             >
               {/* Clickable area for selection */}
               <button
@@ -517,66 +514,55 @@ function CategorySection({
                     }}
                   />
 
-                  {/* Selected Overlay */}
+                  {/* Selected Overlay - Subtle */}
                   {isSelected && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-purple-500/20 backdrop-blur-[2px]">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-500">
-                        <Check className="h-6 w-6 text-white" />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-[1px]">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm ring-1 ring-white/30">
+                        <Check className="h-5 w-5 text-white" />
                       </div>
                     </div>
                   )}
 
                   {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
                 </div>
 
                 {/* Info */}
-                <div className="p-3">
-                  <h3 className="text-sm font-medium text-white">
+                <div className="p-2.5">
+                  <h3 className="text-xs font-medium text-white/90">
                     {preset.title}
                   </h3>
                   {preset.description && (
-                    <p className="mt-1 line-clamp-2 text-xs text-white/50">
+                    <p className="mt-0.5 line-clamp-1 text-[10px] text-white/40">
                       {preset.description}
                     </p>
                   )}
                 </div>
               </button>
 
-              {/* Selection Order Badge (Top-Left) */}
+              {/* Selection Order Badge (Top-Left) - Subtle */}
               {isSelected && order > 0 && (
-                <div className="absolute left-2 top-2 pointer-events-none">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg ring-2 ring-white/20">
-                    <span className="text-sm font-bold text-white">
-                      {order}
-                    </span>
+                <div className="absolute left-1.5 top-1.5 pointer-events-none">
+                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm text-[10px] font-semibold text-white ring-1 ring-white/20">
+                    {order}
                   </div>
                 </div>
               )}
 
-              {/* Favorite Button (Top-Right) */}
+              {/* Favorite Button (Top-Right) - Subtle */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   onFavoriteToggle(preset.id);
                 }}
-                className={`absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full transition-all ${
+                className={`absolute right-1.5 top-1.5 z-10 flex h-6 w-6 items-center justify-center rounded-full transition-all ${
                   isFav 
-                    ? 'bg-red-500 text-white' 
-                    : 'bg-black/40 text-white/60 opacity-0 group-hover:opacity-100 hover:bg-black/60 hover:text-white'
+                    ? 'bg-white/20 text-white backdrop-blur-sm' 
+                    : 'bg-black/30 text-white/50 opacity-0 group-hover:opacity-100 hover:bg-black/50 hover:text-white/80'
                 }`}
               >
-                <Heart className={`h-4 w-4 ${isFav ? 'fill-current' : ''}`} />
+                <Heart className={`h-3 w-3 ${isFav ? 'fill-current' : ''}`} />
               </button>
-
-              {/* Selected Check (Bottom-Right of image) */}
-              {isSelected && (
-                <div className="absolute bottom-[60px] right-2 pointer-events-none">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-purple-500/90 shadow-lg">
-                    <Check className="h-4 w-4 text-white" />
-                  </div>
-                </div>
-              )}
             </div>
           );
         })}
