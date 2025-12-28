@@ -30,6 +30,7 @@ import {
   FlaskConical,
   PenTool,
   Edit3,
+  Video,
 } from 'lucide-react';
 
 // Tools section (Coming Soon - All tools are integrated in Studio)
@@ -88,6 +89,7 @@ export function Sidebar() {
     { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
     { icon: Palette, label: 'Studio', href: '/studio' },
     { icon: Edit3, label: 'Editor', href: '/editor' },
+    { icon: Video, label: 'Motion+', href: '/motion-plus' },
     { icon: Layers, label: 'Batch', href: '/batch' },
     {
       icon: Image,
