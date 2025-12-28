@@ -27,6 +27,9 @@ import {
   Library,
   FileText,
   User,
+  FlaskConical,
+  PenTool,
+  Edit3,
 } from 'lucide-react';
 
 // Tools section (Coming Soon - All tools are integrated in Studio)
@@ -84,6 +87,7 @@ export function Sidebar() {
   const mainNavItems = [
     { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
     { icon: Palette, label: 'Studio', href: '/studio' },
+    { icon: Edit3, label: 'Editor', href: '/editor' },
     { icon: Layers, label: 'Batch', href: '/batch' },
     {
       icon: Image,
@@ -94,6 +98,8 @@ export function Sidebar() {
         : undefined,
     },
     { icon: Library, label: 'Library', href: '/library' },
+    { icon: FlaskConical, label: 'Brand Lab', href: '/brand-lab' },
+    { icon: PenTool, label: 'Design Office', href: '/design-office' },
     { icon: FileText, label: 'Catalogue', href: '/catalogue' },
     { icon: User, label: 'Profile', href: '/profile' },
   ];
