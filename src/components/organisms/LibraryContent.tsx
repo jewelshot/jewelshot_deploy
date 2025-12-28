@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Check, Sparkles, Heart, Bookmark } from 'lucide-react';
+import { Search, Check, Sparkles, Heart, Bookmark, ChevronDown } from 'lucide-react';
 import { PRESET_CATEGORIES, filterPresetsByTab, getDefaultTab, getPresetById } from '@/data/presets';
 import { usePresetLibraryStore } from '@/store/presetLibraryStore';
 import { PresetCategory, PresetTab, Preset } from '@/types/preset';
@@ -12,33 +12,32 @@ import { loadGenerationSettings } from '@/lib/generation-settings-storage';
 
 const logger = createScopedLogger('Library');
 
-// Tab definitions
-const TABS: { id: PresetTab; label: string }[] = [
-  { id: 'women', label: 'Women' },
-  { id: 'men', label: 'Men' },
-  { id: 'studio', label: 'Products' },
-  { id: 'saved', label: 'Saved' },
-  { id: 'favorites', label: 'Favorites' },
-];
-
-// Style filter options (based on category IDs)
-const STYLE_FILTERS = [
-  { id: 'all', label: 'All Styles' },
-  { id: 'on-model', label: 'On Model' },
-  { id: 'lifestyle', label: 'Lifestyle' },
-  { id: 'white-backgrounds', label: 'White BG' },
-  { id: 'still-life', label: 'Still Life' },
-  { id: 'luxury', label: 'Luxury' },
-  { id: 'close-up', label: 'Close-Up' },
-];
-
-// Jewelry type filter options
-const JEWELRY_FILTERS = [
-  { id: 'all', label: 'All Jewelry' },
+// Jewelry type dropdown options
+const JEWELRY_OPTIONS = [
+  { id: 'all', label: 'All Jewelry Types' },
   { id: 'ring', label: 'Rings' },
   { id: 'necklace', label: 'Necklaces' },
   { id: 'earring', label: 'Earrings' },
   { id: 'bracelet', label: 'Bracelets' },
+];
+
+// Gender segmented control options
+const GENDER_OPTIONS = [
+  { id: 'women', label: 'Women' },
+  { id: 'men', label: 'Men' },
+  { id: 'unisex', label: 'Unisex' },
+];
+
+// Shot type segmented control options
+const SHOT_TYPE_OPTIONS = [
+  { id: 'product', label: 'Product Only' },
+  { id: 'on-model', label: 'On Model' },
+];
+
+// Tab definitions for saved/favorites
+const SPECIAL_TABS: { id: 'saved' | 'favorites'; label: string }[] = [
+  { id: 'saved', label: 'Saved' },
+  { id: 'favorites', label: 'Favorites' },
 ];
 
 /**
@@ -49,14 +48,15 @@ const JEWELRY_FILTERS = [
 export function LibraryContent() {
   const { leftOpen, rightOpen, topOpen, bottomOpen } = useSidebarStore();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   
-  // Active tab state
-  const [activeTab, setActiveTab] = useState<PresetTab>('studio');
+  // New filter states
+  const [jewelryType, setJewelryType] = useState<string>('all');
+  const [genderFilter, setGenderFilter] = useState<string>('women');
+  const [shotType, setShotType] = useState<string>('on-model');
+  const [showDropdown, setShowDropdown] = useState(false);
   
-  // Two-level filters
-  const [styleFilter, setStyleFilter] = useState<string>('all');
-  const [jewelryFilter, setJewelryFilter] = useState<string>('all');
+  // Special tabs (Saved/Favorites)
+  const [specialTab, setSpecialTab] = useState<'saved' | 'favorites' | null>(null);
 
   const {
     selectedPresets,
@@ -75,21 +75,23 @@ export function LibraryContent() {
   const selectedCount = getSelectedPresetsCount();
   const favoriteCount = getFavoriteCount();
 
-  // Load Generation Settings on mount and set default tab
+  // Load Generation Settings on mount and set default gender
   useEffect(() => {
     const settings = loadGenerationSettings();
     if (settings?.gender) {
-      const defaultTab = getDefaultTab(settings.gender);
-      setActiveTab(defaultTab);
-      logger.info(`Auto-selected tab: ${defaultTab} based on Generation Settings`);
+      setGenderFilter(settings.gender);
+      logger.info(`Auto-selected gender: ${settings.gender} based on Generation Settings`);
     }
   }, []);
   
-  // Reset filters when tab changes
+  // Close dropdown when clicking outside
   useEffect(() => {
-    setStyleFilter('all');
-    setJewelryFilter('all');
-  }, [activeTab]);
+    const handleClickOutside = () => setShowDropdown(false);
+    if (showDropdown) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [showDropdown]);
   
   // Get saved presets as a virtual category
   const savedPresetsCategory = useMemo((): PresetCategory | null => {
@@ -125,10 +127,10 @@ export function LibraryContent() {
     };
   }, [favoritePresets]);
 
-  // Filter categories based on active tab, search, and category
+  // Filter categories based on filters
   const filteredCategories = useMemo(() => {
-    // Handle special tabs
-    if (activeTab === 'saved') {
+    // Handle special tabs (Saved/Favorites)
+    if (specialTab === 'saved') {
       if (!savedPresetsCategory) return [];
       let categories = [savedPresetsCategory];
       
@@ -149,7 +151,7 @@ export function LibraryContent() {
       return categories;
     }
     
-    if (activeTab === 'favorites') {
+    if (specialTab === 'favorites') {
       if (!favoritePresetsCategory) return [];
       let categories = [favoritePresetsCategory];
       
@@ -170,29 +172,28 @@ export function LibraryContent() {
       return categories;
     }
     
-    // Regular tabs (women, men, studio)
-    let categories = filterPresetsByTab(activeTab);
-
-    // Filter by style (category ID)
-    if (styleFilter !== 'all') {
-      categories = categories.filter((cat) => cat.id === styleFilter);
+    // Determine which tab to use based on shot type
+    // 'product' = studio tab, 'on-model' = gender-based tab
+    let tabToUse: PresetTab;
+    if (shotType === 'product') {
+      tabToUse = 'studio';
+    } else {
+      // on-model: use gender filter
+      tabToUse = genderFilter === 'men' ? 'men' : 'women';
     }
+    
+    let categories = filterPresetsByTab(tabToUse);
 
     // Filter by jewelry type
-    if (jewelryFilter !== 'all') {
+    if (jewelryType !== 'all') {
       categories = categories
         .map((cat) => ({
           ...cat,
           presets: cat.presets.filter(
-            (preset) => preset.jewelryType === jewelryFilter || preset.jewelryType === 'all'
+            (preset) => preset.jewelryType === jewelryType || preset.jewelryType === 'all'
           ),
         }))
         .filter((cat) => cat.presets.length > 0);
-    }
-
-    // Filter by selected category (legacy, keep for compatibility)
-    if (selectedCategory !== 'all') {
-      categories = categories.filter((cat) => cat.id === selectedCategory);
     }
 
     // Filter by search query
@@ -211,22 +212,20 @@ export function LibraryContent() {
     }
 
     return categories;
-  }, [searchQuery, selectedCategory, activeTab, styleFilter, jewelryFilter, savedPresetsCategory, favoritePresetsCategory]);
+  }, [searchQuery, jewelryType, genderFilter, shotType, specialTab, savedPresetsCategory, favoritePresetsCategory]);
 
-  // Get preset count for each tab
-  const tabCounts = useMemo(() => {
-    return TABS.reduce((acc, tab) => {
-      if (tab.id === 'saved') {
-        acc[tab.id] = selectedPresets.length;
-      } else if (tab.id === 'favorites') {
-        acc[tab.id] = favoritePresets.length;
-      } else {
-        const categories = filterPresetsByTab(tab.id);
-        acc[tab.id] = categories.reduce((sum, cat) => sum + cat.presets.length, 0);
-      }
-      return acc;
-    }, {} as Record<PresetTab, number>);
+  // Get preset count for special tabs
+  const specialTabCounts = useMemo(() => {
+    return {
+      saved: selectedPresets.length,
+      favorites: favoritePresets.length,
+    };
   }, [selectedPresets.length, favoritePresets.length]);
+  
+  // Get total preset count for current filters
+  const currentPresetCount = useMemo(() => {
+    return filteredCategories.reduce((sum, cat) => sum + cat.presets.length, 0);
+  }, [filteredCategories]);
 
   const handlePresetToggle = (presetId: string, categoryId: string) => {
     if (isPresetSelected(presetId)) {
@@ -280,32 +279,108 @@ export function LibraryContent() {
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="mt-6">
-          <div className="relative flex border-b border-white/10">
-            {TABS.map((tab) => (
+        {/* Filter Controls */}
+        <div className="mt-6 space-y-4">
+          {/* Row 1: Jewelry Type Dropdown */}
+          <div className="relative inline-block" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setShowDropdown(!showDropdown)}
+              className="flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2.5 text-sm font-medium text-white transition-all hover:border-white/30 hover:bg-white/10"
+            >
+              <span>{JEWELRY_OPTIONS.find(o => o.id === jewelryType)?.label || 'All Jewelry Types'}</span>
+              <ChevronDown className={`h-4 w-4 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
+            </button>
+            
+            {showDropdown && (
+              <div className="absolute top-full left-0 z-50 mt-1 min-w-[200px] rounded-lg border border-white/10 bg-[#1a1a1a] py-1 shadow-xl">
+                {JEWELRY_OPTIONS.map((option) => (
+                  <button
+                    key={option.id}
+                    onClick={() => {
+                      setJewelryType(option.id);
+                      setShowDropdown(false);
+                      setSpecialTab(null);
+                    }}
+                    className={`w-full px-4 py-2 text-left text-sm transition-colors ${
+                      jewelryType === option.id
+                        ? 'bg-purple-500/20 text-purple-300'
+                        : 'text-white/70 hover:bg-white/5 hover:text-white'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Row 2: Gender Segmented Control */}
+          <div>
+            <div className="mb-2 text-xs font-medium uppercase tracking-wider text-white/40">Gender</div>
+            <div className="inline-flex rounded-lg border border-white/10 bg-white/5 p-1">
+              {GENDER_OPTIONS.map((option) => (
+                <button
+                  key={option.id}
+                  onClick={() => {
+                    setGenderFilter(option.id);
+                    setSpecialTab(null);
+                  }}
+                  className={`rounded-md px-4 py-2 text-sm font-medium transition-all ${
+                    genderFilter === option.id
+                      ? 'bg-purple-500 text-white shadow-lg'
+                      : 'text-white/60 hover:text-white/80'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Row 3: Shot Type Segmented Control */}
+          <div>
+            <div className="mb-2 text-xs font-medium uppercase tracking-wider text-white/40">Shot Type</div>
+            <div className="inline-flex rounded-lg border border-white/10 bg-white/5 p-1">
+              {SHOT_TYPE_OPTIONS.map((option) => (
+                <button
+                  key={option.id}
+                  onClick={() => {
+                    setShotType(option.id);
+                    setSpecialTab(null);
+                  }}
+                  className={`rounded-md px-4 py-2 text-sm font-medium transition-all ${
+                    shotType === option.id
+                      ? 'bg-blue-500 text-white shadow-lg'
+                      : 'text-white/60 hover:text-white/80'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Row 4: Special Tabs (Saved/Favorites) */}
+          <div className="flex items-center gap-2 border-t border-white/10 pt-4">
+            {SPECIAL_TABS.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`relative flex-1 px-6 py-3 text-sm font-medium transition-all ${
-                  activeTab === tab.id
-                    ? 'text-white'
-                    : 'text-white/50 hover:text-white/70'
+                onClick={() => setSpecialTab(specialTab === tab.id ? null : tab.id)}
+                className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                  specialTab === tab.id
+                    ? 'bg-white/10 text-white ring-1 ring-white/20'
+                    : 'text-white/50 hover:bg-white/5 hover:text-white/70'
                 }`}
               >
+                {tab.id === 'saved' ? <Bookmark className="h-4 w-4" /> : <Heart className="h-4 w-4" />}
                 <span>{tab.label}</span>
-                <span className={`ml-2 rounded-full px-2 py-0.5 text-xs ${
-                  activeTab === tab.id 
+                <span className={`rounded-full px-2 py-0.5 text-xs ${
+                  specialTab === tab.id 
                     ? 'bg-purple-500/30 text-purple-300' 
                     : 'bg-white/5 text-white/40'
                 }`}>
-                  {tabCounts[tab.id]}
+                  {specialTabCounts[tab.id]}
                 </span>
-                
-                {/* Active indicator line */}
-                {activeTab === tab.id && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500 to-blue-500" />
-                )}
               </button>
             ))}
           </div>
@@ -325,83 +400,17 @@ export function LibraryContent() {
           </div>
         </div>
 
-        {/* Two-Level Filters - Only for regular tabs */}
-        {activeTab !== 'saved' && activeTab !== 'favorites' && (
-          <div className="mt-4 space-y-3">
-            {/* Style Filter Row */}
-            <div>
-              <div className="mb-2 text-xs font-medium uppercase tracking-wider text-white/40">Style</div>
-              <div className="flex flex-wrap gap-2">
-                {STYLE_FILTERS.map((filter) => (
-                  <button
-                    key={filter.id}
-                    onClick={() => setStyleFilter(filter.id)}
-                    className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
-                      styleFilter === filter.id
-                        ? 'bg-purple-500/30 text-purple-200 ring-1 ring-purple-500/50'
-                        : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white/80'
-                    }`}
-                  >
-                    {filter.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Jewelry Type Filter Row */}
-            <div>
-              <div className="mb-2 text-xs font-medium uppercase tracking-wider text-white/40">Jewelry Type</div>
-              <div className="flex flex-wrap gap-2">
-                {JEWELRY_FILTERS.map((filter) => (
-                  <button
-                    key={filter.id}
-                    onClick={() => setJewelryFilter(filter.id)}
-                    className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
-                      jewelryFilter === filter.id
-                        ? 'bg-blue-500/30 text-blue-200 ring-1 ring-blue-500/50'
-                        : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white/80'
-                    }`}
-                  >
-                    {filter.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Active Filters Indicator */}
-            {(styleFilter !== 'all' || jewelryFilter !== 'all') && (
-              <div className="flex items-center gap-2 pt-1">
-                <span className="text-xs text-white/40">Active filters:</span>
-                {styleFilter !== 'all' && (
-                  <span className="rounded bg-purple-500/20 px-2 py-0.5 text-xs text-purple-300">
-                    {STYLE_FILTERS.find(f => f.id === styleFilter)?.label}
-                  </span>
-                )}
-                {jewelryFilter !== 'all' && (
-                  <span className="rounded bg-blue-500/20 px-2 py-0.5 text-xs text-blue-300">
-                    {JEWELRY_FILTERS.find(f => f.id === jewelryFilter)?.label}
-                  </span>
-                )}
-                <button
-                  onClick={() => {
-                    setStyleFilter('all');
-                    setJewelryFilter('all');
-                  }}
-                  className="ml-auto text-xs text-white/40 hover:text-white/60"
-                >
-                  Clear all
-                </button>
-              </div>
-            )}
-          </div>
-        )}
+        {/* Results Count */}
+        <div className="mt-3 text-sm text-white/40">
+          {currentPresetCount} preset{currentPresetCount !== 1 ? 's' : ''} found
+        </div>
       </div>
 
       {/* Preset Categories */}
       <div className="space-y-8">
         {filteredCategories.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            {activeTab === 'saved' ? (
+            {specialTab === 'saved' ? (
               <>
                 <Bookmark className="mb-4 h-12 w-12 text-white/20" />
                 <h3 className="text-lg font-medium text-white/60">
@@ -411,7 +420,7 @@ export function LibraryContent() {
                   Click on any preset to add it to your Quick Presets panel
                 </p>
               </>
-            ) : activeTab === 'favorites' ? (
+            ) : specialTab === 'favorites' ? (
               <>
                 <Heart className="mb-4 h-12 w-12 text-white/20" />
                 <h3 className="text-lg font-medium text-white/60">
