@@ -103,72 +103,111 @@ interface StudioPreset {
   }>;
 }
 
+// 360° Spherical Studio Presets - lights distributed around the sphere
 const STUDIO_PRESETS: StudioPreset[] = [
   {
     id: 'white-studio',
     name: 'White Studio',
     backgroundColor: '#ffffff',
     lights: [
-      { color: '#ffffff', intensity: 2, position: [0, 5, -5], scale: [10, 5, 1] },
-      { color: '#ffffff', intensity: 1.5, position: [-5, 2, 0], scale: [5, 3, 1], rotation: [0, Math.PI / 2, 0] },
-      { color: '#ffffff', intensity: 1.5, position: [5, 2, 0], scale: [5, 3, 1], rotation: [0, -Math.PI / 2, 0] },
-      { color: '#ffffff', intensity: 1, position: [0, -2, 3], scale: [8, 2, 1] },
-      { color: '#ffffff', intensity: 3, position: [0, 8, 0], scale: [15, 15, 1], rotation: [Math.PI / 2, 0, 0] },
+      // Top dome
+      { color: '#ffffff', intensity: 2, position: [0, 8, 0], scale: [20, 20, 1], rotation: [Math.PI / 2, 0, 0] },
+      // 360° ring at eye level (6 panels)
+      { color: '#ffffff', intensity: 1.5, position: [0, 2, -6], scale: [8, 4, 1] },
+      { color: '#ffffff', intensity: 1.5, position: [5.2, 2, -3], scale: [8, 4, 1], rotation: [0, Math.PI / 3, 0] },
+      { color: '#ffffff', intensity: 1.5, position: [5.2, 2, 3], scale: [8, 4, 1], rotation: [0, 2 * Math.PI / 3, 0] },
+      { color: '#ffffff', intensity: 1.5, position: [0, 2, 6], scale: [8, 4, 1], rotation: [0, Math.PI, 0] },
+      { color: '#ffffff', intensity: 1.5, position: [-5.2, 2, 3], scale: [8, 4, 1], rotation: [0, -2 * Math.PI / 3, 0] },
+      { color: '#ffffff', intensity: 1.5, position: [-5.2, 2, -3], scale: [8, 4, 1], rotation: [0, -Math.PI / 3, 0] },
+      // Bottom fill
+      { color: '#f0f0f0', intensity: 0.8, position: [0, -4, 0], scale: [15, 15, 1], rotation: [-Math.PI / 2, 0, 0] },
     ],
   },
   {
-    id: 'soft-white',
-    name: 'Soft White',
-    backgroundColor: '#f5f5f5',
+    id: 'soft-box',
+    name: 'Soft Box',
+    backgroundColor: '#f8f8f8',
     lights: [
-      { color: '#ffffff', intensity: 1.5, position: [0, 4, -4], scale: [12, 6, 1] },
-      { color: '#f0f0ff', intensity: 1, position: [-4, 3, 2], scale: [6, 4, 1], rotation: [0, Math.PI / 3, 0] },
-      { color: '#fff8f0', intensity: 1, position: [4, 3, 2], scale: [6, 4, 1], rotation: [0, -Math.PI / 3, 0] },
-      { color: '#ffffff', intensity: 2, position: [0, 6, 0], scale: [10, 10, 1], rotation: [Math.PI / 2, 0, 0] },
+      // Large soft top
+      { color: '#ffffff', intensity: 2.5, position: [0, 10, 0], scale: [25, 25, 1], rotation: [Math.PI / 2, 0, 0] },
+      // Soft walls (cube-like)
+      { color: '#fafafa', intensity: 1.2, position: [0, 3, -8], scale: [16, 8, 1] },
+      { color: '#fafafa', intensity: 1.2, position: [8, 3, 0], scale: [16, 8, 1], rotation: [0, -Math.PI / 2, 0] },
+      { color: '#fafafa', intensity: 1.2, position: [0, 3, 8], scale: [16, 8, 1], rotation: [0, Math.PI, 0] },
+      { color: '#fafafa', intensity: 1.2, position: [-8, 3, 0], scale: [16, 8, 1], rotation: [0, Math.PI / 2, 0] },
+      // Ground reflection
+      { color: '#f0f0f0', intensity: 0.6, position: [0, -3, 0], scale: [20, 20, 1], rotation: [-Math.PI / 2, 0, 0] },
     ],
   },
   {
     id: 'warm-studio',
-    name: 'Warm Studio',
+    name: 'Warm Gold',
     backgroundColor: '#faf5f0',
     lights: [
-      { color: '#fff5e6', intensity: 2, position: [0, 5, -5], scale: [10, 5, 1] },
-      { color: '#ffe4cc', intensity: 1.5, position: [-5, 2, 0], scale: [5, 3, 1], rotation: [0, Math.PI / 2, 0] },
-      { color: '#fff0e0', intensity: 1.5, position: [5, 2, 0], scale: [5, 3, 1], rotation: [0, -Math.PI / 2, 0] },
-      { color: '#fffaf0', intensity: 2.5, position: [0, 8, 0], scale: [15, 15, 1], rotation: [Math.PI / 2, 0, 0] },
+      // Warm dome
+      { color: '#fff8e8', intensity: 2, position: [0, 8, 0], scale: [20, 20, 1], rotation: [Math.PI / 2, 0, 0] },
+      // 360° warm ring
+      { color: '#ffe8cc', intensity: 1.5, position: [0, 2, -6], scale: [8, 4, 1] },
+      { color: '#ffd9b3', intensity: 1.5, position: [5.2, 2, -3], scale: [8, 4, 1], rotation: [0, Math.PI / 3, 0] },
+      { color: '#ffe8cc', intensity: 1.5, position: [5.2, 2, 3], scale: [8, 4, 1], rotation: [0, 2 * Math.PI / 3, 0] },
+      { color: '#ffd9b3', intensity: 1.5, position: [0, 2, 6], scale: [8, 4, 1], rotation: [0, Math.PI, 0] },
+      { color: '#ffe8cc', intensity: 1.5, position: [-5.2, 2, 3], scale: [8, 4, 1], rotation: [0, -2 * Math.PI / 3, 0] },
+      { color: '#ffd9b3', intensity: 1.5, position: [-5.2, 2, -3], scale: [8, 4, 1], rotation: [0, -Math.PI / 3, 0] },
+      // Warm floor
+      { color: '#fff0e0', intensity: 0.8, position: [0, -4, 0], scale: [15, 15, 1], rotation: [-Math.PI / 2, 0, 0] },
     ],
   },
   {
     id: 'cool-studio',
-    name: 'Cool Studio',
+    name: 'Cool Silver',
     backgroundColor: '#f0f5fa',
     lights: [
-      { color: '#e6f0ff', intensity: 2, position: [0, 5, -5], scale: [10, 5, 1] },
-      { color: '#d0e0ff', intensity: 1.5, position: [-5, 2, 0], scale: [5, 3, 1], rotation: [0, Math.PI / 2, 0] },
-      { color: '#e0f0ff', intensity: 1.5, position: [5, 2, 0], scale: [5, 3, 1], rotation: [0, -Math.PI / 2, 0] },
-      { color: '#f0f8ff', intensity: 2.5, position: [0, 8, 0], scale: [15, 15, 1], rotation: [Math.PI / 2, 0, 0] },
+      // Cool dome
+      { color: '#e8f0ff', intensity: 2, position: [0, 8, 0], scale: [20, 20, 1], rotation: [Math.PI / 2, 0, 0] },
+      // 360° cool ring
+      { color: '#d0e8ff', intensity: 1.5, position: [0, 2, -6], scale: [8, 4, 1] },
+      { color: '#c0d8ff', intensity: 1.5, position: [5.2, 2, -3], scale: [8, 4, 1], rotation: [0, Math.PI / 3, 0] },
+      { color: '#d0e8ff', intensity: 1.5, position: [5.2, 2, 3], scale: [8, 4, 1], rotation: [0, 2 * Math.PI / 3, 0] },
+      { color: '#c0d8ff', intensity: 1.5, position: [0, 2, 6], scale: [8, 4, 1], rotation: [0, Math.PI, 0] },
+      { color: '#d0e8ff', intensity: 1.5, position: [-5.2, 2, 3], scale: [8, 4, 1], rotation: [0, -2 * Math.PI / 3, 0] },
+      { color: '#c0d8ff', intensity: 1.5, position: [-5.2, 2, -3], scale: [8, 4, 1], rotation: [0, -Math.PI / 3, 0] },
+      // Cool floor
+      { color: '#e0f0ff', intensity: 0.8, position: [0, -4, 0], scale: [15, 15, 1], rotation: [-Math.PI / 2, 0, 0] },
     ],
   },
   {
     id: 'dramatic',
     name: 'Dramatic',
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#0a0a0a',
     lights: [
-      { color: '#ffffff', intensity: 4, position: [3, 5, -3], scale: [4, 4, 1] },
-      { color: '#4488ff', intensity: 1, position: [-5, 2, 2], scale: [3, 2, 1], rotation: [0, Math.PI / 2, 0] },
-      { color: '#ff8844', intensity: 1.5, position: [0, 0, -5], scale: [6, 2, 1] },
+      // Strong key light
+      { color: '#ffffff', intensity: 4, position: [4, 6, -4], scale: [5, 5, 1], rotation: [0.3, Math.PI / 4, 0] },
+      // Blue rim/back
+      { color: '#4488ff', intensity: 2, position: [-5, 3, 4], scale: [4, 3, 1], rotation: [0, -2 * Math.PI / 3, 0] },
+      // Orange accent
+      { color: '#ff8844', intensity: 1.5, position: [5, 1, 4], scale: [3, 2, 1], rotation: [0, 2 * Math.PI / 3, 0] },
+      // Subtle fill
+      { color: '#222233', intensity: 0.5, position: [0, 8, 0], scale: [15, 15, 1], rotation: [Math.PI / 2, 0, 0] },
     ],
   },
   {
     id: 'product',
-    name: 'Product Shot',
-    backgroundColor: '#f8f8f8',
+    name: 'Product 360',
+    backgroundColor: '#ffffff',
     lights: [
-      { color: '#ffffff', intensity: 2.5, position: [0, 6, -4], scale: [8, 4, 1] },
-      { color: '#ffffff', intensity: 2, position: [-4, 4, 2], scale: [4, 3, 1], rotation: [0, Math.PI / 3, 0] },
-      { color: '#ffffff', intensity: 2, position: [4, 4, 2], scale: [4, 3, 1], rotation: [0, -Math.PI / 3, 0] },
-      { color: '#ffffff', intensity: 1, position: [0, -1, 4], scale: [6, 2, 1] },
-      { color: '#ffffff', intensity: 3, position: [0, 10, 0], scale: [12, 12, 1], rotation: [Math.PI / 2, 0, 0] },
+      // Large overhead softbox
+      { color: '#ffffff', intensity: 3, position: [0, 10, 0], scale: [20, 20, 1], rotation: [Math.PI / 2, 0, 0] },
+      // 8-point 360° ring for even reflections
+      { color: '#ffffff', intensity: 1.8, position: [0, 3, -7], scale: [6, 4, 1] },
+      { color: '#ffffff', intensity: 1.8, position: [5, 3, -5], scale: [6, 4, 1], rotation: [0, Math.PI / 4, 0] },
+      { color: '#ffffff', intensity: 1.8, position: [7, 3, 0], scale: [6, 4, 1], rotation: [0, Math.PI / 2, 0] },
+      { color: '#ffffff', intensity: 1.8, position: [5, 3, 5], scale: [6, 4, 1], rotation: [0, 3 * Math.PI / 4, 0] },
+      { color: '#ffffff', intensity: 1.8, position: [0, 3, 7], scale: [6, 4, 1], rotation: [0, Math.PI, 0] },
+      { color: '#ffffff', intensity: 1.8, position: [-5, 3, 5], scale: [6, 4, 1], rotation: [0, -3 * Math.PI / 4, 0] },
+      { color: '#ffffff', intensity: 1.8, position: [-7, 3, 0], scale: [6, 4, 1], rotation: [0, -Math.PI / 2, 0] },
+      { color: '#ffffff', intensity: 1.8, position: [-5, 3, -5], scale: [6, 4, 1], rotation: [0, -Math.PI / 4, 0] },
+      // Bright floor for bottom reflections
+      { color: '#ffffff', intensity: 1, position: [0, -3, 0], scale: [18, 18, 1], rotation: [-Math.PI / 2, 0, 0] },
     ],
   },
 ];
