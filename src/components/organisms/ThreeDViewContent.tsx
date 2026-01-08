@@ -13,7 +13,7 @@
 
 import React, { useState, useRef, useCallback, Suspense, useEffect } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
-import { OrbitControls, Center, Environment, Grid, GizmoHelper, GizmoViewport } from '@react-three/drei';
+import { OrbitControls, Center, Environment, Grid, GizmoHelper, GizmoViewport, Lightformer, ContactShadows } from '@react-three/drei';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 import * as THREE from 'three';
 import {
@@ -89,19 +89,91 @@ const STONE_PRESETS: MaterialPreset[] = [
   { id: 'amethyst', name: 'Amethyst', color: '#9966CC', metalness: 0, roughness: 0.05, envMapIntensity: 1.8 },
 ];
 
-// Environment presets - these provide reflections for metallic surfaces
-const ENVIRONMENT_PRESETS = [
-  { id: 'studio', name: 'Studio' },
-  { id: 'apartment', name: 'Apartment' },
-  { id: 'warehouse', name: 'Warehouse' },
-  { id: 'city', name: 'City' },
-  { id: 'sunset', name: 'Sunset' },
-  { id: 'dawn', name: 'Dawn' },
-  { id: 'forest', name: 'Forest' },
-  { id: 'lobby', name: 'Lobby' },
-] as const;
+// Studio environment presets - custom lightformer setups (no external HDR needed)
+interface StudioPreset {
+  id: string;
+  name: string;
+  backgroundColor: string;
+  lights: Array<{
+    color: string;
+    intensity: number;
+    position: [number, number, number];
+    scale: [number, number, number];
+    rotation?: [number, number, number];
+  }>;
+}
 
-type EnvironmentPreset = typeof ENVIRONMENT_PRESETS[number]['id'];
+const STUDIO_PRESETS: StudioPreset[] = [
+  {
+    id: 'white-studio',
+    name: 'White Studio',
+    backgroundColor: '#ffffff',
+    lights: [
+      { color: '#ffffff', intensity: 2, position: [0, 5, -5], scale: [10, 5, 1] },
+      { color: '#ffffff', intensity: 1.5, position: [-5, 2, 0], scale: [5, 3, 1], rotation: [0, Math.PI / 2, 0] },
+      { color: '#ffffff', intensity: 1.5, position: [5, 2, 0], scale: [5, 3, 1], rotation: [0, -Math.PI / 2, 0] },
+      { color: '#ffffff', intensity: 1, position: [0, -2, 3], scale: [8, 2, 1] },
+      { color: '#ffffff', intensity: 3, position: [0, 8, 0], scale: [15, 15, 1], rotation: [Math.PI / 2, 0, 0] },
+    ],
+  },
+  {
+    id: 'soft-white',
+    name: 'Soft White',
+    backgroundColor: '#f5f5f5',
+    lights: [
+      { color: '#ffffff', intensity: 1.5, position: [0, 4, -4], scale: [12, 6, 1] },
+      { color: '#f0f0ff', intensity: 1, position: [-4, 3, 2], scale: [6, 4, 1], rotation: [0, Math.PI / 3, 0] },
+      { color: '#fff8f0', intensity: 1, position: [4, 3, 2], scale: [6, 4, 1], rotation: [0, -Math.PI / 3, 0] },
+      { color: '#ffffff', intensity: 2, position: [0, 6, 0], scale: [10, 10, 1], rotation: [Math.PI / 2, 0, 0] },
+    ],
+  },
+  {
+    id: 'warm-studio',
+    name: 'Warm Studio',
+    backgroundColor: '#faf5f0',
+    lights: [
+      { color: '#fff5e6', intensity: 2, position: [0, 5, -5], scale: [10, 5, 1] },
+      { color: '#ffe4cc', intensity: 1.5, position: [-5, 2, 0], scale: [5, 3, 1], rotation: [0, Math.PI / 2, 0] },
+      { color: '#fff0e0', intensity: 1.5, position: [5, 2, 0], scale: [5, 3, 1], rotation: [0, -Math.PI / 2, 0] },
+      { color: '#fffaf0', intensity: 2.5, position: [0, 8, 0], scale: [15, 15, 1], rotation: [Math.PI / 2, 0, 0] },
+    ],
+  },
+  {
+    id: 'cool-studio',
+    name: 'Cool Studio',
+    backgroundColor: '#f0f5fa',
+    lights: [
+      { color: '#e6f0ff', intensity: 2, position: [0, 5, -5], scale: [10, 5, 1] },
+      { color: '#d0e0ff', intensity: 1.5, position: [-5, 2, 0], scale: [5, 3, 1], rotation: [0, Math.PI / 2, 0] },
+      { color: '#e0f0ff', intensity: 1.5, position: [5, 2, 0], scale: [5, 3, 1], rotation: [0, -Math.PI / 2, 0] },
+      { color: '#f0f8ff', intensity: 2.5, position: [0, 8, 0], scale: [15, 15, 1], rotation: [Math.PI / 2, 0, 0] },
+    ],
+  },
+  {
+    id: 'dramatic',
+    name: 'Dramatic',
+    backgroundColor: '#1a1a1a',
+    lights: [
+      { color: '#ffffff', intensity: 4, position: [3, 5, -3], scale: [4, 4, 1] },
+      { color: '#4488ff', intensity: 1, position: [-5, 2, 2], scale: [3, 2, 1], rotation: [0, Math.PI / 2, 0] },
+      { color: '#ff8844', intensity: 1.5, position: [0, 0, -5], scale: [6, 2, 1] },
+    ],
+  },
+  {
+    id: 'product',
+    name: 'Product Shot',
+    backgroundColor: '#f8f8f8',
+    lights: [
+      { color: '#ffffff', intensity: 2.5, position: [0, 6, -4], scale: [8, 4, 1] },
+      { color: '#ffffff', intensity: 2, position: [-4, 4, 2], scale: [4, 3, 1], rotation: [0, Math.PI / 3, 0] },
+      { color: '#ffffff', intensity: 2, position: [4, 4, 2], scale: [4, 3, 1], rotation: [0, -Math.PI / 3, 0] },
+      { color: '#ffffff', intensity: 1, position: [0, -1, 4], scale: [6, 2, 1] },
+      { color: '#ffffff', intensity: 3, position: [0, 10, 0], scale: [12, 12, 1], rotation: [Math.PI / 2, 0, 0] },
+    ],
+  },
+];
+
+type StudioPresetId = typeof STUDIO_PRESETS[number]['id'];
 
 // Background presets
 const BACKGROUND_PRESETS = [
@@ -231,7 +303,7 @@ function SceneContent({
   autoRotate,
   showGrid,
   wireframe,
-  environment,
+  studioPreset,
   showEnvironmentBackground,
   modelRotation,
   lighting,
@@ -246,7 +318,7 @@ function SceneContent({
   autoRotate: boolean;
   showGrid: boolean;
   wireframe: boolean;
-  environment: EnvironmentPreset;
+  studioPreset: StudioPreset;
   showEnvironmentBackground: boolean;
   modelRotation: [number, number, number];
   lighting: LightingPreset;
@@ -416,12 +488,34 @@ function SceneContent({
         intensity={0.4 * intensityMultiplier}
       />
 
-      {/* Environment for reflections - REQUIRED for metallic surfaces */}
+      {/* Custom Studio Environment with Lightformers - No external HDR needed */}
       <Environment 
-        preset={environment} 
         background={showEnvironmentBackground}
-        backgroundBlurriness={0.4}
-        backgroundIntensity={0.5}
+        resolution={256}
+      >
+        {/* Studio Lightformers for reflections */}
+        {studioPreset.lights.map((light, index) => (
+          <Lightformer
+            key={index}
+            form="rect"
+            color={light.color}
+            intensity={light.intensity * lightIntensity}
+            position={light.position}
+            scale={light.scale}
+            rotation={light.rotation || [0, 0, 0]}
+          />
+        ))}
+        {/* Background color */}
+        <color attach="background" args={[studioPreset.backgroundColor]} />
+      </Environment>
+      
+      {/* Contact shadows for grounding */}
+      <ContactShadows
+        position={[0, -0.5, 0]}
+        opacity={0.4}
+        scale={10}
+        blur={2}
+        far={4}
       />
 
       {/* Grid */}
@@ -550,7 +644,7 @@ export default function ThreeDViewContent() {
   const [wireframe, setWireframe] = useState(false);
   const [materialType, setMaterialType] = useState<'metal' | 'stone'>('metal');
   const [snapshotPreview, setSnapshotPreview] = useState<string | null>(null);
-  const [environment, setEnvironment] = useState<EnvironmentPreset>('studio');
+  const [selectedStudio, setSelectedStudio] = useState<StudioPreset>(STUDIO_PRESETS[0]); // White Studio
   const [backgroundColor, setBackgroundColor] = useState('#0a0a0a');
   const [snapshotScale, setSnapshotScale] = useState<1 | 2 | 4>(1);
   const [isDragging, setIsDragging] = useState(false);
@@ -961,10 +1055,10 @@ export default function ThreeDViewContent() {
               failIfMajorPerformanceCaveat: false,
               powerPreference: 'default',
             }}
-            style={{ background: backgroundColor }}
+            style={{ background: '#000000' }}
             onCreated={(state) => {
               // Ensure WebGL context is properly initialized
-              state.gl.setClearColor(backgroundColor);
+              state.gl.setClearColor('#000000');
             }}
           >
             <Suspense fallback={null}>
@@ -976,7 +1070,7 @@ export default function ThreeDViewContent() {
                 autoRotate={autoRotate}
                 showGrid={showGrid && !isSnapshotMode}
                 wireframe={wireframe}
-                environment={environment}
+                studioPreset={selectedStudio}
                 showEnvironmentBackground={showEnvBackground && !isSnapshotMode}
                 modelRotation={modelRotation}
                 lighting={selectedLighting}
@@ -1103,18 +1197,18 @@ export default function ThreeDViewContent() {
                 </div>
               </div>
 
-              {/* Environment */}
+              {/* Studio Environment */}
               <div className="mb-4">
                 <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
-                  Environment (HDR)
+                  Studio Environment
                 </h3>
-                <div className="grid grid-cols-4 gap-1 mb-3">
-                  {ENVIRONMENT_PRESETS.map((preset) => (
+                <div className="grid grid-cols-3 gap-1 mb-3">
+                  {STUDIO_PRESETS.map((preset) => (
                     <button
                       key={preset.id}
-                      onClick={() => setEnvironment(preset.id)}
+                      onClick={() => setSelectedStudio(preset)}
                       className={`rounded-md py-1.5 text-[10px] transition-all ${
-                        environment === preset.id
+                        selectedStudio.id === preset.id
                           ? 'bg-purple-500/30 text-purple-300 ring-1 ring-purple-500/50'
                           : 'bg-white/5 text-white/50 hover:bg-white/10'
                       }`}
@@ -1125,7 +1219,7 @@ export default function ThreeDViewContent() {
                 </div>
                 {/* Show Background Toggle */}
                 <label className="flex items-center justify-between cursor-pointer">
-                  <span className="text-[10px] text-white/50">Show HDR Background</span>
+                  <span className="text-[10px] text-white/50">Show Background</span>
                   <button
                     onClick={() => setShowEnvBackground(!showEnvBackground)}
                     className={`relative w-9 h-5 rounded-full transition-colors ${
@@ -1140,7 +1234,7 @@ export default function ThreeDViewContent() {
                   </button>
                 </label>
                 <p className="mt-2 text-[10px] text-white/30">
-                  HDR provides reflections for metallic surfaces.
+                  Custom studio lighting - no external files needed.
                 </p>
               </div>
 
