@@ -109,6 +109,67 @@ const BACKGROUND_PRESETS = [
   { id: 'gradient', name: 'Gradient', color: 'linear-gradient(180deg, #1a1a2e 0%, #0a0a0a 100%)' },
 ];
 
+// Lighting presets
+interface LightingPreset {
+  id: string;
+  name: string;
+  ambient: number;
+  main: { intensity: number; color: string; position: [number, number, number] };
+  fill: { intensity: number; color: string; position: [number, number, number] };
+  back: { intensity: number; color: string; position: [number, number, number] };
+}
+
+const LIGHTING_PRESETS: LightingPreset[] = [
+  {
+    id: 'studio',
+    name: 'Studio',
+    ambient: 0.6,
+    main: { intensity: 2.0, color: '#ffffff', position: [5, 8, 5] },
+    fill: { intensity: 1.0, color: '#e0e8ff', position: [-5, 3, -3] },
+    back: { intensity: 0.8, color: '#fff5e0', position: [0, 5, -8] },
+  },
+  {
+    id: 'dramatic',
+    name: 'Dramatic',
+    ambient: 0.2,
+    main: { intensity: 3.0, color: '#ffffff', position: [8, 10, 2] },
+    fill: { intensity: 0.3, color: '#4488ff', position: [-8, 2, -5] },
+    back: { intensity: 1.5, color: '#ff8844', position: [-3, 8, -10] },
+  },
+  {
+    id: 'soft',
+    name: 'Soft',
+    ambient: 1.0,
+    main: { intensity: 1.2, color: '#fff8f0', position: [3, 6, 4] },
+    fill: { intensity: 0.8, color: '#f0f8ff', position: [-4, 4, 2] },
+    back: { intensity: 0.5, color: '#ffffff', position: [0, 3, -5] },
+  },
+  {
+    id: 'warm',
+    name: 'Warm',
+    ambient: 0.5,
+    main: { intensity: 2.0, color: '#ffddaa', position: [5, 7, 5] },
+    fill: { intensity: 0.8, color: '#ffcc88', position: [-5, 4, 0] },
+    back: { intensity: 0.6, color: '#ff9966', position: [0, 5, -6] },
+  },
+  {
+    id: 'cool',
+    name: 'Cool',
+    ambient: 0.5,
+    main: { intensity: 2.0, color: '#e0f0ff', position: [5, 7, 5] },
+    fill: { intensity: 0.8, color: '#aaccff', position: [-5, 4, 0] },
+    back: { intensity: 0.6, color: '#88aaff', position: [0, 5, -6] },
+  },
+  {
+    id: 'product',
+    name: 'Product',
+    ambient: 0.8,
+    main: { intensity: 1.8, color: '#ffffff', position: [0, 10, 5] },
+    fill: { intensity: 1.2, color: '#ffffff', position: [-6, 5, 3] },
+    back: { intensity: 1.2, color: '#ffffff', position: [6, 5, 3] },
+  },
+];
+
 // 3D Model component
 function Model({ 
   geometry, 
@@ -170,6 +231,8 @@ function SceneContent({
   wireframe,
   environment,
   modelRotation,
+  lighting,
+  lightIntensity,
   onControlsReady,
   onFitToView,
 }: {
@@ -182,6 +245,8 @@ function SceneContent({
   wireframe: boolean;
   environment: EnvironmentPreset;
   modelRotation: [number, number, number];
+  lighting: LightingPreset;
+  lightIntensity: number;
   onControlsReady: (controls: any) => void;
   onFitToView: (fitFn: () => void) => void;
 }) {
@@ -309,32 +374,42 @@ function SceneContent({
     }
   }, [layers, camera]);
 
+  // Calculate final intensities with global multiplier
+  const intensityMultiplier = lightIntensity;
+
   return (
     <>
-      {/* Strong Lighting - works without Environment */}
-      <ambientLight intensity={0.8} />
+      {/* Ambient Light */}
+      <ambientLight intensity={lighting.ambient * intensityMultiplier} />
+      
+      {/* Main Key Light */}
       <directionalLight
-        position={[5, 10, 5]}
-        intensity={1.5}
+        position={lighting.main.position}
+        intensity={lighting.main.intensity * intensityMultiplier}
+        color={lighting.main.color}
         castShadow
         shadow-mapSize={2048}
       />
+      
+      {/* Fill Light */}
       <directionalLight
-        position={[-5, 5, -5]}
-        intensity={0.8}
+        position={lighting.fill.position}
+        intensity={lighting.fill.intensity * intensityMultiplier}
+        color={lighting.fill.color}
       />
+      
+      {/* Back/Rim Light */}
       <directionalLight
-        position={[0, -5, 0]}
-        intensity={0.3}
+        position={lighting.back.position}
+        intensity={lighting.back.intensity * intensityMultiplier}
+        color={lighting.back.color}
       />
-      <pointLight position={[10, 10, 10]} intensity={0.5} />
-      <pointLight position={[-10, -10, -10]} intensity={0.3} />
       
       {/* Hemisphere light for better ambient */}
       <hemisphereLight
         color="#ffffff"
         groundColor="#444444"
-        intensity={0.6}
+        intensity={0.4 * intensityMultiplier}
       />
 
       {/* Environment for reflections - only load if not 'none' */}
@@ -413,13 +488,15 @@ function SceneContent({
         target={[0, 0, 0]}
       />
       
-      {/* Axis Gizmo in corner */}
-      <GizmoHelper alignment="bottom-right" margin={[80, 80]}>
-        <GizmoViewport 
-          axisColors={['#ff4444', '#44ff44', '#4444ff']} 
-          labelColor="white"
-        />
-      </GizmoHelper>
+      {/* Axis Gizmo in corner - hide during snapshot */}
+      {showGrid && (
+        <GizmoHelper alignment="bottom-right" margin={[80, 80]}>
+          <GizmoViewport 
+            axisColors={['#ff4444', '#44ff44', '#4444ff']} 
+            labelColor="white"
+          />
+        </GizmoHelper>
+      )}
     </>
   );
 }
@@ -473,6 +550,9 @@ export default function ThreeDViewContent() {
   const [modelInfo, setModelInfo] = useState<{ vertices: number; faces: number } | null>(null);
   const [fitToViewFn, setFitToViewFn] = useState<(() => void) | null>(null);
   const [modelRotation, setModelRotation] = useState<[number, number, number]>([-Math.PI / 2, 0, 0]); // Default Z-up to Y-up
+  const [selectedLighting, setSelectedLighting] = useState<LightingPreset>(LIGHTING_PRESETS[0]); // Studio default
+  const [lightIntensity, setLightIntensity] = useState(1.0); // Global intensity multiplier
+  const [isSnapshotMode, setIsSnapshotMode] = useState(false); // Hide grid during snapshot
   
   // Layer state (for future 3DM support)
   const [layers, setLayers] = useState<ModelLayer[]>([]);
@@ -595,7 +675,17 @@ export default function ThreeDViewContent() {
 
   // Take snapshot
   const handleSnapshot = useCallback(() => {
-    window.dispatchEvent(new CustomEvent('take-3d-snapshot', { detail: { scale: snapshotScale } }));
+    // Hide grid and gizmo during snapshot
+    setIsSnapshotMode(true);
+    
+    // Wait for next frame to render without grid, then take snapshot
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        window.dispatchEvent(new CustomEvent('take-3d-snapshot', { detail: { scale: snapshotScale } }));
+        // Restore grid after snapshot
+        setTimeout(() => setIsSnapshotMode(false), 100);
+      });
+    });
   }, [snapshotScale]);
 
   // Handle snapshot result
@@ -876,10 +966,12 @@ export default function ThreeDViewContent() {
                 layers={layers}
                 layerMaterials={layerMaterials}
                 autoRotate={autoRotate}
-                showGrid={showGrid}
+                showGrid={showGrid && !isSnapshotMode}
                 wireframe={wireframe}
                 environment={environment}
                 modelRotation={modelRotation}
+                lighting={selectedLighting}
+                lightIntensity={lightIntensity}
                 onControlsReady={(controls) => { controlsRef.current = controls; }}
                 onFitToView={(fn) => setFitToViewFn(() => fn)}
               />
@@ -963,10 +1055,49 @@ export default function ThreeDViewContent() {
                 )}
               </div>
 
+              {/* Lighting */}
+              <div className="mb-4">
+                <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
+                  Lighting
+                </h3>
+                {/* Lighting Presets */}
+                <div className="grid grid-cols-3 gap-1 mb-3">
+                  {LIGHTING_PRESETS.map((preset) => (
+                    <button
+                      key={preset.id}
+                      onClick={() => setSelectedLighting(preset)}
+                      className={`rounded-md py-2 text-xs transition-all ${
+                        selectedLighting.id === preset.id
+                          ? 'bg-purple-500/30 text-purple-300 ring-1 ring-purple-500/50'
+                          : 'bg-white/5 text-white/50 hover:bg-white/10'
+                      }`}
+                    >
+                      {preset.name}
+                    </button>
+                  ))}
+                </div>
+                {/* Intensity Slider */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-white/40">Intensity</span>
+                    <span className="text-[10px] text-white/60">{Math.round(lightIntensity * 100)}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0.1"
+                    max="3"
+                    step="0.1"
+                    value={lightIntensity}
+                    onChange={(e) => setLightIntensity(parseFloat(e.target.value))}
+                    className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-purple-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer"
+                  />
+                </div>
+              </div>
+
               {/* Environment */}
               <div className="mb-4">
                 <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
-                  Environment
+                  Environment (HDR)
                 </h3>
                 <div className="grid grid-cols-3 gap-1">
                   {ENVIRONMENT_PRESETS.map((preset) => (
@@ -983,6 +1114,9 @@ export default function ThreeDViewContent() {
                     </button>
                   ))}
                 </div>
+                <p className="mt-2 text-[10px] text-white/30">
+                  HDR environments add reflections. May cause loading delays.
+                </p>
               </div>
 
               {/* Background */}
@@ -1167,7 +1301,7 @@ export default function ThreeDViewContent() {
                       className="w-full"
                     />
                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/70 opacity-0 transition-opacity hover:opacity-100">
-                      <div className="flex gap-2">
+                      <div className="flex flex-wrap justify-center gap-2">
                         <button
                           onClick={handleDownloadSnapshot}
                           className="flex items-center gap-1 rounded-lg bg-purple-500 px-3 py-2 text-xs font-medium text-white hover:bg-purple-600"
@@ -1182,6 +1316,13 @@ export default function ThreeDViewContent() {
                           <Image className="h-3.5 w-3.5" />
                           Gallery
                         </button>
+                        <a
+                          href={`/studio?image=${encodeURIComponent(snapshotPreview || '')}`}
+                          className="flex items-center gap-1 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-3 py-2 text-xs font-medium text-white hover:from-purple-600 hover:to-pink-600"
+                        >
+                          <Palette className="h-3.5 w-3.5" />
+                          Studio
+                        </a>
                       </div>
                       <button
                         onClick={() => setSnapshotPreview(null)}
