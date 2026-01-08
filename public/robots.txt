@@ -1,22 +1,52 @@
 # Jewelshot Studio - Robots.txt
+# https://jewelshot.com
 
 # Allow all crawlers
 User-agent: *
 Allow: /
 
-# Disallow admin and API routes
+# Public pages to crawl
+Allow: /studio
+Allow: /editor
+Allow: /batch
+Allow: /3d-view
+Allow: /motion-plus
+Allow: /brand-lab
+Allow: /design-office
+Allow: /library
+Allow: /catalogue
+Allow: /auth/login
+Allow: /auth/signup
+Allow: /docs/api
+
+# Disallow private/user pages
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /gallery
+Disallow: /admin
+Disallow: /setup
+
+# Disallow API and system routes
 Disallow: /api/
 Disallow: /auth/callback
+Disallow: /auth/reset-password
+Disallow: /auth/verify-email
+Disallow: /maintenance
+Disallow: /_next/
+Disallow: /sentry-*
 
 # Sitemap location
 Sitemap: https://jewelshot.com/sitemap.xml
 
-# Crawl delay (optional, be nice to servers)
+# Crawl delay (be nice to servers)
 Crawl-delay: 1
 
+# Google specific
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
 
-
-
-
-
-
+# Bing specific  
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1

@@ -84,14 +84,14 @@ const STONE_PRESETS: MaterialPreset[] = [
   { id: 'amethyst', name: 'Amethyst', color: '#9966CC', metalness: 0, roughness: 0.05, envMapIntensity: 1.8 },
 ];
 
-// Environment presets
+// Environment presets (without emojis per user preference)
 const ENVIRONMENT_PRESETS = [
-  { id: 'studio', name: 'Studio', icon: '🎬' },
-  { id: 'sunset', name: 'Sunset', icon: '🌅' },
-  { id: 'dawn', name: 'Dawn', icon: '🌄' },
-  { id: 'night', name: 'Night', icon: '🌙' },
-  { id: 'warehouse', name: 'Warehouse', icon: '🏭' },
-  { id: 'city', name: 'City', icon: '🏙️' },
+  { id: 'none', name: 'None' },
+  { id: 'studio', name: 'Studio' },
+  { id: 'sunset', name: 'Sunset' },
+  { id: 'dawn', name: 'Dawn' },
+  { id: 'warehouse', name: 'Warehouse' },
+  { id: 'city', name: 'City' },
 ] as const;
 
 type EnvironmentPreset = typeof ENVIRONMENT_PRESETS[number]['id'];
@@ -274,8 +274,10 @@ function SceneContent({
       />
       <pointLight position={[0, 5, 0]} intensity={0.3} />
 
-      {/* Environment for reflections */}
-      <Environment preset={environment} />
+      {/* Environment for reflections - only load if not 'none' */}
+      {environment !== 'none' && (
+        <Environment preset={environment as Exclude<EnvironmentPreset, 'none'>} />
+      )}
 
       {/* Grid */}
       {showGrid && (
@@ -376,7 +378,7 @@ export default function ThreeDViewContent() {
   const [wireframe, setWireframe] = useState(false);
   const [materialType, setMaterialType] = useState<'metal' | 'stone'>('metal');
   const [snapshotPreview, setSnapshotPreview] = useState<string | null>(null);
-  const [environment, setEnvironment] = useState<EnvironmentPreset>('studio');
+  const [environment, setEnvironment] = useState<EnvironmentPreset>('none');
   const [backgroundColor, setBackgroundColor] = useState('#0a0a0a');
   const [snapshotScale, setSnapshotScale] = useState<1 | 2 | 4>(1);
   const [isDragging, setIsDragging] = useState(false);
@@ -713,8 +715,17 @@ export default function ThreeDViewContent() {
           <Canvas
             shadows
             camera={{ position: [3, 2, 3], fov: 50 }}
-            gl={{ preserveDrawingBuffer: true, antialias: true }}
+            gl={{ 
+              preserveDrawingBuffer: true, 
+              antialias: true,
+              failIfMajorPerformanceCaveat: false,
+              powerPreference: 'default',
+            }}
             style={{ background: backgroundColor }}
+            onCreated={(state) => {
+              // Ensure WebGL context is properly initialized
+              state.gl.setClearColor(backgroundColor);
+            }}
           >
             <Suspense fallback={null}>
               <SceneContent

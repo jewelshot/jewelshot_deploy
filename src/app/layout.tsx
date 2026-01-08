@@ -10,6 +10,7 @@ import { GalleryPrefetch } from '@/components/organisms/GalleryPrefetch';
 import GlobalSidebar from '@/components/organisms/GlobalSidebar';
 import { PlausibleAnalytics } from '@/components/analytics/PlausibleAnalytics';
 import { CookieConsent } from '@/components/molecules/CookieConsent';
+import { OrganizationSchema, SoftwareApplicationSchema, WebSiteSchema } from '@/components/seo/StructuredData';
 import './globals.css';
 
 // Note: Environment validation is available in src/lib/env.ts
@@ -129,6 +130,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* Structured Data for SEO */}
+        <OrganizationSchema />
+        <SoftwareApplicationSchema />
+        <WebSiteSchema />
+      </head>
       <body
         className={`${inter.variable} font-sans antialiased`}
         data-theme="purple"
