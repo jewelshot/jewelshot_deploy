@@ -51,6 +51,8 @@
     "@heroicons/react": "^2.2.0",
     "@react-email/components": "^0.5.7",
     "@react-pdf/renderer": "^4.3.1",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.5.0",
     "@sentry/nextjs": "^10.27.0",
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.77.0",
@@ -76,8 +78,10 @@
     "react-email": "^5.0.5",
     "recharts": "^3.5.0",
     "resend": "^6.5.2",
+    "rhino3dm": "^8.17.0",
     "sonner": "^2.0.7",
     "swagger-ui-react": "^5.30.3",
+    "three": "^0.182.0",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
@@ -94,6 +98,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/swagger-ui-react": "^5.18.0",
+    "@types/three": "^0.182.0",
     "@vitejs/plugin-react": "^5.1.1",
     "@vitest/coverage-v8": "^4.0.4",
     "@vitest/ui": "^4.0.4",

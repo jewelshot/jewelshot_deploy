@@ -666,14 +666,14 @@ export default function EditorCanvas() {
   }, [getOriginalImage, saveState, upscaleMode]);
 
   // Tool button component
-  const ToolButton = ({ 
+  const ToolButton = ({
     icon: Icon, 
     label, 
     tool, 
     onClick,
     active,
   }: { 
-    icon: React.ElementType; 
+    icon: React.ComponentType<{ className?: string }>; 
     label: string; 
     tool?: Tool;
     onClick?: () => void;

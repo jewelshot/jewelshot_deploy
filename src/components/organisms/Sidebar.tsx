@@ -31,6 +31,7 @@ import {
   PenTool,
   Edit3,
   Video,
+  Box,
 } from 'lucide-react';
 
 // Tools section (Coming Soon - All tools are integrated in Studio)
@@ -89,6 +90,7 @@ export function Sidebar() {
     { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
     { icon: Palette, label: 'Studio', href: '/studio' },
     { icon: Edit3, label: 'Editor', href: '/editor' },
+    { icon: Box, label: '3D View', href: '/3d-view' },
     { icon: Video, label: 'Motion+', href: '/motion-plus' },
     { icon: Layers, label: 'Batch', href: '/batch' },
     {

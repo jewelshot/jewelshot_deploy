@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { toastManager, Toast, ToastType } from '@/lib/toast-manager';
 
-const iconMap: Record<ToastType, React.ElementType> = {
+const iconMap: Record<ToastType, React.ComponentType<{ className?: string }>> = {
   success: CheckCircle,
   error: AlertCircle,
   warning: AlertTriangle,
