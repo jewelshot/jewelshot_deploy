@@ -13,7 +13,7 @@
 
 import React, { useState, useRef, useCallback, Suspense, useEffect } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
-import { OrbitControls, Center, Environment, Grid } from '@react-three/drei';
+import { OrbitControls, Center, Environment, Grid, GizmoHelper, GizmoViewport } from '@react-three/drei';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 import * as THREE from 'three';
 import {
@@ -43,6 +43,9 @@ import {
   Info,
   Focus,
   Maximize2,
+  RotateCw,
+  FlipHorizontal,
+  FlipVertical,
 } from 'lucide-react';
 import { useSidebarStore } from '@/store/sidebarStore';
 
@@ -166,6 +169,7 @@ function SceneContent({
   showGrid,
   wireframe,
   environment,
+  modelRotation,
   onControlsReady,
   onFitToView,
 }: {
@@ -177,6 +181,7 @@ function SceneContent({
   showGrid: boolean;
   wireframe: boolean;
   environment: EnvironmentPreset;
+  modelRotation: [number, number, number];
   onControlsReady: (controls: any) => void;
   onFitToView: (fitFn: () => void) => void;
 }) {
@@ -306,23 +311,31 @@ function SceneContent({
 
   return (
     <>
-      {/* Lighting */}
-      <ambientLight intensity={0.4} />
-      <spotLight
-        position={[10, 10, 10]}
-        angle={0.15}
-        penumbra={1}
-        intensity={1}
+      {/* Strong Lighting - works without Environment */}
+      <ambientLight intensity={0.8} />
+      <directionalLight
+        position={[5, 10, 5]}
+        intensity={1.5}
         castShadow
         shadow-mapSize={2048}
       />
-      <spotLight
-        position={[-10, 5, -10]}
-        angle={0.3}
-        penumbra={1}
-        intensity={0.5}
+      <directionalLight
+        position={[-5, 5, -5]}
+        intensity={0.8}
       />
-      <pointLight position={[0, 5, 0]} intensity={0.3} />
+      <directionalLight
+        position={[0, -5, 0]}
+        intensity={0.3}
+      />
+      <pointLight position={[10, 10, 10]} intensity={0.5} />
+      <pointLight position={[-10, -10, -10]} intensity={0.3} />
+      
+      {/* Hemisphere light for better ambient */}
+      <hemisphereLight
+        color="#ffffff"
+        groundColor="#444444"
+        intensity={0.6}
+      />
 
       {/* Environment for reflections - only load if not 'none' */}
       {environment !== 'none' && (
@@ -348,23 +361,25 @@ function SceneContent({
 
       {/* STL Model */}
       {geometry && modelTransform && (
-        <group 
-          position={[
-            modelTransform.position.x * modelTransform.scale,
-            modelTransform.position.y * modelTransform.scale,
-            modelTransform.position.z * modelTransform.scale,
-          ]}
-          scale={[modelTransform.scale, modelTransform.scale, modelTransform.scale]}
-        >
-          <mesh ref={meshRef} geometry={geometry} castShadow receiveShadow>
-            <meshStandardMaterial
-              color={material.color}
-              metalness={material.metalness}
-              roughness={material.roughness}
-              envMapIntensity={material.envMapIntensity}
-              wireframe={wireframe}
-            />
-          </mesh>
+        <group rotation={modelRotation}>
+          <group
+            position={[
+              modelTransform.position.x * modelTransform.scale,
+              modelTransform.position.y * modelTransform.scale,
+              modelTransform.position.z * modelTransform.scale,
+            ]}
+            scale={[modelTransform.scale, modelTransform.scale, modelTransform.scale]}
+          >
+            <mesh ref={meshRef} geometry={geometry} castShadow receiveShadow>
+              <meshStandardMaterial
+                color={material.color}
+                metalness={material.metalness}
+                roughness={material.roughness}
+                envMapIntensity={material.envMapIntensity}
+                wireframe={wireframe}
+              />
+            </mesh>
+          </group>
         </group>
       )}
 
@@ -397,6 +412,14 @@ function SceneContent({
         maxDistance={20}
         target={[0, 0, 0]}
       />
+      
+      {/* Axis Gizmo in corner */}
+      <GizmoHelper alignment="bottom-right" margin={[80, 80]}>
+        <GizmoViewport 
+          axisColors={['#ff4444', '#44ff44', '#4444ff']} 
+          labelColor="white"
+        />
+      </GizmoHelper>
     </>
   );
 }
@@ -449,6 +472,7 @@ export default function ThreeDViewContent() {
   const [isDragging, setIsDragging] = useState(false);
   const [modelInfo, setModelInfo] = useState<{ vertices: number; faces: number } | null>(null);
   const [fitToViewFn, setFitToViewFn] = useState<(() => void) | null>(null);
+  const [modelRotation, setModelRotation] = useState<[number, number, number]>([-Math.PI / 2, 0, 0]); // Default Z-up to Y-up
   
   // Layer state (for future 3DM support)
   const [layers, setLayers] = useState<ModelLayer[]>([]);
@@ -554,6 +578,19 @@ export default function ThreeDViewContent() {
       camera.position.multiplyScalar(1.25);
       controlsRef.current.update();
     }
+  }, []);
+
+  // Rotate model 90 degrees
+  const handleRotateX = useCallback(() => {
+    setModelRotation(prev => [prev[0] + Math.PI / 2, prev[1], prev[2]]);
+  }, []);
+
+  const handleRotateY = useCallback(() => {
+    setModelRotation(prev => [prev[0], prev[1] + Math.PI / 2, prev[2]]);
+  }, []);
+
+  const handleRotateZ = useCallback(() => {
+    setModelRotation(prev => [prev[0], prev[1], prev[2] + Math.PI / 2]);
   }, []);
 
   // Take snapshot
@@ -694,6 +731,36 @@ export default function ThreeDViewContent() {
 
           <div className="mx-1 h-4 w-px bg-white/10" />
 
+          {/* Rotation Controls */}
+          <div className="flex items-center gap-0.5 rounded-md border border-white/10 bg-white/5 px-1">
+            <button
+              onClick={handleRotateX}
+              disabled={!loadedGeometry}
+              className="flex h-7 w-7 items-center justify-center rounded text-white/60 hover:bg-white/10 disabled:opacity-30"
+              title="Rotate X (90°)"
+            >
+              <span className="text-[10px] font-medium">X</span>
+            </button>
+            <button
+              onClick={handleRotateY}
+              disabled={!loadedGeometry}
+              className="flex h-7 w-7 items-center justify-center rounded text-white/60 hover:bg-white/10 disabled:opacity-30"
+              title="Rotate Y (90°)"
+            >
+              <span className="text-[10px] font-medium">Y</span>
+            </button>
+            <button
+              onClick={handleRotateZ}
+              disabled={!loadedGeometry}
+              className="flex h-7 w-7 items-center justify-center rounded text-white/60 hover:bg-white/10 disabled:opacity-30"
+              title="Rotate Z (90°)"
+            >
+              <span className="text-[10px] font-medium">Z</span>
+            </button>
+          </div>
+
+          <div className="mx-1 h-4 w-px bg-white/10" />
+
           <button
             onClick={() => fitToViewFn?.()}
             disabled={!loadedGeometry}
@@ -812,6 +879,7 @@ export default function ThreeDViewContent() {
                 showGrid={showGrid}
                 wireframe={wireframe}
                 environment={environment}
+                modelRotation={modelRotation}
                 onControlsReady={(controls) => { controlsRef.current = controls; }}
                 onFitToView={(fn) => setFitToViewFn(() => fn)}
               />
