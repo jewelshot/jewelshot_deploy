@@ -41,6 +41,8 @@ import {
   Moon,
   Palette,
   Info,
+  Focus,
+  Maximize2,
 } from 'lucide-react';
 import { useSidebarStore } from '@/store/sidebarStore';
 
@@ -165,6 +167,7 @@ function SceneContent({
   wireframe,
   environment,
   onControlsReady,
+  onFitToView,
 }: {
   geometry: THREE.BufferGeometry | null;
   material: MaterialPreset;
@@ -175,11 +178,16 @@ function SceneContent({
   wireframe: boolean;
   environment: EnvironmentPreset;
   onControlsReady: (controls: any) => void;
+  onFitToView: (fitFn: () => void) => void;
 }) {
   const controlsRef = useRef<any>(null);
   const groupRef = useRef<THREE.Group>(null);
+  const meshRef = useRef<THREE.Mesh>(null);
   const { camera } = useThree();
-  const hasInitialized = useRef(false);
+  const [modelTransform, setModelTransform] = useState<{
+    position: THREE.Vector3;
+    scale: number;
+  } | null>(null);
 
   useEffect(() => {
     if (controlsRef.current) {
@@ -187,9 +195,50 @@ function SceneContent({
     }
   }, [onControlsReady]);
 
+  // Fit camera to model
+  const fitToView = useCallback(() => {
+    if (!controlsRef.current) return;
+    
+    // Calculate bounding box
+    const box = new THREE.Box3();
+    
+    if (geometry) {
+      const tempGeom = geometry.clone();
+      tempGeom.computeBoundingBox();
+      if (tempGeom.boundingBox) {
+        box.copy(tempGeom.boundingBox);
+      }
+    }
+    
+    if (box.isEmpty()) return;
+    
+    const center = new THREE.Vector3();
+    box.getCenter(center);
+    
+    const size = new THREE.Vector3();
+    box.getSize(size);
+    const maxDim = Math.max(size.x, size.y, size.z);
+    
+    // Position camera to see the whole model
+    const fov = 50 * (Math.PI / 180);
+    const cameraDistance = (maxDim / 2) / Math.tan(fov / 2) * 2.5;
+    
+    camera.position.set(cameraDistance, cameraDistance * 0.7, cameraDistance);
+    camera.lookAt(0, 0, 0);
+    
+    controlsRef.current.target.set(0, 0, 0);
+    controlsRef.current.update();
+  }, [geometry, camera]);
+
+  // Expose fitToView function
+  useEffect(() => {
+    onFitToView(fitToView);
+  }, [fitToView, onFitToView]);
+
   // Center and scale model when loaded (STL)
   useEffect(() => {
-    if (geometry && !hasInitialized.current) {
+    if (geometry) {
+      // Clone geometry to avoid modifying original
       geometry.computeBoundingBox();
       geometry.computeBoundingSphere();
       
@@ -197,27 +246,34 @@ function SceneContent({
       if (boundingBox) {
         const center = new THREE.Vector3();
         boundingBox.getCenter(center);
-        geometry.translate(-center.x, -center.y, -center.z);
         
         const size = new THREE.Vector3();
         boundingBox.getSize(size);
         const maxDim = Math.max(size.x, size.y, size.z);
-        const scale = 2 / maxDim;
-        geometry.scale(scale, scale, scale);
+        const scale = maxDim > 0 ? 2 / maxDim : 1;
+        
+        setModelTransform({
+          position: new THREE.Vector3(-center.x, -center.y, -center.z),
+          scale: scale,
+        });
+        
+        // Auto fit to view after loading
+        setTimeout(() => {
+          camera.position.set(4, 3, 4);
+          if (controlsRef.current) {
+            controlsRef.current.target.set(0, 0, 0);
+            controlsRef.current.update();
+          }
+        }, 100);
       }
-
-      camera.position.set(3, 2, 3);
-      if (controlsRef.current) {
-        controlsRef.current.target.set(0, 0, 0);
-        controlsRef.current.update();
-      }
-      hasInitialized.current = true;
+    } else {
+      setModelTransform(null);
     }
   }, [geometry, camera]);
 
   // Center and scale layers (3DM)
   useEffect(() => {
-    if (layers.length > 0 && groupRef.current && !hasInitialized.current) {
+    if (layers.length > 0 && groupRef.current) {
       // Compute combined bounding box
       const combinedBox = new THREE.Box3();
       
@@ -240,19 +296,13 @@ function SceneContent({
       groupRef.current.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
       groupRef.current.scale.set(scale, scale, scale);
 
-      camera.position.set(3, 2, 3);
+      camera.position.set(4, 3, 4);
       if (controlsRef.current) {
         controlsRef.current.target.set(0, 0, 0);
         controlsRef.current.update();
       }
-      hasInitialized.current = true;
     }
   }, [layers, camera]);
-
-  // Reset initialization flag when model changes
-  useEffect(() => {
-    hasInitialized.current = false;
-  }, [geometry, layers.length]);
 
   return (
     <>
@@ -297,10 +347,25 @@ function SceneContent({
       )}
 
       {/* STL Model */}
-      {geometry && (
-        <Center>
-          <Model geometry={geometry} material={material} wireframe={wireframe} />
-        </Center>
+      {geometry && modelTransform && (
+        <group 
+          position={[
+            modelTransform.position.x * modelTransform.scale,
+            modelTransform.position.y * modelTransform.scale,
+            modelTransform.position.z * modelTransform.scale,
+          ]}
+          scale={[modelTransform.scale, modelTransform.scale, modelTransform.scale]}
+        >
+          <mesh ref={meshRef} geometry={geometry} castShadow receiveShadow>
+            <meshStandardMaterial
+              color={material.color}
+              metalness={material.metalness}
+              roughness={material.roughness}
+              envMapIntensity={material.envMapIntensity}
+              wireframe={wireframe}
+            />
+          </mesh>
+        </group>
       )}
 
       {/* 3DM Layers */}
@@ -383,6 +448,7 @@ export default function ThreeDViewContent() {
   const [snapshotScale, setSnapshotScale] = useState<1 | 2 | 4>(1);
   const [isDragging, setIsDragging] = useState(false);
   const [modelInfo, setModelInfo] = useState<{ vertices: number; faces: number } | null>(null);
+  const [fitToViewFn, setFitToViewFn] = useState<(() => void) | null>(null);
   
   // Layer state (for future 3DM support)
   const [layers, setLayers] = useState<ModelLayer[]>([]);
@@ -629,6 +695,15 @@ export default function ThreeDViewContent() {
           <div className="mx-1 h-4 w-px bg-white/10" />
 
           <button
+            onClick={() => fitToViewFn?.()}
+            disabled={!loadedGeometry}
+            className="flex h-8 items-center gap-1.5 rounded-md bg-white/5 px-2.5 text-xs text-white/60 hover:bg-white/10 disabled:opacity-30"
+            title="Fit to View (Center model)"
+          >
+            <Maximize2 className="h-3.5 w-3.5" />
+          </button>
+
+          <button
             onClick={handleResetView}
             className="flex h-8 items-center gap-1.5 rounded-md bg-white/5 px-2.5 text-xs text-white/60 hover:bg-white/10"
             title="Reset View"
@@ -738,6 +813,7 @@ export default function ThreeDViewContent() {
                 wireframe={wireframe}
                 environment={environment}
                 onControlsReady={(controls) => { controlsRef.current = controls; }}
+                onFitToView={(fn) => setFitToViewFn(() => fn)}
               />
               <SnapshotHelper onSnapshot={handleSnapshotResult} />
             </Suspense>
