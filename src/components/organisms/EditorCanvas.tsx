@@ -79,6 +79,13 @@ export default function EditorCanvas() {
   const [showInpaintModal, setShowInpaintModal] = useState(false);
   const [inpaintError, setInpaintError] = useState<string | null>(null);
   
+  // AI operations state
+  const [isRemovingBg, setIsRemovingBg] = useState(false);
+  const [isUpscaling, setIsUpscaling] = useState(false);
+  const [showUpscaleModal, setShowUpscaleModal] = useState(false);
+  const [upscaleMode, setUpscaleMode] = useState<'2x' | '4x'>('2x');
+  const [aiError, setAiError] = useState<string | null>(null);
+  
   // Filter state
   const [adjustFilters, setAdjustFilters] = useState<AdjustState>({
     brightness: 0,
@@ -516,6 +523,148 @@ export default function EditorCanvas() {
     }
   }, [inpaintPrompt, getOriginalImage, generateMaskImage, saveState]);
 
+  // Remove Background
+  const handleRemoveBackground = useCallback(async () => {
+    const imageUrl = getOriginalImage();
+    if (!imageUrl) {
+      setAiError('No image to process');
+      return;
+    }
+
+    setIsRemovingBg(true);
+    setAiError(null);
+
+    try {
+      const response = await fetch('/api/ai/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          operation: 'remove-bg',
+          params: { image_url: imageUrl },
+          priority: 'urgent',
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || data.error || 'Background removal failed');
+      }
+
+      if (data.status === 'completed' && data.result?.data?.imageUrl) {
+        const canvas = fabricRef.current!;
+        
+        FabricImage.fromURL(data.result.data.imageUrl, { crossOrigin: 'anonymous' }).then((img) => {
+          const canvasWidth = canvas.getWidth();
+          const canvasHeight = canvas.getHeight();
+          const imgWidth = img.width || 1;
+          const imgHeight = img.height || 1;
+          
+          const scale = Math.min(
+            (canvasWidth * 0.8) / imgWidth,
+            (canvasHeight * 0.8) / imgHeight
+          );
+
+          img.scale(scale);
+          img.set({
+            left: (canvasWidth - imgWidth * scale) / 2,
+            top: (canvasHeight - imgHeight * scale) / 2,
+            selectable: true,
+          });
+
+          canvas.clear();
+          canvas.backgroundColor = '#1a1a1a';
+          canvas.add(img);
+          canvas.renderAll();
+          
+          saveState();
+        });
+      } else {
+        throw new Error('Unexpected response from server');
+      }
+    } catch (error) {
+      console.error('Remove BG error:', error);
+      setAiError(error instanceof Error ? error.message : 'Background removal failed');
+    } finally {
+      setIsRemovingBg(false);
+    }
+  }, [getOriginalImage, saveState]);
+
+  // AI Upscale
+  const handleUpscale = useCallback(async () => {
+    const imageUrl = getOriginalImage();
+    if (!imageUrl) {
+      setAiError('No image to upscale');
+      return;
+    }
+
+    setIsUpscaling(true);
+    setAiError(null);
+
+    try {
+      // Determine target resolution based on mode
+      const targetResolution = upscaleMode === '4x' ? '4320p' : '2160p';
+      
+      const response = await fetch('/api/ai/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          operation: 'upscale',
+          params: { 
+            image_url: imageUrl,
+            target_resolution: targetResolution,
+            upscale_mode: 'target',
+          },
+          priority: 'urgent',
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || data.error || 'Upscaling failed');
+      }
+
+      if (data.status === 'completed' && data.result?.data?.imageUrl) {
+        const canvas = fabricRef.current!;
+        
+        FabricImage.fromURL(data.result.data.imageUrl, { crossOrigin: 'anonymous' }).then((img) => {
+          const canvasWidth = canvas.getWidth();
+          const canvasHeight = canvas.getHeight();
+          const imgWidth = img.width || 1;
+          const imgHeight = img.height || 1;
+          
+          const scale = Math.min(
+            (canvasWidth * 0.8) / imgWidth,
+            (canvasHeight * 0.8) / imgHeight
+          );
+
+          img.scale(scale);
+          img.set({
+            left: (canvasWidth - imgWidth * scale) / 2,
+            top: (canvasHeight - imgHeight * scale) / 2,
+            selectable: true,
+          });
+
+          canvas.clear();
+          canvas.backgroundColor = '#1a1a1a';
+          canvas.add(img);
+          canvas.renderAll();
+          
+          saveState();
+          setShowUpscaleModal(false);
+        });
+      } else {
+        throw new Error('Unexpected response from server');
+      }
+    } catch (error) {
+      console.error('Upscale error:', error);
+      setAiError(error instanceof Error ? error.message : 'Upscaling failed');
+    } finally {
+      setIsUpscaling(false);
+    }
+  }, [getOriginalImage, saveState, upscaleMode]);
+
   // Tool button component
   const ToolButton = ({ 
     icon: Icon, 
@@ -780,9 +929,10 @@ export default function EditorCanvas() {
 
       {/* Bottom AI Tools Bar */}
       <div className="flex h-14 items-center justify-center gap-2 border-t border-white/10 bg-black/40 px-4 backdrop-blur-sm">
+        {/* Inpaint */}
         <button
           onClick={() => setActiveTool('inpaint')}
-          disabled={!hasImage}
+          disabled={!hasImage || isRemovingBg || isUpscaling}
           className={`flex h-9 items-center gap-2 rounded-lg border px-4 text-sm transition-all disabled:cursor-not-allowed disabled:opacity-30 ${
             activeTool === 'inpaint'
               ? 'border-purple-500/50 bg-purple-500/20 text-purple-300'
@@ -792,27 +942,72 @@ export default function EditorCanvas() {
           <Wand2 className="h-4 w-4" />
           Inpaint
         </button>
+
+        {/* Remove BG */}
         <button
-          disabled={!hasImage}
-          className="flex h-9 items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 text-sm text-white/60 transition-all hover:border-white/20 hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+          onClick={handleRemoveBackground}
+          disabled={!hasImage || isRemovingBg || isUpscaling || isInpainting}
+          className={`flex h-9 items-center gap-2 rounded-lg border px-4 text-sm transition-all disabled:cursor-not-allowed disabled:opacity-30 ${
+            isRemovingBg
+              ? 'border-green-500/50 bg-green-500/20 text-green-300'
+              : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20 hover:bg-white/10 hover:text-white'
+          }`}
         >
-          <Scissors className="h-4 w-4" />
-          Remove BG
+          {isRemovingBg ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Removing...
+            </>
+          ) : (
+            <>
+              <Scissors className="h-4 w-4" />
+              Remove BG
+            </>
+          )}
         </button>
+
+        {/* Replace BG - Coming Soon */}
         <button
-          disabled={!hasImage}
-          className="flex h-9 items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 text-sm text-white/60 transition-all hover:border-white/20 hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+          disabled={true}
+          className="flex h-9 items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 text-sm text-white/60 transition-all disabled:cursor-not-allowed disabled:opacity-30"
+          title="Coming Soon"
         >
           <ImagePlus className="h-4 w-4" />
           Replace BG
         </button>
+
+        {/* AI Upscale */}
         <button
-          disabled={!hasImage}
-          className="flex h-9 items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 text-sm text-white/60 transition-all hover:border-white/20 hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+          onClick={() => setShowUpscaleModal(true)}
+          disabled={!hasImage || isRemovingBg || isUpscaling || isInpainting}
+          className={`flex h-9 items-center gap-2 rounded-lg border px-4 text-sm transition-all disabled:cursor-not-allowed disabled:opacity-30 ${
+            isUpscaling
+              ? 'border-blue-500/50 bg-blue-500/20 text-blue-300'
+              : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20 hover:bg-white/10 hover:text-white'
+          }`}
         >
-          <Sparkles className="h-4 w-4" />
-          AI Upscale
+          {isUpscaling ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Upscaling...
+            </>
+          ) : (
+            <>
+              <Sparkles className="h-4 w-4" />
+              AI Upscale
+            </>
+          )}
         </button>
+
+        {/* Error display */}
+        {aiError && (
+          <div className="ml-4 flex items-center gap-2 text-sm text-red-400">
+            <span>{aiError}</span>
+            <button onClick={() => setAiError(null)} className="hover:text-red-300">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Inpaint Modal */}
@@ -867,6 +1062,84 @@ export default function EditorCanvas() {
                   <>
                     <Sparkles className="h-4 w-4" />
                     Apply
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Upscale Modal */}
+      {showUpscaleModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-xl border border-white/10 bg-[#0a0a0a] p-6 shadow-2xl">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-lg font-medium text-white">AI Upscale</h3>
+              <button
+                onClick={() => setShowUpscaleModal(false)}
+                className="rounded-lg p-1 text-white/40 hover:bg-white/10 hover:text-white"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <p className="mb-4 text-sm text-white/50">
+              Choose upscale factor to increase image resolution
+            </p>
+
+            {/* Upscale Mode Selection */}
+            <div className="mb-6 flex gap-3">
+              <button
+                onClick={() => setUpscaleMode('2x')}
+                className={`flex-1 rounded-lg border py-3 text-center transition-all ${
+                  upscaleMode === '2x'
+                    ? 'border-blue-500/50 bg-blue-500/20 text-blue-300'
+                    : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20'
+                }`}
+              >
+                <div className="text-lg font-semibold">2x</div>
+                <div className="text-xs opacity-60">2160p (4K)</div>
+              </button>
+              <button
+                onClick={() => setUpscaleMode('4x')}
+                className={`flex-1 rounded-lg border py-3 text-center transition-all ${
+                  upscaleMode === '4x'
+                    ? 'border-blue-500/50 bg-blue-500/20 text-blue-300'
+                    : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20'
+                }`}
+              >
+                <div className="text-lg font-semibold">4x</div>
+                <div className="text-xs opacity-60">4320p (8K)</div>
+              </button>
+            </div>
+
+            {aiError && (
+              <p className="mb-4 text-sm text-red-400">{aiError}</p>
+            )}
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowUpscaleModal(false)}
+                disabled={isUpscaling}
+                className="rounded-lg px-4 py-2 text-sm text-white/60 hover:bg-white/10 hover:text-white disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUpscale}
+                disabled={isUpscaling}
+                className="flex items-center gap-2 rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isUpscaling ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4" />
+                    Upscale {upscaleMode}
                   </>
                 )}
               </button>
