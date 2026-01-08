@@ -89,14 +89,16 @@ const STONE_PRESETS: MaterialPreset[] = [
   { id: 'amethyst', name: 'Amethyst', color: '#9966CC', metalness: 0, roughness: 0.05, envMapIntensity: 1.8 },
 ];
 
-// Environment presets (without emojis per user preference)
+// Environment presets - these provide reflections for metallic surfaces
 const ENVIRONMENT_PRESETS = [
-  { id: 'none', name: 'None' },
   { id: 'studio', name: 'Studio' },
-  { id: 'sunset', name: 'Sunset' },
-  { id: 'dawn', name: 'Dawn' },
+  { id: 'apartment', name: 'Apartment' },
   { id: 'warehouse', name: 'Warehouse' },
   { id: 'city', name: 'City' },
+  { id: 'sunset', name: 'Sunset' },
+  { id: 'dawn', name: 'Dawn' },
+  { id: 'forest', name: 'Forest' },
+  { id: 'lobby', name: 'Lobby' },
 ] as const;
 
 type EnvironmentPreset = typeof ENVIRONMENT_PRESETS[number]['id'];
@@ -123,50 +125,50 @@ const LIGHTING_PRESETS: LightingPreset[] = [
   {
     id: 'studio',
     name: 'Studio',
-    ambient: 0.6,
-    main: { intensity: 2.0, color: '#ffffff', position: [5, 8, 5] },
-    fill: { intensity: 1.0, color: '#e0e8ff', position: [-5, 3, -3] },
-    back: { intensity: 0.8, color: '#fff5e0', position: [0, 5, -8] },
+    ambient: 1.5,
+    main: { intensity: 4.0, color: '#ffffff', position: [5, 8, 5] },
+    fill: { intensity: 2.5, color: '#e0e8ff', position: [-5, 3, -3] },
+    back: { intensity: 2.0, color: '#fff5e0', position: [0, 5, -8] },
   },
   {
     id: 'dramatic',
     name: 'Dramatic',
-    ambient: 0.2,
-    main: { intensity: 3.0, color: '#ffffff', position: [8, 10, 2] },
-    fill: { intensity: 0.3, color: '#4488ff', position: [-8, 2, -5] },
-    back: { intensity: 1.5, color: '#ff8844', position: [-3, 8, -10] },
+    ambient: 0.8,
+    main: { intensity: 5.0, color: '#ffffff', position: [8, 10, 2] },
+    fill: { intensity: 1.0, color: '#4488ff', position: [-8, 2, -5] },
+    back: { intensity: 3.0, color: '#ff8844', position: [-3, 8, -10] },
   },
   {
     id: 'soft',
     name: 'Soft',
-    ambient: 1.0,
-    main: { intensity: 1.2, color: '#fff8f0', position: [3, 6, 4] },
-    fill: { intensity: 0.8, color: '#f0f8ff', position: [-4, 4, 2] },
-    back: { intensity: 0.5, color: '#ffffff', position: [0, 3, -5] },
+    ambient: 2.5,
+    main: { intensity: 3.0, color: '#fff8f0', position: [3, 6, 4] },
+    fill: { intensity: 2.0, color: '#f0f8ff', position: [-4, 4, 2] },
+    back: { intensity: 1.5, color: '#ffffff', position: [0, 3, -5] },
   },
   {
     id: 'warm',
     name: 'Warm',
-    ambient: 0.5,
-    main: { intensity: 2.0, color: '#ffddaa', position: [5, 7, 5] },
-    fill: { intensity: 0.8, color: '#ffcc88', position: [-5, 4, 0] },
-    back: { intensity: 0.6, color: '#ff9966', position: [0, 5, -6] },
+    ambient: 1.5,
+    main: { intensity: 4.0, color: '#ffddaa', position: [5, 7, 5] },
+    fill: { intensity: 2.0, color: '#ffcc88', position: [-5, 4, 0] },
+    back: { intensity: 1.5, color: '#ff9966', position: [0, 5, -6] },
   },
   {
     id: 'cool',
     name: 'Cool',
-    ambient: 0.5,
-    main: { intensity: 2.0, color: '#e0f0ff', position: [5, 7, 5] },
-    fill: { intensity: 0.8, color: '#aaccff', position: [-5, 4, 0] },
-    back: { intensity: 0.6, color: '#88aaff', position: [0, 5, -6] },
+    ambient: 1.5,
+    main: { intensity: 4.0, color: '#e0f0ff', position: [5, 7, 5] },
+    fill: { intensity: 2.0, color: '#aaccff', position: [-5, 4, 0] },
+    back: { intensity: 1.5, color: '#88aaff', position: [0, 5, -6] },
   },
   {
     id: 'product',
     name: 'Product',
-    ambient: 0.8,
-    main: { intensity: 1.8, color: '#ffffff', position: [0, 10, 5] },
-    fill: { intensity: 1.2, color: '#ffffff', position: [-6, 5, 3] },
-    back: { intensity: 1.2, color: '#ffffff', position: [6, 5, 3] },
+    ambient: 2.0,
+    main: { intensity: 4.0, color: '#ffffff', position: [0, 10, 5] },
+    fill: { intensity: 3.0, color: '#ffffff', position: [-6, 5, 3] },
+    back: { intensity: 3.0, color: '#ffffff', position: [6, 5, 3] },
   },
 ];
 
@@ -230,6 +232,7 @@ function SceneContent({
   showGrid,
   wireframe,
   environment,
+  showEnvironmentBackground,
   modelRotation,
   lighting,
   lightIntensity,
@@ -244,6 +247,7 @@ function SceneContent({
   showGrid: boolean;
   wireframe: boolean;
   environment: EnvironmentPreset;
+  showEnvironmentBackground: boolean;
   modelRotation: [number, number, number];
   lighting: LightingPreset;
   lightIntensity: number;
@@ -412,10 +416,13 @@ function SceneContent({
         intensity={0.4 * intensityMultiplier}
       />
 
-      {/* Environment for reflections - only load if not 'none' */}
-      {environment !== 'none' && (
-        <Environment preset={environment as Exclude<EnvironmentPreset, 'none'>} />
-      )}
+      {/* Environment for reflections - REQUIRED for metallic surfaces */}
+      <Environment 
+        preset={environment} 
+        background={showEnvironmentBackground}
+        backgroundBlurriness={0.4}
+        backgroundIntensity={0.5}
+      />
 
       {/* Grid */}
       {showGrid && (
@@ -543,7 +550,7 @@ export default function ThreeDViewContent() {
   const [wireframe, setWireframe] = useState(false);
   const [materialType, setMaterialType] = useState<'metal' | 'stone'>('metal');
   const [snapshotPreview, setSnapshotPreview] = useState<string | null>(null);
-  const [environment, setEnvironment] = useState<EnvironmentPreset>('none');
+  const [environment, setEnvironment] = useState<EnvironmentPreset>('studio');
   const [backgroundColor, setBackgroundColor] = useState('#0a0a0a');
   const [snapshotScale, setSnapshotScale] = useState<1 | 2 | 4>(1);
   const [isDragging, setIsDragging] = useState(false);
@@ -553,6 +560,7 @@ export default function ThreeDViewContent() {
   const [selectedLighting, setSelectedLighting] = useState<LightingPreset>(LIGHTING_PRESETS[0]); // Studio default
   const [lightIntensity, setLightIntensity] = useState(1.0); // Global intensity multiplier
   const [isSnapshotMode, setIsSnapshotMode] = useState(false); // Hide grid during snapshot
+  const [showEnvBackground, setShowEnvBackground] = useState(true); // Show HDR as background
   
   // Layer state (for future 3DM support)
   const [layers, setLayers] = useState<ModelLayer[]>([]);
@@ -969,6 +977,7 @@ export default function ThreeDViewContent() {
                 showGrid={showGrid && !isSnapshotMode}
                 wireframe={wireframe}
                 environment={environment}
+                showEnvironmentBackground={showEnvBackground && !isSnapshotMode}
                 modelRotation={modelRotation}
                 lighting={selectedLighting}
                 lightIntensity={lightIntensity}
@@ -1099,14 +1108,14 @@ export default function ThreeDViewContent() {
                 <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
                   Environment (HDR)
                 </h3>
-                <div className="grid grid-cols-3 gap-1">
+                <div className="grid grid-cols-4 gap-1 mb-3">
                   {ENVIRONMENT_PRESETS.map((preset) => (
                     <button
                       key={preset.id}
                       onClick={() => setEnvironment(preset.id)}
-                      className={`rounded-md py-2 text-xs transition-all ${
+                      className={`rounded-md py-1.5 text-[10px] transition-all ${
                         environment === preset.id
-                          ? 'bg-white/15 text-white'
+                          ? 'bg-purple-500/30 text-purple-300 ring-1 ring-purple-500/50'
                           : 'bg-white/5 text-white/50 hover:bg-white/10'
                       }`}
                     >
@@ -1114,8 +1123,24 @@ export default function ThreeDViewContent() {
                     </button>
                   ))}
                 </div>
+                {/* Show Background Toggle */}
+                <label className="flex items-center justify-between cursor-pointer">
+                  <span className="text-[10px] text-white/50">Show HDR Background</span>
+                  <button
+                    onClick={() => setShowEnvBackground(!showEnvBackground)}
+                    className={`relative w-9 h-5 rounded-full transition-colors ${
+                      showEnvBackground ? 'bg-purple-500' : 'bg-white/20'
+                    }`}
+                  >
+                    <span 
+                      className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform ${
+                        showEnvBackground ? 'translate-x-4' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                </label>
                 <p className="mt-2 text-[10px] text-white/30">
-                  HDR environments add reflections. May cause loading delays.
+                  HDR provides reflections for metallic surfaces.
                 </p>
               </div>
 
