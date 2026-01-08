@@ -4,13 +4,13 @@
  * Features:
  * - Fabric.js canvas for image editing
  * - Top toolbar with tools
- * - Right panel for adjustments
+ * - Right panel for adjustments (Adjust, Colors tabs)
  * - Bottom AI tools bar
  */
 
 'use client';
 
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import { Canvas as FabricCanvas, FabricImage, PencilBrush, Point } from 'fabric';
 import {
   Upload,
@@ -26,6 +26,7 @@ import {
   RotateCcw,
   Download,
   SlidersHorizontal,
+  Palette,
   Wand2,
   Scissors,
   ImagePlus,
@@ -34,9 +35,12 @@ import {
   ChevronLeft,
 } from 'lucide-react';
 import { useSidebarStore } from '@/store/sidebarStore';
+import AdjustPanel, { AdjustState } from '@/components/molecules/AdjustPanel';
+import ColorsPanel, { ColorFilters } from '@/components/molecules/ColorsPanel';
 
 // Tool types
 type Tool = 'select' | 'pan' | 'brush' | 'eraser';
+type PanelTab = 'adjust' | 'colors';
 
 // History state for undo/redo
 interface HistoryState {
@@ -60,8 +64,30 @@ export default function EditorCanvas() {
   const [zoom, setZoom] = useState(100);
   const [hasImage, setHasImage] = useState(false);
   const [isPanelOpen, setIsPanelOpen] = useState(true);
+  const [activeTab, setActiveTab] = useState<PanelTab>('adjust');
   const [brushSize, setBrushSize] = useState(20);
-  const [brushColor, setBrushColor] = useState('#ffffff');
+  const [brushColor] = useState('#ffffff');
+  
+  // Filter state
+  const [adjustFilters, setAdjustFilters] = useState<AdjustState>({
+    brightness: 0,
+    contrast: 0,
+    exposure: 0,
+    highlights: 0,
+    shadows: 0,
+    whites: 0,
+    blacks: 0,
+    clarity: 0,
+    sharpness: 0,
+    dehaze: 0,
+  });
+  
+  const [colorFilters, setColorFilters] = useState<ColorFilters>({
+    temperature: 0,
+    tint: 0,
+    saturation: 0,
+    vibrance: 0,
+  });
   
   // History for undo/redo
   const [history, setHistory] = useState<HistoryState>({
@@ -69,6 +95,40 @@ export default function EditorCanvas() {
     present: null,
     future: [],
   });
+
+  // Calculate CSS filter string from adjust and color values
+  const cssFilter = useMemo(() => {
+    const filters: string[] = [];
+    
+    // Brightness: -75 to +75 → 0.25 to 1.75
+    if (adjustFilters.brightness !== 0) {
+      filters.push(`brightness(${1 + adjustFilters.brightness / 100})`);
+    }
+    
+    // Contrast: -75 to +75 → 0.25 to 1.75
+    if (adjustFilters.contrast !== 0) {
+      filters.push(`contrast(${1 + adjustFilters.contrast / 100})`);
+    }
+    
+    // Saturation: -75 to +75 → 0.25 to 1.75
+    if (colorFilters.saturation !== 0) {
+      filters.push(`saturate(${1 + (colorFilters.saturation || 0) / 100})`);
+    }
+    
+    // Temperature (sepia + hue-rotate simulation)
+    if (colorFilters.temperature && colorFilters.temperature > 0) {
+      filters.push(`sepia(${colorFilters.temperature / 200})`);
+    } else if (colorFilters.temperature && colorFilters.temperature < 0) {
+      filters.push(`hue-rotate(${colorFilters.temperature}deg)`);
+    }
+    
+    // Sharpness (approximated with contrast boost)
+    if (adjustFilters.sharpness > 0) {
+      filters.push(`contrast(${1 + adjustFilters.sharpness / 200})`);
+    }
+    
+    return filters.length > 0 ? filters.join(' ') : 'none';
+  }, [adjustFilters, colorFilters]);
 
   // Initialize Fabric.js canvas
   useEffect(() => {
@@ -275,6 +335,25 @@ export default function EditorCanvas() {
       setHasImage(false);
       setZoom(100);
       setHistory({ past: [], present: null, future: [] });
+      // Reset filters
+      setAdjustFilters({
+        brightness: 0,
+        contrast: 0,
+        exposure: 0,
+        highlights: 0,
+        shadows: 0,
+        whites: 0,
+        blacks: 0,
+        clarity: 0,
+        sharpness: 0,
+        dehaze: 0,
+      });
+      setColorFilters({
+        temperature: 0,
+        tint: 0,
+        saturation: 0,
+        vibrance: 0,
+      });
     }
   }, []);
 
@@ -431,6 +510,7 @@ export default function EditorCanvas() {
         <div 
           ref={containerRef}
           className="relative flex-1 overflow-hidden"
+          style={{ filter: cssFilter }}
         >
           <canvas ref={canvasRef} />
 
@@ -439,6 +519,7 @@ export default function EditorCanvas() {
             <div 
               className="absolute inset-0 flex cursor-pointer flex-col items-center justify-center gap-4 bg-black/20 transition-colors hover:bg-black/30"
               onClick={() => fileInputRef.current?.click()}
+              style={{ filter: 'none' }}
             >
               <div className="flex h-20 w-20 items-center justify-center rounded-2xl border-2 border-dashed border-white/20 bg-white/5">
                 <Upload className="h-8 w-8 text-white/40" />
@@ -461,7 +542,7 @@ export default function EditorCanvas() {
 
         {/* Right Panel */}
         <div 
-          className={`relative border-l border-white/10 bg-black/40 backdrop-blur-sm transition-all duration-300 ${
+          className={`relative flex flex-col border-l border-white/10 bg-black/40 backdrop-blur-sm transition-all duration-300 ${
             isPanelOpen ? 'w-72' : 'w-0'
           }`}
         >
@@ -474,16 +555,43 @@ export default function EditorCanvas() {
           </button>
 
           {isPanelOpen && (
-            <div className="h-full overflow-y-auto p-4">
-              <h3 className="mb-4 flex items-center gap-2 text-sm font-medium text-white/80">
-                <SlidersHorizontal className="h-4 w-4" />
-                Adjustments
-              </h3>
-              
-              <p className="text-xs text-white/40">
-                Adjustment controls will be added here.
-              </p>
-            </div>
+            <>
+              {/* Tabs */}
+              <div className="flex border-b border-white/10">
+                <button
+                  onClick={() => setActiveTab('adjust')}
+                  className={`flex flex-1 items-center justify-center gap-2 px-4 py-3 text-sm transition-all ${
+                    activeTab === 'adjust'
+                      ? 'border-b-2 border-white/60 text-white'
+                      : 'text-white/40 hover:text-white/60'
+                  }`}
+                >
+                  <SlidersHorizontal className="h-4 w-4" />
+                  Adjust
+                </button>
+                <button
+                  onClick={() => setActiveTab('colors')}
+                  className={`flex flex-1 items-center justify-center gap-2 px-4 py-3 text-sm transition-all ${
+                    activeTab === 'colors'
+                      ? 'border-b-2 border-white/60 text-white'
+                      : 'text-white/40 hover:text-white/60'
+                  }`}
+                >
+                  <Palette className="h-4 w-4" />
+                  Colors
+                </button>
+              </div>
+
+              {/* Panel Content */}
+              <div className="flex-1 overflow-y-auto p-4">
+                {activeTab === 'adjust' && (
+                  <AdjustPanel onAdjustChange={setAdjustFilters} />
+                )}
+                {activeTab === 'colors' && (
+                  <ColorsPanel onColorChange={setColorFilters} />
+                )}
+              </div>
+            </>
           )}
         </div>
       </div>
@@ -522,4 +630,3 @@ export default function EditorCanvas() {
     </div>
   );
 }
-
