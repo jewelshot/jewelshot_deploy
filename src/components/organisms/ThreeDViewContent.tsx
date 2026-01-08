@@ -13,9 +13,10 @@
 
 import React, { useState, useRef, useCallback, Suspense, useEffect } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
-import { OrbitControls, Center, Environment, Grid, GizmoHelper, GizmoViewport, Lightformer, ContactShadows } from '@react-three/drei';
+import { OrbitControls, Center, Environment, Grid, GizmoHelper, GizmoViewport, Lightformer } from '@react-three/drei';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 import * as THREE from 'three';
+import { LoopSubdivision } from 'three-subdivide';
 import {
   Upload,
   Box,
@@ -87,6 +88,17 @@ const STONE_PRESETS: MaterialPreset[] = [
   { id: 'sapphire', name: 'Sapphire', color: '#0F52BA', metalness: 0, roughness: 0.05, envMapIntensity: 2 },
   { id: 'emerald', name: 'Emerald', color: '#50C878', metalness: 0, roughness: 0.08, envMapIntensity: 1.8 },
   { id: 'amethyst', name: 'Amethyst', color: '#9966CC', metalness: 0, roughness: 0.05, envMapIntensity: 1.8 },
+];
+
+// Matte / Resin material presets (for 3D printing visualization)
+const MATTE_PRESETS: MaterialPreset[] = [
+  { id: 'matte-gray', name: 'Matte Gray', color: '#808080', metalness: 0, roughness: 1, envMapIntensity: 0.3 },
+  { id: 'matte-white', name: 'Matte White', color: '#E0E0E0', metalness: 0, roughness: 1, envMapIntensity: 0.3 },
+  { id: 'resin-green', name: 'Resin Green', color: '#2E7D32', metalness: 0, roughness: 0.7, envMapIntensity: 0.5 },
+  { id: 'resin-purple', name: 'Resin Purple', color: '#6A1B9A', metalness: 0, roughness: 0.7, envMapIntensity: 0.5 },
+  { id: 'resin-blue', name: 'Resin Blue', color: '#1565C0', metalness: 0, roughness: 0.7, envMapIntensity: 0.5 },
+  { id: 'resin-red', name: 'Resin Red', color: '#C62828', metalness: 0, roughness: 0.7, envMapIntensity: 0.5 },
+  { id: 'wax-beige', name: 'Wax (Castable)', color: '#D4A574', metalness: 0, roughness: 0.85, envMapIntensity: 0.4 },
 ];
 
 // Studio environment presets - custom lightformer setups (no external HDR needed)
@@ -548,14 +560,7 @@ function SceneContent({
         <color attach="background" args={[studioPreset.backgroundColor]} />
       </Environment>
       
-      {/* Contact shadows for grounding */}
-      <ContactShadows
-        position={[0, -0.5, 0]}
-        opacity={0.4}
-        scale={10}
-        blur={2}
-        far={4}
-      />
+      {/* Contact shadows removed per user request */}
 
       {/* Grid */}
       {showGrid && (
@@ -630,10 +635,12 @@ function SceneContent({
       
       {/* Axis Gizmo in corner - hide during snapshot */}
       {showGrid && (
-        <GizmoHelper alignment="bottom-right" margin={[80, 80]}>
+        <GizmoHelper alignment="bottom-right" margin={[60, 60]}>
           <GizmoViewport 
-            axisColors={['#ff4444', '#44ff44', '#4444ff']} 
-            labelColor="white"
+            axisColors={['#cc6666', '#66aa66', '#6688bb']}  // Softer, muted colors
+            labelColor="#888888"
+            hideNegativeAxes
+            font="12px Inter, system-ui, sans-serif"
           />
         </GizmoHelper>
       )}
@@ -681,7 +688,7 @@ export default function ThreeDViewContent() {
   const [autoRotate, setAutoRotate] = useState(false);
   const [showGrid, setShowGrid] = useState(true);
   const [wireframe, setWireframe] = useState(false);
-  const [materialType, setMaterialType] = useState<'metal' | 'stone'>('metal');
+  const [materialType, setMaterialType] = useState<'metal' | 'stone' | 'matte'>('metal');
   const [snapshotPreview, setSnapshotPreview] = useState<string | null>(null);
   const [selectedStudio, setSelectedStudio] = useState<StudioPreset>(STUDIO_PRESETS[0]); // White Studio
   const [backgroundColor, setBackgroundColor] = useState('#0a0a0a');
@@ -694,11 +701,42 @@ export default function ThreeDViewContent() {
   const [lightIntensity, setLightIntensity] = useState(1.0); // Global intensity multiplier
   const [isSnapshotMode, setIsSnapshotMode] = useState(false); // Hide grid during snapshot
   const [showEnvBackground, setShowEnvBackground] = useState(true); // Show HDR as background
+  const [subdivisionLevel, setSubdivisionLevel] = useState(0); // 0 = original, 1-3 = smoother
+  const [originalGeometry, setOriginalGeometry] = useState<THREE.BufferGeometry | null>(null); // Store original for subdivision
   
   // Layer state (for future 3DM support)
   const [layers, setLayers] = useState<ModelLayer[]>([]);
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
   const [layerMaterials, setLayerMaterials] = useState<Record<string, MaterialPreset>>({});
+
+  // Apply subdivision when level changes
+  useEffect(() => {
+    if (!originalGeometry) return;
+    
+    if (subdivisionLevel === 0) {
+      setLoadedGeometry(originalGeometry.clone());
+    } else {
+      try {
+        // Apply Loop Subdivision
+        const params = {
+          split: true,
+          uvSmooth: false,
+          preserveEdges: false,
+          flatOnly: false,
+        };
+        const subdivided = LoopSubdivision.modify(originalGeometry, subdivisionLevel, params);
+        setLoadedGeometry(subdivided);
+        
+        // Update model info
+        const positionAttribute = subdivided.getAttribute('position');
+        const vertices = positionAttribute ? positionAttribute.count : 0;
+        const faces = Math.floor(vertices / 3);
+        setModelInfo({ vertices, faces });
+      } catch (error) {
+        console.error('Subdivision error:', error);
+      }
+    }
+  }, [subdivisionLevel, originalGeometry]);
 
   // Process file (shared between click and drag&drop)
   const processFile = useCallback((file: File) => {
@@ -707,6 +745,8 @@ export default function ThreeDViewContent() {
     setFileName(file.name);
     setLayers([]);
     setLoadedGeometry(null);
+    setOriginalGeometry(null);
+    setSubdivisionLevel(0);
     setModelInfo(null);
 
     const reader = new FileReader();
@@ -719,6 +759,7 @@ export default function ThreeDViewContent() {
           try {
             setLoadingStatus('Parsing STL...');
             const geometry = loader.parse(contents as ArrayBuffer);
+            setOriginalGeometry(geometry.clone()); // Store original for subdivision
             setLoadedGeometry(geometry);
             setLayers([]);
             
@@ -879,7 +920,11 @@ export default function ThreeDViewContent() {
   }, []);
 
   // Get current material presets
-  const currentPresets = materialType === 'metal' ? METAL_PRESETS : STONE_PRESETS;
+  const currentPresets = materialType === 'metal' 
+    ? METAL_PRESETS 
+    : materialType === 'stone' 
+      ? STONE_PRESETS 
+      : MATTE_PRESETS;
 
   return (
     <div 
@@ -1094,10 +1139,10 @@ export default function ThreeDViewContent() {
               failIfMajorPerformanceCaveat: false,
               powerPreference: 'default',
             }}
-            style={{ background: '#000000' }}
+            style={{ background: backgroundColor }}
             onCreated={(state) => {
               // Ensure WebGL context is properly initialized
-              state.gl.setClearColor('#000000');
+              state.gl.setClearColor(backgroundColor);
             }}
           >
             <Suspense fallback={null}>
@@ -1146,6 +1191,46 @@ export default function ThreeDViewContent() {
 
           {isPanelOpen && (
             <div className="flex flex-1 flex-col overflow-y-auto p-4">
+              {/* Snapshot Preview - ALWAYS AT TOP */}
+              {snapshotPreview && (
+                <div className="mb-6">
+                  <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
+                    Snapshot Preview
+                  </h3>
+                  <div className="relative overflow-hidden rounded-lg border border-white/10">
+                    <img 
+                      src={snapshotPreview} 
+                      alt="Snapshot" 
+                      className="w-full"
+                    />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/70 opacity-0 transition-opacity hover:opacity-100">
+                      <div className="flex flex-wrap justify-center gap-2">
+                        <button
+                          onClick={handleDownloadSnapshot}
+                          className="flex items-center gap-1 rounded-lg bg-purple-500 px-3 py-2 text-xs font-medium text-white hover:bg-purple-600"
+                        >
+                          <Download className="h-3.5 w-3.5" />
+                          Download
+                        </button>
+                        <button
+                          onClick={handleSaveToGallery}
+                          className="flex items-center gap-1 rounded-lg bg-white/15 px-3 py-2 text-xs font-medium text-white hover:bg-white/25"
+                        >
+                          <Image className="h-3.5 w-3.5" />
+                          Gallery
+                        </button>
+                      </div>
+                      <button
+                        onClick={() => setSnapshotPreview(null)}
+                        className="mt-1 text-[10px] text-white/50 hover:text-white/70"
+                      >
+                        Clear
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
               {/* File Upload */}
               <div className="mb-6">
                 <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
@@ -1183,6 +1268,30 @@ export default function ThreeDViewContent() {
                         <Info className="h-3 w-3 text-white/30" />
                         <span>{modelInfo.vertices.toLocaleString()} vertices</span>
                         <span>{modelInfo.faces.toLocaleString()} faces</span>
+                      </div>
+                    )}
+                    
+                    {/* Subdivision Control */}
+                    {originalGeometry && (
+                      <div className="mt-3 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] text-white/40">Subdivision</span>
+                          <span className="text-[10px] text-white/60">{subdivisionLevel}x</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="range"
+                            min="0"
+                            max="3"
+                            step="1"
+                            value={subdivisionLevel}
+                            onChange={(e) => setSubdivisionLevel(parseInt(e.target.value))}
+                            className="flex-1 h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-purple-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer"
+                          />
+                        </div>
+                        <p className="text-[9px] text-white/30">
+                          Higher = smoother (slower)
+                        </p>
                       </div>
                     )}
                   </div>
@@ -1325,13 +1434,23 @@ export default function ThreeDViewContent() {
                   >
                     Stone
                   </button>
+                  <button
+                    onClick={() => setMaterialType('matte')}
+                    className={`flex-1 rounded-md py-1.5 text-xs font-medium transition-all ${
+                      materialType === 'matte'
+                        ? 'bg-white/15 text-white'
+                        : 'text-white/50 hover:text-white/70'
+                    }`}
+                  >
+                    Matte
+                  </button>
                 </div>
               </div>
 
               {/* Material Presets */}
               <div className="mb-6">
                 <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
-                  {materialType === 'metal' ? 'Metal' : 'Stone'} Presets
+                  {materialType === 'metal' ? 'Metal' : materialType === 'stone' ? 'Stone' : 'Matte / Resin'} Presets
                 </h3>
                 <div className="space-y-2">
                   {currentPresets.map((preset) => (
@@ -1446,52 +1565,6 @@ export default function ThreeDViewContent() {
                 )}
               </div>
 
-              {/* Snapshot Preview */}
-              {snapshotPreview && (
-                <div className="mb-6">
-                  <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
-                    Snapshot
-                  </h3>
-                  <div className="relative overflow-hidden rounded-lg border border-white/10">
-                    <img 
-                      src={snapshotPreview} 
-                      alt="Snapshot" 
-                      className="w-full"
-                    />
-                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/70 opacity-0 transition-opacity hover:opacity-100">
-                      <div className="flex flex-wrap justify-center gap-2">
-                        <button
-                          onClick={handleDownloadSnapshot}
-                          className="flex items-center gap-1 rounded-lg bg-purple-500 px-3 py-2 text-xs font-medium text-white hover:bg-purple-600"
-                        >
-                          <Download className="h-3.5 w-3.5" />
-                          Download
-                        </button>
-                        <button
-                          onClick={handleSaveToGallery}
-                          className="flex items-center gap-1 rounded-lg bg-white/15 px-3 py-2 text-xs font-medium text-white hover:bg-white/25"
-                        >
-                          <Image className="h-3.5 w-3.5" />
-                          Gallery
-                        </button>
-                        <a
-                          href={`/studio?image=${encodeURIComponent(snapshotPreview || '')}`}
-                          className="flex items-center gap-1 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-3 py-2 text-xs font-medium text-white hover:from-purple-600 hover:to-pink-600"
-                        >
-                          <Palette className="h-3.5 w-3.5" />
-                          Studio
-                        </a>
-                      </div>
-                      <button
-                        onClick={() => setSnapshotPreview(null)}
-                        className="mt-1 text-[10px] text-white/50 hover:text-white/70"
-                      >
-                        Clear
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
 
               {/* Quick Guide */}
               <div className="mt-auto">
