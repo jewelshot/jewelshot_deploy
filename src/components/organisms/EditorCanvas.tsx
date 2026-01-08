@@ -5,13 +5,13 @@
  * - Fabric.js canvas for image editing
  * - Top toolbar with tools
  * - Right panel for adjustments (Adjust, Colors tabs)
- * - Bottom AI tools bar
+ * - Bottom AI tools bar with Inpainting
  */
 
 'use client';
 
 import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
-import { Canvas as FabricCanvas, FabricImage, PencilBrush, Point } from 'fabric';
+import { Canvas as FabricCanvas, FabricImage, PencilBrush, Point, FabricObject } from 'fabric';
 import {
   Upload,
   ZoomIn,
@@ -33,13 +33,16 @@ import {
   Sparkles,
   ChevronRight,
   ChevronLeft,
+  X,
+  Loader2,
+  Trash2,
 } from 'lucide-react';
 import { useSidebarStore } from '@/store/sidebarStore';
 import AdjustPanel, { AdjustState } from '@/components/molecules/AdjustPanel';
 import ColorsPanel, { ColorFilters } from '@/components/molecules/ColorsPanel';
 
 // Tool types
-type Tool = 'select' | 'pan' | 'brush' | 'eraser';
+type Tool = 'select' | 'pan' | 'brush' | 'eraser' | 'inpaint';
 type PanelTab = 'adjust' | 'colors';
 
 // History state for undo/redo
@@ -55,6 +58,7 @@ export default function EditorCanvas() {
   const containerRef = useRef<HTMLDivElement>(null);
   const fabricRef = useRef<FabricCanvas | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const originalImageRef = useRef<string | null>(null);
 
   // Layout state
   const { leftOpen } = useSidebarStore();
@@ -67,6 +71,13 @@ export default function EditorCanvas() {
   const [activeTab, setActiveTab] = useState<PanelTab>('adjust');
   const [brushSize, setBrushSize] = useState(20);
   const [brushColor] = useState('#ffffff');
+  
+  // Inpaint state
+  const [isInpaintMode, setIsInpaintMode] = useState(false);
+  const [inpaintPrompt, setInpaintPrompt] = useState('');
+  const [isInpainting, setIsInpainting] = useState(false);
+  const [showInpaintModal, setShowInpaintModal] = useState(false);
+  const [inpaintError, setInpaintError] = useState<string | null>(null);
   
   // Filter state
   const [adjustFilters, setAdjustFilters] = useState<AdjustState>({
@@ -100,29 +111,20 @@ export default function EditorCanvas() {
   const cssFilter = useMemo(() => {
     const filters: string[] = [];
     
-    // Brightness: -75 to +75 → 0.25 to 1.75
     if (adjustFilters.brightness !== 0) {
       filters.push(`brightness(${1 + adjustFilters.brightness / 100})`);
     }
-    
-    // Contrast: -75 to +75 → 0.25 to 1.75
     if (adjustFilters.contrast !== 0) {
       filters.push(`contrast(${1 + adjustFilters.contrast / 100})`);
     }
-    
-    // Saturation: -75 to +75 → 0.25 to 1.75
     if (colorFilters.saturation !== 0) {
       filters.push(`saturate(${1 + (colorFilters.saturation || 0) / 100})`);
     }
-    
-    // Temperature (sepia + hue-rotate simulation)
     if (colorFilters.temperature && colorFilters.temperature > 0) {
       filters.push(`sepia(${colorFilters.temperature / 200})`);
     } else if (colorFilters.temperature && colorFilters.temperature < 0) {
       filters.push(`hue-rotate(${colorFilters.temperature}deg)`);
     }
-    
-    // Sharpness (approximated with contrast boost)
     if (adjustFilters.sharpness > 0) {
       filters.push(`contrast(${1 + adjustFilters.sharpness / 200})`);
     }
@@ -142,7 +144,6 @@ export default function EditorCanvas() {
 
     fabricRef.current = canvas;
 
-    // Set initial size
     const updateSize = () => {
       if (!containerRef.current) return;
       const { width, height } = containerRef.current.getBoundingClientRect();
@@ -168,7 +169,7 @@ export default function EditorCanvas() {
       const { width, height } = containerRef.current!.getBoundingClientRect();
       fabricRef.current!.setDimensions({ width, height });
       fabricRef.current!.renderAll();
-    }, 500); // Wait for sidebar animation
+    }, 500);
 
     return () => clearTimeout(timeout);
   }, [leftOpen, isPanelOpen]);
@@ -177,6 +178,11 @@ export default function EditorCanvas() {
   useEffect(() => {
     const canvas = fabricRef.current;
     if (!canvas) return;
+
+    // Exit inpaint mode when switching to other tools
+    if (activeTool !== 'inpaint' && isInpaintMode) {
+      setIsInpaintMode(false);
+    }
 
     switch (activeTool) {
       case 'select':
@@ -199,10 +205,17 @@ export default function EditorCanvas() {
         canvas.isDrawingMode = true;
         canvas.freeDrawingBrush = new PencilBrush(canvas);
         canvas.freeDrawingBrush.width = brushSize;
-        canvas.freeDrawingBrush.color = '#1a1a1a'; // Match background
+        canvas.freeDrawingBrush.color = '#1a1a1a';
+        break;
+      case 'inpaint':
+        canvas.isDrawingMode = true;
+        canvas.freeDrawingBrush = new PencilBrush(canvas);
+        canvas.freeDrawingBrush.width = brushSize;
+        canvas.freeDrawingBrush.color = 'rgba(255, 100, 100, 0.5)'; // Semi-transparent red for mask
+        setIsInpaintMode(true);
         break;
     }
-  }, [activeTool, brushSize, brushColor]);
+  }, [activeTool, brushSize, brushColor, isInpaintMode]);
 
   // Save state to history
   const saveState = useCallback(() => {
@@ -263,11 +276,11 @@ export default function EditorCanvas() {
     const reader = new FileReader();
     reader.onload = (event) => {
       const imgUrl = event.target?.result as string;
+      originalImageRef.current = imgUrl; // Store original for inpainting
       
       FabricImage.fromURL(imgUrl).then((img) => {
         const canvas = fabricRef.current!;
         
-        // Scale image to fit canvas
         const canvasWidth = canvas.getWidth();
         const canvasHeight = canvas.getHeight();
         const imgWidth = img.width || 1;
@@ -296,8 +309,6 @@ export default function EditorCanvas() {
       });
     };
     reader.readAsDataURL(file);
-
-    // Reset input
     e.target.value = '';
   }, [saveState]);
 
@@ -335,25 +346,12 @@ export default function EditorCanvas() {
       setHasImage(false);
       setZoom(100);
       setHistory({ past: [], present: null, future: [] });
-      // Reset filters
       setAdjustFilters({
-        brightness: 0,
-        contrast: 0,
-        exposure: 0,
-        highlights: 0,
-        shadows: 0,
-        whites: 0,
-        blacks: 0,
-        clarity: 0,
-        sharpness: 0,
-        dehaze: 0,
+        brightness: 0, contrast: 0, exposure: 0, highlights: 0,
+        shadows: 0, whites: 0, blacks: 0, clarity: 0, sharpness: 0, dehaze: 0,
       });
-      setColorFilters({
-        temperature: 0,
-        tint: 0,
-        saturation: 0,
-        vibrance: 0,
-      });
+      setColorFilters({ temperature: 0, tint: 0, saturation: 0, vibrance: 0 });
+      originalImageRef.current = null;
     }
   }, []);
 
@@ -374,19 +372,165 @@ export default function EditorCanvas() {
     link.click();
   }, []);
 
+  // Clear inpaint mask (remove drawn paths)
+  const clearInpaintMask = useCallback(() => {
+    const canvas = fabricRef.current;
+    if (!canvas) return;
+
+    // Remove all path objects (mask drawings)
+    const objects = canvas.getObjects();
+    const pathsToRemove = objects.filter((obj: FabricObject) => obj.type === 'path');
+    pathsToRemove.forEach((path: FabricObject) => canvas.remove(path));
+    canvas.renderAll();
+  }, []);
+
+  // Generate mask image from drawn paths
+  const generateMaskImage = useCallback((): string | null => {
+    const canvas = fabricRef.current;
+    if (!canvas) return null;
+
+    // Create a temporary canvas for the mask
+    const tempCanvas = document.createElement('canvas');
+    const ctx = tempCanvas.getContext('2d');
+    if (!ctx) return null;
+
+    tempCanvas.width = canvas.getWidth();
+    tempCanvas.height = canvas.getHeight();
+
+    // Fill with black (areas to keep)
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+    // Get all path objects and draw them in white (areas to inpaint)
+    const objects = canvas.getObjects();
+    objects.forEach((obj: FabricObject) => {
+      if (obj.type === 'path') {
+        // Render path to mask canvas
+        const pathElement = obj.toCanvasElement();
+        ctx.drawImage(pathElement, obj.left || 0, obj.top || 0);
+      }
+    });
+
+    return tempCanvas.toDataURL('image/png');
+  }, []);
+
+  // Get original image as data URL
+  const getOriginalImage = useCallback((): string | null => {
+    const canvas = fabricRef.current;
+    if (!canvas) return null;
+
+    // Find the image object
+    const objects = canvas.getObjects();
+    const imageObj = objects.find((obj: FabricObject) => obj.type === 'image');
+    
+    if (imageObj) {
+      return (imageObj as FabricImage).toDataURL({
+        format: 'png',
+        quality: 1,
+      });
+    }
+
+    return originalImageRef.current;
+  }, []);
+
+  // Apply inpainting
+  const handleApplyInpaint = useCallback(async () => {
+    if (!inpaintPrompt.trim()) {
+      setInpaintError('Please enter a prompt');
+      return;
+    }
+
+    const imageUrl = getOriginalImage();
+    const maskUrl = generateMaskImage();
+
+    if (!imageUrl || !maskUrl) {
+      setInpaintError('Failed to generate mask. Please draw on the area you want to change.');
+      return;
+    }
+
+    setIsInpainting(true);
+    setInpaintError(null);
+
+    try {
+      const response = await fetch('/api/ai/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          operation: 'inpaint',
+          params: {
+            image_url: imageUrl,
+            mask_url: maskUrl,
+            prompt: inpaintPrompt,
+            strength: 0.95,
+          },
+          priority: 'urgent',
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || data.error || 'Inpainting failed');
+      }
+
+      if (data.status === 'completed' && data.result?.data?.imageUrl) {
+        // Load the result image
+        const canvas = fabricRef.current!;
+        
+        FabricImage.fromURL(data.result.data.imageUrl, { crossOrigin: 'anonymous' }).then((img) => {
+          const canvasWidth = canvas.getWidth();
+          const canvasHeight = canvas.getHeight();
+          const imgWidth = img.width || 1;
+          const imgHeight = img.height || 1;
+          
+          const scale = Math.min(
+            (canvasWidth * 0.8) / imgWidth,
+            (canvasHeight * 0.8) / imgHeight
+          );
+
+          img.scale(scale);
+          img.set({
+            left: (canvasWidth - imgWidth * scale) / 2,
+            top: (canvasHeight - imgHeight * scale) / 2,
+            selectable: true,
+          });
+
+          canvas.clear();
+          canvas.backgroundColor = '#1a1a1a';
+          canvas.add(img);
+          canvas.renderAll();
+          
+          saveState();
+          setShowInpaintModal(false);
+          setInpaintPrompt('');
+          setActiveTool('select');
+        });
+      } else {
+        throw new Error('Unexpected response from server');
+      }
+    } catch (error) {
+      console.error('Inpainting error:', error);
+      setInpaintError(error instanceof Error ? error.message : 'Inpainting failed');
+    } finally {
+      setIsInpainting(false);
+    }
+  }, [inpaintPrompt, getOriginalImage, generateMaskImage, saveState]);
+
   // Tool button component
   const ToolButton = ({ 
     icon: Icon, 
     label, 
     tool, 
-    onClick 
+    onClick,
+    active,
   }: { 
     icon: React.ElementType; 
     label: string; 
     tool?: Tool;
     onClick?: () => void;
+    active?: boolean;
   }) => {
-    const isActive = tool && activeTool === tool;
+    const isActive = active !== undefined ? active : (tool && activeTool === tool);
     return (
       <button
         onClick={onClick || (() => tool && setActiveTool(tool))}
@@ -422,8 +566,18 @@ export default function EditorCanvas() {
           <ToolButton icon={Pencil} label="Brush (B)" tool="brush" />
           <ToolButton icon={Eraser} label="Eraser (E)" tool="eraser" />
           
-          {/* Brush size (shown when brush/eraser active) */}
-          {(activeTool === 'brush' || activeTool === 'eraser') && (
+          <div className="mx-2 h-5 w-px bg-white/10" />
+          
+          {/* Inpaint Tool */}
+          <ToolButton 
+            icon={Wand2} 
+            label="Inpaint Brush (I)" 
+            tool="inpaint"
+            active={activeTool === 'inpaint'}
+          />
+          
+          {/* Brush size (shown when brush/eraser/inpaint active) */}
+          {(activeTool === 'brush' || activeTool === 'eraser' || activeTool === 'inpaint') && (
             <div className="ml-2 flex items-center gap-2">
               <span className="text-xs text-white/40">Size:</span>
               <input
@@ -436,6 +590,28 @@ export default function EditorCanvas() {
               />
               <span className="w-6 text-xs text-white/60">{brushSize}</span>
             </div>
+          )}
+
+          {/* Inpaint mode actions */}
+          {activeTool === 'inpaint' && (
+            <>
+              <div className="mx-2 h-5 w-px bg-white/10" />
+              <button
+                onClick={clearInpaintMask}
+                className="flex h-8 items-center gap-1 rounded-md px-2 text-xs text-white/60 hover:bg-white/10 hover:text-white"
+                title="Clear Mask"
+              >
+                <Trash2 className="h-3 w-3" />
+                Clear
+              </button>
+              <button
+                onClick={() => setShowInpaintModal(true)}
+                className="flex h-8 items-center gap-1 rounded-md bg-purple-500/20 px-3 text-xs text-purple-300 hover:bg-purple-500/30"
+              >
+                <Sparkles className="h-3 w-3" />
+                Apply
+              </button>
+            </>
           )}
         </div>
 
@@ -531,6 +707,15 @@ export default function EditorCanvas() {
             </div>
           )}
 
+          {/* Inpaint mode indicator */}
+          {activeTool === 'inpaint' && hasImage && (
+            <div className="absolute left-4 top-4 rounded-lg bg-purple-500/20 px-3 py-2 backdrop-blur-sm">
+              <p className="text-xs text-purple-300">
+                Draw on areas you want to change, then click Apply
+              </p>
+            </div>
+          )}
+
           <input
             ref={fileInputRef}
             type="file"
@@ -546,7 +731,6 @@ export default function EditorCanvas() {
             isPanelOpen ? 'w-72' : 'w-0'
           }`}
         >
-          {/* Toggle Button */}
           <button
             onClick={() => setIsPanelOpen(!isPanelOpen)}
             className="absolute -left-3 top-1/2 z-10 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-black/80 text-white/60 hover:text-white"
@@ -556,7 +740,6 @@ export default function EditorCanvas() {
 
           {isPanelOpen && (
             <>
-              {/* Tabs */}
               <div className="flex border-b border-white/10">
                 <button
                   onClick={() => setActiveTab('adjust')}
@@ -582,7 +765,6 @@ export default function EditorCanvas() {
                 </button>
               </div>
 
-              {/* Panel Content */}
               <div className="flex-1 overflow-y-auto p-4">
                 {activeTab === 'adjust' && (
                   <AdjustPanel onAdjustChange={setAdjustFilters} />
@@ -599,8 +781,13 @@ export default function EditorCanvas() {
       {/* Bottom AI Tools Bar */}
       <div className="flex h-14 items-center justify-center gap-2 border-t border-white/10 bg-black/40 px-4 backdrop-blur-sm">
         <button
+          onClick={() => setActiveTool('inpaint')}
           disabled={!hasImage}
-          className="flex h-9 items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 text-sm text-white/60 transition-all hover:border-white/20 hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+          className={`flex h-9 items-center gap-2 rounded-lg border px-4 text-sm transition-all disabled:cursor-not-allowed disabled:opacity-30 ${
+            activeTool === 'inpaint'
+              ? 'border-purple-500/50 bg-purple-500/20 text-purple-300'
+              : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20 hover:bg-white/10 hover:text-white'
+          }`}
         >
           <Wand2 className="h-4 w-4" />
           Inpaint
@@ -627,6 +814,66 @@ export default function EditorCanvas() {
           AI Upscale
         </button>
       </div>
+
+      {/* Inpaint Modal */}
+      {showInpaintModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-xl border border-white/10 bg-[#0a0a0a] p-6 shadow-2xl">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-lg font-medium text-white">Apply Inpainting</h3>
+              <button
+                onClick={() => setShowInpaintModal(false)}
+                className="rounded-lg p-1 text-white/40 hover:bg-white/10 hover:text-white"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <p className="mb-4 text-sm text-white/50">
+              Describe what you want to appear in the masked area
+            </p>
+
+            <textarea
+              value={inpaintPrompt}
+              onChange={(e) => setInpaintPrompt(e.target.value)}
+              placeholder="e.g., A golden ring with diamond, luxury white background..."
+              className="mb-4 h-24 w-full resize-none rounded-lg border border-white/10 bg-white/5 p-3 text-sm text-white placeholder-white/30 focus:border-purple-500/50 focus:outline-none"
+              disabled={isInpainting}
+            />
+
+            {inpaintError && (
+              <p className="mb-4 text-sm text-red-400">{inpaintError}</p>
+            )}
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowInpaintModal(false)}
+                disabled={isInpainting}
+                className="rounded-lg px-4 py-2 text-sm text-white/60 hover:bg-white/10 hover:text-white disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleApplyInpaint}
+                disabled={isInpainting || !inpaintPrompt.trim()}
+                className="flex items-center gap-2 rounded-lg bg-purple-500 px-4 py-2 text-sm font-medium text-white hover:bg-purple-600 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isInpainting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4" />
+                    Apply
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -16,6 +16,7 @@ import { processEdit } from './edit';
 import { processGenerate } from './generate';
 import { processUpscale } from './upscale';
 import { processRemoveBackground } from './remove-bg';
+import { processInpaint } from './inpaint';
 import { processCameraControl } from './camera-control';
 import { processGemstone } from './gemstone';
 import { processMetalRecolor } from './metal-recolor';
@@ -77,6 +78,10 @@ export async function processAIJob(data: AIJobData): Promise<AIJobResult> {
       
       case 'remove-bg':
         result = await processRemoveBackground(data.params, apiKey);
+        break;
+      
+      case 'inpaint':
+        result = await processInpaint(data.params, apiKey);
         break;
       
       case 'camera-control':

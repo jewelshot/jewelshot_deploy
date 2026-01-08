@@ -13,6 +13,7 @@ export type AIOperation =
   | 'generate'          // Studio generate (flux-pro/v1.1)
   | 'upscale'           // Upscale image
   | 'remove-bg'         // Background removal
+  | 'inpaint'           // Inpainting (mask + fill)
   | 'camera-control'    // Camera control
   | 'gemstone'          // Gemstone enhancement
   | 'metal-recolor'     // Metal recoloring

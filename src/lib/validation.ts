@@ -226,6 +226,12 @@ export const validateAIParams = (operation: string, params: any) => {
       validateUrl(params.image_url, 'image_url', true);
       break;
 
+    case 'inpaint':
+      validateUrl(params.image_url, 'image_url', true);
+      validateUrl(params.mask_url, 'mask_url', true);
+      validateString(params.prompt, 'prompt', { required: true, minLength: 3, maxLength: 2000 });
+      break;
+
     case 'camera-control':
     case 'gemstone-enhance':
     case 'metal-polish':
