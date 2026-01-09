@@ -885,58 +885,67 @@ export default function ThreeDViewContent() {
     }
   }, [snapshotPreview, fileName]);
 
-  // Open in Studio
-  const handleOpenInStudio = useCallback((imageData: string) => {
-    // Store image in sessionStorage for Studio to pick up
-    sessionStorage.setItem('studio-import-image', imageData);
-    sessionStorage.setItem('studio-import-source', '3d-view');
-    // Navigate to studio
-    window.location.href = '/studio';
-  }, []);
+  // Open in Studio - saves to gallery first, then redirects
+  const handleOpenInStudio = useCallback(async (imageData: string) => {
+    try {
+      // 1. Save to gallery first
+      const { saveImageToGallery } = await import('@/lib/gallery-storage');
+      await saveImageToGallery(
+        imageData, 
+        `3D View: ${fileName || 'Model Snapshot'}`,
+        'manual',
+        {
+          prompt: `3D View snapshot of ${fileName || 'model'}`,
+        }
+      );
+      
+      // 2. Dispatch gallery update event
+      window.dispatchEvent(new Event('gallery-updated'));
+      
+      // 3. Store image in sessionStorage for Studio to pick up
+      sessionStorage.setItem('studio-import-image', imageData);
+      sessionStorage.setItem('studio-import-source', '3d-view');
+      sessionStorage.setItem('studio-import-timestamp', Date.now().toString());
+      
+      // 4. Navigate to studio with a small delay to ensure storage is written
+      setTimeout(() => {
+        window.location.href = '/studio';
+      }, 100);
+    } catch (error) {
+      console.error('Error saving to gallery:', error);
+      // Still try to open in studio even if gallery save fails
+      sessionStorage.setItem('studio-import-image', imageData);
+      sessionStorage.setItem('studio-import-source', '3d-view');
+      window.location.href = '/studio';
+    }
+  }, [fileName]);
 
   // Take snapshot and open directly in Studio (shutter button)
   const handleShutterClick = useCallback(() => {
     setIsSnapshotMode(true);
     
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        // Create a custom event that will capture and redirect
-        const captureAndRedirect = (dataUrl: string) => {
-          handleOpenInStudio(dataUrl);
-        };
-        
-        // Temporarily replace the snapshot handler
-        const originalHandler = handleSnapshotResult;
-        const shutterHandler = (dataUrl: string) => {
+    // Wait for grid/gizmo to hide, then take snapshot
+    setTimeout(() => {
+      const canvas = document.querySelector('canvas');
+      if (canvas) {
+        // Render one more frame
+        requestAnimationFrame(() => {
+          const dataUrl = canvas.toDataURL('image/png');
+          
+          // Set preview
           setSnapshotPreview(dataUrl);
-          captureAndRedirect(dataUrl);
-        };
-        
-        // Use a one-time listener
-        const handleShutterSnapshot = (e: Event) => {
-          const canvas = document.querySelector('canvas');
-          if (canvas) {
-            const dataUrl = canvas.toDataURL('image/png');
-            shutterHandler(dataUrl);
-          }
-          window.removeEventListener('shutter-snapshot-complete', handleShutterSnapshot);
-        };
-        
-        window.addEventListener('shutter-snapshot-complete', handleShutterSnapshot);
-        window.dispatchEvent(new CustomEvent('take-3d-snapshot', { detail: { scale: snapshotScale } }));
-        
-        // Trigger the redirect after snapshot
-        setTimeout(() => {
-          const canvas = document.querySelector('canvas');
-          if (canvas) {
-            const dataUrl = canvas.toDataURL('image/png');
-            handleOpenInStudio(dataUrl);
-          }
-          setIsSnapshotMode(false);
-        }, 150);
-      });
-    });
-  }, [snapshotScale, handleOpenInStudio]);
+          
+          // Save to gallery and open in studio
+          handleOpenInStudio(dataUrl);
+          
+          // Restore snapshot mode after a delay
+          setTimeout(() => setIsSnapshotMode(false), 200);
+        });
+      } else {
+        setIsSnapshotMode(false);
+      }
+    }, 100);
+  }, [handleOpenInStudio]);
 
   // Save snapshot to gallery
   const handleSaveToGallery = useCallback(async () => {

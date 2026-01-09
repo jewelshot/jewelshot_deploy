@@ -163,22 +163,42 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
 
   // Check for imported image from 3D View or other sources
   useEffect(() => {
-    const importedImage = sessionStorage.getItem('studio-import-image');
-    const importSource = sessionStorage.getItem('studio-import-source');
+    const checkForImport = () => {
+      const importedImage = sessionStorage.getItem('studio-import-image');
+      const importSource = sessionStorage.getItem('studio-import-source');
+      const importTimestamp = sessionStorage.getItem('studio-import-timestamp');
+      
+      if (importedImage && importTimestamp) {
+        console.log('[Canvas] Found imported image from:', importSource, 'at', importTimestamp);
+        
+        // Clear the import data FIRST to prevent re-processing
+        sessionStorage.removeItem('studio-import-image');
+        sessionStorage.removeItem('studio-import-source');
+        sessionStorage.removeItem('studio-import-timestamp');
+        
+        // Use a microtask to ensure state updates properly
+        queueMicrotask(() => {
+          // Reset any existing state
+          resetTransform();
+          
+          // Set the imported image as the current canvas image
+          setUploadedImage(importedImage);
+          setFileName(`${importSource || 'imported'}_snapshot.png`);
+          setFileSize(0); // Unknown size for base64
+          
+          console.log('[Canvas] Successfully imported image from', importSource);
+        });
+      }
+    };
     
-    if (importedImage) {
-      // Set the imported image as the current canvas image
-      setUploadedImage(importedImage);
-      setFileName(`${importSource || 'imported'}_snapshot.png`);
-      
-      // Clear the import data
-      sessionStorage.removeItem('studio-import-image');
-      sessionStorage.removeItem('studio-import-source');
-      
-      // Show success message
-      console.log(`[Canvas] Imported image from ${importSource}`);
-    }
-  }, [setUploadedImage, setFileName]);
+    // Check immediately on mount
+    checkForImport();
+    
+    // Also check after a short delay in case of race condition
+    const timeout = setTimeout(checkForImport, 100);
+    
+    return () => clearTimeout(timeout);
+  }, [setUploadedImage, setFileName, setFileSize, resetTransform]);
 
   // AI Image Edit & Comparison
   // Track AI image loading state
