@@ -131,25 +131,64 @@ export function DashboardContent() {
           });
         }
 
-        // Get all images for analytics (last 30 days)
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        
-        const { data: images, count } = await supabase
+        // ========== FETCH GALLERY IMAGES (images table) ==========
+        const { data: galleryImages, count: galleryCount } = await supabase
           .from('images')
           .select('*', { count: 'exact' })
           .eq('user_id', user.id)
-          .gte('created_at', thirtyDaysAgo.toISOString())
           .order('created_at', { ascending: false }) as { data: GalleryImage[] | null; count: number | null };
 
-        if (images) {
-          setAllImages(images);
-          setRecentImages(images.slice(0, 8));
-          setTotalGenerations(count || 0);
-          
-          const storage = images.reduce((acc: number, img: GalleryImage) => acc + (img.size || 0), 0);
-          setTotalStorage(storage);
-        }
+        // ========== FETCH BATCH IMAGES (batch_images table) ==========
+        const { data: batchImages } = await supabase
+          .from('batch_images')
+          .select('id, original_filename, original_url, result_url, original_size, status, created_at')
+          .eq('user_id', user.id)
+          .eq('status', 'completed')
+          .order('created_at', { ascending: false }) as { 
+            data: Array<{
+              id: string;
+              original_filename: string;
+              original_url: string | null;
+              result_url: string | null;
+              original_size: number;
+              status: string;
+              created_at: string;
+            }> | null 
+          };
+
+        // ========== CALCULATE TOTALS ==========
+        const galleryImageCount = galleryCount || 0;
+        const batchImageCount = batchImages?.length || 0;
+        const totalImageCount = galleryImageCount + batchImageCount;
+
+        // Storage calculation
+        const galleryStorage = galleryImages?.reduce((acc: number, img: GalleryImage) => acc + (img.size || 0), 0) || 0;
+        const batchStorage = batchImages?.reduce((acc: number, img) => acc + (img.original_size || 0), 0) || 0;
+        const totalStorageBytes = galleryStorage + batchStorage;
+
+        // ========== COMBINE RECENT IMAGES FOR DISPLAY ==========
+        // Convert batch images to GalleryImage format
+        const batchAsGalleryImages: GalleryImage[] = (batchImages || []).map(img => ({
+          id: img.id,
+          name: img.original_filename,
+          original_url: img.original_url || '',
+          generated_url: img.result_url || img.original_url || '',
+          created_at: img.created_at,
+          size: img.original_size,
+        }));
+
+        // Merge and sort by date
+        const allCombinedImages = [
+          ...(galleryImages || []),
+          ...batchAsGalleryImages,
+        ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+        // Set state
+        setAllImages(allCombinedImages);
+        setRecentImages(allCombinedImages.slice(0, 8));
+        setTotalGenerations(totalImageCount);
+        setTotalStorage(totalStorageBytes);
+
       } catch (error) {
         logger.error('Error fetching dashboard data:', error);
       } finally {
