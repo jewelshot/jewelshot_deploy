@@ -12,6 +12,10 @@ export interface Database {
           email: string;
           full_name: string | null;
           avatar_url: string | null;
+          subscription_plan: string | null;
+          subscription_status: string | null;
+          creem_customer_id: string | null;
+          credits: number;
           created_at: string;
           updated_at: string;
         };
@@ -20,6 +24,10 @@ export interface Database {
           email: string;
           full_name?: string | null;
           avatar_url?: string | null;
+          subscription_plan?: string | null;
+          subscription_status?: string | null;
+          creem_customer_id?: string | null;
+          credits?: number;
           created_at?: string;
           updated_at?: string;
         };
@@ -28,8 +36,41 @@ export interface Database {
           email?: string;
           full_name?: string | null;
           avatar_url?: string | null;
+          subscription_plan?: string | null;
+          subscription_status?: string | null;
+          creem_customer_id?: string | null;
+          credits?: number;
           created_at?: string;
           updated_at?: string;
+        };
+      };
+      subscription_history: {
+        Row: {
+          id: string;
+          user_id: string;
+          plan: string;
+          action: string;
+          credits_granted: number;
+          metadata: Record<string, unknown>;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          plan: string;
+          action: string;
+          credits_granted?: number;
+          metadata?: Record<string, unknown>;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          plan?: string;
+          action?: string;
+          credits_granted?: number;
+          metadata?: Record<string, unknown>;
+          created_at?: string;
         };
       };
       images: {

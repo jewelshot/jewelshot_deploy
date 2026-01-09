@@ -1,21 +1,25 @@
 /**
-
  * BillingSection Component
  *
- * Subscription and billing information.
- * Displays current plan, payment method, billing history.
+ * Subscription and billing management with Creem.io integration.
+ * Displays current plan, upgrade options, and payment management.
  */
 
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { CreemCheckout, CreemPortal } from '@creem_io/nextjs';
 import {
   CreditCard,
   Calendar,
-  DollarSign,
   TrendingUp,
   ExternalLink,
+  Sparkles,
+  Check,
+  Zap,
+  Crown,
+  Building,
 } from 'lucide-react';
 import { useCreditStore } from '@/store/creditStore';
 import { createScopedLogger } from '@/lib/logger';
@@ -23,19 +27,62 @@ import { createScopedLogger } from '@/lib/logger';
 const logger = createScopedLogger('BillingSection');
 
 interface BillingInfo {
-  plan: string;
-  billingCycle: string;
-  nextBillingDate: string;
-  amount: string;
+  plan: 'free' | 'pro' | 'enterprise';
+  status: 'active' | 'canceled' | 'expired' | 'trialing' | null;
+  customerId: string | null;
+  nextBillingDate: string | null;
 }
+
+// Plan configurations - REPLACE WITH YOUR CREEM PRODUCT IDs
+const PLANS = {
+  pro: {
+    id: 'pro',
+    name: 'Pro',
+    productId: 'prod_2rAu8IudVOTetQiqDJfYrt', // Replace with actual Creem product ID
+    price: 29,
+    period: '/month',
+    credits: 500,
+    icon: Zap,
+    color: 'from-purple-500 to-pink-500',
+    features: [
+      '500 credits/month',
+      '50 AI requests/min',
+      '50GB storage',
+      'Priority support',
+      'Advanced features',
+      'Batch processing',
+    ],
+  },
+  enterprise: {
+    id: 'enterprise',
+    name: 'Enterprise',
+    productId: 'prod_REPLACE_WITH_ENTERPRISE_ID', // Replace with actual Creem product ID
+    price: 99,
+    period: '/month',
+    credits: 999999,
+    icon: Crown,
+    color: 'from-amber-500 to-orange-500',
+    features: [
+      'Unlimited credits',
+      'Unlimited AI requests',
+      'Unlimited storage',
+      '24/7 priority support',
+      'Custom integrations',
+      'API access',
+      'Dedicated account manager',
+    ],
+  },
+};
 
 export function BillingSection() {
   const { credits } = useCreditStore();
+  const [userId, setUserId] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [billing, setBilling] = useState<BillingInfo>({
-    plan: 'Free',
-    billingCycle: 'N/A',
-    nextBillingDate: 'N/A',
-    amount: '$0.00',
+    plan: 'free',
+    status: null,
+    customerId: null,
+    nextBillingDate: null,
   });
   const [loading, setLoading] = useState(true);
 
@@ -43,20 +90,34 @@ export function BillingSection() {
     const fetchBillingInfo = async () => {
       try {
         const supabase = createClient();
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
+        const { data: { user } } = await supabase.auth.getUser();
 
         if (!user) return;
 
-        // In a real app, fetch from subscriptions table
-        // For now, show free plan info
-        setBilling({
-          plan: 'Free',
-          billingCycle: 'Monthly',
-          nextBillingDate: 'N/A',
-          amount: '$0.00',
-        });
+        setUserId(user.id);
+        setUserEmail(user.email || null);
+
+        // Fetch subscription info from profile
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('subscription_plan, subscription_status, creem_customer_id')
+          .eq('id', user.id)
+          .single();
+
+        if (profile) {
+          const profileData = profile as {
+            subscription_plan?: string | null;
+            subscription_status?: string | null;
+            creem_customer_id?: string | null;
+          };
+          
+          setBilling({
+            plan: (profileData.subscription_plan as 'free' | 'pro' | 'enterprise') || 'free',
+            status: profileData.subscription_status as BillingInfo['status'] || null,
+            customerId: profileData.creem_customer_id || null,
+            nextBillingDate: null, // Could be fetched from Creem API
+          });
+        }
       } catch (error) {
         logger.error('Error fetching billing:', error);
       } finally {
@@ -71,55 +132,15 @@ export function BillingSection() {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
-          <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-purple-500 border-t-transparent"></div>
+          <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-purple-500 border-t-transparent mx-auto"></div>
           <p className="text-sm text-white/70">Loading billing info...</p>
         </div>
       </div>
     );
   }
 
-  const plans = [
-    {
-      name: 'Free',
-      price: '$0',
-      period: '/month',
-      features: [
-        '10 credits/month',
-        '5 AI requests/min',
-        '1GB storage',
-        'Basic support',
-      ],
-      current: billing.plan === 'Free',
-    },
-    {
-      name: 'Pro',
-      price: '$29',
-      period: '/month',
-      features: [
-        '500 credits/month',
-        '50 AI requests/min',
-        '50GB storage',
-        'Priority support',
-        'Advanced features',
-      ],
-      current: billing.plan === 'Pro',
-      popular: true,
-    },
-    {
-      name: 'Enterprise',
-      price: '$99',
-      period: '/month',
-      features: [
-        'Unlimited credits',
-        'Unlimited AI requests',
-        'Unlimited storage',
-        '24/7 support',
-        'Custom integrations',
-        'API access',
-      ],
-      current: billing.plan === 'Enterprise',
-    },
-  ];
+  const currentPlan = billing.plan;
+  const isActive = billing.status === 'active' || billing.status === 'trialing';
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -137,7 +158,12 @@ export function BillingSection() {
             <TrendingUp className="h-5 w-5 text-purple-400" />
             <h3 className="text-sm font-medium text-white/60">Current Plan</h3>
           </div>
-          <p className="text-3xl font-bold text-white">{billing.plan}</p>
+          <p className="text-3xl font-bold text-white capitalize">{currentPlan}</p>
+          {isActive && (
+            <span className="mt-2 inline-block rounded-full bg-green-500/20 px-2 py-0.5 text-xs text-green-400">
+              Active
+            </span>
+          )}
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
@@ -147,124 +173,172 @@ export function BillingSection() {
               Available Credits
             </h3>
           </div>
-          <p className="text-3xl font-bold text-white">{credits}</p>
+          <p className="text-3xl font-bold text-white">
+            {credits === 999999 ? 'Unlimited' : credits.toLocaleString()}
+          </p>
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
           <div className="mb-2 flex items-center gap-2">
             <Calendar className="h-5 w-5 text-purple-400" />
             <h3 className="text-sm font-medium text-white/60">
-              Next Billing
+              Status
             </h3>
           </div>
-          <p className="text-3xl font-bold text-white">
-            {billing.nextBillingDate}
+          <p className="text-3xl font-bold text-white capitalize">
+            {billing.status || 'Free'}
           </p>
         </div>
       </div>
 
-      {/* Pricing Plans */}
+      {/* Upgrade Plans */}
       <div className="mb-8">
-        <h3 className="mb-4 text-xl font-semibold text-white">
-          Available Plans
+        <h3 className="mb-4 text-xl font-semibold text-white flex items-center gap-2">
+          <Sparkles className="h-5 w-5 text-purple-400" />
+          {currentPlan === 'free' ? 'Upgrade Your Plan' : 'Available Plans'}
         </h3>
-        <div className="grid gap-6 md:grid-cols-3">
-          {plans.map((plan, index) => (
-            <div
-              key={index}
-              className={`relative rounded-2xl border p-6 backdrop-blur-sm transition-all hover:scale-105 ${
-                plan.current
-                  ? 'border-purple-500/40 bg-purple-500/10'
-                  : 'border-white/10 bg-white/5'
-              }`}
-            >
-              {plan.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-1 text-xs font-semibold text-white">
-                  Popular
-                </div>
-              )}
-              {plan.current && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-1 text-xs font-semibold text-white">
-                  Current Plan
-                </div>
-              )}
-              <div className="mb-4">
-                <h4 className="mb-2 text-xl font-bold text-white">
-                  {plan.name}
-                </h4>
-                <div className="flex items-baseline">
-                  <span className="text-4xl font-bold text-white">
-                    {plan.price}
-                  </span>
-                  <span className="ml-1 text-white/60">{plan.period}</span>
-                </div>
-              </div>
-              <ul className="mb-6 space-y-2">
-                {plan.features.map((feature, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm">
-                    <span className="mt-1 text-purple-400">✓</span>
-                    <span className="text-white/80">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              <button
-                disabled={plan.current}
-                className={`w-full rounded-lg px-4 py-2.5 text-sm font-medium transition-all ${
-                  plan.current
-                    ? 'cursor-not-allowed bg-white/10 text-white/40'
-                    : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600'
+        
+        <div className="grid gap-6 md:grid-cols-2">
+          {Object.values(PLANS).map((plan) => {
+            const Icon = plan.icon;
+            const isCurrent = currentPlan === plan.id;
+            
+            return (
+              <div
+                key={plan.id}
+                className={`relative rounded-2xl border p-6 backdrop-blur-sm transition-all hover:scale-[1.02] ${
+                  isCurrent
+                    ? 'border-purple-500/40 bg-purple-500/10'
+                    : 'border-white/10 bg-white/5 hover:border-white/20'
                 }`}
               >
-                {plan.current ? 'Current Plan' : 'Upgrade'}
-              </button>
-            </div>
-          ))}
+                {isCurrent && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-1 text-xs font-semibold text-white">
+                    Current Plan
+                  </div>
+                )}
+                
+                {plan.id === 'pro' && currentPlan === 'free' && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-1 text-xs font-semibold text-white">
+                    Popular
+                  </div>
+                )}
+
+                <div className="mb-4 flex items-center gap-3">
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-r ${plan.color}`}>
+                    <Icon className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold text-white">{plan.name}</h4>
+                    <div className="flex items-baseline">
+                      <span className="text-3xl font-bold text-white">${plan.price}</span>
+                      <span className="ml-1 text-white/60">{plan.period}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <ul className="mb-6 space-y-2">
+                  {plan.features.map((feature, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm">
+                      <Check className="mt-0.5 h-4 w-4 text-green-400 flex-shrink-0" />
+                      <span className="text-white/80">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {isCurrent ? (
+                  billing.customerId ? (
+                    <CreemPortal customerId={billing.customerId}>
+                      <button className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-2.5 text-sm font-medium text-white hover:bg-white/20 transition-colors">
+                        Manage Subscription
+                      </button>
+                    </CreemPortal>
+                  ) : (
+                    <button 
+                      disabled 
+                      className="w-full rounded-lg bg-white/10 px-4 py-2.5 text-sm font-medium text-white/40 cursor-not-allowed"
+                    >
+                      Current Plan
+                    </button>
+                  )
+                ) : (
+                  <CreemCheckout
+                    productId={plan.productId}
+                    successUrl="/profile?tab=billing&success=true"
+                    customer={userEmail ? { email: userEmail } : undefined}
+                    referenceId={userId || undefined}
+                    metadata={{ 
+                      userId: userId,
+                      plan: plan.id,
+                      source: 'billing-page'
+                    }}
+                  >
+                    <button className={`w-full rounded-lg bg-gradient-to-r ${plan.color} px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 transition-opacity`}>
+                      {currentPlan === 'free' ? 'Upgrade Now' : 'Switch Plan'}
+                    </button>
+                  </CreemCheckout>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      {/* Payment Method */}
-      <div className="mb-8 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-white">Payment Method</h3>
-          <button className="text-sm text-purple-400 hover:text-purple-300">
-            Add New
-          </button>
-        </div>
-        <div className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 p-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-r from-purple-500 to-pink-500">
-              <DollarSign className="h-5 w-5 text-white" />
+      {/* Free Plan Info */}
+      {currentPlan === 'free' && (
+        <div className="mb-8 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+          <div className="flex items-start gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/10">
+              <Building className="h-6 w-6 text-white/60" />
             </div>
             <div>
-              <p className="text-sm font-medium text-white">No payment method</p>
-              <p className="text-xs text-white/60">Add a card to upgrade</p>
+              <h4 className="text-lg font-semibold text-white">Free Plan</h4>
+              <p className="mt-1 text-white/60">
+                You're currently on the free plan with 10 credits per month.
+                Upgrade to unlock more features and credits.
+              </p>
+              <ul className="mt-3 space-y-1 text-sm text-white/50">
+                <li className="flex items-center gap-2">
+                  <Check className="h-3 w-3" /> 10 credits/month
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-3 w-3" /> 5 AI requests/min
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-3 w-3" /> 1GB storage
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-3 w-3" /> Basic support
+                </li>
+              </ul>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Billing History */}
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-white">
-            Billing History
-          </h3>
-          <button className="flex items-center gap-1 text-sm text-purple-400 hover:text-purple-300">
-            <span>View All</span>
-            <ExternalLink className="h-3 w-3" />
-          </button>
+      {/* Manage Subscription */}
+      {billing.customerId && isActive && (
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-white">
+                Manage Subscription
+              </h3>
+              <p className="mt-1 text-sm text-white/60">
+                Update payment methods, view invoices, or cancel subscription
+              </p>
+            </div>
+            <CreemPortal customerId={billing.customerId}>
+              <button className="flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white hover:bg-white/20 transition-colors">
+                <ExternalLink className="h-4 w-4" />
+                Customer Portal
+              </button>
+            </CreemPortal>
+          </div>
         </div>
-        <div className="text-center py-8">
-          <p className="text-white/60">No billing history yet</p>
-          <p className="mt-2 text-sm text-white/40">
-            Invoices will appear here when you upgrade
-          </p>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
 
 export default BillingSection;
-
-
