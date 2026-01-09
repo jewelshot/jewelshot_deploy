@@ -19,6 +19,15 @@ const NO_SIDEBAR_ROUTES = [
   '/auth/reset-password',
   '/auth/verify-email',
   '/maintenance',
+  // Corporate pages
+  '/about',
+  '/privacy',
+  '/terms',
+  '/security',
+  '/gdpr',
+  '/careers',
+  '/contact',
+  '/blog',
 ];
 
 export default function GlobalSidebar() {
