@@ -14,8 +14,8 @@ import AuroraBackground from '@/components/atoms/AuroraBackground';
 import ErrorBoundary from '@/components/organisms/ErrorBoundary';
 import CanvasFallback from '@/components/molecules/CanvasFallback';
 import { useBreakpoint } from '@/hooks/useMediaQuery';
+import { useNoScroll } from '@/hooks/useNoScroll';
 import MobileStudio from '@/components/organisms/MobileStudio';
-// SkipLink removed - accessibility feature not needed for this UI
 
 // Dynamic imports for heavy components
 const Canvas = dynamic(() => import('@/components/organisms/Canvas'), {
@@ -51,6 +51,9 @@ const BottomBarToggle = dynamic(
 export default function StudioPage() {
   const { isMobile, isTablet, isDesktop } = useBreakpoint();
   const [isClient, setIsClient] = useState(false);
+  
+  // Disable body scroll for fixed viewport
+  useNoScroll();
 
   // Fix hydration: Only check breakpoint after client mount
   useEffect(() => {

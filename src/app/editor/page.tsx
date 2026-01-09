@@ -8,6 +8,7 @@
 
 import dynamic from 'next/dynamic';
 import AuroraBackground from '@/components/atoms/AuroraBackground';
+import { useNoScroll } from '@/hooks/useNoScroll';
 
 // Lazy load Editor component (heavy with Fabric.js)
 const EditorCanvas = dynamic(
@@ -26,6 +27,8 @@ const EditorCanvas = dynamic(
 );
 
 export default function EditorPage() {
+  useNoScroll();
+  
   return (
     <>
       <AuroraBackground />

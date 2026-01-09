@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { Component, ReactNode } from 'react';
+import { useNoScroll } from '@/hooks/useNoScroll';
 
 // Dynamic import to avoid SSR issues with Three.js
 const ThreeDViewContent = dynamic(
@@ -76,6 +77,8 @@ class ThreeDErrorBoundary extends Component<{ children: ReactNode }, ErrorBounda
 }
 
 export default function ThreeDViewPage() {
+  useNoScroll();
+  
   return (
     <ThreeDErrorBoundary>
       <ThreeDViewContent />

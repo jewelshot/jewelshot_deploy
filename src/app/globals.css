@@ -72,9 +72,14 @@ body {
   font-family: var(--font-sans);
   background: var(--background);
   color: var(--foreground);
+  min-height: 100vh;
+  position: relative;
+}
+
+/* App pages that need fixed viewport (Studio, Editor, etc.) */
+body.no-scroll {
   overflow: hidden;
   height: 100vh;
-  position: relative;
 }
 
 /* Custom Scrollbar */

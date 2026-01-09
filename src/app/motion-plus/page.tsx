@@ -8,6 +8,7 @@
 
 import dynamic from 'next/dynamic';
 import AuroraBackground from '@/components/atoms/AuroraBackground';
+import { useNoScroll } from '@/hooks/useNoScroll';
 
 // Lazy load Motion+ component (heavy with video processing)
 const MotionPlusContent = dynamic(
@@ -26,6 +27,8 @@ const MotionPlusContent = dynamic(
 );
 
 export default function MotionPlusPage() {
+  useNoScroll();
+  
   return (
     <>
       <AuroraBackground />

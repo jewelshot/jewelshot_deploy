@@ -1,17 +1,20 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Mail, Lock, ArrowLeft } from 'lucide-react';
-import { AuthCard } from '@/components/molecules/AuthCard';
+import React, { useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { Mail, Lock, ArrowLeft, Shield, Zap, Star, RefreshCw } from 'lucide-react';
 import { AuthInput } from '@/components/atoms/AuthInput';
 import { PrimaryButton } from '@/components/atoms/PrimaryButton';
 import { SocialButton } from '@/components/atoms/SocialButton';
 import { createClient } from '@/lib/supabase/client';
 import { AuroraBackground } from '@/components/atoms/AuroraBackground';
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirectTo') || '/studio';
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -31,7 +34,7 @@ export default function LoginPage() {
 
       if (signInError) throw signInError;
 
-      router.push('/studio');
+      router.push(redirectTo);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to sign in');
     } finally {
@@ -45,7 +48,7 @@ export default function LoginPage() {
       const { error: signInError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}/auth/callback?redirectTo=${encodeURIComponent(redirectTo)}`,
         },
       });
 
@@ -55,109 +58,215 @@ export default function LoginPage() {
     }
   };
 
+  const trustSignals = [
+    { icon: Shield, text: 'Enterprise-grade security' },
+    { icon: Zap, text: 'Instant AI processing' },
+    { icon: Star, text: 'Trusted by 2,500+ businesses' },
+  ];
+
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#0a0a0a]">
+    <div className="relative min-h-screen overflow-auto bg-[#0a0a0a]">
       {/* Aurora Background */}
       <div className="fixed inset-0 z-0">
         <AuroraBackground />
       </div>
 
       {/* Content */}
-      <div className="relative z-10 flex min-h-screen items-center justify-center px-6 py-12">
-        <div className="w-full max-w-md">
-          {/* Back Button */}
-          <button
-            onClick={() => router.push('/')}
-            className="group mb-8 flex items-center gap-2 text-white/60 transition-colors hover:text-white"
-          >
-            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-            <span className="text-sm">Back to home</span>
-          </button>
+      <div className="relative z-10 flex min-h-screen">
+        {/* Left Side - Branding */}
+        <div className="hidden w-1/2 flex-col justify-between p-12 lg:flex">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-purple-600">
+              <span className="text-lg font-bold text-white">J</span>
+            </div>
+            <span className="text-xl font-bold text-white">Jewelshot</span>
+          </Link>
 
-          {/* Login Card */}
-          <AuthCard
-            title="Welcome Back"
-            subtitle="Sign in to your Jewelshot account"
-          >
-            <form onSubmit={handleEmailLogin} className="space-y-4">
-              {/* Email */}
-              <AuthInput
-                type="email"
-                placeholder="Email address"
-                value={email}
-                onChange={setEmail}
-                icon={Mail}
-                disabled={loading}
-              />
+          {/* Main Content */}
+          <div className="max-w-lg">
+            <h1 className="mb-6 text-4xl font-bold leading-tight text-white">
+              Transform Your Jewelry
+              <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"> Photography</span>
+            </h1>
+            <p className="mb-8 text-lg text-white/60">
+              Join thousands of jewelry businesses creating stunning product 
+              visuals with AI. No photography skills required.
+            </p>
 
-              {/* Password */}
-              <AuthInput
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={setPassword}
-                icon={Lock}
-                disabled={loading}
-              />
-
-              {/* Error Message */}
-              {error && (
-                <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
-                  {error}
+            {/* Trust Signals */}
+            <div className="space-y-4">
+              {trustSignals.map((signal, index) => (
+                <div key={index} className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/20 text-purple-400">
+                    <signal.icon className="h-5 w-5" />
+                  </div>
+                  <span className="text-white/80">{signal.text}</span>
                 </div>
-              )}
-
-              {/* Forgot Password */}
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => router.push('/auth/reset-password')}
-                  className="text-sm text-purple-400 transition-colors hover:text-purple-300"
-                >
-                  Forgot password?
-                </button>
-              </div>
-
-              {/* Login Button */}
-              <PrimaryButton
-                type="submit"
-                className="w-full"
-                size="lg"
-                disabled={loading}
-              >
-                {loading ? 'Signing in...' : 'Sign In'}
-              </PrimaryButton>
-            </form>
-
-            {/* Divider */}
-            <div className="my-6 flex items-center gap-3">
-              <div className="h-px flex-1 bg-white/10" />
-              <span className="text-sm text-white/40">Or continue with</span>
-              <div className="h-px flex-1 bg-white/10" />
+              ))}
             </div>
 
-            {/* Social Login */}
-            <div className="space-y-3">
+            {/* Testimonial */}
+            <div className="mt-12 rounded-2xl border border-white/10 bg-white/5 p-6">
+              <p className="mb-4 text-white/80 italic">
+                "Jewelshot saved us $15,000 in photography costs and reduced 
+                our product launch time from weeks to hours."
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-sm font-medium text-white">
+                  SM
+                </div>
+                <div>
+                  <div className="font-medium text-white">Sarah Mitchell</div>
+                  <div className="text-sm text-white/40">CEO, Luxe Jewelers</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="flex items-center gap-6 text-sm text-white/40">
+            <Link href="/privacy" className="hover:text-white/60">Privacy</Link>
+            <Link href="/terms" className="hover:text-white/60">Terms</Link>
+            <Link href="/security" className="hover:text-white/60">Security</Link>
+          </div>
+        </div>
+
+        {/* Right Side - Login Form */}
+        <div className="flex w-full items-center justify-center px-6 py-12 lg:w-1/2">
+          <div className="w-full max-w-md">
+            {/* Mobile Back Button */}
+            <Link
+              href="/"
+              className="group mb-8 flex items-center gap-2 text-white/60 transition-colors hover:text-white lg:hidden"
+            >
+              <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+              <span className="text-sm">Back to home</span>
+            </Link>
+
+            {/* Login Card */}
+            <div className="rounded-2xl border border-white/10 bg-[#0a0a0a]/80 p-8 backdrop-blur-xl">
+              <div className="mb-8 text-center">
+                {/* Mobile Logo */}
+                <div className="mb-4 flex justify-center lg:hidden">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-purple-600">
+                    <span className="text-xl font-bold text-white">J</span>
+                  </div>
+                </div>
+                <h2 className="text-2xl font-bold text-white">Welcome back</h2>
+                <p className="mt-2 text-white/60">
+                  Sign in to continue to your dashboard
+                </p>
+              </div>
+
+              <form onSubmit={handleEmailLogin} className="space-y-4">
+                {/* Email */}
+                <div>
+                  <label htmlFor="email" className="mb-2 block text-sm font-medium text-white/80">
+                    Email address
+                  </label>
+                  <AuthInput
+                    type="email"
+                    placeholder="you@company.com"
+                    value={email}
+                    onChange={setEmail}
+                    icon={Mail}
+                    disabled={loading}
+                  />
+                </div>
+
+                {/* Password */}
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <label htmlFor="password" className="text-sm font-medium text-white/80">
+                      Password
+                    </label>
+                    <Link
+                      href="/auth/reset-password"
+                      className="text-sm text-purple-400 transition-colors hover:text-purple-300"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
+                  <AuthInput
+                    type="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={setPassword}
+                    icon={Lock}
+                    disabled={loading}
+                  />
+                </div>
+
+                {/* Error Message */}
+                {error && (
+                  <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+                    {error}
+                  </div>
+                )}
+
+                {/* Login Button */}
+                <PrimaryButton
+                  type="submit"
+                  className="w-full"
+                  size="lg"
+                  disabled={loading}
+                >
+                  {loading ? 'Signing in...' : 'Sign in'}
+                </PrimaryButton>
+              </form>
+
+              {/* Divider */}
+              <div className="my-6 flex items-center gap-3">
+                <div className="h-px flex-1 bg-white/10" />
+                <span className="text-sm text-white/40">or continue with</span>
+                <div className="h-px flex-1 bg-white/10" />
+              </div>
+
+              {/* Social Login */}
               <SocialButton
                 provider="google"
                 onClick={handleGoogleLogin}
                 disabled={loading}
               />
-            </div>
 
-            {/* Sign Up Link */}
-            <div className="mt-6 text-center text-sm text-white/60">
-              Don&apos;t have an account?{' '}
-              <button
-                onClick={() => router.push('/auth/signup')}
-                className="font-medium text-purple-400 transition-colors hover:text-purple-300"
-              >
-                Sign up
-              </button>
+              {/* Sign Up Link */}
+              <div className="mt-6 text-center text-sm text-white/60">
+                New to Jewelshot?{' '}
+                <Link
+                  href="/auth/signup"
+                  className="font-medium text-purple-400 transition-colors hover:text-purple-300"
+                >
+                  Create an account
+                </Link>
+              </div>
+
+              {/* Security Badge */}
+              <div className="mt-6 flex items-center justify-center gap-2 text-xs text-white/40">
+                <Shield className="h-3 w-3" />
+                <span>Protected by 256-bit SSL encryption</span>
+              </div>
             </div>
-          </AuthCard>
+          </div>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
+          <div className="flex items-center gap-2 text-white/60">
+            <RefreshCw className="h-5 w-5 animate-spin" />
+            <span>Loading...</span>
+          </div>
+        </div>
+      }
+    >
+      <LoginContent />
+    </Suspense>
   );
 }
