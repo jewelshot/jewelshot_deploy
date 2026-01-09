@@ -1,13 +1,13 @@
 /**
  * DashboardContent Component
  *
- * Clean, minimal dashboard with usage analytics.
- * Layout: Stats → Analytics → Content → Quick Actions
+ * Comprehensive dashboard with real data analytics.
+ * All data is fetched from Supabase - NO MOCK DATA.
  */
 
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSidebarStore } from '@/store/sidebarStore';
 import { useCreditStore } from '@/store/creditStore';
@@ -18,11 +18,26 @@ import {
   Edit3,
   ExternalLink,
   ArrowUpRight,
+  Calendar,
+  Layers,
+  Clock,
+  Keyboard,
+  X,
+  Play,
+  AlertCircle,
+  CheckCircle2,
+  Loader2,
+  TrendingUp,
+  Sparkles,
 } from 'lucide-react';
 import { createScopedLogger } from '@/lib/logger';
+import Link from 'next/link';
 
 const logger = createScopedLogger('Dashboard');
 
+// ============================================
+// TYPES
+// ============================================
 interface GalleryImage {
   id: string;
   name: string;
@@ -30,6 +45,8 @@ interface GalleryImage {
   generated_url: string;
   created_at: string;
   size: number;
+  preset_id?: string | null;
+  preset_name?: string | null;
 }
 
 interface DailyUsage {
@@ -38,169 +55,278 @@ interface DailyUsage {
   dayName: string;
 }
 
+interface PresetUsage {
+  name: string;
+  count: number;
+  percentage: number;
+}
+
+interface BatchJob {
+  id: string;
+  name: string;
+  status: string;
+  total_images: number;
+  completed_images: number;
+  failed_images: number;
+  created_at: string;
+}
+
 interface PlanInfo {
   name: string;
   creditsUsed: number;
   creditsTotal: number;
-  renewalDate: string | null;
+  percentUsed: number;
 }
 
+// ============================================
+// CONSTANTS
+// ============================================
+const PLAN_CREDITS: Record<string, number> = {
+  free: 10,
+  pro: 500,
+  enterprise: 9999,
+};
+
+const KEYBOARD_SHORTCUTS = [
+  { keys: ['G'], action: 'Generate image' },
+  { keys: ['Ctrl', 'Z'], action: 'Undo' },
+  { keys: ['Ctrl', 'S'], action: 'Save to gallery' },
+  { keys: ['Ctrl', 'D'], action: 'Download' },
+  { keys: ['Space'], action: 'Pan canvas' },
+  { keys: ['R'], action: 'Reset view' },
+  { keys: ['[', ']'], action: 'Brush size' },
+  { keys: ['1-9'], action: 'Quick presets' },
+];
+
+// ============================================
+// MAIN COMPONENT
+// ============================================
 export function DashboardContent() {
   const router = useRouter();
   const { leftOpen } = useSidebarStore();
   const { credits, loading: creditsLoading, fetchCredits } = useCreditStore();
-  
-  // State
+
+  // Core State
+  const [loading, setLoading] = useState(true);
+  const [userName, setUserName] = useState('');
+  const [hoveredImage, setHoveredImage] = useState<string | null>(null);
+
+  // Data State
   const [recentImages, setRecentImages] = useState<GalleryImage[]>([]);
   const [allImages, setAllImages] = useState<GalleryImage[]>([]);
   const [totalGenerations, setTotalGenerations] = useState(0);
   const [totalStorage, setTotalStorage] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [userName, setUserName] = useState('');
-  const [hoveredImage, setHoveredImage] = useState<string | null>(null);
   const [planInfo, setPlanInfo] = useState<PlanInfo>({
     name: 'Free',
     creditsUsed: 0,
     creditsTotal: 10,
-    renewalDate: null,
+    percentUsed: 0,
   });
 
-  // Calculate weekly usage from images
-  const weeklyUsage = useMemo((): DailyUsage[] => {
+  // Analytics State
+  const [timeRange, setTimeRange] = useState<'week' | 'month'>('week');
+  const [presetUsage, setPresetUsage] = useState<PresetUsage[]>([]);
+  const [activeBatches, setActiveBatches] = useState<BatchJob[]>([]);
+  const [recentBatches, setRecentBatches] = useState<BatchJob[]>([]);
+
+  // UI State
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const [lastUsedPreset, setLastUsedPreset] = useState<{ id: string; name: string } | null>(null);
+
+  // ============================================
+  // COMPUTED: Weekly/Monthly Usage Data
+  // ============================================
+  const usageData = useMemo((): DailyUsage[] => {
     const days: DailyUsage[] = [];
     const now = new Date();
-    
-    for (let i = 6; i >= 0; i--) {
+    const daysToShow = timeRange === 'week' ? 7 : 30;
+
+    for (let i = daysToShow - 1; i >= 0; i--) {
       const date = new Date(now);
       date.setDate(date.getDate() - i);
       const dateStr = date.toISOString().split('T')[0];
-      const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
-      
+      const dayName = timeRange === 'week'
+        ? date.toLocaleDateString('en-US', { weekday: 'short' })
+        : date.getDate().toString();
+
       const count = allImages.filter(img => {
         const imgDate = new Date(img.created_at).toISOString().split('T')[0];
         return imgDate === dateStr;
       }).length;
-      
+
       days.push({ date: dateStr, count, dayName });
     }
-    
+
     return days;
-  }, [allImages]);
+  }, [allImages, timeRange]);
 
-  // Max count for chart scaling
-  const maxCount = useMemo(() => {
-    return Math.max(...weeklyUsage.map(d => d.count), 1);
-  }, [weeklyUsage]);
+  const maxUsageCount = useMemo(() => {
+    return Math.max(...usageData.map(d => d.count), 1);
+  }, [usageData]);
 
-  // This week total
-  const thisWeekTotal = useMemo(() => {
-    return weeklyUsage.reduce((sum, d) => sum + d.count, 0);
-  }, [weeklyUsage]);
+  const periodTotal = useMemo(() => {
+    return usageData.reduce((sum, d) => sum + d.count, 0);
+  }, [usageData]);
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
+  // ============================================
+  // DATA FETCHING
+  // ============================================
+  const fetchDashboardData = useCallback(async () => {
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
 
-        if (!user) return;
+      if (!user) return;
 
-        setUserName(user.user_metadata?.full_name?.split(' ')[0] || '');
+      setUserName(user.user_metadata?.full_name?.split(' ')[0] || '');
 
-        // Get user profile for plan info
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('subscription_plan, subscription_status, credits')
-          .eq('id', user.id)
-          .single() as { data: { subscription_plan?: string; subscription_status?: string; credits?: number } | null };
+      // ========== PROFILE & PLAN ==========
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('subscription_plan, credits')
+        .eq('id', user.id)
+        .single() as { data: { subscription_plan?: string; credits?: number } | null };
 
-        if (profile) {
-          const planCredits: Record<string, number> = {
-            free: 10,
-            pro: 500,
-            enterprise: 9999,
-          };
-          const plan = profile.subscription_plan || 'free';
-          const total = planCredits[plan] || 10;
-          
-          setPlanInfo({
-            name: plan.charAt(0).toUpperCase() + plan.slice(1),
-            creditsUsed: total - (profile.credits || 0),
-            creditsTotal: total,
-            renewalDate: null,
+      if (profile) {
+        const plan = profile.subscription_plan || 'free';
+        const total = PLAN_CREDITS[plan] || 10;
+        const used = total - (profile.credits || 0);
+        const percent = total > 0 ? Math.round((used / total) * 100) : 0;
+
+        setPlanInfo({
+          name: plan.charAt(0).toUpperCase() + plan.slice(1),
+          creditsUsed: used,
+          creditsTotal: total,
+          percentUsed: percent,
+        });
+      }
+
+      // ========== GALLERY IMAGES ==========
+      const { data: galleryImages, count: galleryCount } = await supabase
+        .from('images')
+        .select('*', { count: 'exact' })
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false }) as { data: GalleryImage[] | null; count: number | null };
+
+      // ========== BATCH IMAGES ==========
+      const { data: batchImages } = await supabase
+        .from('batch_images')
+        .select('id, original_filename, original_url, result_url, original_size, status, created_at')
+        .eq('user_id', user.id)
+        .eq('status', 'completed')
+        .order('created_at', { ascending: false }) as {
+          data: Array<{
+            id: string;
+            original_filename: string;
+            original_url: string | null;
+            result_url: string | null;
+            original_size: number;
+            status: string;
+            created_at: string;
+          }> | null
+        };
+
+      // ========== BATCH PROJECTS ==========
+      const { data: batchProjects } = await supabase
+        .from('batch_projects')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(10) as { data: BatchJob[] | null };
+
+      if (batchProjects) {
+        // Active batches (processing)
+        const active = batchProjects.filter(b => b.status === 'processing');
+        setActiveBatches(active);
+
+        // Recent completed batches
+        const completed = batchProjects.filter(b => b.status === 'completed').slice(0, 3);
+        setRecentBatches(completed);
+      }
+
+      // ========== CALCULATE TOTALS ==========
+      const galleryImageCount = galleryCount || 0;
+      const batchImageCount = batchImages?.length || 0;
+      const totalImageCount = galleryImageCount + batchImageCount;
+
+      const galleryStorage = galleryImages?.reduce((acc, img) => acc + (img.size || 0), 0) || 0;
+      const batchStorage = batchImages?.reduce((acc, img) => acc + (img.original_size || 0), 0) || 0;
+
+      // ========== PRESET USAGE ANALYTICS ==========
+      if (galleryImages && galleryImages.length > 0) {
+        const presetCounts: Record<string, number> = {};
+        galleryImages.forEach(img => {
+          const presetName = img.preset_name || 'No Preset';
+          presetCounts[presetName] = (presetCounts[presetName] || 0) + 1;
+        });
+
+        const totalWithPresets = Object.values(presetCounts).reduce((a, b) => a + b, 0);
+        const presetStats: PresetUsage[] = Object.entries(presetCounts)
+          .map(([name, count]) => ({
+            name,
+            count,
+            percentage: Math.round((count / totalWithPresets) * 100),
+          }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 5);
+
+        setPresetUsage(presetStats);
+
+        // Last used preset (most recent image with a preset)
+        const lastWithPreset = galleryImages.find(img => img.preset_id && img.preset_name);
+        if (lastWithPreset) {
+          setLastUsedPreset({
+            id: lastWithPreset.preset_id!,
+            name: lastWithPreset.preset_name!,
           });
         }
-
-        // ========== FETCH GALLERY IMAGES (images table) ==========
-        const { data: galleryImages, count: galleryCount } = await supabase
-          .from('images')
-          .select('*', { count: 'exact' })
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false }) as { data: GalleryImage[] | null; count: number | null };
-
-        // ========== FETCH BATCH IMAGES (batch_images table) ==========
-        const { data: batchImages } = await supabase
-          .from('batch_images')
-          .select('id, original_filename, original_url, result_url, original_size, status, created_at')
-          .eq('user_id', user.id)
-          .eq('status', 'completed')
-          .order('created_at', { ascending: false }) as { 
-            data: Array<{
-              id: string;
-              original_filename: string;
-              original_url: string | null;
-              result_url: string | null;
-              original_size: number;
-              status: string;
-              created_at: string;
-            }> | null 
-          };
-
-        // ========== CALCULATE TOTALS ==========
-        const galleryImageCount = galleryCount || 0;
-        const batchImageCount = batchImages?.length || 0;
-        const totalImageCount = galleryImageCount + batchImageCount;
-
-        // Storage calculation
-        const galleryStorage = galleryImages?.reduce((acc: number, img: GalleryImage) => acc + (img.size || 0), 0) || 0;
-        const batchStorage = batchImages?.reduce((acc: number, img) => acc + (img.original_size || 0), 0) || 0;
-        const totalStorageBytes = galleryStorage + batchStorage;
-
-        // ========== COMBINE RECENT IMAGES FOR DISPLAY ==========
-        // Convert batch images to GalleryImage format
-        const batchAsGalleryImages: GalleryImage[] = (batchImages || []).map(img => ({
-          id: img.id,
-          name: img.original_filename,
-          original_url: img.original_url || '',
-          generated_url: img.result_url || img.original_url || '',
-          created_at: img.created_at,
-          size: img.original_size,
-        }));
-
-        // Merge and sort by date
-        const allCombinedImages = [
-          ...(galleryImages || []),
-          ...batchAsGalleryImages,
-        ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-
-        // Set state
-        setAllImages(allCombinedImages);
-        setRecentImages(allCombinedImages.slice(0, 8));
-        setTotalGenerations(totalImageCount);
-        setTotalStorage(totalStorageBytes);
-
-      } catch (error) {
-        logger.error('Error fetching dashboard data:', error);
-      } finally {
-        setLoading(false);
       }
-    };
 
+      // ========== COMBINE ALL IMAGES ==========
+      const batchAsGallery: GalleryImage[] = (batchImages || []).map(img => ({
+        id: img.id,
+        name: img.original_filename,
+        original_url: img.original_url || '',
+        generated_url: img.result_url || img.original_url || '',
+        created_at: img.created_at,
+        size: img.original_size,
+      }));
+
+      const combined = [
+        ...(galleryImages || []),
+        ...batchAsGallery,
+      ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+      setAllImages(combined);
+      setRecentImages(combined.slice(0, 8));
+      setTotalGenerations(totalImageCount);
+      setTotalStorage(galleryStorage + batchStorage);
+
+    } catch (error) {
+      logger.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
     fetchDashboardData();
     fetchCredits();
-  }, [fetchCredits]);
 
-  // Format bytes
+    // Check localStorage for last used preset (fallback)
+    const stored = localStorage.getItem('jewelshot_last_preset');
+    if (stored) {
+      try {
+        setLastUsedPreset(JSON.parse(stored));
+      } catch {
+        // Ignore parse errors
+      }
+    }
+  }, [fetchDashboardData, fetchCredits]);
+
+  // ============================================
+  // HANDLERS
+  // ============================================
   const formatBytes = (bytes: number) => {
     if (bytes === 0) return '0 B';
     const k = 1024;
@@ -209,7 +335,6 @@ export function DashboardContent() {
     return Math.round((bytes / Math.pow(k, i)) * 10) / 10 + ' ' + sizes[i];
   };
 
-  // Image actions
   const handleOpenInStudio = (image: GalleryImage) => {
     sessionStorage.setItem('studio-import-image', image.generated_url || image.original_url);
     sessionStorage.setItem('studio-import-source', 'dashboard');
@@ -232,6 +357,16 @@ export function DashboardContent() {
     }
   };
 
+  const handleQuickGenerate = () => {
+    if (lastUsedPreset) {
+      sessionStorage.setItem('studio-quick-preset', JSON.stringify(lastUsedPreset));
+    }
+    router.push('/studio');
+  };
+
+  // ============================================
+  // LOADING STATE
+  // ============================================
   if (loading || creditsLoading) {
     return (
       <main
@@ -240,109 +375,157 @@ export function DashboardContent() {
       >
         <div className="text-center">
           <div className="mb-4 h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white/60 mx-auto" />
-          <p className="text-sm text-white/40">Loading...</p>
+          <p className="text-sm text-white/40">Loading dashboard...</p>
         </div>
       </main>
     );
   }
 
-  // Credit usage percentage
-  const creditUsagePercent = planInfo.creditsTotal > 0 
-    ? Math.round((planInfo.creditsUsed / planInfo.creditsTotal) * 100)
-    : 0;
-
+  // ============================================
+  // RENDER
+  // ============================================
   return (
     <main
       className="fixed inset-0 overflow-y-auto transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
       style={{ paddingLeft: leftOpen ? '260px' : '0' }}
     >
-      <div className="min-h-screen p-8">
+      <div className="min-h-screen p-6">
         {/* ==================== HEADER ==================== */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-white">
-            {userName ? `Welcome back, ${userName}` : 'Dashboard'}
-          </h1>
-          <p className="text-sm text-white/40">
-            {new Date().toLocaleDateString('en-US', { 
-              weekday: 'long', 
-              month: 'long', 
-              day: 'numeric' 
-            })}
-          </p>
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-white">
+              {userName ? `Welcome back, ${userName}` : 'Dashboard'}
+            </h1>
+            <p className="text-sm text-white/40">
+              {new Date().toLocaleDateString('en-US', {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric'
+              })}
+            </p>
+          </div>
+
+          {/* Header Actions */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowShortcuts(true)}
+              className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/60 hover:bg-white/[0.06] transition-colors"
+            >
+              <Keyboard className="h-3.5 w-3.5" />
+              Shortcuts
+            </button>
+          </div>
         </div>
 
         {/* ==================== STATS ROW ==================== */}
-        <div className="mb-6 grid grid-cols-4 gap-4">
+        <div className="mb-5 grid grid-cols-4 gap-3">
           <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-            <p className="text-[11px] uppercase tracking-wider text-white/40 mb-1">Credits</p>
+            <p className="text-[10px] uppercase tracking-wider text-white/40 mb-1">Credits</p>
             <p className="text-2xl font-semibold text-white">{credits}</p>
+            <p className="text-[10px] text-white/30 mt-1">of {planInfo.creditsTotal}</p>
           </div>
           <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-            <p className="text-[11px] uppercase tracking-wider text-white/40 mb-1">Total Images</p>
+            <p className="text-[10px] uppercase tracking-wider text-white/40 mb-1">Total Images</p>
             <p className="text-2xl font-semibold text-white">{totalGenerations}</p>
+            <p className="text-[10px] text-white/30 mt-1">all time</p>
           </div>
           <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-            <p className="text-[11px] uppercase tracking-wider text-white/40 mb-1">Storage</p>
+            <p className="text-[10px] uppercase tracking-wider text-white/40 mb-1">Storage</p>
             <p className="text-2xl font-semibold text-white">{formatBytes(totalStorage)}</p>
+            <p className="text-[10px] text-white/30 mt-1">used</p>
           </div>
           <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-            <p className="text-[11px] uppercase tracking-wider text-white/40 mb-1">This Week</p>
-            <p className="text-2xl font-semibold text-white">{thisWeekTotal}</p>
+            <p className="text-[10px] uppercase tracking-wider text-white/40 mb-1">
+              {timeRange === 'week' ? 'This Week' : 'This Month'}
+            </p>
+            <p className="text-2xl font-semibold text-white">{periodTotal}</p>
+            <p className="text-[10px] text-white/30 mt-1">generations</p>
           </div>
         </div>
 
-        {/* ==================== ANALYTICS ROW ==================== */}
-        <div className="mb-6 grid grid-cols-3 gap-4">
-          {/* Usage Chart - 2/3 width */}
+        {/* ==================== ANALYTICS & PLAN ROW ==================== */}
+        <div className="mb-5 grid grid-cols-3 gap-3">
+          {/* Usage Analytics (2/3) */}
           <div className="col-span-2 rounded-xl border border-white/10 bg-white/[0.03] p-5">
             <div className="flex items-center justify-between mb-4">
-              <p className="text-[11px] uppercase tracking-wider text-white/40">
-                Last 7 Days
+              <p className="text-[10px] uppercase tracking-wider text-white/40">
+                Usage Analytics
               </p>
-              <p className="text-xs text-white/30">
-                {thisWeekTotal} generations
-              </p>
+              {/* Time Range Toggle */}
+              <div className="flex rounded-lg border border-white/10 overflow-hidden">
+                <button
+                  onClick={() => setTimeRange('week')}
+                  className={`px-3 py-1 text-[10px] transition-colors ${timeRange === 'week'
+                      ? 'bg-white/10 text-white'
+                      : 'text-white/40 hover:text-white/60'
+                    }`}
+                >
+                  Week
+                </button>
+                <button
+                  onClick={() => setTimeRange('month')}
+                  className={`px-3 py-1 text-[10px] transition-colors ${timeRange === 'month'
+                      ? 'bg-white/10 text-white'
+                      : 'text-white/40 hover:text-white/60'
+                    }`}
+                >
+                  Month
+                </button>
+              </div>
             </div>
-            
-            {/* Simple Bar Chart */}
-            <div className="flex items-end justify-between gap-2 h-24">
-              {weeklyUsage.map((day, i) => (
-                <div key={day.date} className="flex-1 flex flex-col items-center gap-2">
-                  <div className="w-full flex items-end justify-center h-16">
-                    <div 
-                      className="w-full max-w-[32px] rounded-t transition-all duration-300"
+
+            {/* Bar Chart */}
+            <div className="flex items-end justify-between gap-1 h-28">
+              {usageData.map((day) => (
+                <div key={day.date} className="flex-1 flex flex-col items-center gap-1.5">
+                  <div className="w-full flex items-end justify-center h-20">
+                    <div
+                      className="w-full max-w-[24px] rounded-t transition-all duration-300 hover:opacity-80"
                       style={{
-                        height: day.count > 0 ? `${(day.count / maxCount) * 100}%` : '4px',
-                        backgroundColor: day.count > 0 ? 'rgba(168, 85, 247, 0.6)' : 'rgba(255,255,255,0.1)',
-                        minHeight: '4px',
+                        height: day.count > 0 ? `${(day.count / maxUsageCount) * 100}%` : '3px',
+                        backgroundColor: day.count > 0 ? 'rgba(168, 85, 247, 0.5)' : 'rgba(255,255,255,0.08)',
+                        minHeight: '3px',
                       }}
+                      title={`${day.date}: ${day.count} generations`}
                     />
                   </div>
-                  <span className="text-[10px] text-white/30">{day.dayName}</span>
+                  <span className="text-[9px] text-white/30">{day.dayName}</span>
                 </div>
               ))}
             </div>
+
+            {/* Total indicator */}
+            <div className="mt-3 flex items-center justify-between text-[10px] text-white/40">
+              <span>Total: {periodTotal} generations</span>
+              <span className="flex items-center gap-1">
+                <TrendingUp className="h-3 w-3" />
+                {usageData.length > 0 && usageData[usageData.length - 1].count > 0 ? 'Active today' : 'No activity today'}
+              </span>
+            </div>
           </div>
 
-          {/* Plan & Limits - 1/3 width */}
+          {/* Plan & Limits (1/3) */}
           <div className="col-span-1 rounded-xl border border-white/10 bg-white/[0.03] p-5">
             <div className="flex items-center justify-between mb-4">
-              <p className="text-[11px] uppercase tracking-wider text-white/40">Plan</p>
-              <span className="text-xs px-2 py-0.5 rounded bg-white/10 text-white/60">
+              <p className="text-[10px] uppercase tracking-wider text-white/40">Plan</p>
+              <span className="text-[10px] px-2 py-0.5 rounded bg-white/10 text-white/60">
                 {planInfo.name}
               </span>
             </div>
-            
-            {/* Credit Usage Bar */}
-            <div className="mb-3">
+
+            {/* Credit Progress */}
+            <div className="mb-4">
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs text-white/50">Credit Usage</span>
-                <span className="text-xs text-white/50">{creditUsagePercent}%</span>
+                <span className="text-[10px] text-white/50">Credit Usage</span>
+                <span className="text-[10px] text-white/50">{planInfo.percentUsed}%</span>
               </div>
               <div className="h-2 rounded-full bg-white/10 overflow-hidden">
-                <div 
-                  className="h-full rounded-full bg-purple-500/60 transition-all duration-500"
-                  style={{ width: `${creditUsagePercent}%` }}
+                <div
+                  className={`h-full rounded-full transition-all duration-500 ${planInfo.percentUsed > 90 ? 'bg-red-500/60' :
+                      planInfo.percentUsed > 70 ? 'bg-yellow-500/60' :
+                        'bg-purple-500/50'
+                    }`}
+                  style={{ width: `${planInfo.percentUsed}%` }}
                 />
               </div>
               <p className="mt-1.5 text-[10px] text-white/30">
@@ -350,142 +533,293 @@ export function DashboardContent() {
               </p>
             </div>
 
+            {/* Low Credit Warning */}
+            {planInfo.percentUsed > 80 && (
+              <div className="mb-3 flex items-start gap-2 rounded-lg bg-yellow-500/10 border border-yellow-500/20 p-2">
+                <AlertCircle className="h-3.5 w-3.5 text-yellow-500 flex-shrink-0 mt-0.5" />
+                <p className="text-[10px] text-yellow-500/80">
+                  {planInfo.percentUsed >= 100 ? 'Credits depleted!' : 'Running low on credits'}
+                </p>
+              </div>
+            )}
+
             {planInfo.name === 'Free' && (
-              <a 
+              <Link
                 href="/profile?tab=billing"
-                className="mt-3 flex items-center justify-center gap-1 w-full py-2 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-white/60 hover:text-white/80 transition-colors"
+                className="flex items-center justify-center gap-1 w-full py-2 rounded-lg bg-white/5 hover:bg-white/10 text-[10px] text-white/60 hover:text-white/80 transition-colors"
               >
                 Upgrade Plan
                 <ArrowUpRight className="h-3 w-3" />
-              </a>
+              </Link>
             )}
           </div>
         </div>
 
-        {/* ==================== MAIN CONTENT ==================== */}
-        <div className="mb-6 grid grid-cols-3 gap-4">
-          {/* Recent Images - 2/3 width */}
-          <div className="col-span-2 rounded-xl border border-white/10 bg-white/[0.03] p-5">
+        {/* ==================== PRESETS & BATCHES ROW ==================== */}
+        <div className="mb-5 grid grid-cols-3 gap-3">
+          {/* Most Used Presets (1/3) */}
+          <div className="col-span-1 rounded-xl border border-white/10 bg-white/[0.03] p-5">
+            <p className="text-[10px] uppercase tracking-wider text-white/40 mb-4">
+              Most Used Presets
+            </p>
+
+            {presetUsage.length > 0 ? (
+              <div className="space-y-3">
+                {presetUsage.map((preset, i) => (
+                  <div key={preset.name} className="flex items-center gap-3">
+                    <span className="text-[10px] text-white/30 w-4">{i + 1}.</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-white/70 truncate">{preset.name}</p>
+                      <div className="mt-1 h-1 rounded-full bg-white/10 overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-purple-500/40"
+                          style={{ width: `${preset.percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                    <span className="text-[10px] text-white/40">{preset.count}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-white/30">No preset data yet</p>
+            )}
+          </div>
+
+          {/* Quick Generation (1/3) */}
+          <div className="col-span-1 rounded-xl border border-white/10 bg-white/[0.03] p-5">
+            <p className="text-[10px] uppercase tracking-wider text-white/40 mb-4">
+              Quick Generate
+            </p>
+
+            {lastUsedPreset ? (
+              <div>
+                <p className="text-xs text-white/50 mb-2">Continue with:</p>
+                <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3 mb-3">
+                  <p className="text-sm text-white truncate">{lastUsedPreset.name}</p>
+                  <p className="text-[10px] text-white/40 mt-0.5">Last used preset</p>
+                </div>
+                <button
+                  onClick={handleQuickGenerate}
+                  className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-purple-600/80 hover:bg-purple-600 text-xs text-white transition-colors"
+                >
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Generate Now
+                </button>
+              </div>
+            ) : (
+              <div className="text-center py-4">
+                <p className="text-xs text-white/40 mb-3">No recent preset</p>
+                <Link
+                  href="/studio"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-white/60 transition-colors"
+                >
+                  Go to Studio
+                  <ArrowRight className="h-3 w-3" />
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Batch Status (1/3) */}
+          <div className="col-span-1 rounded-xl border border-white/10 bg-white/[0.03] p-5">
             <div className="flex items-center justify-between mb-4">
-              <p className="text-[11px] uppercase tracking-wider text-white/40">
-                Recent Images
+              <p className="text-[10px] uppercase tracking-wider text-white/40">
+                Batch Status
               </p>
-              <a
-                href="/gallery"
-                className="flex items-center gap-1 text-xs text-white/30 hover:text-white/50 transition-colors"
-              >
-                View all <ArrowRight className="h-3 w-3" />
-              </a>
+              {activeBatches.length > 0 && (
+                <span className="flex items-center gap-1 text-[10px] text-yellow-500">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  {activeBatches.length} active
+                </span>
+              )}
             </div>
 
-            {recentImages.length > 0 ? (
-              <div className="grid grid-cols-4 gap-3">
-                {recentImages.map((image) => (
-                  <div
-                    key={image.id}
-                    className="group relative aspect-square overflow-hidden rounded-lg border border-white/10 bg-black/30"
-                    onMouseEnter={() => setHoveredImage(image.id)}
-                    onMouseLeave={() => setHoveredImage(null)}
-                  >
-                    <img
-                      src={image.generated_url || image.original_url}
-                      alt={image.name}
-                      className="h-full w-full object-cover"
-                    />
-                    
-                    {/* Hover Overlay */}
-                    {hoveredImage === image.id && (
-                      <div className="absolute inset-0 bg-black/70 flex items-center justify-center gap-2 animate-in fade-in duration-150">
-                        <button
-                          onClick={() => handleOpenInStudio(image)}
-                          className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
-                          title="Edit in Studio"
-                        >
-                          <Edit3 className="h-4 w-4 text-white" />
-                        </button>
-                        <button
-                          onClick={() => handleDownload(image)}
-                          className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
-                          title="Download"
-                        >
-                          <Download className="h-4 w-4 text-white" />
-                        </button>
-                        <a
-                          href={image.generated_url || image.original_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
-                          title="Open"
-                        >
-                          <ExternalLink className="h-4 w-4 text-white" />
-                        </a>
-                      </div>
-                    )}
+            {activeBatches.length > 0 ? (
+              <div className="space-y-2 mb-3">
+                {activeBatches.slice(0, 2).map((batch) => (
+                  <div key={batch.id} className="rounded-lg border border-yellow-500/20 bg-yellow-500/5 p-2">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-xs text-white truncate flex-1">{batch.name}</p>
+                      <Loader2 className="h-3 w-3 animate-spin text-yellow-500" />
+                    </div>
+                    <div className="h-1 rounded-full bg-white/10 overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-yellow-500/60 transition-all"
+                        style={{
+                          width: `${batch.total_images > 0 ? (batch.completed_images / batch.total_images) * 100 : 0}%`
+                        }}
+                      />
+                    </div>
+                    <p className="text-[10px] text-white/40 mt-1">
+                      {batch.completed_images}/{batch.total_images} completed
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : recentBatches.length > 0 ? (
+              <div className="space-y-2">
+                {recentBatches.map((batch) => (
+                  <div key={batch.id} className="flex items-center gap-2 text-xs">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-green-500/60" />
+                    <span className="text-white/60 truncate flex-1">{batch.name}</span>
+                    <span className="text-white/30">{batch.total_images}</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="py-16 text-center">
-                <p className="text-white/30 mb-2">No images yet</p>
-                <a href="/studio" className="text-sm text-purple-400/80 hover:text-purple-400">
-                  Create your first image →
-                </a>
-              </div>
+              <p className="text-xs text-white/30">No batch jobs</p>
             )}
+
+            <Link
+              href="/batch"
+              className="mt-3 flex items-center justify-center gap-1 w-full py-2 rounded-lg bg-white/5 hover:bg-white/10 text-[10px] text-white/50 transition-colors"
+            >
+              View All Batches
+              <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+        </div>
+
+        {/* ==================== RECENT IMAGES ==================== */}
+        <div className="mb-5 rounded-xl border border-white/10 bg-white/[0.03] p-5">
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-[10px] uppercase tracking-wider text-white/40">
+              Recent Images
+            </p>
+            <Link
+              href="/gallery"
+              className="flex items-center gap-1 text-[10px] text-white/30 hover:text-white/50 transition-colors"
+            >
+              View all <ArrowRight className="h-3 w-3" />
+            </Link>
           </div>
 
-          {/* Activity - 1/3 width */}
-          <div className="col-span-1 rounded-xl border border-white/10 bg-white/[0.03] p-5">
-            <p className="text-[11px] uppercase tracking-wider text-white/40 mb-4">
-              Recent Activity
-            </p>
-            
-            {recentImages.length > 0 ? (
-              <div className="space-y-3">
-                {recentImages.slice(0, 6).map((image) => (
-                  <div key={image.id} className="flex items-start gap-3">
-                    <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-white/20 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-white/70 truncate">
-                        {image.name || 'Image generated'}
-                      </p>
-                      <p className="text-[10px] text-white/30">
-                        {formatTimeAgo(new Date(image.created_at))}
-                      </p>
+          {recentImages.length > 0 ? (
+            <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
+              {recentImages.map((image) => (
+                <div
+                  key={image.id}
+                  className="group relative aspect-square overflow-hidden rounded-lg border border-white/10 bg-black/30"
+                  onMouseEnter={() => setHoveredImage(image.id)}
+                  onMouseLeave={() => setHoveredImage(null)}
+                >
+                  <img
+                    src={image.generated_url || image.original_url}
+                    alt={image.name}
+                    className="h-full w-full object-cover"
+                  />
+
+                  {hoveredImage === image.id && (
+                    <div className="absolute inset-0 bg-black/70 flex items-center justify-center gap-1.5 animate-in fade-in duration-150">
+                      <button
+                        onClick={() => handleOpenInStudio(image)}
+                        className="p-1.5 rounded-md bg-white/10 hover:bg-white/20 transition-colors"
+                        title="Edit in Studio"
+                      >
+                        <Edit3 className="h-3.5 w-3.5 text-white" />
+                      </button>
+                      <button
+                        onClick={() => handleDownload(image)}
+                        className="p-1.5 rounded-md bg-white/10 hover:bg-white/20 transition-colors"
+                        title="Download"
+                      >
+                        <Download className="h-3.5 w-3.5 text-white" />
+                      </button>
+                      <a
+                        href={image.generated_url || image.original_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-1.5 rounded-md bg-white/10 hover:bg-white/20 transition-colors"
+                        title="Open"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5 text-white" />
+                      </a>
                     </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-white/30">No recent activity</p>
-            )}
-          </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-12 text-center">
+              <p className="text-white/30 mb-2">No images yet</p>
+              <Link href="/studio" className="text-xs text-purple-400/80 hover:text-purple-400">
+                Create your first image →
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* ==================== QUICK ACTIONS ==================== */}
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-4 gap-2">
           {[
             { href: '/studio', title: 'Studio', desc: 'Create images' },
             { href: '/batch', title: 'Batch', desc: 'Process multiple' },
             { href: '/gallery', title: 'Gallery', desc: 'View your work' },
             { href: '/profile', title: 'Account', desc: 'Settings & billing' },
           ].map((action) => (
-            <a
+            <Link
               key={action.href}
               href={action.href}
-              className="rounded-xl border border-white/10 bg-white/[0.03] p-4 hover:bg-white/[0.06] transition-colors group"
+              className="rounded-xl border border-white/10 bg-white/[0.03] p-3 hover:bg-white/[0.06] transition-colors group"
             >
               <p className="text-sm font-medium text-white group-hover:text-white/90">{action.title}</p>
-              <p className="text-[11px] text-white/30">{action.desc}</p>
-            </a>
+              <p className="text-[10px] text-white/30">{action.desc}</p>
+            </Link>
           ))}
         </div>
       </div>
+
+      {/* ==================== KEYBOARD SHORTCUTS MODAL ==================== */}
+      {showShortcuts && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-xl border border-white/10 bg-[#0a0a0a] p-6 shadow-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-white">Keyboard Shortcuts</h3>
+              <button
+                onClick={() => setShowShortcuts(false)}
+                className="p-1 rounded hover:bg-white/10 transition-colors"
+              >
+                <X className="h-5 w-5 text-white/60" />
+              </button>
+            </div>
+
+            <div className="space-y-2">
+              {KEYBOARD_SHORTCUTS.map((shortcut, i) => (
+                <div key={i} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
+                  <span className="text-sm text-white/70">{shortcut.action}</span>
+                  <div className="flex items-center gap-1">
+                    {shortcut.keys.map((key, j) => (
+                      <span key={j}>
+                        <kbd className="px-2 py-1 rounded bg-white/10 text-xs text-white/80 font-mono">
+                          {key}
+                        </kbd>
+                        {j < shortcut.keys.length - 1 && (
+                          <span className="text-white/30 mx-1">+</span>
+                        )}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setShowShortcuts(false)}
+              className="mt-4 w-full py-2 rounded-lg bg-white/5 hover:bg-white/10 text-sm text-white/60 transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
 
-// Helper function
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
 function formatTimeAgo(date: Date): string {
   const now = new Date();
   const diff = now.getTime() - date.getTime();
