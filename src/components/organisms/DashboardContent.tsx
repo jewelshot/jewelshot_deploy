@@ -215,45 +215,79 @@ export function DashboardContent() {
 
       setUserName(user.user_metadata?.full_name?.split(' ')[0] || '');
 
-      // ========== RUN ALL QUERIES IN PARALLEL ==========
+      // ========== RUN ALL QUERIES IN PARALLEL (OPTIMIZED) ==========
+      // Only fetch what we need, with strict limits
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
       const [
         profileResult,
         notifsResult,
-        galleryResult,
-        batchImagesResult,
+        // Count only (very fast, head: true)
+        galleryCountResult,
+        // Recent images for display (only 8, minimal fields)
+        recentGalleryResult,
+        // Last 30 days for analytics (minimal fields)
+        analyticsGalleryResult,
+        // Batch images count only
+        batchCountResult,
+        // Recent batch images for display
+        recentBatchImagesResult,
+        // Batch projects
         batchProjectsResult,
       ] = await Promise.all([
-        // Profile
+        // Profile - minimal fields
         supabase
           .from('profiles')
           .select('subscription_plan, subscription_renewal_date, credits')
           .eq('id', user.id)
           .single(),
-        // Notifications
+        // Notifications - limited
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (supabase as any)
           .from('notifications')
-          .select('*')
+          .select('id, type, title, message, read, created_at')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
           .limit(10),
-        // Gallery Images
+        // Gallery count only (super fast)
         supabase
           .from('images')
-          .select('*', { count: 'exact' })
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id),
+        // Recent 8 images for display - minimal fields
+        supabase
+          .from('images')
+          .select('id, name, original_url, generated_url, created_at, size, file_type, preset_name')
           .eq('user_id', user.id)
-          .order('created_at', { ascending: false }),
-        // Batch Images
+          .order('created_at', { ascending: false })
+          .limit(8),
+        // Last 30 days for analytics - only date and preset
+        supabase
+          .from('images')
+          .select('id, created_at, preset_name, size, file_type')
+          .eq('user_id', user.id)
+          .gte('created_at', thirtyDaysAgo.toISOString())
+          .order('created_at', { ascending: false })
+          .limit(500),
+        // Batch images count only
         supabase
           .from('batch_images')
-          .select('id, original_filename, original_url, result_url, original_size, status, created_at')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('status', 'completed'),
+        // Recent batch images - minimal fields, limited
+        supabase
+          .from('batch_images')
+          .select('id, original_filename, original_url, result_url, original_size, created_at')
           .eq('user_id', user.id)
           .eq('status', 'completed')
-          .order('created_at', { ascending: false }),
-        // Batch Projects
+          .order('created_at', { ascending: false })
+          .limit(8),
+        // Batch projects - minimal fields
         supabase
           .from('batch_projects')
-          .select('*')
+          .select('id, name, status, total_images, completed_images, failed_images, created_at')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
           .limit(10),
@@ -283,18 +317,29 @@ export function DashboardContent() {
         setUnreadCount(notifs.filter(n => !n.read).length);
       }
 
-      // ========== PROCESS GALLERY IMAGES ==========
-      const galleryImages = galleryResult.data as GalleryImage[] | null;
-      const galleryCount = galleryResult.count as number | null;
+      // ========== PROCESS COUNTS ==========
+      const galleryCount = galleryCountResult.count as number || 0;
+      const batchCount = batchCountResult.count as number || 0;
+
+      // ========== PROCESS RECENT GALLERY IMAGES ==========
+      const recentGalleryImages = recentGalleryResult.data as GalleryImage[] | null;
+      
+      // ========== PROCESS ANALYTICS DATA ==========
+      const analyticsImages = analyticsGalleryResult.data as Array<{
+        id: string;
+        created_at: string;
+        preset_name: string | null;
+        size: number;
+        file_type: string | null;
+      }> | null;
 
       // ========== PROCESS BATCH IMAGES ==========
-      const batchImages = batchImagesResult.data as Array<{
+      const recentBatchImages = recentBatchImagesResult.data as Array<{
         id: string;
         original_filename: string;
         original_url: string | null;
         result_url: string | null;
         original_size: number;
-        status: string;
         created_at: string;
       }> | null;
 
@@ -307,28 +352,19 @@ export function DashboardContent() {
         setRecentBatches(completed);
       }
 
-      // ========== CALCULATE TOTALS ==========
-      const galleryImageCount = galleryCount || 0;
-      const batchImageCount = batchImages?.length || 0;
-      const totalImageCount = galleryImageCount + batchImageCount;
+      // ========== CALCULATE TOTALS (using counts, not full data) ==========
+      const totalImageCount = galleryCount + batchCount;
 
-      const galleryStorage = galleryImages?.reduce((acc, img) => acc + (img.size || 0), 0) || 0;
-      const batchStorage = batchImages?.reduce((acc, img) => acc + (img.original_size || 0), 0) || 0;
+      // Storage from analytics data (last 30 days only for speed)
+      const galleryStorage = analyticsImages?.reduce((acc, img) => acc + (img.size || 0), 0) || 0;
+      const batchStorage = recentBatchImages?.reduce((acc, img) => acc + (img.original_size || 0), 0) || 0;
 
-      // ========== STORAGE BREAKDOWN ==========
-      if (galleryImages && galleryImages.length > 0) {
+      // ========== STORAGE BREAKDOWN (from analytics data) ==========
+      if (analyticsImages && analyticsImages.length > 0) {
         const breakdown: Record<string, { size: number; count: number }> = {};
         
-        galleryImages.forEach(img => {
-          // Detect file type from URL or stored file_type
-          let fileType = img.file_type || 'image/jpeg';
-          if (!img.file_type) {
-            const url = img.generated_url || img.original_url;
-            if (url.includes('.png')) fileType = 'image/png';
-            else if (url.includes('.webp')) fileType = 'image/webp';
-            else if (url.includes('.gif')) fileType = 'image/gif';
-          }
-          
+        analyticsImages.forEach(img => {
+          const fileType = img.file_type || 'image/jpeg';
           if (!breakdown[fileType]) {
             breakdown[fileType] = { size: 0, count: 0 };
           }
@@ -349,10 +385,10 @@ export function DashboardContent() {
         setStorageBreakdown(storageStats);
       }
 
-      // ========== PRESET USAGE ANALYTICS ==========
-      if (galleryImages && galleryImages.length > 0) {
+      // ========== PRESET USAGE ANALYTICS (from analytics data) ==========
+      if (analyticsImages && analyticsImages.length > 0) {
         const presetCounts: Record<string, number> = {};
-        galleryImages.forEach(img => {
+        analyticsImages.forEach(img => {
           const presetName = img.preset_name || 'No Preset';
           presetCounts[presetName] = (presetCounts[presetName] || 0) + 1;
         });
@@ -369,17 +405,18 @@ export function DashboardContent() {
 
         setPresetUsage(presetStats);
 
-        const lastWithPreset = galleryImages.find(img => img.preset_id && img.preset_name);
+        // Last used preset from recent gallery images
+        const lastWithPreset = recentGalleryImages?.find(img => img.preset_name);
         if (lastWithPreset) {
           setLastUsedPreset({
-            id: lastWithPreset.preset_id!,
+            id: lastWithPreset.preset_id || '',
             name: lastWithPreset.preset_name!,
           });
         }
       }
 
-      // ========== COMBINE ALL IMAGES ==========
-      const batchAsGallery: GalleryImage[] = (batchImages || []).map(img => ({
+      // ========== COMBINE RECENT IMAGES FOR DISPLAY ==========
+      const batchAsGallery: GalleryImage[] = (recentBatchImages || []).map(img => ({
         id: img.id,
         name: img.original_filename,
         original_url: img.original_url || '',
@@ -388,13 +425,25 @@ export function DashboardContent() {
         size: img.original_size,
       }));
 
-      const combined = [
-        ...(galleryImages || []),
+      const combinedRecent = [
+        ...(recentGalleryImages || []),
         ...batchAsGallery,
-      ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+       .slice(0, 8);
 
-      setAllImages(combined);
-      setRecentImages(combined.slice(0, 8));
+      // For analytics chart, use analytics data
+      const analyticsForChart = (analyticsImages || []).map(img => ({
+        id: img.id,
+        name: '',
+        original_url: '',
+        generated_url: '',
+        created_at: img.created_at,
+        size: img.size,
+        preset_name: img.preset_name,
+      }));
+
+      setAllImages(analyticsForChart);
+      setRecentImages(combinedRecent);
       setTotalGenerations(totalImageCount);
       setTotalStorage(galleryStorage + batchStorage);
 
