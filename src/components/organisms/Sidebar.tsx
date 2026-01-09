@@ -110,7 +110,7 @@ export function Sidebar() {
 
   return (
     <aside
-      className={`fixed bottom-0 left-0 top-0 z-[100] w-[260px] border-r border-[rgba(139,92,246,0.15)] bg-[rgba(10,10,10,0.7)] shadow-[4px_0_24px_rgba(0,0,0,0.3)] backdrop-blur-[24px] backdrop-saturate-[200%] transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)] ${leftOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      className={`fixed bottom-0 left-0 top-0 z-[100] w-[260px] border-r border-purple-500/15 bg-[var(--panel)] shadow-[var(--shadow-lg)] backdrop-blur-[24px] backdrop-saturate-[200%] transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)] ${leftOpen ? 'translate-x-0' : '-translate-x-full'}`}
     >
       {/* Sidebar Content */}
       <div className="sidebar-scroll flex h-full flex-col overflow-y-auto px-4 py-3">
@@ -118,7 +118,7 @@ export function Sidebar() {
         <SidebarLogo />
 
         {/* Divider */}
-        <div className="my-4 h-px bg-white/[0.06]" />
+        <div className="my-4 h-px bg-[var(--border)]" />
 
         {/* Main Navigation */}
         <nav className="mb-2 flex flex-col gap-1">

@@ -11,6 +11,7 @@ import GlobalSidebar from '@/components/organisms/GlobalSidebar';
 import { PlausibleAnalytics } from '@/components/analytics/PlausibleAnalytics';
 import { CookieConsent } from '@/components/molecules/CookieConsent';
 import { OrganizationSchema, SoftwareApplicationSchema, WebSiteSchema } from '@/components/seo/StructuredData';
+import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import './globals.css';
 
 // Note: Environment validation is available in src/lib/env.ts
@@ -129,8 +130,29 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark" suppressHydrationWarning>
       <head>
+        {/* Theme initialization script to prevent flash */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                const stored = localStorage.getItem('jewelshot-theme');
+                if (stored) {
+                  const { state } = JSON.parse(stored);
+                  const theme = state.theme;
+                  let resolved = theme;
+                  if (theme === 'system') {
+                    resolved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                  }
+                  document.documentElement.classList.remove('dark', 'light');
+                  document.documentElement.classList.add(resolved);
+                  document.documentElement.style.colorScheme = resolved;
+                }
+              } catch (e) {}
+            `,
+          }}
+        />
         {/* Structured Data for SEO */}
         <OrganizationSchema />
         <SoftwareApplicationSchema />
@@ -140,12 +162,14 @@ export default function RootLayout({
         className={`${inter.variable} font-sans antialiased`}
         data-theme="purple"
       >
-        <ErrorBoundary>{children}</ErrorBoundary>
-        <GlobalSidebar />
-        <ToastContainer />
-        <GalleryPrefetch />
-        <PlausibleAnalytics />
-        <CookieConsent />
+        <ThemeProvider>
+          <ErrorBoundary>{children}</ErrorBoundary>
+          <GlobalSidebar />
+          <ToastContainer />
+          <GalleryPrefetch />
+          <PlausibleAnalytics />
+          <CookieConsent />
+        </ThemeProvider>
         <Analytics />
         <SpeedInsights />
       </body>

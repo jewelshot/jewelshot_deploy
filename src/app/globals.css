@@ -52,14 +52,86 @@
   }
 
   :root {
-    --background: #0a0a0a;
-    --foreground: #ffffff;
-
-    /* Theme Colors - Deep Purple */
+    /* Theme Colors - Deep Purple (shared) */
     --theme-primary: 168 85 247;
     --theme-primary-dark: 147 51 234;
     --theme-primary-light: 192 132 252;
     --theme-glow: rgba(168, 85, 247, 0.5);
+  }
+
+  /* ============================================
+     Dark Theme (Default)
+     ============================================ */
+  :root.dark,
+  :root:not(.light) {
+    --background: #0a0a0a;
+    --background-secondary: #111111;
+    --background-tertiary: #1a1a1a;
+    --foreground: #ffffff;
+    --foreground-muted: rgba(255, 255, 255, 0.7);
+    --foreground-subtle: rgba(255, 255, 255, 0.5);
+    --foreground-faint: rgba(255, 255, 255, 0.3);
+    
+    /* Borders */
+    --border: rgba(255, 255, 255, 0.1);
+    --border-hover: rgba(255, 255, 255, 0.2);
+    --border-active: rgba(255, 255, 255, 0.3);
+    
+    /* Surfaces */
+    --surface: rgba(255, 255, 255, 0.05);
+    --surface-hover: rgba(255, 255, 255, 0.1);
+    --surface-active: rgba(255, 255, 255, 0.15);
+    
+    /* Cards & Panels */
+    --card: rgba(255, 255, 255, 0.03);
+    --card-hover: rgba(255, 255, 255, 0.06);
+    --panel: rgba(0, 0, 0, 0.4);
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
+    
+    /* Scrollbar */
+    --scrollbar-thumb: rgba(255, 255, 255, 0.2);
+    --scrollbar-thumb-hover: rgba(255, 255, 255, 0.3);
+  }
+
+  /* ============================================
+     Light Theme
+     ============================================ */
+  :root.light {
+    --background: #f8f9fa;
+    --background-secondary: #ffffff;
+    --background-tertiary: #f0f1f3;
+    --foreground: #1a1a2e;
+    --foreground-muted: rgba(26, 26, 46, 0.8);
+    --foreground-subtle: rgba(26, 26, 46, 0.6);
+    --foreground-faint: rgba(26, 26, 46, 0.4);
+    
+    /* Borders */
+    --border: rgba(0, 0, 0, 0.1);
+    --border-hover: rgba(0, 0, 0, 0.15);
+    --border-active: rgba(0, 0, 0, 0.2);
+    
+    /* Surfaces */
+    --surface: rgba(0, 0, 0, 0.03);
+    --surface-hover: rgba(0, 0, 0, 0.06);
+    --surface-active: rgba(0, 0, 0, 0.1);
+    
+    /* Cards & Panels */
+    --card: #ffffff;
+    --card-hover: #f8f9fa;
+    --panel: rgba(255, 255, 255, 0.9);
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+    
+    /* Scrollbar */
+    --scrollbar-thumb: rgba(0, 0, 0, 0.2);
+    --scrollbar-thumb-hover: rgba(0, 0, 0, 0.3);
   }
 }
 
@@ -74,6 +146,7 @@ body {
   color: var(--foreground);
   min-height: 100vh;
   position: relative;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* App pages that need fixed viewport (Studio, Editor, etc.) */
@@ -92,12 +165,12 @@ body.no-scroll {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(var(--theme-primary), 0.2);
+  background: var(--scrollbar-thumb);
   border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(var(--theme-primary), 0.4);
+  background: var(--scrollbar-thumb-hover);
 }
 
 /* Sidebar Scrollbar */
@@ -110,12 +183,12 @@ body.no-scroll {
 }
 
 .sidebar-scroll::-webkit-scrollbar-thumb {
-  background: rgba(var(--theme-primary), 0.2);
+  background: var(--scrollbar-thumb);
   border-radius: 2px;
 }
 
 .sidebar-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(var(--theme-primary), 0.4);
+  background: var(--scrollbar-thumb-hover);
 }
 
 /* No Scrollbar (for horizontal scroll areas) */
