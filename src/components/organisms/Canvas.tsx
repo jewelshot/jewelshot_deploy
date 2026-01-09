@@ -161,6 +161,25 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
     fetchCredits();
   }, [fetchCredits]);
 
+  // Check for imported image from 3D View or other sources
+  useEffect(() => {
+    const importedImage = sessionStorage.getItem('studio-import-image');
+    const importSource = sessionStorage.getItem('studio-import-source');
+    
+    if (importedImage) {
+      // Set the imported image as the current canvas image
+      setUploadedImage(importedImage);
+      setFileName(`${importSource || 'imported'}_snapshot.png`);
+      
+      // Clear the import data
+      sessionStorage.removeItem('studio-import-image');
+      sessionStorage.removeItem('studio-import-source');
+      
+      // Show success message
+      console.log(`[Canvas] Imported image from ${importSource}`);
+    }
+  }, [setUploadedImage, setFileName]);
+
   // AI Image Edit & Comparison
   // Track AI image loading state
   const [isAIImageLoading, setIsAIImageLoading] = useState(false);

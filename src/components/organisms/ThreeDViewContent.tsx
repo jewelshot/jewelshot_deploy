@@ -885,6 +885,59 @@ export default function ThreeDViewContent() {
     }
   }, [snapshotPreview, fileName]);
 
+  // Open in Studio
+  const handleOpenInStudio = useCallback((imageData: string) => {
+    // Store image in sessionStorage for Studio to pick up
+    sessionStorage.setItem('studio-import-image', imageData);
+    sessionStorage.setItem('studio-import-source', '3d-view');
+    // Navigate to studio
+    window.location.href = '/studio';
+  }, []);
+
+  // Take snapshot and open directly in Studio (shutter button)
+  const handleShutterClick = useCallback(() => {
+    setIsSnapshotMode(true);
+    
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        // Create a custom event that will capture and redirect
+        const captureAndRedirect = (dataUrl: string) => {
+          handleOpenInStudio(dataUrl);
+        };
+        
+        // Temporarily replace the snapshot handler
+        const originalHandler = handleSnapshotResult;
+        const shutterHandler = (dataUrl: string) => {
+          setSnapshotPreview(dataUrl);
+          captureAndRedirect(dataUrl);
+        };
+        
+        // Use a one-time listener
+        const handleShutterSnapshot = (e: Event) => {
+          const canvas = document.querySelector('canvas');
+          if (canvas) {
+            const dataUrl = canvas.toDataURL('image/png');
+            shutterHandler(dataUrl);
+          }
+          window.removeEventListener('shutter-snapshot-complete', handleShutterSnapshot);
+        };
+        
+        window.addEventListener('shutter-snapshot-complete', handleShutterSnapshot);
+        window.dispatchEvent(new CustomEvent('take-3d-snapshot', { detail: { scale: snapshotScale } }));
+        
+        // Trigger the redirect after snapshot
+        setTimeout(() => {
+          const canvas = document.querySelector('canvas');
+          if (canvas) {
+            const dataUrl = canvas.toDataURL('image/png');
+            handleOpenInStudio(dataUrl);
+          }
+          setIsSnapshotMode(false);
+        }, 150);
+      });
+    });
+  }, [snapshotScale, handleOpenInStudio]);
+
   // Save snapshot to gallery
   const handleSaveToGallery = useCallback(async () => {
     if (!snapshotPreview) return;
@@ -1077,6 +1130,20 @@ export default function ThreeDViewContent() {
             <Camera className="h-3.5 w-3.5" />
             Snapshot
           </button>
+
+          <div className="mx-1 h-4 w-px bg-white/10" />
+
+          {/* Shutter Button - Take snapshot and open in Studio */}
+          <button
+            onClick={handleShutterClick}
+            disabled={!loadedGeometry}
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-rose-500 to-orange-500 text-white shadow-lg hover:from-rose-600 hover:to-orange-600 disabled:cursor-not-allowed disabled:opacity-50 transition-all hover:scale-105"
+            title="Capture & Open in Studio"
+          >
+            <div className="h-5 w-5 rounded-full border-2 border-white flex items-center justify-center">
+              <div className="h-3 w-3 rounded-full bg-white" />
+            </div>
+          </button>
         </div>
       </div>
 
@@ -1218,6 +1285,13 @@ export default function ThreeDViewContent() {
                         >
                           <Image className="h-3.5 w-3.5" />
                           Gallery
+                        </button>
+                        <button
+                          onClick={() => handleOpenInStudio(snapshotPreview)}
+                          className="flex items-center gap-1 rounded-lg bg-gradient-to-r from-rose-500 to-orange-500 px-3 py-2 text-xs font-medium text-white hover:from-rose-600 hover:to-orange-600"
+                        >
+                          <Palette className="h-3.5 w-3.5" />
+                          Studio
                         </button>
                       </div>
                       <button
