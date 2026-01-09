@@ -27,7 +27,12 @@ const PLAN_CREDITS: Record<string, number> = {
 };
 
 // Grant user access - called on successful payment
-async function grantAccess(userId: string, email: string, productName: string) {
+async function grantAccess(
+  userId: string, 
+  email: string, 
+  productName: string,
+  renewalDate?: string | null
+) {
   console.log(`[Creem Webhook] Granting access to user ${userId} (${email}) for ${productName}`);
   
   try {
@@ -40,12 +45,16 @@ async function grantAccess(userId: string, email: string, productName: string) {
     
     const credits = PLAN_CREDITS[planName] || PLAN_CREDITS['pro'];
     
+    // Calculate renewal date (default: 30 days from now if not provided)
+    const nextRenewal = renewalDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    
     // Update user's subscription status and credits
     const { error } = await supabaseAdmin
       .from('profiles')
       .update({
         subscription_plan: planName,
         subscription_status: 'active',
+        subscription_renewal_date: nextRenewal,
         credits: credits,
         updated_at: new Date().toISOString(),
       })
@@ -67,6 +76,17 @@ async function grantAccess(userId: string, email: string, productName: string) {
         created_at: new Date().toISOString(),
       });
     
+    // Create subscription renewed notification
+    await supabaseAdmin
+      .from('notifications')
+      .insert({
+        user_id: userId,
+        type: 'subscription_renewed',
+        title: 'Subscription Activated',
+        message: `Your ${planName} plan is now active with ${credits} credits. Next renewal: ${new Date(nextRenewal).toLocaleDateString()}.`,
+        metadata: { plan: planName, credits, renewal_date: nextRenewal },
+      });
+    
     console.log(`[Creem Webhook] Successfully granted ${planName} plan with ${credits} credits to ${email}`);
   } catch (error) {
     console.error('[Creem Webhook] Error granting access:', error);
@@ -75,8 +95,8 @@ async function grantAccess(userId: string, email: string, productName: string) {
 }
 
 // Revoke user access - called on cancellation or expiry
-async function revokeAccess(userId: string, email: string) {
-  console.log(`[Creem Webhook] Revoking access for user ${userId} (${email})`);
+async function revokeAccess(userId: string, email: string, reason: 'canceled' | 'expired' = 'canceled') {
+  console.log(`[Creem Webhook] Revoking access for user ${userId} (${email}) - ${reason}`);
   
   try {
     // Downgrade to free plan
@@ -84,7 +104,8 @@ async function revokeAccess(userId: string, email: string) {
       .from('profiles')
       .update({
         subscription_plan: 'free',
-        subscription_status: 'canceled',
+        subscription_status: reason,
+        subscription_renewal_date: null,
         credits: PLAN_CREDITS['free'],
         updated_at: new Date().toISOString(),
       })
@@ -106,6 +127,19 @@ async function revokeAccess(userId: string, email: string) {
         created_at: new Date().toISOString(),
       });
     
+    // Create notification
+    await supabaseAdmin
+      .from('notifications')
+      .insert({
+        user_id: userId,
+        type: reason === 'expired' ? 'subscription_expired' : 'subscription_canceled',
+        title: reason === 'expired' ? 'Subscription Expired' : 'Subscription Canceled',
+        message: reason === 'expired' 
+          ? 'Your subscription has expired. You have been downgraded to the free plan.'
+          : 'Your subscription has been canceled. You have been downgraded to the free plan.',
+        metadata: { reason },
+      });
+    
     console.log(`[Creem Webhook] Successfully revoked access for ${email}, downgraded to free`);
   } catch (error) {
     console.error('[Creem Webhook] Error revoking access:', error);
@@ -121,6 +155,7 @@ export const POST = Webhook({
     console.log(`[Creem Webhook] Checkout completed: ${customer?.email} purchased ${product?.name}`);
     
     const userId = metadata?.referenceId as string;
+    
     if (userId && customer?.email && product?.name) {
       await grantAccess(userId, customer.email, product.name);
     }
@@ -131,6 +166,7 @@ export const POST = Webhook({
     console.log(`[Creem Webhook] Subscription paid: ${customer?.email}`);
     
     const userId = metadata?.referenceId as string;
+    
     if (userId && customer?.email && product?.name) {
       await grantAccess(userId, customer.email, product.name);
     }
@@ -139,6 +175,7 @@ export const POST = Webhook({
   // Simplified grant access callback
   onGrantAccess: async ({ customer, metadata, product }) => {
     const userId = metadata?.referenceId as string;
+    
     if (userId && customer?.email) {
       await grantAccess(userId, customer.email, product?.name || 'Pro');
     }
@@ -148,7 +185,7 @@ export const POST = Webhook({
   onRevokeAccess: async ({ customer, metadata }) => {
     const userId = metadata?.referenceId as string;
     if (userId && customer?.email) {
-      await revokeAccess(userId, customer.email);
+      await revokeAccess(userId, customer.email, 'canceled');
     }
   },
   
@@ -158,7 +195,7 @@ export const POST = Webhook({
     
     const userId = metadata?.referenceId as string;
     if (userId && customer?.email) {
-      await revokeAccess(userId, customer.email);
+      await revokeAccess(userId, customer.email, 'canceled');
     }
   },
   
@@ -168,7 +205,7 @@ export const POST = Webhook({
     
     const userId = metadata?.referenceId as string;
     if (userId && customer?.email) {
-      await revokeAccess(userId, customer.email);
+      await revokeAccess(userId, customer.email, 'expired');
     }
   },
 });

@@ -18,17 +18,18 @@ import {
   Edit3,
   ExternalLink,
   ArrowUpRight,
-  Calendar,
-  Layers,
-  Clock,
   Keyboard,
   X,
-  Play,
   AlertCircle,
   CheckCircle2,
   Loader2,
   TrendingUp,
   Sparkles,
+  Bell,
+  Check,
+  Trash2,
+  HardDrive,
+  CalendarClock,
 } from 'lucide-react';
 import { createScopedLogger } from '@/lib/logger';
 import Link from 'next/link';
@@ -45,6 +46,7 @@ interface GalleryImage {
   generated_url: string;
   created_at: string;
   size: number;
+  file_type?: string | null;
   preset_id?: string | null;
   preset_name?: string | null;
 }
@@ -76,6 +78,24 @@ interface PlanInfo {
   creditsUsed: number;
   creditsTotal: number;
   percentUsed: number;
+  renewalDate: string | null;
+}
+
+interface NotificationItem {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  read: boolean;
+  created_at: string;
+}
+
+interface StorageBreakdown {
+  type: string;
+  label: string;
+  size: number;
+  count: number;
+  color: string;
 }
 
 // ============================================
@@ -97,6 +117,14 @@ const KEYBOARD_SHORTCUTS = [
   { keys: ['[', ']'], action: 'Brush size' },
   { keys: ['1-9'], action: 'Quick presets' },
 ];
+
+const FILE_TYPE_COLORS: Record<string, string> = {
+  'image/jpeg': '#8b5cf6',
+  'image/png': '#3b82f6',
+  'image/webp': '#10b981',
+  'image/gif': '#f59e0b',
+  'other': '#6b7280',
+};
 
 // ============================================
 // MAIN COMPONENT
@@ -121,6 +149,7 @@ export function DashboardContent() {
     creditsUsed: 0,
     creditsTotal: 10,
     percentUsed: 0,
+    renewalDate: null,
   });
 
   // Analytics State
@@ -128,6 +157,12 @@ export function DashboardContent() {
   const [presetUsage, setPresetUsage] = useState<PresetUsage[]>([]);
   const [activeBatches, setActiveBatches] = useState<BatchJob[]>([]);
   const [recentBatches, setRecentBatches] = useState<BatchJob[]>([]);
+  const [storageBreakdown, setStorageBreakdown] = useState<StorageBreakdown[]>([]);
+
+  // Notifications State
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   // UI State
   const [showShortcuts, setShowShortcuts] = useState(false);
@@ -183,9 +218,9 @@ export function DashboardContent() {
       // ========== PROFILE & PLAN ==========
       const { data: profile } = await supabase
         .from('profiles')
-        .select('subscription_plan, credits')
+        .select('subscription_plan, subscription_renewal_date, credits')
         .eq('id', user.id)
-        .single() as { data: { subscription_plan?: string; credits?: number } | null };
+        .single() as { data: { subscription_plan?: string; subscription_renewal_date?: string; credits?: number } | null };
 
       if (profile) {
         const plan = profile.subscription_plan || 'free';
@@ -198,7 +233,22 @@ export function DashboardContent() {
           creditsUsed: used,
           creditsTotal: total,
           percentUsed: percent,
+          renewalDate: profile.subscription_renewal_date || null,
         });
+      }
+
+      // ========== NOTIFICATIONS ==========
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: notifs } = await (supabase as any)
+        .from('notifications')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(10) as { data: NotificationItem[] | null };
+
+      if (notifs) {
+        setNotifications(notifs);
+        setUnreadCount(notifs.filter(n => !n.read).length);
       }
 
       // ========== GALLERY IMAGES ==========
@@ -235,11 +285,8 @@ export function DashboardContent() {
         .limit(10) as { data: BatchJob[] | null };
 
       if (batchProjects) {
-        // Active batches (processing)
         const active = batchProjects.filter(b => b.status === 'processing');
         setActiveBatches(active);
-
-        // Recent completed batches
         const completed = batchProjects.filter(b => b.status === 'completed').slice(0, 3);
         setRecentBatches(completed);
       }
@@ -251,6 +298,40 @@ export function DashboardContent() {
 
       const galleryStorage = galleryImages?.reduce((acc, img) => acc + (img.size || 0), 0) || 0;
       const batchStorage = batchImages?.reduce((acc, img) => acc + (img.original_size || 0), 0) || 0;
+
+      // ========== STORAGE BREAKDOWN ==========
+      if (galleryImages && galleryImages.length > 0) {
+        const breakdown: Record<string, { size: number; count: number }> = {};
+        
+        galleryImages.forEach(img => {
+          // Detect file type from URL or stored file_type
+          let fileType = img.file_type || 'image/jpeg';
+          if (!img.file_type) {
+            const url = img.generated_url || img.original_url;
+            if (url.includes('.png')) fileType = 'image/png';
+            else if (url.includes('.webp')) fileType = 'image/webp';
+            else if (url.includes('.gif')) fileType = 'image/gif';
+          }
+          
+          if (!breakdown[fileType]) {
+            breakdown[fileType] = { size: 0, count: 0 };
+          }
+          breakdown[fileType].size += img.size || 0;
+          breakdown[fileType].count += 1;
+        });
+
+        const storageStats: StorageBreakdown[] = Object.entries(breakdown)
+          .map(([type, data]) => ({
+            type,
+            label: type.replace('image/', '').toUpperCase(),
+            size: data.size,
+            count: data.count,
+            color: FILE_TYPE_COLORS[type] || FILE_TYPE_COLORS['other'],
+          }))
+          .sort((a, b) => b.size - a.size);
+
+        setStorageBreakdown(storageStats);
+      }
 
       // ========== PRESET USAGE ANALYTICS ==========
       if (galleryImages && galleryImages.length > 0) {
@@ -272,7 +353,6 @@ export function DashboardContent() {
 
         setPresetUsage(presetStats);
 
-        // Last used preset (most recent image with a preset)
         const lastWithPreset = galleryImages.find(img => img.preset_id && img.preset_name);
         if (lastWithPreset) {
           setLastUsedPreset({
@@ -313,13 +393,12 @@ export function DashboardContent() {
     fetchDashboardData();
     fetchCredits();
 
-    // Check localStorage for last used preset (fallback)
     const stored = localStorage.getItem('jewelshot_last_preset');
     if (stored) {
       try {
         setLastUsedPreset(JSON.parse(stored));
       } catch {
-        // Ignore parse errors
+        // Ignore
       }
     }
   }, [fetchDashboardData, fetchCredits]);
@@ -362,6 +441,49 @@ export function DashboardContent() {
       sessionStorage.setItem('studio-quick-preset', JSON.stringify(lastUsedPreset));
     }
     router.push('/studio');
+  };
+
+  const markNotificationRead = async (id: string) => {
+    const supabase = createClient();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any)
+      .from('notifications')
+      .update({ read: true })
+      .eq('id', id);
+    
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+    setUnreadCount(prev => Math.max(0, prev - 1));
+  };
+
+  const markAllNotificationsRead = async () => {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any)
+      .from('notifications')
+      .update({ read: true })
+      .eq('user_id', user.id)
+      .eq('read', false);
+    
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    setUnreadCount(0);
+  };
+
+  const deleteNotification = async (id: string) => {
+    const supabase = createClient();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any)
+      .from('notifications')
+      .delete()
+      .eq('id', id);
+    
+    const notif = notifications.find(n => n.id === id);
+    setNotifications(prev => prev.filter(n => n.id !== id));
+    if (notif && !notif.read) {
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    }
   };
 
   // ============================================
@@ -407,6 +529,19 @@ export function DashboardContent() {
 
           {/* Header Actions */}
           <div className="flex items-center gap-2">
+            {/* Notifications Button */}
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="relative flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/60 hover:bg-white/[0.06] transition-colors"
+            >
+              <Bell className="h-3.5 w-3.5" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">
+                  {unreadCount}
+                </span>
+              )}
+            </button>
+
             <button
               onClick={() => setShowShortcuts(true)}
               className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/60 hover:bg-white/[0.06] transition-colors"
@@ -451,7 +586,6 @@ export function DashboardContent() {
               <p className="text-[10px] uppercase tracking-wider text-white/40">
                 Usage Analytics
               </p>
-              {/* Time Range Toggle */}
               <div className="flex rounded-lg border border-white/10 overflow-hidden">
                 <button
                   onClick={() => setTimeRange('week')}
@@ -474,7 +608,6 @@ export function DashboardContent() {
               </div>
             </div>
 
-            {/* Bar Chart */}
             <div className="flex items-end justify-between gap-1 h-28">
               {usageData.map((day) => (
                 <div key={day.date} className="flex-1 flex flex-col items-center gap-1.5">
@@ -494,7 +627,6 @@ export function DashboardContent() {
               ))}
             </div>
 
-            {/* Total indicator */}
             <div className="mt-3 flex items-center justify-between text-[10px] text-white/40">
               <span>Total: {periodTotal} generations</span>
               <span className="flex items-center gap-1">
@@ -513,8 +645,7 @@ export function DashboardContent() {
               </span>
             </div>
 
-            {/* Credit Progress */}
-            <div className="mb-4">
+            <div className="mb-3">
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-[10px] text-white/50">Credit Usage</span>
                 <span className="text-[10px] text-white/50">{planInfo.percentUsed}%</span>
@@ -533,7 +664,16 @@ export function DashboardContent() {
               </p>
             </div>
 
-            {/* Low Credit Warning */}
+            {/* Renewal Date */}
+            {planInfo.renewalDate && (
+              <div className="mb-3 flex items-center gap-2 text-[10px] text-white/40">
+                <CalendarClock className="h-3 w-3" />
+                <span>
+                  Renews {new Date(planInfo.renewalDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                </span>
+              </div>
+            )}
+
             {planInfo.percentUsed > 80 && (
               <div className="mb-3 flex items-start gap-2 rounded-lg bg-yellow-500/10 border border-yellow-500/20 p-2">
                 <AlertCircle className="h-3.5 w-3.5 text-yellow-500 flex-shrink-0 mt-0.5" />
@@ -555,22 +695,22 @@ export function DashboardContent() {
           </div>
         </div>
 
-        {/* ==================== PRESETS & BATCHES ROW ==================== */}
-        <div className="mb-5 grid grid-cols-3 gap-3">
-          {/* Most Used Presets (1/3) */}
+        {/* ==================== PRESETS & STORAGE & BATCHES ROW ==================== */}
+        <div className="mb-5 grid grid-cols-4 gap-3">
+          {/* Most Used Presets */}
           <div className="col-span-1 rounded-xl border border-white/10 bg-white/[0.03] p-5">
             <p className="text-[10px] uppercase tracking-wider text-white/40 mb-4">
-              Most Used Presets
+              Top Presets
             </p>
 
             {presetUsage.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {presetUsage.map((preset, i) => (
-                  <div key={preset.name} className="flex items-center gap-3">
-                    <span className="text-[10px] text-white/30 w-4">{i + 1}.</span>
+                  <div key={preset.name} className="flex items-center gap-2">
+                    <span className="text-[10px] text-white/30 w-3">{i + 1}.</span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs text-white/70 truncate">{preset.name}</p>
-                      <div className="mt-1 h-1 rounded-full bg-white/10 overflow-hidden">
+                      <p className="text-[11px] text-white/70 truncate">{preset.name}</p>
+                      <div className="mt-0.5 h-1 rounded-full bg-white/10 overflow-hidden">
                         <div
                           className="h-full rounded-full bg-purple-500/40"
                           style={{ width: `${preset.percentage}%` }}
@@ -582,11 +722,53 @@ export function DashboardContent() {
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-white/30">No preset data yet</p>
+              <p className="text-[11px] text-white/30">No data yet</p>
             )}
           </div>
 
-          {/* Quick Generation (1/3) */}
+          {/* Storage Breakdown */}
+          <div className="col-span-1 rounded-xl border border-white/10 bg-white/[0.03] p-5">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-[10px] uppercase tracking-wider text-white/40">
+                Storage
+              </p>
+              <HardDrive className="h-3.5 w-3.5 text-white/30" />
+            </div>
+
+            {storageBreakdown.length > 0 ? (
+              <>
+                {/* Mini Pie Chart (CSS) */}
+                <div className="flex justify-center mb-3">
+                  <div 
+                    className="w-16 h-16 rounded-full"
+                    style={{
+                      background: `conic-gradient(${storageBreakdown.map((item, i, arr) => {
+                        const prevPercent = arr.slice(0, i).reduce((acc, it) => acc + (it.size / totalStorage * 100), 0);
+                        const thisPercent = item.size / totalStorage * 100;
+                        return `${item.color} ${prevPercent}% ${prevPercent + thisPercent}%`;
+                      }).join(', ')})`,
+                    }}
+                  />
+                </div>
+                
+                <div className="space-y-1.5">
+                  {storageBreakdown.map(item => (
+                    <div key={item.type} className="flex items-center justify-between text-[10px]">
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
+                        <span className="text-white/60">{item.label}</span>
+                      </div>
+                      <span className="text-white/40">{formatBytes(item.size)}</span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <p className="text-[11px] text-white/30">No files yet</p>
+            )}
+          </div>
+
+          {/* Quick Generation */}
           <div className="col-span-1 rounded-xl border border-white/10 bg-white/[0.03] p-5">
             <p className="text-[10px] uppercase tracking-wider text-white/40 mb-4">
               Quick Generate
@@ -594,25 +776,24 @@ export function DashboardContent() {
 
             {lastUsedPreset ? (
               <div>
-                <p className="text-xs text-white/50 mb-2">Continue with:</p>
-                <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3 mb-3">
-                  <p className="text-sm text-white truncate">{lastUsedPreset.name}</p>
-                  <p className="text-[10px] text-white/40 mt-0.5">Last used preset</p>
+                <div className="rounded-lg border border-white/10 bg-white/[0.03] p-2.5 mb-3">
+                  <p className="text-[11px] text-white truncate">{lastUsedPreset.name}</p>
+                  <p className="text-[10px] text-white/40">Last used</p>
                 </div>
                 <button
                   onClick={handleQuickGenerate}
-                  className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-purple-600/80 hover:bg-purple-600 text-xs text-white transition-colors"
+                  className="flex items-center justify-center gap-2 w-full py-2 rounded-lg bg-purple-600/80 hover:bg-purple-600 text-[11px] text-white transition-colors"
                 >
-                  <Sparkles className="h-3.5 w-3.5" />
-                  Generate Now
+                  <Sparkles className="h-3 w-3" />
+                  Generate
                 </button>
               </div>
             ) : (
-              <div className="text-center py-4">
-                <p className="text-xs text-white/40 mb-3">No recent preset</p>
+              <div className="text-center py-2">
+                <p className="text-[11px] text-white/40 mb-2">No recent preset</p>
                 <Link
                   href="/studio"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-white/60 transition-colors"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] text-white/60 transition-colors"
                 >
                   Go to Studio
                   <ArrowRight className="h-3 w-3" />
@@ -621,61 +802,59 @@ export function DashboardContent() {
             )}
           </div>
 
-          {/* Batch Status (1/3) */}
+          {/* Batch Status */}
           <div className="col-span-1 rounded-xl border border-white/10 bg-white/[0.03] p-5">
             <div className="flex items-center justify-between mb-4">
               <p className="text-[10px] uppercase tracking-wider text-white/40">
-                Batch Status
+                Batches
               </p>
               {activeBatches.length > 0 && (
                 <span className="flex items-center gap-1 text-[10px] text-yellow-500">
                   <Loader2 className="h-3 w-3 animate-spin" />
-                  {activeBatches.length} active
+                  {activeBatches.length}
                 </span>
               )}
             </div>
 
             {activeBatches.length > 0 ? (
-              <div className="space-y-2 mb-3">
+              <div className="space-y-2">
                 {activeBatches.slice(0, 2).map((batch) => (
                   <div key={batch.id} className="rounded-lg border border-yellow-500/20 bg-yellow-500/5 p-2">
                     <div className="flex items-center justify-between mb-1">
-                      <p className="text-xs text-white truncate flex-1">{batch.name}</p>
+                      <p className="text-[11px] text-white truncate flex-1">{batch.name}</p>
                       <Loader2 className="h-3 w-3 animate-spin text-yellow-500" />
                     </div>
                     <div className="h-1 rounded-full bg-white/10 overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-yellow-500/60 transition-all"
-                        style={{
-                          width: `${batch.total_images > 0 ? (batch.completed_images / batch.total_images) * 100 : 0}%`
-                        }}
+                        className="h-full rounded-full bg-yellow-500/60"
+                        style={{ width: `${batch.total_images > 0 ? (batch.completed_images / batch.total_images) * 100 : 0}%` }}
                       />
                     </div>
                     <p className="text-[10px] text-white/40 mt-1">
-                      {batch.completed_images}/{batch.total_images} completed
+                      {batch.completed_images}/{batch.total_images}
                     </p>
                   </div>
                 ))}
               </div>
             ) : recentBatches.length > 0 ? (
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {recentBatches.map((batch) => (
-                  <div key={batch.id} className="flex items-center gap-2 text-xs">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-green-500/60" />
+                  <div key={batch.id} className="flex items-center gap-2 text-[11px]">
+                    <CheckCircle2 className="h-3 w-3 text-green-500/60" />
                     <span className="text-white/60 truncate flex-1">{batch.name}</span>
                     <span className="text-white/30">{batch.total_images}</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-white/30">No batch jobs</p>
+              <p className="text-[11px] text-white/30">No batches</p>
             )}
 
             <Link
               href="/batch"
-              className="mt-3 flex items-center justify-center gap-1 w-full py-2 rounded-lg bg-white/5 hover:bg-white/10 text-[10px] text-white/50 transition-colors"
+              className="mt-3 flex items-center justify-center gap-1 w-full py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[10px] text-white/50 transition-colors"
             >
-              View All Batches
+              View All
               <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
@@ -769,6 +948,73 @@ export function DashboardContent() {
           ))}
         </div>
       </div>
+
+      {/* ==================== NOTIFICATIONS PANEL ==================== */}
+      {showNotifications && (
+        <div className="fixed inset-0 z-50" onClick={() => setShowNotifications(false)}>
+          <div 
+            className="absolute right-6 top-16 w-80 rounded-xl border border-white/10 bg-[#0a0a0a] shadow-2xl"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-4 border-b border-white/10">
+              <h3 className="text-sm font-semibold text-white">Notifications</h3>
+              {unreadCount > 0 && (
+                <button
+                  onClick={markAllNotificationsRead}
+                  className="text-[10px] text-purple-400 hover:text-purple-300"
+                >
+                  Mark all read
+                </button>
+              )}
+            </div>
+
+            <div className="max-h-80 overflow-y-auto">
+              {notifications.length > 0 ? (
+                notifications.map(notif => (
+                  <div
+                    key={notif.id}
+                    className={`p-3 border-b border-white/5 hover:bg-white/[0.03] ${!notif.read ? 'bg-purple-500/5' : ''}`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`mt-1 h-2 w-2 rounded-full flex-shrink-0 ${!notif.read ? 'bg-purple-500' : 'bg-white/20'}`} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-white">{notif.title}</p>
+                        <p className="text-[11px] text-white/60 mt-0.5">{notif.message}</p>
+                        <p className="text-[10px] text-white/30 mt-1">
+                          {formatTimeAgo(new Date(notif.created_at))}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        {!notif.read && (
+                          <button
+                            onClick={() => markNotificationRead(notif.id)}
+                            className="p-1 rounded hover:bg-white/10"
+                            title="Mark as read"
+                          >
+                            <Check className="h-3 w-3 text-white/40" />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => deleteNotification(notif.id)}
+                          className="p-1 rounded hover:bg-white/10"
+                          title="Delete"
+                        >
+                          <Trash2 className="h-3 w-3 text-white/40" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="p-8 text-center">
+                  <Bell className="h-8 w-8 text-white/20 mx-auto mb-2" />
+                  <p className="text-xs text-white/40">No notifications</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ==================== KEYBOARD SHORTCUTS MODAL ==================== */}
       {showShortcuts && (
