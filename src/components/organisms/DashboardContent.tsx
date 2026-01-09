@@ -112,7 +112,7 @@ export function DashboardContent() {
           .from('profiles')
           .select('subscription_plan, subscription_status, credits')
           .eq('id', user.id)
-          .single();
+          .single() as { data: { subscription_plan?: string; subscription_status?: string; credits?: number } | null };
 
         if (profile) {
           const planCredits: Record<string, number> = {
@@ -127,7 +127,7 @@ export function DashboardContent() {
             name: plan.charAt(0).toUpperCase() + plan.slice(1),
             creditsUsed: total - (profile.credits || 0),
             creditsTotal: total,
-            renewalDate: null, // Would come from billing
+            renewalDate: null,
           });
         }
 
@@ -140,14 +140,14 @@ export function DashboardContent() {
           .select('*', { count: 'exact' })
           .eq('user_id', user.id)
           .gte('created_at', thirtyDaysAgo.toISOString())
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false }) as { data: GalleryImage[] | null; count: number | null };
 
         if (images) {
           setAllImages(images);
           setRecentImages(images.slice(0, 8));
           setTotalGenerations(count || 0);
           
-          const storage = images.reduce((acc, img) => acc + (img.size || 0), 0);
+          const storage = images.reduce((acc: number, img: GalleryImage) => acc + (img.size || 0), 0);
           setTotalStorage(storage);
         }
       } catch (error) {
