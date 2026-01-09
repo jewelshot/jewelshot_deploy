@@ -52,51 +52,51 @@ export function ColorsPanel({ onColorChange }: ColorsPanelProps) {
   }, [temperature, tint, saturation, vibrance]);
 
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-6">
       {/* Color Balance Section */}
       <div className="flex flex-col gap-3">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-white/50">
-          Color Balance
-        </h3>
-
-        <AdjustSlider
-          label="Temperature"
-          value={temperature}
-          min={-75}
-          max={75}
-          onChange={setTemperature}
-        />
-
-        <AdjustSlider
-          label="Tint"
-          value={tint}
-          min={-75}
-          max={75}
-          onChange={setTint}
-        />
+        <div className="flex items-center gap-1.5">
+          <h4 className="text-xs font-semibold text-white/80">Color Balance</h4>
+        </div>
+        <div className="flex flex-col gap-3">
+          <AdjustSlider
+            label="Temperature"
+            value={temperature}
+            min={-75}
+            max={75}
+            onChange={setTemperature}
+          />
+          <AdjustSlider
+            label="Tint"
+            value={tint}
+            min={-75}
+            max={75}
+            onChange={setTint}
+          />
+        </div>
       </div>
 
       {/* Color Intensity Section */}
       <div className="flex flex-col gap-3">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-white/50">
-          Color Intensity
-        </h3>
-
-        <AdjustSlider
-          label="Saturation"
-          value={saturation}
-          min={-75}
-          max={75}
-          onChange={setSaturation}
-        />
-
-        <AdjustSlider
-          label="Vibrance"
-          value={vibrance}
-          min={-75}
-          max={75}
-          onChange={setVibrance}
-        />
+        <div className="flex items-center gap-1.5">
+          <h4 className="text-xs font-semibold text-white/80">Color Intensity</h4>
+        </div>
+        <div className="flex flex-col gap-3">
+          <AdjustSlider
+            label="Saturation"
+            value={saturation}
+            min={-75}
+            max={75}
+            onChange={setSaturation}
+          />
+          <AdjustSlider
+            label="Vibrance"
+            value={vibrance}
+            min={-75}
+            max={75}
+            onChange={setVibrance}
+          />
+        </div>
       </div>
     </div>
   );

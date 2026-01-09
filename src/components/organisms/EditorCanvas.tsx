@@ -1,17 +1,18 @@
 /**
- * EditorCanvas - Main Editor Component
+ * EditorCanvas - Professional Image Editor Component
  * 
  * Features:
  * - Fabric.js canvas for image editing
- * - Top toolbar with tools
+ * - Top toolbar with tools (Select, Pan, Crop, Brush, Eraser, Lasso, Inpaint)
  * - Right panel for adjustments (Adjust, Colors tabs)
- * - Bottom AI tools bar with Inpainting
+ * - Bottom AI tools bar
+ * - Consistent animations with Studio page
  */
 
 'use client';
 
 import React, { useRef, useState, useEffect, useCallback, useMemo } from 'react';
-import { Canvas as FabricCanvas, FabricImage, PencilBrush, Point, FabricObject } from 'fabric';
+import { Canvas as FabricCanvas, FabricImage, PencilBrush, Point, FabricObject, Rect } from 'fabric';
 import {
   Upload,
   ZoomIn,
@@ -36,14 +37,26 @@ import {
   X,
   Loader2,
   Trash2,
+  Crop,
+  Lasso,
+  Check,
 } from 'lucide-react';
 import { useSidebarStore } from '@/store/sidebarStore';
 import AdjustPanel, { AdjustState } from '@/components/molecules/AdjustPanel';
 import ColorsPanel, { ColorFilters } from '@/components/molecules/ColorsPanel';
 
 // Tool types
-type Tool = 'select' | 'pan' | 'brush' | 'eraser' | 'inpaint';
+type Tool = 'select' | 'pan' | 'brush' | 'eraser' | 'inpaint' | 'crop' | 'lasso';
 type PanelTab = 'adjust' | 'colors';
+
+// Brush presets
+const BRUSH_PRESETS = [
+  { size: 5, label: 'XS' },
+  { size: 15, label: 'S' },
+  { size: 30, label: 'M' },
+  { size: 50, label: 'L' },
+  { size: 80, label: 'XL' },
+];
 
 // History state for undo/redo
 interface HistoryState {
@@ -52,6 +65,21 @@ interface HistoryState {
   future: string[];
 }
 
+// Configure Fabric.js controls styling
+const configureControls = () => {
+  // Custom control rendering for modern look
+  FabricObject.prototype.set({
+    transparentCorners: false,
+    cornerColor: 'rgba(255, 255, 255, 0.9)',
+    cornerStrokeColor: 'rgba(0, 0, 0, 0.3)',
+    cornerSize: 10,
+    cornerStyle: 'circle',
+    borderColor: 'rgba(255, 255, 255, 0.8)',
+    borderScaleFactor: 1.5,
+    padding: 0,
+  });
+};
+
 export default function EditorCanvas() {
   // Refs
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -59,18 +87,22 @@ export default function EditorCanvas() {
   const fabricRef = useRef<FabricCanvas | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const originalImageRef = useRef<string | null>(null);
+  const imageBoundsRef = useRef<{ left: number; top: number; width: number; height: number } | null>(null);
+  const cropRectRef = useRef<Rect | null>(null);
 
-  // Layout state
-  const { leftOpen } = useSidebarStore();
+  // Layout state from store (matching Studio)
+  const { leftOpen, rightOpen, setRightOpen } = useSidebarStore();
   
   // Editor state
   const [activeTool, setActiveTool] = useState<Tool>('select');
   const [zoom, setZoom] = useState(100);
   const [hasImage, setHasImage] = useState(false);
-  const [isPanelOpen, setIsPanelOpen] = useState(true);
   const [activeTab, setActiveTab] = useState<PanelTab>('adjust');
   const [brushSize, setBrushSize] = useState(20);
   const [brushColor] = useState('#ffffff');
+  
+  // Crop state
+  const [isCropping, setIsCropping] = useState(false);
   
   // Inpaint state
   const [isInpaintMode, setIsInpaintMode] = useState(false);
@@ -143,6 +175,8 @@ export default function EditorCanvas() {
   useEffect(() => {
     if (!canvasRef.current || fabricRef.current) return;
 
+    configureControls();
+
     const canvas = new FabricCanvas(canvasRef.current, {
       backgroundColor: '#1a1a1a',
       selection: true,
@@ -168,7 +202,7 @@ export default function EditorCanvas() {
     };
   }, []);
 
-  // Update canvas size when sidebar toggles
+  // Update canvas size when sidebars toggle
   useEffect(() => {
     if (!fabricRef.current || !containerRef.current) return;
     
@@ -179,7 +213,7 @@ export default function EditorCanvas() {
     }, 500);
 
     return () => clearTimeout(timeout);
-  }, [leftOpen, isPanelOpen]);
+  }, [leftOpen, rightOpen]);
 
   // Handle tool change
   useEffect(() => {
@@ -189,6 +223,11 @@ export default function EditorCanvas() {
     // Exit inpaint mode when switching to other tools
     if (activeTool !== 'inpaint' && isInpaintMode) {
       setIsInpaintMode(false);
+    }
+
+    // Exit crop mode when switching tools
+    if (activeTool !== 'crop' && isCropping) {
+      cancelCrop();
     }
 
     switch (activeTool) {
@@ -218,11 +257,22 @@ export default function EditorCanvas() {
         canvas.isDrawingMode = true;
         canvas.freeDrawingBrush = new PencilBrush(canvas);
         canvas.freeDrawingBrush.width = brushSize;
-        canvas.freeDrawingBrush.color = 'rgba(255, 100, 100, 0.5)'; // Semi-transparent red for mask
+        canvas.freeDrawingBrush.color = 'rgba(255, 100, 100, 0.5)';
         setIsInpaintMode(true);
         break;
+      case 'lasso':
+        canvas.isDrawingMode = true;
+        canvas.freeDrawingBrush = new PencilBrush(canvas);
+        canvas.freeDrawingBrush.width = 2;
+        canvas.freeDrawingBrush.color = 'rgba(100, 200, 255, 0.8)';
+        break;
+      case 'crop':
+        canvas.isDrawingMode = false;
+        canvas.selection = false;
+        canvas.defaultCursor = 'crosshair';
+        break;
     }
-  }, [activeTool, brushSize, brushColor, isInpaintMode]);
+  }, [activeTool, brushSize, brushColor, isInpaintMode, isCropping]);
 
   // Save state to history
   const saveState = useCallback(() => {
@@ -283,7 +333,7 @@ export default function EditorCanvas() {
     const reader = new FileReader();
     reader.onload = (event) => {
       const imgUrl = event.target?.result as string;
-      originalImageRef.current = imgUrl; // Store original for inpainting
+      originalImageRef.current = imgUrl;
       
       FabricImage.fromURL(imgUrl).then((img) => {
         const canvas = fabricRef.current!;
@@ -299,11 +349,22 @@ export default function EditorCanvas() {
         );
 
         img.scale(scale);
+        
         img.set({
-          left: (canvasWidth - imgWidth * scale) / 2,
-          top: (canvasHeight - imgHeight * scale) / 2,
+          left: canvasWidth / 2,
+          top: canvasHeight / 2,
+          originX: 'center',
+          originY: 'center',
           selectable: true,
         });
+
+        // Store image bounds for export masking
+        imageBoundsRef.current = {
+          left: (canvasWidth - imgWidth * scale) / 2,
+          top: (canvasHeight - imgHeight * scale) / 2,
+          width: imgWidth * scale,
+          height: imgHeight * scale,
+        };
 
         canvas.clear();
         canvas.backgroundColor = '#1a1a1a';
@@ -359,44 +420,182 @@ export default function EditorCanvas() {
       });
       setColorFilters({ temperature: 0, tint: 0, saturation: 0, vibrance: 0 });
       originalImageRef.current = null;
+      imageBoundsRef.current = null;
     }
   }, []);
 
-  // Download image
+  // Download image - only the image area, not the whole canvas
   const handleDownload = useCallback(() => {
     const canvas = fabricRef.current;
     if (!canvas) return;
 
-    const dataUrl = canvas.toDataURL({
-      format: 'png',
-      quality: 1,
-      multiplier: 2,
-    });
+    // Find the image object to get its bounds
+    const objects = canvas.getObjects();
+    const imageObj = objects.find((obj: FabricObject) => obj.type === 'image') as FabricImage | undefined;
+    
+    if (imageObj) {
+      // Export only the image object
+      const dataUrl = imageObj.toDataURL({
+        format: 'png',
+        quality: 1,
+        multiplier: 2,
+      });
 
-    const link = document.createElement('a');
-    link.href = dataUrl;
-    link.download = `edited-${Date.now()}.png`;
-    link.click();
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = `edited-${Date.now()}.png`;
+      link.click();
+    } else {
+      // Fallback to full canvas export
+      const dataUrl = canvas.toDataURL({
+        format: 'png',
+        quality: 1,
+        multiplier: 2,
+      });
+
+      const link = document.createElement('a');
+      link.href = dataUrl;
+      link.download = `edited-${Date.now()}.png`;
+      link.click();
+    }
   }, []);
 
-  // Clear inpaint mask (remove drawn paths)
+  // Crop functions
+  const startCrop = useCallback(() => {
+    const canvas = fabricRef.current;
+    if (!canvas || !hasImage) return;
+
+    setActiveTool('crop');
+    setIsCropping(true);
+
+    // Create crop rectangle
+    const canvasWidth = canvas.getWidth();
+    const canvasHeight = canvas.getHeight();
+    
+    const cropRect = new Rect({
+      left: canvasWidth * 0.2,
+      top: canvasHeight * 0.2,
+      width: canvasWidth * 0.6,
+      height: canvasHeight * 0.6,
+      fill: 'rgba(0,0,0,0)',
+      stroke: 'rgba(255,255,255,0.8)',
+      strokeWidth: 2,
+      strokeDashArray: [5, 5],
+      selectable: true,
+      hasControls: true,
+      hasBorders: true,
+      lockRotation: true,
+    });
+
+    cropRectRef.current = cropRect;
+    canvas.add(cropRect);
+    canvas.setActiveObject(cropRect);
+    canvas.renderAll();
+  }, [hasImage]);
+
+  const applyCrop = useCallback(() => {
+    const canvas = fabricRef.current;
+    const cropRect = cropRectRef.current;
+    if (!canvas || !cropRect) return;
+
+    const objects = canvas.getObjects();
+    const imageObj = objects.find((obj: FabricObject) => obj.type === 'image') as FabricImage | undefined;
+    
+    if (imageObj) {
+      // Get crop area relative to image
+      const cropData = {
+        left: cropRect.left || 0,
+        top: cropRect.top || 0,
+        width: (cropRect.width || 100) * (cropRect.scaleX || 1),
+        height: (cropRect.height || 100) * (cropRect.scaleY || 1),
+      };
+
+      // Create cropped image
+      const tempCanvas = document.createElement('canvas');
+      const ctx = tempCanvas.getContext('2d');
+      if (!ctx) return;
+
+      tempCanvas.width = cropData.width;
+      tempCanvas.height = cropData.height;
+
+      // Export full canvas and crop
+      const fullDataUrl = canvas.toDataURL({ format: 'png', multiplier: 1 });
+      const img = new Image();
+      img.onload = () => {
+        ctx.drawImage(
+          img,
+          cropData.left,
+          cropData.top,
+          cropData.width,
+          cropData.height,
+          0,
+          0,
+          cropData.width,
+          cropData.height
+        );
+
+        const croppedDataUrl = tempCanvas.toDataURL('image/png');
+        
+        FabricImage.fromURL(croppedDataUrl).then((newImg) => {
+          const canvasWidth = canvas.getWidth();
+          const canvasHeight = canvas.getHeight();
+          
+          const scale = Math.min(
+            (canvasWidth * 0.8) / cropData.width,
+            (canvasHeight * 0.8) / cropData.height
+          );
+
+          newImg.scale(scale);
+          newImg.set({
+            left: canvasWidth / 2,
+            top: canvasHeight / 2,
+            originX: 'center',
+            originY: 'center',
+            selectable: true,
+          });
+
+          canvas.clear();
+          canvas.backgroundColor = '#1a1a1a';
+          canvas.add(newImg);
+          canvas.renderAll();
+
+          saveState();
+          setIsCropping(false);
+          setActiveTool('select');
+          cropRectRef.current = null;
+        });
+      };
+      img.src = fullDataUrl;
+    }
+  }, [saveState]);
+
+  const cancelCrop = useCallback(() => {
+    const canvas = fabricRef.current;
+    const cropRect = cropRectRef.current;
+    if (canvas && cropRect) {
+      canvas.remove(cropRect);
+      canvas.renderAll();
+    }
+    cropRectRef.current = null;
+    setIsCropping(false);
+  }, []);
+
+  // Clear inpaint mask
   const clearInpaintMask = useCallback(() => {
     const canvas = fabricRef.current;
     if (!canvas) return;
 
-    // Remove all path objects (mask drawings)
     const objects = canvas.getObjects();
     const pathsToRemove = objects.filter((obj: FabricObject) => obj.type === 'path');
     pathsToRemove.forEach((path: FabricObject) => canvas.remove(path));
     canvas.renderAll();
   }, []);
 
-  // Generate mask image from drawn paths
+  // Generate mask image
   const generateMaskImage = useCallback((): string | null => {
     const canvas = fabricRef.current;
     if (!canvas) return null;
 
-    // Create a temporary canvas for the mask
     const tempCanvas = document.createElement('canvas');
     const ctx = tempCanvas.getContext('2d');
     if (!ctx) return null;
@@ -404,15 +603,12 @@ export default function EditorCanvas() {
     tempCanvas.width = canvas.getWidth();
     tempCanvas.height = canvas.getHeight();
 
-    // Fill with black (areas to keep)
     ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
 
-    // Get all path objects and draw them in white (areas to inpaint)
     const objects = canvas.getObjects();
     objects.forEach((obj: FabricObject) => {
       if (obj.type === 'path') {
-        // Render path to mask canvas
         const pathElement = obj.toCanvasElement();
         ctx.drawImage(pathElement, obj.left || 0, obj.top || 0);
       }
@@ -421,12 +617,11 @@ export default function EditorCanvas() {
     return tempCanvas.toDataURL('image/png');
   }, []);
 
-  // Get original image as data URL
+  // Get original image
   const getOriginalImage = useCallback((): string | null => {
     const canvas = fabricRef.current;
     if (!canvas) return null;
 
-    // Find the image object
     const objects = canvas.getObjects();
     const imageObj = objects.find((obj: FabricObject) => obj.type === 'image');
     
@@ -481,7 +676,6 @@ export default function EditorCanvas() {
       }
 
       if (data.status === 'completed' && data.result?.data?.imageUrl) {
-        // Load the result image
         const canvas = fabricRef.current!;
         
         FabricImage.fromURL(data.result.data.imageUrl, { crossOrigin: 'anonymous' }).then((img) => {
@@ -497,8 +691,10 @@ export default function EditorCanvas() {
 
           img.scale(scale);
           img.set({
-            left: (canvasWidth - imgWidth * scale) / 2,
-            top: (canvasHeight - imgHeight * scale) / 2,
+            left: canvasWidth / 2,
+            top: canvasHeight / 2,
+            originX: 'center',
+            originY: 'center',
             selectable: true,
           });
 
@@ -567,8 +763,10 @@ export default function EditorCanvas() {
 
           img.scale(scale);
           img.set({
-            left: (canvasWidth - imgWidth * scale) / 2,
-            top: (canvasHeight - imgHeight * scale) / 2,
+            left: canvasWidth / 2,
+            top: canvasHeight / 2,
+            originX: 'center',
+            originY: 'center',
             selectable: true,
           });
 
@@ -602,7 +800,6 @@ export default function EditorCanvas() {
     setAiError(null);
 
     try {
-      // Determine target resolution based on mode
       const targetResolution = upscaleMode === '4x' ? '4320p' : '2160p';
       
       const response = await fetch('/api/ai/submit', {
@@ -641,8 +838,10 @@ export default function EditorCanvas() {
 
           img.scale(scale);
           img.set({
-            left: (canvasWidth - imgWidth * scale) / 2,
-            top: (canvasHeight - imgHeight * scale) / 2,
+            left: canvasWidth / 2,
+            top: canvasHeight / 2,
+            originX: 'center',
+            originY: 'center',
             selectable: true,
           });
 
@@ -672,92 +871,130 @@ export default function EditorCanvas() {
     tool, 
     onClick,
     active,
+    disabled,
   }: { 
     icon: React.ComponentType<{ className?: string }>; 
     label: string; 
     tool?: Tool;
     onClick?: () => void;
     active?: boolean;
+    disabled?: boolean;
   }) => {
     const isActive = active !== undefined ? active : (tool && activeTool === tool);
     return (
       <button
         onClick={onClick || (() => tool && setActiveTool(tool))}
-        className={`flex h-8 w-8 items-center justify-center rounded-md transition-all ${
+        disabled={disabled}
+        className={`flex h-7 w-7 items-center justify-center rounded-md transition-all ${
           isActive
             ? 'bg-white/20 text-white'
-            : 'text-white/60 hover:bg-white/10 hover:text-white'
+            : 'text-white/50 hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30'
         }`}
         title={label}
       >
-        <Icon className="h-4 w-4" />
+        <Icon className="h-3.5 w-3.5" />
       </button>
     );
   };
 
   return (
     <div 
-      className="fixed inset-0 flex flex-col"
+      className="fixed inset-0 flex flex-col bg-[#0a0a0a]"
       style={{
-        left: leftOpen ? '256px' : '0',
-        transition: 'left 500ms ease-in-out',
+        left: leftOpen ? '256px' : '56px',
+        right: rightOpen ? '280px' : '0',
+        transition: 'left 800ms cubic-bezier(0.4, 0.0, 0.2, 1), right 800ms cubic-bezier(0.4, 0.0, 0.2, 1)',
       }}
     >
       {/* Top Toolbar */}
-      <div className="flex h-12 items-center justify-between border-b border-white/10 bg-black/40 px-4 backdrop-blur-sm">
+      <div className="flex h-10 items-center justify-between border-b border-white/5 bg-black/20 px-3">
         {/* Left: Tools */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5">
           <ToolButton icon={MousePointer} label="Select (V)" tool="select" />
           <ToolButton icon={Move} label="Pan (H)" tool="pan" />
           
-          <div className="mx-2 h-5 w-px bg-white/10" />
+          <div className="mx-1.5 h-4 w-px bg-white/10" />
+          
+          <ToolButton icon={Crop} label="Crop (C)" onClick={startCrop} disabled={!hasImage || isCropping} />
+          
+          <div className="mx-1.5 h-4 w-px bg-white/10" />
           
           <ToolButton icon={Pencil} label="Brush (B)" tool="brush" />
           <ToolButton icon={Eraser} label="Eraser (E)" tool="eraser" />
+          <ToolButton icon={Lasso} label="Lasso (L)" tool="lasso" />
           
-          <div className="mx-2 h-5 w-px bg-white/10" />
+          <div className="mx-1.5 h-4 w-px bg-white/10" />
           
-          {/* Inpaint Tool */}
-          <ToolButton 
-            icon={Wand2} 
-            label="Inpaint Brush (I)" 
-            tool="inpaint"
-            active={activeTool === 'inpaint'}
-          />
+          <ToolButton icon={Wand2} label="Inpaint (I)" tool="inpaint" />
           
-          {/* Brush size (shown when brush/eraser/inpaint active) */}
+          {/* Brush size presets */}
           {(activeTool === 'brush' || activeTool === 'eraser' || activeTool === 'inpaint') && (
-            <div className="ml-2 flex items-center gap-2">
-              <span className="text-xs text-white/40">Size:</span>
+            <div className="ml-2 flex items-center gap-1">
+              <span className="text-[10px] text-white/30">Size:</span>
+              <div className="flex items-center gap-0.5">
+                {BRUSH_PRESETS.map(preset => (
+                  <button
+                    key={preset.size}
+                    onClick={() => setBrushSize(preset.size)}
+                    className={`h-5 min-w-[24px] rounded px-1 text-[9px] font-medium transition-all ${
+                      brushSize === preset.size
+                        ? 'bg-white/20 text-white'
+                        : 'text-white/40 hover:bg-white/10 hover:text-white'
+                    }`}
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
               <input
                 type="range"
                 min="1"
                 max="100"
                 value={brushSize}
                 onChange={(e) => setBrushSize(Number(e.target.value))}
-                className="h-1 w-20 cursor-pointer appearance-none rounded-full bg-white/20 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
+                className="ml-1 h-1 w-16 cursor-pointer appearance-none rounded-full bg-white/10 [&::-webkit-slider-thumb]:h-2.5 [&::-webkit-slider-thumb]:w-2.5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white/80"
               />
-              <span className="w-6 text-xs text-white/60">{brushSize}</span>
+              <span className="w-5 text-[10px] text-white/40">{brushSize}</span>
             </div>
           )}
 
-          {/* Inpaint mode actions */}
+          {/* Inpaint actions */}
           {activeTool === 'inpaint' && (
             <>
-              <div className="mx-2 h-5 w-px bg-white/10" />
+              <div className="mx-1.5 h-4 w-px bg-white/10" />
               <button
                 onClick={clearInpaintMask}
-                className="flex h-8 items-center gap-1 rounded-md px-2 text-xs text-white/60 hover:bg-white/10 hover:text-white"
-                title="Clear Mask"
+                className="flex h-6 items-center gap-1 rounded px-1.5 text-[10px] text-white/50 hover:bg-white/10 hover:text-white"
               >
                 <Trash2 className="h-3 w-3" />
                 Clear
               </button>
               <button
                 onClick={() => setShowInpaintModal(true)}
-                className="flex h-8 items-center gap-1 rounded-md bg-purple-500/20 px-3 text-xs text-purple-300 hover:bg-purple-500/30"
+                className="flex h-6 items-center gap-1 rounded bg-white/10 px-2 text-[10px] text-white hover:bg-white/15"
               >
                 <Sparkles className="h-3 w-3" />
+                Apply
+              </button>
+            </>
+          )}
+
+          {/* Crop actions */}
+          {isCropping && (
+            <>
+              <div className="mx-1.5 h-4 w-px bg-white/10" />
+              <button
+                onClick={cancelCrop}
+                className="flex h-6 items-center gap-1 rounded px-1.5 text-[10px] text-white/50 hover:bg-white/10 hover:text-white"
+              >
+                <X className="h-3 w-3" />
+                Cancel
+              </button>
+              <button
+                onClick={applyCrop}
+                className="flex h-6 items-center gap-1 rounded bg-white/10 px-2 text-[10px] text-white hover:bg-white/15"
+              >
+                <Check className="h-3 w-3" />
                 Apply
               </button>
             </>
@@ -765,101 +1002,95 @@ export default function EditorCanvas() {
         </div>
 
         {/* Center: Zoom */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5">
           <button
             onClick={() => handleZoom(-10)}
-            className="flex h-8 w-8 items-center justify-center rounded-md text-white/60 hover:bg-white/10 hover:text-white"
-            title="Zoom Out"
+            className="flex h-7 w-7 items-center justify-center rounded-md text-white/50 hover:bg-white/10 hover:text-white"
           >
-            <ZoomOut className="h-4 w-4" />
+            <ZoomOut className="h-3.5 w-3.5" />
           </button>
-          <span className="w-12 text-center text-xs text-white/60">{zoom}%</span>
+          <span className="w-10 text-center text-[10px] text-white/50">{zoom}%</span>
           <button
             onClick={() => handleZoom(10)}
-            className="flex h-8 w-8 items-center justify-center rounded-md text-white/60 hover:bg-white/10 hover:text-white"
-            title="Zoom In"
+            className="flex h-7 w-7 items-center justify-center rounded-md text-white/50 hover:bg-white/10 hover:text-white"
           >
-            <ZoomIn className="h-4 w-4" />
+            <ZoomIn className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={handleFitToScreen}
-            className="flex h-8 w-8 items-center justify-center rounded-md text-white/60 hover:bg-white/10 hover:text-white"
-            title="Fit to Screen"
+            className="flex h-7 w-7 items-center justify-center rounded-md text-white/50 hover:bg-white/10 hover:text-white"
           >
-            <Maximize className="h-4 w-4" />
+            <Maximize className="h-3.5 w-3.5" />
           </button>
         </div>
 
         {/* Right: Actions */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5">
           <button
             onClick={handleUndo}
             disabled={history.past.length === 0}
-            className="flex h-8 w-8 items-center justify-center rounded-md text-white/60 transition-all hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
-            title="Undo (Ctrl+Z)"
+            className="flex h-7 w-7 items-center justify-center rounded-md text-white/50 hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
           >
-            <Undo2 className="h-4 w-4" />
+            <Undo2 className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={handleRedo}
             disabled={history.future.length === 0}
-            className="flex h-8 w-8 items-center justify-center rounded-md text-white/60 transition-all hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
-            title="Redo (Ctrl+Shift+Z)"
+            className="flex h-7 w-7 items-center justify-center rounded-md text-white/50 hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
           >
-            <Redo2 className="h-4 w-4" />
+            <Redo2 className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={handleReset}
-            className="flex h-8 w-8 items-center justify-center rounded-md text-white/60 hover:bg-white/10 hover:text-white"
-            title="Reset All"
+            className="flex h-7 w-7 items-center justify-center rounded-md text-white/50 hover:bg-white/10 hover:text-white"
           >
-            <RotateCcw className="h-4 w-4" />
+            <RotateCcw className="h-3.5 w-3.5" />
           </button>
           
-          <div className="mx-2 h-5 w-px bg-white/10" />
+          <div className="mx-1.5 h-4 w-px bg-white/10" />
           
           <button
             onClick={handleDownload}
             disabled={!hasImage}
-            className="flex h-8 items-center gap-2 rounded-md bg-white/10 px-3 text-sm text-white/80 transition-all hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-30"
+            className="flex h-7 items-center gap-1.5 rounded-md bg-white/10 px-2.5 text-[11px] text-white/80 hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-30"
           >
-            <Download className="h-4 w-4" />
+            <Download className="h-3 w-3" />
             Export
           </button>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="relative flex-1 overflow-hidden">
         {/* Canvas Area */}
         <div 
           ref={containerRef}
-          className="relative flex-1 overflow-hidden"
+          className="h-full w-full"
           style={{ filter: cssFilter }}
         >
           <canvas ref={canvasRef} />
 
-          {/* Upload overlay when no image */}
+          {/* Upload overlay */}
           {!hasImage && (
             <div 
-              className="absolute inset-0 flex cursor-pointer flex-col items-center justify-center gap-4 bg-black/20 transition-colors hover:bg-black/30"
+              className="absolute inset-0 flex cursor-pointer flex-col items-center justify-center gap-3 bg-black/20 transition-colors hover:bg-black/30"
               onClick={() => fileInputRef.current?.click()}
               style={{ filter: 'none' }}
             >
-              <div className="flex h-20 w-20 items-center justify-center rounded-2xl border-2 border-dashed border-white/20 bg-white/5">
-                <Upload className="h-8 w-8 text-white/40" />
+              <div className="flex h-16 w-16 items-center justify-center rounded-xl border-2 border-dashed border-white/15 bg-white/5">
+                <Upload className="h-6 w-6 text-white/30" />
               </div>
               <div className="text-center">
-                <p className="text-sm font-medium text-white/60">Click to upload image</p>
-                <p className="mt-1 text-xs text-white/30">PNG, JPG, WebP supported</p>
+                <p className="text-xs font-medium text-white/50">Click to upload image</p>
+                <p className="mt-0.5 text-[10px] text-white/25">PNG, JPG, WebP supported</p>
               </div>
             </div>
           )}
 
           {/* Inpaint mode indicator */}
           {activeTool === 'inpaint' && hasImage && (
-            <div className="absolute left-4 top-4 rounded-lg bg-purple-500/20 px-3 py-2 backdrop-blur-sm">
-              <p className="text-xs text-purple-300">
+            <div className="absolute left-3 top-3 rounded-md bg-white/10 px-2 py-1.5 backdrop-blur-sm">
+              <p className="text-[10px] text-white/70">
                 Draw on areas you want to change, then click Apply
               </p>
             </div>
@@ -873,158 +1104,161 @@ export default function EditorCanvas() {
             className="hidden"
           />
         </div>
-
-        {/* Right Panel */}
-        <div 
-          className={`relative flex flex-col border-l border-white/10 bg-black/40 backdrop-blur-sm transition-all duration-300 ${
-            isPanelOpen ? 'w-72' : 'w-0'
-          }`}
-        >
-          <button
-            onClick={() => setIsPanelOpen(!isPanelOpen)}
-            className="absolute -left-3 top-1/2 z-10 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-black/80 text-white/60 hover:text-white"
-          >
-            {isPanelOpen ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
-          </button>
-
-          {isPanelOpen && (
-            <>
-              <div className="flex border-b border-white/10">
-                <button
-                  onClick={() => setActiveTab('adjust')}
-                  className={`flex flex-1 items-center justify-center gap-2 px-4 py-3 text-sm transition-all ${
-                    activeTab === 'adjust'
-                      ? 'border-b-2 border-white/60 text-white'
-                      : 'text-white/40 hover:text-white/60'
-                  }`}
-                >
-                  <SlidersHorizontal className="h-4 w-4" />
-                  Adjust
-                </button>
-                <button
-                  onClick={() => setActiveTab('colors')}
-                  className={`flex flex-1 items-center justify-center gap-2 px-4 py-3 text-sm transition-all ${
-                    activeTab === 'colors'
-                      ? 'border-b-2 border-white/60 text-white'
-                      : 'text-white/40 hover:text-white/60'
-                  }`}
-                >
-                  <Palette className="h-4 w-4" />
-                  Colors
-                </button>
-              </div>
-
-              <div className="flex-1 overflow-y-auto p-4">
-                {activeTab === 'adjust' && (
-                  <AdjustPanel onAdjustChange={setAdjustFilters} />
-                )}
-                {activeTab === 'colors' && (
-                  <ColorsPanel onColorChange={setColorFilters} />
-                )}
-              </div>
-            </>
-          )}
-        </div>
       </div>
 
       {/* Bottom AI Tools Bar */}
-      <div className="flex h-14 items-center justify-center gap-2 border-t border-white/10 bg-black/40 px-4 backdrop-blur-sm">
-        {/* Inpaint */}
+      <div className="flex h-11 items-center justify-center gap-1.5 border-t border-white/5 bg-black/20 px-3">
         <button
           onClick={() => setActiveTool('inpaint')}
           disabled={!hasImage || isRemovingBg || isUpscaling}
-          className={`flex h-9 items-center gap-2 rounded-lg border px-4 text-sm transition-all disabled:cursor-not-allowed disabled:opacity-30 ${
+          className={`flex h-7 items-center gap-1.5 rounded-md border px-3 text-[11px] transition-all disabled:cursor-not-allowed disabled:opacity-30 ${
             activeTool === 'inpaint'
-              ? 'border-purple-500/50 bg-purple-500/20 text-purple-300'
-              : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20 hover:bg-white/10 hover:text-white'
+              ? 'border-white/20 bg-white/10 text-white'
+              : 'border-white/5 bg-white/5 text-white/50 hover:border-white/10 hover:bg-white/10 hover:text-white'
           }`}
         >
-          <Wand2 className="h-4 w-4" />
+          <Wand2 className="h-3 w-3" />
           Inpaint
         </button>
 
-        {/* Remove BG */}
         <button
           onClick={handleRemoveBackground}
           disabled={!hasImage || isRemovingBg || isUpscaling || isInpainting}
-          className={`flex h-9 items-center gap-2 rounded-lg border px-4 text-sm transition-all disabled:cursor-not-allowed disabled:opacity-30 ${
+          className={`flex h-7 items-center gap-1.5 rounded-md border px-3 text-[11px] transition-all disabled:cursor-not-allowed disabled:opacity-30 ${
             isRemovingBg
-              ? 'border-green-500/50 bg-green-500/20 text-green-300'
-              : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20 hover:bg-white/10 hover:text-white'
+              ? 'border-white/20 bg-white/10 text-white'
+              : 'border-white/5 bg-white/5 text-white/50 hover:border-white/10 hover:bg-white/10 hover:text-white'
           }`}
         >
           {isRemovingBg ? (
             <>
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-3 w-3 animate-spin" />
               Removing...
             </>
           ) : (
             <>
-              <Scissors className="h-4 w-4" />
+              <Scissors className="h-3 w-3" />
               Remove BG
             </>
           )}
         </button>
 
-        {/* Replace BG - Coming Soon */}
         <button
           disabled={true}
-          className="flex h-9 items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 text-sm text-white/60 transition-all disabled:cursor-not-allowed disabled:opacity-30"
+          className="flex h-7 items-center gap-1.5 rounded-md border border-white/5 bg-white/5 px-3 text-[11px] text-white/30 disabled:cursor-not-allowed"
           title="Coming Soon"
         >
-          <ImagePlus className="h-4 w-4" />
+          <ImagePlus className="h-3 w-3" />
           Replace BG
         </button>
 
-        {/* AI Upscale */}
         <button
           onClick={() => setShowUpscaleModal(true)}
           disabled={!hasImage || isRemovingBg || isUpscaling || isInpainting}
-          className={`flex h-9 items-center gap-2 rounded-lg border px-4 text-sm transition-all disabled:cursor-not-allowed disabled:opacity-30 ${
+          className={`flex h-7 items-center gap-1.5 rounded-md border px-3 text-[11px] transition-all disabled:cursor-not-allowed disabled:opacity-30 ${
             isUpscaling
-              ? 'border-blue-500/50 bg-blue-500/20 text-blue-300'
-              : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20 hover:bg-white/10 hover:text-white'
+              ? 'border-white/20 bg-white/10 text-white'
+              : 'border-white/5 bg-white/5 text-white/50 hover:border-white/10 hover:bg-white/10 hover:text-white'
           }`}
         >
           {isUpscaling ? (
             <>
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-3 w-3 animate-spin" />
               Upscaling...
             </>
           ) : (
             <>
-              <Sparkles className="h-4 w-4" />
+              <Sparkles className="h-3 w-3" />
               AI Upscale
             </>
           )}
         </button>
 
-        {/* Error display */}
         {aiError && (
-          <div className="ml-4 flex items-center gap-2 text-sm text-red-400">
+          <div className="ml-2 flex items-center gap-1.5 text-[11px] text-red-400/80">
             <span>{aiError}</span>
             <button onClick={() => setAiError(null)} className="hover:text-red-300">
-              <X className="h-4 w-4" />
+              <X className="h-3 w-3" />
             </button>
           </div>
+        )}
+      </div>
+
+      {/* Right Panel - Toggle Button (matching Studio style) */}
+      <button
+        onClick={() => setRightOpen(!rightOpen)}
+        className="fixed right-0 top-1/2 z-50 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-l-md border border-r-0 border-white/10 bg-[#0a0a0a] text-white/50 transition-all hover:text-white"
+        style={{
+          right: rightOpen ? '280px' : '0',
+          transition: 'right 800ms cubic-bezier(0.4, 0.0, 0.2, 1)',
+        }}
+      >
+        {rightOpen ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
+      </button>
+
+      {/* Right Panel */}
+      <div 
+        className="fixed right-0 top-0 bottom-0 z-40 flex flex-col border-l border-white/5 bg-[#0a0a0a]"
+        style={{
+          width: rightOpen ? '280px' : '0',
+          opacity: rightOpen ? 1 : 0,
+          transition: 'width 800ms cubic-bezier(0.4, 0.0, 0.2, 1), opacity 400ms ease',
+        }}
+      >
+        {rightOpen && (
+          <>
+            <div className="flex border-b border-white/5">
+              <button
+                onClick={() => setActiveTab('adjust')}
+                className={`flex flex-1 items-center justify-center gap-1.5 px-3 py-2.5 text-[11px] transition-all ${
+                  activeTab === 'adjust'
+                    ? 'border-b border-white/40 text-white'
+                    : 'text-white/40 hover:text-white/60'
+                }`}
+              >
+                <SlidersHorizontal className="h-3 w-3" />
+                Adjust
+              </button>
+              <button
+                onClick={() => setActiveTab('colors')}
+                className={`flex flex-1 items-center justify-center gap-1.5 px-3 py-2.5 text-[11px] transition-all ${
+                  activeTab === 'colors'
+                    ? 'border-b border-white/40 text-white'
+                    : 'text-white/40 hover:text-white/60'
+                }`}
+              >
+                <Palette className="h-3 w-3" />
+                Colors
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-3">
+              {activeTab === 'adjust' && (
+                <AdjustPanel onAdjustChange={setAdjustFilters} />
+              )}
+              {activeTab === 'colors' && (
+                <ColorsPanel onColorChange={setColorFilters} />
+              )}
+            </div>
+          </>
         )}
       </div>
 
       {/* Inpaint Modal */}
       {showInpaintModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-xl border border-white/10 bg-[#0a0a0a] p-6 shadow-2xl">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-medium text-white">Apply Inpainting</h3>
+          <div className="w-full max-w-md rounded-xl border border-white/10 bg-[#0a0a0a] p-5 shadow-2xl">
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="text-sm font-medium text-white">Apply Inpainting</h3>
               <button
                 onClick={() => setShowInpaintModal(false)}
-                className="rounded-lg p-1 text-white/40 hover:bg-white/10 hover:text-white"
+                className="rounded p-1 text-white/40 hover:bg-white/10 hover:text-white"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4" />
               </button>
             </div>
 
-            <p className="mb-4 text-sm text-white/50">
+            <p className="mb-3 text-[11px] text-white/40">
               Describe what you want to appear in the masked area
             </p>
 
@@ -1032,35 +1266,35 @@ export default function EditorCanvas() {
               value={inpaintPrompt}
               onChange={(e) => setInpaintPrompt(e.target.value)}
               placeholder="e.g., A golden ring with diamond, luxury white background..."
-              className="mb-4 h-24 w-full resize-none rounded-lg border border-white/10 bg-white/5 p-3 text-sm text-white placeholder-white/30 focus:border-purple-500/50 focus:outline-none"
+              className="mb-3 h-20 w-full resize-none rounded-lg border border-white/10 bg-white/5 p-2.5 text-xs text-white placeholder-white/25 focus:border-white/20 focus:outline-none"
               disabled={isInpainting}
             />
 
             {inpaintError && (
-              <p className="mb-4 text-sm text-red-400">{inpaintError}</p>
+              <p className="mb-3 text-[11px] text-red-400/80">{inpaintError}</p>
             )}
 
-            <div className="flex justify-end gap-3">
+            <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowInpaintModal(false)}
                 disabled={isInpainting}
-                className="rounded-lg px-4 py-2 text-sm text-white/60 hover:bg-white/10 hover:text-white disabled:opacity-50"
+                className="rounded-md px-3 py-1.5 text-xs text-white/50 hover:bg-white/10 hover:text-white disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleApplyInpaint}
                 disabled={isInpainting || !inpaintPrompt.trim()}
-                className="flex items-center gap-2 rounded-lg bg-purple-500 px-4 py-2 text-sm font-medium text-white hover:bg-purple-600 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-md bg-white/10 px-3 py-1.5 text-xs font-medium text-white hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isInpainting ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Loader2 className="h-3 w-3 animate-spin" />
                     Processing...
                   </>
                 ) : (
                   <>
-                    <Sparkles className="h-4 w-4" />
+                    <Sparkles className="h-3 w-3" />
                     Apply
                   </>
                 )}
@@ -1073,72 +1307,71 @@ export default function EditorCanvas() {
       {/* Upscale Modal */}
       {showUpscaleModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="w-full max-w-sm rounded-xl border border-white/10 bg-[#0a0a0a] p-6 shadow-2xl">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-medium text-white">AI Upscale</h3>
+          <div className="w-full max-w-sm rounded-xl border border-white/10 bg-[#0a0a0a] p-5 shadow-2xl">
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="text-sm font-medium text-white">AI Upscale</h3>
               <button
                 onClick={() => setShowUpscaleModal(false)}
-                className="rounded-lg p-1 text-white/40 hover:bg-white/10 hover:text-white"
+                className="rounded p-1 text-white/40 hover:bg-white/10 hover:text-white"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4" />
               </button>
             </div>
 
-            <p className="mb-4 text-sm text-white/50">
+            <p className="mb-3 text-[11px] text-white/40">
               Choose upscale factor to increase image resolution
             </p>
 
-            {/* Upscale Mode Selection */}
-            <div className="mb-6 flex gap-3">
+            <div className="mb-4 flex gap-2">
               <button
                 onClick={() => setUpscaleMode('2x')}
-                className={`flex-1 rounded-lg border py-3 text-center transition-all ${
+                className={`flex-1 rounded-lg border py-2.5 text-center transition-all ${
                   upscaleMode === '2x'
-                    ? 'border-blue-500/50 bg-blue-500/20 text-blue-300'
-                    : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20'
+                    ? 'border-white/20 bg-white/10 text-white'
+                    : 'border-white/5 bg-white/5 text-white/50 hover:border-white/10'
                 }`}
               >
-                <div className="text-lg font-semibold">2x</div>
-                <div className="text-xs opacity-60">2160p (4K)</div>
+                <div className="text-sm font-semibold">2x</div>
+                <div className="text-[10px] opacity-60">2160p (4K)</div>
               </button>
               <button
                 onClick={() => setUpscaleMode('4x')}
-                className={`flex-1 rounded-lg border py-3 text-center transition-all ${
+                className={`flex-1 rounded-lg border py-2.5 text-center transition-all ${
                   upscaleMode === '4x'
-                    ? 'border-blue-500/50 bg-blue-500/20 text-blue-300'
-                    : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20'
+                    ? 'border-white/20 bg-white/10 text-white'
+                    : 'border-white/5 bg-white/5 text-white/50 hover:border-white/10'
                 }`}
               >
-                <div className="text-lg font-semibold">4x</div>
-                <div className="text-xs opacity-60">4320p (8K)</div>
+                <div className="text-sm font-semibold">4x</div>
+                <div className="text-[10px] opacity-60">4320p (8K)</div>
               </button>
             </div>
 
             {aiError && (
-              <p className="mb-4 text-sm text-red-400">{aiError}</p>
+              <p className="mb-3 text-[11px] text-red-400/80">{aiError}</p>
             )}
 
-            <div className="flex justify-end gap-3">
+            <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowUpscaleModal(false)}
                 disabled={isUpscaling}
-                className="rounded-lg px-4 py-2 text-sm text-white/60 hover:bg-white/10 hover:text-white disabled:opacity-50"
+                className="rounded-md px-3 py-1.5 text-xs text-white/50 hover:bg-white/10 hover:text-white disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleUpscale}
                 disabled={isUpscaling}
-                className="flex items-center gap-2 rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-md bg-white/10 px-3 py-1.5 text-xs font-medium text-white hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isUpscaling ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Loader2 className="h-3 w-3 animate-spin" />
                     Processing...
                   </>
                 ) : (
                   <>
-                    <Sparkles className="h-4 w-4" />
+                    <Sparkles className="h-3 w-3" />
                     Upscale {upscaleMode}
                   </>
                 )}

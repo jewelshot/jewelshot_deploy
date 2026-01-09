@@ -80,6 +80,11 @@ interface SidebarState {
   closeRight: () => void;
 
   /**
+   * Set right sidebar open state directly
+   */
+  setRightOpen: (open: boolean) => void;
+
+  /**
    * Explicitly open the top bar
    */
   openTop: () => void;
@@ -165,6 +170,9 @@ export const useSidebarStore = create<SidebarState>()(
 
       closeRight: () =>
         set({ rightOpen: false }, undefined, 'sidebar/closeRight'),
+
+      setRightOpen: (open) =>
+        set({ rightOpen: open }, undefined, 'sidebar/setRightOpen'),
 
       openTop: () => set({ topOpen: true }, undefined, 'sidebar/openTop'),
 

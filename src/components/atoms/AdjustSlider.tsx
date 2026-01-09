@@ -52,18 +52,18 @@ export function AdjustSlider({
   const percentage = ((value - min) / (max - min)) * 100;
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-1">
       <div className="flex items-center justify-between">
-        <label className="text-xs font-medium text-white/70">{label}</label>
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-xs text-violet-400">
+        <label className="text-[11px] font-medium text-white/60">{label}</label>
+        <div className="flex items-center gap-1.5">
+          <span className="font-mono text-[11px] text-white/80">
             {value > 0 ? '+' : ''}
             {value}
           </span>
           {value !== 0 && (
             <button
               onClick={handleReset}
-              className="text-[10px] text-white/40 hover:text-white/60"
+              className="flex h-4 w-4 items-center justify-center rounded text-[10px] text-white/30 hover:bg-white/10 hover:text-white/60"
               title="Reset"
               aria-label={`Reset ${label}`}
             >
@@ -85,37 +85,37 @@ export function AdjustSlider({
           aria-label={`${label} adjustment`}
           className="h-1 w-full cursor-pointer appearance-none rounded-full bg-white/10"
           style={{
-            background: `linear-gradient(to right, rgba(139,92,246,0.3) 0%, rgba(139,92,246,0.3) ${percentage}%, rgba(255,255,255,0.1) ${percentage}%, rgba(255,255,255,0.1) 100%)`,
+            background: `linear-gradient(to right, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.25) ${percentage}%, rgba(255,255,255,0.08) ${percentage}%, rgba(255,255,255,0.08) 100%)`,
           }}
         />
         <style jsx>{`
           input[type='range']::-webkit-slider-thumb {
             appearance: none;
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            background: #8b5cf6;
+            background: rgba(255, 255, 255, 0.9);
             cursor: pointer;
-            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
             transition: all 0.15s;
           }
           input[type='range']::-webkit-slider-thumb:hover {
-            transform: scale(1.15);
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
+            transform: scale(1.2);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
           }
           input[type='range']::-moz-range-thumb {
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             border: none;
             border-radius: 50%;
-            background: #8b5cf6;
+            background: rgba(255, 255, 255, 0.9);
             cursor: pointer;
-            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
             transition: all 0.15s;
           }
           input[type='range']::-moz-range-thumb:hover {
-            transform: scale(1.15);
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
+            transform: scale(1.2);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
           }
         `}</style>
       </div>

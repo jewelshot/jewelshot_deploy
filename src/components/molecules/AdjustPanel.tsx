@@ -90,7 +90,6 @@ export function AdjustPanel({ onAdjustChange }: AdjustPanelProps) {
       {/* Advanced Tone Control */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-1.5">
-          <span className="text-lg">🎚️</span>
           <h4 className="text-xs font-semibold text-white/80">
             Advanced Tone Control
           </h4>
