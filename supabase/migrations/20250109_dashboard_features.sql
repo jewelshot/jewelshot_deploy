@@ -2,6 +2,12 @@
 -- Adds notifications table, renewal date, and file type tracking
 
 -- ============================================
+-- 0. ADD CREDITS COLUMN IF NOT EXISTS
+-- ============================================
+ALTER TABLE public.profiles 
+ADD COLUMN IF NOT EXISTS credits INTEGER DEFAULT 10;
+
+-- ============================================
 -- 1. NOTIFICATIONS TABLE
 -- ============================================
 CREATE TABLE IF NOT EXISTS public.notifications (
