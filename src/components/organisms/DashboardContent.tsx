@@ -1,13 +1,13 @@
 /**
  * DashboardContent Component
  *
- * Clean, minimal dashboard consistent with Studio UI.
- * No colorful effects, no mock data, real activity from database.
+ * Clean, minimal dashboard with usage analytics.
+ * Layout: Stats → Analytics → Content → Quick Actions
  */
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSidebarStore } from '@/store/sidebarStore';
 import { useCreditStore } from '@/store/creditStore';
@@ -15,9 +15,9 @@ import { createClient } from '@/lib/supabase/client';
 import {
   ArrowRight,
   Download,
-  Trash2,
   Edit3,
   ExternalLink,
+  ArrowUpRight,
 } from 'lucide-react';
 import { createScopedLogger } from '@/lib/logger';
 
@@ -32,25 +32,70 @@ interface GalleryImage {
   size: number;
 }
 
-interface ActivityItem {
-  id: string;
-  type: 'generation' | 'upload' | 'batch' | 'edit';
-  message: string;
-  time: string;
-  created_at: string;
+interface DailyUsage {
+  date: string;
+  count: number;
+  dayName: string;
+}
+
+interface PlanInfo {
+  name: string;
+  creditsUsed: number;
+  creditsTotal: number;
+  renewalDate: string | null;
 }
 
 export function DashboardContent() {
   const router = useRouter();
   const { leftOpen } = useSidebarStore();
   const { credits, loading: creditsLoading, fetchCredits } = useCreditStore();
+  
+  // State
   const [recentImages, setRecentImages] = useState<GalleryImage[]>([]);
-  const [activity, setActivity] = useState<ActivityItem[]>([]);
+  const [allImages, setAllImages] = useState<GalleryImage[]>([]);
   const [totalGenerations, setTotalGenerations] = useState(0);
   const [totalStorage, setTotalStorage] = useState(0);
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState('');
   const [hoveredImage, setHoveredImage] = useState<string | null>(null);
+  const [planInfo, setPlanInfo] = useState<PlanInfo>({
+    name: 'Free',
+    creditsUsed: 0,
+    creditsTotal: 10,
+    renewalDate: null,
+  });
+
+  // Calculate weekly usage from images
+  const weeklyUsage = useMemo((): DailyUsage[] => {
+    const days: DailyUsage[] = [];
+    const now = new Date();
+    
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(now);
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+      const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+      
+      const count = allImages.filter(img => {
+        const imgDate = new Date(img.created_at).toISOString().split('T')[0];
+        return imgDate === dateStr;
+      }).length;
+      
+      days.push({ date: dateStr, count, dayName });
+    }
+    
+    return days;
+  }, [allImages]);
+
+  // Max count for chart scaling
+  const maxCount = useMemo(() => {
+    return Math.max(...weeklyUsage.map(d => d.count), 1);
+  }, [weeklyUsage]);
+
+  // This week total
+  const thisWeekTotal = useMemo(() => {
+    return weeklyUsage.reduce((sum, d) => sum + d.count, 0);
+  }, [weeklyUsage]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -60,40 +105,50 @@ export function DashboardContent() {
 
         if (!user) return;
 
-        setUserName(user.user_metadata?.full_name?.split(' ')[0] || 'there');
+        setUserName(user.user_metadata?.full_name?.split(' ')[0] || '');
 
-        // Get total images count
-        const { count: imagesCount } = await supabase
+        // Get user profile for plan info
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('subscription_plan, subscription_status, credits')
+          .eq('id', user.id)
+          .single();
+
+        if (profile) {
+          const planCredits: Record<string, number> = {
+            free: 10,
+            pro: 500,
+            enterprise: 9999,
+          };
+          const plan = profile.subscription_plan || 'free';
+          const total = planCredits[plan] || 10;
+          
+          setPlanInfo({
+            name: plan.charAt(0).toUpperCase() + plan.slice(1),
+            creditsUsed: total - (profile.credits || 0),
+            creditsTotal: total,
+            renewalDate: null, // Would come from billing
+          });
+        }
+
+        // Get all images for analytics (last 30 days)
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        
+        const { data: images, count } = await supabase
           .from('images')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id);
-
-        setTotalGenerations(imagesCount || 0);
-
-        // Get recent images (last 8)
-        const { data: images } = await supabase
-          .from('images')
-          .select('*')
+          .select('*', { count: 'exact' })
           .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(8);
+          .gte('created_at', thirtyDaysAgo.toISOString())
+          .order('created_at', { ascending: false });
 
         if (images) {
-          setRecentImages(images);
+          setAllImages(images);
+          setRecentImages(images.slice(0, 8));
+          setTotalGenerations(count || 0);
           
-          // Calculate total storage
           const storage = images.reduce((acc, img) => acc + (img.size || 0), 0);
           setTotalStorage(storage);
-
-          // Create activity from real data
-          const activityItems: ActivityItem[] = images.slice(0, 5).map((img) => ({
-            id: img.id,
-            type: 'generation' as const,
-            message: img.name || 'New image generated',
-            time: formatTimeAgo(new Date(img.created_at)),
-            created_at: img.created_at,
-          }));
-          setActivity(activityItems);
         }
       } catch (error) {
         logger.error('Error fetching dashboard data:', error);
@@ -106,21 +161,6 @@ export function DashboardContent() {
     fetchCredits();
   }, [fetchCredits]);
 
-  // Format time ago
-  const formatTimeAgo = (date: Date) => {
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
-
-    if (minutes < 1) return 'Just now';
-    if (minutes < 60) return `${minutes}m ago`;
-    if (hours < 24) return `${hours}h ago`;
-    if (days < 7) return `${days}d ago`;
-    return date.toLocaleDateString();
-  };
-
   // Format bytes
   const formatBytes = (bytes: number) => {
     if (bytes === 0) return '0 B';
@@ -130,7 +170,7 @@ export function DashboardContent() {
     return Math.round((bytes / Math.pow(k, i)) * 10) / 10 + ' ' + sizes[i];
   };
 
-  // Handle image actions
+  // Image actions
   const handleOpenInStudio = (image: GalleryImage) => {
     sessionStorage.setItem('studio-import-image', image.generated_url || image.original_url);
     sessionStorage.setItem('studio-import-source', 'dashboard');
@@ -167,61 +207,135 @@ export function DashboardContent() {
     );
   }
 
+  // Credit usage percentage
+  const creditUsagePercent = planInfo.creditsTotal > 0 
+    ? Math.round((planInfo.creditsUsed / planInfo.creditsTotal) * 100)
+    : 0;
+
   return (
     <main
       className="fixed inset-0 overflow-y-auto transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
       style={{ paddingLeft: leftOpen ? '260px' : '0' }}
     >
       <div className="min-h-screen p-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="mb-1 text-2xl font-semibold text-white">
-            Welcome back{userName ? `, ${userName}` : ''}
+        {/* ==================== HEADER ==================== */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-semibold text-white">
+            {userName ? `Welcome back, ${userName}` : 'Dashboard'}
           </h1>
           <p className="text-sm text-white/40">
-            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+            {new Date().toLocaleDateString('en-US', { 
+              weekday: 'long', 
+              month: 'long', 
+              day: 'numeric' 
+            })}
           </p>
         </div>
 
-        {/* Stats Row */}
-        <div className="mb-8 grid grid-cols-4 gap-4">
-          <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-            <p className="text-xs text-white/40 mb-1">Credits</p>
+        {/* ==================== STATS ROW ==================== */}
+        <div className="mb-6 grid grid-cols-4 gap-4">
+          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+            <p className="text-[11px] uppercase tracking-wider text-white/40 mb-1">Credits</p>
             <p className="text-2xl font-semibold text-white">{credits}</p>
           </div>
-          <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-            <p className="text-xs text-white/40 mb-1">Total Images</p>
+          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+            <p className="text-[11px] uppercase tracking-wider text-white/40 mb-1">Total Images</p>
             <p className="text-2xl font-semibold text-white">{totalGenerations}</p>
           </div>
-          <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-            <p className="text-xs text-white/40 mb-1">Storage Used</p>
+          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+            <p className="text-[11px] uppercase tracking-wider text-white/40 mb-1">Storage</p>
             <p className="text-2xl font-semibold text-white">{formatBytes(totalStorage)}</p>
           </div>
-          <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-            <p className="text-xs text-white/40 mb-1">This Week</p>
-            <p className="text-2xl font-semibold text-white">{recentImages.filter(img => {
-              const imgDate = new Date(img.created_at);
-              const weekAgo = new Date();
-              weekAgo.setDate(weekAgo.getDate() - 7);
-              return imgDate > weekAgo;
-            }).length}</p>
+          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+            <p className="text-[11px] uppercase tracking-wider text-white/40 mb-1">This Week</p>
+            <p className="text-2xl font-semibold text-white">{thisWeekTotal}</p>
           </div>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Recent Images */}
-          <div className="lg:col-span-2 rounded-xl border border-white/10 bg-white/5 p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-sm font-medium text-white/60 uppercase tracking-wider">
+        {/* ==================== ANALYTICS ROW ==================== */}
+        <div className="mb-6 grid grid-cols-3 gap-4">
+          {/* Usage Chart - 2/3 width */}
+          <div className="col-span-2 rounded-xl border border-white/10 bg-white/[0.03] p-5">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-[11px] uppercase tracking-wider text-white/40">
+                Last 7 Days
+              </p>
+              <p className="text-xs text-white/30">
+                {thisWeekTotal} generations
+              </p>
+            </div>
+            
+            {/* Simple Bar Chart */}
+            <div className="flex items-end justify-between gap-2 h-24">
+              {weeklyUsage.map((day, i) => (
+                <div key={day.date} className="flex-1 flex flex-col items-center gap-2">
+                  <div className="w-full flex items-end justify-center h-16">
+                    <div 
+                      className="w-full max-w-[32px] rounded-t transition-all duration-300"
+                      style={{
+                        height: day.count > 0 ? `${(day.count / maxCount) * 100}%` : '4px',
+                        backgroundColor: day.count > 0 ? 'rgba(168, 85, 247, 0.6)' : 'rgba(255,255,255,0.1)',
+                        minHeight: '4px',
+                      }}
+                    />
+                  </div>
+                  <span className="text-[10px] text-white/30">{day.dayName}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Plan & Limits - 1/3 width */}
+          <div className="col-span-1 rounded-xl border border-white/10 bg-white/[0.03] p-5">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-[11px] uppercase tracking-wider text-white/40">Plan</p>
+              <span className="text-xs px-2 py-0.5 rounded bg-white/10 text-white/60">
+                {planInfo.name}
+              </span>
+            </div>
+            
+            {/* Credit Usage Bar */}
+            <div className="mb-3">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs text-white/50">Credit Usage</span>
+                <span className="text-xs text-white/50">{creditUsagePercent}%</span>
+              </div>
+              <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+                <div 
+                  className="h-full rounded-full bg-purple-500/60 transition-all duration-500"
+                  style={{ width: `${creditUsagePercent}%` }}
+                />
+              </div>
+              <p className="mt-1.5 text-[10px] text-white/30">
+                {planInfo.creditsUsed} of {planInfo.creditsTotal} used
+              </p>
+            </div>
+
+            {planInfo.name === 'Free' && (
+              <a 
+                href="/profile?tab=billing"
+                className="mt-3 flex items-center justify-center gap-1 w-full py-2 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-white/60 hover:text-white/80 transition-colors"
+              >
+                Upgrade Plan
+                <ArrowUpRight className="h-3 w-3" />
+              </a>
+            )}
+          </div>
+        </div>
+
+        {/* ==================== MAIN CONTENT ==================== */}
+        <div className="mb-6 grid grid-cols-3 gap-4">
+          {/* Recent Images - 2/3 width */}
+          <div className="col-span-2 rounded-xl border border-white/10 bg-white/[0.03] p-5">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-[11px] uppercase tracking-wider text-white/40">
                 Recent Images
-              </h2>
+              </p>
               <a
                 href="/gallery"
-                className="flex items-center gap-1 text-xs text-white/40 hover:text-white/60 transition-colors"
+                className="flex items-center gap-1 text-xs text-white/30 hover:text-white/50 transition-colors"
               >
-                View all
-                <ArrowRight className="h-3 w-3" />
+                View all <ArrowRight className="h-3 w-3" />
               </a>
             </div>
 
@@ -230,7 +344,7 @@ export function DashboardContent() {
                 {recentImages.map((image) => (
                   <div
                     key={image.id}
-                    className="group relative aspect-square overflow-hidden rounded-lg border border-white/10 bg-black/20"
+                    className="group relative aspect-square overflow-hidden rounded-lg border border-white/10 bg-black/30"
                     onMouseEnter={() => setHoveredImage(image.id)}
                     onMouseLeave={() => setHoveredImage(null)}
                   >
@@ -240,9 +354,9 @@ export function DashboardContent() {
                       className="h-full w-full object-cover"
                     />
                     
-                    {/* Hover Overlay - Like Studio */}
+                    {/* Hover Overlay */}
                     {hoveredImage === image.id && (
-                      <div className="absolute inset-0 bg-black/60 flex items-center justify-center gap-2">
+                      <div className="absolute inset-0 bg-black/70 flex items-center justify-center gap-2 animate-in fade-in duration-150">
                         <button
                           onClick={() => handleOpenInStudio(image)}
                           className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
@@ -262,7 +376,7 @@ export function DashboardContent() {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
-                          title="Open in new tab"
+                          title="Open"
                         >
                           <ExternalLink className="h-4 w-4 text-white" />
                         </a>
@@ -272,91 +386,79 @@ export function DashboardContent() {
                 ))}
               </div>
             ) : (
-              <div className="py-12 text-center">
-                <p className="text-white/40 mb-2">No images yet</p>
-                <a
-                  href="/studio"
-                  className="text-sm text-purple-400 hover:text-purple-300"
-                >
+              <div className="py-16 text-center">
+                <p className="text-white/30 mb-2">No images yet</p>
+                <a href="/studio" className="text-sm text-purple-400/80 hover:text-purple-400">
                   Create your first image →
                 </a>
               </div>
             )}
           </div>
 
-          {/* Activity */}
-          <div className="lg:col-span-1 rounded-xl border border-white/10 bg-white/5 p-6">
-            <h2 className="mb-4 text-sm font-medium text-white/60 uppercase tracking-wider">
-              Activity
-            </h2>
+          {/* Activity - 1/3 width */}
+          <div className="col-span-1 rounded-xl border border-white/10 bg-white/[0.03] p-5">
+            <p className="text-[11px] uppercase tracking-wider text-white/40 mb-4">
+              Recent Activity
+            </p>
             
-            {activity.length > 0 ? (
-              <div className="space-y-4">
-                {activity.map((item) => (
-                  <div key={item.id} className="flex items-start gap-3">
-                    <div className="mt-0.5 h-2 w-2 rounded-full bg-white/20 flex-shrink-0" />
+            {recentImages.length > 0 ? (
+              <div className="space-y-3">
+                {recentImages.slice(0, 6).map((image) => (
+                  <div key={image.id} className="flex items-start gap-3">
+                    <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-white/20 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-white/80 truncate">{item.message}</p>
-                      <p className="text-xs text-white/30">{item.time}</p>
+                      <p className="text-sm text-white/70 truncate">
+                        {image.name || 'Image generated'}
+                      </p>
+                      <p className="text-[10px] text-white/30">
+                        {formatTimeAgo(new Date(image.created_at))}
+                      </p>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-white/40">No recent activity</p>
+              <p className="text-sm text-white/30">No recent activity</p>
             )}
           </div>
         </div>
 
-        {/* Quick Actions - Minimal */}
-        <div className="mt-6 grid grid-cols-4 gap-3">
-          <a
-            href="/studio"
-            className="rounded-xl border border-white/10 bg-white/5 p-4 hover:bg-white/10 transition-colors"
-          >
-            <p className="text-sm font-medium text-white mb-0.5">Studio</p>
-            <p className="text-xs text-white/40">Create new images</p>
-          </a>
-          <a
-            href="/batch"
-            className="rounded-xl border border-white/10 bg-white/5 p-4 hover:bg-white/10 transition-colors"
-          >
-            <p className="text-sm font-medium text-white mb-0.5">Batch</p>
-            <p className="text-xs text-white/40">Process multiple files</p>
-          </a>
-          <a
-            href="/gallery"
-            className="rounded-xl border border-white/10 bg-white/5 p-4 hover:bg-white/10 transition-colors"
-          >
-            <p className="text-sm font-medium text-white mb-0.5">Gallery</p>
-            <p className="text-xs text-white/40">Browse your work</p>
-          </a>
-          <a
-            href="/profile"
-            className="rounded-xl border border-white/10 bg-white/5 p-4 hover:bg-white/10 transition-colors"
-          >
-            <p className="text-sm font-medium text-white mb-0.5">Account</p>
-            <p className="text-xs text-white/40">Manage subscription</p>
-          </a>
-        </div>
-
-        {/* Usage Tips - Collapsible */}
-        <div className="mt-6 rounded-xl border border-white/10 bg-white/5 p-4">
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-white/40">
-              Tip: Use <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-white/60 font-mono text-[10px]">Ctrl+S</kbd> in Studio to save your work to Gallery
-            </p>
+        {/* ==================== QUICK ACTIONS ==================== */}
+        <div className="grid grid-cols-4 gap-3">
+          {[
+            { href: '/studio', title: 'Studio', desc: 'Create images' },
+            { href: '/batch', title: 'Batch', desc: 'Process multiple' },
+            { href: '/gallery', title: 'Gallery', desc: 'View your work' },
+            { href: '/profile', title: 'Account', desc: 'Settings & billing' },
+          ].map((action) => (
             <a
-              href="/docs/api"
-              className="text-xs text-white/40 hover:text-white/60"
+              key={action.href}
+              href={action.href}
+              className="rounded-xl border border-white/10 bg-white/[0.03] p-4 hover:bg-white/[0.06] transition-colors group"
             >
-              View shortcuts →
+              <p className="text-sm font-medium text-white group-hover:text-white/90">{action.title}</p>
+              <p className="text-[11px] text-white/30">{action.desc}</p>
             </a>
-          </div>
+          ))}
         </div>
       </div>
     </main>
   );
+}
+
+// Helper function
+function formatTimeAgo(date: Date): string {
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+
+  if (minutes < 1) return 'Just now';
+  if (minutes < 60) return `${minutes}m ago`;
+  if (hours < 24) return `${hours}h ago`;
+  if (days < 7) return `${days}d ago`;
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
 export default DashboardContent;
