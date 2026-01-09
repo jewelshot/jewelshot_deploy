@@ -98,6 +98,49 @@ export interface CanvasControlsProps {
   isGeneratingVideo?: boolean;
 }
 
+// CSS keyframes for initial mount animation
+const mountAnimationStyle = `
+  @keyframes slideInFromRight {
+    from {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  @keyframes slideInFromLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  @keyframes slideInFromBottom {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-slide-in-right {
+    animation: slideInFromRight 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  .animate-slide-in-left {
+    animation: slideInFromLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  .animate-slide-in-bottom {
+    animation: slideInFromBottom 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+`;
+
 /**
  * CanvasControls: All UI controls with smart positioning
  */
@@ -155,9 +198,12 @@ export default function CanvasControls({
 
   return (
     <>
+      {/* Inject animation styles */}
+      <style>{mountAnimationStyle}</style>
+
       {/* Top Left Controls - File Info */}
       <div
-        className="fixed z-20 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
+        className="fixed z-20 animate-slide-in-left transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
         style={{
           top: topOpen ? '80px' : '16px',
           left: leftOpen ? '276px' : '16px',
@@ -197,7 +243,7 @@ export default function CanvasControls({
 
       {/* Top Right Controls - Zoom & Actions */}
       <div
-        className="fixed z-20 flex items-center gap-2 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
+        className="fixed z-20 flex items-center gap-2 animate-slide-in-right transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
         style={{
           top: topOpen ? '80px' : '16px',
           right: rightOpen ? '276px' : '16px',
@@ -220,34 +266,43 @@ export default function CanvasControls({
         />
       </div>
 
-      {/* Bottom Left Controls - UI Toggle & Background Selector (in same container) */}
+      {/* Bottom Left Controls - UI Toggle & Background Selector */}
       <div
-        className="fixed z-30 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
+        className="fixed z-30 flex items-center gap-2 animate-slide-in-left transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
         style={{
           bottom: bottomOpen ? '56px' : '16px',
           left: leftOpen ? '276px' : '16px',
         }}
       >
-        <div className="flex items-center gap-1 rounded-lg border border-[rgba(139,92,246,0.2)] bg-[rgba(10,10,10,0.8)] p-1.5 backdrop-blur-[16px]">
-          {/* UI Toggle Button (left) */}
+        {/* UI Toggle Button - Always visible (so user can show controls) */}
+        <div className="rounded-lg border border-[rgba(139,92,246,0.2)] bg-[rgba(10,10,10,0.8)] p-1.5 backdrop-blur-[16px]">
           <UIToggleButton
             controlsVisible={controlsVisible}
             onToggle={onToggleUI}
           />
-          
-          <div className="h-5 w-px bg-[rgba(139,92,246,0.15)]" />
-          
-          {/* Background Selector (right) */}
-          <BackgroundSelector
-            background={background}
-            onBackgroundChange={onBackgroundChange}
-          />
+        </div>
+        
+        {/* Background Selector - Animated with other controls */}
+        <div
+          className="transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
+          style={{
+            opacity: controlsVisible ? 1 : 0,
+            transform: controlsVisible ? 'translateX(0) scale(1)' : 'translateX(-10px) scale(0.95)',
+            pointerEvents: controlsVisible ? 'auto' : 'none',
+          }}
+        >
+          <div className="rounded-lg border border-[rgba(139,92,246,0.2)] bg-[rgba(10,10,10,0.8)] p-1.5 backdrop-blur-[16px]">
+            <BackgroundSelector
+              background={background}
+              onBackgroundChange={onBackgroundChange}
+            />
+          </div>
         </div>
       </div>
 
       {/* Bottom Center - AI Edit Control */}
       <div
-        className="fixed z-20 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
+        className="fixed z-20 animate-slide-in-bottom transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
         style={{
           bottom: bottomOpen ? '56px' : '16px',
           left: leftOpen ? '260px' : '0px',
@@ -270,7 +325,7 @@ export default function CanvasControls({
 
       {/* Bottom Right Controls - Edit, Delete, Save, Download, Video */}
       <div
-        className="fixed z-20 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
+        className="fixed z-20 animate-slide-in-right transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
         style={{
           bottom: bottomOpen ? '56px' : '16px',
           right: rightOpen ? '276px' : '16px',

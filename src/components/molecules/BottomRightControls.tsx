@@ -47,18 +47,18 @@ export function BottomRightControls({
   isGeneratingVideo = false,
 }: BottomRightControlsProps) {
   return (
-    <div className="flex items-center gap-1.5 rounded-lg border border-[rgba(139,92,246,0.2)] bg-[rgba(10,10,10,0.8)] p-1.5 backdrop-blur-[16px]">
+    <div className="flex items-center gap-1 rounded-lg border border-[rgba(139,92,246,0.2)] bg-[rgba(10,10,10,0.8)] p-1.5 backdrop-blur-[16px]">
       <EditButton onClick={onEdit} active={editActive} />
-      <div className="h-5 w-px bg-[rgba(139,92,246,0.2)]" />
+      <div className="h-4 w-px bg-[rgba(139,92,246,0.15)]" />
       <SaveButton onClick={onSave} />
       <DownloadButton onClick={onDownload} />
       {onGenerateVideo && (
         <>
-          <div className="h-5 w-px bg-[rgba(139,92,246,0.2)]" />
+          <div className="h-4 w-px bg-[rgba(139,92,246,0.15)]" />
           <VideoButton onClick={onGenerateVideo} disabled={isGeneratingVideo} />
         </>
       )}
-      <div className="h-5 w-px bg-[rgba(139,92,246,0.2)]" />
+      <div className="h-4 w-px bg-[rgba(139,92,246,0.15)]" />
       <DeleteButton onClick={onDelete} />
     </div>
   );
