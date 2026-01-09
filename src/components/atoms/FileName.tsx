@@ -9,7 +9,7 @@ interface FileNameProps {
 
 export function FileName({ name }: FileNameProps) {
   return (
-    <div className="max-w-[200px] truncate text-sm font-medium text-white">
+    <div className="max-w-[160px] truncate text-[11px] font-medium text-white">
       {name}
     </div>
   );

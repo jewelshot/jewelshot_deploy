@@ -14,9 +14,9 @@ interface FileInfoProps {
 
 export function FileInfo({ fileName, fileSizeInBytes }: FileInfoProps) {
   return (
-    <div className="pointer-events-none flex select-none items-center gap-1.5">
+    <div className="pointer-events-none flex select-none items-center gap-1">
       <FileName name={fileName} />
-      <div className="h-3.5 w-px bg-[rgba(139,92,246,0.2)]" />
+      <div className="h-3 w-px bg-[rgba(139,92,246,0.2)]" />
       <FileSize sizeInBytes={fileSizeInBytes} />
     </div>
   );

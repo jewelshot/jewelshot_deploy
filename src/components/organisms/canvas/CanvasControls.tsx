@@ -220,38 +220,27 @@ export default function CanvasControls({
         />
       </div>
 
-      {/* Bottom Left Controls - Background Selector & UI Toggle */}
+      {/* Bottom Left Controls - UI Toggle & Background Selector (in same container) */}
       <div
-        className="fixed z-30 flex items-center gap-2 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
+        className="fixed z-30 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
         style={{
           bottom: bottomOpen ? '56px' : '16px',
           left: leftOpen ? '276px' : '16px',
         }}
       >
-        {/* Background Selector */}
-        <div
-          className="transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
-          style={{
-            opacity: controlsVisible ? 1 : 0,
-            transform: controlsVisible
-              ? 'translateX(0) scale(1)'
-              : 'translateX(-20px) scale(0.95)',
-            pointerEvents: controlsVisible ? 'auto' : 'none',
-          }}
-        >
-          <div className="rounded-lg border border-[rgba(139,92,246,0.2)] bg-[rgba(10,10,10,0.8)] p-2 backdrop-blur-[16px]">
-            <BackgroundSelector
-              background={background}
-              onBackgroundChange={onBackgroundChange}
-            />
-          </div>
-        </div>
-
-        {/* UI Toggle Button */}
-        <div className="relative z-10">
+        <div className="flex items-center gap-1 rounded-lg border border-[rgba(139,92,246,0.2)] bg-[rgba(10,10,10,0.8)] p-1.5 backdrop-blur-[16px]">
+          {/* UI Toggle Button (left) */}
           <UIToggleButton
             controlsVisible={controlsVisible}
             onToggle={onToggleUI}
+          />
+          
+          <div className="h-5 w-px bg-[rgba(139,92,246,0.15)]" />
+          
+          {/* Background Selector (right) */}
+          <BackgroundSelector
+            background={background}
+            onBackgroundChange={onBackgroundChange}
           />
         </div>
       </div>

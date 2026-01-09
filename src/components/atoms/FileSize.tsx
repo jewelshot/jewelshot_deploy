@@ -20,7 +20,7 @@ function formatBytes(bytes: number): string {
 
 export function FileSize({ sizeInBytes }: FileSizeProps) {
   return (
-    <div className="text-sm text-white/60">{formatBytes(sizeInBytes)}</div>
+    <div className="text-[11px] text-white/50">{formatBytes(sizeInBytes)}</div>
   );
 }
 
