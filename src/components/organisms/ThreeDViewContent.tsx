@@ -671,15 +671,12 @@ function SnapshotHelper({
 }
 
 export default function ThreeDViewContent() {
-  // Layout state
-  const { leftOpen } = useSidebarStore();
+  // Layout state from global store (matching Studio)
+  const { leftOpen, rightOpen, setRightOpen } = useSidebarStore();
   
   // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
   const controlsRef = useRef<any>(null);
-  
-  // State
-  const [isPanelOpen, setIsPanelOpen] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState('');
   const [loadedGeometry, setLoadedGeometry] = useState<THREE.BufferGeometry | null>(null);
@@ -992,8 +989,9 @@ export default function ThreeDViewContent() {
     <div 
       className="fixed inset-0 flex flex-col bg-[#0a0a0a]"
       style={{
-        left: leftOpen ? '260px' : '0',
-        transition: 'left 500ms ease-in-out',
+        left: leftOpen ? '256px' : '56px',
+        right: rightOpen ? '280px' : '0',
+        transition: 'left 800ms cubic-bezier(0.4, 0.0, 0.2, 1), right 800ms cubic-bezier(0.4, 0.0, 0.2, 1)',
       }}
     >
       {/* Top Bar */}
@@ -1252,20 +1250,28 @@ export default function ThreeDViewContent() {
           )}
         </div>
 
+        {/* Right Panel Toggle Button (matching Studio style) */}
+        <button
+          onClick={() => setRightOpen(!rightOpen)}
+          className="fixed right-0 top-1/2 z-50 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-l-md border border-r-0 border-white/10 bg-[#0a0a0a] text-white/50 transition-all hover:text-white"
+          style={{
+            right: rightOpen ? '280px' : '0',
+            transition: 'right 800ms cubic-bezier(0.4, 0.0, 0.2, 1)',
+          }}
+        >
+          {rightOpen ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
+        </button>
+
         {/* Right Panel */}
         <div 
-          className={`relative flex flex-col border-l border-white/10 bg-black/40 backdrop-blur-sm transition-all duration-300 ${
-            isPanelOpen ? 'w-72' : 'w-0'
-          }`}
+          className="fixed right-0 top-0 bottom-0 z-40 flex flex-col border-l border-white/5 bg-[#0a0a0a]"
+          style={{
+            width: rightOpen ? '280px' : '0',
+            opacity: rightOpen ? 1 : 0,
+            transition: 'width 800ms cubic-bezier(0.4, 0.0, 0.2, 1), opacity 400ms ease',
+          }}
         >
-          <button
-            onClick={() => setIsPanelOpen(!isPanelOpen)}
-            className="absolute -left-3 top-1/2 z-10 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-black/80 text-white/60 hover:text-white"
-          >
-            {isPanelOpen ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
-          </button>
-
-          {isPanelOpen && (
+          {rightOpen && (
             <div className="flex flex-1 flex-col overflow-y-auto p-4">
               {/* Snapshot Preview - ALWAYS AT TOP */}
               {snapshotPreview && (
