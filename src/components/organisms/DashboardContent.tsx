@@ -204,7 +204,7 @@ export function DashboardContent() {
   }, [usageData]);
 
   // ============================================
-  // DATA FETCHING
+  // DATA FETCHING (PARALLEL)
   // ============================================
   const fetchDashboardData = useCallback(async () => {
     try {
@@ -215,13 +215,52 @@ export function DashboardContent() {
 
       setUserName(user.user_metadata?.full_name?.split(' ')[0] || '');
 
-      // ========== PROFILE & PLAN ==========
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('subscription_plan, subscription_renewal_date, credits')
-        .eq('id', user.id)
-        .single() as { data: { subscription_plan?: string; subscription_renewal_date?: string; credits?: number } | null };
+      // ========== RUN ALL QUERIES IN PARALLEL ==========
+      const [
+        profileResult,
+        notifsResult,
+        galleryResult,
+        batchImagesResult,
+        batchProjectsResult,
+      ] = await Promise.all([
+        // Profile
+        supabase
+          .from('profiles')
+          .select('subscription_plan, subscription_renewal_date, credits')
+          .eq('id', user.id)
+          .single(),
+        // Notifications
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (supabase as any)
+          .from('notifications')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(10),
+        // Gallery Images
+        supabase
+          .from('images')
+          .select('*', { count: 'exact' })
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false }),
+        // Batch Images
+        supabase
+          .from('batch_images')
+          .select('id, original_filename, original_url, result_url, original_size, status, created_at')
+          .eq('user_id', user.id)
+          .eq('status', 'completed')
+          .order('created_at', { ascending: false }),
+        // Batch Projects
+        supabase
+          .from('batch_projects')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(10),
+      ]);
 
+      // ========== PROCESS PROFILE ==========
+      const profile = profileResult.data as { subscription_plan?: string; subscription_renewal_date?: string; credits?: number } | null;
       if (profile) {
         const plan = profile.subscription_plan || 'free';
         const total = PLAN_CREDITS[plan] || 10;
@@ -237,53 +276,30 @@ export function DashboardContent() {
         });
       }
 
-      // ========== NOTIFICATIONS ==========
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { data: notifs } = await (supabase as any)
-        .from('notifications')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(10) as { data: NotificationItem[] | null };
-
+      // ========== PROCESS NOTIFICATIONS ==========
+      const notifs = notifsResult.data as NotificationItem[] | null;
       if (notifs) {
         setNotifications(notifs);
         setUnreadCount(notifs.filter(n => !n.read).length);
       }
 
-      // ========== GALLERY IMAGES ==========
-      const { data: galleryImages, count: galleryCount } = await supabase
-        .from('images')
-        .select('*', { count: 'exact' })
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false }) as { data: GalleryImage[] | null; count: number | null };
+      // ========== PROCESS GALLERY IMAGES ==========
+      const galleryImages = galleryResult.data as GalleryImage[] | null;
+      const galleryCount = galleryResult.count as number | null;
 
-      // ========== BATCH IMAGES ==========
-      const { data: batchImages } = await supabase
-        .from('batch_images')
-        .select('id, original_filename, original_url, result_url, original_size, status, created_at')
-        .eq('user_id', user.id)
-        .eq('status', 'completed')
-        .order('created_at', { ascending: false }) as {
-          data: Array<{
-            id: string;
-            original_filename: string;
-            original_url: string | null;
-            result_url: string | null;
-            original_size: number;
-            status: string;
-            created_at: string;
-          }> | null
-        };
+      // ========== PROCESS BATCH IMAGES ==========
+      const batchImages = batchImagesResult.data as Array<{
+        id: string;
+        original_filename: string;
+        original_url: string | null;
+        result_url: string | null;
+        original_size: number;
+        status: string;
+        created_at: string;
+      }> | null;
 
-      // ========== BATCH PROJECTS ==========
-      const { data: batchProjects } = await supabase
-        .from('batch_projects')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(10) as { data: BatchJob[] | null };
-
+      // ========== PROCESS BATCH PROJECTS ==========
+      const batchProjects = batchProjectsResult.data as BatchJob[] | null;
       if (batchProjects) {
         const active = batchProjects.filter(b => b.status === 'processing');
         setActiveBatches(active);
