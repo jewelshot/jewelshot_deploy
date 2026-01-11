@@ -502,5 +502,28 @@ GRANT EXECUTE ON FUNCTION public.add_admin_credits(UUID, INTEGER, TEXT) TO servi
 GRANT EXECUTE ON FUNCTION public.remove_admin_credits(UUID, INTEGER, TEXT) TO service_role;
 
 -- ============================================
+-- ENSURE ALL OPERATION COSTS EXIST
+-- ============================================
+
+-- Add any missing operation costs
+INSERT INTO public.operation_costs (operation_type, cost, description) VALUES
+  ('edit', 1, 'Studio edit (nano-banana)'),
+  ('generate', 2, 'Image generation (FLUX Pro)'),
+  ('upscale', 1, 'Image upscaling (SeedVR2)'),
+  ('remove-bg', 1, 'Background removal'),
+  ('inpaint', 2, 'Inpainting (mask + fill)'),
+  ('camera-control', 2, 'Camera angle adjustment'),
+  ('gemstone', 2, 'Gemstone enhancement'),
+  ('metal-recolor', 2, 'Metal recoloring'),
+  ('metal-polish', 2, 'Metal polishing'),
+  ('natural-light', 2, 'Natural lighting'),
+  ('video', 5, 'Video generation'),
+  ('turntable', 5, 'Turntable video')
+ON CONFLICT (operation_type) DO UPDATE SET
+  cost = EXCLUDED.cost,
+  description = EXCLUDED.description,
+  updated_at = NOW();
+
+-- ============================================
 -- END OF MIGRATION
 -- ============================================
