@@ -800,4 +800,126 @@ OUTPUT: Macro craftsmanship showcase. Aspect ratio ${aspectRatio}. Extreme close
       });
     },
   },
+
+  'high-key-joy': {
+    name: 'High-Key Joy',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'female' : gender === 'men' ? 'male' : 'model';
+      const genderAdj = gender === 'women' ? 'feminine' : gender === 'men' ? 'masculine' : 'natural';
+      const type = jewelryType.toLowerCase();
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      // Dynamic jewelry placement based on type
+      const jewelryPose = {
+        ring: 'hand playfully near mouth or touching face in candid gesture, fingers elegantly displayed showing the ring',
+        necklace: 'laughing joyfully with natural head tilt, necklace resting beautifully on decollete area',
+        earring: 'head slightly turned in genuine laugh, earrings catching the light near jawline',
+        bracelet: 'hand raised in candid gesture near face, wrist positioned to showcase the bracelet naturally',
+      }[type] || 'natural candid pose showcasing the jewelry with genuine joy';
+
+      // Dynamic clothing based on gender
+      const clothing = gender === 'men' 
+        ? 'minimalist white crew-neck t-shirt or open-collar white linen shirt'
+        : 'minimalist white ribbed tank top or simple white silk blouse';
+
+      // Real-world size specifications
+      const sizeSpecs = {
+        ring: 'Ring band 2-3mm wide, face 8-12mm diameter, natural finger proportions',
+        necklace: 'Chain 16-20 inch length, pendant 10-25mm, natural chest proportions',
+        earring: 'Stud 4-8mm diameter, drop 15-35mm length, natural ear proportions',
+        bracelet: 'Chain 7-8 inch length, links 3-8mm width, natural wrist proportions',
+      }[type] || 'Standard jewelry proportions relative to human body';
+
+      // 3D placement specifications
+      const placementSpecs = {
+        ring: 'Ring WRAPPED AROUND finger naturally, band follows finger curve, TOUCHES skin, no floating',
+        necklace: 'Chain RESTS ON skin, follows neck contour, pendant LIES FLAT on chest, natural drape',
+        earring: 'Earring SECURED through earlobe, HANGS naturally, catches light beautifully',
+        bracelet: 'Bracelet WRAPS AROUND wrist, follows wrist curve, TOUCHES skin with gravity drape',
+      }[type] || 'Jewelry makes natural PHYSICAL CONTACT with body';
+
+      return `Ultra-clean high-key commercial beauty portrait. ${genderText} model laughing joyfully in candid moment, ${jewelryPose}.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+THE SUBJECT & SKIN TEXTURE - HYPER-REALISTIC:
+Skin texture is hyper-realistic, dewy, and fresh
+Visible natural pores, light freckles, fine vellus hair
+Definitely NOT airbrushed, NOT plastic, NOT wax-like
+Genuine emotion: crinkled-eye smile, authentic joy, natural ${genderAdj} beauty
+Natural ${genderAdj} features, contemporary beauty standards
+Expression: Genuine candid laughter, eyes sparkling with joy
+
+JEWELRY & STYLING:
+${jewelryType} as the hero piece - showcased prominently
+${clothing} to keep focus on skin and metal
+Clean minimal styling, no distracting accessories
+${sizeSpecs}
+
+CRITICAL 3D PLACEMENT & PHYSICAL CONTACT:
+${placementSpecs}
+Jewelry shows DEPTH and PERSPECTIVE on body
+DIRECT SKIN CONTACT - no air gaps, no floating appearance
+Natural wearing physics, realistic gravity
+
+CRITICAL PRESERVATION - ABSOLUTE ZERO TOLERANCE:
+JEWELRY DESIGN MUST REMAIN 100% PIXEL-IDENTICAL
+EXACT structure: geometry, shape, form, dimensions UNCHANGED
+EXACT gemstone count: SAME NUMBER, NO additions, NO removals
+EXACT setting details: prongs, bezels, metalwork UNTOUCHED
+EXACT proportions: ALL ratios, measurements MAINTAINED
+ONLY lighting, pose, context MAY change - JEWELRY FROZEN
+
+HIGH-KEY ENVIRONMENT - PURE WHITE:
+Background: Seamless infinite pure white (#FFFFFF)
+ZERO shadows on wall or floor
+No dark corners, no vignetting
+Ultra-bright, airy, expansive feel
+
+HIGH-KEY LIGHTING - ULTRA-BRIGHT SOFT:
+Ultra-bright soft diffused commercial studio lighting
+Light wraps around face and body evenly
+Key: Large diffused overhead softbox
+Fill: Wrap-around soft ambient light
+No harsh shadows, high-key luminosity throughout
+Color temp: 5500-6000K neutral to cool white
+Effect: Metal gleams brilliantly, diamonds/gems sparkle intensely
+
+STRICTLY FORBIDDEN - NEGATIVE PROMPT:
+Grey background, off-white background, cream tones
+Shadows on wall, floor shadows, dark areas
+Vignetting, dark corners, moody lighting
+Heavy makeup, fake eyelashes, thick foundation
+Airbrushed skin, plastic skin, smooth skin
+Wax figure appearance, doll-like, mannequin
+Blurry jewelry, unclear details
+Messy hair, sad expression, forced smile
+Low resolution, grainy, noisy image
+Jewelry modifications, added/removed gemstones
+Floating jewelry, unnatural placement
+
+MOOD & ATMOSPHERE:
+Expensive yet effortless aesthetic
+Fresh, full of life, genuine joy
+Aspirational but approachable
+Contemporary luxury commercial feel
+Editorial beauty campaign quality
+
+CAMERA & TECHNICAL:
+Medium format camera look, 85mm equivalent
+Razor-sharp focus on jewelry and eyes
+Shallow depth for background separation
+f/2.8-f/4 aperture for beautiful bokeh
+Ultra-high resolution, 300 DPI quality
+Aspect ratio: ${aspectRatio}
+
+OUTPUT: High-key commercial beauty. Candid joy. Luxury jewelry editorial. Ultra-clean aesthetic.`;
+    },
+  },
 };

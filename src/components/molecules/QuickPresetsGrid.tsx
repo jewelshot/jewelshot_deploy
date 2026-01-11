@@ -18,7 +18,8 @@ import {
   Gem,
   Image,
   Zap,
-  Film
+  Film,
+  Laugh
 } from 'lucide-react';
 
 interface QuickPreset {
@@ -100,6 +101,13 @@ const QUICK_PRESETS: QuickPreset[] = [
     icon: Film,
     description: 'Bold, high-contrast style',
     color: 'text-red-400',
+  },
+  {
+    id: 'high-key-joy',
+    name: 'High-Key Joy',
+    icon: Laugh,
+    description: 'Bright, joyful commercial',
+    color: 'text-orange-400',
   },
 ];
 
