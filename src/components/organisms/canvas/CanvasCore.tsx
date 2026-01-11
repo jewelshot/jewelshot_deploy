@@ -19,7 +19,7 @@ import React, { Dispatch, SetStateAction } from 'react';
 import ImageViewer from '@/components/molecules/ImageViewer';
 import EmptyState from '@/components/molecules/EmptyState';
 import LoadingState from '@/components/atoms/LoadingState';
-import AILoadingOverlay from '@/components/atoms/AILoadingOverlay';
+// AILoadingOverlay removed - using global AILoadingModal instead
 import type { Transform } from '@/hooks/useImageTransform';
 import type {
   AdjustFilters,
@@ -192,12 +192,7 @@ export default function CanvasCore({
                 paddingBottom: `${imagePadding.bottom}px`,
               }}
             >
-              {/* AI Loading Overlay */}
-              {(isAIEditing || isAIImageLoading) && (
-                <div className="absolute inset-0 z-50">
-                  <AILoadingOverlay progress={aiProgress} />
-                </div>
-              )}
+              {/* AI Loading handled by global AILoadingModal */}
 
               {/* Original Image (Left) */}
               {originalImage && (

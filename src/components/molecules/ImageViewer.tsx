@@ -10,7 +10,7 @@ import { useClarity } from '@/hooks/useClarity';
 import { useDehaze } from '@/hooks/useDehaze';
 import { useVignette } from '@/hooks/useVignette';
 import { useGrain } from '@/hooks/useGrain';
-import AILoadingOverlay from '@/components/atoms/AILoadingOverlay';
+// AILoadingOverlay removed - using global AILoadingModal instead
 import {
   clampAdjustFilters,
   clampColorFilters,
@@ -717,8 +717,7 @@ export function ImageViewer({
         draggable={false}
       />
 
-      {/* AI Loading Overlay */}
-      {isAIProcessing && <AILoadingOverlay progress={aiProgress} />}
+      {/* AI Loading handled by global AILoadingModal */}
 
       <style jsx>{`
         @keyframes scaleIn {
