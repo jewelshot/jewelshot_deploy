@@ -2,12 +2,12 @@
  * SelectivePresetsPanel Component
  * 
  * Build custom presets by selecting individual parameters
- * Style, Model, Setting, Mood - dynamically filtered by jewelry type
+ * Style, Model, Setting, Mood - dynamically filtered by jewelry type AND gender
  */
 
 'use client';
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { ChevronDown, Sparkles } from 'lucide-react';
 import { FaceVisibility } from '@/lib/generation-settings-storage';
 
@@ -22,22 +22,26 @@ export interface SelectivePresetOptions {
   mood: string | null;
 }
 
+type Gender = 'women' | 'men';
+type JewelryType = 'ring' | 'necklace' | 'earring' | 'bracelet';
+
 interface OptionItem {
   id: string;
   label: string;
+  labelMen?: string; // Alternative label for men
   description?: string;
+  descriptionMen?: string; // Alternative description for men
   icon?: string;
-  // Which jewelry types this option applies to (empty = all)
-  forJewelry?: ('ring' | 'necklace' | 'earring' | 'bracelet')[];
-  // Which styles this option applies to (empty = all)
+  forJewelry?: JewelryType[];
   forStyles?: string[];
+  forGender?: Gender[]; // Gender-specific options
 }
 
 // ============================================
 // OPTION DEFINITIONS
 // ============================================
 
-// Style Options - applies to all jewelry types
+// Style Options - some gender-specific variations
 const STYLE_OPTIONS: OptionItem[] = [
   { id: 'editorial', label: 'Editorial', description: 'Magazine quality', icon: '📸' },
   { id: 'ecommerce', label: 'E-Commerce', description: 'Clean catalog', icon: '🛒' },
@@ -47,93 +51,140 @@ const STYLE_OPTIONS: OptionItem[] = [
   { id: 'artistic', label: 'Artistic', description: 'Creative experimental', icon: '🎨' },
 ];
 
-// Model Options - filtered by jewelry type
-// All jewelry types have access to general shots (half body, full body)
-// Each jewelry type has EXTRA specific options for that jewelry area
+// Model Options - filtered by jewelry type AND gender
 const MODEL_OPTIONS: OptionItem[] = [
-  // ===== UNIVERSAL OPTIONS (All jewelry types) =====
-  { id: 'product-only', label: 'Product Only', description: 'No model, jewelry focus', icon: '💍', forJewelry: ['ring', 'necklace', 'earring', 'bracelet'] },
-  { id: 'half-body', label: 'Half Body', description: 'Waist up shot', icon: '🧍', forJewelry: ['ring', 'necklace', 'earring', 'bracelet'] },
-  { id: 'full-body', label: 'Full Body', description: 'Complete figure', icon: '🧍‍♀️', forJewelry: ['ring', 'necklace', 'earring', 'bracelet'] },
+  // ===== UNIVERSAL (All jewelry, all genders) =====
+  { id: 'product-only', label: 'Product Only', description: 'No model, jewelry focus', icon: '💍' },
+  { id: 'half-body', label: 'Half Body', description: 'Waist up shot', icon: '🧍' },
+  { id: 'full-body', label: 'Full Body', description: 'Complete figure', icon: '🧍‍♀️' },
   
-  // ===== RING & BRACELET SPECIFIC (Hand focus) =====
-  { id: 'hand-elegant', label: 'Elegant Hand', description: 'Graceful hand pose', icon: '🤚', forJewelry: ['ring', 'bracelet'] },
-  { id: 'hand-natural', label: 'Natural Hand', description: 'Relaxed casual hand', icon: '✋', forJewelry: ['ring', 'bracelet'] },
-  { id: 'hand-gesture', label: 'Hand Gesture', description: 'Dynamic movement', icon: '👌', forJewelry: ['ring', 'bracelet'] },
-  { id: 'hands-both', label: 'Both Hands', description: 'Hands together/touching', icon: '🙏', forJewelry: ['ring', 'bracelet'] },
-  { id: 'hand-face', label: 'Hand Near Face', description: 'Hand touching face', icon: '🤔', forJewelry: ['ring', 'bracelet'] },
-  { id: 'hand-hair', label: 'Hand in Hair', description: 'Playing with hair', icon: '💇', forJewelry: ['ring', 'bracelet'] },
+  // ===== RING & BRACELET - WOMEN (Elegant, Delicate) =====
+  { id: 'hand-elegant-f', label: 'Elegant Hand', description: 'Graceful feminine pose', icon: '💅', forJewelry: ['ring', 'bracelet'], forGender: ['women'] },
+  { id: 'hand-natural-f', label: 'Natural Hand', description: 'Soft relaxed pose', icon: '🤚', forJewelry: ['ring', 'bracelet'], forGender: ['women'] },
+  { id: 'hand-gesture-f', label: 'Delicate Gesture', description: 'Gentle movement', icon: '👌', forJewelry: ['ring', 'bracelet'], forGender: ['women'] },
+  { id: 'hands-together-f', label: 'Hands Together', description: 'Feminine interlaced', icon: '🙏', forJewelry: ['ring', 'bracelet'], forGender: ['women'] },
+  { id: 'hand-face-f', label: 'Hand on Face', description: 'Touching cheek gently', icon: '🤔', forJewelry: ['ring', 'bracelet'], forGender: ['women'] },
+  { id: 'hand-hair-f', label: 'Playing with Hair', description: 'Running through hair', icon: '💇', forJewelry: ['ring', 'bracelet'], forGender: ['women'] },
   
-  // ===== NECKLACE SPECIFIC (Neck/Chest focus) =====
-  { id: 'neck-closeup', label: 'Neck Close-up', description: 'Tight framing on necklace', icon: '👤', forJewelry: ['necklace'] },
-  { id: 'decollete', label: 'Décolleté', description: 'Collarbone & chest area', icon: '✨', forJewelry: ['necklace'] },
-  { id: 'neck-shoulder', label: 'Neck & Shoulders', description: 'Wider neck framing', icon: '🎀', forJewelry: ['necklace'] },
-  { id: 'layered-necklace', label: 'Layered Look', description: 'Multiple necklace styling', icon: '📿', forJewelry: ['necklace'] },
+  // ===== RING & BRACELET - MEN (Strong, Confident) =====
+  { id: 'hand-confident-m', label: 'Confident Hand', description: 'Strong masculine pose', icon: '✊', forJewelry: ['ring', 'bracelet'], forGender: ['men'] },
+  { id: 'hand-relaxed-m', label: 'Relaxed Hand', description: 'Casual natural pose', icon: '🤚', forJewelry: ['ring', 'bracelet'], forGender: ['men'] },
+  { id: 'hand-grip-m', label: 'Grip/Hold', description: 'Holding object', icon: '🤝', forJewelry: ['ring', 'bracelet'], forGender: ['men'] },
+  { id: 'hands-clasped-m', label: 'Hands Clasped', description: 'Business/confident', icon: '🙏', forJewelry: ['ring', 'bracelet'], forGender: ['men'] },
+  { id: 'hand-chin-m', label: 'Hand on Chin', description: 'Thoughtful pose', icon: '🤔', forJewelry: ['ring', 'bracelet'], forGender: ['men'] },
+  { id: 'wrist-watch-m', label: 'Watch Style', description: 'Wrist display pose', icon: '⌚', forJewelry: ['bracelet'], forGender: ['men'] },
   
-  // ===== EARRING SPECIFIC (Ear/Profile focus) =====
-  { id: 'ear-closeup', label: 'Ear Close-up', description: 'Tight on ear & earring', icon: '👂', forJewelry: ['earring'] },
-  { id: 'profile-side', label: 'Side Profile', description: 'Classic profile view', icon: '🎭', forJewelry: ['earring'] },
-  { id: 'three-quarter', label: '3/4 View', description: 'Angled face view', icon: '📐', forJewelry: ['earring'] },
-  { id: 'both-ears', label: 'Both Ears', description: 'Front view showing both', icon: '👥', forJewelry: ['earring'] },
-  { id: 'hair-tucked', label: 'Hair Tucked', description: 'Hair behind ear', icon: '💇‍♀️', forJewelry: ['earring'] },
+  // ===== NECKLACE - WOMEN (Graceful, Elegant) =====
+  { id: 'neck-closeup-f', label: 'Neck Close-up', description: 'Delicate framing', icon: '✨', forJewelry: ['necklace'], forGender: ['women'] },
+  { id: 'decollete-f', label: 'Décolleté', description: 'Elegant collarbone', icon: '👗', forJewelry: ['necklace'], forGender: ['women'] },
+  { id: 'shoulder-bare-f', label: 'Bare Shoulders', description: 'Off-shoulder elegance', icon: '🎀', forJewelry: ['necklace'], forGender: ['women'] },
+  { id: 'layered-f', label: 'Layered Chains', description: 'Multiple necklaces', icon: '📿', forJewelry: ['necklace'], forGender: ['women'] },
+  
+  // ===== NECKLACE - MEN (Bold, Minimal) =====
+  { id: 'neck-closeup-m', label: 'Neck Close-up', description: 'Strong neckline', icon: '👤', forJewelry: ['necklace'], forGender: ['men'] },
+  { id: 'chest-open-m', label: 'Open Collar', description: 'Shirt unbuttoned', icon: '👔', forJewelry: ['necklace'], forGender: ['men'] },
+  { id: 'chain-pendant-m', label: 'Chain Focus', description: 'Bold chain/pendant', icon: '⛓️', forJewelry: ['necklace'], forGender: ['men'] },
+  { id: 'casual-neck-m', label: 'Casual Neck', description: 'T-shirt neckline', icon: '👕', forJewelry: ['necklace'], forGender: ['men'] },
+  
+  // ===== EARRING - WOMEN (Profile, Hair) =====
+  { id: 'ear-closeup-f', label: 'Ear Close-up', description: 'Delicate detail', icon: '👂', forJewelry: ['earring'], forGender: ['women'] },
+  { id: 'profile-elegant-f', label: 'Elegant Profile', description: 'Graceful side view', icon: '🎭', forJewelry: ['earring'], forGender: ['women'] },
+  { id: 'three-quarter-f', label: '3/4 View', description: 'Feminine angle', icon: '📐', forJewelry: ['earring'], forGender: ['women'] },
+  { id: 'hair-up-f', label: 'Hair Up', description: 'Updo showing earrings', icon: '💇‍♀️', forJewelry: ['earring'], forGender: ['women'] },
+  { id: 'hair-tucked-f', label: 'Hair Tucked', description: 'Behind ear reveal', icon: '✨', forJewelry: ['earring'], forGender: ['women'] },
+  
+  // ===== EARRING - MEN (Minimal, Edgy) =====
+  { id: 'ear-closeup-m', label: 'Ear Close-up', description: 'Clean detail shot', icon: '👂', forJewelry: ['earring'], forGender: ['men'] },
+  { id: 'profile-strong-m', label: 'Strong Profile', description: 'Bold jawline view', icon: '🎭', forJewelry: ['earring'], forGender: ['men'] },
+  { id: 'three-quarter-m', label: '3/4 View', description: 'Masculine angle', icon: '📐', forJewelry: ['earring'], forGender: ['men'] },
+  { id: 'stud-focus-m', label: 'Stud Focus', description: 'Minimal stud style', icon: '⚫', forJewelry: ['earring'], forGender: ['men'] },
 ];
 
 // Setting Options - filtered by style
 const SETTING_OPTIONS: OptionItem[] = [
-  // Studio options - E-commerce, Minimalist, Luxury
+  // Studio options
   { id: 'studio-white', label: 'Studio White', description: 'Pure white seamless', icon: '⬜', forStyles: ['ecommerce', 'minimalist', 'editorial'] },
   { id: 'studio-gray', label: 'Studio Gray', description: 'Neutral backdrop', icon: '🔲', forStyles: ['ecommerce', 'minimalist', 'editorial', 'luxury'] },
   { id: 'studio-black', label: 'Studio Black', description: 'Dark dramatic', icon: '⬛', forStyles: ['luxury', 'editorial', 'artistic'] },
   { id: 'gradient-soft', label: 'Soft Gradient', description: 'Subtle color fade', icon: '🌅', forStyles: ['editorial', 'minimalist', 'luxury'] },
   
-  // Indoor lifestyle options
+  // Indoor lifestyle
   { id: 'living-room', label: 'Living Room', description: 'Modern home interior', icon: '🛋️', forStyles: ['lifestyle'] },
   { id: 'bedroom', label: 'Bedroom', description: 'Intimate setting', icon: '🛏️', forStyles: ['lifestyle'] },
   { id: 'vanity-mirror', label: 'Vanity Mirror', description: 'Getting ready moment', icon: '🪞', forStyles: ['lifestyle', 'editorial'] },
   { id: 'cafe-restaurant', label: 'Café', description: 'Cozy public space', icon: '☕', forStyles: ['lifestyle'] },
   
-  // Outdoor lifestyle options
+  // Outdoor
   { id: 'garden-nature', label: 'Garden', description: 'Natural greenery', icon: '🌿', forStyles: ['lifestyle', 'artistic'] },
   { id: 'beach-coastal', label: 'Beach', description: 'Coastal golden hour', icon: '🏖️', forStyles: ['lifestyle', 'artistic'] },
   { id: 'urban-city', label: 'Urban Street', description: 'City backdrop', icon: '🏙️', forStyles: ['lifestyle', 'editorial'] },
   
-  // Artistic options
+  // Artistic
   { id: 'abstract-bokeh', label: 'Abstract Bokeh', description: 'Blurred light play', icon: '✨', forStyles: ['artistic', 'luxury'] },
   { id: 'textured-surface', label: 'Textured Surface', description: 'Marble, velvet, etc.', icon: '🪨', forStyles: ['luxury', 'editorial', 'artistic'] },
   { id: 'dramatic-shadows', label: 'Dramatic Shadows', description: 'Chiaroscuro lighting', icon: '🌑', forStyles: ['artistic', 'luxury'] },
 ];
 
-// Mood Options - some filtered by style
+// Mood Options - some gender-specific vibes
 const MOOD_OPTIONS: OptionItem[] = [
-  { id: 'elegant', label: 'Elegant', description: 'Refined sophisticated', icon: '✨', forStyles: ['editorial', 'luxury', 'minimalist'] },
-  { id: 'romantic', label: 'Romantic', description: 'Soft warm dreamy', icon: '💕', forStyles: ['lifestyle', 'artistic'] },
-  { id: 'dramatic', label: 'Dramatic', description: 'Bold high contrast', icon: '🎭', forStyles: ['luxury', 'editorial', 'artistic'] },
-  { id: 'fresh', label: 'Fresh', description: 'Bright natural light', icon: '🌸', forStyles: ['lifestyle', 'ecommerce', 'minimalist'] },
-  { id: 'warm', label: 'Warm', description: 'Golden cozy tones', icon: '🌅', forStyles: ['lifestyle', 'luxury'] },
-  { id: 'cool', label: 'Cool', description: 'Modern blue tones', icon: '❄️', forStyles: ['minimalist', 'editorial'] },
-  { id: 'luxurious', label: 'Luxurious', description: 'Rich opulent feel', icon: '👑', forStyles: ['luxury', 'editorial'] },
-  { id: 'playful', label: 'Playful', description: 'Fun energetic vibe', icon: '🎉', forStyles: ['lifestyle', 'artistic'] },
-  { id: 'mysterious', label: 'Mysterious', description: 'Dark moody allure', icon: '🌙', forStyles: ['artistic', 'luxury'] },
-  { id: 'serene', label: 'Serene', description: 'Calm peaceful zen', icon: '🕊️', forStyles: ['minimalist', 'lifestyle'] },
+  // Universal moods
+  { id: 'elegant', label: 'Elegant', description: 'Refined sophisticated', icon: '✨' },
+  { id: 'dramatic', label: 'Dramatic', description: 'Bold high contrast', icon: '🎭' },
+  { id: 'fresh', label: 'Fresh', description: 'Bright natural light', icon: '🌸' },
+  { id: 'luxurious', label: 'Luxurious', description: 'Rich opulent feel', icon: '👑' },
+  
+  // Feminine leaning
+  { id: 'romantic', label: 'Romantic', description: 'Soft warm dreamy', icon: '💕', forGender: ['women'] },
+  { id: 'ethereal', label: 'Ethereal', description: 'Dreamy magical', icon: '🦋', forGender: ['women'] },
+  { id: 'sensual', label: 'Sensual', description: 'Intimate alluring', icon: '🌹', forGender: ['women'] },
+  { id: 'playful', label: 'Playful', description: 'Fun energetic vibe', icon: '🎉', forGender: ['women'] },
+  
+  // Masculine leaning
+  { id: 'bold', label: 'Bold', description: 'Strong confident', icon: '💪', forGender: ['men'] },
+  { id: 'rugged', label: 'Rugged', description: 'Raw masculine', icon: '🏔️', forGender: ['men'] },
+  { id: 'sleek', label: 'Sleek', description: 'Modern minimal', icon: '🔷', forGender: ['men'] },
+  { id: 'edgy', label: 'Edgy', description: 'Alternative cool', icon: '⚡', forGender: ['men'] },
+  
+  // More universal
+  { id: 'warm', label: 'Warm', description: 'Golden cozy tones', icon: '🌅' },
+  { id: 'cool', label: 'Cool', description: 'Modern blue tones', icon: '❄️' },
+  { id: 'mysterious', label: 'Mysterious', description: 'Dark moody allure', icon: '🌙' },
+  { id: 'serene', label: 'Serene', description: 'Calm peaceful zen', icon: '🕊️' },
 ];
 
 // ============================================
 // HELPER FUNCTIONS
 // ============================================
 
-function filterOptionsByJewelry(options: OptionItem[], jewelryType: string | null): OptionItem[] {
-  if (!jewelryType) return [];
+function filterOptions(
+  options: OptionItem[], 
+  jewelryType: JewelryType | null, 
+  gender: Gender | null,
+  style: string | null
+): OptionItem[] {
   return options.filter(opt => {
-    if (!opt.forJewelry || opt.forJewelry.length === 0) return true;
-    return opt.forJewelry.includes(jewelryType as any);
-  });
-}
-
-function filterOptionsByStyle(options: OptionItem[], style: string | null): OptionItem[] {
-  if (!style) return options; // Show all if no style selected
-  return options.filter(opt => {
-    if (!opt.forStyles || opt.forStyles.length === 0) return true;
-    return opt.forStyles.includes(style);
+    // Filter by jewelry type if specified
+    if (opt.forJewelry && opt.forJewelry.length > 0) {
+      if (!jewelryType || !opt.forJewelry.includes(jewelryType)) {
+        return false;
+      }
+    }
+    
+    // Filter by gender if specified
+    if (opt.forGender && opt.forGender.length > 0) {
+      if (!gender || !opt.forGender.includes(gender)) {
+        return false;
+      }
+    }
+    
+    // Filter by style if specified
+    if (opt.forStyles && opt.forStyles.length > 0) {
+      if (!style || !opt.forStyles.includes(style)) {
+        return false;
+      }
+    }
+    
+    return true;
   });
 }
 
@@ -265,7 +316,7 @@ export function SelectivePresetsPanel({
     mood: null,
   });
 
-  // Accordion state - all open by default
+  // Accordion state
   const [openSections, setOpenSections] = useState({
     style: true,
     model: true,
@@ -273,53 +324,59 @@ export function SelectivePresetsPanel({
     mood: true,
   });
 
-  // Get filtered options based on jewelry type and style
+  // Get filtered options
   const filteredModelOptions = useMemo(() => 
-    filterOptionsByJewelry(MODEL_OPTIONS, jewelryType),
-    [jewelryType]
+    filterOptions(MODEL_OPTIONS, jewelryType, gender, null),
+    [jewelryType, gender]
   );
 
   const filteredSettingOptions = useMemo(() => 
-    filterOptionsByStyle(SETTING_OPTIONS, selections.style),
+    filterOptions(SETTING_OPTIONS, null, null, selections.style),
     [selections.style]
   );
 
   const filteredMoodOptions = useMemo(() => 
-    filterOptionsByStyle(MOOD_OPTIONS, selections.style),
-    [selections.style]
+    filterOptions(MOOD_OPTIONS, null, gender, null),
+    [gender]
   );
 
-  // Reset dependent selections when parent changes
+  // Reset model selection when jewelry type or gender changes
+  useEffect(() => {
+    if (selections.modelType) {
+      const validOptions = filterOptions(MODEL_OPTIONS, jewelryType, gender, null);
+      if (!validOptions.some(o => o.id === selections.modelType)) {
+        setSelections(prev => ({ ...prev, modelType: null }));
+      }
+    }
+  }, [jewelryType, gender, selections.modelType]);
+
+  // Reset mood when gender changes
+  useEffect(() => {
+    if (selections.mood) {
+      const validOptions = filterOptions(MOOD_OPTIONS, null, gender, null);
+      if (!validOptions.some(o => o.id === selections.mood)) {
+        setSelections(prev => ({ ...prev, mood: null }));
+      }
+    }
+  }, [gender, selections.mood]);
+
   const updateSelection = useCallback((key: keyof SelectivePresetOptions, value: string) => {
     setSelections(prev => {
       const newValue = prev[key] === value ? null : value;
       
-      // If style changes, clear setting and mood if they're no longer valid
+      // If style changes, clear setting if it's no longer valid
       if (key === 'style') {
-        const newSettings = filterOptionsByStyle(SETTING_OPTIONS, newValue);
-        const newMoods = filterOptionsByStyle(MOOD_OPTIONS, newValue);
-        
+        const newSettings = filterOptions(SETTING_OPTIONS, null, null, newValue);
         return {
           ...prev,
           style: newValue,
           setting: prev.setting && newSettings.some(s => s.id === prev.setting) ? prev.setting : null,
-          mood: prev.mood && newMoods.some(m => m.id === prev.mood) ? prev.mood : null,
         };
       }
       
       return { ...prev, [key]: newValue };
     });
   }, []);
-
-  // Reset model selection when jewelry type changes
-  React.useEffect(() => {
-    if (jewelryType && selections.modelType) {
-      const validOptions = filterOptionsByJewelry(MODEL_OPTIONS, jewelryType);
-      if (!validOptions.some(o => o.id === selections.modelType)) {
-        setSelections(prev => ({ ...prev, modelType: null }));
-      }
-    }
-  }, [jewelryType, selections.modelType]);
 
   const toggleSection = (section: keyof typeof openSections) => {
     setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
@@ -331,159 +388,146 @@ export function SelectivePresetsPanel({
   };
 
   const hasMinimumSelection = selections.style !== null;
-  const hasAnySelection = Object.values(selections).some(v => v !== null);
 
-  // Build prompt from selections
+  // Build clean prompt for API (no metadata headers)
   const buildPrompt = useCallback(() => {
     const parts: string[] = [];
+    const genderText = gender === 'women' ? 'female' : gender === 'men' ? 'male' : '';
+    const jewelryName = jewelryType || 'jewelry';
     
-    // Header with generation settings
-    parts.push('[GENERATION SETTINGS]');
-    parts.push(`Gender: ${gender || 'not specified'}`);
-    parts.push(`Jewelry Type: ${jewelryType || 'ring'}`);
-    parts.push(`Aspect Ratio: ${aspectRatio}`);
-    parts.push(`Model Face: ${showFace === 'hide' ? 'HIDDEN (crop at neck/chin, NO face visible)' : 'VISIBLE'}`);
-    parts.push('');
-    parts.push('[SELECTIVE PRESET]');
+    // Main subject
+    parts.push(`Professional ${jewelryName} photography on ${genderText} model.`);
     
     // Style
     if (selections.style) {
-      const style = STYLE_OPTIONS.find(s => s.id === selections.style);
-      parts.push(`Style: ${style?.label}`);
+      const stylePrompts: Record<string, string> = {
+        editorial: 'High-end editorial magazine quality, sophisticated composition, refined aesthetics.',
+        ecommerce: 'Clean e-commerce catalog photography, pure white background, product-focused, maximum clarity.',
+        lifestyle: 'Natural lifestyle photography, candid authentic moment, relatable aesthetic, soft natural light.',
+        luxury: 'Luxury premium photography, dramatic lighting, exclusive high-end feel, rich tones.',
+        minimalist: 'Minimalist clean aesthetic, negative space, simple elegant composition.',
+        artistic: 'Creative artistic photography, experimental composition, unique perspective.',
+      };
+      parts.push(stylePrompts[selections.style] || '');
     }
     
-    // Model Type
+    // Model pose (gender-specific descriptions built into the prompts)
     if (selections.modelType) {
-      const model = MODEL_OPTIONS.find(m => m.id === selections.modelType);
-      parts.push(`Model: ${model?.label}`);
+      const modelPrompts: Record<string, string> = {
+        // Universal
+        'product-only': `${jewelryName} displayed elegantly without model, product as sole subject on premium surface.`,
+        'half-body': `${genderText} model from waist up, ${jewelryName} featured prominently, ${showFace === 'hide' ? 'cropped at neck level' : 'natural expression'}.`,
+        'full-body': `Full body ${genderText} model, ${jewelryName} as styling accent, ${showFace === 'hide' ? 'face not visible' : 'elegant pose'}.`,
+        
+        // Women - Hand
+        'hand-elegant-f': `Feminine hand elegantly posed, slender fingers gracefully positioned, ${jewelryName} catching light.`,
+        'hand-natural-f': `Soft feminine hand in relaxed natural position, delicate wrist, ${jewelryName} displayed beautifully.`,
+        'hand-gesture-f': `Delicate feminine hand gesture, gentle movement, ${jewelryName} as focal point.`,
+        'hands-together-f': `Feminine hands together, interlaced or touching, ${jewelryName} prominently visible.`,
+        'hand-face-f': `Feminine hand gently touching cheek or face, ${jewelryName} visible, ${showFace === 'hide' ? 'face cropped' : 'soft expression'}.`,
+        'hand-hair-f': `Feminine hand running through hair, playful moment, ${jewelryName} catching movement.`,
+        
+        // Men - Hand
+        'hand-confident-m': `Strong masculine hand, confident pose, ${jewelryName} as statement piece.`,
+        'hand-relaxed-m': `Relaxed masculine hand, casual natural position, ${jewelryName} visible.`,
+        'hand-grip-m': `Masculine hand gripping or holding object, ${jewelryName} prominently displayed.`,
+        'hands-clasped-m': `Masculine hands clasped together, business confident pose, ${jewelryName} visible.`,
+        'hand-chin-m': `Masculine hand on chin, thoughtful contemplative pose, ${jewelryName} featured.`,
+        'wrist-watch-m': `Masculine wrist displayed watch-style, ${jewelryName} as focal point.`,
+        
+        // Women - Necklace
+        'neck-closeup-f': `Delicate feminine neck close-up, ${jewelryName} as hero element, ${showFace === 'hide' ? 'cropped above chin' : 'partial face'}.`,
+        'decollete-f': `Elegant feminine décolleté and collarbone, ${jewelryName} draped beautifully, ${showFace === 'hide' ? 'face not visible' : 'graceful expression'}.`,
+        'shoulder-bare-f': `Bare feminine shoulders, off-shoulder elegance, ${jewelryName} prominent.`,
+        'layered-f': `Feminine neck with layered necklaces styled together, ${showFace === 'hide' ? 'face cropped' : 'natural pose'}.`,
+        
+        // Men - Necklace
+        'neck-closeup-m': `Strong masculine neck close-up, ${jewelryName} as statement, ${showFace === 'hide' ? 'cropped at chin' : 'partial profile'}.`,
+        'chest-open-m': `Masculine open collar shirt, chest partially visible, ${jewelryName} prominent.`,
+        'chain-pendant-m': `Bold masculine chain or pendant focus, strong presence.`,
+        'casual-neck-m': `Casual masculine t-shirt neckline, ${jewelryName} naturally displayed.`,
+        
+        // Women - Earring
+        'ear-closeup-f': `Delicate feminine ear close-up, ${jewelryName} in perfect detail, ${showFace === 'hide' ? 'face excluded' : 'partial profile'}.`,
+        'profile-elegant-f': `Elegant feminine side profile, graceful silhouette, ${jewelryName} catching light, ${showFace === 'hide' ? 'face in shadow' : 'refined expression'}.`,
+        'three-quarter-f': `Feminine three-quarter view, ${jewelryName} visible, ${showFace === 'hide' ? 'face partially hidden' : 'natural expression'}.`,
+        'hair-up-f': `Feminine updo hairstyle, ${jewelryName} fully exposed, ${showFace === 'hide' ? 'face cropped or in shadow' : 'elegant pose'}.`,
+        'hair-tucked-f': `Feminine hair tucked behind ear, ${jewelryName} prominently revealed.`,
+        
+        // Men - Earring
+        'ear-closeup-m': `Clean masculine ear close-up, ${jewelryName} in sharp detail, ${showFace === 'hide' ? 'face excluded' : 'partial profile'}.`,
+        'profile-strong-m': `Strong masculine profile, bold jawline, ${jewelryName} visible, ${showFace === 'hide' ? 'face in shadow' : 'confident expression'}.`,
+        'three-quarter-m': `Masculine three-quarter view, ${jewelryName} catching light, ${showFace === 'hide' ? 'face obscured' : 'natural pose'}.`,
+        'stud-focus-m': `Minimal masculine stud earring focus, clean aesthetic.`,
+      };
+      parts.push(modelPrompts[selections.modelType] || '');
     }
     
     // Setting
     if (selections.setting) {
-      const setting = SETTING_OPTIONS.find(s => s.id === selections.setting);
-      parts.push(`Setting: ${setting?.label}`);
+      const settingPrompts: Record<string, string> = {
+        'studio-white': 'Pure white seamless studio background, clean professional lighting.',
+        'studio-gray': 'Neutral gray studio backdrop, balanced even lighting.',
+        'studio-black': 'Deep black dramatic background, accent lighting on jewelry.',
+        'gradient-soft': 'Soft subtle gradient background, elegant color transition.',
+        'living-room': 'Modern living room interior, soft natural window light.',
+        'bedroom': 'Intimate bedroom setting, soft ambient lighting.',
+        'vanity-mirror': 'Vanity mirror setting, getting ready moment.',
+        'cafe-restaurant': 'Cozy café ambiance, warm interior lighting.',
+        'garden-nature': 'Natural garden setting, soft dappled sunlight.',
+        'beach-coastal': 'Beach coastal setting, golden hour light.',
+        'urban-city': 'Urban city street, modern architectural backdrop.',
+        'abstract-bokeh': 'Abstract blurred background, beautiful bokeh lights.',
+        'textured-surface': 'Elegant textured surface, premium feel.',
+        'dramatic-shadows': 'Dramatic shadow play, artistic lighting.',
+      };
+      parts.push(settingPrompts[selections.setting] || '');
     }
     
     // Mood
     if (selections.mood) {
-      const mood = MOOD_OPTIONS.find(m => m.id === selections.mood);
-      parts.push(`Mood: ${mood?.label}`);
-    }
-    
-    parts.push('');
-    parts.push('[PROMPT]');
-    
-    // Build detailed prompt based on jewelry type
-    const promptParts: string[] = [];
-    const genderText = gender === 'women' ? 'female' : gender === 'men' ? 'male' : '';
-    const jewelryName = jewelryType || 'jewelry';
-    
-    promptParts.push(`Professional ${jewelryName} photography.`);
-    
-    // Style-specific prompts
-    if (selections.style) {
-      const stylePrompts: Record<string, string> = {
-        editorial: 'High-end editorial magazine quality, sophisticated composition, refined aesthetics, professional lighting.',
-        ecommerce: 'Clean e-commerce catalog photography, pure white background, product-focused, maximum clarity.',
-        lifestyle: 'Natural lifestyle photography, candid authentic moment, relatable aesthetic, soft natural light.',
-        luxury: 'Luxury premium photography, dramatic lighting, exclusive high-end feel, rich tones.',
-        minimalist: 'Minimalist clean aesthetic, negative space, simple elegant composition, refined details.',
-        artistic: 'Creative artistic photography, experimental composition, unique perspective, artistic expression.',
-      };
-      promptParts.push(stylePrompts[selections.style] || '');
-    }
-    
-    // Model-specific prompts based on jewelry type
-    if (selections.modelType) {
-      const faceInstruction = showFace === 'hide' ? 'face NOT visible, cropped at chin/neck level' : 'natural expression visible';
-      
-      const modelPrompts: Record<string, string> = {
-        // ===== UNIVERSAL =====
-        'product-only': `${jewelryName} displayed without model, product as sole subject, elegant presentation on premium surface.`,
-        'half-body': `${genderText} model from waist up, ${jewelryName} as styling accent, ${faceInstruction}, elegant pose.`,
-        'full-body': `Full body ${genderText} model shot, ${jewelryName} integrated into complete look, ${faceInstruction}, fashion editorial stance.`,
-        
-        // ===== HAND OPTIONS (ring, bracelet) =====
-        'hand-elegant': `${genderText} hand elegantly posed, fingers gracefully positioned, ${jewelryName} prominently displayed, refined gesture.`,
-        'hand-natural': `${genderText} hand in natural relaxed position, casual authentic pose, ${jewelryName} featured naturally.`,
-        'hand-gesture': `${genderText} hand in dynamic gesture, movement and energy, ${jewelryName} catching light.`,
-        'hands-both': `Both ${genderText} hands together, touching or interacting, ${jewelryName} as focal point between hands.`,
-        'hand-face': `${genderText} hand gently touching face or chin, ${jewelryName} visible, ${showFace === 'hide' ? 'face cropped above hand' : 'contemplative expression'}.`,
-        'hand-hair': `${genderText} hand running through hair, ${jewelryName} catching movement, ${showFace === 'hide' ? 'focus on hand and jewelry only' : 'natural candid moment'}.`,
-        
-        // ===== NECK OPTIONS (necklace) =====
-        'neck-closeup': `Tight framing on ${genderText} neck area, ${jewelryName} as hero element, ${showFace === 'hide' ? 'cropped above chin NO face visible' : 'partial face visible'}.`,
-        'decollete': `${genderText} décolleté and collarbone area, elegant framing, ${jewelryName} draped perfectly, ${showFace === 'hide' ? 'face cropped out' : 'subtle expression'}.`,
-        'neck-shoulder': `${genderText} neck and shoulders, wider framing, ${jewelryName} in context, ${showFace === 'hide' ? 'cropped at chin level' : 'relaxed natural pose'}.`,
-        'layered-necklace': `${genderText} neck showcasing ${jewelryName} layering, multiple chains styled together, ${faceInstruction}.`,
-        
-        // ===== EAR OPTIONS (earring) =====
-        'ear-closeup': `Tight close-up on ${genderText} ear, ${jewelryName} in perfect detail, ${showFace === 'hide' ? 'cropped to exclude face' : 'partial profile'}.`,
-        'profile-side': `${genderText} side profile view, classic silhouette, ${jewelryName} prominently featured, ${showFace === 'hide' ? 'face in shadow or cropped' : 'elegant profile'}.`,
-        'three-quarter': `${genderText} three-quarter angled view, ${jewelryName} visible and catching light, ${showFace === 'hide' ? 'face partially hidden' : 'natural expression'}.`,
-        'both-ears': `Front view of ${genderText} showing both ears, ${jewelryName} pair symmetrically displayed, ${faceInstruction}.`,
-        'hair-tucked': `${genderText} with hair tucked behind ear, ${jewelryName} fully exposed and prominent, ${faceInstruction}.`,
-      };
-      promptParts.push(modelPrompts[selections.modelType] || '');
-    }
-    
-    // Setting-specific prompts
-    if (selections.setting) {
-      const settingPrompts: Record<string, string> = {
-        'studio-white': 'Pure white seamless studio background, clean professional lighting, no distractions.',
-        'studio-gray': 'Neutral gray studio backdrop, balanced even lighting, sophisticated feel.',
-        'studio-black': 'Deep black dramatic background, accent lighting on jewelry, luxury feel.',
-        'gradient-soft': 'Soft subtle gradient background, smooth color transition, elegant backdrop.',
-        'living-room': 'Modern living room interior, soft natural window light, lifestyle context.',
-        'bedroom': 'Intimate bedroom setting, soft ambient lighting, personal moment.',
-        'vanity-mirror': 'Vanity mirror setting, getting ready moment, warm lighting, lifestyle.',
-        'cafe-restaurant': 'Cozy café ambiance, warm interior lighting, lifestyle context.',
-        'garden-nature': 'Natural garden setting, soft dappled sunlight through leaves, organic feel.',
-        'beach-coastal': 'Beach coastal setting, golden hour light, ocean in background, summery.',
-        'urban-city': 'Urban city street, modern architectural elements, contemporary backdrop.',
-        'abstract-bokeh': 'Abstract blurred background, beautiful bokeh lights, dreamy quality.',
-        'textured-surface': 'Elegant textured surface (marble, velvet, wood), premium feel.',
-        'dramatic-shadows': 'Dramatic shadow play, chiaroscuro lighting, artistic mood.',
-      };
-      promptParts.push(settingPrompts[selections.setting] || '');
-    }
-    
-    // Mood-specific prompts
-    if (selections.mood) {
       const moodPrompts: Record<string, string> = {
-        elegant: 'Elegant sophisticated mood, refined color palette, graceful presentation.',
-        romantic: 'Romantic soft atmosphere, warm pink tones, dreamy ethereal quality.',
-        dramatic: 'Dramatic high-contrast mood, bold shadows, intense visual presence.',
-        fresh: 'Fresh bright mood, clean whites, natural daylight feel, uplifting.',
-        warm: 'Warm golden mood, amber honey tones, cozy inviting atmosphere.',
-        cool: 'Cool modern mood, blue undertones, crisp contemporary feel.',
-        luxurious: 'Luxurious opulent mood, rich deep tones, premium exclusive aesthetic.',
-        playful: 'Playful vibrant mood, dynamic colors, fun energetic expression.',
-        mysterious: 'Mysterious moody atmosphere, dark tones, intriguing shadows.',
-        serene: 'Serene peaceful mood, soft pastel tones, calming zen presence.',
+        elegant: 'Elegant sophisticated mood, refined palette.',
+        dramatic: 'Dramatic high-contrast, bold shadows.',
+        fresh: 'Fresh bright, natural daylight feel.',
+        luxurious: 'Luxurious opulent, rich deep tones.',
+        romantic: 'Romantic soft atmosphere, warm dreamy.',
+        ethereal: 'Ethereal magical quality, soft glow.',
+        sensual: 'Sensual intimate allure, warm tones.',
+        playful: 'Playful vibrant, fun energetic.',
+        bold: 'Bold confident presence, strong impact.',
+        rugged: 'Rugged raw masculine energy.',
+        sleek: 'Sleek modern minimal, sharp lines.',
+        edgy: 'Edgy alternative cool, urban edge.',
+        warm: 'Warm golden cozy tones.',
+        cool: 'Cool modern blue undertones.',
+        mysterious: 'Mysterious moody, intriguing shadows.',
+        serene: 'Serene peaceful, calming presence.',
       };
-      promptParts.push(moodPrompts[selections.mood] || '');
+      parts.push(moodPrompts[selections.mood] || '');
     }
     
-    // Critical instructions
-    promptParts.push('');
-    promptParts.push('CRITICAL: Preserve exact jewelry design unchanged. Ultra-sharp 300dpi professional quality.');
+    // Technical requirements
+    parts.push('Ultra-sharp 300dpi professional quality.');
+    parts.push('CRITICAL: Preserve exact jewelry design unchanged.');
+    
+    // Face visibility
     if (showFace === 'hide') {
-      promptParts.push('STRICT: NO face visible. Crop at neck/chin level. NO eyes, nose, mouth in frame.');
+      parts.push('STRICT: NO face visible. Crop at neck/chin level. NO eyes, nose, mouth in frame.');
     }
     
-    parts.push(promptParts.join(' '));
+    // Aspect ratio
+    parts.push(`Aspect ratio: ${aspectRatio}.`);
     
-    return parts.join('\n');
+    return parts.filter(p => p).join(' ');
   }, [selections, gender, jewelryType, aspectRatio, showFace]);
 
   const handleGenerate = () => {
-    if (!hasMinimumSelection || disabled || !jewelryType) return;
+    if (!hasMinimumSelection || disabled || !jewelryType || !gender) return;
     const prompt = buildPrompt();
     onGenerate(prompt);
   };
 
-  // Check if settings are complete
   const settingsComplete = Boolean(gender && jewelryType && aspectRatio && showFace);
 
   return (
@@ -497,7 +541,7 @@ export function SelectivePresetsPanel({
         </div>
       )}
 
-      {/* Style Section - Always available */}
+      {/* Style Section */}
       <CollapsibleSection
         title="Style"
         icon="🎨"
@@ -518,7 +562,7 @@ export function SelectivePresetsPanel({
         </div>
       </CollapsibleSection>
 
-      {/* Model Section - Filtered by jewelry type */}
+      {/* Model Section */}
       <CollapsibleSection
         title="Model"
         icon="👤"
@@ -546,7 +590,7 @@ export function SelectivePresetsPanel({
         )}
       </CollapsibleSection>
 
-      {/* Setting Section - Filtered by style */}
+      {/* Setting Section */}
       <CollapsibleSection
         title="Setting"
         icon="📍"
@@ -569,20 +613,19 @@ export function SelectivePresetsPanel({
           </div>
         ) : (
           <p className="text-[10px] text-white/40 text-center py-2">
-            Select a style to see available settings
+            Select a style to see settings
           </p>
         )}
       </CollapsibleSection>
 
-      {/* Mood Section - Filtered by style */}
+      {/* Mood Section */}
       <CollapsibleSection
         title="Mood"
         icon="💫"
         isOpen={openSections.mood}
         onToggle={() => toggleSection('mood')}
         selectedLabel={getSelectedLabel(filteredMoodOptions, selections.mood)}
-        disabled={!settingsComplete || !selections.style}
-        disabledMessage={!selections.style ? 'Select style first' : undefined}
+        disabled={!settingsComplete}
       >
         {filteredMoodOptions.length > 0 ? (
           <div className="grid grid-cols-2 gap-1.5">
@@ -597,39 +640,10 @@ export function SelectivePresetsPanel({
           </div>
         ) : (
           <p className="text-[10px] text-white/40 text-center py-2">
-            Select a style to see available moods
+            No moods available
           </p>
         )}
       </CollapsibleSection>
-
-      {/* Selection Preview */}
-      {hasAnySelection && settingsComplete && (
-        <div className="rounded-lg border border-white/10 bg-white/[0.02] p-2">
-          <p className="text-[9px] text-white/40 mb-1">Current selection:</p>
-          <div className="flex flex-wrap gap-1">
-            {selections.style && (
-              <span className="rounded-full bg-purple-500/20 px-2 py-0.5 text-[9px] text-purple-300">
-                {STYLE_OPTIONS.find(s => s.id === selections.style)?.label}
-              </span>
-            )}
-            {selections.modelType && (
-              <span className="rounded-full bg-blue-500/20 px-2 py-0.5 text-[9px] text-blue-300">
-                {MODEL_OPTIONS.find(m => m.id === selections.modelType)?.label}
-              </span>
-            )}
-            {selections.setting && (
-              <span className="rounded-full bg-green-500/20 px-2 py-0.5 text-[9px] text-green-300">
-                {SETTING_OPTIONS.find(s => s.id === selections.setting)?.label}
-              </span>
-            )}
-            {selections.mood && (
-              <span className="rounded-full bg-orange-500/20 px-2 py-0.5 text-[9px] text-orange-300">
-                {MOOD_OPTIONS.find(m => m.id === selections.mood)?.label}
-              </span>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* Generate Button */}
       <button
@@ -645,7 +659,6 @@ export function SelectivePresetsPanel({
         Generate with Selection
       </button>
 
-      {/* Helper text */}
       {settingsComplete && !hasMinimumSelection && (
         <p className="text-center text-[9px] text-white/40">
           Select at least a Style to generate
