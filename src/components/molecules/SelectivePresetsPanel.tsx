@@ -8,7 +8,7 @@
 'use client';
 
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { ChevronDown, Sparkles } from 'lucide-react';
+import { ChevronDown, Sparkles, Shuffle } from 'lucide-react';
 import { FaceVisibility } from '@/lib/generation-settings-storage';
 import { buildSelectivePrompt } from '@/lib/prompt-builder';
 
@@ -315,6 +315,39 @@ export function SelectivePresetsPanel({
   };
 
   const hasMinimumSelection = selections.style !== null;
+  const settingsComplete = Boolean(gender && jewelryType && aspectRatio && showFace);
+
+  // Randomize all selections
+  const handleRandomize = useCallback(() => {
+    if (!settingsComplete) return;
+    
+    // Helper to pick random item from array
+    const pickRandom = <T,>(arr: T[]): T | null => {
+      if (arr.length === 0) return null;
+      return arr[Math.floor(Math.random() * arr.length)];
+    };
+    
+    // Pick random style first (required)
+    const randomStyle = pickRandom(STYLE_OPTIONS);
+    if (!randomStyle) return;
+    
+    // Get filtered options based on random style
+    const availableModels = filterOptions(MODEL_OPTIONS, jewelryType, gender, null);
+    const availableSettings = filterOptions(SETTING_OPTIONS, null, null, randomStyle.id);
+    const availableMoods = filterOptions(MOOD_OPTIONS, null, gender, null);
+    
+    // Pick random from each
+    const randomModel = pickRandom(availableModels);
+    const randomSetting = pickRandom(availableSettings);
+    const randomMood = pickRandom(availableMoods);
+    
+    setSelections({
+      style: randomStyle.id,
+      modelType: randomModel?.id || null,
+      setting: randomSetting?.id || null,
+      mood: randomMood?.id || null,
+    });
+  }, [settingsComplete, jewelryType, gender]);
 
   const handleGenerate = useCallback(() => {
     if (!hasMinimumSelection || disabled || !jewelryType || !gender) return;
@@ -327,7 +360,48 @@ export function SelectivePresetsPanel({
     onGenerate(prompt);
   }, [hasMinimumSelection, disabled, jewelryType, gender, aspectRatio, showFace, selections, onGenerate]);
 
-  const settingsComplete = Boolean(gender && jewelryType && aspectRatio && showFace);
+  // Randomize and immediately generate
+  const handleRandomGenerate = useCallback(() => {
+    if (!settingsComplete || disabled || !jewelryType || !gender) return;
+    
+    // Helper to pick random item from array
+    const pickRandom = <T extends OptionItem>(arr: T[]): T | null => {
+      if (arr.length === 0) return null;
+      return arr[Math.floor(Math.random() * arr.length)];
+    };
+    
+    // Pick random style first (required)
+    const randomStyle = pickRandom(STYLE_OPTIONS);
+    if (!randomStyle) return;
+    
+    // Get filtered options based on random style
+    const availableModels = filterOptions(MODEL_OPTIONS, jewelryType, gender, null);
+    const availableSettings = filterOptions(SETTING_OPTIONS, null, null, randomStyle.id);
+    const availableMoods = filterOptions(MOOD_OPTIONS, null, gender, null);
+    
+    // Pick random from each
+    const randomModel = pickRandom(availableModels);
+    const randomSetting = pickRandom(availableSettings);
+    const randomMood = pickRandom(availableMoods);
+    
+    const randomSelections = {
+      style: randomStyle.id,
+      modelType: randomModel?.id || null,
+      setting: randomSetting?.id || null,
+      mood: randomMood?.id || null,
+    };
+    
+    // Update state for visual feedback
+    setSelections(randomSelections);
+    
+    // Generate with random selections
+    const { prompt } = buildSelectivePrompt(
+      { gender, jewelryType, aspectRatio, showFace },
+      randomSelections
+    );
+    
+    onGenerate(prompt);
+  }, [settingsComplete, disabled, jewelryType, gender, aspectRatio, showFace, onGenerate]);
 
   return (
     <div className="space-y-2">
@@ -407,21 +481,54 @@ export function SelectivePresetsPanel({
         )}
       </CollapsibleSection>
 
-      <button
-        onClick={handleGenerate}
-        disabled={!hasMinimumSelection || disabled || !settingsComplete}
-        className={`mt-3 flex w-full items-center justify-center gap-2 rounded-lg py-2.5 text-xs font-medium transition-all ${
-          hasMinimumSelection && !disabled && settingsComplete
-            ? 'bg-white/10 text-white hover:bg-white/15 border border-white/20'
-            : 'bg-white/5 text-white/30 cursor-not-allowed border border-white/5'
-        }`}
-      >
-        <Sparkles className="h-3.5 w-3.5" />
-        Generate with Selection
-      </button>
+      {/* Action Buttons */}
+      <div className="mt-3 flex gap-2">
+        {/* Random Button */}
+        <button
+          onClick={handleRandomize}
+          disabled={!settingsComplete || disabled}
+          title="Randomize selections"
+          className={`flex items-center justify-center rounded-lg px-3 py-2.5 transition-all ${
+            settingsComplete && !disabled
+              ? 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white border border-white/10'
+              : 'bg-white/5 text-white/30 cursor-not-allowed border border-white/5'
+          }`}
+        >
+          <Shuffle className="h-4 w-4" />
+        </button>
+
+        {/* Generate Button */}
+        <button
+          onClick={handleGenerate}
+          disabled={!hasMinimumSelection || disabled || !settingsComplete}
+          className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-xs font-medium transition-all ${
+            hasMinimumSelection && !disabled && settingsComplete
+              ? 'bg-white/10 text-white hover:bg-white/15 border border-white/20'
+              : 'bg-white/5 text-white/30 cursor-not-allowed border border-white/5'
+          }`}
+        >
+          <Sparkles className="h-3.5 w-3.5" />
+          Generate
+        </button>
+
+        {/* Random Generate Button */}
+        <button
+          onClick={handleRandomGenerate}
+          disabled={!settingsComplete || disabled}
+          title="Random generate"
+          className={`flex items-center justify-center gap-1.5 rounded-lg px-3 py-2.5 text-xs font-medium transition-all ${
+            settingsComplete && !disabled
+              ? 'bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 border border-purple-500/30'
+              : 'bg-white/5 text-white/30 cursor-not-allowed border border-white/5'
+          }`}
+        >
+          <Shuffle className="h-3.5 w-3.5" />
+          <Sparkles className="h-3.5 w-3.5" />
+        </button>
+      </div>
 
       {settingsComplete && !hasMinimumSelection && (
-        <p className="text-center text-[9px] text-white/40">Select at least a Style to generate</p>
+        <p className="text-center text-[9px] text-white/40">Select options or use random</p>
       )}
     </div>
   );

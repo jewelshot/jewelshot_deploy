@@ -8,7 +8,7 @@
 'use client';
 
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { ChevronDown, Sparkles, RotateCcw } from 'lucide-react';
+import { ChevronDown, Sparkles, RotateCcw, Shuffle } from 'lucide-react';
 import { FaceVisibility } from '@/lib/generation-settings-storage';
 import { buildAdvancedPrompt } from '@/lib/prompt-builder';
 
@@ -475,6 +475,148 @@ export function AdvancedPresetsPanel({
     onGenerate(prompt);
   }, [settingsComplete, hasSelections, disabled, gender, jewelryType, aspectRatio, showFace, selections, getOptionLabels, onGenerate]);
 
+  // Randomize all selections
+  const handleRandomize = useCallback(() => {
+    if (!settingsComplete) return;
+    
+    const pickRandom = <T extends { id: string }>(arr: T[]): T | null => {
+      if (arr.length === 0) return null;
+      return arr[Math.floor(Math.random() * arr.length)];
+    };
+    
+    // Pick random style
+    const randomStyle = pickRandom(STYLE_OPTIONS);
+    if (!randomStyle) return;
+    
+    // Get filtered options
+    const availablePoses = filterOptions(MODEL_POSES, null, jewelryType, null);
+    const availableSettings = filterOptions(SETTING_OPTIONS, null, null, randomStyle.id);
+    const availableMoods = filterOptions(MOOD_OPTIONS, gender, null, null);
+    
+    // Pick random main options
+    const randomPose = pickRandom(availablePoses);
+    const randomSetting = pickRandom(availableSettings);
+    const randomMood = pickRandom(availableMoods);
+    
+    // Randomly decide which optional fields to fill (50% chance each)
+    const shouldInclude = () => Math.random() > 0.5;
+    
+    // Appearance options based on gender
+    let newSelections: AdvancedSelections = {
+      ...initialSelections,
+      style: randomStyle.id,
+      modelPose: randomPose?.id || null,
+      setting: randomSetting?.id || null,
+      mood: randomMood?.id || null,
+    };
+    
+    // Only add appearance if not product-only
+    if (randomPose?.id !== 'product-only') {
+      if (gender === 'women') {
+        if (shouldInclude()) newSelections.hairType = pickRandom(HAIR_TYPE_WOMEN)?.id || null;
+        if (shouldInclude()) newSelections.hairColor = pickRandom(HAIR_COLORS)?.id || null;
+        if (shouldInclude()) newSelections.nailType = pickRandom(NAIL_TYPES)?.id || null;
+        if (shouldInclude()) newSelections.nailColor = pickRandom(NAIL_COLORS)?.id || null;
+        if (shouldInclude()) newSelections.makeup = pickRandom(MAKEUP_STYLES)?.id || null;
+        if (shouldInclude()) newSelections.skinTone = pickRandom(SKIN_TONES)?.id || null;
+      } else {
+        if (shouldInclude()) newSelections.hairStyleM = pickRandom(HAIR_TYPE_MEN)?.id || null;
+        if (shouldInclude()) newSelections.hairColorM = pickRandom(HAIR_COLORS)?.id || null;
+        if (shouldInclude()) newSelections.facialHair = pickRandom(FACIAL_HAIR)?.id || null;
+        if (shouldInclude()) newSelections.skinTone = pickRandom(SKIN_TONES)?.id || null;
+      }
+    }
+    
+    // Camera settings (30% chance each)
+    const shouldIncludeCamera = () => Math.random() > 0.7;
+    if (shouldIncludeCamera()) newSelections.cameraAngle = pickRandom(CAMERA_ANGLES)?.id || null;
+    if (shouldIncludeCamera()) newSelections.depthOfField = pickRandom(DEPTH_OF_FIELD)?.id || null;
+    if (shouldIncludeCamera()) newSelections.focalLength = pickRandom(FOCAL_LENGTHS)?.id || null;
+    
+    // Lighting settings (30% chance each)
+    if (shouldIncludeCamera()) newSelections.lightingType = pickRandom(LIGHTING_TYPES)?.id || null;
+    if (shouldIncludeCamera()) newSelections.lightingDirection = pickRandom(LIGHTING_DIRECTIONS)?.id || null;
+    if (shouldIncludeCamera()) newSelections.lightingIntensity = pickRandom(LIGHTING_INTENSITY)?.id || null;
+    
+    // Color temperature (20% chance)
+    if (Math.random() > 0.8) newSelections.colorTemperature = pickRandom(COLOR_TEMPERATURES)?.id || null;
+    
+    setSelections(newSelections);
+  }, [settingsComplete, gender, jewelryType]);
+
+  // Randomize and immediately generate
+  const handleRandomGenerate = useCallback(() => {
+    if (!settingsComplete || disabled) return;
+    
+    const pickRandom = <T extends { id: string }>(arr: T[]): T | null => {
+      if (arr.length === 0) return null;
+      return arr[Math.floor(Math.random() * arr.length)];
+    };
+    
+    // Pick random style
+    const randomStyle = pickRandom(STYLE_OPTIONS);
+    if (!randomStyle) return;
+    
+    // Get filtered options
+    const availablePoses = filterOptions(MODEL_POSES, null, jewelryType, null);
+    const availableSettings = filterOptions(SETTING_OPTIONS, null, null, randomStyle.id);
+    const availableMoods = filterOptions(MOOD_OPTIONS, gender, null, null);
+    
+    // Pick random main options
+    const randomPose = pickRandom(availablePoses);
+    const randomSetting = pickRandom(availableSettings);
+    const randomMood = pickRandom(availableMoods);
+    
+    const shouldInclude = () => Math.random() > 0.5;
+    
+    let randomSelections: AdvancedSelections = {
+      ...initialSelections,
+      style: randomStyle.id,
+      modelPose: randomPose?.id || null,
+      setting: randomSetting?.id || null,
+      mood: randomMood?.id || null,
+    };
+    
+    // Appearance
+    if (randomPose?.id !== 'product-only') {
+      if (gender === 'women') {
+        if (shouldInclude()) randomSelections.hairType = pickRandom(HAIR_TYPE_WOMEN)?.id || null;
+        if (shouldInclude()) randomSelections.hairColor = pickRandom(HAIR_COLORS)?.id || null;
+        if (shouldInclude()) randomSelections.makeup = pickRandom(MAKEUP_STYLES)?.id || null;
+        if (shouldInclude()) randomSelections.skinTone = pickRandom(SKIN_TONES)?.id || null;
+      } else {
+        if (shouldInclude()) randomSelections.hairStyleM = pickRandom(HAIR_TYPE_MEN)?.id || null;
+        if (shouldInclude()) randomSelections.facialHair = pickRandom(FACIAL_HAIR)?.id || null;
+        if (shouldInclude()) randomSelections.skinTone = pickRandom(SKIN_TONES)?.id || null;
+      }
+    }
+    
+    // Update state for visual feedback
+    setSelections(randomSelections);
+    
+    // Build option labels for the prompt
+    const optLabels = {
+      hairType: HAIR_TYPE_WOMEN.find(o => o.id === randomSelections.hairType)?.label,
+      hairColor: HAIR_COLORS.find(o => o.id === randomSelections.hairColor)?.label,
+      nailType: NAIL_TYPES.find(o => o.id === randomSelections.nailType)?.label,
+      nailColor: NAIL_COLORS.find(o => o.id === randomSelections.nailColor)?.label,
+      skinTone: SKIN_TONES.find(o => o.id === randomSelections.skinTone)?.label,
+      makeup: MAKEUP_STYLES.find(o => o.id === randomSelections.makeup)?.label,
+      facialHair: FACIAL_HAIR.find(o => o.id === randomSelections.facialHair)?.label,
+      hairStyleM: HAIR_TYPE_MEN.find(o => o.id === randomSelections.hairStyleM)?.label,
+      hairColorM: HAIR_COLORS.find(o => o.id === randomSelections.hairColorM)?.label,
+    };
+    
+    // Generate with random selections
+    const { prompt } = buildAdvancedPrompt(
+      { gender, jewelryType, aspectRatio, showFace },
+      randomSelections,
+      optLabels
+    );
+    
+    onGenerate(prompt);
+  }, [settingsComplete, disabled, gender, jewelryType, aspectRatio, showFace, onGenerate]);
+
   if (!settingsComplete) {
     return (
       <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-4 text-center">
@@ -701,19 +843,51 @@ export function AdvancedPresetsPanel({
         </SubSection>
       </CollapsibleSection>
 
-      {/* Generate Button */}
-      <button
-        onClick={handleGenerate}
-        disabled={!hasSelections || disabled}
-        className={`mt-3 flex w-full items-center justify-center gap-2 rounded-lg py-2.5 text-xs font-medium transition-all ${
-          hasSelections && !disabled
-            ? 'bg-white/10 text-white hover:bg-white/15 border border-white/20'
-            : 'bg-white/5 text-white/30 cursor-not-allowed border border-white/5'
-        }`}
-      >
-        <Sparkles className="h-3.5 w-3.5" />
-        Generate with Advanced Settings
-      </button>
+      {/* Action Buttons */}
+      <div className="mt-3 flex gap-2">
+        {/* Random Button */}
+        <button
+          onClick={handleRandomize}
+          disabled={disabled}
+          title="Randomize all settings"
+          className={`flex items-center justify-center rounded-lg px-3 py-2.5 transition-all ${
+            !disabled
+              ? 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white border border-white/10'
+              : 'bg-white/5 text-white/30 cursor-not-allowed border border-white/5'
+          }`}
+        >
+          <Shuffle className="h-4 w-4" />
+        </button>
+
+        {/* Generate Button */}
+        <button
+          onClick={handleGenerate}
+          disabled={!hasSelections || disabled}
+          className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-xs font-medium transition-all ${
+            hasSelections && !disabled
+              ? 'bg-white/10 text-white hover:bg-white/15 border border-white/20'
+              : 'bg-white/5 text-white/30 cursor-not-allowed border border-white/5'
+          }`}
+        >
+          <Sparkles className="h-3.5 w-3.5" />
+          Generate
+        </button>
+
+        {/* Random Generate Button */}
+        <button
+          onClick={handleRandomGenerate}
+          disabled={disabled}
+          title="Random generate"
+          className={`flex items-center justify-center gap-1.5 rounded-lg px-3 py-2.5 text-xs font-medium transition-all ${
+            !disabled
+              ? 'bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 border border-purple-500/30'
+              : 'bg-white/5 text-white/30 cursor-not-allowed border border-white/5'
+          }`}
+        >
+          <Shuffle className="h-3.5 w-3.5" />
+          <Sparkles className="h-3.5 w-3.5" />
+        </button>
+      </div>
     </div>
   );
 }
