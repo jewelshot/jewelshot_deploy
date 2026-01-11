@@ -98,7 +98,7 @@ function createWorker(queueName: string) {
     const transactionId = job.data.metadata?.creditTransactionId;
     if (transactionId) {
       try {
-        await confirmCredit(transactionId);
+        await confirmCredit(transactionId, job.data.userId);
         logger.info('Credits confirmed', { jobId: job.id, transactionId });
       } catch (error) {
         logger.error('Failed to confirm credits', { jobId: job.id }, error as Error);

@@ -1,8 +1,16 @@
 /**
  * AI Job Submission Endpoint
  * 
- * Unified endpoint for all AI operations
- * Synchronous processing - processes immediately and returns result
+ * Queue-based processing via Redis/BullMQ
+ * Returns job ID immediately, client polls for status
+ * 
+ * Flow:
+ * 1. Validate request & check credits
+ * 2. Reserve credits
+ * 3. Add job to Redis queue
+ * 4. Return job ID immediately
+ * 5. Worker processes job in background
+ * 6. Client polls /api/ai/status/{jobId} for result
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -12,6 +20,7 @@ import { reserveCredit, getAvailableCredits, confirmCredit, refundCredit } from 
 import { aiRateLimit, checkRateLimit } from '@/lib/rate-limit';
 import { createApiError, ApiErrorCode, withErrorHandling } from '@/lib/api-error';
 import { validateAIParams, ValidationError } from '@/lib/validation';
+import { addJob, isQueueAvailable } from '@/lib/queue/client';
 import { processAIJob } from '@/lib/queue/processors/ai-processor';
 
 // ============================================
@@ -68,23 +77,24 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
       params,
       priority = 'normal',
       metadata,
+      // New: Allow client to request sync processing
+      sync = false,
     } = body as {
       operation: AIOperation;
       params: Record<string, any>;
       priority?: JobPriority;
       metadata?: any;
+      sync?: boolean;
     };
 
     // ============================================
     // INPUT VALIDATION
     // ============================================
     
-    // Validate required fields
     if (!operation) {
       return createApiError(ApiErrorCode.MISSING_REQUIRED_FIELD, 'Operation is required');
     }
 
-    // Validate and sanitize params
     try {
       validateAIParams(operation, params);
     } catch (error) {
@@ -98,13 +108,11 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     // CREDIT CHECK & RESERVATION
     // ============================================
     
-    // Check if user has enough credits
     const availableCredits = await getAvailableCredits(user.id);
     if (availableCredits <= 0) {
       return createApiError(ApiErrorCode.INSUFFICIENT_CREDITS);
     }
 
-    // Reserve credits atomically
     let creditReservation;
     try {
       creditReservation = await reserveCredit(user.id, operation);
@@ -116,37 +124,31 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
       );
     }
 
-    // ============================================
-    // SYNCHRONOUS PROCESSING
-    // ============================================
-    
-    console.log(`[API] Processing ${operation} synchronously for user ${user.id}`);
-    console.log(`[API] Credits reserved: ${creditReservation.amount} (Transaction: ${creditReservation.transactionId})`);
-    
-    // Check for FAL API key before processing
+    // Check FAL API key
     const hasFalKey = !!(process.env.FAL_KEY || process.env.FAL_AI_KEY_1);
-    console.log(`[API] FAL API key configured: ${hasFalKey}`);
-    
     if (!hasFalKey) {
-      console.error('[API] No FAL API key configured!');
-      // Refund credits since we can't process
-      try {
-        await refundCredit(creditReservation.transactionId);
-      } catch (e) {
-        console.error('[API] Failed to refund credits:', e);
-      }
+      await refundCredit(creditReservation.transactionId);
       return NextResponse.json(
-        {
-          error: 'AI service not configured',
-          message: 'FAL.AI API key is not configured. Please contact support.',
-        },
+        { error: 'AI service not configured' },
         { status: 503 }
       );
     }
 
-    try {
-      // Process the job immediately (synchronous)
-      const result = await processAIJob({
+    // ============================================
+    // DETERMINE PROCESSING MODE
+    // ============================================
+    
+    const useQueue = isQueueAvailable() && !sync;
+    const jobId = `job-${user.id.slice(0, 8)}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+
+    console.log(`[API/submit] Processing mode: ${useQueue ? 'QUEUE' : 'SYNC'}, JobID: ${jobId}`);
+
+    // ============================================
+    // QUEUE-BASED PROCESSING (Redis available)
+    // ============================================
+    
+    if (useQueue) {
+      const jobData = {
         userId: user.id,
         operation,
         params,
@@ -155,78 +157,129 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
           ...metadata,
           creditTransactionId: creditReservation.transactionId,
           submittedAt: new Date().toISOString(),
+          jobId,
         },
-      });
+      };
 
-      console.log(`[API] ProcessAIJob result:`, JSON.stringify(result, null, 2));
-      
-      if (result.success) {
-        // Confirm credit deduction
-        try {
-          await confirmCredit(creditReservation.transactionId);
-          console.log(`[API] Credits confirmed for transaction ${creditReservation.transactionId}`);
-        } catch (creditError) {
-          console.error('[API] Failed to confirm credits:', creditError);
-        }
+      const queueResult = await addJob(jobData);
 
-        // Return successful result
-        return NextResponse.json({
-          jobId: `sync-${Date.now()}`,
-          status: 'completed',
-          state: 'completed',
-          priority,
-          operation,
-          result: result,
-          creditReservation: {
-            transactionId: creditReservation.transactionId,
-            amount: creditReservation.amount,
-          },
-        });
-      } else {
-        // Processing failed - refund credits
-        console.error(`[API] Job failed with error:`, result.error);
-        
-        try {
-          await refundCredit(creditReservation.transactionId);
-          console.log(`[API] Credits refunded for failed job ${creditReservation.transactionId}`);
-        } catch (refundError) {
-          console.error('[API] Failed to refund credits:', refundError);
-        }
-
-        return NextResponse.json(
-          {
-            jobId: `sync-${Date.now()}`,
-            status: 'failed',
-            state: 'failed',
-            error: result.error || { message: 'Processing failed' },
-          },
-          { status: 500 }
+      if (!queueResult.success) {
+        console.error('[API/submit] Failed to add job to queue:', queueResult.error);
+        // Fallback to sync processing
+        return processSynchronously(
+          jobId, 
+          user.id, 
+          operation, 
+          params, 
+          priority, 
+          metadata, 
+          creditReservation
         );
       }
-    } catch (error: any) {
-      console.error('[API] Synchronous processing error:', error);
-      
-      // Refund credits on error
-      try {
-        await refundCredit(creditReservation.transactionId);
-        console.log(`[API] Credits refunded due to error ${creditReservation.transactionId}`);
-      } catch (refundError) {
-        console.error('[API] Failed to refund credits:', refundError);
-      }
 
-      // Extract error message properly
-      const errorMessage = error instanceof Error 
-        ? error.message 
-        : typeof error === 'string' 
-          ? error 
-          : 'Unknown error occurred';
+      console.log(`[API/submit] Job queued: ${queueResult.jobId} in ${queueResult.queueName}`);
+
+      // Return immediately with job ID
+      return NextResponse.json({
+        jobId: queueResult.jobId || jobId,
+        status: 'queued',
+        state: 'waiting',
+        priority,
+        operation,
+        message: 'Job added to queue. Poll /api/ai/status/{jobId} for updates.',
+        creditReservation: {
+          transactionId: creditReservation.transactionId,
+          amount: creditReservation.amount,
+        },
+      });
+    }
+
+    // ============================================
+    // SYNCHRONOUS PROCESSING (No Redis or sync requested)
+    // ============================================
+    
+    return processSynchronously(
+      jobId,
+      user.id,
+      operation,
+      params,
+      priority,
+      metadata,
+      creditReservation
+    );
+});
+
+// ============================================
+// SYNC PROCESSING HELPER
+// ============================================
+
+async function processSynchronously(
+  jobId: string,
+  userId: string,
+  operation: AIOperation,
+  params: Record<string, any>,
+  priority: JobPriority,
+  metadata: any,
+  creditReservation: { transactionId: string; amount: number }
+) {
+  console.log(`[API/submit] Processing ${operation} synchronously for user ${userId}`);
+
+  try {
+    const result = await processAIJob({
+      userId,
+      operation,
+      params,
+      priority,
+      metadata: {
+        ...metadata,
+        creditTransactionId: creditReservation.transactionId,
+        submittedAt: new Date().toISOString(),
+        jobId,
+      },
+    });
+
+    if (result.success) {
+      await confirmCredit(creditReservation.transactionId, userId);
+      console.log(`[API/submit] Job completed: ${jobId}`);
+
+      return NextResponse.json({
+        jobId,
+        status: 'completed',
+        state: 'completed',
+        priority,
+        operation,
+        result,
+        creditReservation: {
+          transactionId: creditReservation.transactionId,
+          amount: creditReservation.amount,
+        },
+      });
+    } else {
+      await refundCredit(creditReservation.transactionId);
+      console.error(`[API/submit] Job failed: ${jobId}`, result.error);
 
       return NextResponse.json(
         {
-          error: 'AI processing failed',
-          message: errorMessage,
+          jobId,
+          status: 'failed',
+          state: 'failed',
+          error: result.error || { message: 'Processing failed' },
         },
         { status: 500 }
       );
     }
-});
+  } catch (error: any) {
+    await refundCredit(creditReservation.transactionId);
+    console.error(`[API/submit] Error: ${jobId}`, error);
+
+    return NextResponse.json(
+      {
+        jobId,
+        status: 'failed',
+        state: 'failed',
+        error: { message: error.message || 'Unknown error' },
+      },
+      { status: 500 }
+    );
+  }
+}

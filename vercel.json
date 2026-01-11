@@ -4,6 +4,10 @@
   "installCommand": "npm install",
   "crons": [
     {
+      "path": "/api/ai/process",
+      "schedule": "* * * * *"
+    },
+    {
       "path": "/api/cron/cleanup-credits",
       "schedule": "0 * * * *"
     },
