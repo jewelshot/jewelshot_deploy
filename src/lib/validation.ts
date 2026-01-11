@@ -118,6 +118,7 @@ export const validateEnum = <T extends string>(
 
 /**
  * URL Validation
+ * Accepts regular URLs, data URIs, and blob URLs
  */
 export const validateUrl = (
   value: any,
@@ -129,6 +130,26 @@ export const validateUrl = (
   }
 
   if (value) {
+    // Check if it's a string
+    if (typeof value !== 'string') {
+      throw new ValidationError(`${fieldName} must be a string URL`);
+    }
+
+    // Accept data URIs (base64 encoded images)
+    if (value.startsWith('data:')) {
+      // Basic data URI validation
+      if (!value.includes(',')) {
+        throw new ValidationError(`${fieldName} has invalid data URI format`);
+      }
+      return value;
+    }
+
+    // Accept blob URLs
+    if (value.startsWith('blob:')) {
+      return value;
+    }
+
+    // Validate regular URLs
     try {
       new URL(value);
     } catch {
@@ -222,6 +243,7 @@ export const validateAIParams = (operation: string, params: any) => {
       validateUrl(params.image_url, 'image_url', true);
       break;
 
+    case 'remove-bg':
     case 'remove-background':
       validateUrl(params.image_url, 'image_url', true);
       break;
@@ -233,17 +255,24 @@ export const validateAIParams = (operation: string, params: any) => {
       break;
 
     case 'camera-control':
+    case 'gemstone':
     case 'gemstone-enhance':
     case 'metal-polish':
     case 'metal-recolor':
     case 'natural-light':
       validateUrl(params.image_url, 'image_url', true);
-      validateString(params.prompt, 'prompt', { required: true, minLength: 3, maxLength: 500 });
+      // Prompt is optional for some operations
+      if (params.prompt) {
+        validateString(params.prompt, 'prompt', { minLength: 1, maxLength: 500 });
+      }
       break;
 
+    case 'video':
+    case 'turntable':
     case 'image-to-video':
     case 'turntable-video':
-      validateUrl(params.image_url, 'image_url', true);
+    case 'video-upscale':
+      validateUrl(params.image_url || params.video_url, 'image_url or video_url', true);
       break;
 
     default:
