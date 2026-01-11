@@ -174,25 +174,29 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
       {/* Container matching Canvas UI */}
       <div className="flex flex-col gap-1.5 rounded-lg border border-[rgba(139,92,246,0.2)] bg-[rgba(10,10,10,0.8)] p-1.5 backdrop-blur-[16px]">
         {/* Upscale Button */}
-        <button
-          onClick={onUpscale}
-          disabled={!hasActiveImage || isUpscaling}
-          className={getButtonClass(hasActiveImage, isUpscaling, colors.purple)}
-          title={isUpscaling ? 'Upscaling...' : 'Upscale 2x Quality'}
+        <Tooltip
+          content={isUpscaling ? 'Upscaling...' : 'Upscale 2x'}
+          side="left"
         >
-          {isUpscaling ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          ) : (
-            <>
-              <ArrowUp className="h-3.5 w-3.5" />
-              {hasActiveImage && (
-                <span className="absolute -right-0.5 -top-0.5 flex h-3 w-3 items-center justify-center rounded-full bg-purple-500 text-[8px] font-bold text-white">
-                  2×
-                </span>
-              )}
-            </>
-          )}
-        </button>
+          <button
+            onClick={onUpscale}
+            disabled={!hasActiveImage || isUpscaling}
+            className={getButtonClass(hasActiveImage, isUpscaling, colors.purple)}
+          >
+            {isUpscaling ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <>
+                <ArrowUp className="h-3.5 w-3.5" />
+                {hasActiveImage && (
+                  <span className="absolute -right-0.5 -top-0.5 flex h-3 w-3 items-center justify-center rounded-full bg-purple-500 text-[8px] font-bold text-white">
+                    2×
+                  </span>
+                )}
+              </>
+            )}
+          </button>
+        </Tooltip>
 
         {/* Remove Background Button */}
         <Tooltip
