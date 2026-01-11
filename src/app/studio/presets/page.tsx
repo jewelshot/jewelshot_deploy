@@ -98,6 +98,7 @@ export default function PresetsPage() {
   const [gender, setGender] = useState<Gender | null>(null);
   const [jewelryType, setJewelryType] = useState<JewelryType | null>(null);
   const [aspectRatio, setAspectRatio] = useState<string>('9:16');
+  const [showFace, setShowFace] = useState<'show' | 'hide'>('show');
   const [selectedPreset, setSelectedPreset] = useState<QuickPreset | null>(null);
   const [showJsonView, setShowJsonView] = useState(false);
   const [copiedJson, setCopiedJson] = useState(false);
@@ -169,6 +170,7 @@ export default function PresetsPage() {
       gender,
       jewelryType,
       aspectRatio,
+      showFace,
       applyToAll: true,
       timestamp: Date.now(),
     });
