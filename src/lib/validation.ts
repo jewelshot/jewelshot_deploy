@@ -229,13 +229,13 @@ export const validateAIParams = (operation: string, params: any) => {
 
   switch (operation) {
     case 'generate':
-      validateString(params.prompt, 'prompt', { required: true, minLength: 3, maxLength: 4000 }); // Increased for preset prompts
+      validateString(params.prompt, 'prompt', { required: true, minLength: 3, maxLength: 8000 }); // Increased for detailed preset prompts
       validateAspectRatio(params.aspect_ratio);
       break;
 
     case 'edit':
       validateUrl(params.image_url, 'image_url', true);
-      validateString(params.prompt, 'prompt', { required: true, minLength: 3, maxLength: 4000 }); // Increased for preset prompts with negative prompts
+      validateString(params.prompt, 'prompt', { required: true, minLength: 3, maxLength: 8000 }); // Increased for detailed preset prompts with negative prompts
       validateAspectRatio(params.aspect_ratio);
       break;
 
@@ -251,7 +251,7 @@ export const validateAIParams = (operation: string, params: any) => {
     case 'inpaint':
       validateUrl(params.image_url, 'image_url', true);
       validateUrl(params.mask_url, 'mask_url', true);
-      validateString(params.prompt, 'prompt', { required: true, minLength: 3, maxLength: 2000 });
+      validateString(params.prompt, 'prompt', { required: true, minLength: 1, maxLength: 4000 });
       break;
 
     case 'camera-control':
