@@ -319,14 +319,12 @@ export function SelectivePresetsPanel({
   const handleGenerate = useCallback(() => {
     if (!hasMinimumSelection || disabled || !jewelryType || !gender) return;
     
-    const { prompt, negativePrompt } = buildSelectivePrompt(
+    const { prompt } = buildSelectivePrompt(
       { gender, jewelryType, aspectRatio, showFace },
       selections
     );
     
-    // Combine prompt with negative prompt
-    const fullPrompt = `${prompt}\n\nNegative prompt: ${negativePrompt}`;
-    onGenerate(fullPrompt);
+    onGenerate(prompt);
   }, [hasMinimumSelection, disabled, jewelryType, gender, aspectRatio, showFace, selections, onGenerate]);
 
   const settingsComplete = Boolean(gender && jewelryType && aspectRatio && showFace);

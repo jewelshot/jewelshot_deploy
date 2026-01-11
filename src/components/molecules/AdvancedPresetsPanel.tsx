@@ -466,15 +466,13 @@ export function AdvancedPresetsPanel({
   const handleGenerate = useCallback(() => {
     if (!settingsComplete || !hasSelections || disabled) return;
     
-    const { prompt, negativePrompt } = buildAdvancedPrompt(
+    const { prompt } = buildAdvancedPrompt(
       { gender, jewelryType, aspectRatio, showFace },
       selections,
       getOptionLabels()
     );
     
-    // Combine prompt with negative prompt
-    const fullPrompt = `${prompt}\n\nNegative prompt: ${negativePrompt}`;
-    onGenerate(fullPrompt);
+    onGenerate(prompt);
   }, [settingsComplete, hasSelections, disabled, gender, jewelryType, aspectRatio, showFace, selections, getOptionLabels, onGenerate]);
 
   if (!settingsComplete) {
