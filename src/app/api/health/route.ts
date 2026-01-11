@@ -2,11 +2,12 @@
  * Health Check Endpoint
  * 
  * Simple health check for uptime monitoring (UptimeRobot, etc.)
- * Checks: Database connectivity, environment variables
+ * Checks: Database connectivity, Redis queue, environment variables
  */
 
 import { NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/service';
+import { getQueueHealth, isQueueAvailable } from '@/lib/queue/client';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -18,12 +19,15 @@ export async function GET() {
     version: '1.0.0',
     services: {
       database: false,
+      redis: false,
       environment: false,
     },
     details: {
       database: '',
+      redis: '',
       environment: '',
     },
+    queue: null as any,
   };
 
   // Check Database (Supabase)
@@ -44,6 +48,31 @@ export async function GET() {
     checks.status = 'unhealthy';
     checks.services.database = false;
     checks.details.database = error.message || 'Connection failed';
+  }
+
+  // Check Redis (BullMQ Queue)
+  try {
+    if (isQueueAvailable()) {
+      const queueHealth = await getQueueHealth();
+      checks.services.redis = queueHealth.connected;
+      checks.details.redis = queueHealth.connected ? 'Connected' : 'Connection failed';
+      checks.queue = queueHealth;
+      
+      if (!queueHealth.connected) {
+        checks.status = 'degraded';
+      }
+    } else {
+      checks.services.redis = false;
+      checks.details.redis = 'REDIS_URL not configured';
+      // Redis is optional, just degrade status
+      if (checks.status === 'healthy') {
+        checks.status = 'degraded';
+      }
+    }
+  } catch (error: any) {
+    checks.services.redis = false;
+    checks.details.redis = error.message || 'Check failed';
+    checks.status = 'degraded';
   }
 
   // Check Environment Variables
