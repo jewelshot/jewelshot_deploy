@@ -2,12 +2,12 @@
  * Health Check Endpoint
  * 
  * Simple health check for uptime monitoring (UptimeRobot, etc.)
- * Checks: Database connectivity, Redis queue, environment variables
+ * Checks: Database connectivity, Redis (rate limiting), environment variables
  */
 
 import { NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/service';
-import { getQueueHealth, isQueueAvailable } from '@/lib/queue/client';
+import { getQueueHealth, isQueueAvailable, isRedisConnected } from '@/lib/queue/client';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -20,11 +20,14 @@ export async function GET() {
     services: {
       database: false,
       redis: false,
+      rateLimiting: false,
       environment: false,
     },
     details: {
       database: '',
       redis: '',
+      rateLimiting: '',
+      processingMode: '',
       environment: '',
     },
     queue: null as any,
@@ -50,29 +53,36 @@ export async function GET() {
     checks.details.database = error.message || 'Connection failed';
   }
 
-  // Check Redis (BullMQ Queue)
-  try {
-    if (isQueueAvailable()) {
+  // Check Redis Connection (for rate limiting)
+  const redisConnected = isRedisConnected();
+  checks.services.redis = redisConnected;
+  checks.details.redis = redisConnected ? 'Connected' : 'Not configured';
+  
+  // Rate limiting depends on Redis
+  checks.services.rateLimiting = redisConnected;
+  checks.details.rateLimiting = redisConnected 
+    ? 'Active (10 AI requests/min/user)' 
+    : 'Disabled (Redis not configured)';
+
+  // Processing mode
+  const asyncMode = isQueueAvailable();
+  checks.details.processingMode = asyncMode 
+    ? 'Async (queue + worker)' 
+    : 'Sync (direct processing)';
+
+  // Check Queue Health (if async mode)
+  if (asyncMode) {
+    try {
       const queueHealth = await getQueueHealth();
-      checks.services.redis = queueHealth.connected;
-      checks.details.redis = queueHealth.connected ? 'Connected' : 'Connection failed';
       checks.queue = queueHealth;
       
       if (!queueHealth.connected) {
         checks.status = 'degraded';
       }
-    } else {
-      checks.services.redis = false;
-      checks.details.redis = 'REDIS_URL not configured';
-      // Redis is optional, just degrade status
-      if (checks.status === 'healthy') {
-        checks.status = 'degraded';
-      }
+    } catch (error: any) {
+      checks.queue = { error: error.message };
+      checks.status = 'degraded';
     }
-  } catch (error: any) {
-    checks.services.redis = false;
-    checks.details.redis = error.message || 'Check failed';
-    checks.status = 'degraded';
   }
 
   // Check Environment Variables

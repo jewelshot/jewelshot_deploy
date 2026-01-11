@@ -260,13 +260,42 @@ export async function getQueueHealth(): Promise<QueueHealth> {
 }
 
 // ============================================
-// CHECK IF QUEUE AVAILABLE
+// CHECK IF QUEUE AVAILABLE FOR ASYNC PROCESSING
 // ============================================
 
 /**
- * Check if the queue system is available
- * Use this to decide between sync and async processing
+ * Check if the queue system is available for ASYNC processing
+ * 
+ * IMPORTANT: In Vercel serverless environment, we cannot run persistent workers.
+ * Even if Redis is connected, jobs will sit in queue forever without a worker.
+ * 
+ * This returns false to force synchronous processing.
+ * Enable async mode only when you have a dedicated worker process running
+ * (e.g., on Railway, Render, or a VPS with ENABLE_ASYNC_QUEUE=true).
+ * 
+ * Note: Redis is still used for:
+ * - Rate limiting (protects against 200+ concurrent users)
+ * - Job tracking and monitoring
+ * - Future migration to async processing
  */
 export function isQueueAvailable(): boolean {
+  // Check if async queue mode is explicitly enabled
+  // Set ENABLE_ASYNC_QUEUE=true when you have a dedicated worker
+  const asyncEnabled = process.env.ENABLE_ASYNC_QUEUE === 'true';
+  
+  if (!asyncEnabled) {
+    // Sync mode: process immediately in API route
+    // Redis still works for rate limiting
+    return false;
+  }
+  
+  // Async mode: use queue (requires dedicated worker)
+  return connection !== null;
+}
+
+/**
+ * Check if Redis is connected (for rate limiting, health checks)
+ */
+export function isRedisConnected(): boolean {
   return connection !== null;
 }

@@ -363,7 +363,7 @@ export function useAIQueue() {
         
         // Show error in modal
         if (showModal) {
-          loadingStore.error(error.message || 'İşlem başarısız oldu');
+          loadingStore.error(error.message || 'Operation failed');
         }
         
         handleError(error);
