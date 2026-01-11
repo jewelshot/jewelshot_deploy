@@ -15,6 +15,7 @@ const logger = createScopedLogger('AIProcessor');
 import { processEdit } from './edit';
 import { processGenerate } from './generate';
 import { processUpscale } from './upscale';
+import { processVideoUpscale } from './video-upscale';
 import { processRemoveBackground } from './remove-bg';
 import { processInpaint } from './inpaint';
 import { processCameraControl } from './camera-control';
@@ -74,6 +75,10 @@ export async function processAIJob(data: AIJobData): Promise<AIJobResult> {
       
       case 'upscale':
         result = await processUpscale(data.params, apiKey);
+        break;
+      
+      case 'video-upscale':
+        result = await processVideoUpscale(data.params, apiKey);
         break;
       
       case 'remove-bg':
