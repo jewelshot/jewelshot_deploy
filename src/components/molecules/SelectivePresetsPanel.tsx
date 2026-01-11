@@ -10,6 +10,7 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { ChevronDown, Sparkles } from 'lucide-react';
 import { FaceVisibility } from '@/lib/generation-settings-storage';
+import { buildSelectivePrompt } from '@/lib/prompt-builder';
 
 // ============================================
 // TYPES
@@ -315,122 +316,18 @@ export function SelectivePresetsPanel({
 
   const hasMinimumSelection = selections.style !== null;
 
-  const buildPrompt = useCallback(() => {
-    const parts: string[] = [];
-    const genderText = gender === 'women' ? 'female' : gender === 'men' ? 'male' : '';
-    const jewelryName = jewelryType || 'jewelry';
-    
-    parts.push(`Professional ${jewelryName} photography on ${genderText} model.`);
-    
-    if (selections.style) {
-      const stylePrompts: Record<string, string> = {
-        editorial: 'High-end editorial magazine quality, sophisticated composition, refined aesthetics.',
-        ecommerce: 'Clean e-commerce catalog photography, pure white background, product-focused, maximum clarity.',
-        lifestyle: 'Natural lifestyle photography, candid authentic moment, relatable aesthetic, soft natural light.',
-        luxury: 'Luxury premium photography, dramatic lighting, exclusive high-end feel, rich tones.',
-        minimalist: 'Minimalist clean aesthetic, negative space, simple elegant composition.',
-        artistic: 'Creative artistic photography, experimental composition, unique perspective.',
-      };
-      parts.push(stylePrompts[selections.style] || '');
-    }
-    
-    if (selections.modelType) {
-      const modelPrompts: Record<string, string> = {
-        'product-only': `${jewelryName} displayed elegantly without model, product as sole subject on premium surface.`,
-        'half-body': `${genderText} model from waist up, ${jewelryName} featured prominently, ${showFace === 'hide' ? 'cropped at neck level' : 'natural expression'}.`,
-        'full-body': `Full body ${genderText} model, ${jewelryName} as styling accent, ${showFace === 'hide' ? 'face not visible' : 'elegant pose'}.`,
-        'hand-elegant-f': `Feminine hand elegantly posed, slender fingers gracefully positioned, ${jewelryName} catching light.`,
-        'hand-natural-f': `Soft feminine hand in relaxed natural position, delicate wrist, ${jewelryName} displayed beautifully.`,
-        'hand-gesture-f': `Delicate feminine hand gesture, gentle movement, ${jewelryName} as focal point.`,
-        'hands-together-f': `Feminine hands together, interlaced or touching, ${jewelryName} prominently visible.`,
-        'hand-face-f': `Feminine hand gently touching cheek or face, ${jewelryName} visible, ${showFace === 'hide' ? 'face cropped' : 'soft expression'}.`,
-        'hand-hair-f': `Feminine hand running through hair, playful moment, ${jewelryName} catching movement.`,
-        'hand-confident-m': `Strong masculine hand, confident pose, ${jewelryName} as statement piece.`,
-        'hand-relaxed-m': `Relaxed masculine hand, casual natural position, ${jewelryName} visible.`,
-        'hand-grip-m': `Masculine hand gripping or holding object, ${jewelryName} prominently displayed.`,
-        'hands-clasped-m': `Masculine hands clasped together, business confident pose, ${jewelryName} visible.`,
-        'hand-chin-m': `Masculine hand on chin, thoughtful contemplative pose, ${jewelryName} featured.`,
-        'wrist-watch-m': `Masculine wrist displayed watch-style, ${jewelryName} as focal point.`,
-        'neck-closeup-f': `Delicate feminine neck close-up, ${jewelryName} as hero element, ${showFace === 'hide' ? 'cropped above chin' : 'partial face'}.`,
-        'decollete-f': `Elegant feminine decollete and collarbone, ${jewelryName} draped beautifully, ${showFace === 'hide' ? 'face not visible' : 'graceful expression'}.`,
-        'shoulder-bare-f': `Bare feminine shoulders, off-shoulder elegance, ${jewelryName} prominent.`,
-        'layered-f': `Feminine neck with layered necklaces styled together, ${showFace === 'hide' ? 'face cropped' : 'natural pose'}.`,
-        'neck-closeup-m': `Strong masculine neck close-up, ${jewelryName} as statement, ${showFace === 'hide' ? 'cropped at chin' : 'partial profile'}.`,
-        'chest-open-m': `Masculine open collar shirt, chest partially visible, ${jewelryName} prominent.`,
-        'chain-pendant-m': `Bold masculine chain or pendant focus, strong presence.`,
-        'casual-neck-m': `Casual masculine t-shirt neckline, ${jewelryName} naturally displayed.`,
-        'ear-closeup-f': `Delicate feminine ear close-up, ${jewelryName} in perfect detail, ${showFace === 'hide' ? 'face excluded' : 'partial profile'}.`,
-        'profile-elegant-f': `Elegant feminine side profile, graceful silhouette, ${jewelryName} catching light, ${showFace === 'hide' ? 'face in shadow' : 'refined expression'}.`,
-        'three-quarter-f': `Feminine three-quarter view, ${jewelryName} visible, ${showFace === 'hide' ? 'face partially hidden' : 'natural expression'}.`,
-        'hair-up-f': `Feminine updo hairstyle, ${jewelryName} fully exposed, ${showFace === 'hide' ? 'face cropped or in shadow' : 'elegant pose'}.`,
-        'hair-tucked-f': `Feminine hair tucked behind ear, ${jewelryName} prominently revealed.`,
-        'ear-closeup-m': `Clean masculine ear close-up, ${jewelryName} in sharp detail, ${showFace === 'hide' ? 'face excluded' : 'partial profile'}.`,
-        'profile-strong-m': `Strong masculine profile, bold jawline, ${jewelryName} visible, ${showFace === 'hide' ? 'face in shadow' : 'confident expression'}.`,
-        'three-quarter-m': `Masculine three-quarter view, ${jewelryName} catching light, ${showFace === 'hide' ? 'face obscured' : 'natural pose'}.`,
-        'stud-focus-m': `Minimal masculine stud earring focus, clean aesthetic.`,
-      };
-      parts.push(modelPrompts[selections.modelType] || '');
-    }
-    
-    if (selections.setting) {
-      const settingPrompts: Record<string, string> = {
-        'studio-white': 'Pure white seamless studio background, clean professional lighting.',
-        'studio-gray': 'Neutral gray studio backdrop, balanced even lighting.',
-        'studio-black': 'Deep black dramatic background, accent lighting on jewelry.',
-        'gradient-soft': 'Soft subtle gradient background, elegant color transition.',
-        'living-room': 'Modern living room interior, soft natural window light.',
-        'bedroom': 'Intimate bedroom setting, soft ambient lighting.',
-        'vanity-mirror': 'Vanity mirror setting, getting ready moment.',
-        'cafe-restaurant': 'Cozy cafe ambiance, warm interior lighting.',
-        'garden-nature': 'Natural garden setting, soft dappled sunlight.',
-        'beach-coastal': 'Beach coastal setting, golden hour light.',
-        'urban-city': 'Urban city street, modern architectural backdrop.',
-        'abstract-bokeh': 'Abstract blurred background, beautiful bokeh lights.',
-        'textured-surface': 'Elegant textured surface, premium feel.',
-        'dramatic-shadows': 'Dramatic shadow play, artistic lighting.',
-      };
-      parts.push(settingPrompts[selections.setting] || '');
-    }
-    
-    if (selections.mood) {
-      const moodPrompts: Record<string, string> = {
-        elegant: 'Elegant sophisticated mood, refined palette.',
-        dramatic: 'Dramatic high-contrast, bold shadows.',
-        fresh: 'Fresh bright, natural daylight feel.',
-        luxurious: 'Luxurious opulent, rich deep tones.',
-        romantic: 'Romantic soft atmosphere, warm dreamy.',
-        ethereal: 'Ethereal magical quality, soft glow.',
-        sensual: 'Sensual intimate allure, warm tones.',
-        playful: 'Playful vibrant, fun energetic.',
-        bold: 'Bold confident presence, strong impact.',
-        rugged: 'Rugged raw masculine energy.',
-        sleek: 'Sleek modern minimal, sharp lines.',
-        edgy: 'Edgy alternative cool, urban edge.',
-        warm: 'Warm golden cozy tones.',
-        cool: 'Cool modern blue undertones.',
-        mysterious: 'Mysterious moody, intriguing shadows.',
-        serene: 'Serene peaceful, calming presence.',
-      };
-      parts.push(moodPrompts[selections.mood] || '');
-    }
-    
-    parts.push('Ultra-sharp 300dpi professional quality.');
-    parts.push('CRITICAL: Preserve exact jewelry design unchanged.');
-    
-    if (showFace === 'hide') {
-      parts.push('STRICT: NO face visible. Crop at neck/chin level. NO eyes, nose, mouth in frame.');
-    }
-    
-    parts.push(`Aspect ratio: ${aspectRatio}.`);
-    
-    return parts.filter(p => p).join(' ');
-  }, [selections, gender, jewelryType, aspectRatio, showFace]);
-
-  const handleGenerate = () => {
+  const handleGenerate = useCallback(() => {
     if (!hasMinimumSelection || disabled || !jewelryType || !gender) return;
-    const prompt = buildPrompt();
-    onGenerate(prompt);
-  };
+    
+    const { prompt, negativePrompt } = buildSelectivePrompt(
+      { gender, jewelryType, aspectRatio, showFace },
+      selections
+    );
+    
+    // Combine prompt with negative prompt
+    const fullPrompt = `${prompt}\n\nNegative prompt: ${negativePrompt}`;
+    onGenerate(fullPrompt);
+  }, [hasMinimumSelection, disabled, jewelryType, gender, aspectRatio, showFace, selections, onGenerate]);
 
   const settingsComplete = Boolean(gender && jewelryType && aspectRatio && showFace);
 

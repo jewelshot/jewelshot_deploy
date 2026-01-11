@@ -10,6 +10,7 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { ChevronDown, Sparkles, RotateCcw } from 'lucide-react';
 import { FaceVisibility } from '@/lib/generation-settings-storage';
+import { buildAdvancedPrompt } from '@/lib/prompt-builder';
 
 // ============================================
 // TYPES
@@ -447,137 +448,34 @@ export function AdvancedPresetsPanel({
   const settingsComplete = Boolean(gender && jewelryType && aspectRatio && showFace);
   const hasSelections = Object.values(selections).some(v => v !== null);
 
-  // Build prompt
-  const buildPrompt = useCallback(() => {
-    const parts: string[] = [];
-    const genderText = gender === 'women' ? 'female' : 'male';
-    const jewelry = jewelryType || 'jewelry';
+  // Get labels for appearance options
+  const getOptionLabels = useCallback(() => {
+    return {
+      hairType: HAIR_TYPE_WOMEN.find(o => o.id === selections.hairType)?.label,
+      hairColor: HAIR_COLORS.find(o => o.id === selections.hairColor)?.label,
+      nailType: NAIL_TYPES.find(o => o.id === selections.nailType)?.label,
+      nailColor: NAIL_COLORS.find(o => o.id === selections.nailColor)?.label,
+      skinTone: SKIN_TONES.find(o => o.id === selections.skinTone)?.label,
+      makeup: MAKEUP_STYLES.find(o => o.id === selections.makeup)?.label,
+      facialHair: FACIAL_HAIR.find(o => o.id === selections.facialHair)?.label,
+      hairStyleM: HAIR_TYPE_MEN.find(o => o.id === selections.hairStyleM)?.label,
+      hairColorM: HAIR_COLORS.find(o => o.id === selections.hairColorM)?.label,
+    };
+  }, [selections]);
 
-    parts.push(`Professional ${jewelry} photography on ${genderText} model.`);
-
-    // Style
-    if (selections.style) {
-      const s = STYLE_OPTIONS.find(o => o.id === selections.style);
-      parts.push(`${s?.label} style photography.`);
-    }
-
-    // Model pose
-    if (selections.modelPose && selections.modelPose !== 'product-only') {
-      const p = MODEL_POSES.find(o => o.id === selections.modelPose);
-      parts.push(`${p?.label} composition.`);
-    } else if (selections.modelPose === 'product-only') {
-      parts.push('Product-only shot, no model.');
-    }
-
-    // Appearance - Women
-    if (gender === 'women') {
-      if (selections.hairType) {
-        const h = HAIR_TYPE_WOMEN.find(o => o.id === selections.hairType);
-        parts.push(`${h?.label} hairstyle.`);
-      }
-      if (selections.hairColor) {
-        const c = HAIR_COLORS.find(o => o.id === selections.hairColor);
-        parts.push(`${c?.label} hair color.`);
-      }
-      if (selections.nailType) {
-        const n = NAIL_TYPES.find(o => o.id === selections.nailType);
-        parts.push(`${n?.label} nails.`);
-      }
-      if (selections.nailColor) {
-        const c = NAIL_COLORS.find(o => o.id === selections.nailColor);
-        parts.push(`${c?.label} nail polish.`);
-      }
-      if (selections.makeup) {
-        const m = MAKEUP_STYLES.find(o => o.id === selections.makeup);
-        parts.push(`${m?.label} makeup.`);
-      }
-    }
-
-    // Appearance - Men
-    if (gender === 'men') {
-      if (selections.hairStyleM) {
-        const h = HAIR_TYPE_MEN.find(o => o.id === selections.hairStyleM);
-        parts.push(`${h?.label} hairstyle.`);
-      }
-      if (selections.hairColorM) {
-        const c = HAIR_COLORS.find(o => o.id === selections.hairColorM);
-        parts.push(`${c?.label} hair color.`);
-      }
-      if (selections.facialHair) {
-        const f = FACIAL_HAIR.find(o => o.id === selections.facialHair);
-        parts.push(`${f?.label}.`);
-      }
-    }
-
-    // Skin tone
-    if (selections.skinTone) {
-      const t = SKIN_TONES.find(o => o.id === selections.skinTone);
-      parts.push(`${t?.label} skin tone.`);
-    }
-
-    // Setting
-    if (selections.setting) {
-      const s = SETTING_OPTIONS.find(o => o.id === selections.setting);
-      parts.push(`${s?.label} setting.`);
-    }
-
-    // Mood
-    if (selections.mood) {
-      const m = MOOD_OPTIONS.find(o => o.id === selections.mood);
-      parts.push(`${m?.label} mood.`);
-    }
-
-    // Camera
-    if (selections.cameraAngle) {
-      const a = CAMERA_ANGLES.find(o => o.id === selections.cameraAngle);
-      parts.push(`${a?.label} camera angle.`);
-    }
-    if (selections.depthOfField) {
-      const d = DEPTH_OF_FIELD.find(o => o.id === selections.depthOfField);
-      parts.push(`${d?.label} depth of field.`);
-    }
-    if (selections.focalLength) {
-      const f = FOCAL_LENGTHS.find(o => o.id === selections.focalLength);
-      parts.push(`${f?.label} focal length.`);
-    }
-
-    // Lighting
-    if (selections.lightingType) {
-      const l = LIGHTING_TYPES.find(o => o.id === selections.lightingType);
-      parts.push(`${l?.label} lighting.`);
-    }
-    if (selections.lightingDirection) {
-      const d = LIGHTING_DIRECTIONS.find(o => o.id === selections.lightingDirection);
-      parts.push(`${d?.label} light direction.`);
-    }
-    if (selections.lightingIntensity) {
-      const i = LIGHTING_INTENSITY.find(o => o.id === selections.lightingIntensity);
-      parts.push(`${i?.label} intensity.`);
-    }
-
-    // Color grading
-    if (selections.colorTemperature) {
-      const t = COLOR_TEMPERATURES.find(o => o.id === selections.colorTemperature);
-      parts.push(`${t?.label} color temperature.`);
-    }
-
-    // Technical
-    parts.push('Ultra-sharp 300dpi professional quality.');
-    parts.push('CRITICAL: Preserve exact jewelry design unchanged.');
-    
-    if (showFace === 'hide') {
-      parts.push('STRICT: NO face visible. Crop at neck/chin level.');
-    }
-
-    parts.push(`Aspect ratio: ${aspectRatio}.`);
-
-    return parts.join(' ');
-  }, [selections, gender, jewelryType, aspectRatio, showFace]);
-
-  const handleGenerate = () => {
+  const handleGenerate = useCallback(() => {
     if (!settingsComplete || !hasSelections || disabled) return;
-    onGenerate(buildPrompt());
-  };
+    
+    const { prompt, negativePrompt } = buildAdvancedPrompt(
+      { gender, jewelryType, aspectRatio, showFace },
+      selections,
+      getOptionLabels()
+    );
+    
+    // Combine prompt with negative prompt
+    const fullPrompt = `${prompt}\n\nNegative prompt: ${negativePrompt}`;
+    onGenerate(fullPrompt);
+  }, [settingsComplete, hasSelections, disabled, gender, jewelryType, aspectRatio, showFace, selections, getOptionLabels, onGenerate]);
 
   if (!settingsComplete) {
     return (
