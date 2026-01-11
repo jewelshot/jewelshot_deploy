@@ -35,7 +35,7 @@ export async function GET() {
     const supabase = createServiceClient();
     const { error } = await supabase
       .from('user_credits')
-      .select('id')
+      .select('user_id')
       .limit(1);
     
     checks.services.database = !error;

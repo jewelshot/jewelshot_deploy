@@ -251,7 +251,6 @@ export function useAIQueue() {
 
         // Show global loading modal
         if (showModal) {
-          console.log('[useAIQueue] Showing loading modal for:', params.operation);
           loadingStore.show(params.operation);
         }
 
