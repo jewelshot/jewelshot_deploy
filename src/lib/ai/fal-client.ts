@@ -11,6 +11,7 @@
  */
 
 import { createScopedLogger } from '@/lib/logger';
+import { showAILoading, showAISuccess, showAIError } from './ai-request';
 
 const logger = createScopedLogger('FAL.AI');
 
@@ -193,6 +194,9 @@ export async function generateImage(
 ): Promise<FalOutput> {
   if (onProgress) onProgress('INITIALIZING', 'Starting generation...');
 
+  // Show global loading modal
+  showAILoading('generate');
+
   try {
     if (onProgress) onProgress('GENERATING', 'Processing with AI...');
 
@@ -233,6 +237,7 @@ export async function generateImage(
     if (response.status === 'completed' && response.result) {
       if (onProgress) onProgress('COMPLETED', 'Generation complete!');
       logger.info('✅ Generation successful');
+      showAISuccess();
       
       // Map result to FalOutput format
       return {
@@ -247,15 +252,18 @@ export async function generateImage(
     // Handle failed status
     if (response.status === 'failed' || response.state === 'failed') {
       const errorMsg = response.error?.message || response.message || 'Generation failed';
+      showAIError(errorMsg);
       throw new Error(errorMsg);
     }
 
     // Unexpected response
     console.error('[FAL.AI] Unexpected response:', JSON.stringify(response));
+    showAIError('Beklenmeyen yanıt');
     throw new Error(response.message || 'Unexpected response from server');
 
   } catch (error) {
     logger.error('❌ Generation failed:', error);
+    showAIError(error instanceof Error ? error.message : 'Oluşturma başarısız');
 
     if (error instanceof Error) {
       if (error.message.includes('Insufficient credits')) {
@@ -294,6 +302,9 @@ export async function editImage(
   onProgress?: ProgressCallback
 ): Promise<FalOutput> {
   if (onProgress) onProgress('UPLOADING', 'Preparing image...');
+
+  // Show global loading modal
+  showAILoading('edit');
 
   try {
     if (onProgress) onProgress('EDITING', 'Processing with AI...');
@@ -336,6 +347,7 @@ export async function editImage(
     if (response.status === 'completed' && response.result) {
       if (onProgress) onProgress('COMPLETED', 'Edit complete!');
       logger.info('✅ Edit successful');
+      showAISuccess();
       
       // Map result to FalOutput format
       return {
@@ -350,15 +362,18 @@ export async function editImage(
     // Handle failed status
     if (response.status === 'failed' || response.state === 'failed') {
       const errorMsg = response.error?.message || response.message || 'Edit failed';
+      showAIError(errorMsg);
       throw new Error(errorMsg);
     }
 
     // Unexpected response
     console.error('[FAL.AI] Unexpected response:', JSON.stringify(response));
+    showAIError('Beklenmeyen yanıt');
     throw new Error(response.message || 'Unexpected response from server');
 
   } catch (error) {
     logger.error('❌ Edit failed:', error);
+    showAIError(error instanceof Error ? error.message : 'Düzenleme başarısız');
 
     if (error instanceof Error) {
       if (error.message.includes('Insufficient credits')) {

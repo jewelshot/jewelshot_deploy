@@ -44,6 +44,7 @@ import {
 import { useSidebarStore } from '@/store/sidebarStore';
 import AdjustPanel, { AdjustState } from '@/components/molecules/AdjustPanel';
 import ColorsPanel, { ColorFilters } from '@/components/molecules/ColorsPanel';
+import { showAILoading, showAISuccess, showAIError } from '@/lib/ai/ai-request';
 
 // Tool types
 type Tool = 'select' | 'pan' | 'brush' | 'eraser' | 'inpaint' | 'crop' | 'lasso';
@@ -652,6 +653,7 @@ export default function EditorCanvas() {
 
     setIsInpainting(true);
     setInpaintError(null);
+    showAILoading('inpaint');
 
     try {
       const response = await fetch('/api/ai/submit', {
@@ -707,13 +709,16 @@ export default function EditorCanvas() {
           setShowInpaintModal(false);
           setInpaintPrompt('');
           setActiveTool('select');
+          showAISuccess();
         });
       } else {
         throw new Error('Unexpected response from server');
       }
     } catch (error) {
       console.error('Inpainting error:', error);
-      setInpaintError(error instanceof Error ? error.message : 'Inpainting failed');
+      const errorMsg = error instanceof Error ? error.message : 'Inpainting failed';
+      setInpaintError(errorMsg);
+      showAIError(errorMsg);
     } finally {
       setIsInpainting(false);
     }
@@ -729,6 +734,7 @@ export default function EditorCanvas() {
 
     setIsRemovingBg(true);
     setAiError(null);
+    showAILoading('remove-bg');
 
     try {
       const response = await fetch('/api/ai/submit', {
@@ -776,13 +782,16 @@ export default function EditorCanvas() {
           canvas.renderAll();
           
           saveState();
+          showAISuccess();
         });
       } else {
         throw new Error('Unexpected response from server');
       }
     } catch (error) {
       console.error('Remove BG error:', error);
-      setAiError(error instanceof Error ? error.message : 'Background removal failed');
+      const errorMsg = error instanceof Error ? error.message : 'Background removal failed';
+      setAiError(errorMsg);
+      showAIError(errorMsg);
     } finally {
       setIsRemovingBg(false);
     }
@@ -798,6 +807,7 @@ export default function EditorCanvas() {
 
     setIsUpscaling(true);
     setAiError(null);
+    showAILoading('upscale');
 
     try {
       const targetResolution = upscaleMode === '4x' ? '4320p' : '2160p';
@@ -852,13 +862,16 @@ export default function EditorCanvas() {
           
           saveState();
           setShowUpscaleModal(false);
+          showAISuccess();
         });
       } else {
         throw new Error('Unexpected response from server');
       }
     } catch (error) {
       console.error('Upscale error:', error);
-      setAiError(error instanceof Error ? error.message : 'Upscaling failed');
+      const errorMsg = error instanceof Error ? error.message : 'Upscaling failed';
+      setAiError(errorMsg);
+      showAIError(errorMsg);
     } finally {
       setIsUpscaling(false);
     }
