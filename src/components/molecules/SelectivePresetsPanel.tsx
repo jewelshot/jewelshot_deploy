@@ -48,29 +48,34 @@ const STYLE_OPTIONS: OptionItem[] = [
 ];
 
 // Model Options - filtered by jewelry type
+// All jewelry types have access to general shots (half body, full body)
+// Each jewelry type has EXTRA specific options for that jewelry area
 const MODEL_OPTIONS: OptionItem[] = [
-  // Product Only - all jewelry types
+  // ===== UNIVERSAL OPTIONS (All jewelry types) =====
   { id: 'product-only', label: 'Product Only', description: 'No model, jewelry focus', icon: '💍', forJewelry: ['ring', 'necklace', 'earring', 'bracelet'] },
+  { id: 'half-body', label: 'Half Body', description: 'Waist up shot', icon: '🧍', forJewelry: ['ring', 'necklace', 'earring', 'bracelet'] },
+  { id: 'full-body', label: 'Full Body', description: 'Complete figure', icon: '🧍‍♀️', forJewelry: ['ring', 'necklace', 'earring', 'bracelet'] },
   
-  // Ring & Bracelet - Hand options
+  // ===== RING & BRACELET SPECIFIC (Hand focus) =====
   { id: 'hand-elegant', label: 'Elegant Hand', description: 'Graceful hand pose', icon: '🤚', forJewelry: ['ring', 'bracelet'] },
   { id: 'hand-natural', label: 'Natural Hand', description: 'Relaxed casual hand', icon: '✋', forJewelry: ['ring', 'bracelet'] },
   { id: 'hand-gesture', label: 'Hand Gesture', description: 'Dynamic movement', icon: '👌', forJewelry: ['ring', 'bracelet'] },
   { id: 'hands-both', label: 'Both Hands', description: 'Hands together/touching', icon: '🙏', forJewelry: ['ring', 'bracelet'] },
+  { id: 'hand-face', label: 'Hand Near Face', description: 'Hand touching face', icon: '🤔', forJewelry: ['ring', 'bracelet'] },
+  { id: 'hand-hair', label: 'Hand in Hair', description: 'Playing with hair', icon: '💇', forJewelry: ['ring', 'bracelet'] },
   
-  // Necklace - Neck/Chest options
+  // ===== NECKLACE SPECIFIC (Neck/Chest focus) =====
   { id: 'neck-closeup', label: 'Neck Close-up', description: 'Tight framing on necklace', icon: '👤', forJewelry: ['necklace'] },
   { id: 'decollete', label: 'Décolleté', description: 'Collarbone & chest area', icon: '✨', forJewelry: ['necklace'] },
-  { id: 'neck-shoulder', label: 'Neck & Shoulders', description: 'Wider framing', icon: '🧍', forJewelry: ['necklace'] },
+  { id: 'neck-shoulder', label: 'Neck & Shoulders', description: 'Wider neck framing', icon: '🎀', forJewelry: ['necklace'] },
+  { id: 'layered-necklace', label: 'Layered Look', description: 'Multiple necklace styling', icon: '📿', forJewelry: ['necklace'] },
   
-  // Earring - Ear/Face options
+  // ===== EARRING SPECIFIC (Ear/Profile focus) =====
   { id: 'ear-closeup', label: 'Ear Close-up', description: 'Tight on ear & earring', icon: '👂', forJewelry: ['earring'] },
   { id: 'profile-side', label: 'Side Profile', description: 'Classic profile view', icon: '🎭', forJewelry: ['earring'] },
   { id: 'three-quarter', label: '3/4 View', description: 'Angled face view', icon: '📐', forJewelry: ['earring'] },
-  
-  // Half & Full body - Necklace, Earring, Bracelet
-  { id: 'half-body', label: 'Half Body', description: 'Waist up shot', icon: '🧍', forJewelry: ['necklace', 'earring', 'bracelet'] },
-  { id: 'full-body', label: 'Full Body', description: 'Complete figure', icon: '🧍‍♀️', forJewelry: ['necklace', 'earring'] },
+  { id: 'both-ears', label: 'Both Ears', description: 'Front view showing both', icon: '👥', forJewelry: ['earring'] },
+  { id: 'hair-tucked', label: 'Hair Tucked', description: 'Hair behind ear', icon: '💇‍♀️', forJewelry: ['earring'] },
 ];
 
 // Setting Options - filtered by style
@@ -390,29 +395,34 @@ export function SelectivePresetsPanel({
     
     // Model-specific prompts based on jewelry type
     if (selections.modelType) {
+      const faceInstruction = showFace === 'hide' ? 'face NOT visible, cropped at chin/neck level' : 'natural expression visible';
+      
       const modelPrompts: Record<string, string> = {
-        // Product only
-        'product-only': `${jewelryName} displayed without model, product as sole subject, elegant presentation.`,
+        // ===== UNIVERSAL =====
+        'product-only': `${jewelryName} displayed without model, product as sole subject, elegant presentation on premium surface.`,
+        'half-body': `${genderText} model from waist up, ${jewelryName} as styling accent, ${faceInstruction}, elegant pose.`,
+        'full-body': `Full body ${genderText} model shot, ${jewelryName} integrated into complete look, ${faceInstruction}, fashion editorial stance.`,
         
-        // Hand options (ring, bracelet)
+        // ===== HAND OPTIONS (ring, bracelet) =====
         'hand-elegant': `${genderText} hand elegantly posed, fingers gracefully positioned, ${jewelryName} prominently displayed, refined gesture.`,
         'hand-natural': `${genderText} hand in natural relaxed position, casual authentic pose, ${jewelryName} featured naturally.`,
         'hand-gesture': `${genderText} hand in dynamic gesture, movement and energy, ${jewelryName} catching light.`,
-        'hands-both': `Both ${genderText} hands together, touching or interacting, ${jewelryName} as focal point.`,
+        'hands-both': `Both ${genderText} hands together, touching or interacting, ${jewelryName} as focal point between hands.`,
+        'hand-face': `${genderText} hand gently touching face or chin, ${jewelryName} visible, ${showFace === 'hide' ? 'face cropped above hand' : 'contemplative expression'}.`,
+        'hand-hair': `${genderText} hand running through hair, ${jewelryName} catching movement, ${showFace === 'hide' ? 'focus on hand and jewelry only' : 'natural candid moment'}.`,
         
-        // Neck options (necklace)
+        // ===== NECK OPTIONS (necklace) =====
         'neck-closeup': `Tight framing on ${genderText} neck area, ${jewelryName} as hero element, ${showFace === 'hide' ? 'cropped above chin NO face visible' : 'partial face visible'}.`,
-        'decollete': `${genderText} décolleté and collarbone area, elegant framing, ${jewelryName} draped perfectly, ${showFace === 'hide' ? 'face cropped out' : 'natural expression'}.`,
-        'neck-shoulder': `${genderText} neck and shoulders, wider framing, ${jewelryName} in context, ${showFace === 'hide' ? 'cropped at chin level' : 'relaxed pose'}.`,
+        'decollete': `${genderText} décolleté and collarbone area, elegant framing, ${jewelryName} draped perfectly, ${showFace === 'hide' ? 'face cropped out' : 'subtle expression'}.`,
+        'neck-shoulder': `${genderText} neck and shoulders, wider framing, ${jewelryName} in context, ${showFace === 'hide' ? 'cropped at chin level' : 'relaxed natural pose'}.`,
+        'layered-necklace': `${genderText} neck showcasing ${jewelryName} layering, multiple chains styled together, ${faceInstruction}.`,
         
-        // Ear options (earring)
-        'ear-closeup': `Tight close-up on ${genderText} ear, ${jewelryName} in perfect detail, ${showFace === 'hide' ? 'cropped to exclude face' : 'partial profile visible'}.`,
-        'profile-side': `${genderText} side profile view, classic silhouette, ${jewelryName} prominently featured, ${showFace === 'hide' ? 'cropped or face hidden' : 'elegant profile'}.`,
-        'three-quarter': `${genderText} three-quarter angled view, ${jewelryName} visible, ${showFace === 'hide' ? 'face partially hidden or cropped' : 'natural expression'}.`,
-        
-        // Body options
-        'half-body': `${genderText} model from waist up, ${jewelryName} integrated into look, ${showFace === 'hide' ? 'cropped above neck' : 'full pose with expression'}.`,
-        'full-body': `Full body ${genderText} model, ${jewelryName} as part of complete styling, ${showFace === 'hide' ? 'face not visible' : 'elegant full pose'}.`,
+        // ===== EAR OPTIONS (earring) =====
+        'ear-closeup': `Tight close-up on ${genderText} ear, ${jewelryName} in perfect detail, ${showFace === 'hide' ? 'cropped to exclude face' : 'partial profile'}.`,
+        'profile-side': `${genderText} side profile view, classic silhouette, ${jewelryName} prominently featured, ${showFace === 'hide' ? 'face in shadow or cropped' : 'elegant profile'}.`,
+        'three-quarter': `${genderText} three-quarter angled view, ${jewelryName} visible and catching light, ${showFace === 'hide' ? 'face partially hidden' : 'natural expression'}.`,
+        'both-ears': `Front view of ${genderText} showing both ears, ${jewelryName} pair symmetrically displayed, ${faceInstruction}.`,
+        'hair-tucked': `${genderText} with hair tucked behind ear, ${jewelryName} fully exposed and prominent, ${faceInstruction}.`,
       };
       promptParts.push(modelPrompts[selections.modelType] || '');
     }
