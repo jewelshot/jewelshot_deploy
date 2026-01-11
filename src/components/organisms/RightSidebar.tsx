@@ -15,6 +15,7 @@ import { QuickModeContent } from '@/components/molecules/QuickModeContent';
 import { QuickPresetsGrid } from '@/components/molecules/QuickPresetsGrid';
 import { PresetModeTabs, PresetMode } from '@/components/molecules/PresetModeTabs';
 import { SelectivePresetsPanel } from '@/components/molecules/SelectivePresetsPanel';
+import { AdvancedPresetsPanel } from '@/components/molecules/AdvancedPresetsPanel';
 import { PresetConfirmModal } from '@/components/molecules/PresetConfirmModal';
 import { presetPrompts } from '@/lib/preset-prompts';
 import { getPresetById } from '@/data/presets';
@@ -393,15 +394,20 @@ ${confirmModal.libraryNegativePrompt}`;
             />
           )}
 
-          {/* Advanced Mode - Coming Soon */}
+          {/* Advanced Mode */}
           {presetMode === 'advanced' && (
-            <div className="flex flex-col items-center justify-center rounded-lg border border-white/10 bg-white/[0.02] p-6 text-center">
-              <div className="mb-3 text-2xl">🚀</div>
-              <h3 className="mb-1 text-sm font-medium text-white/70">Advanced Mode</h3>
-              <p className="text-[10px] text-white/40">
-                Full prompt control coming soon
-              </p>
-            </div>
+            <AdvancedPresetsPanel
+              gender={gender}
+              jewelryType={jewelryType}
+              aspectRatio={aspectRatio}
+              showFace={showFace}
+              onGenerate={(prompt) => {
+                if (onGenerateWithPreset) {
+                  onGenerateWithPreset(prompt, aspectRatio, 'Advanced Preset', 'advanced-custom');
+                }
+              }}
+              disabled={!jewelryType}
+            />
           )}
         </div>
 
