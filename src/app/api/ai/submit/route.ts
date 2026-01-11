@@ -258,12 +258,17 @@ async function processSynchronously(
       await refundCredit(creditReservation.transactionId);
       console.error(`[API/submit] Job failed: ${jobId}`, result.error);
 
+      // Ensure error message is always a string
+      const errorMessage = result.error?.message 
+        || (typeof result.error === 'string' ? result.error : 'Processing failed');
+
       return NextResponse.json(
         {
           jobId,
           status: 'failed',
           state: 'failed',
-          error: result.error || { message: 'Processing failed' },
+          message: errorMessage,
+          error: { message: errorMessage, code: result.error?.code },
         },
         { status: 500 }
       );
@@ -272,12 +277,15 @@ async function processSynchronously(
     await refundCredit(creditReservation.transactionId);
     console.error(`[API/submit] Error: ${jobId}`, error);
 
+    const errorMessage = error.message || 'Unknown error';
+
     return NextResponse.json(
       {
         jobId,
         status: 'failed',
         state: 'failed',
-        error: { message: error.message || 'Unknown error' },
+        message: errorMessage,
+        error: { message: errorMessage },
       },
       { status: 500 }
     );

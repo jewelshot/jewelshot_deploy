@@ -46,6 +46,29 @@ const POLL_INTERVAL = 2000;
 // Max polling time (5 minutes)
 const MAX_POLL_TIME = 300000;
 
+/**
+ * Safely extract error message from various error formats
+ * Handles: string, { message: string }, { error: string }, nested objects
+ */
+function extractErrorMessage(error: any, fallback: string = 'Unknown error'): string {
+  if (!error) return fallback;
+  if (typeof error === 'string') return error;
+  if (typeof error === 'object') {
+    // Try common error message properties
+    if (typeof error.message === 'string') return error.message;
+    if (typeof error.error === 'string') return error.error;
+    if (error.error && typeof error.error.message === 'string') return error.error.message;
+    // Last resort: try to stringify but avoid [object Object]
+    try {
+      const str = JSON.stringify(error);
+      if (str && str !== '{}') return str;
+    } catch {
+      // Ignore stringify errors
+    }
+  }
+  return fallback;
+}
+
 // ============================================
 // HOOK
 // ============================================
@@ -84,7 +107,7 @@ export function useAIQueue() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || data.error || 'Failed to get job status');
+        throw new Error(extractErrorMessage(data, 'Failed to get job status'));
       }
 
       return {
@@ -92,7 +115,7 @@ export function useAIQueue() {
         state: data.state || data.status,
         progress: data.progress,
         result: data.result,
-        error: data.error ? { message: data.error } : undefined,
+        error: data.error ? { message: extractErrorMessage(data.error) } : undefined,
       };
     } catch (error: any) {
       console.error('[useAIQueue] getStatus error:', error);
@@ -126,7 +149,7 @@ export function useAIQueue() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || data.error || 'AI processing failed');
+        throw new Error(extractErrorMessage(data, 'AI processing failed'));
       }
 
       return {
@@ -296,7 +319,7 @@ export function useAIQueue() {
 
         // Check if job failed
         if (response.status === 'failed' || response.state === 'failed') {
-          throw new Error(response.result?.error?.message || 'Job failed');
+          throw new Error(extractErrorMessage(response.result?.error, 'Job failed'));
         }
 
         // Job is queued - start polling
@@ -363,7 +386,7 @@ export function useAIQueue() {
         
         // Show error in modal
         if (showModal) {
-          loadingStore.error(error.message || 'Operation failed');
+          loadingStore.error(extractErrorMessage(error, 'Operation failed'));
         }
         
         handleError(error);
