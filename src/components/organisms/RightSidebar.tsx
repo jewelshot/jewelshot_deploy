@@ -8,11 +8,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Settings, ChevronDown } from 'lucide-react';
+import { Settings } from 'lucide-react';
 import { useSidebarStore } from '@/store/sidebarStore';
 import { GenerationSettingsModal } from '@/components/molecules/GenerationSettingsModal';
 import { QuickModeContent } from '@/components/molecules/QuickModeContent';
 import { QuickPresetsGrid } from '@/components/molecules/QuickPresetsGrid';
+import { PresetModeTabs, PresetMode } from '@/components/molecules/PresetModeTabs';
+import { SelectivePresetsPanel } from '@/components/molecules/SelectivePresetsPanel';
 import { PresetConfirmModal } from '@/components/molecules/PresetConfirmModal';
 import { presetPrompts } from '@/lib/preset-prompts';
 import { getPresetById } from '@/data/presets';
@@ -46,6 +48,9 @@ export function RightSidebar({ mode = 'studio', onGenerateWithPreset }: RightSid
   const [jewelryType, setJewelryType] = useState<JewelryType>(null);
   const [aspectRatio, setAspectRatio] = useState<string>('9:16'); // Default: 9:16
   const [showFace, setShowFace] = useState<FaceVisibility>('show'); // Default: show face
+  
+  // Preset mode state
+  const [presetMode, setPresetMode] = useState<PresetMode>('quick');
 
   // Modal states
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
@@ -326,38 +331,78 @@ ${confirmModal.libraryNegativePrompt}`;
         {/* Divider */}
         <div className="my-2 h-px bg-white/5" />
 
-        {/* Quick Presets Section - Built-in presets */}
+        {/* Preset Mode Tabs */}
         <div className="mb-3">
-          <div className="mb-2 flex items-center justify-between">
-            <h3 className="text-xs font-medium text-white/70">Quick Presets</h3>
-            <span className="text-[9px] text-white/30">Built-in</span>
-          </div>
-          <QuickPresetsGrid 
-            onPresetSelect={handlePresetSelect}
-            disabled={!jewelryType}
+          <PresetModeTabs 
+            activeMode={presetMode} 
+            onModeChange={setPresetMode} 
           />
-          {!jewelryType && (
-            <p className="mt-1.5 text-center text-[9px] text-amber-400/70">
-              Configure settings to enable presets
-            </p>
-          )}
         </div>
 
-        {/* Divider */}
-        <div className="my-2 h-px bg-white/5" />
-
-        {/* Library Presets Section Header */}
-        <div className="mb-2 flex items-center justify-between">
-          <h3 className="text-xs font-medium text-white/70">My Library</h3>
-        </div>
-
-        {/* Library Presets Content */}
+        {/* Preset Content based on mode */}
         <div className="flex-1 overflow-y-auto">
-          <QuickModeContent 
-            onPresetSelect={handlePresetSelect}
-            gender={gender}
-            jewelryType={jewelryType}
-          />
+          {/* Quick Mode */}
+          {presetMode === 'quick' && (
+            <div className="space-y-3">
+              {/* Built-in Quick Presets */}
+              <div>
+                <div className="mb-2 flex items-center justify-between">
+                  <h3 className="text-[10px] font-medium text-white/50">Built-in Presets</h3>
+                </div>
+                <QuickPresetsGrid 
+                  onPresetSelect={handlePresetSelect}
+                  disabled={!jewelryType}
+                />
+                {!jewelryType && (
+                  <p className="mt-1.5 text-center text-[9px] text-amber-400/70">
+                    Configure settings to enable presets
+                  </p>
+                )}
+              </div>
+
+              {/* Divider */}
+              <div className="h-px bg-white/5" />
+
+              {/* Library Presets */}
+              <div>
+                <div className="mb-2 flex items-center justify-between">
+                  <h3 className="text-[10px] font-medium text-white/50">My Library</h3>
+                </div>
+                <QuickModeContent 
+                  onPresetSelect={handlePresetSelect}
+                  gender={gender}
+                  jewelryType={jewelryType}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Selective Mode */}
+          {presetMode === 'selective' && (
+            <SelectivePresetsPanel
+              gender={gender}
+              jewelryType={jewelryType}
+              aspectRatio={aspectRatio}
+              showFace={showFace}
+              onGenerate={(prompt) => {
+                if (onGenerateWithPreset) {
+                  onGenerateWithPreset(prompt, aspectRatio, 'Selective Preset', 'selective-custom');
+                }
+              }}
+              disabled={!jewelryType}
+            />
+          )}
+
+          {/* Advanced Mode - Coming Soon */}
+          {presetMode === 'advanced' && (
+            <div className="flex flex-col items-center justify-center rounded-lg border border-white/10 bg-white/[0.02] p-6 text-center">
+              <div className="mb-3 text-2xl">🚀</div>
+              <h3 className="mb-1 text-sm font-medium text-white/70">Advanced Mode</h3>
+              <p className="text-[10px] text-white/40">
+                Full prompt control coming soon
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Confirmation Modal */}
