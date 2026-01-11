@@ -1,17 +1,19 @@
 /**
  * Generation Settings Storage
  * 
- * Manages localStorage for generation settings (gender, jewelry type, aspect ratio)
+ * Manages localStorage for generation settings (gender, jewelry type, aspect ratio, face visibility)
  * Supports "apply to all uploads" functionality
  */
 
 export type Gender = 'women' | 'men' | null;
 export type JewelryType = 'ring' | 'necklace' | 'earring' | 'bracelet' | null;
+export type FaceVisibility = 'show' | 'hide' | null;
 
 export interface GenerationSettings {
   gender: Gender;
   jewelryType: JewelryType;
   aspectRatio: string;
+  showFace: FaceVisibility;
   applyToAll: boolean;
   timestamp: number;
 }

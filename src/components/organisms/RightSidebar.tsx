@@ -17,7 +17,7 @@ import { PresetConfirmModal } from '@/components/molecules/PresetConfirmModal';
 import { presetPrompts } from '@/lib/preset-prompts';
 import { getPresetById } from '@/data/presets';
 import { createScopedLogger } from '@/lib/logger';
-import { loadGenerationSettings, areSettingsComplete, type GenerationSettings } from '@/lib/generation-settings-storage';
+import { loadGenerationSettings, areSettingsComplete, type GenerationSettings, type FaceVisibility } from '@/lib/generation-settings-storage';
 
 const logger = createScopedLogger('RightSidebar');
 
@@ -45,6 +45,7 @@ export function RightSidebar({ mode = 'studio', onGenerateWithPreset }: RightSid
   const [gender, setGender] = useState<Gender>(null);
   const [jewelryType, setJewelryType] = useState<JewelryType>(null);
   const [aspectRatio, setAspectRatio] = useState<string>('9:16'); // Default: 9:16
+  const [showFace, setShowFace] = useState<FaceVisibility>('show'); // Default: show face
 
   // Modal states
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
@@ -69,6 +70,9 @@ export function RightSidebar({ mode = 'studio', onGenerateWithPreset }: RightSid
       setGender(savedSettings.gender);
       setJewelryType(savedSettings.jewelryType);
       setAspectRatio(savedSettings.aspectRatio);
+      if (savedSettings.showFace) {
+        setShowFace(savedSettings.showFace);
+      }
       logger.info('Loaded saved generation settings', savedSettings);
     }
   }, []);
@@ -93,6 +97,9 @@ export function RightSidebar({ mode = 'studio', onGenerateWithPreset }: RightSid
         setGender(savedSettings.gender);
         setJewelryType(savedSettings.jewelryType);
         setAspectRatio(savedSettings.aspectRatio);
+        if (savedSettings.showFace) {
+          setShowFace(savedSettings.showFace);
+        }
       } else {
         // Show modal (required)
         logger.info('Opening settings modal (required)');
@@ -154,6 +161,7 @@ export function RightSidebar({ mode = 'studio', onGenerateWithPreset }: RightSid
 Gender: ${gender || 'not specified'}
 Jewelry Type: ${jewelryType || 'ring'}
 Aspect Ratio: ${aspectRatio}
+Model Face: ${showFace === 'hide' ? 'HIDDEN (crop at neck/chin, NO face visible)' : 'VISIBLE (full model with face)'}
 
 [PROMPT]
 `;
@@ -204,6 +212,7 @@ ${libraryPreset.negativePrompt}`;
 Gender: ${gender || 'not specified'}
 Jewelry Type: ${finalJewelryType}
 Aspect Ratio: ${aspectRatio}
+Model Face: ${showFace === 'hide' ? 'HIDDEN (crop at neck/chin, NO face visible)' : 'VISIBLE (full model with face)'}
 
 [PROMPT]
 `;
@@ -258,6 +267,7 @@ ${confirmModal.libraryNegativePrompt}`;
     if (gender) parts.push(gender === 'women' ? 'Women' : 'Men');
     if (jewelryType) parts.push(jewelryType.charAt(0).toUpperCase() + jewelryType.slice(1));
     parts.push(aspectRatio);
+    if (showFace === 'hide') parts.push('No Face');
     return parts.length > 1 ? parts.join(' · ') : 'Not configured';
   };
 
@@ -373,6 +383,8 @@ ${confirmModal.libraryNegativePrompt}`;
           onJewelryChange={(value) => setJewelryType(value)}
           aspectRatio={aspectRatio}
           onAspectRatioChange={setAspectRatio}
+          showFace={showFace}
+          onShowFaceChange={(value) => setShowFace(value)}
           isRequired={isSettingsRequired}
         />
       </div>

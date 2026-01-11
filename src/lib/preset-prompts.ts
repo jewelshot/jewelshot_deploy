@@ -4,14 +4,34 @@
  * Two-stage processing for better results
  */
 
+export type FaceVisibility = 'show' | 'hide' | null;
+
 export interface PresetPrompt {
   name: string;
   requiresModel: boolean; // whether gender is needed
   buildPrompt: (
     jewelryType: string,
     gender?: string,
-    aspectRatio?: string
+    aspectRatio?: string,
+    showFace?: FaceVisibility
   ) => string;
+}
+
+/**
+ * Generate face visibility instructions for prompts
+ */
+function getFaceInstructions(showFace: FaceVisibility, jewelryType: string): { framing: string; forbidden: string } {
+  if (showFace === 'hide') {
+    const cropPoint = jewelryType.toLowerCase() === 'earring' ? 'below eyes' : 'at neck/chin level';
+    return {
+      framing: `CRITICAL FRAMING: Crop ${cropPoint}. NO face visible. Focus on ${jewelryType} area. Model body only from neck/shoulders down.`,
+      forbidden: '❌ NO face ❌ NO eyes ❌ NO nose ❌ NO mouth ❌ NO chin ❌ NO forehead - STRICTLY crop above jewelry zone',
+    };
+  }
+  return {
+    framing: 'Full model with face visible. Natural expression, elegant pose.',
+    forbidden: '',
+  };
 }
 
 export const presetPrompts: Record<string, PresetPrompt> = {
@@ -242,10 +262,12 @@ OUTPUT: E-commerce ready. Tiffany catalog standard. Aspect ratio ${aspectRatio}.
     buildPrompt: (
       jewelryType: string,
       gender?: string,
-      aspectRatio: string = '9:16'
+      aspectRatio: string = '9:16',
+      showFace: FaceVisibility = 'show'
     ) => {
       const genderText = gender ? `${gender}` : 'model';
       const type = jewelryType.toLowerCase();
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
 
       const placement =
         {
@@ -279,6 +301,8 @@ OUTPUT: E-commerce ready. Tiffany catalog standard. Aspect ratio ${aspectRatio}.
 
       return `Lifestyle editorial ${jewelryType} on ${genderText}. Natural everyday candid moment. Authentic relatable aesthetic.
 
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
 CRITICAL SIZE & SCALE - ACCURATE PROPORTIONS:
 SOURCE IMAGE: Close-up product photography enlarged for detail
 IMPORTANT: When compositing on model use LIFE-SIZE REAL-WORLD proportions
@@ -471,13 +495,15 @@ OUTPUT: Editorial minimalist still life. Aspect ratio ${aspectRatio}. Soft paste
     buildPrompt: (
       jewelryType: string,
       gender?: string,
-      aspectRatio: string = '9:16'
+      aspectRatio: string = '9:16',
+      showFace: FaceVisibility = 'show'
     ) => {
       const genderText = gender ? `${gender}` : 'model';
       const type = jewelryType.toLowerCase();
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
 
-      // Special handling for Women Necklace - Ultra Close-Up
-      if (type === 'necklace' && genderText.toLowerCase() === 'women') {
+      // Special handling for Women Necklace - Ultra Close-Up (always hides face)
+      if (type === 'necklace' && genderText.toLowerCase() === 'women' && showFace === 'hide') {
         return JSON.stringify({
           scene:
             'professional on-model necklace photography product-focused commercial',
@@ -543,6 +569,8 @@ OUTPUT: Editorial minimalist still life. Aspect ratio ${aspectRatio}. Soft paste
 
       return `Professional e-commerce model ${jewelryType} on ${genderText}. Clean commercial presentation. Product-focused.
 
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
 CRITICAL SIZE & SCALE - ACCURATE PROPORTIONS:
 SOURCE IMAGE: Close-up product photography enlarged for detail
 IMPORTANT: When compositing on model use LIFE-SIZE REAL-WORLD proportions
@@ -717,7 +745,8 @@ OUTPUT: Macro craftsmanship showcase. Aspect ratio ${aspectRatio}. Extreme close
     buildPrompt: (
       jewelryType: string,
       gender?: string,
-      aspectRatio: string = '9:16'
+      aspectRatio: string = '9:16',
+      showFace: FaceVisibility = 'hide' // This preset always hides face
     ) => {
       return JSON.stringify({
         scene:

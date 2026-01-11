@@ -1,7 +1,7 @@
 /**
  * Generation Settings Modal
  * 
- * Modal for configuring generation parameters (gender, jewelry type, aspect ratio)
+ * Modal for configuring generation parameters (gender, jewelry type, aspect ratio, face visibility)
  * These settings don't change frequently, so they're hidden in a modal to save space
  */
 
@@ -9,8 +9,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Settings, AlertCircle } from 'lucide-react';
-import { saveGenerationSettings, areSettingsComplete } from '@/lib/generation-settings-storage';
+import { X, Settings, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { saveGenerationSettings, areSettingsComplete, FaceVisibility } from '@/lib/generation-settings-storage';
 
 type Gender = 'women' | 'men' | null;
 type JewelryType = 'ring' | 'necklace' | 'earring' | 'bracelet' | null;
@@ -31,6 +31,10 @@ interface GenerationSettingsModalProps {
   // Aspect Ratio
   aspectRatio: string;
   onAspectRatioChange: (value: string) => void;
+  
+  // Face Visibility
+  showFace: FaceVisibility;
+  onShowFaceChange: (value: FaceVisibility) => void;
   
   // Required validation
   isRequired?: boolean;
@@ -64,6 +68,11 @@ const horizontalRatios = [
   { value: '21:9', label: '21:9', description: 'Ultrawide', ratio: 2.333 },
 ];
 
+const faceOptions = [
+  { value: 'show', label: 'Show Face', icon: Eye, description: 'Full model with face visible' },
+  { value: 'hide', label: 'Hide Face', icon: EyeOff, description: 'Cropped, focus on jewelry' },
+];
+
 export function GenerationSettingsModal({
   isOpen,
   onClose,
@@ -74,6 +83,8 @@ export function GenerationSettingsModal({
   onJewelryChange,
   aspectRatio,
   onAspectRatioChange,
+  showFace,
+  onShowFaceChange,
   isRequired = false,
 }: GenerationSettingsModalProps) {
   const [mounted, setMounted] = useState(false);
@@ -115,6 +126,7 @@ export function GenerationSettingsModal({
         gender,
         jewelryType,
         aspectRatio,
+        showFace,
         applyToAll,
         timestamp: Date.now(),
       });
@@ -192,6 +204,36 @@ export function GenerationSettingsModal({
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Face Visibility Selection */}
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-white/70">
+                Model Face
+              </label>
+              <div className="grid grid-cols-2 gap-1.5">
+                {faceOptions.map((option) => {
+                  const Icon = option.icon;
+                  return (
+                    <button
+                      key={option.value}
+                      onClick={() => onShowFaceChange(option.value as FaceVisibility)}
+                      className={`flex items-center gap-2 rounded-md border px-3 py-2 text-xs font-medium transition-all ${
+                        showFace === option.value
+                          ? 'border-white/40 bg-white/10 text-white'
+                          : 'border-white/10 bg-white/[0.02] text-white/60 hover:border-white/20 hover:bg-white/5 hover:text-white'
+                      }`}
+                      title={option.description}
+                    >
+                      <Icon className="h-3.5 w-3.5" />
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="mt-1 text-[10px] text-white/40">
+                {showFace === 'hide' ? 'Face will be cropped out, focusing on jewelry area' : 'Full model with face visible in frame'}
+              </p>
             </div>
 
             {/* Jewelry Type Selection */}
