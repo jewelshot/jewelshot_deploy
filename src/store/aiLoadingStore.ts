@@ -55,63 +55,63 @@ interface AILoadingActions {
 
 export const OPERATION_LABELS: Record<AIOperation, { title: string; description: string; icon: string }> = {
   'edit': {
-    title: 'AI Düzenleme',
-    description: 'Görseliniz yapay zeka ile düzenleniyor',
+    title: 'AI Edit',
+    description: 'Processing your image with AI',
     icon: '✨',
   },
   'generate': {
-    title: 'Görsel Oluşturma',
-    description: 'Yapay zeka görselinizi oluşturuyor',
+    title: 'Generating',
+    description: 'Creating your image',
     icon: '🎨',
   },
   'upscale': {
-    title: 'Kalite Artırma',
-    description: 'Görsel çözünürlüğü artırılıyor (2x)',
+    title: 'Upscaling',
+    description: 'Enhancing resolution (2x)',
     icon: '🔍',
   },
   'remove-bg': {
-    title: 'Arka Plan Kaldırma',
-    description: 'Arka plan şeffaf yapılıyor',
+    title: 'Removing Background',
+    description: 'Making background transparent',
     icon: '✂️',
   },
   'inpaint': {
-    title: 'Bölge Düzenleme',
-    description: 'Seçili alan düzenleniyor',
+    title: 'Inpainting',
+    description: 'Editing selected area',
     icon: '🖌️',
   },
   'camera-control': {
-    title: 'Kamera Açısı',
-    description: 'Görüş açısı değiştiriliyor',
+    title: 'Camera Control',
+    description: 'Adjusting view angle',
     icon: '📷',
   },
   'gemstone': {
-    title: 'Taş İyileştirme',
-    description: 'Değerli taşlar parlatılıyor',
+    title: 'Gemstone Enhancement',
+    description: 'Polishing gemstones',
     icon: '💎',
   },
   'metal-recolor': {
-    title: 'Metal Renklendirme',
-    description: 'Metal rengi değiştiriliyor',
+    title: 'Metal Recolor',
+    description: 'Changing metal color',
     icon: '🎨',
   },
   'metal-polish': {
-    title: 'Metal Parlatma',
-    description: 'Metal yüzey parlatılıyor',
+    title: 'Metal Polish',
+    description: 'Polishing metal surface',
     icon: '✨',
   },
   'natural-light': {
-    title: 'Doğal Işık',
-    description: 'Doğal aydınlatma ekleniyor',
+    title: 'Natural Light',
+    description: 'Adding natural lighting',
     icon: '☀️',
   },
   'video': {
-    title: 'Video Oluşturma',
-    description: 'Görsel videoya dönüştürülüyor',
+    title: 'Video Generation',
+    description: 'Converting image to video',
     icon: '🎬',
   },
   'turntable': {
-    title: '360° Döndürme',
-    description: 'Turntable video oluşturuluyor',
+    title: '360° Turntable',
+    description: 'Creating turntable video',
     icon: '🔄',
   },
 };
@@ -122,11 +122,11 @@ export const OPERATION_LABELS: Record<AIOperation, { title: string; description:
 
 export const STATUS_MESSAGES: Record<AILoadingState['status'], string> = {
   idle: '',
-  submitting: 'İstek gönderiliyor...',
-  queued: 'Sıraya alındı, işleniyor...',
-  processing: 'İşlem devam ediyor...',
-  completed: 'İşlem tamamlandı!',
-  failed: 'İşlem başarısız oldu',
+  submitting: 'Submitting...',
+  queued: 'Queued, processing...',
+  processing: 'Processing...',
+  completed: 'Completed!',
+  failed: 'Failed',
 };
 
 // ============================================
