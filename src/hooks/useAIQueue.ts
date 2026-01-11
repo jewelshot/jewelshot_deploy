@@ -6,6 +6,7 @@
  * 
  * - If queue is available: Jobs are queued and polled for completion
  * - If queue is unavailable: Jobs complete immediately in /api/ai/submit response
+ * - Automatically shows global loading modal during operations
  */
 
 'use client';
@@ -13,6 +14,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { AIOperation, JobPriority } from '@/lib/queue/types';
 import { useApiError } from './useApiError';
+import { useAILoadingStore } from '@/store/aiLoadingStore';
 
 // ============================================
 // TYPES
@@ -56,6 +58,9 @@ export function useAIQueue() {
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const pollStartTimeRef = useRef<number>(0);
   const { handleError } = useApiError();
+  
+  // Global loading modal
+  const loadingStore = useAILoadingStore();
 
   // Cleanup on unmount
   useEffect(() => {
@@ -225,6 +230,7 @@ export function useAIQueue() {
   /**
    * Submit job and wait for result
    * Handles both sync and async (queue) responses
+   * Automatically shows global loading modal
    */
   const submitAndWait = useCallback(
     async (
@@ -233,12 +239,20 @@ export function useAIQueue() {
         interval?: number;
         maxAttempts?: number;
         onProgress?: (status: JobStatus) => void;
+        showModal?: boolean; // Default: true
       }
     ): Promise<any> => {
+      const showModal = options?.showModal !== false;
+      
       try {
         setIsProcessing(true);
         setProgress(10);
         setCurrentStatus(null);
+
+        // Show global loading modal
+        if (showModal) {
+          loadingStore.show(params.operation);
+        }
 
         // Call progress callback with "processing" status
         if (options?.onProgress) {
@@ -251,6 +265,10 @@ export function useAIQueue() {
 
         // Submit job
         setProgress(20);
+        if (showModal) {
+          loadingStore.updateProgress(20);
+        }
+        
         const response = await submitJob(params);
 
         // Check if job completed synchronously
@@ -267,6 +285,12 @@ export function useAIQueue() {
           }
 
           setIsProcessing(false);
+          
+          // Show success in modal
+          if (showModal) {
+            loadingStore.success();
+          }
+          
           return response.result;
         }
 
@@ -276,6 +300,11 @@ export function useAIQueue() {
         }
 
         // Job is queued - start polling
+        if (showModal) {
+          loadingStore.updateStatus('queued');
+          loadingStore.setJobId(response.jobId);
+        }
+        
         if (options?.onProgress) {
           options.onProgress({
             jobId: response.jobId,
@@ -285,7 +314,22 @@ export function useAIQueue() {
         }
 
         setProgress(30);
-        const result = await pollForResult(response.jobId, options);
+        
+        // Custom progress callback that also updates modal
+        const wrappedOnProgress = (status: JobStatus) => {
+          if (showModal) {
+            loadingStore.updateStatus(status.state as any);
+            if (typeof status.progress === 'number') {
+              loadingStore.updateProgress(status.progress);
+            }
+          }
+          options?.onProgress?.(status);
+        };
+        
+        const result = await pollForResult(response.jobId, {
+          ...options,
+          onProgress: wrappedOnProgress,
+        });
 
         if (options?.onProgress) {
           options.onProgress({
@@ -298,6 +342,12 @@ export function useAIQueue() {
 
         setProgress(100);
         setIsProcessing(false);
+        
+        // Show success in modal
+        if (showModal) {
+          loadingStore.success();
+        }
+        
         return result;
 
       } catch (error: any) {
@@ -311,11 +361,16 @@ export function useAIQueue() {
           pollIntervalRef.current = null;
         }
         
+        // Show error in modal
+        if (showModal) {
+          loadingStore.error(error.message || 'İşlem başarısız oldu');
+        }
+        
         handleError(error);
         throw error;
       }
     },
-    [submitJob, pollForResult, handleError]
+    [submitJob, pollForResult, handleError, loadingStore]
   );
 
   // ============================================

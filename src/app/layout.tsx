@@ -12,6 +12,7 @@ import { PlausibleAnalytics } from '@/components/analytics/PlausibleAnalytics';
 import { CookieConsent } from '@/components/molecules/CookieConsent';
 import { OrganizationSchema, SoftwareApplicationSchema, WebSiteSchema } from '@/components/seo/StructuredData';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
+import { AILoadingModal } from '@/components/molecules/AILoadingModal';
 import './globals.css';
 
 // Note: Environment validation is available in src/lib/env.ts
@@ -166,6 +167,7 @@ export default function RootLayout({
           <ErrorBoundary>{children}</ErrorBoundary>
           <GlobalSidebar />
           <ToastContainer />
+          <AILoadingModal />
           <GalleryPrefetch />
           <PlausibleAnalytics />
           <CookieConsent />
