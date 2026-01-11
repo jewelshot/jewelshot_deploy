@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Maximize2, Minimize2 } from 'lucide-react';
+import { Tooltip } from '@/components/atoms/Tooltip';
 
 interface ToggleAllBarsButtonProps {
   /**
@@ -18,18 +19,22 @@ export function ToggleAllBarsButton({
   allBarsOpen,
   onClick,
 }: ToggleAllBarsButtonProps) {
+  const label = allBarsOpen ? 'Hide Bars' : 'Show Bars';
+  
   return (
-    <button
-      onClick={onClick}
-      className="flex h-7 w-7 items-center justify-center rounded-md border border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] text-white/80 transition-all hover:border-[rgba(139,92,246,0.5)] hover:bg-[rgba(139,92,246,0.15)] hover:text-white"
-      title={allBarsOpen ? 'Hide All Bars' : 'Show All Bars'}
-    >
-      {allBarsOpen ? (
-        <Minimize2 className="h-3.5 w-3.5" />
-      ) : (
-        <Maximize2 className="h-3.5 w-3.5" />
-      )}
-    </button>
+    <Tooltip content={label} side="bottom">
+      <button
+        onClick={onClick}
+        className="flex h-7 w-7 items-center justify-center rounded-md border border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] text-white/80 transition-all hover:border-[rgba(139,92,246,0.5)] hover:bg-[rgba(139,92,246,0.15)] hover:text-white"
+        aria-label={label}
+      >
+        {allBarsOpen ? (
+          <Minimize2 className="h-3.5 w-3.5" />
+        ) : (
+          <Maximize2 className="h-3.5 w-3.5" />
+        )}
+      </button>
+    </Tooltip>
   );
 }
 
