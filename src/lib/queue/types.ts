@@ -11,8 +11,7 @@
 export type AIOperation =
   | 'edit'              // Studio edit (nano-banana/edit)
   | 'generate'          // Studio generate (flux-pro/v1.1)
-  | 'upscale'           // Upscale image (SeedVR)
-  | 'video-upscale'     // Upscale video (FlashVSR)
+  | 'upscale'           // Upscale image (SeedVR2)
   | 'remove-bg'         // Background removal
   | 'inpaint'           // Inpainting (mask + fill)
   | 'camera-control'    // Camera control

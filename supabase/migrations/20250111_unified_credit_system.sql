@@ -502,16 +502,5 @@ GRANT EXECUTE ON FUNCTION public.add_admin_credits(UUID, INTEGER, TEXT) TO servi
 GRANT EXECUTE ON FUNCTION public.remove_admin_credits(UUID, INTEGER, TEXT) TO service_role;
 
 -- ============================================
--- 11. ADD VIDEO-UPSCALE TO OPERATION COSTS
--- ============================================
-
-INSERT INTO public.operation_costs (operation_type, cost, description)
-VALUES ('video-upscale', 5, 'Video upscaling (FlashVSR)')
-ON CONFLICT (operation_type) DO UPDATE SET
-  cost = 5,
-  description = 'Video upscaling (FlashVSR)',
-  updated_at = NOW();
-
--- ============================================
 -- END OF MIGRATION
 -- ============================================
