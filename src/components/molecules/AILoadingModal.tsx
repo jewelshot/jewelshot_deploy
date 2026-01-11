@@ -23,6 +23,9 @@ export function AILoadingModal() {
   const [elapsed, setElapsed] = useState(0);
   const [mounted, setMounted] = useState(false);
 
+  // Debug log
+  console.log('[AILoadingModal] isVisible:', isVisible, 'operation:', operation, 'status:', status);
+
   // Handle mount animation
   useEffect(() => {
     if (isVisible) {
