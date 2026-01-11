@@ -8,10 +8,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Settings } from 'lucide-react';
+import { Settings, ChevronDown } from 'lucide-react';
 import { useSidebarStore } from '@/store/sidebarStore';
 import { GenerationSettingsModal } from '@/components/molecules/GenerationSettingsModal';
 import { QuickModeContent } from '@/components/molecules/QuickModeContent';
+import { QuickPresetsGrid } from '@/components/molecules/QuickPresetsGrid';
 import { PresetConfirmModal } from '@/components/molecules/PresetConfirmModal';
 import { presetPrompts } from '@/lib/preset-prompts';
 import { getPresetById } from '@/data/presets';
@@ -315,12 +316,32 @@ ${confirmModal.libraryNegativePrompt}`;
         {/* Divider */}
         <div className="my-2 h-px bg-white/5" />
 
-        {/* Quick Presets Section Header */}
-        <div className="mb-2 flex items-center justify-between">
-          <h3 className="text-xs font-medium text-white/70">Quick Presets</h3>
+        {/* Quick Presets Section - Built-in presets */}
+        <div className="mb-3">
+          <div className="mb-2 flex items-center justify-between">
+            <h3 className="text-xs font-medium text-white/70">Quick Presets</h3>
+            <span className="text-[9px] text-white/30">Built-in</span>
+          </div>
+          <QuickPresetsGrid 
+            onPresetSelect={handlePresetSelect}
+            disabled={!jewelryType}
+          />
+          {!jewelryType && (
+            <p className="mt-1.5 text-center text-[9px] text-amber-400/70">
+              Configure settings to enable presets
+            </p>
+          )}
         </div>
 
-        {/* Quick Mode Content */}
+        {/* Divider */}
+        <div className="my-2 h-px bg-white/5" />
+
+        {/* Library Presets Section Header */}
+        <div className="mb-2 flex items-center justify-between">
+          <h3 className="text-xs font-medium text-white/70">My Library</h3>
+        </div>
+
+        {/* Library Presets Content */}
         <div className="flex-1 overflow-y-auto">
           <QuickModeContent 
             onPresetSelect={handlePresetSelect}
