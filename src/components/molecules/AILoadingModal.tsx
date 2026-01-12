@@ -7,14 +7,104 @@
 
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { useAILoadingStore, OPERATION_LABELS } from '@/store/aiLoadingStore';
 
+// Illusion progress that completes in ~90 seconds with organic, non-linear movement
+function useIllusionProgress(isActive: boolean, isCompleted: boolean): number {
+  const [illusionProgress, setIllusionProgress] = useState(0);
+  const startTimeRef = useRef<number | null>(null);
+  const lastProgressRef = useRef(0);
+  const targetRef = useRef(0);
+  
+  // Total duration: 90 seconds (1:30)
+  const TOTAL_DURATION = 90000;
+  
+  // Easing function for organic movement
+  const easeOutExpo = (t: number): number => {
+    return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+  };
+  
+  // Calculate target progress based on elapsed time with randomized micro-jumps
+  const calculateProgress = useCallback((elapsedMs: number): number => {
+    const t = Math.min(elapsedMs / TOTAL_DURATION, 1);
+    
+    // Phase-based progression for organic feel
+    let baseProgress: number;
+    
+    if (t < 0.33) {
+      // Phase 1 (0-30s): Fast start, 0-55%
+      baseProgress = easeOutExpo(t / 0.33) * 55;
+    } else if (t < 0.67) {
+      // Phase 2 (30-60s): Slow down, 55-82%
+      const phase2Progress = (t - 0.33) / 0.34;
+      baseProgress = 55 + easeOutExpo(phase2Progress) * 27;
+    } else {
+      // Phase 3 (60-90s): Very slow, 82-98%
+      const phase3Progress = (t - 0.67) / 0.33;
+      baseProgress = 82 + easeOutExpo(phase3Progress) * 16;
+    }
+    
+    // Add small random variations for organic feel (±1.5%)
+    const randomOffset = (Math.sin(elapsedMs * 0.003) * 0.8 + Math.cos(elapsedMs * 0.007) * 0.7);
+    
+    return Math.min(98, Math.max(0, baseProgress + randomOffset));
+  }, []);
+  
+  useEffect(() => {
+    if (!isActive) {
+      setIllusionProgress(0);
+      startTimeRef.current = null;
+      lastProgressRef.current = 0;
+      targetRef.current = 0;
+      return;
+    }
+    
+    if (isCompleted) {
+      // Animate to 100% on completion
+      setIllusionProgress(100);
+      return;
+    }
+    
+    if (!startTimeRef.current) {
+      startTimeRef.current = Date.now();
+    }
+    
+    // Update with variable intervals for organic movement
+    const updateProgress = () => {
+      if (!startTimeRef.current || isCompleted) return;
+      
+      const elapsed = Date.now() - startTimeRef.current;
+      const newTarget = calculateProgress(elapsed);
+      
+      // Smoothly interpolate towards target
+      const currentProgress = lastProgressRef.current;
+      const smoothedProgress = currentProgress + (newTarget - currentProgress) * 0.15;
+      
+      lastProgressRef.current = smoothedProgress;
+      setIllusionProgress(Math.round(smoothedProgress * 10) / 10);
+    };
+    
+    // Use variable interval timing for organic feel
+    const interval = setInterval(updateProgress, 100 + Math.random() * 150);
+    
+    return () => clearInterval(interval);
+  }, [isActive, isCompleted, calculateProgress]);
+  
+  return illusionProgress;
+}
+
 export function AILoadingModal() {
-  const { isVisible, operation, status, progress, message, subMessage, startTime } = useAILoadingStore();
+  const { isVisible, operation, status, message, subMessage, startTime } = useAILoadingStore();
   const [elapsed, setElapsed] = useState(0);
   const [mounted, setMounted] = useState(false);
+  
+  const isProcessing = status !== 'completed' && status !== 'failed';
+  const isCompleted = status === 'completed';
+  
+  // Use illusion progress instead of real progress
+  const illusionProgress = useIllusionProgress(isVisible && isProcessing, isCompleted);
 
   useEffect(() => {
     if (isVisible) {
@@ -45,8 +135,9 @@ export function AILoadingModal() {
   };
 
   if (!isVisible) return null;
-
-  const isProcessing = status !== 'completed' && status !== 'failed';
+  
+  // Display progress: use 100 for completed, otherwise use illusion
+  const displayProgress = isCompleted ? 100 : Math.round(illusionProgress);
 
   return (
     <>
@@ -164,9 +255,9 @@ export function AILoadingModal() {
                   />
                   {/* Actual progress */}
                   <div
-                    className="relative h-full rounded-full transition-all duration-700 ease-out"
+                    className="relative h-full rounded-full transition-all duration-300 ease-out"
                     style={{ 
-                      width: `${progress}%`,
+                      width: `${displayProgress}%`,
                       background: 'linear-gradient(90deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.6) 100%)',
                     }}
                   />
@@ -175,7 +266,7 @@ export function AILoadingModal() {
                 {/* Time and percentage */}
                 <div className="mt-3 flex items-center justify-between text-[10px] text-white/25">
                   <span className="font-mono">{formatTime(elapsed)}</span>
-                  <span className="font-mono">{progress}%</span>
+                  <span className="font-mono">{displayProgress}%</span>
                 </div>
               </div>
             )}
