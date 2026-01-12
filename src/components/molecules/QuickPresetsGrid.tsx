@@ -38,7 +38,17 @@ import {
   Contrast,
   Building,
   Car,
-  Triangle
+  Triangle,
+  Lightbulb,
+  Columns,
+  CarFront,
+  Feather,
+  CircleDot,
+  TreeDeciduous,
+  Armchair,
+  CoffeeIcon,
+  BedDouble,
+  FlipHorizontal
 } from 'lucide-react';
 
 interface QuickPreset {
@@ -260,6 +270,76 @@ const QUICK_PRESETS: QuickPreset[] = [
     icon: Triangle,
     description: 'Rainbow refraction, avant-garde',
     color: 'text-fuchsia-300',
+  },
+  {
+    id: 'sharp-strobe',
+    name: 'Sharp Strobe',
+    icon: Lightbulb,
+    description: 'Direct flash, high contrast',
+    color: 'text-white',
+  },
+  {
+    id: 'concrete-exterior',
+    name: 'Concrete Exterior',
+    icon: Columns,
+    description: 'Brutalist outdoor, cold light',
+    color: 'text-gray-400',
+  },
+  {
+    id: 'luxury-exit',
+    name: 'Luxury Exit',
+    icon: CarFront,
+    description: 'Night car flash, celebrity',
+    color: 'text-violet-300',
+  },
+  {
+    id: 'soft-minimalist',
+    name: 'Soft Minimalist',
+    icon: Feather,
+    description: 'Cream tones, bright airy',
+    color: 'text-amber-100',
+  },
+  {
+    id: 'velvet-noir',
+    name: 'Velvet Noir',
+    icon: CircleDot,
+    description: 'Low key, black velvet',
+    color: 'text-purple-300',
+  },
+  {
+    id: 'garden-bokeh',
+    name: 'Garden Bokeh',
+    icon: TreeDeciduous,
+    description: 'Dappled sunlight, golden',
+    color: 'text-green-300',
+  },
+  {
+    id: 'car-sunset',
+    name: 'Car Sunset',
+    icon: Armchair,
+    description: 'Luxury interior, golden hour',
+    color: 'text-orange-400',
+  },
+  {
+    id: 'parisian-cafe',
+    name: 'Parisian Cafe',
+    icon: CoffeeIcon,
+    description: 'Street style, overcast chic',
+    color: 'text-stone-300',
+  },
+  {
+    id: 'linen-morning',
+    name: 'Linen Morning',
+    icon: BedDouble,
+    description: 'White sheets, soft blinds',
+    color: 'text-cream-200',
+  },
+  {
+    id: 'mirror-reflection',
+    name: 'Mirror Reflection',
+    icon: FlipHorizontal,
+    description: 'Vintage mirror, getting ready',
+    color: 'text-pink-200',
   },
 ];
 

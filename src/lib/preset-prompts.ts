@@ -2271,4 +2271,648 @@ Extra jewelry pieces
 OUTPUT: Prism art. Rainbow refraction. Avant-garde. Sharp jewelry through distortion.`;
     },
   },
+
+  'sharp-strobe': {
+    name: 'Sharp Strobe',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'female' : gender === 'men' ? 'male' : '';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Editorial studio photography. Portrait of a ${genderText} model with slicked-back hair wearing ${jewelryType}. Sharp and direct studio strobe lighting creating high contrast and defined shadows.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+LIGHTING - SHARP STROBE:
+Sharp, direct studio strobe lighting
+High contrast with defined shadows on skin
+Not soft or diffused - crisp and punchy
+Professional studio flash quality
+
+BACKGROUND:
+Neutral grey seamless background
+Clean, distraction-free
+Professional studio environment
+
+STYLING:
+Slicked-back hair, away from ${jewelryType}
+Minimal, editorial styling
+${genderText === 'female' ? 'Realistic makeup texture visible' : 'Clean, refined grooming'}
+
+SKIN DETAIL:
+Highly detailed skin texture
+Visible pores, fine lines, natural imperfections
+NOT airbrushed, NOT photoshopped
+Hyper-realistic texture quality
+
+JEWELRY:
+Razor-sharp focus on ${jewelryType} details
+Intricate craftsmanship visible
+ONLY the specified jewelry
+Metal and gems catching strobe light
+
+TECHNICAL:
+Shot on medium format Hasselblad equivalent
+8K resolution quality
+Hyper-realistic texture rendering
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Smooth airbrushed skin
+Soft, diffused lighting
+CGI or 3D render look
+Blurred jewelry details
+Excessive bloom or glow
+Extra jewelry pieces
+
+OUTPUT: Sharp strobe. High contrast. Editorial studio. Hasselblad quality.`;
+    },
+  },
+
+  'concrete-exterior': {
+    name: 'Concrete Exterior',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'female' : gender === 'men' ? 'male' : '';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Editorial fashion photography. Medium shot of a ${genderText} model wearing ${jewelryType}, posing against a raw brutalist concrete wall exterior. Cold natural daylight.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+BRUTALIST EXTERIOR:
+Raw brutalist concrete wall background
+Outdoor architectural setting
+Cold natural daylight
+Sharp geometric shadows cast by architecture
+
+STYLING:
+Minimalist monochrome outfit
+Strong architectural styling to match setting
+${genderText === 'female' ? 'Bold, structured look' : 'Sharp, refined appearance'}
+
+CONTRAST:
+Metallic shine of ${jewelryType} vs rough grey concrete
+Warm jewelry against cold architecture
+Soft skin against hard texture
+
+SKIN & TEXTURE:
+Authentic skin texture with visible imperfections
+Real, unretouched appearance
+Cold daylight revealing details
+NOT plastic, NOT retouched
+
+JEWELRY:
+${jewelryType} as focal point
+Sharp contrast against concrete
+ONLY the specified jewelry
+Metal gleaming in cold light
+
+TECHNICAL:
+Shot on Phase One XF IQ4 equivalent
+High detail capture
+Sharp focus throughout
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Smooth plastic skin
+Warm tones (should be cool)
+Blurry background with bokeh
+Studio lighting
+Distorted anatomy
+Extra jewelry
+
+OUTPUT: Concrete exterior. Brutalist architecture. Cold daylight. Editorial contrast.`;
+    },
+  },
+
+  'luxury-exit': {
+    name: 'Luxury Exit',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Flash photography style, editorial night shoot. Candid shot of a ${genderText} getting out of a luxury car at night wearing ${jewelryType}. Direct on-camera flash.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+FLASH AESTHETIC:
+Direct on-camera flash
+Harsh lighting, hard shadows
+Dark urban background
+Blurred city lights in distance
+Night time atmosphere
+
+CANDID MOMENT:
+Getting out of luxury car
+Candid, not posed
+Authentic movement captured
+Celebrity arrival aesthetic
+Snapshot realism
+
+STYLING:
+${genderText === 'woman' ? 'Messy chic hair, glamorous but effortless' : 'Stylish evening look'}
+Event-ready appearance
+${jewelryType} catching intense flash light
+
+FILM AESTHETIC:
+Shot on 35mm film look
+Authentic skin grain
+Disposable camera aesthetic
+Sharp focus on jewelry despite movement
+
+JEWELRY:
+${jewelryType} brilliantly catching flash
+ONLY the specified jewelry
+Design preserved exactly
+Sparkling in harsh light
+
+AVOID:
+Studio lighting, softbox
+Perfect posed shots
+Airbrushed skin
+CGI or 3D render
+Symmetrical composition
+Extra jewelry
+
+OUTPUT: Luxury exit. Night flash. Disposable aesthetic. Candid celebrity.`;
+    },
+  },
+
+  'soft-minimalist': {
+    name: 'Soft Minimalist',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Soft minimalist photography. Portrait of a ${genderText} wearing ${jewelryType}. Cream and beige tones, soft natural morning light coming from a window.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+SOFT AESTHETIC:
+Cream and beige color palette
+Soft natural morning light from window
+Sheer curtains diffusing light
+Blurred neutral background
+Bright and airy atmosphere
+
+STYLING:
+White silk blouse or elegant minimal top
+Elegant and gentle pose
+Refined, understated beauty
+${genderText === 'woman' ? 'Natural, fresh appearance' : 'Clean, relaxed look'}
+
+SKIN & TEXTURE:
+Natural skin texture but softly rendered
+Realistic atmosphere
+Warm, flattering light on skin
+Gentle, not harsh details
+
+JEWELRY:
+${jewelryType} as gentle focal point
+Soft light on metal and gems
+ONLY the specified jewelry
+Elegant, not flashy presentation
+
+MOOD:
+Serene and peaceful
+Intimate morning moment
+Aspirational lifestyle
+Quiet luxury
+
+TECHNICAL:
+Shot on 50mm lens equivalent
+Bright and airy exposure
+Soft focus edges
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Harsh shadows
+Dark colors
+High contrast
+Neon or vibrant colors
+Messy or grimy appearance
+
+OUTPUT: Soft minimalist. Cream tones. Morning light. Bright and airy.`;
+    },
+  },
+
+  'velvet-noir': {
+    name: 'Velvet Noir',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Elegant portrait photography, low key lighting. A ${genderText} wearing ${jewelryType} in a dimly lit room. Focus on the sparkle of the jewelry against darkness.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+LOW KEY LIGHTING:
+Dimly lit room atmosphere
+Focus on jewelry sparkle
+Soft rim light highlighting silhouette
+Cinematic, dramatic lighting
+Rich, deep tones
+
+BACKGROUND:
+Black velvet texture OR
+Dark wooden texture
+Deep, luxurious darkness
+No distractions
+
+STYLING:
+${genderText === 'woman' ? 'Black dress, sophisticated' : 'Dark formal attire'}
+Elegant, refined appearance
+${jewelryType} as the luminous focal point
+
+JEWELRY:
+${jewelryType} sparkling against darkness
+Gems catching minimal light brilliantly
+ONLY the specified jewelry
+Sharp details on craftsmanship
+
+MOOD:
+Sophisticated and mysterious
+Old Hollywood glamour
+Intimate luxury
+Timeless elegance
+
+TECHNICAL:
+Shot on 85mm lens equivalent
+Sharp focus on jewelry
+Cinematic color grading
+Rich tonal range
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Bright daylight
+White background
+Messy hair
+Casual clothes
+Flash photography
+Noise and grain
+
+OUTPUT: Velvet noir. Low key. Black velvet. Sophisticated sparkle.`;
+    },
+  },
+
+  'garden-bokeh': {
+    name: 'Garden Bokeh',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Outdoor lifestyle photography. Close up of a ${genderText} wearing ${jewelryType}, standing in a garden with blurred green plants in background. Dappled sunlight filtering through leaves.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+GARDEN SETTING:
+Blurred green plants in background
+Dappled sunlight filtering through leaves
+Beautiful bokeh from foliage
+Natural outdoor environment
+Warm, golden tones
+
+LIGHTING:
+Natural sunlight through leaves
+Warm golden hour quality
+Sun-kissed skin appearance
+Light dancing on ${jewelryType}
+
+STYLING:
+Linen clothing, natural and relaxed
+Natural wind movement in hair
+Relaxed and happy vibe
+${genderText === 'woman' ? 'Natural, effortless beauty' : 'Casual, refined look'}
+
+SKIN:
+Sun-kissed skin tone
+Natural texture visible
+Warm, healthy glow
+NOT artificial or plastic
+
+JEWELRY:
+Macro focus on ${jewelryType}
+Sunlight sparkling on gems
+ONLY the specified jewelry
+Natural light enhancing brilliance
+
+TECHNICAL:
+Shot on Canon 5D equivalent
+Shallow depth of field
+Beautiful background bokeh
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Studio lighting
+Grey background
+Cold tones
+Indoor settings
+Industrial aesthetics
+Sharp, harsh edges
+
+OUTPUT: Garden bokeh. Dappled sunlight. Golden tones. Natural lifestyle.`;
+    },
+  },
+
+  'car-sunset': {
+    name: 'Car Sunset',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Lifestyle photography shot from the passenger seat of a luxury car. A ${genderText} wearing ${jewelryType}. Sun visor down, soft sunset light hitting face and jewelry.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+CAR INTERIOR:
+Luxury car passenger seat perspective
+Leather car seat visible in background
+Sun visor down creating interesting light
+Expensive, aspirational setting
+
+LIGHTING:
+Soft sunset light hitting subject
+Golden hour warmth
+Light catching ${jewelryType} beautifully
+Natural, cinematic quality
+
+STYLING:
+${genderText === 'woman' ? 'Chic beige trench coat, sunglasses on head' : 'Stylish casual wear'}
+Casual but expensive look
+Effortless elegance
+Authentic moment feel
+
+MOOD:
+Aspirational lifestyle
+Casual luxury
+Authentic, candid moment
+Modern, relatable
+
+JEWELRY:
+Sharp focus on ${jewelryType}
+Sunset light enhancing metal
+ONLY the specified jewelry
+Natural, not staged showcase
+
+TECHNICAL:
+iPhone 15 Pro Max style aesthetic
+Shallow depth of field
+Sharp focus on jewelry
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Studio lighting
+Grey background
+Complicated backgrounds
+Messy or dirty settings
+Blurry jewelry
+3D render look
+
+OUTPUT: Car sunset. Luxury interior. Golden light. Lifestyle moment.`;
+    },
+  },
+
+  'parisian-cafe': {
+    name: 'Parisian Cafe',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'stylish woman' : gender === 'men' ? 'stylish man' : 'stylish model';
+      const type = jewelryType.toLowerCase();
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      const jewelryPose = (type === 'ring' || type === 'bracelet')
+        ? 'holding a white ceramic coffee cup near face, showcasing the jewelry'
+        : 'with jewelry prominently visible';
+
+      return `Street style photography. A ${genderText} sitting at an outdoor Parisian cafe table wearing ${jewelryType}, ${jewelryPose}. Blurred city street background.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+PARISIAN SETTING:
+Outdoor Parisian cafe table
+White ceramic coffee cup as prop
+Blurred city street background
+Soft overcast daylight
+European street atmosphere
+
+STYLING:
+Black blazer and white t-shirt (or equivalent)
+Effortless chic aesthetic
+${genderText === 'stylish woman' ? 'Natural, minimal makeup' : 'Well-groomed appearance'}
+Candid, not posed look
+
+SKIN & AUTHENTICITY:
+Natural skin texture visible
+Real, authentic appearance
+Soft overcast light flattering skin
+NOT plastic or airbrushed
+
+JEWELRY:
+${jewelryType} as focal point
+${jewelryPose}
+ONLY the specified jewelry
+Realistic colors and details
+
+MOOD:
+Effortless chic
+Aspirational lifestyle
+Candid street moment
+European elegance
+
+TECHNICAL:
+Shot on 35mm lens equivalent
+Realistic colors
+Natural depth of field
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Studio setup
+Solid color background
+Neon lights
+Night time
+Heavy makeup
+Distorted hands or anatomy
+Extra jewelry
+
+OUTPUT: Parisian cafe. Street style. Overcast chic. Effortless elegance.`;
+    },
+  },
+
+  'linen-morning': {
+    name: 'Linen Morning',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Intimate lifestyle photography. High angle shot of a ${genderText} lying on white linen bed sheets wearing ${jewelryType}. Soft morning sunlight casting gentle shadows through window blinds.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+INTIMATE SETTING:
+White linen bed sheets
+High angle perspective
+Cozy, intimate atmosphere
+Morning bedroom scene
+Soft, inviting environment
+
+LIGHTING:
+Soft morning sunlight
+Gentle shadows from window blinds
+Natural glow quality
+Warm, flattering light
+
+STYLING:
+${genderText === 'woman' ? 'Silk slip dress, delicate and feminine' : 'Simple, relaxed attire'}
+Relaxed pose, comfortable
+Hand resting near face
+Effortless morning beauty
+
+COLOR PALETTE:
+Soft creamy colors
+Whites and warm neutrals
+Natural, not saturated
+Bright but gentle
+
+JEWELRY:
+Focus on ${jewelryType}
+Morning light on metal and gems
+ONLY the specified jewelry
+Intimate, personal showcase
+
+TECHNICAL:
+Shot on Canon R5 equivalent
+High angle composition
+Natural glow
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Dark room
+Night time
+Flash photography
+High contrast
+Grungy aesthetics
+Vibrant neon colors
+Artificial light
+Fake skin texture
+
+OUTPUT: Linen morning. White sheets. Soft blinds light. Intimate cozy.`;
+    },
+  },
+
+  'mirror-reflection': {
+    name: 'Mirror Reflection',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Portrait looking into a vintage mirror. Reflection of a ${genderText} putting on ${jewelryType}. Focus on the reflection in the mirror, slightly blurred frame in foreground.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+MIRROR COMPOSITION:
+Focus on reflection in mirror
+Vintage or elegant mirror frame
+Slightly blurred frame in foreground
+Unique perspective and depth
+Getting ready moment
+
+SETTING:
+Warm indoor lighting
+Cozy bedroom background
+Intimate, personal space
+Lived-in, authentic atmosphere
+
+STYLING:
+${genderText === 'woman' ? 'Soft knit sweater, comfortable' : 'Casual, relaxed attire'}
+Natural expression
+Moment of putting on ${jewelryType}
+Authentic, not staged
+
+DEPTH OF FIELD:
+Realistic depth of field
+Mirror frame soft, reflection sharp
+Aesthetic layered composition
+${jewelryType} in sharp focus in reflection
+
+JEWELRY:
+${jewelryType} being put on or adjusted
+Caught in moment of adorning
+ONLY the specified jewelry
+Natural, intimate showcase
+
+TECHNICAL:
+Shot on Fujifilm X100V equivalent
+Aesthetic composition
+Realistic depth
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Direct eye contact with camera
+Phone in hand
+Ugly or dirty mirror frame
+Flash reflection in mirror
+Cartoon or anime style
+CGI appearance
+
+OUTPUT: Mirror reflection. Vintage frame. Getting ready moment. Intimate aesthetic.`;
+    },
+  },
 };
