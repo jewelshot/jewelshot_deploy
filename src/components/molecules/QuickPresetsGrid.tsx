@@ -68,6 +68,9 @@ const PRESET_CATEGORIES: PresetCategory[] = [
       { id: 'sharp-strobe', name: 'Sharp Strobe', icon: Zap, description: 'Hard light, facet sparkle', color: 'text-yellow-300' },
       { id: 'octabox-luxury', name: 'Octabox Luxury', icon: Lamp, description: 'Clamshell lighting, minimal', color: 'text-blue-200' },
       { id: 'ceo-diamond', name: 'CEO Diamond', icon: Crown, description: 'Low angle, tuxedo power', color: 'text-slate-400' },
+      { id: 'relaxed-chin-touch', name: 'Relaxed Chin Touch', icon: Hand, description: 'Hand near cheek, relaxed', color: 'text-rose-200' },
+      { id: 'wavy-framing-calm', name: 'Wavy Framing Calm', icon: Wind, description: 'Wavy hair, pure white', color: 'text-violet-200' },
+      { id: 'chest-presentation', name: 'Chest Presentation', icon: Target, description: 'Chest view, knitwear', color: 'text-amber-200' },
     ],
   },
 
@@ -89,6 +92,7 @@ const PRESET_CATEGORIES: PresetCategory[] = [
       { id: 'duo-friends', name: 'Duo Friends', icon: Users, description: 'Two models, friendship', color: 'text-rose-300' },
       { id: 'motion-candid', name: 'Motion Candid', icon: Wind, description: 'Hair blowing, movement blur', color: 'text-violet-300' },
       { id: 'bracelet-laugh', name: 'Bracelet Laugh', icon: Laugh, description: 'Covering mouth, genuine joy', color: 'text-amber-300' },
+      { id: 'smiling-jawline', name: 'Smiling Jawline', icon: Smile, description: 'Anonymous, gentle smile', color: 'text-yellow-200' },
     ],
   },
 
@@ -140,6 +144,8 @@ const PRESET_CATEGORIES: PresetCategory[] = [
       { id: 'chain-tension', name: 'Chain Tension', icon: Link2, description: 'Pendant pull, tactile', color: 'text-yellow-300' },
       { id: 'influencer-golden', name: 'Influencer Golden', icon: Instagram, description: 'Golden hour, sun flare', color: 'text-orange-400' },
       { id: 'pendant-touch', name: 'Pendant Touch', icon: Shirt, description: 'Soft touch, intimate', color: 'text-stone-200' },
+      { id: 'beige-knit-warmth', name: 'Beige Knit Warmth', icon: Heart, description: 'Soft knitwear, warm', color: 'text-orange-200' },
+      { id: 'pendant-chain-pull', name: 'Pendant Chain Pull', icon: Link2, description: 'Chain tension, tactile', color: 'text-yellow-300' },
     ],
   },
 
@@ -166,6 +172,7 @@ const PRESET_CATEGORIES: PresetCategory[] = [
       { id: 'ear-cartilage', name: 'Ear Cartilage', icon: Ear, description: 'Ultra-macro, capillaries', color: 'text-rose-300' },
       { id: 'pendant-hollow', name: 'Pendant Hollow', icon: Minus, description: 'Collarbone dip, intimate', color: 'text-stone-300' },
       { id: 'lapel-contrast', name: 'Lapel Contrast', icon: Blend, description: 'Fabric vs skin texture', color: 'text-slate-300' },
+      { id: 'natural-moles-pores', name: 'Natural Moles Pores', icon: CircleDot, description: 'Hyper-real moles, pores', color: 'text-rose-200' },
     ],
   },
 
@@ -220,6 +227,9 @@ const PRESET_CATEGORIES: PresetCategory[] = [
       { id: 'sunglasses-rings', name: 'Sunglasses Rings', icon: Glasses, description: 'It-girl attitude', color: 'text-zinc-300' },
       { id: 'wind-silk-blouse', name: 'Wind Silk Blouse', icon: Wind, description: 'Hair shadows, intense', color: 'text-purple-300' },
       { id: 'cashmere-cozy', name: 'Cashmere Cozy', icon: CloudFog, description: 'Collar to chin, cozy', color: 'text-amber-200' },
+      { id: 'silk-blouse-elegance', name: 'Silk Blouse Elegance', icon: Shirt, description: 'White silk, healthy glow', color: 'text-slate-100' },
+      { id: 'hasselblad-editorial', name: 'Hasselblad Editorial', icon: Camera, description: 'Gray backdrop, 8K detail', color: 'text-stone-400' },
+      { id: 'deep-neckline-contrast', name: 'Deep Neckline Contrast', icon: Moon, description: 'Black silk, evening elegance', color: 'text-slate-500' },
     ],
   },
 
@@ -260,6 +270,7 @@ const PRESET_CATEGORIES: PresetCategory[] = [
       { id: 'curtain-dreams', name: 'Curtain Dreams', icon: FlipHorizontal, description: 'Sheer curtain, diffused', color: 'text-pink-200' },
       { id: 'water-glass', name: 'Water Glass', icon: GlassWater, description: 'Caustic light, fresh morning', color: 'text-teal-200' },
       { id: 'clean-girl-crop', name: 'Clean Girl Crop', icon: Crop, description: 'Eyes cropped, dekolte', color: 'text-slate-100' },
+      { id: 'anonymous-jawline', name: 'Anonymous Jawline', icon: Eye, description: 'Cropped, chin visible', color: 'text-zinc-300' },
     ],
   },
 
@@ -283,6 +294,7 @@ const PRESET_CATEGORIES: PresetCategory[] = [
       { id: 'bw-lips-pendant', name: 'BW Lips Pendant', icon: SquareIcon, description: 'Monochrome macro, iconic', color: 'text-zinc-400' },
       { id: 'mirror-shard', name: 'Mirror Shard', icon: Wand2, description: 'Broken reflection, surreal', color: 'text-purple-400' },
       { id: 'wet-droplets', name: 'Wet Droplets', icon: Droplets, description: 'Water on skin, glossy', color: 'text-cyan-300' },
+      { id: 'motion-blur-focus', name: 'Motion Blur Focus', icon: Zap, description: 'Long exposure, jewelry sharp', color: 'text-purple-300' },
     ],
   },
 ];

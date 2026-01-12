@@ -9409,4 +9409,668 @@ Airbrushed, cartoon
 OUTPUT: Wet droplets. Water on skin. Slicked hair. Glossy fashion.`;
     },
   },
+
+  // ============================================
+  // PRESETS 155-176: HIGH-KEY & EDITORIAL SERIES
+  // ============================================
+
+  'relaxed-chin-touch': {
+    name: 'Relaxed Chin Touch',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'handsome man' : 'beautiful woman';
+      const faceDesc = showFace === 'show' ? 'gentle relaxed smile looking at camera' : 'chin and lips visible with gentle expression';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'elegant hand resting softly near cheek, fingers elegantly displayed'
+        : 'neck and ear area visible, elegant pose';
+
+      return `STYLE: Commercial portrait photography, high-key studio setting
+
+LIGHTING:
+Soft diffused lighting
+Bright white background
+Clean commercial illumination
+Healthy glow on skin
+
+MODEL:
+${genderDesc}
+Natural hair tied back loosely
+${faceDesc}
+${jewelryPlacement}
+Natural clean skin
+Soft skin texture
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Prominently featured
+Sharp focus on jewelry
+
+COMPOSITION:
+Minimalist aesthetic
+Sharp focus
+Clean beauty
+Relaxed atmosphere
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Heavy makeup
+Strange hairstyles
+Bad anatomy
+Bad hands
+Plastic skin
+Dark background
+Cartoon, 3D render
+
+OUTPUT: Relaxed chin touch. High-key elegance. Commercial portrait.`;
+    },
+  },
+
+  'wavy-framing-calm': {
+    name: 'Wavy Framing Calm',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'young man' : 'young woman';
+      const faceDesc = showFace === 'show' ? 'calm expression, serene gaze' : 'lower face visible, peaceful expression';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'elegant hand pose under chin, fingers delicately presented'
+        : 'neck and ear area showcased, elegant neckline';
+
+      return `STYLE: Commercial beauty photography, high-key
+
+LIGHTING:
+Pure white background
+Soft flattering studio light
+Clean illumination
+Even coverage
+
+MODEL:
+${genderDesc}
+Natural wavy hair framing face
+${faceDesc}
+${jewelryPlacement}
+Natural skin appearance
+Clean beauty aesthetic
+Realistic proportions
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Delicately featured
+Sharp focus on jewelry
+
+COMPOSITION:
+Sharp focus on face and jewelry
+Clean aesthetic
+Minimalist
+Calm atmosphere
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Heavy makeup
+Strange hairstyles
+Bad anatomy
+Plastic skin
+Dark background
+Blurry jewelry
+
+OUTPUT: Wavy hair framing. Calm expression. Pure white beauty.`;
+    },
+  },
+
+  'silk-blouse-elegance': {
+    name: 'Silk Blouse Elegance',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'handsome man wearing white minimal shirt' : 'beautiful woman wearing white minimalist silk blouse';
+      const faceDesc = showFace === 'show' ? 'gentle relaxed smile looking at camera' : 'lower face visible with gentle expression';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'elegant hand resting softly near cheek, fingers prominently displayed'
+        : 'neck and ear elegantly showcased against silk fabric';
+
+      return `STYLE: Commercial portrait photography, high-key studio
+
+LIGHTING:
+Soft diffused lighting
+Bright white background
+Clean commercial light
+Healthy glow illumination
+
+MODEL:
+${genderDesc}
+Natural hair tied back loosely
+${faceDesc}
+${jewelryPlacement}
+Natural clean skin with healthy glow
+Soft skin texture
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Central and prominent
+Sharp focus on jewelry
+
+COMPOSITION:
+Minimalist aesthetic
+Sharp focus
+Silk fabric texture
+Elegant contrast
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Heavy makeup
+Strange hairstyles
+Bad anatomy
+Plastic skin
+Dark background
+Blurry details
+
+OUTPUT: Silk blouse elegance. Healthy glow. Commercial polish.`;
+    },
+  },
+
+  'beige-knit-warmth': {
+    name: 'Beige Knit Warmth',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'young man wearing soft beige knit top' : 'young woman wearing soft beige knit top';
+      const faceDesc = showFace === 'show' ? 'calm expression, warm gaze' : 'lower face visible with peaceful expression';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'elegant hand pose under chin, fingers delicately presented'
+        : 'neck and ear area showcased against soft knit fabric';
+
+      return `STYLE: Commercial beauty photography, high-key
+
+LIGHTING:
+Pure white background
+Soft flattering studio light
+Warm illumination
+Clean coverage
+
+MODEL:
+${genderDesc}
+Natural wavy hair framing face
+${faceDesc}
+${jewelryPlacement}
+Natural skin appearance
+Clean beauty aesthetic
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Delicately featured
+Sharp focus on jewelry
+
+COMPOSITION:
+Sharp focus on jewelry
+Soft knit texture contrast
+Warm aesthetic
+Realistic proportions
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Explicit content
+Heavy makeup
+Bad anatomy
+Plastic skin
+Dark background
+Cartoon render
+
+OUTPUT: Beige knit warmth. Soft texture. Cozy elegance.`;
+    },
+  },
+
+  'anonymous-jawline': {
+    name: 'Anonymous Jawline',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'elegant hand holding finger up near jawline, clean manicure'
+        : 'neck and ear area prominently featured near jawline';
+
+      return `STYLE: Commercial jewelry photography, high-key studio
+
+LIGHTING:
+High-key studio lighting
+Pure white background
+Clean illumination
+Minimal shadows
+
+MODEL:
+${genderDesc}
+Anonymous cropped shot
+Focus on hand and lower face
+${jewelryPlacement}
+Chin and lower lip visible
+Wearing white silk blouse
+Natural clean skin texture
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Sharp focus on jewelry
+Central composition
+
+COMPOSITION:
+Minimalist
+Anonymous elegance
+Sharp focus on finger/neck area
+Clean manicure
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Full face visible
+Eyes and nose showing
+Portrait crop
+Heavy makeup
+Bad anatomy
+Dark background
+
+OUTPUT: Anonymous jawline. Elegant mystery. Commercial jewelry focus.`;
+    },
+  },
+
+  'smiling-jawline': {
+    name: 'Smiling Jawline',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'elegant hand holding finger up near jawline, clean manicure'
+        : 'neck and ear area prominently featured near jawline';
+
+      return `STYLE: Commercial jewelry photography, high-key studio
+
+LIGHTING:
+High-key studio lighting
+Pure white background
+Clean illumination
+Soft happy lighting
+
+MODEL:
+${genderDesc}
+Anonymous cropped shot
+Focus on hand and lower face
+${jewelryPlacement}
+Chin and lower lip visible with gentle smile
+Wearing white silk blouse
+Natural clean skin texture
+Soft happy mood
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Sharp focus on jewelry
+Joyful presentation
+
+COMPOSITION:
+Minimalist
+Happy anonymous
+Sharp focus
+Clean manicure
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Full face visible
+Eyes and nose showing
+Serious expression
+Frowning
+Heavy makeup
+Dark background
+
+OUTPUT: Smiling jawline. Joyful mystery. Soft happy mood.`;
+    },
+  },
+
+  'chest-presentation': {
+    name: 'Chest Presentation',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'beautiful female model';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands presenting finger centrally on chest, elegant pose'
+        : 'chest area showcasing jewelry, elegant neckline';
+
+      return `STYLE: Commercial product photography, high-key studio
+
+LIGHTING:
+High-key studio setting
+Bright white background
+Clean commercial lighting
+Healthy glow
+
+MODEL:
+${genderDesc}
+Cropped view focusing on chest and hands
+${jewelryPlacement}
+Wearing soft beige knitwear
+Lower chin tip and smiling mouth visible
+Natural skin aesthetic
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Sharp focus on target area
+Central composition
+
+COMPOSITION:
+Joyful atmosphere
+Elegant pose
+Healthy glow
+Natural aesthetic
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Full face visible
+Eyes and nose showing
+Serious expression
+Heavy makeup
+Dark background
+Bad anatomy
+
+OUTPUT: Chest presentation. Joyful knitwear. Commercial elegance.`;
+    },
+  },
+
+  'hasselblad-editorial': {
+    name: 'Hasselblad Editorial',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'visible skin texture and pores, editorial expression' : 'partial face, editorial mystery';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'elegant hands prominently displayed'
+        : 'neck and ear area showcased, necklace/earring prominently featured';
+
+      return `STYLE: Editorial fashion photography
+
+LIGHTING:
+Sharp studio lighting
+Clean gray background
+High contrast
+Minimalist illumination
+
+MODEL:
+${genderDesc}
+${faceDesc}
+Minimalist styling
+Sleek ponytail or slicked hair
+${jewelryPlacement}
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Highly detailed craftsmanship
+Ultra-realistic rendering
+
+TECHNICAL:
+Shot on Hasselblad X2D 100C
+8K resolution
+Ultra-realistic
+Razor sharp focus
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Plastic skin
+Airbrushed
+Blurry jewelry
+Cartoon
+Low resolution
+
+OUTPUT: Hasselblad editorial. Gray backdrop. Fashion precision.`;
+    },
+  },
+
+  'pendant-chain-pull': {
+    name: 'Pendant Chain Pull',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5'
+    ) => {
+      const genderDesc = gender === 'men' ? 'masculine hands' : 'feminine hands';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands prominently displayed, fingers elegantly posed'
+        : 'hands gently pulling necklace pendant downwards on chest, showing slight tension on chain';
+
+      return `STYLE: Lifestyle jewelry photography, high-key
+
+LIGHTING:
+Soft directional light
+Simple white background
+Clean illumination
+Subtle shadows
+
+MODEL:
+Cropped shot of two hands
+${genderDesc}
+${jewelryPlacement}
+Realistic finger texture
+Natural manicure
+Hyper-real skin details on chest
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Chain tension visible
+Metal catching light
+
+COMPOSITION:
+Tactile feeling
+Intimate gesture
+Interaction with jewelry
+Natural pose
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Heavy pulling
+Fake pose
+Plastic hands
+Smooth skin
+Perfect nails
+Dark shadows
+
+OUTPUT: Pendant pull. Chain tension. Tactile jewelry interaction.`;
+    },
+  },
+
+  'motion-blur-focus': {
+    name: 'Motion Blur Focus',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'rings remain sharp and in focus on moving hands'
+        : 'earrings remain sharp and in focus while face blurs';
+
+      return `STYLE: Artistic fashion photography, long exposure technique
+
+LIGHTING:
+High-flash style
+Dark background
+Dramatic illumination
+Energy and chaos
+
+MODEL:
+${genderDesc}
+Shaking head creating motion blur effect on face (ghosting)
+${jewelryPlacement}
+Raw skin tones visible through blur
+Chaotic and energetic atmosphere
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Sharp and in focus
+Contrasting with blur
+
+COMPOSITION:
+Experimental and edgy
+Motion vs stillness
+Long exposure effect
+Dramatic contrast
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Static pose
+Frozen image
+Perfect focus on face
+Plastic skin
+Standard portrait
+
+OUTPUT: Motion blur sharp. Experimental energy. Jewelry focus in chaos.`;
+    },
+  },
+
+  'natural-moles-pores': {
+    name: 'Natural Moles Pores',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'showing natural moles and pores' : 'partial face with visible skin texture';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'elegant hands prominently displayed'
+        : 'cropped medium shot of neck and chest area';
+
+      return `STYLE: Editorial jewelry photography, bright high-key
+
+LIGHTING:
+Soft directional lighting
+Pure white background
+Minimalist illumination
+Expensive aesthetic
+
+MODEL:
+${genderDesc}
+${faceDesc}
+Hyper-realistic skin texture
+Natural moles and pores visible
+${jewelryPlacement}
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Sharp focus on jewelry
+Editorial presentation
+
+TECHNICAL:
+Shot on macro lens
+Skin detail focus
+High resolution
+Natural imperfections
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Plastic skin
+Smooth face
+Airbrushed
+Perfect skin
+Cartoon
+
+OUTPUT: Natural moles. Skin texture. Hyper-real editorial.`;
+    },
+  },
+
+  'deep-neckline-contrast': {
+    name: 'Deep Neckline Contrast',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'man in black silk shirt' : 'woman in black silk dress with deep neckline';
+      const faceDesc = showFace === 'show' ? 'elegant evening expression' : 'partial face, mysterious elegance';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'elegant hands against black silk, fingers prominently displayed'
+        : 'gold pendant on chest, glowing skin against black fabric';
+
+      return `STYLE: Editorial jewelry photography, deep neckline contrast
+
+LIGHTING:
+Soft directional lighting
+Pure white background
+High-key with skin glow
+Sharp fabric vs skin contrast
+
+MODEL:
+${genderDesc}
+${faceDesc}
+Cropped medium shot
+${jewelryPlacement}
+Hyper-realistic skin texture
+Natural moles and pores
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Gold/metal catching light
+Sharp focus on jewelry
+
+COMPOSITION:
+Sharp contrast black fabric vs glowing skin
+Elegant evening look
+Clean and minimal
+Expensive aesthetic
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Plastic skin
+Smooth face
+Low resolution
+Dark background
+Cluttered styling
+
+OUTPUT: Deep neckline. Black silk contrast. Editorial elegance.`;
+    },
+  },
 };
