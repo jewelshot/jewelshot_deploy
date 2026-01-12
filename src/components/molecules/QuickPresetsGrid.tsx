@@ -20,7 +20,15 @@ import {
   Zap,
   Film,
   Laugh,
-  Focus
+  Focus,
+  Building2,
+  Leaf,
+  Sunset,
+  Coffee,
+  Square,
+  Blinds,
+  Hand,
+  ScanEye
 } from 'lucide-react';
 
 interface QuickPreset {
@@ -116,6 +124,62 @@ const QUICK_PRESETS: QuickPreset[] = [
     icon: Focus,
     description: 'Extreme close-up on skin',
     color: 'text-teal-400',
+  },
+  {
+    id: 'editorial-luxury',
+    name: 'Editorial Luxury',
+    icon: Building2,
+    description: 'High fashion apartment shot',
+    color: 'text-fuchsia-400',
+  },
+  {
+    id: 'rustic-morning',
+    name: 'Rustic Morning',
+    icon: Leaf,
+    description: 'Natural light, cozy room',
+    color: 'text-lime-400',
+  },
+  {
+    id: 'golden-hour',
+    name: 'Golden Hour',
+    icon: Sunset,
+    description: 'Outdoor sunset warmth',
+    color: 'text-amber-500',
+  },
+  {
+    id: 'urban-cafe',
+    name: 'Urban Cafe',
+    icon: Coffee,
+    description: 'Documentary cafe style',
+    color: 'text-stone-400',
+  },
+  {
+    id: 'bare-canvas',
+    name: 'Bare Canvas',
+    icon: Square,
+    description: 'Clean skin, ready for jewelry',
+    color: 'text-neutral-400',
+  },
+  {
+    id: 'venetian-light',
+    name: 'Venetian Light',
+    icon: Blinds,
+    description: 'Dramatic blind shadows',
+    color: 'text-yellow-500',
+  },
+  {
+    id: 'coffee-moment',
+    name: 'Coffee Moment',
+    icon: Hand,
+    description: 'Candid casual elegance',
+    color: 'text-orange-300',
+  },
+  {
+    id: 'macro-skin',
+    name: 'Macro Skin',
+    icon: ScanEye,
+    description: 'Hyper-realistic texture',
+    color: 'text-rose-300',
   },
 ];
 

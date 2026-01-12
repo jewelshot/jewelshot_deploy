@@ -1042,4 +1042,617 @@ Low resolution, noise, grain
 OUTPUT: Macro e-commerce. Extreme jewelry detail. Photorealistic skin. Commercial catalog quality.`;
     },
   },
+
+  'editorial-luxury': {
+    name: 'Editorial Luxury',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const type = jewelryType.toLowerCase();
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      const jewelryPlacement = {
+        ring: 'elegant hand positioning near face or resting gracefully',
+        necklace: 'pendant resting beautifully on decollete, chain following neck contour',
+        earring: 'earrings catching the natural window light, visible near jawline',
+        bracelet: 'wrist elegantly positioned, bracelet catching ambient light',
+      }[type] || 'jewelry prominently displayed and naturally worn';
+
+      const sizeSpecs = {
+        ring: 'Ring natural finger proportions, 2-3mm band, 8-12mm face',
+        necklace: 'Chain 16-20 inch drape, pendant 10-25mm',
+        earring: 'Stud 4-8mm or drop 15-35mm length',
+        bracelet: 'Bracelet 7-8 inch length, natural wrist fit',
+      }[type] || 'Standard jewelry proportions';
+
+      return `Editorial style e-commerce photograph of a sophisticated ${genderText} wearing ${jewelryType}. Waist-up shot, the model is posing elegantly in a blurred luxury apartment interior bathed in natural window light.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+SUBJECT & STYLING:
+Sophisticated ${genderText} with chic, high-fashion styling
+Elegant pose, confident yet relaxed body language
+Aspirational vibe, luxury lifestyle aesthetic
+Natural but polished makeup and grooming
+Hair styled elegantly, not distracting from jewelry
+
+JEWELRY FOCUS:
+${jewelryPlacement}
+Sharp focus on ${jewelryType}, showing its brilliance and craftsmanship
+${sizeSpecs}
+ONLY the specified ${jewelryType} - NO other jewelry pieces
+Jewelry is the hero, everything else supports it
+
+ENVIRONMENT:
+Blurred luxury apartment interior
+Natural window light flooding the space
+Soft bokeh background with hints of elegant decor
+Warm, inviting atmosphere
+High-end residential feel
+
+LIGHTING & MOOD:
+Natural window light as primary source
+Soft, flattering illumination on skin
+Jewelry catching and reflecting the ambient light
+Cinematic color grading, slightly warm tones
+Golden hour quality indoor light
+
+CRITICAL PRESERVATION:
+JEWELRY DESIGN 100% UNCHANGED - exact structure preserved
+NO modifications to gemstones, settings, or proportions
+NO additional jewelry on the model
+ONLY the ${jewelryType} being showcased
+
+TECHNICAL:
+Highly detailed, photorealistic quality
+Shallow depth of field, background softly blurred
+Focus razor-sharp on jewelry
+Skin texture natural, not over-processed
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Deformed body parts, bad anatomy
+Plastic or airbrushed skin texture
+Blurry or distorted jewelry
+Extra jewelry pieces not specified
+Harsh shadows, overexposed areas
+Low resolution, noise, grain
+
+OUTPUT: Editorial luxury. High fashion e-commerce. Cinematic color grading.`;
+    },
+  },
+
+  'rustic-morning': {
+    name: 'Rustic Morning',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const type = jewelryType.toLowerCase();
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      const jewelryPose = {
+        ring: 'hand near face or resting on window frame, ring catching morning light',
+        necklace: 'necklace visible against casual linen shirt, pendant catching sunlight',
+        earring: 'earrings visible as head turns toward window light',
+        bracelet: 'wrist casually positioned, bracelet catching gentle rays',
+      }[type] || 'jewelry naturally catching the morning light';
+
+      return `A candid, natural light photograph of a ${genderText} in a sunlit, rustic apartment room, wearing ${jewelryType}. Casually dressed in a textured linen shirt, leaning against a window frame.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+NATURAL MOMENT:
+Gentle morning light streaming in through window
+${jewelryPose}
+Relaxed pose, genuine smile, authentic expression
+Natural skin texture visible - pores, fine lines, real human details
+No heavy makeup, minimal styling, effortless beauty
+
+SKIN & TEXTURE:
+Real skin texture, visible pores and natural imperfections
+NOT airbrushed, NOT plastic, genuinely human
+Warm skin tones catching the morning light
+Fine vellus hair visible in backlight
+Authentic, unretouched appearance
+
+JEWELRY SHOWCASE:
+${jewelryType} catching real textures and sparkles of morning light
+Natural interaction between light, skin, and metal
+ONLY the specified ${jewelryType} - no additional jewelry
+Jewelry is the focal point of the candid moment
+
+ENVIRONMENT:
+Real, slightly cluttered but cozy room
+Plants and old wooden furniture in background
+Softly blurred bokeh background
+Warm, lived-in atmosphere
+Authentic rustic apartment feel
+
+PHOTOGRAPHIC STYLE:
+Film grain aesthetic, organic feel
+Authentic moment, raw photography style
+Shot on film camera aesthetic
+Natural colors, not oversaturated
+Soft morning light quality
+
+CRITICAL PRESERVATION:
+JEWELRY DESIGN UNCHANGED - exact original preserved
+NO additional jewelry pieces
+NO modifications to the ${jewelryType}
+
+AVOID:
+Artificial, synthetic appearance
+Overly polished, airbrushed skin
+Studio lighting, harsh flash
+Fake or rendered backgrounds
+Stiff poses, model stare
+Heavy makeup, oversaturated colors
+
+OUTPUT: Rustic morning. Natural light. Authentic candid moment. Film aesthetic.`;
+    },
+  },
+
+  'golden-hour': {
+    name: 'Golden Hour',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const type = jewelryType.toLowerCase();
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      const jewelryHighlight = {
+        ring: 'ring catching golden sunlight, metal and gems glowing warmly',
+        necklace: 'necklace bathed in warm low sunlight, pendant creating light flares',
+        earring: 'earrings catching golden rays, sparkling against windblown hair',
+        bracelet: 'bracelet reflecting sunset colors, warm metal tones enhanced',
+      }[type] || 'jewelry highlighted by golden hour light';
+
+      return `A natural outdoor portrait during golden hour. A ${genderText} with windblown, natural hair wearing ${jewelryType}, bathed in warm, low sunlight.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+GOLDEN HOUR MAGIC:
+Warm, low sunlight creating natural lens flares
+${jewelryHighlight}
+Light naturally highlighting the metal and gems
+Soft golden glow on skin and jewelry
+
+ENVIRONMENT:
+Authentic, untamed garden setting
+Dried grasses and stone textures in background
+Natural outdoor atmosphere
+Deep depth of field showing environment context
+Real location, not studio backdrop
+
+EXPRESSION & POSE:
+Contemplative and gentle expression
+Unposed and real feeling
+Genuine human imperfections and textures
+Windblown, natural hair movement
+Relaxed, authentic body language
+
+SKIN & AUTHENTICITY:
+Natural skin showing genuine texture
+Visible pores, real human details
+Warm golden light flattering skin tones
+NOT airbrushed, NOT synthetic
+
+JEWELRY FOCUS:
+${jewelryType} as the hero, enhanced by golden light
+ONLY the specified jewelry - no additional pieces
+Natural light interaction with metal and gems
+Jewelry design preserved exactly as original
+
+PHOTOGRAPHIC STYLE:
+Analog film photography aesthetic
+Natural, warm colors from golden hour
+Deep depth of field
+Lens flares adding atmosphere
+High quality, detailed capture
+
+AVOID:
+Artificial studio lighting
+Airbrushed or plastic skin
+Stiff, posed appearance
+Additional jewelry not specified
+Blurry or distorted jewelry details
+
+OUTPUT: Golden hour portrait. Natural outdoor. Warm sunlight. Analog film aesthetic.`;
+    },
+  },
+
+  'urban-cafe': {
+    name: 'Urban Cafe',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const type = jewelryType.toLowerCase();
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      const jewelryFocus = {
+        ring: 'close-up on hands holding ceramic cup, ring prominently displayed on finger',
+        necklace: 'close-up on neck area, necklace visible above casual clothing',
+        earring: 'close-up including ear and jawline, earring catching cafe light',
+        bracelet: 'close-up on wrist and hands holding cup, bracelet as focal point',
+      }[type] || 'close-up focusing on jewelry against authentic cafe setting';
+
+      return `A realistic, documentary-style shot in a textured urban cafe. ${jewelryFocus}, wearing ${jewelryType}. Holding a ceramic coffee cup on an old worn wooden table.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+DOCUMENTARY STYLE:
+Candid, non-studio composition
+Real cafe environment, authentic textures
+Worn wooden table, ceramic cup details
+Natural, unposed moment captured
+
+LIGHTING:
+Diffused daylight from large cafe window
+Soft, natural illumination
+Realistic material wear and reflections on jewelry
+No harsh studio lighting
+
+JEWELRY DETAIL:
+Razor-sharp focus on ${jewelryType} details
+Showing realistic material quality and reflections
+ONLY the specified jewelry - no additional pieces
+Jewelry interacting naturally with scene
+
+BACKGROUND:
+Real, bustling cafe environment
+Naturally out of focus (bokeh)
+Authentic textures and atmosphere
+Urban, lived-in feeling
+
+SKIN & HANDS:
+Natural skin texture, real human details
+${type === 'ring' || type === 'bracelet' ? 'Elegant hands with natural nails' : 'Natural neck and shoulder area'}
+Visible pores and authentic skin quality
+NOT plastic or airbrushed
+
+AUTHENTICITY:
+Non-studio look and feel
+Candid composition
+Real environment, real moment
+Documentary photography approach
+
+CRITICAL PRESERVATION:
+${jewelryType} design UNCHANGED
+NO additional jewelry pieces
+Exact original jewelry preserved
+
+AVOID:
+Studio lighting, fake backgrounds
+Airbrushed skin, plastic texture
+Stiff poses, artificial moments
+Extra jewelry not specified
+Blurry jewelry details
+
+OUTPUT: Urban cafe. Documentary style. Authentic textures. Candid composition.`;
+    },
+  },
+
+  'bare-canvas': {
+    name: 'Bare Canvas',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const type = jewelryType.toLowerCase();
+
+      const bodyArea = {
+        ring: 'elegant hands with fingers extended, ready for ring placement',
+        necklace: 'neck and décolletage area, collarbones visible, open for necklace',
+        earring: 'ear and neck area, hair pulled back, earlobes clearly visible',
+        bracelet: 'wrist and forearm, elegant hand positioning for bracelet',
+      }[type] || 'body area prepared for jewelry placement';
+
+      return `Close-up portrait crop focusing on ${bodyArea}. ${genderText} wearing a simple white ribbed tank top. Natural skin texture, visible features, soft daylight studio lighting.
+
+FRAMING & COMPOSITION:
+${type === 'necklace' ? 'Neck and décolletage area, visible collarbones' : ''}
+${type === 'earring' ? 'Ear, jawline, and upper neck, hair pulled back' : ''}
+${type === 'ring' ? 'Hands and fingers elegantly positioned' : ''}
+${type === 'bracelet' ? 'Wrist and forearm with graceful hand pose' : ''}
+Head turned slightly away if showing neck/ear
+Body area completely open and ready for ${jewelryType} placement
+Neutral beige background, seamless and clean
+
+SKIN QUALITY:
+Realistic skin texture, visible pores
+Natural peach fuzz visible in soft light
+Warm, healthy skin tone
+NOT airbrushed, NOT plastic
+Real human skin quality
+
+STYLING:
+Simple white ribbed tank top (minimal, non-distracting)
+Hair pulled back from jewelry area
+Minimal or no visible makeup
+Clean, prepared canvas for jewelry
+
+LIGHTING:
+Soft daylight studio lighting
+Even, flattering illumination
+Highlights natural skin texture
+Professional commercial quality
+
+JEWELRY PLACEMENT:
+${jewelryType} will be placed on this prepared canvas
+Area is clean, open, and ready
+Natural body positioning for optimal jewelry display
+
+TECHNICAL:
+High fashion photography quality
+Sharp focus on skin and body details
+Neutral background, no distractions
+Professional e-commerce ready
+
+AVOID:
+Heavy makeup or styling
+Distracting clothing or accessories
+Harsh shadows or unflattering light
+Artificial skin texture
+
+OUTPUT: Bare canvas. Ready for ${jewelryType}. Clean, professional preparation.`;
+    },
+  },
+
+  'venetian-light': {
+    name: 'Venetian Light',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const type = jewelryType.toLowerCase();
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      const jewelryLight = {
+        ring: 'ring catching striped sunlight, dramatic shadows and highlights on hand',
+        necklace: 'necklace with venetian blind shadows across chest, golden light on pendant',
+        earring: 'earrings catching light through blind slats, dramatic ear and neck lighting',
+        bracelet: 'bracelet with striped light pattern, dramatic wrist illumination',
+      }[type] || 'jewelry dramatically lit by venetian blind shadows';
+
+      return `Portrait photography of a ${genderText} wearing ${jewelryType}, harsh sunlight casting venetian blind shadows across the body. Golden hour lighting quality.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+DRAMATIC LIGHTING:
+Harsh sunlight through venetian blinds
+Striped shadow pattern across skin
+${jewelryLight}
+Golden hour color temperature
+High contrast, cinematic mood
+
+SKIN & TEXTURE:
+Authentic skin texture, visible pores
+Slight sweat sheen from warm light
+Natural, non-retouched appearance
+Real human details visible
+Warm skin tones in golden light
+
+STYLING:
+Messy, natural hair
+Minimal styling, effortless look
+${genderText === 'woman' ? 'Subtle natural makeup only' : 'Natural grooming'}
+Focus on the dramatic light and jewelry
+
+JEWELRY FOCUS:
+${jewelryType} as hero piece
+ONLY the specified jewelry - no additional pieces
+Jewelry interacting with striped light dramatically
+Metal and gems catching the harsh sunlight
+
+PHOTOGRAPHIC STYLE:
+Shot on film aesthetic (Kodak Portra 400)
+35mm film grain texture
+Cinematic, emotional mood
+Non-retouched look
+High fashion editorial feel
+
+MOOD:
+Dramatic and emotional
+Intimate, artistic portrait
+Golden warmth throughout
+Strong visual impact
+
+AVOID:
+Flat, even lighting
+Airbrushed skin
+Additional jewelry pieces
+Blurry jewelry details
+Over-processed appearance
+
+OUTPUT: Venetian light. Dramatic shadows. Golden hour. Film aesthetic.`;
+    },
+  },
+
+  'coffee-moment': {
+    name: 'Coffee Moment',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const type = jewelryType.toLowerCase();
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      const jewelryPose = {
+        ring: 'rings on fingers, hand close to face or holding cup, ring catching soft light',
+        necklace: 'necklace visible against loose linen shirt, casual elegance',
+        earring: 'earrings visible near jawline, head tilted in relaxed pose',
+        bracelet: 'bracelet on wrist, hand near face or wrapped around warm cup',
+      }[type] || 'jewelry visible in casual, intimate moment';
+
+      return `Candid shot of a ${genderText} drinking coffee in a cozy room, wearing a loose linen shirt and ${jewelryType}. Hand close to face, natural soft morning light.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+CANDID MOMENT:
+Genuine, unposed coffee moment
+${jewelryPose}
+Relaxed, intimate atmosphere
+Authentic everyday elegance
+
+STYLING:
+Loose linen shirt, casual but chic
+Messy bun or natural hair
+Freckles and natural skin visible
+Minimal makeup, effortless beauty
+${genderText === 'woman' ? 'Natural, understated femininity' : 'Relaxed masculine elegance'}
+
+ENVIRONMENT:
+Cozy room interior
+Blurred background with soft bokeh
+Warm, inviting atmosphere
+Natural morning light quality
+Depth of field focusing on subject
+
+SKIN & AUTHENTICITY:
+Natural skin texture with freckles
+Visible pores, real human details
+Warm morning light on skin
+NOT airbrushed, genuinely natural
+
+JEWELRY:
+${jewelryType} naturally integrated into moment
+ONLY the specified jewelry - no extras
+Catching soft morning light beautifully
+Casual elegance, not overdone
+
+PHOTOGRAPHIC STYLE:
+Editorial fashion photography
+Shot on film aesthetic (Fujifilm Pro 400H)
+Soft, diffused light quality
+Authentic moments captured
+Warm, inviting color palette
+
+MOOD:
+Casual, relaxed vibe
+Intimate, personal moment
+Authentic and relatable
+Aspirational yet accessible
+
+AVOID:
+Stiff, posed shots
+Heavy makeup or styling
+Additional jewelry pieces
+Studio lighting feel
+Over-processed appearance
+
+OUTPUT: Coffee moment. Candid elegance. Soft morning light. Editorial quality.`;
+    },
+  },
+
+  'macro-skin': {
+    name: 'Macro Skin',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const type = jewelryType.toLowerCase();
+
+      const macroFocus = {
+        ring: 'extreme close-up of ring on finger, showing skin texture and jewelry detail',
+        necklace: 'macro of pendant on collarbone, skin texture and jewelry in sharp detail',
+        earring: 'extreme close-up of earring on earlobe, skin and jewelry texture',
+        bracelet: 'macro of bracelet on wrist, skin and metal detail visible',
+      }[type] || 'extreme macro showing jewelry against skin texture';
+
+      const bodyPart = {
+        ring: 'finger and hand',
+        necklace: 'collarbone and décolletage',
+        earring: 'earlobe and neck',
+        bracelet: 'wrist and forearm',
+      }[type] || 'body part';
+
+      return `Macro photography of ${jewelryType} on a ${genderText}'s ${bodyPart}. Extreme close-up, soft daylight, focus on the jewelry and skin texture.
+
+EXTREME MACRO:
+${macroFocus}
+Jewelry fills 60-80% of frame
+True macro lens perspective (100mm macro equivalent)
+Hyper-detailed texture capture
+
+SKIN TEXTURE - HYPER REALISTIC:
+Visible vellus hair (peach fuzz) on skin
+Natural skin tone with real texture
+Goosebumps texture visible
+Visible pores and natural skin details
+NOT airbrushed, completely authentic
+
+LIGHTING:
+Soft daylight illumination
+Gentle, even lighting on skin
+Jewelry catching natural light
+No harsh shadows or hotspots
+Light revealing texture details
+
+COMPOSITION:
+Minimalist, focused framing
+${jewelryType} and skin as only subjects
+Clean, uncluttered macro view
+Shallow depth of field
+Background is soft skin blur
+
+JEWELRY DETAIL:
+${jewelryType} in razor-sharp focus
+Every facet and detail visible
+Metal texture and reflections captured
+ONLY the specified jewelry
+Design preserved exactly
+
+TECHNICAL:
+Shot on 100mm macro lens equivalent
+High detailed texture capture
+Ultra-sharp focus plane
+300 DPI publication quality
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Wide or distant framing
+Airbrushed skin texture
+Multiple jewelry pieces
+Blurry jewelry details
+Flat, textureless skin
+
+OUTPUT: Macro skin. Extreme detail. Hyper-realistic texture. Minimalist composition.`;
+    },
+  },
 };
