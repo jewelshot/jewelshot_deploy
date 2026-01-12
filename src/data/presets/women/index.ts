@@ -74,6 +74,12 @@ export const studioCommercial: PresetCategory = {
     createPreset('feather-trim-diamonds', 'Feather Trim Diamonds', 'Angelic glamour, soft', 'studio-commercial'),
     createPreset('negative-space-profile', 'Negative Space Profile', 'Minimalist, airy luxury', 'studio-commercial'),
     createPreset('symmetry-back-to-back', 'Symmetry Back to Back', 'Geometric duo, balanced', 'studio-commercial'),
+    createPreset('sage-mint-pastel', 'Sage Mint Pastel', 'Youthful pastel background', 'studio-commercial'),
+    createPreset('burgundy-monochrome', 'Burgundy Monochrome', 'All-red, gold pop', 'studio-commercial'),
+    createPreset('royal-blue-gold', 'Royal Blue Gold', 'Complementary contrast', 'studio-commercial'),
+    createPreset('editorial-penthouse-bokeh', 'Editorial Penthouse Bokeh', 'Luxurious blur, 8K', 'studio-commercial'),
+    createPreset('faint-smile-editorial', 'Faint Smile Editorial', 'Macro polish, natural', 'studio-commercial'),
+    createPreset('smooth-skin-editorial', 'Smooth Skin Editorial', 'Flawless, manicured', 'studio-commercial'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -100,6 +106,8 @@ export const joyExpression: PresetCategory = {
     createPreset('candid-laughter-duo', 'Candid Laughter Duo', 'Genuine laughing duo', 'joy-expression'),
     createPreset('hair-flip-action', 'Hair Flip Action', 'Dynamic frozen motion', 'joy-expression'),
     createPreset('wind-blown-reveal', 'Wind Blown Reveal', 'Editorial drama, jewelry visible', 'joy-expression'),
+    createPreset('friends-bench-laughter', 'Friends Bench Laughter', 'Duo authentic joy', 'joy-expression'),
+    createPreset('kodak-portra-motion', 'Kodak Portra Motion', 'Film grain, nostalgic energy', 'joy-expression'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -138,6 +146,10 @@ export const hardLightDrama: PresetCategory = {
     createPreset('black-velvet-diamonds', 'Black Velvet Diamonds', 'Rembrandt, matte vs sparkle', 'hard-light-drama'),
     createPreset('theatrical-spotlight', 'Theatrical Spotlight', 'Single spot, total darkness', 'hard-light-drama'),
     createPreset('glossy-black-reflection', 'Glossy Black Reflection', 'Cool silver, modern', 'hard-light-drama'),
+    createPreset('venetian-film-noir', 'Venetian Film Noir', 'Blind shadows, moody', 'hard-light-drama'),
+    createPreset('palm-dappled-light', 'Palm Dappled Light', 'Organic shadow texture', 'hard-light-drama'),
+    createPreset('neon-gel-cyberpunk', 'Neon Gel Cyberpunk', 'Split color, futuristic', 'hard-light-drama'),
+    createPreset('windy-desaturated-drama', 'Windy Desaturated Drama', 'B&W motion editorial', 'hard-light-drama'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -181,6 +193,18 @@ export const lifestyleCandid: PresetCategory = {
     createPreset('ear-tuck-reveal', 'Ear Tuck Reveal', 'Natural hair gesture', 'lifestyle-candid'),
     createPreset('pendant-contemplation', 'Pendant Contemplation', 'Playing with pendant, thoughtful', 'lifestyle-candid'),
     createPreset('pov-mirror-adjusting', 'POV Mirror Adjusting', 'Getting ready moment', 'lifestyle-candid'),
+    createPreset('magazine-cafe-luxury', 'Magazine Cafe Luxury', 'Reading, leisure lifestyle', 'lifestyle-candid'),
+    createPreset('parisian-window-gaze', 'Parisian Window Gaze', 'Cafe reflection, dreamy', 'lifestyle-candid'),
+    createPreset('city-motion-blur', 'City Motion Blur', 'Walking confident mission', 'lifestyle-candid'),
+    createPreset('kinfolk-window-seat', 'Kinfolk Window Seat', 'Cozy peaceful home', 'lifestyle-candid'),
+    createPreset('art-gallery-contemplation', 'Art Gallery Contemplation', 'Intellectual calm', 'lifestyle-candid'),
+    createPreset('greenhouse-garden', 'Greenhouse Garden', 'Organic fresh calm', 'lifestyle-candid'),
+    createPreset('lazy-morning-bed', 'Lazy Morning Bed', 'Intimate real quiet', 'lifestyle-candid'),
+    createPreset('quiet-street-candid', 'Quiet Street Candid', 'Natural urban moment', 'lifestyle-candid'),
+    createPreset('entryway-getting-ready', 'Entryway Getting Ready', 'Daily routine slice', 'lifestyle-candid'),
+    createPreset('rain-window-moody', 'Rain Window Moody', 'Emotional depth, cinematic', 'lifestyle-candid'),
+    createPreset('train-window-reflection', 'Train Window Reflection', 'Travel introspective', 'lifestyle-candid'),
+    createPreset('scarf-winter-reveal', 'Scarf Winter Reveal', 'Texture contrast wool-gold', 'lifestyle-candid'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -220,6 +244,10 @@ export const macroDetail: PresetCategory = {
     createPreset('generations-hands', 'Generations Hands', 'Grandmother-daughter, emotional', 'macro-detail'),
     createPreset('hand-mirror-earring', 'Hand Mirror Earring', 'Reflection focus, creative', 'macro-detail'),
     createPreset('orchid-gold-rings', 'Orchid Gold Rings', 'Flower contrast, delicate', 'macro-detail'),
+    createPreset('collarbone-intimate-macro', 'Collarbone Intimate Macro', 'No face, raw texture', 'macro-detail'),
+    createPreset('ear-hairline-stolen', 'Ear Hairline Stolen', 'Stolen glance, intimate', 'macro-detail'),
+    createPreset('unclasp-mirror-evening', 'Unclasp Mirror Evening', 'End of day ritual', 'macro-detail'),
+    createPreset('sleeve-cuff-reveal', 'Sleeve Cuff Reveal', 'Fashion detail crop', 'macro-detail'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -379,6 +407,8 @@ export const artisticSpecial: PresetCategory = {
     createPreset('light-leak-prism', 'Light Leak Prism', 'Rainbow flare, analog vibe', 'artistic-special'),
     createPreset('soft-focus-90s', 'Soft Focus 90s', 'Diffusion filter, nostalgic', 'artistic-special'),
     createPreset('pristine-no-makeup', 'Pristine No-Makeup', 'Fresh dewy, ultra-clean', 'artistic-special'),
+    createPreset('blue-hour-flash', 'Blue Hour Flash', 'Rooftop direct flash, raw', 'artistic-special'),
+    createPreset('summer-light-leak', 'Summer Light Leak', 'Retro memory, romantic', 'artistic-special'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 

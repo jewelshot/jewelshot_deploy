@@ -15684,4 +15684,1599 @@ No reflection
 OUTPUT: Glossy black. Silver reflection. Sophisticated modern.`;
     },
   },
+
+  // ============================================
+  // PACK 121-164: COLORFUL & LIFESTYLE SERIES
+  // ============================================
+
+  'sage-mint-pastel': {
+    name: 'Sage Mint Pastel',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'smiling gently' : 'elegant presence';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'delicate gold ring stack on fingers'
+        : 'delicate gold layered necklaces';
+
+      return `STYLE: Fresh youthful jewelry campaign
+
+BACKGROUND:
+Seamless matte sage green or dusty mint
+Soft pastel color
+
+LIGHTING:
+Bright and soft
+Commercial beauty light
+
+MODEL:
+${genderDesc}
+White tank top
+${faceDesc}
+
+JEWELRY:
+${jewelryPlacement}
+${jewelryType}
+ONLY the specified jewelry
+Gold looks warm and inviting against pastel
+
+AESTHETIC:
+Youthful
+Fresh
+Inviting
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Dark backgrounds
+Cold tones
+Heavy styling
+
+OUTPUT: Sage mint. Pastel fresh. Youthful warmth.`;
+    },
+  },
+
+  'burgundy-monochrome': {
+    name: 'Burgundy Monochrome',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'dramatic expression, dark lips' : 'monochrome silhouette';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'bright yellow gold rings popping against red'
+        : 'bright yellow gold necklace popping against red';
+
+      return `STYLE: Striking monochromatic fashion shot
+
+COLOR PALETTE:
+Entire palette shades of deep burgundy red
+Burgundy silk blouse
+Matching burgundy background
+Dark red lipstick
+
+CONTRAST:
+${jewelryPlacement}
+Gold pops vividly against all-red environment
+Only contrasting element
+
+MODEL:
+${genderDesc}
+${faceDesc}
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Bright gold contrast
+
+AESTHETIC:
+High-fashion
+Monochromatic drama
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Multiple colors
+Neutral tones
+Muted gold
+
+OUTPUT: Burgundy mono. Gold pop. High fashion drama.`;
+    },
+  },
+
+  'royal-blue-gold': {
+    name: 'Royal Blue Gold',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'confident expression' : 'bold silhouette';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'heavy gold chain bracelet or rings'
+        : 'heavy gold chain necklace';
+
+      return `STYLE: Vibrant high-contrast studio shot
+
+BACKGROUND:
+Rich electric royal blue
+
+MODEL:
+${genderDesc}
+Simple outfit
+${faceDesc}
+
+COLOR THEORY:
+Yellow gold creates perfect complementary contrast
+Blue background makes gold richer, more saturated
+
+JEWELRY:
+${jewelryPlacement}
+${jewelryType}
+ONLY the specified jewelry
+Complementary color pop
+
+AESTHETIC:
+Bold
+Commercial
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Muted colors
+Weak contrast
+Silver jewelry
+
+OUTPUT: Royal blue. Gold complementary. Bold commercial.`;
+    },
+  },
+
+  'venetian-film-noir': {
+    name: 'Venetian Film Noir',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'moody expression, partially shadowed' : 'shadowed mystery';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'jewelry catching light between shadows'
+        : 'diamond earrings highlighted between shadow strips';
+
+      return `STYLE: Moody artistic portrait with Gobo lighting
+
+LIGHTING:
+Harsh Venetian blind shadows (horizontal slats)
+Cast across face and neck
+Alternating strips of light and shadow
+${jewelryPlacement}
+
+MODEL:
+${genderDesc}
+${faceDesc}
+
+BACKGROUND:
+Neutral grey wall
+
+ATMOSPHERE:
+Film noir aesthetic
+Late afternoon room vibe
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Highlighted in light strips
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Even lighting
+Bright cheerful mood
+No shadows
+
+OUTPUT: Venetian blinds. Film noir. Shadow drama.`;
+    },
+  },
+
+  'palm-dappled-light': {
+    name: 'Palm Dappled Light',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'sun-kissed expression' : 'tropical presence';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'gold bangles and rings in dappled light'
+        : 'gold jewelry in dappled sunlight';
+
+      return `STYLE: Sun-kissed studio shot with dappled lighting
+
+LIGHTING:
+Shadows of palm leaves or tree branches
+Cast softly onto skin and white background
+Mimics natural sunlight filtering through trees
+
+MODEL:
+${genderDesc}
+${faceDesc}
+
+TEXTURE:
+Interplay of light and shadow adds texture
+No real plants needed in frame
+
+JEWELRY:
+${jewelryPlacement}
+${jewelryType}
+ONLY the specified jewelry
+Catching dappled light
+
+BACKGROUND:
+White with organic shadows
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Even flat lighting
+Dark background
+Indoor feel
+
+OUTPUT: Palm dappled. Organic shadows. Sun-kissed texture.`;
+    },
+  },
+
+  'neon-gel-cyberpunk': {
+    name: 'Neon Gel Cyberpunk',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'edgy expression, split-lit' : 'neon silhouette';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'silver chain jewelry reflecting neon colors'
+        : 'silver chain jewelry reflecting neon colors';
+
+      return `STYLE: Modern edgy fashion portrait with color gel lighting
+
+LIGHTING:
+Creative color gel lighting
+One side cool blue light
+Other side warm magenta/red light
+${jewelryPlacement}
+
+MODEL:
+${genderDesc}
+${faceDesc}
+
+BACKGROUND:
+Dark
+
+MOOD:
+Cinematic
+Cyber-inspired
+Futuristic
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Reflecting neon colors
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Natural lighting
+Warm only tones
+Vintage look
+
+OUTPUT: Neon gel. Cyberpunk split. Futuristic edge.`;
+    },
+  },
+
+  'magazine-cafe-luxury': {
+    name: 'Magazine Cafe Luxury',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'sophisticated, reading' : 'hands prominent';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'multiple diamond bands and gold rings on hand turning page'
+        : 'elegant jewelry visible while reading';
+
+      return `STYLE: Sophisticated lifestyle shot
+
+SCENE:
+${genderDesc} reading high-end fashion magazine
+Sunlit cafe setting
+Camera focuses on hand gently turning page
+
+JEWELRY:
+${jewelryPlacement}
+${jewelryType}
+ONLY the specified jewelry
+
+LIGHTING:
+Bright and natural
+Golden hour quality
+
+PROPS:
+Croissant and sunglasses on table (out of focus)
+
+LIFESTYLE:
+Leisure and luxury message
+
+EXPRESSION:
+${faceDesc}
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Dark room
+Messy table
+Focus on text
+
+OUTPUT: Magazine cafe. Leisure luxury. Sophisticated lifestyle.`;
+    },
+  },
+
+  'parisian-window-gaze': {
+    name: 'Parisian Window Gaze',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'looking out at street, chin on hand' : 'contemplative silhouette';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'gold rings on hand near face'
+        : 'gold hoop earrings and pendant necklace';
+
+      return `STYLE: Dreamy lifestyle portrait
+
+SCENE:
+${genderDesc} sitting by window
+Parisian-style cafe
+${faceDesc}
+Faint reflection in glass visible
+
+EXTERIOR:
+City street bright but blurry
+
+LIGHTING:
+Soft natural light
+Illuminating face and jewelry
+
+JEWELRY:
+${jewelryPlacement}
+${jewelryType}
+ONLY the specified jewelry
+
+MOOD:
+Dreamy
+Romantic
+European
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Dirty window
+Looking at camera
+Dark interior
+
+OUTPUT: Parisian window. Dreamy gaze. Romantic reflection.`;
+    },
+  },
+
+  'city-motion-blur': {
+    name: 'City Motion Blur',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'looking confidently ahead' : 'sharp silhouette in motion';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'jewelry visible on hands'
+        : 'large gold hoop earrings catching light';
+
+      return `STYLE: Dynamic lifestyle shot
+
+SCENE:
+Stylish ${genderDesc} walking down busy high-end city street
+NYC or Paris aesthetic
+
+EFFECT:
+Background has motion blur (cars, people, buildings)
+Emphasizes speed of city
+Model sharp and in focus
+
+STYLING:
+Beige trench coat
+${faceDesc}
+
+LIGHTING:
+Natural daylight on face
+
+JEWELRY:
+${jewelryPlacement}
+${jewelryType}
+ONLY the specified jewelry
+
+VIBE:
+Woman/man on a mission
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Static background
+Indoor setting
+Casual pose
+
+OUTPUT: City motion. Blur energy. Confident mission.`;
+    },
+  },
+
+  'kinfolk-window-seat': {
+    name: 'Kinfolk Window Seat',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'looking out window, lost in thought' : 'peaceful presence';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'delicate gold rings while touching necklace or resting chin'
+        : 'delicate gold necklace being touched';
+
+      return `STYLE: Serene candid lifestyle shot
+
+SCENE:
+${genderDesc} sitting in cozy window seat at home
+Soft beige knit sweater
+${faceDesc}
+
+LIGHTING:
+Soft diffused daylight (cloudy day vibe)
+Muted low-contrast color palette
+Creams, warm woods, soft greys
+
+GESTURE:
+Absent-mindedly touching jewelry
+Or resting chin on hand
+
+JEWELRY:
+${jewelryPlacement}
+${jewelryType}
+ONLY the specified jewelry
+
+MOOD:
+Quiet
+Introverted
+Peaceful
+Kinfolk aesthetic
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Bright colors
+Busy background
+Posed look
+
+OUTPUT: Kinfolk cozy. Window seat. Quiet peace.`;
+    },
+  },
+
+  'art-gallery-contemplation': {
+    name: 'Art Gallery Contemplation',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'looking at art, slightly turned' : 'back view, ear visible';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'minimalist jewelry on hands'
+        : 'earrings visible, elegant posture';
+
+      return `STYLE: Sophisticated quiet lifestyle portrait
+
+SCENE:
+${genderDesc} wandering in art gallery
+Standing before large blurry abstract painting
+Muted colors in artwork
+${faceDesc}
+
+STYLING:
+Minimalist outfit
+
+FOCUS:
+Ear with earrings
+Elegant posture
+
+ATMOSPHERE:
+Intellectual
+Calm
+Culturally rich
+Soft acoustic feeling
+
+JEWELRY:
+${jewelryPlacement}
+${jewelryType}
+ONLY the specified jewelry
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Looking at camera
+Busy gallery
+Bright artwork
+
+OUTPUT: Art gallery. Intellectual calm. Cultural sophistication.`;
+    },
+  },
+
+  'greenhouse-garden': {
+    name: 'Greenhouse Garden',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'gentle expression, touching leaf' : 'organic presence';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'gold jewelry on hands adjusting hair or touching leaf'
+        : 'gold jewelry standing out against muted greens';
+
+      return `STYLE: Gentle lifestyle shot
+
+SCENE:
+Inside greenhouse or quiet garden corner
+${genderDesc} surrounded by soft blurred green foliage
+
+LIGHTING:
+Overcast and diffused
+Avoiding harsh sun spots
+
+GESTURE:
+Gently touching leaf
+Or adjusting hair
+${faceDesc}
+
+JEWELRY:
+${jewelryPlacement}
+${jewelryType}
+ONLY the specified jewelry
+Subtle against organic greens
+
+FEEL:
+Fresh but calm
+High-quality natural textures
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Harsh sunlight
+Cluttered plants
+Indoor studio feel
+
+OUTPUT: Greenhouse organic. Fresh calm. Natural texture.`;
+    },
+  },
+
+  'lazy-morning-bed': {
+    name: 'Lazy Morning Bed',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'natural, unstyled' : 'relaxed presence';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'simple rings on hand near neck'
+        : 'gold necklace and simple rings';
+
+      return `STYLE: Candid intimate lifestyle shot
+
+SCENE:
+${genderDesc} lounging in bed or soft sofa
+Late morning
+Simple white ribbed tank top or oversized t-shirt
+Messy bun, natural unstyled hair
+
+GESTURE:
+Stretching arms
+Or resting hand on neck
+
+LIGHTING:
+Soft diffused window light
+Palette of whites, greys, skin tones
+No bright colors
+
+JEWELRY:
+${jewelryPlacement}
+${jewelryType}
+ONLY the specified jewelry
+
+MOOD:
+Lazy
+Quiet
+Real
+${faceDesc}
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Styled hair
+Bright colors
+Posed look
+
+OUTPUT: Lazy morning. Intimate real. Quiet authenticity.`;
+    },
+  },
+
+  'quiet-street-candid': {
+    name: 'Quiet Street Candid',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'checking phone or looking in bag' : 'everyday moment';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'ear stack and rings catching sunlight'
+        : 'ear stack and jewelry natural in daylight';
+
+      return `STYLE: Candid street style shot
+
+SCENE:
+${genderDesc} waiting on quiet sidewalk or crossing street
+Dressed casually in denim and beige trench coat
+Canvas tote bag on shoulder
+${faceDesc}
+
+BACKGROUND:
+Blurry city street with neutral colors
+Concrete, stone
+No bright neon signs or traffic
+Natural everyday urban moment
+
+LIGHTING:
+Sunlight hits jewelry naturally
+
+JEWELRY:
+${jewelryPlacement}
+${jewelryType}
+ONLY the specified jewelry
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Posed look
+Bright neon
+Busy traffic
+
+OUTPUT: Quiet street. Candid moment. Natural urban.`;
+    },
+  },
+
+  'entryway-getting-ready': {
+    name: 'Entryway Getting Ready',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'looking in mirror or down' : 'daily routine moment';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'jewelry as daily essential'
+        : 'jewelry as part of essential outfit';
+
+      return `STYLE: Lifestyle shot captured in entryway
+
+SCENE:
+${genderDesc} in entryway or hallway
+Putting on coat or adjusting scarf
+Getting ready to leave
+${faceDesc}
+Mirror showing reflection or looking down
+
+LIGHTING:
+Soft interior light
+
+COLORS:
+Muted tones of hallway
+
+FOCUS:
+${jewelryPlacement}
+Daily essential outfit piece
+
+ATMOSPHERE:
+Unposed
+Slice-of-life
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Bright studio light
+Posed look
+Cluttered hallway
+
+OUTPUT: Entryway routine. Daily essential. Slice-of-life.`;
+    },
+  },
+
+  'collarbone-intimate-macro': {
+    name: 'Collarbone Intimate Macro',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male' : 'female';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'delicate gold jewelry near collarbone area'
+        : 'delicate gold chain necklace resting on skin';
+
+      return `STYLE: Hyper-realistic close-up crop
+
+COMPOSITION:
+${genderDesc} collarbone (clavicle) area
+No face visible
+${jewelryPlacement}
+
+FOCUS:
+Strictly on skin texture
+Pores, natural moles, fine vellus hair
+Metal jewelry detail
+
+LIGHTING:
+Soft directional window light
+Gentle highlights on bone structure
+
+MOOD:
+Intimate
+Quiet
+Raw
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Face visible
+Smooth skin
+Studio flash
+
+OUTPUT: Collarbone macro. Intimate texture. Raw detail.`;
+    },
+  },
+
+  'ear-hairline-stolen': {
+    name: 'Ear Hairline Stolen',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male' : 'female';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'jewelry visible on hands near ear'
+        : 'stack of gold hoop earrings revealed';
+
+      return `STYLE: Detailed macro shot
+
+COMPOSITION:
+${genderDesc} ear and hairline from side/back
+Dark hair loosely tucked behind ear
+${jewelryPlacement}
+
+FOCUS:
+Texture of hair
+Skin behind ear
+
+BACKGROUND:
+Blurry neutral wall
+
+LIGHTING:
+Soft and warm
+
+FEEL:
+Stolen glance
+No posing
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Face visible
+Posed look
+Sharp background
+
+OUTPUT: Ear hairline. Stolen glance. Intimate detail.`;
+    },
+  },
+
+  'kodak-portra-motion': {
+    name: 'Kodak Portra Motion',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'laughing and turning head' : 'motion energy';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'gold jewelry catching light in motion'
+        : 'gold hoop earrings catching light';
+
+      return `STYLE: Candid slightly motion-blurred lifestyle shot
+
+AESTHETIC:
+Vintage 35mm film photography
+Kodak Portra 400 style
+Visible film grain
+
+SCENE:
+${genderDesc} on city street
+${faceDesc}
+
+EFFECT:
+Not perfectly sharp
+Spontaneous, energetic
+Full of life
+
+COLORS:
+Warm nostalgic
+
+JEWELRY:
+${jewelryPlacement}
+${jewelryType}
+ONLY the specified jewelry
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Digital sharpness
+Static pose
+Cold colors
+
+OUTPUT: Kodak Portra. Motion blur. Nostalgic energy.`;
+    },
+  },
+
+  'blue-hour-flash': {
+    name: 'Blue Hour Flash',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'raw real skin texture' : 'flash illuminated';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'layered gold jewelry catching flash'
+        : 'layered gold necklaces illuminated by flash';
+
+      return `STYLE: Trendy direct flash photography
+
+TIME:
+Dusk (blue hour)
+Balcony or rooftop
+
+BACKGROUND:
+Dark blue city skyline
+
+LIGHTING:
+Harsh direct flash
+Illuminates face and jewelry
+Strong contrast
+Shadows behind subject
+
+AESTHETIC:
+Raw, unpolished
+Modern social media style
+${faceDesc}
+No smoothing
+
+MODEL:
+${genderDesc}
+
+JEWELRY:
+${jewelryPlacement}
+${jewelryType}
+ONLY the specified jewelry
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Soft lighting
+Retouched skin
+Daytime
+
+OUTPUT: Blue hour. Direct flash. Raw modern.`;
+    },
+  },
+
+  'summer-light-leak': {
+    name: 'Summer Light Leak',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'dreamy expression' : 'soft romantic presence';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'delicate rings on fingers'
+        : 'delicate jewelry in soft light';
+
+      return `STYLE: Dreamy sun-drenched portrait
+
+SCENE:
+${genderDesc} in a park
+Light leaks and vintage lens flares
+Orange and red hues overlaying image
+
+AESTHETIC:
+Retro disposable camera vibe
+
+FOCUS:
+Soft and romantic
+
+FEEL:
+Memory from summer holiday
+${faceDesc}
+
+JEWELRY:
+${jewelryPlacement}
+${jewelryType}
+ONLY the specified jewelry
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Sharp digital
+Cold colors
+Studio setting
+
+OUTPUT: Summer light leak. Retro memory. Romantic soft.`;
+    },
+  },
+
+  'friends-bench-laughter': {
+    name: 'Friends Bench Laughter',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'two male friends' : 'two female friends';
+      const faceDesc = showFace === 'show' ? 'laughing naturally' : 'joyful moment';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'matching or complementary stacked rings'
+        : 'matching or complementary earrings';
+
+      return `STYLE: Joyful candid shot
+
+SCENE:
+${genderDesc} sitting close together on bench
+${faceDesc}
+Leaning into each other
+
+JEWELRY:
+${jewelryPlacement}
+Both wearing matching/complementary jewelry
+${jewelryType}
+ONLY the specified jewelry
+
+VIBE:
+Authentic friendship
+Happiness
+Captured private joke
+
+LIGHTING:
+Sunlight
+Natural texture
+
+STYLING:
+Casual clothes
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Posed look
+Single model
+Sad expression
+
+OUTPUT: Friends bench. Natural laughter. Authentic joy.`;
+    },
+  },
+
+  'rain-window-moody': {
+    name: 'Rain Window Moody',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'looking out through rain' : 'contemplative silhouette';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'gold jewelry in warm interior light'
+        : 'gold earrings highlighted by warm light';
+
+      return `STYLE: Moody lifestyle portrait
+
+TECHNIQUE:
+Shot through glass window covered in rain droplets
+${genderDesc} inside looking out
+${faceDesc}
+
+EXTERIOR:
+Grey and blurry outside
+
+INTERIOR:
+Warm light highlights face and jewelry
+${jewelryPlacement}
+
+TEXTURE:
+Rain on glass adds depth and emotion
+
+MOOD:
+Cinematic
+Emotional
+Quiet
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Clear window
+Bright exterior
+Happy expression
+
+OUTPUT: Rain window. Moody depth. Cinematic emotion.`;
+    },
+  },
+
+  'windy-desaturated-drama': {
+    name: 'Windy Desaturated Drama',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'sweeping hair away' : 'dynamic motion';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'large statement ring and jewelry revealed by gesture'
+        : 'large statement ring and earrings revealed';
+
+      return `STYLE: Dynamic black and white or desaturated portrait
+
+WEATHER:
+Windy day
+Hair blowing across face
+Sense of movement
+
+GESTURE:
+${genderDesc} using hand to sweep hair away
+${faceDesc}
+Revealing jewelry
+
+JEWELRY:
+${jewelryPlacement}
+${jewelryType}
+ONLY the specified jewelry
+
+AESTHETIC:
+High contrast
+Fashion editorial style
+
+TECHNICAL:
+Black and white or desaturated color
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Static calm
+Color saturation
+Indoor setting
+
+OUTPUT: Windy drama. Desaturated motion. Editorial sweep.`;
+    },
+  },
+
+  'train-window-reflection': {
+    name: 'Train Window Reflection',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'resting head against glass' : 'silhouette reflection';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'gold jewelry with faint reflection'
+        : 'gold hoop earrings doubled in reflection';
+
+      return `STYLE: Cinematic lifestyle shot
+
+SCENE:
+${genderDesc} looking out of train window or ferry
+${faceDesc}
+
+EXTERIOR:
+Landscape is blurred streak of greens and greys
+Motion blur outside
+
+REFLECTION:
+Faintly visible in window
+Doubling view of jewelry
+${jewelryPlacement}
+
+LIGHTING:
+Soft overcast daylight
+
+MOOD:
+Introspective
+Solitary
+Travel-inspired
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Static background
+Bright direct sun
+No reflection
+
+OUTPUT: Train window. Motion blur. Introspective travel.`;
+    },
+  },
+
+  'unclasp-mirror-evening': {
+    name: 'Unclasp Mirror Evening',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male' : 'female';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'removing bracelet or ring'
+        : 'unclasping gold chain necklace';
+
+      return `STYLE: Intimate behind-the-scenes shot
+
+SCENE:
+${genderDesc} standing before mirror
+Only back and reflection visible (or just back)
+Arms raised, hands behind neck
+${jewelryPlacement}
+End of the day moment
+
+LIGHTING:
+Warm, dim
+Bedroom lamp atmosphere
+
+FOCUS:
+Hands and necklace clasp
+
+TEXTURE:
+Soft, grainy
+Realistic skin texture
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Face visible
+Bright light
+Morning setting
+
+OUTPUT: Unclasp mirror. Evening intimate. End of day.`;
+    },
+  },
+
+  'sleeve-cuff-reveal': {
+    name: 'Sleeve Cuff Reveal',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male' : 'female';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'stack of gold bangles and watch revealed'
+        : 'gold jewelry revealed by sleeve';
+
+      return `STYLE: Detailed lifestyle crop
+
+SCENE:
+${genderDesc} adjusting cuff of crisp white oversized shirt
+Or beige trench coat sleeve
+As sleeve is pulled, jewelry revealed
+
+COMPOSITION:
+No face needed
+Focus on interaction between fabric and jewelry
+${jewelryPlacement}
+
+LIGHTING:
+Bright and clean
+
+AESTHETIC:
+Fashion detail shot
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Face visible
+Wrinkled fabric
+Dark setting
+
+OUTPUT: Sleeve cuff. Jewelry reveal. Fashion detail.`;
+    },
+  },
+
+  'scarf-winter-reveal': {
+    name: 'Scarf Winter Reveal',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'natural expression' : 'hands prominent';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'rings on hand near neck'
+        : 'pendant necklace revealed underneath';
+
+      return `STYLE: Candid shot
+
+SCENE:
+${genderDesc} loosening wool scarf
+Or adjusting collar of coat
+Hand near neck showcasing jewelry
+Movement reveals pendant
+
+TEXTURE:
+Mix of heavy winter wool
+Delicate gold
+
+BACKGROUND:
+Blurred city cafe or street
+
+MOOD:
+Natural unposed moment
+${faceDesc}
+
+JEWELRY:
+${jewelryPlacement}
+${jewelryType}
+ONLY the specified jewelry
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Summer setting
+Staged pose
+No texture contrast
+
+OUTPUT: Scarf winter. Pendant reveal. Texture contrast.`;
+    },
+  },
+
+  'editorial-penthouse-bokeh': {
+    name: 'Editorial Penthouse Bokeh',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'sophisticated pose, hand near face' : 'elegant hand pose';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'ring on finger, hand near face or chin'
+        : 'jewelry with elegant hand gesture';
+
+      return `STYLE: High-end editorial portrait
+
+POSE:
+${genderDesc} gracefully showcasing jewelry
+${faceDesc}
+Hand gently raised near face or resting on chin
+Fingers elongated and elegant
+
+SKIN:
+Flawless natural texture
+Visible pores
+
+LIGHTING:
+Cinematic masterful blend
+Soft diffused studio light sculpting features
+Precise accent lighting for brilliant specular highlights
+Intense sparkle on gemstone and metal
+
+CAMERA:
+Medium format
+Extremely shallow depth of field
+Jewelry tack sharp
+
+BACKGROUND:
+Luxurious heavily blurred bokeh interior
+Warm muted tones
+Opulent penthouse suggestion
+
+JEWELRY:
+${jewelryPlacement}
+${jewelryType}
+ONLY the specified jewelry
+Rich textures, ultra-detailed
+
+TECHNICAL:
+8K resolution
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Deformed hands
+Extra fingers
+Flat lighting
+Cheap imagery
+
+OUTPUT: Editorial penthouse. Bokeh luxury. Specular brilliance.`;
+    },
+  },
+
+  'faint-smile-editorial': {
+    name: 'Faint Smile Editorial',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'faint polite smile' : 'elegant presence';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'ring on finger near chin'
+        : 'jewelry with subtle expression';
+
+      return `STYLE: High-end editorial close-up portrait
+
+EXPRESSION:
+${genderDesc} with ${faceDesc}
+Hand gracefully raised near chin
+Showcasing jewelry
+
+SKIN:
+Ultra-realistic
+Visible pores
+Natural vellus hair
+
+LIGHTING:
+Cinematic studio quality
+Soft directional light sculpts face and hand
+Physically correct reflections on metal
+No artificial flares
+
+CAMERA:
+Medium format
+Macro lens
+Shallow depth of field
+
+BACKGROUND:
+Blurry warm luxury interior
+
+JEWELRY:
+${jewelryPlacement}
+${jewelryType}
+ONLY the specified jewelry
+
+TECHNICAL:
+8K resolution
+Raw photography style
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Artificial sparkles
+Fake lens flare
+Deformed hands
+Airbrushed skin
+
+OUTPUT: Faint smile. Editorial macro. Natural reflections.`;
+    },
+  },
+
+  'smooth-skin-editorial': {
+    name: 'Smooth Skin Editorial',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'soft subtle smile, gentle gaze' : 'elegant presence';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'ring on elongated elegant fingers near jawline'
+        : 'jewelry with sophisticated hand pose';
+
+      return `STYLE: High-end editorial portrait
+
+POSE:
+${genderDesc} gracefully showcasing jewelry
+Sophisticated pose
+Hand gently resting near jawline or cheek
+Fingers elongated and elegant
+Manicured nails
+
+EXPRESSION:
+${faceDesc}
+
+SKIN:
+Flawless, completely hairless, smooth
+No peach fuzz
+
+LIGHTING:
+Cinematic masterful blend
+Soft diffused studio light
+Precise accent lighting for real specular highlights
+
+CAMERA:
+Medium format
+Extremely shallow depth of field
+Jewelry tack sharp
+
+BACKGROUND:
+Luxurious heavily blurred bokeh interior
+Warm muted tones
+Opulent penthouse
+
+JEWELRY:
+${jewelryPlacement}
+${jewelryType}
+ONLY the specified jewelry
+Rich textures, ultra-detailed
+
+TECHNICAL:
+8K resolution
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Facial hair
+Peach fuzz
+Body hair
+Visible pores with hair
+Artificial lens flare
+
+OUTPUT: Smooth skin. Editorial elegance. Penthouse bokeh.`;
+    },
+  },
 };
