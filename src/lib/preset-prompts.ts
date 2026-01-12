@@ -7089,4 +7089,469 @@ Painting, CGI render
 OUTPUT: Derma detail. Goosebumps. Micro-texture. Hyper-realistic skin.`;
     },
   },
+
+  'natural-50mm': {
+    name: 'Natural 50mm',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Natural studio portrait. Shot on 50mm lens, medium shot of a ${genderText} looking at camera with a gentle smile, hands resting near face, wearing ${jewelryType}. Pure white background.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+50MM NATURAL:
+50mm lens - natural perspective
+Medium shot framing
+Hands resting near face
+Authentic, approachable feel
+Realistic proportions
+
+EXPRESSION:
+Gentle smile
+Looking at camera
+Warm, inviting
+Natural connection
+
+LIGHTING:
+Hard daylight simulation
+Pure white background
+Sharp but natural
+Studio controlled
+
+POSE:
+Hands near face
+Natural, relaxed
+Not stiff or forced
+Approachable
+
+JEWELRY:
+${jewelryType} sharp detail
+ONLY the specified jewelry
+Natural presentation
+Authentic showcase
+
+TECHNICAL:
+50mm lens equivalent
+Natural perspective
+Approachable mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Wide angle distortion
+Extreme telephoto compression
+Dramatic angles
+Fake, forced poses
+Heavy retouching
+
+OUTPUT: Natural 50mm. Gentle smile. Hands near face. Approachable authenticity.`;
+    },
+  },
+
+  'crows-feet-joy': {
+    name: 'Crows Feet Joy',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Close-up portrait of a ${genderText} laughing hysterically, eyes squinted shut from joy, wearing ${jewelryType}. Direct hard studio flash simulating sunlight.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+AUTHENTIC EXPRESSION:
+Laughing hysterically
+Eyes squinted shut from joy
+Distinct crow's feet visible
+Expression lines around eyes
+Real, unfiltered emotion
+
+SKIN DETAIL:
+Sharp skin texture
+Visible pores on nose and cheeks
+Natural lines and wrinkles
+Real human appearance
+Not smoothed or airbrushed
+
+TEETH:
+Natural teeth texture visible
+Not artificially whitened
+Real, authentic smile
+Genuine expression
+
+LIGHTING:
+Direct hard studio flash
+Simulating bright sunlight
+White background
+Energetic, raw quality
+
+JEWELRY:
+${jewelryType} sharp focus
+ONLY the specified jewelry
+Catching flash light
+Joyful showcase
+
+TECHNICAL:
+Shot on 85mm lens equivalent
+Close-up perspective
+Energetic, raw mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Plastic, airbrushed skin
+Smooth, botox appearance
+Blurry, soft focus
+Flat lighting
+Illustration style
+
+OUTPUT: Crows feet joy. Hysterical laughter. Expression lines. Raw authentic.`;
+    },
+  },
+
+  'duo-friends': {
+    name: 'Duo Friends',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'female' : gender === 'men' ? 'male' : '';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Commercial studio photography. Two ${genderText} models standing cheek-to-cheek laughing, both wearing ${jewelryType}. Hard high-key lighting with pure white background.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+DUO COMPOSITION:
+Two models cheek-to-cheek
+Laughing together
+Genuine friendship vibe
+Warm connection
+Intimate moment
+
+SKIN CONTRAST:
+Contrasting skin tones
+Different textures visible
+Visible vellus hair where faces touch
+Real human interaction
+Authentic contact
+
+LIGHTING:
+Hard high-key lighting
+Sharp shadows between faces
+Pure white background
+Commercial quality
+Detailed illumination
+
+EXPRESSION:
+Genuine laughter
+Real friendship energy
+Not posed or stiff
+Authentic joy
+
+JEWELRY:
+Both wearing ${jewelryType}
+ONLY the specified jewelry
+Sharp focus on all pieces
+Friendship showcase
+
+SKIN:
+Extremely detailed texture
+Real, not wax figures
+Not identical faces
+Individual beauty
+
+TECHNICAL:
+Shot on Hasselblad equivalent
+Commercial studio quality
+Friendship mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Wax figures, mannequins
+Identical faces
+Smooth, plastic skin
+Blurry jewelry
+Soft focus
+
+OUTPUT: Duo friends. Cheek-to-cheek. Genuine laughter. Friendship bond.`;
+    },
+  },
+
+  'hair-strand-shadow': {
+    name: 'Hair Strand Shadow',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Dynamic fashion portrait. ${genderText === 'woman' ? 'Woman' : 'Model'} looking at camera with wind blowing hair across face, wearing ${jewelryType}. Hard direct lighting casting sharp, thin shadows of hair strands onto skin.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+HAIR STRAND SHADOWS:
+Wind blowing hair across face
+Sharp thin shadows of hair on skin
+Hard direct lighting creates effect
+Dynamic, windswept moment
+Creative shadow pattern
+
+SKIN TEXTURE:
+Porous, realistic under harsh light
+Detailed, not smoothed
+Natural imperfections visible
+Real human quality
+
+EXPRESSION:
+Confident expression
+Looking at camera
+Dynamic, powerful
+Fashion-forward
+
+LIGHTING:
+Hard direct lighting
+Sharp shadow definition
+White background
+High contrast
+
+COMPOSITION:
+Creative shadow interplay
+Hair as design element
+Dynamic framing
+Editorial quality
+
+JEWELRY:
+${jewelryType} visible through hair
+ONLY the specified jewelry
+Catching hard light
+Dynamic showcase
+
+TECHNICAL:
+Fashion photography
+High contrast
+Dynamic mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Floating, CGI hair
+Plastic skin
+Smooth, soft shadows
+Soft lighting
+Blur, painting style
+
+OUTPUT: Hair strand shadow. Wind blown. Sharp shadows. Dynamic fashion.`;
+    },
+  },
+
+  'wet-look-glam': {
+    name: 'Wet Look Glam',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Macro beauty shot. Extreme close-up of cheekbone and ear wearing ${jewelryType}. Model has "wet look" makeup with high-shine highlighter on cheekbones. Hard studio lighting reflecting off wet skin texture and jewelry.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+WET LOOK MAKEUP:
+High-shine highlighter on cheekbones
+Wet look, glossy appearance
+Reflective skin texture
+Dewy, luminous finish
+Glossy lips
+
+LIGHTING:
+Hard studio lighting
+Reflecting off wet texture
+Highlighting jewelry brilliance
+Commercial quality
+Sharp reflections
+
+SKIN DETAIL:
+Visible skin bumps and texture
+Not unnaturally smooth
+Real skin under gloss
+Hyper-realistic commercial
+
+JEWELRY:
+${jewelryType} reflecting light
+ONLY the specified jewelry
+Matching wet-look shine
+Glamorous showcase
+
+COMPOSITION:
+Extreme close-up
+Cheekbone and ear focus
+Macro perspective
+Editorial beauty
+
+TECHNICAL:
+Hyper-realistic commercial
+Macro beauty perspective
+Glamorous mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Matte skin
+Powder finish
+Plastic doll look
+Blurred reflections
+Softbox only
+Low resolution
+
+OUTPUT: Wet look glam. High-shine cheeks. Glossy finish. Macro glamour.`;
+    },
+  },
+
+  'peach-fuzz-rim': {
+    name: 'Peach Fuzz Rim',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+
+      return `Extreme macro portrait photography. Side profile of a ${genderText}'s jawline and neck wearing ${jewelryType}. Hard backlighting (rim light) highlighting fine vellus hair (peach fuzz) along jaw and neck skin.
+
+PEACH FUZZ REVEAL:
+Fine vellus hair illuminated
+Backlit rim lighting effect
+Peach fuzz along jawline and neck
+Visible hair texture
+Natural human detail
+
+PROFILE VIEW:
+Side profile perspective
+Jawline and neck focus
+Elegant silhouette
+Classic angle
+
+SKIN TEXTURE:
+Distinct pores visible
+Not smoothed or airbrushed
+Real skin quality
+Hyper-realistic dermatology
+
+LIGHTING:
+Hard backlighting (rim light)
+Highlighting fine hair
+Creating edge glow
+Pure white background
+
+JEWELRY:
+${jewelryType} against detailed skin
+ONLY the specified jewelry
+Sharp focus on metal
+Profile showcase
+
+TECHNICAL:
+Shot on Phase One IQ4 150MP equivalent
+Hyper-realistic detail
+Profile mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Plastic, airbrushed skin
+Blurry texture
+Soft, flat light
+Painting, CGI appearance
+
+OUTPUT: Peach fuzz rim. Backlit vellus. Profile detail. Hyper-realistic texture.`;
+    },
+  },
+
+  'tension-grip': {
+    name: 'Tension Grip',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+
+      return `Tight close-up studio shot. A ${genderText}'s hand gripping own neck/shoulder area near ${jewelryType}. Hard directional lighting showing tension in skin.
+
+TENSION & GRIP:
+Hand gripping neck or shoulder
+Tension visible in skin
+Near ${jewelryType}
+Dynamic, intense moment
+Physical presence
+
+HAND DETAIL:
+Visible veins on hand
+Natural wrinkles on knuckles
+Dry skin texture
+Realistic manicure
+Authentic hand appearance
+
+NECK/SHOULDER:
+Neck folds visible
+High-frequency skin details
+Real texture
+Tension creates interest
+
+LIGHTING:
+Hard directional lighting
+Showing skin tension
+Pure white background
+Raw camera capture quality
+
+JEWELRY:
+${jewelryType} near grip point
+ONLY the specified jewelry
+Tension showcasing jewelry
+Intense presentation
+
+SKIN:
+High-frequency details
+Dry, real texture
+Not smoothed
+Authentic human
+
+TECHNICAL:
+Tight close-up
+Raw capture quality
+Intense mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Smooth, rubber hands
+Mannequin appearance
+Fake nails
+Soft focus
+Overly edited
+
+OUTPUT: Tension grip. Hand on neck. Visible veins. Raw intensity.`;
+    },
+  },
 };
