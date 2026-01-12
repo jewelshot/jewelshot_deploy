@@ -98,6 +98,8 @@ export const joyExpression: PresetCategory = {
     createPreset('smiling-jawline', 'Smiling Jawline', 'Anonymous, gentle smile', 'joy-expression'),
     createPreset('sisterhood-contrast', 'Sisterhood Contrast', 'Two skin tones, trust', 'joy-expression'),
     createPreset('candid-laughter-duo', 'Candid Laughter Duo', 'Genuine laughing duo', 'joy-expression'),
+    createPreset('hair-flip-action', 'Hair Flip Action', 'Dynamic frozen motion', 'joy-expression'),
+    createPreset('wind-blown-reveal', 'Wind Blown Reveal', 'Editorial drama, jewelry visible', 'joy-expression'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -132,6 +134,10 @@ export const hardLightDrama: PresetCategory = {
     createPreset('brutalist-architecture', 'Brutalist Architecture', 'Concrete, geometric shadows', 'hard-light-drama'),
     createPreset('rim-light-mystery', 'Rim Light Mystery', 'Pitch black, diamond silhouette', 'hard-light-drama'),
     createPreset('lace-shadow-pattern', 'Lace Shadow Pattern', 'Shadow rhythm, fierce', 'hard-light-drama'),
+    createPreset('silhouette-rim-glow', 'Silhouette Rim Glow', 'Backlit edge, jewelry glow', 'hard-light-drama'),
+    createPreset('black-velvet-diamonds', 'Black Velvet Diamonds', 'Rembrandt, matte vs sparkle', 'hard-light-drama'),
+    createPreset('theatrical-spotlight', 'Theatrical Spotlight', 'Single spot, total darkness', 'hard-light-drama'),
+    createPreset('glossy-black-reflection', 'Glossy Black Reflection', 'Cool silver, modern', 'hard-light-drama'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -172,6 +178,9 @@ export const lifestyleCandid: PresetCategory = {
     createPreset('golden-hour-intimate', 'Golden Hour Intimate', 'Sun-kissed, Portra warmth', 'lifestyle-candid'),
     createPreset('champagne-satin-lying', 'Champagne Satin Lying', 'Silk luxury, intimate', 'lifestyle-candid'),
     createPreset('denim-gold-casual', 'Denim Gold Casual', 'Fresh youth, casual luxe', 'lifestyle-candid'),
+    createPreset('ear-tuck-reveal', 'Ear Tuck Reveal', 'Natural hair gesture', 'lifestyle-candid'),
+    createPreset('pendant-contemplation', 'Pendant Contemplation', 'Playing with pendant, thoughtful', 'lifestyle-candid'),
+    createPreset('pov-mirror-adjusting', 'POV Mirror Adjusting', 'Getting ready moment', 'lifestyle-candid'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -365,6 +374,11 @@ export const artisticSpecial: PresetCategory = {
     createPreset('diamond-ice-frozen', 'Diamond Ice Frozen', 'Crystal ice, cool luxury', 'artistic-special'),
     createPreset('freckles-emerald', 'Freckles Emerald', 'Natural beauty, gemstone pop', 'artistic-special'),
     createPreset('vitiligo-gold-pride', 'Vitiligo Gold Pride', 'Celebrating uniqueness', 'artistic-special'),
+    createPreset('totem-duo-vertical', 'Totem Duo Vertical', 'Two models, avant-garde', 'artistic-special'),
+    createPreset('blurred-foreground-frame', 'Blurred Foreground Frame', 'Dreamy depth, romantic', 'artistic-special'),
+    createPreset('light-leak-prism', 'Light Leak Prism', 'Rainbow flare, analog vibe', 'artistic-special'),
+    createPreset('soft-focus-90s', 'Soft Focus 90s', 'Diffusion filter, nostalgic', 'artistic-special'),
+    createPreset('pristine-no-makeup', 'Pristine No-Makeup', 'Fresh dewy, ultra-clean', 'artistic-special'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
