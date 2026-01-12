@@ -139,7 +139,8 @@ export function RightSidebar({ mode = 'studio', onGenerateWithPreset }: RightSid
         const prompt = legacyPreset.buildPrompt(
           jewelryType || 'ring',
           gender || undefined,
-          aspectRatio
+          aspectRatio,
+          showFace // Add showFace parameter
         );
         onGenerateWithPreset?.(prompt, aspectRatio, legacyPreset.name, presetId);
         return;
@@ -161,8 +162,18 @@ export function RightSidebar({ mode = 'studio', onGenerateWithPreset }: RightSid
     if (libraryPreset) {
       logger.info('RightSidebar: Found library preset:', presetId, libraryPreset.title, 'mode:', mode);
       
-      // BATCH MODE: Add preset directly without confirmation
-      if (mode === 'batch') {
+      // Build prompt dynamically if buildPrompt function exists
+      let prompt: string;
+      if (libraryPreset.buildPrompt) {
+        // Use dynamic buildPrompt with all generation settings
+        prompt = libraryPreset.buildPrompt({
+          jewelryType: jewelryType || 'ring',
+          gender: gender || 'women',
+          aspectRatio,
+          showFace,
+        });
+      } else if (libraryPreset.prompt) {
+        // Fallback to static prompt with settings header
         const settingsHeader = `[GENERATION SETTINGS]
 Gender: ${gender || 'not specified'}
 Jewelry Type: ${jewelryType || 'ring'}
@@ -171,26 +182,33 @@ Model Face: ${showFace === 'hide' ? 'HIDDEN (crop at neck/chin, NO face visible)
 
 [PROMPT]
 `;
-        let prompt = settingsHeader + (libraryPreset.prompt || '');
+        prompt = settingsHeader + libraryPreset.prompt;
         if (libraryPreset.negativePrompt) {
           prompt += `
 
 --no
 ${libraryPreset.negativePrompt}`;
         }
+      } else {
+        logger.error('RightSidebar: Library preset has no prompt or buildPrompt:', presetId);
+        return;
+      }
+      
+      // BATCH MODE: Add preset directly without confirmation
+      if (mode === 'batch') {
         onGenerateWithPreset?.(prompt, aspectRatio, libraryPreset.title, presetId);
         return;
       }
       
-      // STUDIO MODE: Show confirmation modal
+      // STUDIO MODE: Show confirmation modal with generated prompt
       setConfirmModal({
         show: true,
         presetName: libraryPreset.title,
         presetId,
         requiresModel: false, // Library presets don't require model
         isLibraryPreset: true,
-        libraryPrompt: libraryPreset.prompt,
-        libraryNegativePrompt: libraryPreset.negativePrompt,
+        libraryPrompt: prompt, // Use the dynamically built prompt
+        libraryNegativePrompt: undefined, // Already included in prompt if exists
       });
       return;
     }
@@ -213,28 +231,11 @@ ${libraryPreset.negativePrompt}`;
     let finalPrompt: string;
 
     if (confirmModal.isLibraryPreset) {
-      // Library preset - build prompt with generation settings header
-      const settingsHeader = `[GENERATION SETTINGS]
-Gender: ${gender || 'not specified'}
-Jewelry Type: ${finalJewelryType}
-Aspect Ratio: ${aspectRatio}
-Model Face: ${showFace === 'hide' ? 'HIDDEN (crop at neck/chin, NO face visible)' : 'VISIBLE (full model with face)'}
-
-[PROMPT]
-`;
-      finalPrompt = settingsHeader + (confirmModal.libraryPrompt || '');
-      
-      // Add negative prompt if exists
-      if (confirmModal.libraryNegativePrompt) {
-        finalPrompt += `
-
---no
-${confirmModal.libraryNegativePrompt}`;
-      }
-
-      logger.info('RightSidebar: Built library preset prompt with settings');
+      // Library preset - prompt already built in handlePresetSelect
+      finalPrompt = confirmModal.libraryPrompt || '';
+      logger.info('RightSidebar: Using pre-built library preset prompt');
     } else {
-      // Legacy preset - use buildPrompt method
+      // Legacy preset - use buildPrompt method with all settings including showFace
       const preset = presetPrompts[confirmModal.presetId];
       if (!preset) {
         logger.error('RightSidebar: Legacy preset not found during generation:', confirmModal.presetId);
@@ -245,7 +246,8 @@ ${confirmModal.libraryNegativePrompt}`;
       finalPrompt = preset.buildPrompt(
         finalJewelryType,
         gender || undefined,
-        aspectRatio
+        aspectRatio,
+        showFace // Include showFace parameter
       );
     }
 
