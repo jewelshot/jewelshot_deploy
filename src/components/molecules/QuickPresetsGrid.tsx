@@ -78,7 +78,17 @@ import {
   Activity,
   Scissors,
   SunSnow,
-  Undo2
+  Undo2,
+  MoveHorizontal,
+  Grip,
+  StretchHorizontal,
+  LayoutGrid,
+  Sunrise,
+  Palette as PaletteIcon,
+  Paintbrush,
+  Sparkles as SparklesIcon,
+  Waves,
+  Ribbon
 } from 'lucide-react';
 
 interface QuickPreset {
@@ -580,6 +590,76 @@ const QUICK_PRESETS: QuickPreset[] = [
     icon: Undo2,
     description: 'Spine elegance, rear view',
     color: 'text-pink-200',
+  },
+  {
+    id: 'hair-tuck',
+    name: 'Hair Tuck',
+    icon: MoveHorizontal,
+    description: 'Ear reveal, candid gesture',
+    color: 'text-amber-200',
+  },
+  {
+    id: 'cashmere-hand',
+    name: 'Cashmere Hand',
+    icon: Grip,
+    description: 'Cozy sweater, warm detail',
+    color: 'text-orange-100',
+  },
+  {
+    id: 'camisole-shoulder',
+    name: 'Camisole Shoulder',
+    icon: StretchHorizontal,
+    description: 'Spaghetti strap, morning light',
+    color: 'text-slate-100',
+  },
+  {
+    id: 'lap-hands',
+    name: 'Lap Hands',
+    icon: LayoutGrid,
+    description: 'High angle, linen calm',
+    color: 'text-amber-100',
+  },
+  {
+    id: 'sun-tilt',
+    name: 'Sun Tilt',
+    icon: Sunrise,
+    description: 'Eyes closed, peaceful bliss',
+    color: 'text-yellow-300',
+  },
+  {
+    id: 'glazed-tan',
+    name: 'Glazed Tan',
+    icon: PaletteIcon,
+    description: 'Golden hour, dewy skin',
+    color: 'text-amber-300',
+  },
+  {
+    id: 'nude-palette',
+    name: 'Nude Palette',
+    icon: Paintbrush,
+    description: 'Monochrome beige, calm',
+    color: 'text-stone-200',
+  },
+  {
+    id: 'leaf-shadows',
+    name: 'Leaf Shadows',
+    icon: SparklesIcon,
+    description: 'Dappled warmth, Kodak film',
+    color: 'text-lime-200',
+  },
+  {
+    id: 'dewy-macro',
+    name: 'Dewy Macro',
+    icon: Waves,
+    description: 'Hydrated sheen, close-up',
+    color: 'text-cyan-200',
+  },
+  {
+    id: 'silk-slip',
+    name: 'Silk Slip',
+    icon: Ribbon,
+    description: 'Champagne cowl, liquid silk',
+    color: 'text-yellow-100',
   },
 ];
 

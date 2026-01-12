@@ -4872,4 +4872,701 @@ Plastic skin
 OUTPUT: Back necklace. Spine elegance. Rear view. Sensual simplicity.`;
     },
   },
+
+  'hair-tuck': {
+    name: 'Hair Tuck',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Candid close up. A ${genderText} tucking hair behind ear with hand, revealing ${jewelryType}. Focus on the ear and hand.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+CANDID MOMENT:
+Tucking hair behind ear
+Hand in natural movement
+Revealing ${jewelryType}
+Authentic, unposed gesture
+Genuine moment captured
+
+FOCUS:
+Ear and hand area
+${jewelryType} being revealed
+Natural movement
+Sharp on jewelry
+
+LIGHTING:
+Soft side lighting
+Blurry neutral background
+Natural, flattering illumination
+No harsh shadows
+
+STYLING:
+Messy natural hair texture
+Not perfectly styled
+${genderText === 'woman' ? 'No heavy makeup' : 'Natural grooming'}
+Authentic appearance
+
+SKIN:
+Visible pores on cheek
+Natural skin texture
+Real, human quality
+Not airbrushed
+
+JEWELRY:
+${jewelryType} revealed by gesture
+ONLY the specified jewelry
+Catching soft light
+Natural showcase
+
+TECHNICAL:
+Shot on Fujifilm X100V equivalent
+Candid perspective
+Unposed look
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Looking at camera
+Forced smile
+Perfect hair
+Stiff hand pose
+Mannequin appearance
+Heavy makeup
+Sharp studio light
+Neon, dark settings
+
+OUTPUT: Hair tuck. Ear reveal. Candid gesture. Authentic moment.`;
+    },
+  },
+
+  'cashmere-hand': {
+    name: 'Cashmere Hand',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      return `Close up detail photography. A woman's hand resting on a soft beige surface, wearing a beige ribbed cashmere sweater with sleeves slightly pulled up, revealing ${jewelryType} on wrist and fingers.
+
+HAND DETAIL:
+Hand resting elegantly on soft surface
+Wrist and fingers visible
+${jewelryType} prominently displayed
+Relaxed, natural position
+
+CASHMERE STYLING:
+Beige ribbed cashmere sweater
+Sleeves slightly pulled up
+Soft tactile texture
+Cozy, luxurious fabric
+
+COLOR PALETTE:
+Neutral tones throughout
+Beige, cream, soft brown
+Warm, harmonious
+Cozy atmosphere
+
+LIGHTING:
+Cozy warm daylight
+Soft, inviting illumination
+Natural quality
+Gentle shadows
+
+SKIN & HANDS:
+Natural manicure (clean, not fake)
+Authentic skin texture
+Veins visible on hand
+Real, human details
+
+JEWELRY:
+${jewelryType} on wrist and/or fingers
+ONLY the specified jewelry
+Warm light on metal
+Elegant, simple showcase
+
+TECHNICAL:
+Shot on 50mm lens equivalent
+Detail perspective
+Cozy mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Denim, leather
+Dark colors
+Busy patterns
+Face, full body
+Messy setting
+Plastic skin
+Fake nails
+
+OUTPUT: Cashmere hand. Soft beige. Cozy detail. Warm luxury.`;
+    },
+  },
+
+  'camisole-shoulder': {
+    name: 'Camisole Shoulder',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      return `Minimalist portrait detail. Close up of a woman's shoulder and neck area, wearing a simple white camisole with thin spaghetti straps, wearing ${jewelryType}.
+
+FRAMING:
+Shoulder and neck area focus
+Thin spaghetti straps visible
+Collarbone area prominent
+Face not the focus
+
+CAMISOLE STYLING:
+Simple white camisole
+Thin spaghetti straps
+Minimal, elegant
+Clean, fresh look
+
+LIGHTING:
+Soft morning light hitting the collarbone
+Gentle shadows
+Airy and fresh vibe
+Natural illumination
+
+BACKGROUND:
+Neutral cream background
+Clean, uncluttered
+Minimalist aesthetic
+No distractions
+
+SKIN:
+Clean skin texture
+Pores visible, authentic
+Natural, healthy appearance
+Real human quality
+
+JEWELRY:
+${jewelryType} as focal point
+ONLY the specified jewelry
+Focus strictly on jewelry and skin
+Sharp details
+
+TECHNICAL:
+Shot on Canon R5 equivalent
+Detail perspective
+Airy mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Heavy clothes, collars, jackets
+Messy hair in frame
+Dark room, night
+Studio strobe lighting
+Artificial appearance
+Heavy makeup
+
+OUTPUT: Camisole shoulder. Morning light. Collarbone detail. Airy fresh.`;
+    },
+  },
+
+  'lap-hands': {
+    name: 'Lap Hands',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+
+      return `High angle close up shot. A ${genderText}'s hands resting gently on lap, wearing ${jewelryType}. Wearing beige linen trousers, soft fabric texture.
+
+COMPOSITION:
+High angle perspective
+Hands on lap
+Relaxed, natural posture
+Calming, peaceful scene
+
+LAP & STYLING:
+Beige linen trousers
+Soft fabric texture visible
+Neutral tones
+Lifestyle aesthetic
+
+LIGHTING:
+Natural daylight
+Soft, even illumination
+Calming atmosphere
+Gentle shadows
+
+HANDS:
+Authentic hand details
+Knuckles, skin texture visible
+Natural, relaxed position
+Real human quality
+
+JEWELRY:
+${jewelryType} on hands
+ONLY the specified jewelry
+Daylight on metal
+Natural showcase
+
+MOOD:
+Calming atmosphere
+Lifestyle aesthetic
+Peaceful, relaxed
+Simple elegance
+
+TECHNICAL:
+Shot on 35mm lens equivalent
+High angle view
+Calm mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Awkward leg position
+Weird finger poses
+Dark colors
+Jeans, leather
+Studio background
+Face in shot
+
+OUTPUT: Lap hands. High angle. Linen texture. Calming lifestyle.`;
+    },
+  },
+
+  'sun-tilt': {
+    name: 'Sun Tilt',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Close up profile photography. A ${genderText} tilting head back slightly with eyes closed, enjoying the sun, wearing ${jewelryType}. Focus on the jawline and neck.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+SUN ENJOYMENT:
+Head tilted back slightly
+Eyes closed
+Enjoying warm sunlight
+Peaceful, blissful expression
+
+FOCUS:
+Jawline and neck area
+${jewelryType} prominent
+Profile perspective
+Natural beauty
+
+LIGHTING:
+Soft sunlight on face
+Warm, golden tones
+Blurred neutral background
+Natural illumination
+
+STYLING:
+${genderText === 'woman' ? 'Simple white crew neck t-shirt' : 'Simple, clean attire'}
+Minimal, clean
+No distracting elements
+Natural appearance
+
+SKIN:
+Natural skin texture
+Vellus hair on neck visible
+Real, authentic
+Warm light on skin
+
+JEWELRY:
+${jewelryType} catching sunlight
+ONLY the specified jewelry
+Minimal composition
+Peaceful showcase
+
+TECHNICAL:
+Profile perspective
+Natural light mastery
+Peaceful mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Looking at camera
+Heavy eye makeup
+Mouth open, teeth showing
+Busy background
+Dark shadows
+Flash photography
+Plastic skin
+
+OUTPUT: Sun tilt. Eyes closed. Jawline focus. Peaceful bliss.`;
+    },
+  },
+
+  'glazed-tan': {
+    name: 'Glazed Tan',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Aesthetic jewelry photography. Close up of a ${genderText} with sun-kissed tan skin wearing ${jewelryType}. Bathed in warm golden hour sunlight. Skin looks hydrated and glowy (glazed skin trend).
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+GLAZED SKIN TREND:
+Sun-kissed tan skin
+Hydrated, glowy appearance
+"Glazed donut" skin aesthetic
+Healthy, radiant complexion
+
+COLOR PALETTE:
+Monochromatic warm nude tones
+Beige, caramel, golden
+Warm throughout
+Harmonious color story
+
+LIGHTING:
+Warm golden hour sunlight
+Soft shadows
+Sun flare effects
+Natural glow
+
+STYLING:
+${genderText === 'woman' ? 'Simple beige tank top' : 'Simple, nude-toned attire'}
+Minimal, effortless
+Natural vibe
+No heavy styling
+
+SKIN:
+Distinct skin texture visible
+Glowing, healthy
+Natural tan
+Real, not filtered
+
+JEWELRY:
+${jewelryType} complementing warm tones
+ONLY the specified jewelry
+Golden light on metal
+Effortless showcase
+
+TECHNICAL:
+Shot on Canon R5 equivalent
+Golden hour mastery
+Sun flare included
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Cold tones, blue light
+Grey background
+Pale skin
+Studio strobe
+Heavy makeup, lipstick
+Messy background
+Cool colors
+
+OUTPUT: Glazed tan. Sun-kissed glow. Golden hour. Warm nude palette.`;
+    },
+  },
+
+  'nude-palette': {
+    name: 'Nude Palette',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Minimalist editorial photography. A ${genderText} wearing ${jewelryType}. Monochromatic nude color palette - shades of beige, camel, oatmeal throughout.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+MONOCHROMATIC PALETTE:
+Shades of beige, camel, oatmeal
+Consistent nude tones
+Warm, harmonious colors
+No contrasting elements
+
+STYLING:
+${genderText === 'woman' ? 'Ribbed knit top in dark beige' : 'Neutral toned knitwear'}
+Matching color story
+Minimal, refined
+Expensive aesthetic
+
+BACKGROUND:
+Warm textured plaster wall
+Matching nude tones
+Soft, minimal
+Architectural texture
+
+LIGHTING:
+Soft diffuse daylight
+Even, flattering illumination
+Calm atmosphere
+No harsh shadows
+
+MOOD:
+Calm and expensive
+Sophisticated minimalism
+Refined elegance
+Quiet luxury
+
+SKIN:
+Authentic skin texture
+Natural, real appearance
+No-makeup look
+Human quality
+
+JEWELRY:
+Sharp focus on ${jewelryType}
+ONLY the specified jewelry
+Complementing nude palette
+Understated showcase
+
+TECHNICAL:
+Shot on Sony A7R IV equivalent
+Editorial perspective
+Calm mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Contrasting colors
+Black, white, bright colors
+Neon, busy patterns
+Denim, blue, green
+Studio grey
+
+OUTPUT: Nude palette. Monochrome beige. Calm expensive. Editorial minimalism.`;
+    },
+  },
+
+  'leaf-shadows': {
+    name: 'Leaf Shadows',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+
+      return `Lifestyle portrait. Cropped shot of a ${genderText}'s neck and chest area wearing ${jewelryType}. Dappled sunlight filtering through leaves creating warm soft shadows on the skin.
+
+DAPPLED EFFECT:
+Sunlight filtering through leaves
+Warm soft shadows on skin
+Natural, organic pattern
+Summer atmosphere
+
+FOCUS:
+Neck and chest area
+${jewelryType} prominently displayed
+Glowing skin texture
+Aesthetic composition
+
+STYLING:
+${genderText === 'woman' ? 'Linen shirt in soft cream color, unbuttoned' : 'Light linen attire, open collar'}
+Relaxed, casual
+Warm earth tones
+Natural fabric
+
+LIGHTING:
+Dappled sunlight through leaves
+Warm golden quality
+Soft, organic shadows
+Summer feeling
+
+SKIN:
+Glowing skin texture
+Natural, healthy
+Sun-kissed warmth
+Authentic appearance
+
+FILM AESTHETIC:
+Kodak Portra 400 color palette
+Film grain texture
+Warm, nostalgic
+Analog feel
+
+JEWELRY:
+${jewelryType} catching leaf-filtered light
+ONLY the specified jewelry
+Organic light on metal
+Natural showcase
+
+AVOID:
+Hard black shadows
+Darkness, cold light
+Winter feeling
+Indoor studio
+Plain background
+Plastic skin
+Blurry jewelry
+
+OUTPUT: Leaf shadows. Dappled warmth. Summer aesthetic. Kodak Portra.`;
+    },
+  },
+
+  'dewy-macro': {
+    name: 'Dewy Macro',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      return `Macro beauty shot. Extreme close up of ${jewelryType} on a woman's skin. Skin appears dewy and hydrated with high sheen. Warm natural lighting reflecting off the skin and metal.
+
+DEWY SKIN AESTHETIC:
+Skin appears dewy, hydrated
+High sheen, glossy quality
+Fresh, healthy glow
+Natural moisture
+
+MACRO DETAIL:
+Extreme close-up of ${jewelryType} on skin
+Visible pores and vellus hair
+Natural moles or freckles
+Hyper-realistic texture
+
+LIGHTING:
+Warm natural lighting
+Reflecting off skin and metal
+Highlighting moisture
+Soft, flattering
+
+COLOR:
+Soft nude aesthetic
+Warm tones
+Natural skin color
+Harmonious palette
+
+COMPOSITION:
+Minimalist framing
+${jewelryType} and skin only
+Shallow depth of field
+Clean, focused
+
+SKIN AUTHENTICITY:
+Natural imperfections
+Real skin texture
+Moles, freckles welcome
+Human quality
+
+JEWELRY:
+${jewelryType} in sharp focus
+ONLY the specified jewelry
+Light dancing on metal
+Intimate showcase
+
+AVOID:
+Matte, dry skin
+Powder makeup
+Artificial blur
+Painting, illustration
+Cold colors
+Silver/grey background tones
+Studio lighting
+
+OUTPUT: Dewy macro. Hydrated sheen. Warm light. Hyper-realistic.`;
+    },
+  },
+
+  'silk-slip': {
+    name: 'Silk Slip',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Editorial jewelry photography. Close up of a ${genderText} wearing ${jewelryType}. Wearing a champagne-colored silk slip dress with a draped neckline (cowl neck). Fabric looks liquid and soft.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+SILK SLIP STYLING:
+Champagne-colored silk slip dress
+Cowl neck / draped neckline
+Fabric looks liquid and soft
+Luxurious, flowing material
+
+LIGHTING:
+Warm golden hour lighting
+Reflecting off silk and skin
+Highlighting fabric drape
+Elegant illumination
+
+SKIN:
+Sun-kissed tan skin
+Healthy, glowing
+Natural texture
+Warm tones
+
+FABRIC QUALITY:
+Liquid, soft appearance
+Champagne/gold color
+Luxurious drape
+Elegant movement
+
+MOOD:
+Elegant and expensive
+Sophisticated luxury
+Refined beauty
+High-end editorial
+
+JEWELRY:
+${jewelryType} complementing silk
+ONLY the specified jewelry
+Golden light on metal
+Luxurious showcase
+
+BACKGROUND:
+Soft focus
+Non-distracting
+Warm tones
+Elegant setting
+
+TECHNICAL:
+Shot on Canon R5 equivalent
+Editorial perspective
+Luxury mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Cotton, ribbed tank, t-shirt
+Stiff fabric, hard seams
+Cheap looking clothing
+Casual appearance
+Denim, grey tones
+
+OUTPUT: Silk slip. Champagne cowl. Liquid fabric. Golden luxury.`;
+    },
+  },
 };
