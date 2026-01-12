@@ -7,4 +7,4 @@
 
 export { translations, en, tr } from './translations';
 export type { Language, TranslationKeys, Translations } from './types';
-export { LanguageProvider, useLanguage } from './LanguageContext';
+export { LanguageProvider, useLanguage, AVAILABLE_LANGUAGES } from './LanguageContext';
