@@ -48,7 +48,17 @@ import {
   Armchair,
   CoffeeIcon,
   BedDouble,
-  FlipHorizontal
+  FlipHorizontal,
+  Soup,
+  Landmark,
+  Flower2,
+  BookOpen,
+  RectangleHorizontal,
+  CloudSun,
+  SunMedium,
+  Shirt,
+  UserCircle,
+  SunDim
 } from 'lucide-react';
 
 interface QuickPreset {
@@ -340,6 +350,76 @@ const QUICK_PRESETS: QuickPreset[] = [
     icon: FlipHorizontal,
     description: 'Vintage mirror, getting ready',
     color: 'text-pink-200',
+  },
+  {
+    id: 'cafe-cozy',
+    name: 'Cafe Cozy',
+    icon: Soup,
+    description: 'Ceramic cup, warm sweater',
+    color: 'text-amber-200',
+  },
+  {
+    id: 'stone-wall',
+    name: 'Stone Wall',
+    icon: Landmark,
+    description: 'Golden hour, Kodak warmth',
+    color: 'text-stone-400',
+  },
+  {
+    id: 'flower-walk',
+    name: 'Flower Walk',
+    icon: Flower2,
+    description: 'Candid bouquet, pastel tones',
+    color: 'text-pink-300',
+  },
+  {
+    id: 'book-corner',
+    name: 'Book Corner',
+    icon: BookOpen,
+    description: 'Sunlit reading, dust motes',
+    color: 'text-yellow-200',
+  },
+  {
+    id: 'plaster-wall',
+    name: 'Plaster Wall',
+    icon: RectangleHorizontal,
+    description: 'Beige texture, serene calm',
+    color: 'text-amber-100',
+  },
+  {
+    id: 'curtain-dreams',
+    name: 'Curtain Dreams',
+    icon: CloudSun,
+    description: 'Sheer shadows, ethereal',
+    color: 'text-sky-200',
+  },
+  {
+    id: 'pure-white',
+    name: 'Pure White',
+    icon: SunMedium,
+    description: 'High key, bright airy',
+    color: 'text-white',
+  },
+  {
+    id: 'monochrome-beige',
+    name: 'Monochrome Beige',
+    icon: Shirt,
+    description: 'Tan cream palette, calm',
+    color: 'text-orange-100',
+  },
+  {
+    id: 'gentle-profile',
+    name: 'Gentle Profile',
+    icon: UserCircle,
+    description: 'Back view, low bun, delicate',
+    color: 'text-rose-200',
+  },
+  {
+    id: 'shadow-play',
+    name: 'Shadow Play',
+    icon: SunDim,
+    description: 'Golden hour shadows, warm',
+    color: 'text-orange-300',
   },
 ];
 

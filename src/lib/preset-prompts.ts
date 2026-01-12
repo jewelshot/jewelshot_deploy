@@ -2915,4 +2915,643 @@ CGI appearance
 OUTPUT: Mirror reflection. Vintage frame. Getting ready moment. Intimate aesthetic.`;
     },
   },
+
+  'cafe-cozy': {
+    name: 'Cafe Cozy',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Candid lifestyle photography. A ${genderText} sitting in a quiet aesthetic cafe wearing ${jewelryType}, holding a warm textured ceramic cup with both hands near face.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+CAFE SETTING:
+Quiet aesthetic cafe atmosphere
+Warm textured ceramic cup as prop
+Blurred background of light wood
+Indoor plants in soft focus
+Cozy, inviting environment
+
+STYLING:
+${genderText === 'woman' ? 'Soft oversized beige knit sweater' : 'Comfortable casual knitwear'}
+Warm, cozy clothing
+Hands near face holding cup
+Relaxed, comfortable pose
+
+LIGHTING:
+Soft window light illuminating face and jewelry
+Natural, flattering illumination
+Warm, golden tones
+No harsh shadows
+
+SKIN & TEXTURE:
+Natural skin texture visible
+Authentic, not airbrushed
+Warm light enhancing skin
+Cozy, genuine appearance
+
+JEWELRY:
+${jewelryType} catching soft window light
+ONLY the specified jewelry
+Subtle, natural showcase
+Creamy bokeh around jewelry
+
+TECHNICAL:
+Shot on 50mm lens equivalent
+Creamy bokeh background
+Warm color palette
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Neon lights
+Dark room
+Flash photography
+Plastic skin texture
+Heavy makeup
+Studio lighting
+Night time setting
+
+OUTPUT: Cafe cozy. Warm ceramic. Window light. Creamy bokeh.`;
+    },
+  },
+
+  'stone-wall': {
+    name: 'Stone Wall',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Outdoor summer portrait. ${genderText} leaning against an old warm stone wall wearing ${jewelryType}. Soft golden hour sunlight.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+SETTING:
+Old warm stone wall texture
+Outdoor summer atmosphere
+Golden hour sunlight
+Earthy, natural tones
+Rustic, timeless backdrop
+
+STYLING:
+${genderText === 'woman' ? 'White linen shirt with rolled up sleeves' : 'Casual linen attire'}
+Wind gently blowing hair
+Natural "no-makeup" makeup look
+Relaxed, authentic pose
+
+LIGHTING:
+Soft golden hour sunlight
+Warm, flattering tones
+Sun-kissed skin appearance
+Natural shadows
+
+SKIN & TEXTURE:
+Sun-kissed skin texture
+Authentic and relaxed vibe
+Natural, healthy glow
+Film-like quality
+
+JEWELRY:
+Sharp focus on ${jewelryType}
+ONLY the specified jewelry
+Golden light enhancing metal
+Warm tones on gems
+
+FILM AESTHETIC:
+Kodak Portra 400 color palette
+Film grain texture
+Warm, nostalgic feel
+Analog photography look
+
+AVOID:
+Cold tones, blue light
+City or car backgrounds
+Studio background
+Glossy, plastic skin
+CGI or 3D render
+Dark shadows, flash
+
+OUTPUT: Stone wall. Golden hour. Summer warmth. Kodak Portra.`;
+    },
+  },
+
+  'flower-walk': {
+    name: 'Flower Walk',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'happy woman' : gender === 'men' ? 'happy man' : 'happy model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Lifestyle photography. Medium shot of a ${genderText} walking on a quiet street holding a bouquet of flowers wrapped in brown paper, wearing ${jewelryType}.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+CANDID MOMENT:
+Walking on quiet street
+Holding bouquet of flowers (brown paper wrap)
+Genuine smile, candid movement
+Natural, unposed feeling
+
+SETTING:
+Soft daylight illumination
+Pastel tones throughout
+Blurred background of garden or quiet street
+Natural lighting, no artificial sources
+
+STYLING:
+${genderText.includes('woman') ? 'Casual trench coat or cotton dress' : 'Casual, elegant attire'}
+Fresh, approachable appearance
+Movement in clothing and hair
+Natural, effortless beauty
+
+JEWELRY:
+Focus on ${jewelryType} and hands
+ONLY the specified jewelry
+Catching soft daylight
+Natural showcase through movement
+
+TECHNICAL:
+Shot on Fujifilm X-T4 equivalent
+Natural lighting only
+Candid composition
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Studio pose, serious face
+Night time, dark colors
+High contrast lighting
+Artificial light
+Plastic texture, perfect skin
+
+OUTPUT: Flower walk. Candid movement. Pastel tones. Natural daylight.`;
+    },
+  },
+
+  'book-corner': {
+    name: 'Book Corner',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Intimate indoor lifestyle shot. A ${genderText} reading a book in a sunlit corner wearing ${jewelryType}. Hand resting gently on the page or near face.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+READING MOMENT:
+Reading a book in sunlit corner
+Hand near face or on page
+Intellectual, calm vibe
+Absorbed in reading
+
+LIGHTING:
+Soft afternoon sun beams
+Dust motes visible in air
+Airy and bright atmosphere
+Natural window light
+
+SETTING:
+Realistic home environment
+Comfortable reading nook
+Warm, lived-in space
+Quiet, peaceful corner
+
+STYLING:
+${genderText === 'woman' ? 'Simple white cotton tank top' : 'Simple, comfortable attire'}
+Relaxed, natural appearance
+Thoughtful expression
+No heavy styling
+
+JEWELRY:
+Focus on ${jewelryType}
+ONLY the specified jewelry
+Catching afternoon light
+Subtle, elegant presence
+
+TECHNICAL:
+Shallow depth of field
+Airy, bright exposure
+Natural environment
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Digital screens, phones
+Harsh lighting, neon
+Futuristic settings
+Messy background
+Anime, cartoon style
+Heavy jewelry clutter
+Dark room
+
+OUTPUT: Book corner. Afternoon sun. Dust motes. Intellectual calm.`;
+    },
+  },
+
+  'plaster-wall': {
+    name: 'Plaster Wall',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Minimalist portrait photography. Close up of a ${genderText} wearing ${jewelryType}, posing against a textured beige plaster wall. Soft natural side lighting.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+MINIMALIST BACKDROP:
+Textured beige plaster wall
+Simple, clean composition
+Neutral earth tones
+No distracting elements
+
+LIGHTING:
+Soft natural side lighting
+Gentle shadows defining features
+Calm, serene atmosphere
+Not harsh or dramatic
+
+STYLING:
+${genderText === 'woman' ? 'Simple white tank top' : 'Simple, minimal top'}
+Clean, uncluttered appearance
+Calm, serene expression
+Minimal to no makeup
+
+SKIN & TEXTURE:
+Authentic skin texture
+Natural pores visible
+Soft focus overall
+Real, human quality
+
+JEWELRY:
+${jewelryType} as focal point
+ONLY the specified jewelry
+Soft light on metal and gems
+Understated elegance
+
+TECHNICAL:
+Shot on 50mm lens equivalent
+Clean composition
+Calm mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Furniture, plants
+Busy background
+Messy hair
+Bright colors, neon
+Studio lights, flash
+Heavy makeup
+Intense contrast
+
+OUTPUT: Plaster wall. Minimalist. Earth tones. Serene calm.`;
+    },
+  },
+
+  'curtain-dreams': {
+    name: 'Curtain Dreams',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Aesthetic close up photography. Sun-kissed skin, a ${genderText} wearing ${jewelryType}. Soft shadows of a sheer curtain falling on skin.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+DREAMY AESTHETIC:
+Sheer curtain shadows on skin
+Very clean, simple background (off-white)
+Soft daylight filtering through
+Dreamy, ethereal atmosphere
+
+LIGHTING:
+Soft daylight through curtains
+Shadow patterns on skin
+Ethereal glow quality
+Minimalistic illumination
+
+SKIN & GLOW:
+Sun-kissed skin texture
+Ethereal glow on skin
+Natural beauty emphasized
+NOT plastic, real texture
+
+STYLING:
+Minimalistic styling only
+Focus on skin and jewelry
+Natural, effortless beauty
+No distracting elements
+
+JEWELRY:
+Focus strictly on ${jewelryType} and skin
+ONLY the specified jewelry
+Soft light enhancing details
+Dreamy showcase
+
+TECHNICAL:
+Shot on Canon R5 equivalent
+Clean composition
+Ethereal mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Dark shadows
+Black background
+Props, holding objects
+Messy, complex compositions
+CGI, plastic skin
+Heavy jewelry clutter
+
+OUTPUT: Curtain dreams. Ethereal shadows. Sun-kissed. Dreamy glow.`;
+    },
+  },
+
+  'pure-white': {
+    name: 'Pure White',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `High key minimalism. Bright and airy photography, a ${genderText} wearing ${jewelryType}. White linen shirt, blurred white background.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+HIGH KEY AESTHETIC:
+Bright and airy atmosphere
+Blurred white background
+Soft diffused window light
+Elegant and pure vibe
+
+STYLING:
+${genderText === 'woman' ? 'High quality white linen shirt' : 'Clean white linen attire'}
+Clean lines, minimal styling
+Gentle, elegant pose
+Subtle makeup only
+
+LIGHTING:
+Soft diffused window light
+No harsh shadows
+Even, bright illumination
+Fresh, clean feel
+
+SKIN & TONE:
+Realistic skin tones
+Natural, healthy appearance
+Bright but not overexposed
+Authentic texture
+
+JEWELRY:
+Sharp details on ${jewelryType}
+ONLY the specified jewelry
+Bright light on metal
+Clean, elegant showcase
+
+TECHNICAL:
+Shot on Sony A7R IV equivalent
+High key exposure
+Clean composition
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Dark colors, black, grey
+High contrast, shadows
+Busy patterns, props
+Furniture, messy elements
+Artificial light
+
+OUTPUT: Pure white. High key. Bright airy. Elegant minimalism.`;
+    },
+  },
+
+  'monochrome-beige': {
+    name: 'Monochrome Beige',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Minimalist fashion photography. Medium close-up of a ${genderText} wearing ${jewelryType}. Monochrome palette of beige, tan, and cream.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+MONOCHROME PALETTE:
+Beige, tan, cream tones only
+Cohesive color harmony
+Soft, muted colors
+Minimalist color story
+
+STYLING:
+${genderText === 'woman' ? 'High-quality ribbed knit tank top in beige' : 'Quality beige knitwear'}
+Plain textured wall background
+Calm expression, looking away
+Simple and clean appearance
+
+LIGHTING:
+Soft diffuse lighting
+Even, flattering illumination
+No harsh contrasts
+Gentle, minimal shadows
+
+SKIN & TEXTURE:
+Authentic skin texture visible
+Natural, real appearance
+Warm neutral tones on skin
+NOT retouched
+
+JEWELRY:
+${jewelryType} complementing palette
+ONLY the specified jewelry
+Warm metal tones
+Simple, elegant showcase
+
+TECHNICAL:
+Shot on 85mm lens equivalent
+Clean composition
+Calm mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Bright colors, contrast
+Patterns, busy backgrounds
+Heavy makeup
+Studio lights
+Jewelry clutter
+
+OUTPUT: Monochrome beige. Tan and cream. Minimalist. Calm elegance.`;
+    },
+  },
+
+  'gentle-profile': {
+    name: 'Gentle Profile',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const type = jewelryType.toLowerCase();
+
+      const focusArea = (type === 'earring' || type === 'necklace')
+        ? 'neck and ear area'
+        : 'hands and wrist area';
+
+      return `Soft profile portrait. Back view of a ${genderText} turning head slightly showing ${jewelryType}. Hair loosely tied back in a low bun. Focus on the ${focusArea}.
+
+FRAMING:
+Back view or profile perspective
+Head turning slightly to show ${jewelryType}
+Hair in low bun, away from jewelry
+Clean off-white background
+
+STYLING:
+${genderText === 'woman' ? 'Simple white shirt falling off shoulder' : 'Simple, elegant attire'}
+Delicate, fragile mood
+Soft, vulnerable aesthetic
+Minimal styling
+
+LIGHTING:
+Soft daylight from the side
+Gentle, diffused illumination
+Flattering, soft shadows
+Ethereal quality
+
+SKIN & TEXTURE:
+Realistic skin grain visible
+Vellus hair (peach fuzz) visible
+Natural, authentic texture
+Delicate appearance
+
+JEWELRY:
+Focus on ${jewelryType}
+ONLY the specified jewelry
+Catching soft side light
+Delicate, refined showcase
+
+TECHNICAL:
+Shallow depth of field
+Soft focus on background
+Intimate perspective
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Face focus, direct eye contact
+Intense staring
+Complex hairstyles
+Dark background
+Harsh shadows
+Plastic skin texture
+
+OUTPUT: Gentle profile. Low bun. Delicate mood. Soft side light.`;
+    },
+  },
+
+  'shadow-play': {
+    name: 'Shadow Play',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Aesthetic minimal photography. ${genderText} standing against a plain white wall during golden hour. Warm orange sunlight casting a soft geometric shape on face and ${jewelryType}.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+SHADOW ARTISTRY:
+Golden hour sunlight through window
+Geometric shadow patterns on wall and skin
+Warm orange light casting shapes
+Natural sun flare effects
+Artistic light and shadow interplay
+
+STYLING:
+${genderText === 'woman' ? 'Minimalist silk camisole' : 'Simple, elegant attire'}
+Clean, minimal styling
+Relaxed, natural pose
+Warm glow on skin
+
+LIGHTING:
+Golden hour quality
+Warm orange tones
+Soft geometric shadows
+Natural sun flare
+Dreamy, warm atmosphere
+
+SKIN:
+Glowing skin in warm light
+Natural, healthy appearance
+Golden hour enhancing texture
+Sun-kissed warmth
+
+JEWELRY:
+Sharp focus on ${jewelryType}
+ONLY the specified jewelry
+Golden light on metal
+Warm tones enhancing gems
+
+FILM AESTHETIC:
+Kodak Portra 400 film style
+Warm color palette
+Natural grain
+Analog warmth
+
+AVOID:
+Props, furniture, plants
+Grey tones, cold light
+Studio strobe lighting
+High contrast
+Messy compositions
+
+OUTPUT: Shadow play. Golden hour. Geometric light. Warm dreamy.`;
+    },
+  },
 };
