@@ -10073,4 +10073,1612 @@ Cluttered styling
 OUTPUT: Deep neckline. Black silk contrast. Editorial elegance.`;
     },
   },
+
+  // ============================================
+  // PACK PRESETS: HIGH-END EDITORIAL SERIES
+  // ============================================
+
+  'editorial-penthouse': {
+    name: 'Editorial Penthouse',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'elegant male model' : 'elegant female model';
+      const faceDesc = showFace === 'show' ? 'sophisticated, poised pose with gentle gaze towards camera' : 'elegant pose, face partially visible';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'gracefully showcasing hands with jewelry'
+        : 'gracefully showcasing neck/ear jewelry';
+
+      return `STYLE: High-end editorial portrait photograph
+
+LIGHTING:
+Cinematic and masterful lighting
+Soft diffused studio light to sculpt features
+Precise accent lighting
+Brilliant specular highlights on gemstones
+Intense sparkle on precious metal
+
+MODEL:
+${genderDesc}
+${faceDesc}
+${jewelryPlacement}
+Flawless natural skin texture
+Shot on medium format camera
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Tack sharp focus
+Intense sparkle and brilliance
+
+ENVIRONMENT:
+Extremely shallow depth of field
+Luxurious heavily blurred bokeh
+Opulent penthouse interior
+Warm muted tones
+Rich textures
+
+TECHNICAL:
+Ultra-detailed
+8K resolution
+Photorealistic
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Ugly, deformed hands
+Bad anatomy
+Plastic skin
+Flat lighting
+Dull metal
+Cheap imagery
+CGI, cartoon
+
+OUTPUT: Editorial penthouse. Cinematic luxury. Opulent bokeh.`;
+    },
+  },
+
+  'macro-hands-detail': {
+    name: 'Macro Hands Detail',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4'
+    ) => {
+      const genderDesc = gender === 'men' ? 'masculine hands' : 'elegant feminine hands';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'long graceful fingers positioned to catch light, near cheek or collarbone'
+        : 'elegant neck/ear area with jewelry catching light';
+
+      return `STYLE: Detailed macro photograph
+
+SUBJECT:
+${genderDesc}
+${jewelryPlacement}
+Realistic well-cared skin texture
+Natural manicure
+
+LIGHTING:
+Specialized macro jewelry lighting
+Dazzling refractions in stones
+Highly polished metal reflections
+Razor-sharp focus on craftsmanship
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Intricate details visible
+Facets catching light
+
+BACKGROUND:
+Creamy soft bokeh
+Neutral luxury fabrics
+Silk or velvet texture
+No distractions
+
+MOOD:
+Luxurious
+Tactile feel
+Intimate detail
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Deformed hands
+Extra fingers
+Bad anatomy
+Flat lighting
+Dull metal
+Low resolution
+
+OUTPUT: Macro hands. Jewelry detail. Luxurious tactile.`;
+    },
+  },
+
+  'kodak-portra-golden': {
+    name: 'Kodak Portra Golden',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'sophisticated male model' : 'sophisticated female model';
+      const faceDesc = showFace === 'show' ? 'natural dewy makeup look with visible pores' : 'partial face, natural skin texture';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands elegantly displayed'
+        : 'neck and ear area showcased';
+
+      return `STYLE: High-end commercial jewelry photography
+
+FILM AESTHETIC:
+Kodak Portra 400 film stock
+Phase One XF IQ4 medium format sharpness
+
+LIGHTING:
+Golden Hour natural sunlight hitting side of face
+Soft studio rim light for separation
+Intense specular highlights on jewelry
+
+MODEL:
+${genderDesc}
+${faceDesc}
+Wearing textured cream raw silk dress
+Realistic skin texture (no plastic smoothing)
+${jewelryPlacement}
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Intricate craftsmanship visible
+Brilliant sparkles
+
+COLOR GRADING:
+Warm cinematic tones
+Beige, gold, soft honey hues
+
+BACKGROUND:
+Heavily blurred creamy bokeh
+Luxury balcony at sunset
+Architectural structure
+
+TECHNICAL:
+8K resolution
+Photorealistic
+Razor-sharp focus on jewelry
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Plastic skin
+Airbrushed look
+Dull metal
+Flat lighting
+Bad anatomy
+
+OUTPUT: Kodak Portra. Golden hour. Film aesthetic luxury.`;
+    },
+  },
+
+  'chiaroscuro-decolletage': {
+    name: 'Chiaroscuro Decolletage',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands prominently displayed in dramatic light'
+        : 'neck and decolletage area with jewelry';
+
+      return `STYLE: Dramatic close-up editorial
+
+FRAMING:
+Headless shot, no face visible
+Framing from chin down to chest
+${jewelryPlacement}
+
+LIGHTING:
+High-contrast Chiaroscuro
+Cool-toned strobe lights
+Hard shadows and crisp lighting
+Maximum refraction and fire on jewelry
+
+COLOR PALETTE:
+Deep blacks
+Cool blues
+Silvers
+Monochromatic tones
+
+MODEL:
+${genderDesc}
+Pale porcelain-like skin tone
+High-definition pores visible
+Pitch-black background (infinite void)
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Dramatic light catching facets
+
+TECHNICAL:
+Hasselblad H6D-100c
+Macro lens 120mm
+Razor-sharp focus on metal and stones
+Shallow depth of field
+Vogue Italia aesthetic
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Face visible
+Warm tones
+Nature outdoor
+Soft lighting
+Low contrast
+
+OUTPUT: Chiaroscuro. Dramatic decolletage. Vogue Italia.`;
+    },
+  },
+
+  'wet-summer-campaign': {
+    name: 'Wet Summer Campaign',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'slicked back wet hair, glossy skin' : 'wet hair visible, partial face';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'water droplets on hands near jewelry'
+        : 'water droplets on collarbone near jewelry';
+
+      return `STYLE: High-fashion summer campaign
+
+TEXTURE:
+Skin glistening with water droplets
+Glossy oil finish
+Fresh hydrated look
+${faceDesc}
+
+LIGHTING:
+Bright harsh natural sunlight
+Poolside setting simulation
+Sharp shadows
+Caustics (water light reflections)
+${jewelryPlacement}
+
+COLORS:
+Vibrant saturated tones
+Aquatic blues
+Bright teals
+Warm bronzed skin
+
+ACTION:
+Light hitting water droplets
+Prism effect on jewelry
+${jewelryType} catching light
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Brilliant wet reflections
+
+BACKGROUND:
+Blurred glimmering blue water
+Pool or ocean out of focus
+
+TECHNICAL:
+Macro lens
+Fast shutter speed
+Freeze motion of water and light
+High contrast
+Sharp details
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Dry skin
+Matte skin
+Frizzy hair
+Flat lighting
+Cartoon
+
+OUTPUT: Wet summer. Water droplets. Poolside luxury.`;
+    },
+  },
+
+  'old-money-library': {
+    name: 'Old Money Library',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'elegant gentleman' : 'elegant lady';
+      const faceDesc = showFace === 'show' ? 'regal sophisticated pose' : 'elegant pose, partial face';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands elegantly displayed'
+        : 'neck and ear area showcased';
+
+      return `STYLE: Timeless luxurious portrait
+
+AESTHETIC:
+Old Money heritage luxury style
+Opulent antique library setting
+Wood-paneled study
+
+LIGHTING:
+Warm ambient interior lighting
+Vintage lamps creating golden glow
+Deep rich shadows
+Sharp specular highlights on jewelry
+
+MODEL:
+${genderDesc}
+${faceDesc}
+${jewelryPlacement}
+Classic high-quality fabrics
+Cashmere turtleneck or rich velvet
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Quality revealed by lighting
+
+BACKGROUND:
+Heavily blurred bokeh
+Leather-bound books
+Mahogany wood
+Antique furniture
+
+COLOR PALETTE:
+Deep browns
+Emerald greens
+Burgundy
+Gold and warm cream
+
+FILM GRAIN:
+Subtle classic structure
+Kodak Portra 800 heritage feel
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Modern architecture
+Minimalism
+Cold blue tones
+Neon lights
+Casual style
+
+OUTPUT: Old money. Library heritage. Timeless luxury.`;
+    },
+  },
+
+  'intimate-boudoir': {
+    name: 'Intimate Boudoir',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'graceful male model' : 'graceful female model';
+      const faceDesc = showFace === 'show' ? 'relaxed candid pose, natural expression' : 'relaxed pose, face partially visible';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'jewelry resting on wrist or finger'
+        : 'jewelry on collarbone or ear';
+
+      return `STYLE: Intimate sensual portrait
+
+SETTING:
+Plush bed
+Luxurious bedroom
+Rumpled silk sheets
+Delicate lace or cashmere throw
+
+LIGHTING:
+Soft diffused morning light
+Filtering through sheer curtains
+Gentle flattering shadows
+Warm atmosphere
+No harsh flashes
+
+MODEL:
+${genderDesc}
+${faceDesc}
+Hair loosely tied or naturally wavy
+${jewelryPlacement}
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Resting against skin
+
+FOCUS:
+Tender and shallow depth
+Creamy bokeh bedroom tones
+Jewelry highlighted
+
+MOOD:
+Romantic
+Dreamy
+Serene
+Private luxury
+
+FILM GRAIN:
+Soft subtle grain
+Kodak Portra 160
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Harsh lighting
+Studio lighting
+Cold tones
+Industrial background
+Cluttered room
+
+OUTPUT: Intimate boudoir. Morning light. Romantic luxury.`;
+    },
+  },
+
+  'street-style-urban': {
+    name: 'Street Style Urban',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'trendy male model' : 'trendy female model';
+      const faceDesc = showFace === 'show' ? 'confident It Girl expression, windblown hair' : 'candid pose, partial face';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands visible while walking'
+        : 'neck and ear jewelry catching light';
+
+      return `STYLE: High-fashion street style
+
+POSE:
+Candid captured in motion
+Walking towards camera
+Looking over shoulder
+Hair slightly windblown
+${faceDesc}
+
+LIGHTING:
+Natural daylight
+Slightly overcast
+Soft city light
+Even illumination on metal
+
+OUTFIT:
+Stylish urban attire
+Beige trench coat
+Sharp blazer
+Modern confident aesthetic
+
+MODEL:
+${genderDesc}
+${jewelryPlacement}
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Crystal clear focus
+
+BACKGROUND:
+Beautifully chaotic city bokeh
+Blurred taxis
+Architectural lines
+Shop windows
+Streetlights
+
+TECHNICAL:
+Shot on 50mm or 85mm prime
+Wide aperture f/1.8
+Depth separation
+It Girl aesthetic
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Studio lighting
+Plain background
+Nature forest
+Static stiff pose
+Bad anatomy
+
+OUTPUT: Street style. Urban bokeh. It Girl confidence.`;
+    },
+  },
+
+  'prism-rainbow': {
+    name: 'Prism Rainbow',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'beautiful male model' : 'beautiful female model';
+      const faceDesc = showFace === 'show' ? 'eyes and jewelry tack sharp' : 'jewelry in sharp focus';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands with jewelry in center focus'
+        : 'neck/ear jewelry in center focus';
+
+      return `STYLE: Artistic dreamlike editorial
+
+TECHNIQUE:
+Prism photography style
+Shot through crystal glass prism
+Soft ethereal rainbow light leaks
+Flares and subtle refractions
+
+FOCUS:
+Center of image sharp
+${faceDesc}
+${jewelryPlacement}
+Edges fade into magical blur
+
+LIGHTING:
+Backlit by soft sunlight
+Maximize flare effect
+Light leaks framing subject
+
+COLOR PALETTE:
+Pastel tones
+Iridescent colors
+Soft pinks, lilacs
+Light blues
+Metallic shine
+
+MODEL:
+${genderDesc}
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Sharp in center
+
+MOOD:
+Whimsical
+Magical
+Poetic
+High-fashion
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Boring flat
+Standard studio
+Plain background
+Over-distorted
+Bad anatomy
+
+OUTPUT: Prism rainbow. Magical flares. Dreamlike editorial.`;
+    },
+  },
+
+  'cyberpunk-neon': {
+    name: 'Cyberpunk Neon',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'cool male model' : 'cool female model';
+      const faceDesc = showFace === 'show' ? 'edgy confident expression' : 'mysterious partial face';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands catching colored neon reflections'
+        : 'jewelry with colorful neon reflections';
+
+      return `STYLE: Cinematic edgy night-time fashion
+
+LIGHTING STRATEGY:
+Dual Tone lighting
+Cyberpunk aesthetic
+Cool teal/cyan neon on one side
+Warm magenta/pink rim light other side
+Colorful artistic reflections on metal
+${jewelryPlacement}
+
+ATMOSPHERE:
+Nocturnal
+Urban
+Glossy
+Futuristic
+
+MODEL:
+${genderDesc}
+${faceDesc}
+Modern textures
+Black leather or metallic fabrics
+Sequins complementing jewelry
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Colored light refractions in gemstones
+
+BACKGROUND:
+Dark out-of-focus city lights
+Bokeh circles of neon signs
+Neon tube lights
+
+TECHNICAL:
+High contrast
+Moody
+Vogue Hong Kong style
+Sharp focus on jewelry
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Daylight
+Sunlight
+Nature
+Vintage rustic
+Flat lighting
+Dull colors
+
+OUTPUT: Cyberpunk neon. Dual tone. Night fashion.`;
+    },
+  },
+
+  'bw-peter-lindbergh': {
+    name: 'BW Peter Lindbergh',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'strong empowering intense gaze into camera' : 'powerful pose, partial face';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands prominently displayed'
+        : 'neck and ear jewelry prominent';
+
+      return `STYLE: Striking black and white editorial
+
+INSPIRATION:
+Peter Lindbergh
+Helmut Newton
+Timeless fashion photography
+
+COLOR:
+Monochrome black and white
+High contrast
+Deep rich blacks
+Bright pearlescent whites
+
+LIGHTING:
+Dramatic sculpting studio lighting
+Light catches jewelry facets
+Jewelry pops against skin/clothing
+
+MODEL:
+${genderDesc}
+${faceDesc}
+Detailed skin texture
+Freckles and pores visible
+Raw authentic feel
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Sparkling against monochrome
+
+BACKGROUND:
+Simple dark or grey studio
+Maximum separation for jewelry
+
+TECHNICAL:
+8K resolution
+Sharp details
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Color
+Saturated
+Flat lighting
+Low contrast
+Plastic skin
+Blur
+
+OUTPUT: Black white. Peter Lindbergh. Timeless editorial.`;
+    },
+  },
+
+  'bridal-heavenly': {
+    name: 'Bridal Heavenly',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'elegant groom' : 'beautiful bride';
+      const faceDesc = showFace === 'show' ? 'pure angelic joyful serene expression' : 'ethereal presence, partial face';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'ring/bracelet visible through soft veil overlay'
+        : 'necklace/earring framed by delicate veil';
+
+      return `STYLE: Dreamy romantic bridal fashion
+
+STYLING:
+${genderDesc}
+Exquisite white lace wedding attire
+Delicate tulle veils
+${faceDesc}
+
+COMPOSITION:
+Semi-transparent white veil in foreground
+Soft blurry overlay framing jewelry
+${jewelryPlacement}
+
+LIGHTING:
+Heavenly lighting
+Backlit by soft glowing light
+Halo effect around hair and veil
+Pure white and airy
+Diamonds and metal sparkle intensely
+
+COLOR PALETTE:
+Shades of white
+Ivory, cream
+Soft pastel skin tones
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Sharp focus contrasting soft textures
+
+MOOD:
+Pure
+Angelic
+Joyful
+Serene
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Dark
+Gloomy
+Casual clothes
+Harsh shadows
+Low quality
+
+OUTPUT: Bridal heavenly. Angelic light. Pure romance.`;
+    },
+  },
+
+  'brutalist-concrete': {
+    name: 'Brutalist Concrete',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'powerful edgy expression' : 'avant-garde pose, partial face';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands against concrete texture'
+        : 'jewelry against architectural backdrop';
+
+      return `STYLE: Sharp avant-garde fashion
+
+SETTING:
+Raw concrete wall
+Brutalist architectural structure
+Strong geometric lines
+
+LIGHTING:
+Harsh direct sunlight
+Sharp angular shadows
+Drama and depth on jewelry
+${jewelryPlacement}
+
+TEXTURES:
+Rough matte grey concrete
+Polished shiny jewelry surface
+Contrast between raw and refined
+
+OUTFIT:
+Minimalist architectural fashion
+Sharp blazer
+Structured oversized suit
+Monochrome grey, black, white
+
+MODEL:
+${genderDesc}
+${faceDesc}
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Metal gleaming against stone
+
+COLOR PALETTE:
+Desaturated cool tones
+Slate grey, stone
+Metallic silver
+
+ATMOSPHERE:
+Cold
+Modern
+Powerful
+Edgy
+High sharpness
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Soft lighting
+Romantic
+Flowers nature
+Warm tones
+Cozy
+
+OUTPUT: Brutalist concrete. Avant-garde. Architectural power.`;
+    },
+  },
+
+  'desert-dunes': {
+    name: 'Desert Dunes',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'bronzed glowing skin, adventurous expression' : 'silhouette against landscape';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands catching desert sunlight'
+        : 'jewelry creating metallic flares';
+
+      return `STYLE: High-fashion outdoor campaign
+
+SETTING:
+Vast desert landscape
+Sand dunes
+Dried pampas grass
+Sandstone rock formations
+
+COLOR PALETTE:
+Warm earth tones
+Beige, sand, terracotta
+Soft sky blues
+
+LIGHTING:
+Bright harsh daylight
+Strong shadows high contrast
+Intense desert sun
+${jewelryPlacement}
+Brilliant metallic flares
+
+MODEL:
+${genderDesc}
+${faceDesc}
+High-end resort wear
+Flowing linen fabrics
+Neutral tones
+Safari-chic attire
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Sun creating brilliant flares
+
+BACKGROUND:
+Minimalist sand dunes
+Simple expansive landscape
+Subject stands out
+
+ATMOSPHERE:
+Adventurous
+Warm
+Luxurious
+Free-spirited
+8K resolution
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Forest green
+City buildings
+Rain snow
+Cold tones
+Studio background
+
+OUTPUT: Desert dunes. Safari luxury. Warm adventure.`;
+    },
+  },
+
+  'pop-art-color': {
+    name: 'Pop Art Color',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'confident expression, vivid makeup' : 'bold styling, partial face';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands against vibrant background'
+        : 'jewelry standing out against saturated colors';
+
+      return `STYLE: Playful high-energy fashion
+
+BACKGROUND:
+Seamless solid vibrant studio
+Electric Blue, Hot Pink, or Bright Orange
+No texture
+
+LIGHTING:
+High-contrast commercial studio
+Hard Flash strobe
+Sharp distinct shadow on colored wall
+Metal and gemstones glisten intensely
+
+MODEL:
+${genderDesc}
+${faceDesc}
+Bold solid-colored outfit
+Color Blocking technique
+Vivid makeup
+Confident expression
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Crystal clear focus
+Stands out against colors
+
+COMPOSITION:
+Clean
+Graphic
+Modern
+
+AESTHETIC:
+Pop-art
+Commercial magazine cover
+Trendy
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Muted colors
+Pastel tones
+Earth tones
+Natural background
+Soft lighting
+Vintage
+
+OUTPUT: Pop art. Color blocking. High energy commercial.`;
+    },
+  },
+
+  'renaissance-rembrandt': {
+    name: 'Renaissance Rembrandt',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'graceful male model' : 'graceful female model';
+      const faceDesc = showFace === 'show' ? 'face illuminated by single light source' : 'mysterious partial illumination';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands catching the light'
+        : 'jewelry illuminated dramatically';
+
+      return `STYLE: Fine art portrait, Renaissance painting
+
+LIGHTING:
+Masterful Rembrandt lighting
+Chiaroscuro technique
+Single soft light source
+Illuminates face and jewelry
+Deep mysterious shadow
+
+ATMOSPHERE:
+Quiet
+Museum-quality
+Serene
+
+BACKGROUND:
+Dark textured hand-painted canvas
+Deep olive green
+Charcoal or mahogany tones
+
+MODEL:
+${genderDesc}
+${faceDesc}
+Timeless velvet drape
+Corset-style top
+Bare shoulders highlighting jewelry
+${jewelryPlacement}
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Catching the single light
+
+SKIN TEXTURE:
+Soft creamy painterly
+Oil painting texture evocation
+
+TECHNICAL:
+8K resolution
+Artistic masterpiece
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Modern clothing
+Neon bright lights
+Flat lighting
+White background
+Outdoor
+Cartoon
+
+OUTPUT: Renaissance. Rembrandt lighting. Fine art portrait.`;
+    },
+  },
+
+  'paparazzi-night-out': {
+    name: 'Paparazzi Night Out',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'stylish male model' : 'stylish female model';
+      const faceDesc = showFace === 'show' ? 'confident caught in the moment expression' : 'glamorous candid pose';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands catching flash reflections'
+        : 'jewelry with glossy flash reflections';
+
+      return `STYLE: Candid high-flash paparazzi
+
+LIGHTING:
+Direct on-camera flash
+Hard flash
+Intense subject illumination
+Background falls into darkness
+Vignette effect
+Glossy reflections on jewelry
+Shiny hydrated skin look
+
+AESTHETIC:
+1990s disposable camera
+Polaroid aesthetic
+Slightly raw unpolished
+High fashion
+
+BACKGROUND:
+Blurred limousine interior
+Velvet club curtain
+Dark street corner
+
+MODEL:
+${genderDesc}
+${faceDesc}
+Glamorous night out styling
+${jewelryPlacement}
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Sharp glossy reflections
+
+POSE:
+Spontaneous
+Looking at camera
+Caught in the moment
+
+COLOR:
+High saturation
+High contrast
+Glossy finish
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Studio softbox
+Diffused light
+Perfect lighting
+Stiff pose
+Daytime sunlight
+
+OUTPUT: Paparazzi flash. 90s glamour. Caught in moment.`;
+    },
+  },
+
+  'underwater-ethereal': {
+    name: 'Underwater Ethereal',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'serene male model' : 'serene female model';
+      const faceDesc = showFace === 'show' ? 'calm ethereal dreamlike, eyes open' : 'graceful underwater pose';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands floating with jewelry visible'
+        : 'jewelry catching underwater light';
+
+      return `STYLE: Breathtaking underwater fashion
+
+PHYSICS:
+Completely submerged in crystal clear water
+Zero-gravity effect
+Hair floating weightlessly
+Light chiffon dress creating fluid shapes
+
+LIGHTING:
+God rays (sunlight beams) from above
+Piercing through water surface
+Caustic light patterns on skin
+${jewelryPlacement}
+
+MODEL:
+${genderDesc}
+${faceDesc}
+No puffing cheeks
+No visible breath holding
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Water creating magnifying effect
+
+COLORS:
+Aquatic teals
+Deep blues
+Soft whites
+Metallic gold/silver pop
+
+MOOD:
+Cinematic
+Magical
+Photorealistic
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Drowning panic
+Holding breath
+Murky dirty water
+Horror
+Swimming goggles
+Pool tiles
+
+OUTPUT: Underwater ethereal. Zero gravity. Magical submerged.`;
+    },
+  },
+
+  'wong-kar-wai': {
+    name: 'Wong Kar-wai',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'mysterious male model' : 'mysterious female model';
+      const faceDesc = showFace === 'show' ? 'melancholic romantic gaze' : 'mysterious silhouette';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands in sharp focus with jewelry'
+        : 'jewelry in perfect sharp focus';
+
+      return `STYLE: Cinematic mood-drenched fashion
+
+INSPIRATION:
+Wong Kar-wai films
+Christopher Doyle cinematography
+
+SETTING:
+Looking through rainy window
+Or standing in neon-lit alleyway
+${faceDesc}
+
+LIGHTING & COLOR:
+Low-key lighting
+Strong color casts
+Deep mood lighting
+Emerald greens
+Sultry reds
+Golden ambers
+
+VISUAL STYLE:
+Step-printing effect
+Slight motion blur on background
+Traffic lights creating movement
+${jewelryPlacement}
+
+MODEL:
+${genderDesc}
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Perfect sharp focus
+
+ATMOSPHERE:
+Melancholic
+Romantic
+Intimate
+Nostalgic
+
+TEXTURE:
+Film grain simulation
+Wet surfaces reflecting neon
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Bright daylight
+Happy smiling
+Flat lighting
+Clean white background
+Digital sterile
+
+OUTPUT: Wong Kar-wai. Neon rain. Cinematic melancholy.`;
+    },
+  },
+
+  'sarah-moon-impressionist': {
+    name: 'Sarah Moon Impressionist',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'ghostly elegant male model' : 'ghostly elegant female model';
+      const faceDesc = showFace === 'show' ? 'dreamlike ethereal expression' : 'mysterious presence';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'jewelry glimmering through haze'
+        : 'jewelry as light source in darkness';
+
+      return `STYLE: Ethereal impressionist fashion
+
+INSPIRATION:
+Sarah Moon photography
+Faded memory aesthetic
+Vintage photograph feel
+
+AESTHETIC:
+Soft-focus
+Dreamlike
+Painterly quality
+
+LIGHTING:
+Soft diffused
+Low-contrast
+Deep shadows
+Sense of mystery
+
+TEXTURE:
+Heavy film grain
+Scratched texture overlay
+Muted desaturated colors
+Sepia, pale blue, dusty rose
+
+MODEL:
+${genderDesc}
+${faceDesc}
+Perhaps holding dried flower
+Wearing vintage lace
+${jewelryPlacement}
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Glimmers softly through haze
+Acts as light source
+
+MOOD:
+Romantic
+Fragile
+Timeless
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Sharp HD 4K 8K
+Digital photography
+High contrast
+Vivid colors
+Modern clothes
+Hyper-realistic
+
+OUTPUT: Sarah Moon. Impressionist haze. Fragile timeless.`;
+    },
+  },
+
+  'irving-penn-corner': {
+    name: 'Irving Penn Corner',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'static poised monumental presence' : 'architectural pose';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands with extreme clarity'
+        : 'jewelry with extreme texture detail';
+
+      return `STYLE: Masterfully composed minimalist studio
+
+INSPIRATION:
+Irving Penn
+Corner portrait style
+
+SETTING:
+Tight corner of two plain grey walls
+Penn's corner style
+Or mottled grey hand-painted canvas
+
+LIGHTING:
+Exquisite North Light quality
+Single soft light source
+Sculpts face
+Creates volume in jewelry
+
+MODEL:
+${genderDesc}
+${faceDesc}
+Stark simple architectural clothing
+Issey Miyake style pleats
+Or black turtleneck
+${jewelryPlacement}
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Extreme clarity and texture
+
+FOCUS:
+Static
+Poised
+Monumental
+
+COLOR:
+Black and white
+Or very muted palette
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Busy background
+Colors neon
+Outdoor nature
+Lifestyle candid
+Blur motion
+Wide angle
+
+OUTPUT: Irving Penn. Corner portrait. Minimalist monument.`;
+    },
+  },
+
+  'bulgari-glamour': {
+    name: 'Bulgari Glamour',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'glamorous gentleman' : 'glamorous supermodel';
+      const faceDesc = showFace === 'show' ? 'confident seductive smile' : 'glamorous presence';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands displayed elegantly'
+        : 'jewelry as hero piece';
+
+      return `STYLE: Glamorous high-jewelry campaign
+
+INSPIRATION:
+Bulgari and Chopard advertisements
+Mario Testino photography
+
+SETTING:
+Luxury evening gala
+Or yacht in Mediterranean
+
+LIGHTING:
+Vibrant high-key commercial fashion
+Saturated colors
+Rich skin tones
+Glossy finish
+Star-filter sparkles on gemstones
+
+MODEL:
+${genderDesc}
+${faceDesc}
+Deep red or emerald green satin evening gown
+Bold makeup (red lips, smoky eyes)
+${jewelryPlacement}
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Razor-sharp details
+
+BACKGROUND:
+Blurred luxury party lights
+Or deep blue sea at twilight
+Bokeh
+
+ATMOSPHERE:
+Opulent
+Expensive
+Energetic
+Vivid
+8K resolution
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Sad depressed
+Dark gloomy
+Pale desaturated
+Casual clothes
+Flat lighting
+
+OUTPUT: Bulgari glamour. Mediterranean luxury. Opulent energy.`;
+    },
+  },
+
+  'messika-edgy': {
+    name: 'Messika Edgy',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'powerful male model' : 'powerful female model';
+      const faceDesc = showFace === 'show' ? 'femme fatale confident gaze' : 'edgy mysterious presence';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands with extreme sharpness on jewelry'
+        : 'jewelry looking solid heavy ultra-expensive';
+
+      return `STYLE: Powerful edgy jewelry campaign
+
+INSPIRATION:
+Messika and Cartier campaigns
+Mert & Marcus photography
+
+AESTHETIC:
+Femme Fatale
+High-contrast glossy studio
+
+LIGHTING:
+Deep sharp shadows
+Wet look or highlighter sheen on skin
+Matches jewelry brilliance
+
+MODEL:
+${genderDesc}
+${faceDesc}
+Black tuxedo jacket
+Or sleek leather
+Neck and hands bare
+${jewelryPlacement}
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Extreme sharpness on diamonds/gold
+Solid heavy ultra-expensive look
+
+COLOR PALETTE:
+Cool tones
+Silver
+Metallic greys
+Deep blacks
+Stark whites
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Soft romantic
+Dreamy hazy
+Floral pastel
+Vintage boho
+Warm yellow light
+Grainy noise
+
+OUTPUT: Messika edgy. Femme fatale. Ultra-expensive power.`;
+    },
+  },
+
+  'tiffany-raw-elegance': {
+    name: 'Tiffany Raw Elegance',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'effortlessly chic male model' : 'effortlessly chic female model';
+      const faceDesc = showFace === 'show' ? 'natural windswept expression' : 'casual yet expensive pose';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'touching hair with jewelry visible'
+        : 'jewelry naturally displayed';
+
+      return `STYLE: Timeless sophisticated portrait
+
+INSPIRATION:
+Tiffany & Co. campaigns
+Peter Lindbergh photography
+
+AESTHETIC:
+Raw Elegance
+Black and white or cool desaturated blue
+
+MODEL:
+${genderDesc}
+Natural windswept look
+${faceDesc}
+Leaning against wall
+Or touching hair
+${jewelryPlacement}
+
+LIGHTING:
+Natural window light
+Or open shade
+Soft flattering transitions
+Distinct highlights on metal
+
+STYLING:
+Simple white shirt
+Denim
+Or classic trench coat
+No heavy makeup
+Just natural beauty
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Metal surfaces catching light
+
+MOOD:
+Tiffany aesthetic
+Cool desaturated blue tone
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Heavy makeup
+Fake eyelashes
+Studio flash
+Hard shadows
+Vibrant colors
+Neon
+Chaotic background
+
+OUTPUT: Tiffany elegance. Raw natural. Windswept chic.`;
+    },
+  },
 };

@@ -65,6 +65,7 @@ export const studioCommercial: PresetCategory = {
     createPreset('relaxed-chin-touch', 'Relaxed Chin Touch', 'Hand near cheek, relaxed', 'studio-commercial'),
     createPreset('wavy-framing-calm', 'Wavy Framing Calm', 'Wavy hair, pure white', 'studio-commercial'),
     createPreset('chest-presentation', 'Chest Presentation', 'Chest view, knitwear', 'studio-commercial'),
+    createPreset('old-money-library', 'Old Money Library', 'Heritage luxury, warm books', 'studio-commercial'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -113,6 +114,9 @@ export const hardLightDrama: PresetCategory = {
     createPreset('spotlight-dark', 'Spotlight Dark', 'Low-key, black background', 'hard-light-drama'),
     createPreset('party-flash', 'Party Flash', 'Direct flash, night candid', 'hard-light-drama'),
     createPreset('gobo-vacation', 'Gobo Vacation', 'Dappled shadows, exotic', 'hard-light-drama'),
+    createPreset('pop-art-color', 'Pop Art Color', 'Color blocking, vibrant studio', 'hard-light-drama'),
+    createPreset('brutalist-concrete', 'Brutalist Concrete', 'Architectural, avant-garde', 'hard-light-drama'),
+    createPreset('chiaroscuro-decolletage', 'Chiaroscuro Decolletage', 'Dramatic neck, Vogue Italia', 'hard-light-drama'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -140,6 +144,8 @@ export const lifestyleCandid: PresetCategory = {
     createPreset('pendant-touch', 'Pendant Touch', 'Soft touch, intimate', 'lifestyle-candid'),
     createPreset('beige-knit-warmth', 'Beige Knit Warmth', 'Soft knitwear, warm', 'lifestyle-candid'),
     createPreset('pendant-chain-pull', 'Pendant Chain Pull', 'Chain tension, tactile', 'lifestyle-candid'),
+    createPreset('street-style-urban', 'Street Style Urban', 'City bokeh, It Girl', 'lifestyle-candid'),
+    createPreset('intimate-boudoir', 'Intimate Boudoir', 'Morning light, romantic', 'lifestyle-candid'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -167,6 +173,7 @@ export const macroDetail: PresetCategory = {
     createPreset('pendant-hollow', 'Pendant Hollow', 'Collarbone dip, intimate', 'macro-detail'),
     createPreset('lapel-contrast', 'Lapel Contrast', 'Fabric vs skin texture', 'macro-detail'),
     createPreset('natural-moles-pores', 'Natural Moles Pores', 'Hyper-real moles, pores', 'macro-detail'),
+    createPreset('macro-hands-detail', 'Macro Hands Detail', 'Jewelry craftsmanship detail', 'macro-detail'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -190,6 +197,8 @@ export const outdoorNature: PresetCategory = {
     createPreset('glazed-tan', 'Glazed Tan', 'Golden hour, dewy skin', 'outdoor-nature'),
     createPreset('rustic-light', 'Rustic Light', 'Sunlit apartment', 'outdoor-nature'),
     createPreset('sunset-squint', 'Sunset Squint', 'Golden hour, terracotta', 'outdoor-nature'),
+    createPreset('desert-dunes', 'Desert Dunes', 'Sand landscape, safari luxury', 'outdoor-nature'),
+    createPreset('wet-summer-campaign', 'Wet Summer Campaign', 'Poolside, water droplets', 'outdoor-nature'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -224,6 +233,14 @@ export const fashionEditorial: PresetCategory = {
     createPreset('silk-blouse-elegance', 'Silk Blouse Elegance', 'White silk, healthy glow', 'fashion-editorial'),
     createPreset('hasselblad-editorial', 'Hasselblad Editorial', 'Gray backdrop, 8K detail', 'fashion-editorial'),
     createPreset('deep-neckline-contrast', 'Deep Neckline Contrast', 'Black silk, evening elegance', 'fashion-editorial'),
+    createPreset('editorial-penthouse', 'Editorial Penthouse', 'Cinematic luxury, opulent bokeh', 'fashion-editorial'),
+    createPreset('kodak-portra-golden', 'Kodak Portra Golden', 'Film aesthetic, golden hour', 'fashion-editorial'),
+    createPreset('bw-peter-lindbergh', 'BW Peter Lindbergh', 'Monochrome, raw elegance', 'fashion-editorial'),
+    createPreset('bulgari-glamour', 'Bulgari Glamour', 'Mediterranean luxury, opulent', 'fashion-editorial'),
+    createPreset('messika-edgy', 'Messika Edgy', 'Femme fatale, ultra-expensive', 'fashion-editorial'),
+    createPreset('tiffany-raw-elegance', 'Tiffany Raw Elegance', 'Windswept chic, natural', 'fashion-editorial'),
+    createPreset('bridal-heavenly', 'Bridal Heavenly', 'Angelic light, pure romance', 'fashion-editorial'),
+    createPreset('irving-penn-corner', 'Irving Penn Corner', 'Minimalist portrait, monumental', 'fashion-editorial'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -288,6 +305,13 @@ export const artisticSpecial: PresetCategory = {
     createPreset('mirror-shard', 'Mirror Shard', 'Broken reflection, surreal', 'artistic-special'),
     createPreset('wet-droplets', 'Wet Droplets', 'Water on skin, glossy', 'artistic-special'),
     createPreset('motion-blur-focus', 'Motion Blur Focus', 'Long exposure, jewelry sharp', 'artistic-special'),
+    createPreset('prism-rainbow', 'Prism Rainbow', 'Crystal flares, magical', 'artistic-special'),
+    createPreset('cyberpunk-neon', 'Cyberpunk Neon', 'Dual tone, night fashion', 'artistic-special'),
+    createPreset('underwater-ethereal', 'Underwater Ethereal', 'Zero gravity, god rays', 'artistic-special'),
+    createPreset('wong-kar-wai', 'Wong Kar-wai', 'Neon rain, cinematic melancholy', 'artistic-special'),
+    createPreset('sarah-moon-impressionist', 'Sarah Moon Impressionist', 'Soft-focus, fragile timeless', 'artistic-special'),
+    createPreset('renaissance-rembrandt', 'Renaissance Rembrandt', 'Fine art, chiaroscuro', 'artistic-special'),
+    createPreset('paparazzi-night-out', 'Paparazzi Night Out', '90s flash, caught moment', 'artistic-special'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
