@@ -28,7 +28,17 @@ import {
   Square,
   Blinds,
   Hand,
-  ScanEye
+  ScanEye,
+  Aperture,
+  FlashlightOff,
+  Moon,
+  Droplets,
+  Diamond,
+  Scan,
+  Contrast,
+  Building,
+  Car,
+  Triangle
 } from 'lucide-react';
 
 interface QuickPreset {
@@ -180,6 +190,76 @@ const QUICK_PRESETS: QuickPreset[] = [
     icon: ScanEye,
     description: 'Hyper-realistic texture',
     color: 'text-rose-300',
+  },
+  {
+    id: 'studio-editorial',
+    name: 'Studio Editorial',
+    icon: Aperture,
+    description: 'Sharp studio, gray bg',
+    color: 'text-slate-400',
+  },
+  {
+    id: 'flash-glamour',
+    name: 'Flash Glamour',
+    icon: FlashlightOff,
+    description: 'Night event, direct flash',
+    color: 'text-pink-300',
+  },
+  {
+    id: 'cinematic-profile',
+    name: 'Cinematic Profile',
+    icon: Moon,
+    description: 'Low key, Rembrandt light',
+    color: 'text-indigo-400',
+  },
+  {
+    id: 'wet-beauty',
+    name: 'Wet Beauty',
+    icon: Droplets,
+    description: 'Water droplets, glistening',
+    color: 'text-sky-400',
+  },
+  {
+    id: 'diamond-studio',
+    name: 'Diamond Studio',
+    icon: Diamond,
+    description: 'Ultra-detailed craftsmanship',
+    color: 'text-cyan-300',
+  },
+  {
+    id: 'macro-droplets',
+    name: 'Macro Droplets',
+    icon: Scan,
+    description: 'Extreme close-up, wet skin',
+    color: 'text-blue-300',
+  },
+  {
+    id: 'chiaroscuro',
+    name: 'Chiaroscuro',
+    icon: Contrast,
+    description: 'Single spotlight, deep shadows',
+    color: 'text-amber-600',
+  },
+  {
+    id: 'brutalist',
+    name: 'Brutalist',
+    icon: Building,
+    description: 'Industrial concrete, geometric',
+    color: 'text-zinc-400',
+  },
+  {
+    id: 'paparazzi-flash',
+    name: 'Paparazzi Flash',
+    icon: Car,
+    description: 'Night car exit, candid',
+    color: 'text-red-300',
+  },
+  {
+    id: 'prism-art',
+    name: 'Prism Art',
+    icon: Triangle,
+    description: 'Rainbow refraction, avant-garde',
+    color: 'text-fuchsia-300',
   },
 ];
 

@@ -1655,4 +1655,620 @@ Flat, textureless skin
 OUTPUT: Macro skin. Extreme detail. Hyper-realistic texture. Minimalist composition.`;
     },
   },
+
+  'studio-editorial': {
+    name: 'Studio Editorial',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'female' : gender === 'men' ? 'male' : '';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Editorial fashion photography of a ${genderText} model wearing ${jewelryType}. Sharp studio lighting, clean gray background, minimalist styling.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+STUDIO SETUP:
+Sharp studio strobe lighting
+Clean neutral gray seamless background
+Minimalist, distraction-free environment
+Professional editorial atmosphere
+
+STYLING:
+Sleek hairstyle, pulled back or styled away from jewelry
+Minimalist clothing that doesn't compete with jewelry
+Clean, polished appearance
+${genderText === 'female' ? 'Natural makeup enhancing features' : 'Well-groomed, refined look'}
+
+SKIN & DETAIL:
+Visible skin texture and pores - hyper-realistic
+Natural imperfections visible
+High contrast lighting revealing texture
+NOT airbrushed, NOT plastic
+
+JEWELRY FOCUS:
+${jewelryType} as the hero piece
+Highly detailed craftsmanship visible
+Sharp focus on every facet and detail
+ONLY the specified ${jewelryType} - no additional pieces
+
+TECHNICAL:
+Shot on Hasselblad X2D 100C equivalent
+8K resolution quality
+Ultra-realistic rendering
+Medium format camera aesthetic
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Smooth airbrushed skin
+CGI or 3D render appearance
+Blurred jewelry details
+Deformed anatomy
+Extra jewelry pieces
+
+OUTPUT: Studio editorial. Sharp lighting. Gray background. Hasselblad quality.`;
+    },
+  },
+
+  'flash-glamour': {
+    name: 'Flash Glamour',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'glamorous woman' : gender === 'men' ? 'stylish man' : 'glamorous model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Flash photography of a ${genderText} wearing statement ${jewelryType}. Night time event setting, harsh direct flash, hard shadows.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+FLASH AESTHETIC:
+Direct camera flash, harsh lighting
+Hard shadows characteristic of flash
+Vignette around edges
+Night time event atmosphere
+Candid celebrity/paparazzi look
+
+STYLING:
+${genderText === 'glamorous woman' ? 'Glossy red lipstick, glamorous makeup' : 'Refined evening styling'}
+Event-ready, polished appearance
+Statement ${jewelryType} as focal point
+Chic, fashionable clothing
+
+SKIN & TEXTURE:
+Realistic skin imperfections visible
+Flash revealing natural texture
+Glossy finish from flash reflection
+NOT over-retouched
+
+JEWELRY:
+Statement ${jewelryType} catching flash brilliantly
+ONLY the specified jewelry - no extras
+Metal reflecting harsh flash light
+Design preserved exactly
+
+FILM AESTHETIC:
+Shot on 35mm film look
+Kodak Gold 200 color palette
+Authentic film grain
+Warm flash tones
+
+AVOID:
+Studio softbox lighting
+Airbrushed perfection
+Multiple jewelry pieces
+Blurry or soft focus
+
+OUTPUT: Flash glamour. Night event. Direct flash. Film aesthetic.`;
+    },
+  },
+
+  'cinematic-profile': {
+    name: 'Cinematic Profile',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'elegant woman' : gender === 'men' ? 'distinguished man' : 'elegant model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Cinematic portrait of a ${genderText} in profile wearing ${jewelryType}. Low key lighting, deep shadows, Rembrandt lighting style.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+LIGHTING - DRAMATIC:
+Low key lighting, predominantly dark
+Deep shadows (chiaroscuro effect)
+Rembrandt lighting triangle on face
+Single soft spotlight as main source
+Mysterious, dramatic atmosphere
+
+COMPOSITION:
+Profile or three-quarter view
+${jewelryType} illuminated by spotlight
+Rich velvet or dark fabric textures
+Deep, saturated colors
+
+MOOD:
+Mysterious and elegant
+Cinematic drama
+Intimate, artistic portrait
+Luxurious atmosphere
+
+SKIN & TEXTURE:
+Natural skin imperfections visible
+Warm spotlight on skin
+Film grain texture
+NOT airbrushed
+
+JEWELRY:
+${jewelryType} catching the spotlight
+Gems and metal gleaming in low light
+ONLY the specified jewelry
+Design preserved exactly
+
+TECHNICAL:
+Shot on Kodak Portra 800 film aesthetic
+85mm lens equivalent
+Photorealistic analog look
+Visible film grain and noise
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Bright, flat lighting
+Digital noise (not film grain)
+Over-saturated colors
+Cartoonish appearance
+Extra jewelry
+
+OUTPUT: Cinematic profile. Low key. Rembrandt lighting. Film noir aesthetic.`;
+    },
+  },
+
+  'wet-beauty': {
+    name: 'Wet Beauty',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'female' : gender === 'men' ? 'male' : '';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Close up beauty shot of a ${genderText} model with wet slicked back hair wearing ${jewelryType}. Water droplets on skin, glistening texture.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+WET AESTHETIC:
+Wet slicked back hair, sleek and glossy
+Water droplets on skin surface
+Glistening, dewy skin texture
+Fresh, just-from-water appearance
+
+SKIN DETAIL:
+Hyper-realistic wet skin details
+Water droplets catching light
+Visible pores beneath water
+Natural skin texture enhanced by moisture
+NOT plastic, genuinely wet human skin
+
+LIGHTING:
+Soft diffused light on wet surfaces
+Water droplets sparkling
+Neutral color palette
+Clean, fresh illumination
+
+JEWELRY FOCUS:
+Sharp focus on ${jewelryType}
+Water droplets near but not obscuring jewelry
+Metal and gems contrasting with wet skin
+ONLY the specified jewelry
+Design preserved exactly
+
+TECHNICAL:
+Macro photography approach
+Shot on Phase One IQ4 equivalent
+Extreme detail capture
+Shallow depth of field
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Dry, matte skin
+Blurry jewelry
+Plastic skin texture
+Additional jewelry pieces
+
+OUTPUT: Wet beauty. Water droplets. Glistening skin. Macro detail.`;
+    },
+  },
+
+  'diamond-studio': {
+    name: 'Diamond Studio',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'female' : gender === 'men' ? 'male' : '';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Editorial fashion photography portrait of a ${genderText} model wearing ${jewelryType}. Sharp studio strobe lighting, neutral grey seamless background, sleeked back hair.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+STUDIO EXCELLENCE:
+Sharp studio strobe lighting
+Neutral grey seamless background
+Professional editorial environment
+Controlled, perfect lighting setup
+
+STYLING:
+Sleeked back hair, away from jewelry
+Minimalist, elegant appearance
+${genderText === 'female' ? 'Realistic makeup texture visible' : 'Refined grooming'}
+Clean, sophisticated look
+
+SKIN DETAIL:
+Highly detailed skin texture
+Visible pores and fine lines
+Realistic, not airbrushed
+Natural imperfections present
+
+JEWELRY CRAFTSMANSHIP:
+Sharp focus on ${jewelryType} facets
+Ultra-detailed craftsmanship visible
+Every cut, prong, and setting sharp
+ONLY the specified jewelry
+Hyper-realistic metal and gem rendering
+
+TECHNICAL:
+Shot on medium format Hasselblad X2D 100C equivalent
+100mm lens quality
+8K resolution detail
+Ultra-realistic rendering
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Smooth airbrushed skin
+CGI or 3D render look
+Blurred jewelry details
+Deformed hands or anatomy
+Excessive bloom or glow
+Extra jewelry pieces
+
+OUTPUT: Diamond studio. Editorial precision. Ultra-detailed craftsmanship.`;
+    },
+  },
+
+  'macro-droplets': {
+    name: 'Macro Droplets',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      const type = jewelryType.toLowerCase();
+      
+      const bodyFocus = {
+        ring: 'extreme close-up of hand with water droplets, ring catching light through moisture',
+        necklace: 'extreme close-up of collarbone area, water droplets on skin, pendant glistening',
+        earring: 'extreme close-up of ear, water droplets on skin near ear, earring sparkling',
+        bracelet: 'extreme close-up of wrist with water droplets, bracelet catching wet reflections',
+      }[type] || 'extreme close-up with water droplets on skin';
+
+      return `Macro beauty photography. ${bodyFocus}. Glistening water droplets on skin, wet slicked hair texture visible.
+
+EXTREME MACRO:
+${bodyFocus}
+Water droplets scattered on skin surface
+Visible vellus hair (peach fuzz) through water
+Distinct pores visible beneath moisture
+Wet, glistening skin texture
+
+WATER DETAIL:
+Individual water droplets catching light
+Droplets refracting and reflecting
+Fresh, dewy appearance
+Natural water behavior on skin
+
+JEWELRY FOCUS:
+Sharp focus on ${jewelryType}
+Gemstone inclusions visible if present
+Metalwork detail razor-sharp
+Water enhancing jewelry sparkle
+ONLY the specified jewelry
+
+LIGHTING:
+Soft diffused daylight
+Light playing through water droplets
+Neutral color palette
+Even, flattering illumination
+
+TECHNICAL:
+Shot with Canon MP-E 65mm macro lens equivalent
+Shallow depth of field
+Extreme detail capture
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Smooth plastic skin
+Blurry focus on jewelry
+Artificial shine
+Overexposed areas
+Illustration or painting look
+Extra jewelry
+
+OUTPUT: Macro droplets. Water on skin. Extreme close-up. Hyper-realistic.`;
+    },
+  },
+
+  'chiaroscuro': {
+    name: 'Chiaroscuro',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'elegant woman' : gender === 'men' ? 'distinguished man' : 'elegant model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Cinematic film portrait of a ${genderText} in profile wearing ${jewelryType}. Low key lighting, deep shadows (chiaroscuro), illuminated by a single warm spotlight.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+CHIAROSCURO LIGHTING:
+Deep shadows, dramatic contrast
+Single warm spotlight as sole illumination
+Chiaroscuro technique - light vs dark
+Mysterious, painterly atmosphere
+Rich velvet clothing textures visible
+
+MOOD & ATMOSPHERE:
+Mysterious and dramatic
+Deep, saturated colors
+Intimate, artistic composition
+Old master painting influence
+Luxurious, timeless feel
+
+SKIN & TEXTURE:
+Natural skin imperfections visible
+Warm spotlight creating highlights
+Visible film grain aesthetic
+NOT over-processed
+
+JEWELRY:
+${jewelryType} catching the warm spotlight
+Gems glowing in dramatic light
+ONLY the specified jewelry
+Metal reflecting single light source
+
+FILM AESTHETIC:
+Shot on Kodak Portra 800 film look
+85mm prime lens quality
+Photorealistic analog appearance
+Natural film grain and texture
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Bright or flat lighting
+Digital noise (not film grain)
+Over-saturated, unnatural tones
+Cartoonish appearance
+Flawless, airbrushed skin
+Extra jewelry pieces
+
+OUTPUT: Chiaroscuro. Single spotlight. Deep shadows. Analog film.`;
+    },
+  },
+
+  'brutalist': {
+    name: 'Brutalist',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'female' : gender === 'men' ? 'male' : '';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Editorial fashion photography, high angle shot of a ${genderText} model wearing ${jewelryType}. Posing against a raw concrete wall, brutalist architecture style.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+BRUTALIST SETTING:
+Raw concrete wall background
+Brutalist architecture aesthetic
+Cold industrial lighting
+Sharp geometric shadows
+Stark, minimalist environment
+
+STYLING:
+Minimalist black outfit
+Strong contrast with jewelry
+Clean, architectural styling
+${genderText === 'female' ? 'Bold, structured look' : 'Sharp, refined appearance'}
+
+CONTRAST:
+Shiny ${jewelryType} against rough grey concrete
+Metal gleam vs raw texture
+Warmth of skin against cold concrete
+Sharp, geometric shadow play
+
+SKIN & TEXTURE:
+Visible pores and natural imperfections
+Real skin texture, not airbrushed
+Cold light revealing details
+Stark contrast on skin
+
+JEWELRY:
+${jewelryType} as focal point
+Catching industrial light
+ONLY the specified jewelry
+Sharp focus on metalwork
+
+TECHNICAL:
+Shot on Phase One XF IQ4 equivalent
+High detail capture
+Sharp focus throughout
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Smooth plastic skin
+Warm tones (should be cool/industrial)
+Blurry background with bokeh
+Soft lighting
+Distorted anatomy
+Extra jewelry pieces
+
+OUTPUT: Brutalist. Industrial concrete. Geometric shadows. Editorial contrast.`;
+    },
+  },
+
+  'paparazzi-flash': {
+    name: 'Paparazzi Flash',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Flash photography style, editorial night shoot. ${genderText} getting out of a black car wearing ${jewelryType}. Direct camera flash, harsh lighting.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+PAPARAZZI AESTHETIC:
+Direct camera flash, harsh lighting
+Hard shadows from flash
+Vignette around edges
+Blurry city lights in background
+Night time, event atmosphere
+
+CANDID MOMENT:
+Getting out of car motion
+Candid movement captured
+Not posed, spontaneous feel
+Celebrity-style capture
+Snapshot realism
+
+STYLING:
+${genderText === 'woman' ? 'Messy chic hair, glossy red lipstick' : 'Stylish evening look'}
+Event-ready appearance
+${jewelryType} prominently visible
+Authentic, not overly styled
+
+FILM AESTHETIC:
+Shot on 35mm film Kodak Gold 200 look
+Authentic film grain
+Disposable camera aesthetic
+Warm flash color tones
+
+JEWELRY:
+${jewelryType} catching flash brilliantly
+ONLY the specified jewelry
+Diamonds/gems sparkling in flash
+Design preserved exactly
+
+AVOID:
+Studio lighting, softbox
+Perfect, posed shots
+Airbrushed skin
+CGI or 3D render look
+Symmetrical composition
+Extra jewelry
+
+OUTPUT: Paparazzi flash. Night car exit. Disposable camera. Candid snapshot.`;
+    },
+  },
+
+  'prism-art': {
+    name: 'Prism Art',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Avant-garde fashion photography. Portrait of a ${genderText} wearing ${jewelryType}, shot through a glass prism or crystal. Light refraction effects, rainbow flares.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+PRISM EFFECTS:
+Shot through glass prism or crystal
+Light refraction creating rainbow effects
+Rainbow flares across image
+Distorted reflections, dreamlike quality
+Experimental, artistic lighting
+
+COMPOSITION:
+Abstract, non-traditional framing
+Dreamlike but SHARP focus on ${jewelryType}
+Experimental angles and perspectives
+Fine art photography approach
+Creative, boundary-pushing
+
+SKIN & TEXTURE:
+Visible skin texture despite effects
+Real human appearance
+Light playing across skin through prism
+NOT plastic or smooth
+
+JEWELRY FOCUS:
+${jewelryType} remains sharp and clear
+Rainbow light enhancing gems
+Prism effects adding to sparkle
+ONLY the specified jewelry
+Design preserved through distortion
+
+ARTISTIC VISION:
+Avant-garde, experimental
+Fine art meets fashion
+Unexpected beauty
+Creative interpretation
+
+TECHNICAL:
+Shot on Sony A7R IV with 50mm lens equivalent
+High detail despite effects
+Artistic but technically excellent
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Blurry jewelry (must stay sharp)
+Out of focus subject
+Heavy CGI effects
+Smooth plastic skin
+Standard portrait composition
+Extra jewelry pieces
+
+OUTPUT: Prism art. Rainbow refraction. Avant-garde. Sharp jewelry through distortion.`;
+    },
+  },
 };
