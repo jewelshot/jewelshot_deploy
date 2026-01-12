@@ -117,6 +117,9 @@ export const hardLightDrama: PresetCategory = {
     createPreset('pop-art-color', 'Pop Art Color', 'Color blocking, vibrant studio', 'hard-light-drama'),
     createPreset('brutalist-concrete', 'Brutalist Concrete', 'Architectural, avant-garde', 'hard-light-drama'),
     createPreset('chiaroscuro-decolletage', 'Chiaroscuro Decolletage', 'Dramatic neck, Vogue Italia', 'hard-light-drama'),
+    createPreset('gobo-venetian', 'Gobo Venetian', 'Striped shadows, blind effect', 'hard-light-drama'),
+    createPreset('monochromatic-flood', 'Monochromatic Flood', 'Single color flood, bold', 'hard-light-drama'),
+    createPreset('brutalist-architecture', 'Brutalist Architecture', 'Concrete, geometric shadows', 'hard-light-drama'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -146,6 +149,11 @@ export const lifestyleCandid: PresetCategory = {
     createPreset('pendant-chain-pull', 'Pendant Chain Pull', 'Chain tension, tactile', 'lifestyle-candid'),
     createPreset('street-style-urban', 'Street Style Urban', 'City bokeh, It Girl', 'lifestyle-candid'),
     createPreset('intimate-boudoir', 'Intimate Boudoir', 'Morning light, romantic', 'lifestyle-candid'),
+    createPreset('backstage-vanity', 'Backstage Vanity', 'Hollywood lights, getting ready', 'lifestyle-candid'),
+    createPreset('slim-aarons-riviera', 'Slim Aarons Riviera', '70s poolside, retro glamour', 'lifestyle-candid'),
+    createPreset('french-new-wave', 'French New Wave', '60s cinema, vintage candid', 'lifestyle-candid'),
+    createPreset('old-money-tennis', 'Old Money Tennis', 'Country club, sporty chic', 'lifestyle-candid'),
+    createPreset('turkish-hammam', 'Turkish Hammam', 'Marble spa, steam luxury', 'lifestyle-candid'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -174,6 +182,8 @@ export const macroDetail: PresetCategory = {
     createPreset('lapel-contrast', 'Lapel Contrast', 'Fabric vs skin texture', 'macro-detail'),
     createPreset('natural-moles-pores', 'Natural Moles Pores', 'Hyper-real moles, pores', 'macro-detail'),
     createPreset('macro-hands-detail', 'Macro Hands Detail', 'Jewelry craftsmanship detail', 'macro-detail'),
+    createPreset('intimate-skin-contrast', 'Intimate Skin Contrast', 'Bare skin vs metal', 'macro-detail'),
+    createPreset('macro-eye-jewelry', 'Macro Eye Jewelry', 'Extreme eye close-up', 'macro-detail'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -199,6 +209,8 @@ export const outdoorNature: PresetCategory = {
     createPreset('sunset-squint', 'Sunset Squint', 'Golden hour, terracotta', 'outdoor-nature'),
     createPreset('desert-dunes', 'Desert Dunes', 'Sand landscape, safari luxury', 'outdoor-nature'),
     createPreset('wet-summer-campaign', 'Wet Summer Campaign', 'Poolside, water droplets', 'outdoor-nature'),
+    createPreset('windswept-cliff', 'Windswept Cliff', 'Billowing fabric, golden hour', 'outdoor-nature'),
+    createPreset('rain-window-bokeh', 'Rain Window Bokeh', 'Raindrops, city lights', 'outdoor-nature'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -241,6 +253,9 @@ export const fashionEditorial: PresetCategory = {
     createPreset('tiffany-raw-elegance', 'Tiffany Raw Elegance', 'Windswept chic, natural', 'fashion-editorial'),
     createPreset('bridal-heavenly', 'Bridal Heavenly', 'Angelic light, pure romance', 'fashion-editorial'),
     createPreset('irving-penn-corner', 'Irving Penn Corner', 'Minimalist portrait, monumental', 'fashion-editorial'),
+    createPreset('greek-marble-statue', 'Greek Marble Statue', 'Classical sculpture, eternal', 'fashion-editorial'),
+    createPreset('liquid-metal-chrome', 'Liquid Metal Chrome', 'Futuristic, sci-fi luxury', 'fashion-editorial'),
+    createPreset('mirror-reflection-dual', 'Mirror Reflection Dual', 'Dual perspective, surreal', 'fashion-editorial'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -312,6 +327,11 @@ export const artisticSpecial: PresetCategory = {
     createPreset('sarah-moon-impressionist', 'Sarah Moon Impressionist', 'Soft-focus, fragile timeless', 'artistic-special'),
     createPreset('renaissance-rembrandt', 'Renaissance Rembrandt', 'Fine art, chiaroscuro', 'artistic-special'),
     createPreset('paparazzi-night-out', 'Paparazzi Night Out', '90s flash, caught moment', 'artistic-special'),
+    createPreset('light-painting-trails', 'Light Painting Trails', 'Long exposure, swirling light', 'artistic-special'),
+    createPreset('double-exposure-nature', 'Double Exposure Nature', 'Silhouette blend, surreal', 'artistic-special'),
+    createPreset('textured-glass-blur', 'Textured Glass Blur', 'Reeded glass, ethereal', 'artistic-special'),
+    createPreset('cyberpunk-glitch', 'Cyberpunk Glitch', 'Neon Tokyo, digital rebel', 'artistic-special'),
+    createPreset('prism-spectral-light', 'Prism Spectral Light', 'Rainbow flares, angelic', 'artistic-special'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 

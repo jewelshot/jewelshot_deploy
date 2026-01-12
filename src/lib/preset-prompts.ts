@@ -11681,4 +11681,1328 @@ Chaotic background
 OUTPUT: Tiffany elegance. Raw natural. Windswept chic.`;
     },
   },
+
+  // ============================================
+  // PACK 31-54: CREATIVE TECHNIQUES SERIES
+  // ============================================
+
+  'gobo-venetian': {
+    name: 'Gobo Venetian',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'mysterious artistic expression' : 'dramatic shadow play';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands in strip of bright light'
+        : 'jewelry positioned in light strip';
+
+      return `STYLE: Sophisticated architectural fashion
+
+LIGHTING SETUP:
+Gobo Lighting technique
+Strong directional light through window blind
+Venetian blind effect
+Sharp rhythmic striped shadows
+Dramatic high-contrast geometric pattern
+
+FOCUS:
+${jewelryPlacement}
+Metal and stones sparkle intensely
+Alternating light and shadow
+
+MODEL:
+${genderDesc}
+${faceDesc}
+Minimalist sleek hair
+Simple structural outfit
+Black bodysuit or white shirt
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Positioned in bright light strip
+
+BACKGROUND:
+Plain textured wall
+Concrete or plaster
+Warm beige or cool grey
+Canvas for shadows
+
+MOOD:
+Mysterious
+Artistic
+Modern luxury
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Flat diffused lighting
+Shadowless
+Plain white background
+Messy shadows
+Outdoor nature
+
+OUTPUT: Gobo venetian. Striped shadows. Architectural drama.`;
+    },
+  },
+
+  'mirror-reflection-dual': {
+    name: 'Mirror Reflection Dual',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'profile and reflected angle visible' : 'artistic reflection only';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands with jewelry in both views'
+        : 'jewelry sharp in real and reflection';
+
+      return `STYLE: Conceptual high-fashion editorial
+
+COMPOSITION:
+Interacting with frameless geometric mirrors
+Holding shard of mirror
+Both real profile and reflected angle
+Dual-perspective effect
+
+LIGHTING:
+Precision studio lighting
+No glare on glass surfaces
+Clean sharp highlights on jewelry
+Illuminates reflection and subject equally
+
+MODEL:
+${genderDesc}
+${faceDesc}
+${jewelryPlacement}
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Razor-sharp in model and reflection
+
+BACKGROUND:
+Solid muted color
+Sage green, soft grey, or matte black
+Focus on reflection interplay
+
+MOOD:
+Artistic
+Intellectual
+Surreal
+Sleek
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Glare reflection
+Messy mirrors
+Bad anatomy
+Low resolution
+
+OUTPUT: Mirror reflection. Dual perspective. Surreal elegance.`;
+    },
+  },
+
+  'backstage-vanity': {
+    name: 'Backstage Vanity',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'looking into vanity mirror, adjusting jewelry' : 'reflection visible in mirror';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'adjusting ring or bracelet in mirror'
+        : 'adjusting earring or necklace in mirror';
+
+      return `STYLE: Cinematic behind-the-scenes fashion
+
+NARRATIVE:
+Getting ready moment before big gala
+Luxury dressing room
+Backstage vanity area
+
+LIGHTING:
+Mixed lighting
+Warm tungsten Hollywood mirror bulbs
+Illuminating face and jewelry sparkle
+Cooler ambient room background
+
+MODEL:
+${genderDesc}
+${faceDesc}
+${jewelryPlacement}
+Wearing silk dressing gown
+Or partially zipped haute couture
+
+MIRROR:
+Framed with bright vanity bulbs
+Reflection doubles jewelry impact
+
+FOREGROUND:
+Lipstick, makeup brushes, perfume bottles
+Blurred adding context
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Catching Hollywood light
+
+MOOD:
+Exclusive
+Anticipatory
+High-society
+Intimate
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Messy room
+Ugly furniture
+Fluorescent lighting
+Stiff pose
+
+OUTPUT: Backstage vanity. Hollywood lights. Getting ready luxury.`;
+    },
+  },
+
+  'windswept-cliff': {
+    name: 'Windswept Cliff',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'powerful expression facing the wind' : 'dramatic silhouette';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands visible against dramatic backdrop'
+        : 'jewelry catching golden light';
+
+      return `STYLE: Dramatic dynamic outdoor fashion
+
+SETTING:
+Atop wind-swept cliff or sand dune
+Strong wind blowing
+
+ACTION:
+Long hair billowing dramatically
+Voluminous sheer fabric dress
+Chiffon or silk tulle
+Sculptural shapes in air
+
+LIGHTING:
+Powerful backlighting
+Setting sun (Golden Hour)
+Translucent fabric glowing
+Brilliant halo rim light effect
+${jewelryPlacement}
+Facets sparkling intensely
+
+MODEL:
+${genderDesc}
+${faceDesc}
+Majestic epic pose
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Catching golden light
+
+BACKGROUND:
+Expansive blurred natural landscape
+Ocean horizon, mountains, or desert
+
+TECHNICAL:
+High shutter speed
+Freeze motion of fabric and hair
+Sharp detail
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Static pose
+No wind
+Stiff fabric
+Flat lighting
+City buildings
+
+OUTPUT: Windswept cliff. Billowing fabric. Epic golden hour.`;
+    },
+  },
+
+  'greek-marble-statue': {
+    name: 'Greek Marble Statue',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'serene noble expression, statuesque' : 'classical pose, partial face';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands positioned like classical sculpture'
+        : 'jewelry highlighted by museum lighting';
+
+      return `STYLE: Timeless statuesque fashion
+
+INSPIRATION:
+Classical Greek sculpture
+High-fashion museum editorials
+
+SETTING:
+Textured white Carrara marble columns
+Classical architecture backdrop
+
+POSE:
+Graceful static pose
+Living statue reminiscent
+Serene noble expression
+
+MODEL:
+${genderDesc}
+${faceDesc}
+Flowing pleated white or cream fabric
+Toga or haute couture gown
+Mimics marble drapery lines
+${jewelryPlacement}
+
+LIGHTING:
+Soft diffused skylight
+Museum lighting style
+Gentle shadows sculpting features
+Dimensional jewelry details
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Gold/silver against white marble
+
+COLOR PALETTE:
+Monochromatic whites
+Creams, soft greys
+Metallic jewelry accent
+
+ATMOSPHERE:
+Eternal
+Noble
+Artistic
+Expensive
+8K resolution
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Modern city
+Neon graffiti
+Vibrant colors
+Casual clothing
+Horror
+
+OUTPUT: Greek marble. Living statue. Classical nobility.`;
+    },
+  },
+
+  'liquid-metal-chrome': {
+    name: 'Liquid Metal Chrome',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'stunning male model' : 'stunning female model';
+      const faceDesc = showFace === 'show' ? 'otherworldly powerful expression' : 'metallic silhouette';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands with metallic sheen'
+        : 'jewelry blending with metallic skin';
+
+      return `STYLE: Avant-garde futuristic editorial
+
+AESTHETIC:
+Liquid Metal look
+Living precious metal statue
+
+STYLING:
+High-gloss metallic skin finish
+Gold or silver body shimmer
+Rising from pool of dark liquid chrome
+${jewelryPlacement}
+
+LIGHTING:
+Glossy specular lighting
+Accentuates body curves
+Jewelry facets catching light
+Skin reflections blend with jewelry shine
+Unified hyper-luxurious texture
+
+MODEL:
+${genderDesc}
+${faceDesc}
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Seamless with metallic aesthetic
+
+BACKGROUND:
+Abstract flowing liquid forms
+Sleek dark metallic environment
+
+COLOR PALETTE:
+Monochromatic gold
+Silver, bronze, or platinum tones
+
+ATMOSPHERE:
+Otherworldly
+Powerful
+Sci-fi luxury
+High-tech
+8K resolution
+Hyper-realistic texture
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Matte skin
+Dry skin
+Vintage rustic
+Nature flowers
+Low contrast
+
+OUTPUT: Liquid metal. Chrome beauty. Sci-fi luxury.`;
+    },
+  },
+
+  'slim-aarons-riviera': {
+    name: 'Slim Aarons Riviera',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'chic male model' : 'chic female model';
+      const faceDesc = showFace === 'show' ? 'leisurely wealthy expression' : 'glamorous poolside presence';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'holding colorful cocktail, jewelry visible'
+        : 'jewelry popping against pool blue';
+
+      return `STYLE: Vibrant retro-glamorous fashion
+
+INSPIRATION:
+Slim Aarons photography
+1970s French Riviera high society
+
+SETTING:
+Poolside at luxury mid-century villa
+Amalfi Coast sunny day
+Sparkling turquoise swimming pool
+White parasols
+Lush bougainvillea flowers
+
+MODEL:
+${genderDesc}
+${faceDesc}
+Lounging on sunbed
+${jewelryPlacement}
+
+STYLING:
+Colorful vintage caftan
+Or high-waisted swimsuit
+Oversized sunglasses
+Silk headscarf
+
+LIGHTING:
+Bright flat high-key natural sunlight
+Vivid colors
+Minimized shadows
+Gold/silver jewelry pops against pool blue
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Catching Mediterranean sun
+
+MOOD:
+Leisurely
+Wealthy
+Nostalgic
+Joyful
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Dark gloomy
+Black and white
+Studio lighting
+Rain winter snow
+Modern streetwear
+
+OUTPUT: Slim Aarons. Riviera poolside. 70s glamour.`;
+    },
+  },
+
+  'rain-window-bokeh': {
+    name: 'Rain Window Bokeh',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'pensive emotional expression' : 'silhouette behind glass';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands near glass with jewelry'
+        : 'jewelry catching rain-refracted light';
+
+      return `STYLE: Moody atmospheric editorial
+
+FOREGROUND:
+Sharp realistic water droplets
+On glass surface
+
+SUBJECT:
+${genderDesc}
+${faceDesc}
+Positioned just behind glass
+Looking out through rainy window
+
+FOCUS:
+Selective focus on jewelry and raindrops
+Connection between water and gemstones
+${jewelryPlacement}
+
+BACKGROUND:
+Blurred city night lights
+Colorful bokeh orbs
+Red tail lights
+Amber street lamps
+Or grey overcast sky
+
+LIGHTING:
+Soft cinematic ambient light
+Reflecting off wet glass
+Metallic jewelry surfaces catching light
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Gleaming through rain
+
+ATMOSPHERE:
+Intimate
+Melancholic
+Romantic
+Luxurious
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Sunny bright sky
+Dry glass
+Happy laughing
+Studio background
+Beach summer
+
+OUTPUT: Rain window. City bokeh. Melancholic luxury.`;
+    },
+  },
+
+  'intimate-skin-contrast': {
+    name: 'Intimate Skin Contrast',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hand near face, wrist/finger jewelry visible'
+        : 'neck, shoulder, decolletage with jewelry';
+
+      return `STYLE: Sensual intimate close-up fashion
+
+FRAMING:
+Tight crop showing
+${jewelryPlacement}
+Appears unclothed or minimalist
+
+TEXTURE:
+High emphasis on flawless glowing skin
+Slight dewy sheen or shimmer
+Hydrated skin or light body oil
+Softness contrasting hard polished metal
+Sharp gemstone facets
+
+LIGHTING:
+Soft warm enveloping studio lighting
+Both skin and gold/metal glow
+
+COLOR PALETTE:
+Warm monochrome skin tones
+Beige, bronze, honey
+Metallic jewelry color
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Against bare skin
+
+MOOD:
+Pure
+Expensive
+Intimate
+Raw luxury
+8K resolution
+Highly detailed textures
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Busy clothing
+Fabric textures
+Busy background
+Harsh shadows
+Matte dry skin
+Cold tones
+
+OUTPUT: Intimate skin. Jewelry contrast. Pure luxury.`;
+    },
+  },
+
+  'monochromatic-flood': {
+    name: 'Monochromatic Flood',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'bold confident expression' : 'artistic silhouette';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands against monochrome backdrop'
+        : 'jewelry as only contrast element';
+
+      return `STYLE: Striking avant-garde editorial
+
+COLOR THEME:
+Monochromatic Color Flood
+Entire image dominated by single bold color
+Deep Crimson Red OR Electric Blue
+
+STYLING:
+High-fashion outfit
+Makeup matches color exactly
+Background matches color
+
+CONTRAST:
+${jewelryPlacement}
+Jewelry is ONLY non-dominant color element
+Gold, silver, diamonds retain natural brilliance
+Stands out vividly against saturated surroundings
+
+LIGHTING:
+Soft commercial studio lighting
+Rich color saturation
+Jewelry perfectly illuminated
+White highlights on metal
+
+MODEL:
+${genderDesc}
+${faceDesc}
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Natural metallic brilliance
+
+MOOD:
+Bold
+Artistic
+Modern
+Graphic
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Rainbow multi-colored
+Messy colors
+White background
+Nature trees
+Faded washed out
+
+OUTPUT: Monochromatic flood. Jewelry contrast. Bold graphic.`;
+    },
+  },
+
+  'light-painting-trails': {
+    name: 'Light Painting Trails',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'perfectly still, sharp amidst light' : 'silhouette with light trails';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands with streaking light reflections'
+        : 'jewelry with intense light reflections';
+
+      return `STYLE: Mesmerizing artistic fashion
+
+TECHNIQUE:
+Light Painting
+Long Exposure photography
+
+SETTING:
+Pitch-black dark studio
+
+EFFECT:
+Swirling glowing light trails
+Neon blue, gold, or bright white
+Abstract shapes and ribbons of light
+Dancing around model
+
+MODEL:
+${genderDesc}
+${faceDesc}
+Perfectly still and razor-sharp
+Amidst moving lights
+${jewelryPlacement}
+
+LIGHTING:
+Light trails as primary illumination
+Dramatic colorful highlights on face
+Streaking reflections on metallic jewelry
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Catching light trail reflections
+
+ATMOSPHERE:
+Electric
+Energetic
+Futuristic
+Magical
+8K resolution
+Creative shutter effect
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Bright daylight
+Static lighting
+White background
+Blurry model
+Standard portrait
+
+OUTPUT: Light painting. Swirling trails. Electric magic.`;
+    },
+  },
+
+  'double-exposure-nature': {
+    name: 'Double Exposure Nature',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'silhouette blended with nature' : 'ethereal profile';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands solid and sharp with jewelry'
+        : 'jewelry 100% solid and opaque';
+
+      return `STYLE: Surreal fine-art portrait
+
+COMPOSITION:
+Double Exposure technique
+Silhouette blended with secondary image
+Nature elements filling shadows
+Misty forest, blooming flowers, or ocean waves
+Dreamlike multi-layered effect
+
+VISUAL PRIORITY:
+Model and background blended ethereal
+${jewelryPlacement}
+Jewelry remains 100% solid, opaque, razor-sharp
+Sits on top of double exposure
+Shining brightly as focal point of reality
+
+MODEL:
+${genderDesc}
+${faceDesc}
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+NOT transparent or fading
+Reality anchor in surreal scene
+
+COLORS:
+Cool blues
+Forest greens
+Or monochrome
+Metallic gold/silver contrast
+
+MOOD:
+Psychological
+Deep
+Ethereal
+Artistic
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Messy confusing blend
+Jewelry looking transparent
+Ghost jewelry fading
+Horror creepy
+Low resolution
+
+OUTPUT: Double exposure. Nature blend. Jewelry reality anchor.`;
+    },
+  },
+
+  'textured-glass-blur': {
+    name: 'Textured Glass Blur',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'softened mysterious features' : 'abstracted silhouette';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hand pressing against glass, jewelry distinct'
+        : 'jewelry close to glass, relatively distinct';
+
+      return `STYLE: Abstract high-fashion editorial
+
+TECHNIQUE:
+Shot through textured glass
+Reeded glass, fluted glass, or frosted glass
+
+COMPOSITION:
+${genderDesc}
+Pressing hand or face against textured surface
+Areas touching glass sharper
+Areas further away painting-like blur
+
+FOCUS:
+${jewelryPlacement}
+Jewelry positioned close to glass
+Relatively distinct, catching light
+Model features softened and mysterious
+${faceDesc}
+
+LIGHTING:
+Soft backlighting or side lighting
+Emphasizes vertical lines of glass
+Glass texture visible
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Sharp against softened surroundings
+
+MOOD:
+Ethereal
+Modern
+Artistic
+Soft
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Clear plain glass
+Completely invisible subject
+Broken glass dangerous
+Dirty smudge marks
+Glare on glass
+
+OUTPUT: Textured glass. Painting blur. Ethereal mystery.`;
+    },
+  },
+
+  'macro-eye-jewelry': {
+    name: 'Macro Eye Jewelry',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'ring-adorned hand held near eye'
+        : 'earring close to frame near eye';
+
+      return `STYLE: Extreme close-up macro fashion
+
+COMPOSITION:
+Frame filled tightly with eye
+Eyebrows visible
+${jewelryPlacement}
+${genderDesc}
+
+DETAIL:
+Hyper-realistic texture
+Intricate iris patterns
+Individual eyelashes
+Skin pores visible
+
+LIGHTING:
+Precision macro lighting
+Distinct bright catchlight in pupil
+Matches sparkle of jewelry gemstones
+
+FOCUS:
+Extremely shallow depth of field
+Eye and jewelry razor-sharp
+Background soft blur
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Catching catchlight sparkle
+
+AESTHETIC:
+Hypnotic
+Intense
+High-end beauty photography
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Full face
+Distant shot
+Blurry eye
+Red bloodshot eyes
+Messy makeup
+Bad anatomy
+Wide angle lens
+
+OUTPUT: Macro eye. Hypnotic detail. Beauty intensity.`;
+    },
+  },
+
+  'cyberpunk-glitch': {
+    name: 'Cyberpunk Glitch',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'rebellious edgy expression' : 'mysterious cyber presence';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands reflecting chaotic neon'
+        : 'jewelry with colorful specular highlights';
+
+      return `STYLE: Futuristic edgy cyberpunk fashion
+
+LIGHTING:
+Intense neon lights
+Hot pink, electric blue, ultraviolet
+Rainy night in futuristic Tokyo street
+
+VISUAL EFFECTS:
+Subtle chromatic aberration (RGB color shift)
+Scanlines
+Digital noise/grain overlays
+Raw hacked system failure aesthetic
+
+MODEL:
+${genderDesc}
+${faceDesc}
+Wet-look hair
+Metallic makeup
+Rebellious styling
+
+REFLECTIONS:
+${jewelryPlacement}
+Metallic surfaces reflect chaotic neon
+High-contrast colorful specular highlights
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Neon reflections on metal
+
+ATMOSPHERE:
+Dystopian
+High-tech
+Cinematic
+Cool
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Natural sunlight
+Nature flowers
+Rustic vintage
+Sepia black white
+Clean white background
+Traditional portrait
+
+OUTPUT: Cyberpunk glitch. Neon Tokyo. Digital rebellion.`;
+    },
+  },
+
+  'french-new-wave': {
+    name: 'French New Wave',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'stylish man' : 'stylish woman';
+      const faceDesc = showFace === 'show' ? 'romantic intellectual expression' : 'candid European presence';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands visible in lifestyle scene'
+        : 'jewelry blending naturally in scene';
+
+      return `STYLE: Nostalgic cinematic fashion
+
+INSPIRATION:
+1960s French New Wave cinema
+Vintage Kodak Portra photography
+
+AESTHETIC:
+Analog film look
+Visible film grain
+Slightly muted/faded pastel colors
+Soft warm vintage color grading
+
+SETTING:
+Walking down historic European street
+Or sitting in retro sidewalk cafe
+
+MODEL:
+${genderDesc}
+${faceDesc}
+${jewelryPlacement}
+
+STYLING:
+Classic 60s/70s fashion
+Trench coat
+Silk headscarf
+Cat-eye sunglasses
+
+LIGHTING:
+Natural afternoon sunlight
+Slightly hazy and romantic
+Soft focus keeps jewelry clear
+Blends naturally in lifestyle scene
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Timeless vintage feel
+
+MOOD:
+Romantic
+Intellectual
+Timeless
+Candid
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Digital HD sharp
+Modern architecture
+Neon lights futuristic
+Studio lighting
+Bright saturated colors
+
+OUTPUT: French New Wave. 60s romance. Intellectual vintage.`;
+    },
+  },
+
+  'prism-spectral-light': {
+    name: 'Prism Spectral Light',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'angelic radiant expression' : 'ethereal presence';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands catching spectral light'
+        : 'jewelry sparkling intensely in prism light';
+
+      return `STYLE: Ethereal light-filled fashion beauty
+
+TECHNIQUE:
+Prism Photography
+Beams through crystal prism
+
+LIGHTING EFFECT:
+Soft spectral rainbow flares
+Light leaks across face and neck
+Light split into constituent colors
+Red, blue, violet
+Holographic dreamy atmosphere
+${jewelryPlacement}
+
+MODEL:
+${genderDesc}
+${faceDesc}
+
+FOCUS:
+Jewelry sharp and sparkling intensely
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Catching rainbow light
+
+BACKGROUND:
+Clean high-key white
+Or very pale grey
+Rainbow colors pop
+
+AESTHETICS:
+Clean
+Modern
+Angelic
+Radiant
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Dark gloomy
+Muddy colors
+Heavy shadows
+Neon tubes (natural prism only)
+Over-saturated
+Bad anatomy
+
+OUTPUT: Prism spectral. Rainbow flares. Angelic radiance.`;
+    },
+  },
+
+  'brutalist-architecture': {
+    name: 'Brutalist Architecture',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'modern edgy confident' : 'powerful silhouette';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands against concrete texture'
+        : 'jewelry as only warmth/shine source';
+
+      return `STYLE: Striking architectural fashion
+
+TEXTURE CONTRAST:
+Rough matte cold grey concrete
+Against smooth polished warm metallic jewelry
+
+SETTING:
+Raw brutalist concrete walls
+Architectural backdrop
+
+LIGHTING:
+Hard directional sunlight
+Sharp geometric shadows on wall
+Architectural shadow patterns
+${jewelryPlacement}
+
+MODEL:
+${genderDesc}
+${faceDesc}
+Modern edgy minimalist styling
+Sharp blazer or structural dress
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Only source of warmth/shine
+Gold/silver popping against grey
+
+COLOR PALETTE:
+Dominant greys and shadows
+Metallic jewelry accent
+
+MOOD:
+Modern
+Powerful
+Architectural
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Nature flowers soft
+Romantic vintage
+Ornate wallpaper
+Warm orange background
+Casual messy
+
+OUTPUT: Brutalist concrete. Geometric shadows. Metal warmth.`;
+    },
+  },
+
+  'turkish-hammam': {
+    name: 'Turkish Hammam',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'handsome model' : 'beautiful model';
+      const faceDesc = showFace === 'show' ? 'serene spa-like expression' : 'relaxed partial face';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands with water droplets near jewelry'
+        : 'jewelry against steamy skin, regal timeless';
+
+      return `STYLE: Luxurious atmospheric fashion
+
+INSPIRATION:
+Modern Orientalism
+Authentic Turkish Hammam culture
+
+SETTING:
+Inside marble hammam
+Authentic Iznik tiles
+Or white marble basins
+Background atmosphere
+
+ATMOSPHERE:
+Hazy with gentle steam/mist
+Skin glowing hydrated look
+
+MODEL:
+${genderDesc}
+${faceDesc}
+Wrapped in high-quality white towel
+Or pestemal
+Shoulders and neck revealed
+${jewelryPlacement}
+
+LIGHTING:
+Soft diffused daylight
+Filtering through dome (elephant eyes)
+Serene spa-like mood
+
+TEXTURE:
+Marble surfaces
+Water droplets on skin
+Wet hair
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Regal and timeless in setting
+
+MOOD:
+Serene
+Luxurious
+Authentic
+Timeless
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Dry skin matte
+Studio background
+Street cars
+Western jeans
+Neon hard flash
+
+OUTPUT: Turkish hammam. Marble steam. Regal spa luxury.`;
+    },
+  },
+
+  'old-money-tennis': {
+    name: 'Old Money Tennis',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'healthy wealthy active expression' : 'sporty elegant presence';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'tennis bracelet or rings visible'
+        : 'jewelry adding incongruous luxury';
+
+      return `STYLE: Dynamic Old Money aesthetic lifestyle
+
+SETTING:
+Sunny tennis court
+Or country club
+
+STYLING:
+Sporty-chic attire
+White pleated skirt
+Polo shirt
+Tennis racket in hand or nearby
+${jewelryPlacement}
+
+LIGHTING:
+Bright energetic morning sunlight
+
+COLORS:
+Clay orange (court)
+Fresh white (clothes)
+Sky blue
+Jewelry adds luxury to sporty setting
+
+MODEL:
+${genderDesc}
+${faceDesc}
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Touch of incongruous luxury
+
+VIBE:
+Healthy
+Wealthy
+Active
+Fresh
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Night dark
+Studio indoor
+Evening gown
+Heavy makeup
+Lazy sedentary
+Grunge dirty
+
+OUTPUT: Old money tennis. Sporty luxury. Active elegance.`;
+    },
+  },
 };
