@@ -21,7 +21,9 @@ import {
   Target, Flashlight, Star, Droplet, PartyPopper, Smile, HandMetal, Shapes,
   Thermometer, CircleUser, Microscope, Move3D, ScanFace, FileSearch, ChevronDown,
   ChevronRight, Users, Crosshair, Eye, Gauge, Heart, Brush, Timer, Droplet as DropletIcon,
-  PersonStanding, Blend, Shirt as ShirtBlaze, Minus, ArrowDownToLine, Palette as PaletteIcon
+  PersonStanding, Blend, Shirt as ShirtBlaze, Minus, ArrowDownToLine, Palette as PaletteIcon,
+  Lamp, Instagram, PartyPopperIcon, Glasses, Palmtree, Crown, Square as SquareIcon,
+  Wand2, Pill
 } from 'lucide-react';
 
 interface QuickPreset {
@@ -64,6 +66,8 @@ const PRESET_CATEGORIES: PresetCategory[] = [
       { id: 'still-life', name: 'Still Life', icon: Gem, description: 'Product-only elegance', color: 'text-green-400' },
       { id: 'macro', name: 'Macro', icon: Focus, description: 'Extreme close-up details', color: 'text-cyan-400' },
       { id: 'sharp-strobe', name: 'Sharp Strobe', icon: Zap, description: 'Hard light, facet sparkle', color: 'text-yellow-300' },
+      { id: 'octabox-luxury', name: 'Octabox Luxury', icon: Lamp, description: 'Clamshell lighting, minimal', color: 'text-blue-200' },
+      { id: 'ceo-diamond', name: 'CEO Diamond', icon: Crown, description: 'Low angle, tuxedo power', color: 'text-slate-400' },
     ],
   },
 
@@ -84,6 +88,7 @@ const PRESET_CATEGORIES: PresetCategory[] = [
       { id: 'candid-laugh', name: 'Candid Laugh', icon: Laugh, description: 'Real moment, genuine emotion', color: 'text-pink-300' },
       { id: 'duo-friends', name: 'Duo Friends', icon: Users, description: 'Two models, friendship', color: 'text-rose-300' },
       { id: 'motion-candid', name: 'Motion Candid', icon: Wind, description: 'Hair blowing, movement blur', color: 'text-violet-300' },
+      { id: 'bracelet-laugh', name: 'Bracelet Laugh', icon: Laugh, description: 'Covering mouth, genuine joy', color: 'text-amber-300' },
     ],
   },
 
@@ -107,6 +112,9 @@ const PRESET_CATEGORIES: PresetCategory[] = [
       { id: 'hair-strand-shadow', name: 'Hair Strand', icon: Brush, description: 'Hair shadows on face', color: 'text-purple-300' },
       { id: 'kodak-low-key', name: 'Kodak Low Key', icon: Film, description: 'Cinematic chiaroscuro', color: 'text-amber-600' },
       { id: 'oily-glow', name: 'Oily Glow', icon: Droplets, description: 'Sweaty sheen, specular', color: 'text-yellow-200' },
+      { id: 'spotlight-dark', name: 'Spotlight Dark', icon: Flashlight, description: 'Low-key, black background', color: 'text-zinc-400' },
+      { id: 'party-flash', name: 'Party Flash', icon: Zap, description: 'Direct flash, night candid', color: 'text-pink-400' },
+      { id: 'gobo-vacation', name: 'Gobo Vacation', icon: Palmtree, description: 'Dappled shadows, exotic', color: 'text-amber-400' },
     ],
   },
 
@@ -130,6 +138,8 @@ const PRESET_CATEGORIES: PresetCategory[] = [
       { id: 'urban-cafe', name: 'Urban Cafe', icon: Building, description: 'Bustling coffee shop', color: 'text-orange-400' },
       { id: 'soft-blinds', name: 'Soft Blinds', icon: Grid3X3, description: 'Gentle stripes, peaceful', color: 'text-amber-100' },
       { id: 'chain-tension', name: 'Chain Tension', icon: Link2, description: 'Pendant pull, tactile', color: 'text-yellow-300' },
+      { id: 'influencer-golden', name: 'Influencer Golden', icon: Instagram, description: 'Golden hour, sun flare', color: 'text-orange-400' },
+      { id: 'pendant-touch', name: 'Pendant Touch', icon: Shirt, description: 'Soft touch, intimate', color: 'text-stone-200' },
     ],
   },
 
@@ -205,6 +215,11 @@ const PRESET_CATEGORIES: PresetCategory[] = [
       { id: 'dark-glow', name: 'Dark Glow', icon: Star, description: 'Deep dark skin, cashmere', color: 'text-amber-400' },
       { id: 'silk-shoulder', name: 'Silk Shoulder', icon: Ribbon, description: 'Olive skin, champagne slip', color: 'text-rose-200' },
       { id: 'freckle-linen', name: 'Freckle Linen', icon: Shirt, description: 'Fair skin, natural freckles', color: 'text-orange-200' },
+      { id: 'hair-tie-profile', name: 'Hair Tie Profile', icon: User, description: 'Tying hair, earrings', color: 'text-violet-200' },
+      { id: 'black-silk-evening', name: 'Black Silk Evening', icon: Moon, description: 'Deep neckline, evening', color: 'text-slate-400' },
+      { id: 'sunglasses-rings', name: 'Sunglasses Rings', icon: Glasses, description: 'It-girl attitude', color: 'text-zinc-300' },
+      { id: 'wind-silk-blouse', name: 'Wind Silk Blouse', icon: Wind, description: 'Hair shadows, intense', color: 'text-purple-300' },
+      { id: 'cashmere-cozy', name: 'Cashmere Cozy', icon: CloudFog, description: 'Collar to chin, cozy', color: 'text-amber-200' },
     ],
   },
 
@@ -265,6 +280,9 @@ const PRESET_CATEGORIES: PresetCategory[] = [
       { id: 'art-gallery', name: 'Art Gallery', icon: Landmark, description: 'Museum, stark white walls', color: 'text-slate-400' },
       { id: 'architecture', name: 'Architecture', icon: Columns, description: 'Modern geometric lines', color: 'text-slate-300' },
       { id: 'library-classic', name: 'Library Classic', icon: BookOpen, description: 'Warm wood, old books', color: 'text-amber-500' },
+      { id: 'bw-lips-pendant', name: 'BW Lips Pendant', icon: SquareIcon, description: 'Monochrome macro, iconic', color: 'text-zinc-400' },
+      { id: 'mirror-shard', name: 'Mirror Shard', icon: Wand2, description: 'Broken reflection, surreal', color: 'text-purple-400' },
+      { id: 'wet-droplets', name: 'Wet Droplets', icon: Droplets, description: 'Water on skin, glossy', color: 'text-cyan-300' },
     ],
   },
 ];

@@ -8337,4 +8337,1076 @@ Dark background
 OUTPUT: Freckle linen. Fair skin. Natural freckles. White linen fresh.`;
     },
   },
+
+  'octabox-luxury': {
+    name: 'Octabox Luxury',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'female' : gender === 'men' ? 'male' : '';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Ultra-clean luxury jewelry beauty photography. Close-up portrait of a ${genderText} model wearing ${jewelryType}. Minimal aesthetic, flawless natural skin texture, soft makeup, neutral tones.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+OCTABOX LIGHTING:
+High-key lighting setup
+Soft diffused light
+Large octabox and reflector
+Clamshell lighting technique
+No harsh shadows
+
+AESTHETIC:
+Ultra-clean luxury
+Minimal, elegant
+Timeless look
+Premium editorial
+
+BACKGROUND:
+Pure white or very light beige
+Seamless, clean
+No distractions
+High-key environment
+
+SKIN:
+Flawless natural texture
+Smooth highlights
+Natural skin color accuracy
+Not overly retouched
+
+JEWELRY:
+${jewelryType} sharp focus
+ONLY the specified jewelry
+Controlled reflections
+Luxury brand aesthetic
+
+TECHNICAL:
+85mm lens look, f/4
+ISO 100, ultra high resolution
+Commercial beauty style
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Harsh shadows, hard light
+Dark background
+Overexposed, blown whites
+Orange/unnatural skin tones
+Oily, glossy face
+
+OUTPUT: Octabox luxury. Clamshell lighting. Ultra-clean minimal. Premium beauty.`;
+    },
+  },
+
+  'spotlight-dark': {
+    name: 'Spotlight Dark',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+
+      return `Luxury jewelry photography. Low-key lighting (dark mood). Close up of a ${genderText} wearing ${jewelryType}. Deep black seamless background.
+
+LOW-KEY LIGHTING:
+Single spotlight only
+Illuminating gold metal and neck
+Deep black seamless background
+Strong contrast
+Mysterious atmosphere
+
+MOOD:
+Mysterious and expensive
+Dark, luxurious
+Dramatic presence
+High-end editorial
+
+LIGHTING:
+Single spotlight source
+Creating strong contrast
+Skin texture visible in lit areas
+Dark surrounding
+
+SKIN:
+Texture visible where lit
+Real human quality
+Emerging from darkness
+Dramatic reveal
+
+JEWELRY:
+${jewelryType} catching spotlight
+ONLY the specified jewelry
+Glowing in darkness
+Luxury showcase
+
+TECHNICAL:
+Shot on Hasselblad equivalent
+Low-key style
+Mysterious mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+White background
+Bright, cheerful lighting
+Daytime feel
+Flat lighting
+
+OUTPUT: Spotlight dark. Low-key luxury. Black background. Mysterious drama.`;
+    },
+  },
+
+  'influencer-golden': {
+    name: 'Influencer Golden',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Lifestyle influencer photography. Outdoor shot during golden hour sunset. Warm sunlight hitting the face of a ${genderText} wearing ${jewelryType}.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+INFLUENCER AESTHETIC:
+Golden hour sunset
+Natural, messy hair blowing
+Sun flare in lens
+Casual and authentic
+Social media ready
+
+BACKGROUND:
+Blurred city street or nature
+Beautiful bokeh
+Outdoor environment
+Natural context
+
+LIGHTING:
+Warm golden hour sunlight
+Natural warmth
+Authentic glow
+No artificial flash
+
+STYLING:
+Natural messy hair
+Wind-blown
+Casual, effortless
+Real, not posed
+
+SKIN:
+Glowing with natural warmth
+Real texture visible
+Authentic appearance
+Sun-kissed
+
+JEWELRY:
+${jewelryType} catching golden light
+ONLY the specified jewelry
+Instagram-ready
+Natural showcase
+
+TECHNICAL:
+Shot on 35mm lens equivalent
+Outdoor natural light
+Authentic mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Studio lighting
+Artificial flash
+Grey background
+Posed mannequin look
+Cold tones
+
+OUTPUT: Influencer golden. Sunset flare. Messy hair. Authentic lifestyle.`;
+    },
+  },
+
+  'party-flash': {
+    name: 'Party Flash',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Flash photography aesthetic. Direct camera flash hitting a ${genderText} wearing ${jewelryType}. Leaning against a textured wall at night.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+PARTY FLASH:
+Direct camera flash
+Hard sharp shadows behind
+High contrast
+Slight vignette
+Candid party vibe
+
+ENVIRONMENT:
+Textured wall at night
+Urban, nightlife
+Raw, unpolished setting
+Real location
+
+SKIN:
+Shiny skin texture
+Oily/dewy look
+Real party appearance
+Flash-lit reality
+
+MOOD:
+Candid party vibe
+Raw, unpolished
+Nightlife energy
+Authentic moment
+
+JEWELRY:
+${jewelryType} catching flash
+ONLY the specified jewelry
+Night sparkle
+Party showcase
+
+TECHNICAL:
+Shot on film camera aesthetic
+Direct flash style
+Party mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Soft, studio lighting
+Perfect beauty dish
+Romantic, dreamy
+Airbrushed appearance
+
+OUTPUT: Party flash. Direct flash. Night textured. Candid party.`;
+    },
+  },
+
+  'hair-tie-profile': {
+    name: 'Hair Tie Profile',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Editorial jewelry photography. Bright high-key style with soft directional lighting. Side profile view of a ${genderText} tying hair up, wearing ${jewelryType}.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+HAIR TIE MOMENT:
+Side profile view
+Tying hair up
+Arms raised
+Neck and jawline fully visible
+Elegant posture
+
+LIGHTING:
+Bright high-key style
+Soft directional lighting
+Pure white background
+Clean illumination
+
+SKIN:
+Hyper-realistic texture
+Natural moles and pores
+Vellus hair on neck visible
+Not plastic
+
+FOCUS:
+Earring movement
+Neck exposure
+Profile elegance
+Dynamic action
+
+JEWELRY:
+${jewelryType} in motion
+ONLY the specified jewelry
+Catching movement
+Elegant showcase
+
+AESTHETIC:
+Minimalist, expensive
+Editorial quality
+Clean, refined
+Modern beauty
+
+TECHNICAL:
+Macro lens equivalent
+High-key style
+Elegant mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Plastic skin
+Smooth face
+Static pose
+Dark background
+
+OUTPUT: Hair tie profile. Arms raised. Neck revealed. Editorial elegance.`;
+    },
+  },
+
+  'black-silk-evening': {
+    name: 'Black Silk Evening',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Editorial jewelry photography. Bright high-key style with soft directional lighting. Cropped medium shot of a ${genderText} wearing a black silk dress with deep neckline, wearing ${jewelryType}.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+BLACK SILK STYLING:
+Black silk dress
+Deep neckline/V-neck
+Elegant evening look
+Clean and minimal
+
+CONTRAST:
+Sharp contrast black fabric
+Glowing skin texture
+Elegant juxtaposition
+Dramatic but refined
+
+LIGHTING:
+Bright high-key
+Soft directional
+Pure white background
+Evening elegance in studio
+
+SKIN:
+Hyper-realistic texture
+Natural moles and pores
+Glowing against black
+Minimalist expensive
+
+JEWELRY:
+${jewelryType} against black silk
+ONLY the specified jewelry
+Standing out dramatically
+Evening showcase
+
+TECHNICAL:
+Editorial quality
+High-key style
+Evening mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Plastic skin
+Smooth face
+Cheap fabric
+Busy patterns
+
+OUTPUT: Black silk evening. Deep neckline. Skin glow. Elegant contrast.`;
+    },
+  },
+
+  'sunglasses-rings': {
+    name: 'Sunglasses Rings',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Editorial jewelry photography. Soft dimensional high-key lighting. Close-up of a ${genderText}'s hand adjusting black sunglasses on face, wearing ${jewelryType} on fingers.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+IT-GIRL ATTITUDE:
+Hand adjusting sunglasses
+Cool, nonchalant
+"It-girl" confidence
+Effortless attitude
+Statement moment
+
+HAND DETAIL:
+Visible knuckles
+Dry skin texture
+Natural, not perfect
+Real hands
+
+CONTRAST:
+Glossy gold metal vs smooth acetate
+Sunglasses plastic vs metal jewelry
+Black contrast against white
+Material interplay
+
+LIGHTING:
+Soft dimensional high-key
+Hyper-realistic skin texture
+Pores and veins visible
+Clean background
+
+JEWELRY:
+${jewelryType} prominently on fingers
+ONLY the specified jewelry
+Statement showcase
+Attitude accessory
+
+COMPOSITION:
+Tight framing
+Interaction between hand and glasses
+Blurred background
+Dynamic moment
+
+TECHNICAL:
+Editorial quality
+High-key style
+Confident mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Plastic skin
+Airbrushed
+Smooth hands
+Boring pose
+
+OUTPUT: Sunglasses rings. It-girl attitude. Cool nonchalant. Statement moment.`;
+    },
+  },
+
+  'pendant-touch': {
+    name: 'Pendant Touch',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+
+      return `Editorial jewelry photography. Soft dimensional high-key lighting. Cropped shot of a ${genderText} wearing an unbuttoned white linen shirt, one hand gently touching ${jewelryType} on chest.
+
+INTIMATE MORNING:
+Unbuttoned white linen shirt
+Hand touching pendant/jewelry
+Serene, intimate
+Soft morning vibe
+Relaxing atmosphere
+
+FRAMING:
+Anonymous crop (lips down to chest)
+Rule of thirds composition
+Pendant in lower center
+Intimate perspective
+
+COLOR PALETTE:
+Creamy whites
+Champagne tones
+Soft warm palette
+Minimal, clean
+
+SKIN:
+Hyper-realistic texture
+Natural moles, vellus hair
+Chain pressing into skin
+Real human quality
+
+STYLING:
+Textured linen fabric weave
+Natural unpolished nails
+Authentic, not perfect
+Morning casual
+
+JEWELRY:
+${jewelryType} being touched
+ONLY the specified jewelry
+Intimate interaction
+Morning showcase
+
+TECHNICAL:
+High-key soft directional
+Intimate mood
+Serene atmosphere
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Plastic skin
+Smooth chest
+Heavy retouching
+Posed feeling
+
+OUTPUT: Pendant touch. Soft touch. Intimate serene. Champagne tones.`;
+    },
+  },
+
+  'bracelet-laugh': {
+    name: 'Bracelet Laugh',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Editorial jewelry photography. Soft dimensional high-key lighting. Dynamic shot of a ${genderText} laughing genuinely and covering mouth with hand playfully, wearing ${jewelryType}.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+GENUINE LAUGHTER:
+Laughing genuinely
+Covering mouth playfully
+Joyful, bubbly, candid
+Authentic happiness
+Energetic moment
+
+MOTION:
+Dynamic angles of arms
+Slight motion blur on hair
+Sharp jewelry focus
+Movement captured
+
+SKIN:
+Hyper-realistic texture
+Laugh lines visible
+Glistening (natural oils/sheen)
+Real, human quality
+
+LIGHTING:
+Soft dimensional high-key
+Warm sunny glow
+Golden hour feeling
+White background
+
+JEWELRY:
+${jewelryType} sharp and clear
+ONLY the specified jewelry
+Heavy metal weight visual
+Joyful showcase
+
+STYLING:
+Natural soft manicure
+Energetic pose
+Authentic expression
+Real moment
+
+TECHNICAL:
+Center composition
+Dynamic angles
+Energetic mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Plastic skin
+Fake smile
+Posed, static
+Frozen mannequin
+
+OUTPUT: Bracelet laugh. Covering mouth. Genuine joy. Dynamic motion.`;
+    },
+  },
+
+  'gobo-vacation': {
+    name: 'Gobo Vacation',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `High-end magazine editorial. Cinematic lighting with "Gobo" effects (dappled light/shadow patterns). Close-up portrait of a ${genderText} wearing ${jewelryType}.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+GOBO LIGHTING:
+Dappled light/shadow patterns
+Palm leaves or window blinds
+Shadows falling across face and neck
+Interplay between light and shadow
+Cinematic effect
+
+MOOD:
+Mysterious, exotic
+Slow luxury
+Quiet confidence
+Expensive vacation vibe
+Artistic atmosphere
+
+COLOR:
+Warm golden hour tones
+Deep rich browns
+Shadows and highlights
+Luxurious palette
+
+SKIN:
+Oily/glowing summer skin
+Hyper-realistic texture
+Natural, vacation look
+Illuminated by pattern
+
+STYLING:
+Wet hair look
+Relaxed, luxurious
+Vacation elegance
+Effortless
+
+JEWELRY:
+${jewelryType} in illuminated areas
+ONLY the specified jewelry
+Heavy gold catching light
+Exotic showcase
+
+TECHNICAL:
+Artistic framing
+Gobo lighting
+Vacation mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Flat lighting
+Studio grey background
+Plastic skin
+Boring, standard
+
+OUTPUT: Gobo vacation. Dappled shadows. Exotic luxury. Cinematic pattern.`;
+    },
+  },
+
+  'ceo-diamond': {
+    name: 'CEO Diamond',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Premium commercial photography. Crisp "Beauty Dish" lighting (hard but flattering). Low-angle shot (looking up) of a powerful ${genderText} wearing a sharp tuxedo blazer and ${jewelryType}.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+CEO POWER:
+Low-angle shot (looking up)
+Authoritative, bold
+CEO energy
+Timeless elegance
+Serious luxury
+
+LIGHTING:
+Beauty Dish lighting
+Hard but flattering
+Ultra-sharp detailed skin
+Hero angle
+
+STYLING:
+Sharp tuxedo blazer
+Satin lapel fabric
+Powerful silhouette
+Executive elegance
+
+COLOR:
+Cool neutrals
+Slate greys, pure white
+Icy silver or platinum tones
+Professional palette
+
+CONTRAST:
+Satin lapel vs matte skin
+Sparkling diamond dispersion
+Material interplay
+Luxurious textures
+
+JEWELRY:
+${jewelryType} with fire/dispersion
+ONLY the specified jewelry
+Powerful statement
+Authority showcase
+
+BACKGROUND:
+Clean geometric lines
+Minimal, architectural
+Professional setting
+Executive environment
+
+TECHNICAL:
+Beauty dish lighting
+Hero angle (low)
+Powerful mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Soft focus, romantic
+Dreamy, messy
+Warm casual tones
+Plastic face
+
+OUTPUT: CEO diamond. Low angle. Tuxedo power. Authoritative luxury.`;
+    },
+  },
+
+  'bw-lips-pendant': {
+    name: 'BW Lips Pendant',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      return `Iconic black and white fashion photography. Dramatic contrast lighting, raw film grain aesthetic. Extremely tight macro crop of lips, chin and a hand holding ${jewelryType} against the lips.
+
+BLACK & WHITE ICONIC:
+Monochrome photography
+Dramatic contrast
+Raw film grain aesthetic
+Iconic, timeless
+Pure and honest
+
+FRAMING:
+Extremely tight macro crop
+Lips, chin, and hand only
+Shallow depth of field
+Intimate perspective
+
+TEXTURE FOCUS:
+Visible lip texture (cracks/lines)
+Fingerprints on metal
+Realistic pores
+Form over color
+
+MOOD:
+Soulful, raw, emotional
+Iconic imagery
+Pure, honest
+Artistic expression
+
+JEWELRY:
+${jewelryType} held against lips
+ONLY the specified jewelry
+Metal against skin
+Iconic showcase
+
+LIGHTING:
+Dramatic contrast
+Rich blacks, bright highlights
+High contrast monochrome
+Film aesthetic
+
+TECHNICAL:
+Black and white only
+Macro perspective
+Emotional mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Color, sepia tones
+Plastic skin
+Smooth gradient
+Digital render look
+
+OUTPUT: BW lips pendant. Monochrome macro. Lips and metal. Iconic drama.`;
+    },
+  },
+
+  'wind-silk-blouse': {
+    name: 'Wind Silk Blouse',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `High-fashion photography. Energetic shot of a ${genderText} with wind blowing hair across face, strands of hair casting thin shadows on skin, wearing ${jewelryType}. White silk blouse.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+WIND DYNAMICS:
+Wind blowing hair across face
+Strands casting thin shadows on skin
+Dynamic movement
+Energetic moment
+
+EXPRESSION:
+Intense gaze
+Powerful, confident
+Fashion-forward
+Strong presence
+
+STYLING:
+White silk blouse
+Elegant fabric movement
+Statement jewelry
+High-fashion look
+
+LIGHTING:
+Bright studio lighting
+High contrast
+Sharp detailed skin texture
+White background
+
+SKIN:
+Sharp, detailed texture
+Real, not plastic
+Shadows from hair strands
+Dynamic appearance
+
+JEWELRY:
+${jewelryType} as statement
+ONLY the specified jewelry
+Catching light in motion
+Dynamic showcase
+
+TECHNICAL:
+High-fashion perspective
+Energetic mood
+Dynamic composition
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Static pose
+Plastic skin
+Mannequin look
+Flat lighting
+
+OUTPUT: Wind silk blouse. Hair shadows. Intense gaze. Dynamic fashion.`;
+    },
+  },
+
+  'cashmere-cozy': {
+    name: 'Cashmere Cozy',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Luxury editorial photography. Close-up of a ${genderText} pulling a plush beige cashmere collar (or faux fur) up to chin, wearing ${jewelryType}. Contrast between soft fuzzy fabric and hard shiny metal.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+COZY LUXURY:
+Pulling cashmere to chin
+Soft fuzzy fabric texture
+Cozy but expensive vibe
+Intimate warmth
+
+TEXTURE CONTRAST:
+Soft fuzzy fabric
+Hard shiny gold metal
+Material interplay
+Tactile luxury
+
+SKIN:
+Natural texture
+Visible freckles
+Real, not airbrushed
+Authentic appearance
+
+LIGHTING:
+Soft warm lighting
+Flattering, cozy
+Luxurious atmosphere
+Shot on Hasselblad equivalent
+
+JEWELRY:
+${jewelryType} contrasting fabric
+ONLY the specified jewelry
+Warm metal glow
+Cozy showcase
+
+MOOD:
+Warm, inviting
+Luxurious comfort
+Intimate, personal
+Winter elegance
+
+TECHNICAL:
+Hasselblad quality
+Cozy mood
+Intimate atmosphere
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Plastic skin
+Smooth hands
+Blurry fabric
+Cheap clothes
+
+OUTPUT: Cashmere cozy. Collar to chin. Soft vs hard. Cozy luxury.`;
+    },
+  },
+
+  'mirror-shard': {
+    name: 'Mirror Shard',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+
+      return `Abstract editorial photography. Shooting into a broken mirror shard held by a ${genderText}. The reflection shows a razor-sharp macro view of eye and ${jewelryType}, rest of image is blurry and distorted.
+
+SURREAL CONCEPT:
+Broken mirror shard
+Reflection showing macro detail
+Rest blurry and distorted
+Psychological, surreal
+Abstract editorial
+
+MIRROR DETAIL:
+Razor-sharp reflection
+Eye and jewelry visible
+Fingerprints on glass surface
+Fragmented reality
+
+CONTRAST:
+Sharp reflection vs blurry surroundings
+Focused vs distorted
+Reality vs abstraction
+Artistic tension
+
+SKIN:
+Hyper-realistic texture in reflection
+Real, authentic
+Visible only in mirror
+Macro detail
+
+LIGHTING:
+Cinematic lighting
+Dramatic atmosphere
+Mysterious mood
+Artistic illumination
+
+JEWELRY:
+${jewelryType} in reflection
+ONLY the specified jewelry
+Sharp in mirror
+Surreal showcase
+
+TECHNICAL:
+Abstract perspective
+Surreal mood
+Artistic composition
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Clean, unbroken mirror
+Standard selfie
+Whole face visible
+Plastic skin
+
+OUTPUT: Mirror shard. Broken reflection. Surreal macro. Psychological depth.`;
+    },
+  },
+
+  'wet-droplets': {
+    name: 'Wet Droplets',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `High-fashion beauty photography. "Wet look" styling. ${genderText === 'woman' ? 'Woman' : 'Model'} appears to have just emerged from water, wet hair slicked back, wearing ${jewelryType}.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+WET LOOK STYLING:
+Just emerged from water
+Wet hair slicked back
+Large water droplets on skin
+Glossy, high-contrast
+Fresh, aquatic
+
+WATER DETAIL:
+Distinct droplets clinging to skin
+Water magnifying pores/skin details
+Realistic water behavior
+Natural wetness
+
+SKIN:
+Real skin texture visible
+Pores magnified by water
+Authentic, not airbrushed
+Wet, glossy appearance
+
+LIGHTING:
+Sharp studio lighting
+High contrast
+Droplets catching light
+Fashion illumination
+
+JEWELRY:
+${jewelryType} (heavy gold/metal)
+ONLY the specified jewelry
+Water beading on metal
+Wet showcase
+
+FOCUS:
+Sharp on jewelry and water drops
+Detailed texture
+Glossy finish
+Fashion precision
+
+TECHNICAL:
+High-fashion perspective
+Wet look mood
+Aquatic elegance
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Dry skin
+Matte makeup
+Plastic skin
+Airbrushed, cartoon
+
+OUTPUT: Wet droplets. Water on skin. Slicked hair. Glossy fashion.`;
+    },
+  },
 };
