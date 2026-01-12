@@ -218,4 +218,121 @@ export const tr: TranslationKeys = {
     download: 'Görseli İndir',
     share: 'Görseli Paylaş',
   },
+
+  // Ayarlar Modalı
+  settingsModal: {
+    title: 'Oluşturma Ayarları',
+    subtitle: 'AI oluşturma tercihlerinizi yapılandırın',
+    requiredWarning: 'Lütfen oluşturmadan önce ayarları yapılandırın',
+    gender: 'Cinsiyet',
+    jewelryType: 'Takı Türü',
+    aspectRatio: 'En-Boy Oranı',
+    faceVisibility: 'Model Yüzü',
+    showFace: 'Yüzü Göster',
+    hideFace: 'Yüzü Gizle',
+    showFaceDesc: 'Yüzü görünen tam model',
+    hideFaceDesc: 'Kırpılmış, takıya odaklı',
+    vertical: 'Dikey',
+    horizontal: 'Yatay',
+    applyToAll: 'Gelecek tüm oluşturmalara uygula',
+    saveSettings: 'Ayarları Kaydet',
+    story: 'Hikaye',
+    standard: 'Standart',
+    classic: 'Klasik',
+    portrait: 'Portre',
+    square: 'Kare',
+    landscape: 'Manzara',
+    ultrawide: 'Ultra Geniş',
+  },
+
+  // Sağ Kenar Çubuğu
+  rightSidebar: {
+    aiGeneration: 'AI Oluşturma',
+    settings: 'Ayarlar',
+    settingsComplete: 'Ayarlar Tamam',
+    configureSettings: 'Ayarları Yapılandır',
+    browseLibrary: "Daha fazla preset için Kütüphane'ye göz atın",
+    mostUsed: 'En çok kullanılan 10',
+  },
+
+  // Preset Modları
+  presets: {
+    quick: 'Hızlı',
+    selective: 'Seçimli',
+    advanced: 'Gelişmiş',
+    random: 'Rastgele',
+    generate: 'Oluştur',
+    style: 'Stil',
+    model: 'Model',
+    setting: 'Mekan',
+    mood: 'Atmosfer',
+    camera: 'Kamera',
+    lighting: 'Işık',
+    colorGrading: 'Renk Düzenleme',
+    hair: 'Saç',
+    nails: 'Tırnak',
+    makeup: 'Makyaj',
+    skinTone: 'Ten Rengi',
+    facialHair: 'Yüz Kılları',
+  },
+
+  // Dashboard
+  dashboard: {
+    title: 'Kontrol Paneli',
+    welcome: 'Tekrar hoş geldiniz',
+    recentActivity: 'Son Aktivite',
+    quickActions: 'Hızlı İşlemler',
+    startCreating: 'Oluşturmaya Başla',
+    viewGallery: 'Galeriyi Görüntüle',
+    openStudio: "Stüdyo'yu Aç",
+  },
+
+  // Toplu İşlem
+  batch: {
+    title: 'Toplu İşlem',
+    uploadImages: 'Görselleri Yükle',
+    processAll: 'Tümünü İşle',
+    downloading: 'İndiriliyor...',
+    processing: 'İşleniyor...',
+    completed: 'Tamamlandı',
+    failed: 'Başarısız',
+    pending: 'Beklemede',
+    selectPreset: 'Toplu işlem için bir preset seçin',
+    dragDropImages: 'Görselleri buraya sürükleyip bırakın',
+    orClickToUpload: 'veya yüklemek için tıklayın',
+    imagesSelected: 'görsel seçildi',
+    clearAll: 'Tümünü Temizle',
+    downloadAll: 'Tümünü İndir',
+  },
+
+  // Onay
+  confirm: {
+    deleteTitle: 'Öğeyi Sil',
+    deleteMessage: 'Bu öğeyi silmek istediğinizden emin misiniz?',
+    deleteConfirm: 'Sil',
+    cancelAction: 'İptal',
+    unsavedChanges: 'Kaydedilmemiş değişiklikleriniz var',
+    leavePageMessage: 'Ayrılmak istediğinizden emin misiniz? Değişiklikler kaybolacak.',
+    stay: 'Kal',
+    leave: 'Ayrıl',
+  },
+
+  // Boş Durumlar
+  empty: {
+    noImages: 'Henüz görsel yok',
+    noPresets: 'Preset bulunamadı',
+    noResults: 'Sonuç bulunamadı',
+    startByUploading: 'Bir görsel yükleyerek başlayın',
+    tryDifferentSearch: 'Farklı bir arama terimi deneyin',
+  },
+
+  // Zaman
+  time: {
+    justNow: 'Az önce',
+    minutesAgo: 'dakika önce',
+    hoursAgo: 'saat önce',
+    daysAgo: 'gün önce',
+    seconds: 'sn',
+    minutes: 'dk',
+  },
 };

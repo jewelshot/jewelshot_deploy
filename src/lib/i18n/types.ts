@@ -218,6 +218,123 @@ export interface TranslationKeys {
     download: string;
     share: string;
   };
+
+  // Settings Modal
+  settingsModal: {
+    title: string;
+    subtitle: string;
+    requiredWarning: string;
+    gender: string;
+    jewelryType: string;
+    aspectRatio: string;
+    faceVisibility: string;
+    showFace: string;
+    hideFace: string;
+    showFaceDesc: string;
+    hideFaceDesc: string;
+    vertical: string;
+    horizontal: string;
+    applyToAll: string;
+    saveSettings: string;
+    story: string;
+    standard: string;
+    classic: string;
+    portrait: string;
+    square: string;
+    landscape: string;
+    ultrawide: string;
+  };
+
+  // Right Sidebar
+  rightSidebar: {
+    aiGeneration: string;
+    settings: string;
+    settingsComplete: string;
+    configureSettings: string;
+    browseLibrary: string;
+    mostUsed: string;
+  };
+
+  // Preset Modes
+  presets: {
+    quick: string;
+    selective: string;
+    advanced: string;
+    random: string;
+    generate: string;
+    style: string;
+    model: string;
+    setting: string;
+    mood: string;
+    camera: string;
+    lighting: string;
+    colorGrading: string;
+    hair: string;
+    nails: string;
+    makeup: string;
+    skinTone: string;
+    facialHair: string;
+  };
+
+  // Dashboard
+  dashboard: {
+    title: string;
+    welcome: string;
+    recentActivity: string;
+    quickActions: string;
+    startCreating: string;
+    viewGallery: string;
+    openStudio: string;
+  };
+
+  // Batch
+  batch: {
+    title: string;
+    uploadImages: string;
+    processAll: string;
+    downloading: string;
+    processing: string;
+    completed: string;
+    failed: string;
+    pending: string;
+    selectPreset: string;
+    dragDropImages: string;
+    orClickToUpload: string;
+    imagesSelected: string;
+    clearAll: string;
+    downloadAll: string;
+  };
+
+  // Confirmation
+  confirm: {
+    deleteTitle: string;
+    deleteMessage: string;
+    deleteConfirm: string;
+    cancelAction: string;
+    unsavedChanges: string;
+    leavePageMessage: string;
+    stay: string;
+    leave: string;
+  };
+
+  // Empty States
+  empty: {
+    noImages: string;
+    noPresets: string;
+    noResults: string;
+    startByUploading: string;
+    tryDifferentSearch: string;
+  };
+
+  // Time
+  time: {
+    justNow: string;
+    minutesAgo: string;
+    hoursAgo: string;
+    daysAgo: string;
+    seconds: string;
+    minutes: string;
+  };
 }
 
 export type Translations = {

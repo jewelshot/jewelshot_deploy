@@ -218,4 +218,121 @@ export const en: TranslationKeys = {
     download: 'Download Image',
     share: 'Share Image',
   },
+
+  // Settings Modal
+  settingsModal: {
+    title: 'Generation Settings',
+    subtitle: 'Configure your AI generation preferences',
+    requiredWarning: 'Please configure settings before generating',
+    gender: 'Gender',
+    jewelryType: 'Jewelry Type',
+    aspectRatio: 'Aspect Ratio',
+    faceVisibility: 'Model Face',
+    showFace: 'Show Face',
+    hideFace: 'Hide Face',
+    showFaceDesc: 'Full model with face visible',
+    hideFaceDesc: 'Cropped, focus on jewelry',
+    vertical: 'Vertical',
+    horizontal: 'Horizontal',
+    applyToAll: 'Apply to all future generations',
+    saveSettings: 'Save Settings',
+    story: 'Story',
+    standard: 'Standard',
+    classic: 'Classic',
+    portrait: 'Portrait',
+    square: 'Square',
+    landscape: 'Landscape',
+    ultrawide: 'Ultrawide',
+  },
+
+  // Right Sidebar
+  rightSidebar: {
+    aiGeneration: 'AI Generation',
+    settings: 'Settings',
+    settingsComplete: 'Settings Complete',
+    configureSettings: 'Configure Settings',
+    browseLibrary: 'Browse more presets in Library',
+    mostUsed: '10 most used',
+  },
+
+  // Preset Modes
+  presets: {
+    quick: 'Quick',
+    selective: 'Selective',
+    advanced: 'Advanced',
+    random: 'Random',
+    generate: 'Generate',
+    style: 'Style',
+    model: 'Model',
+    setting: 'Setting',
+    mood: 'Mood',
+    camera: 'Camera',
+    lighting: 'Lighting',
+    colorGrading: 'Color Grading',
+    hair: 'Hair',
+    nails: 'Nails',
+    makeup: 'Makeup',
+    skinTone: 'Skin Tone',
+    facialHair: 'Facial Hair',
+  },
+
+  // Dashboard
+  dashboard: {
+    title: 'Dashboard',
+    welcome: 'Welcome back',
+    recentActivity: 'Recent Activity',
+    quickActions: 'Quick Actions',
+    startCreating: 'Start Creating',
+    viewGallery: 'View Gallery',
+    openStudio: 'Open Studio',
+  },
+
+  // Batch
+  batch: {
+    title: 'Batch Processing',
+    uploadImages: 'Upload Images',
+    processAll: 'Process All',
+    downloading: 'Downloading...',
+    processing: 'Processing...',
+    completed: 'Completed',
+    failed: 'Failed',
+    pending: 'Pending',
+    selectPreset: 'Select a preset for batch processing',
+    dragDropImages: 'Drag and drop images here',
+    orClickToUpload: 'or click to upload',
+    imagesSelected: 'images selected',
+    clearAll: 'Clear All',
+    downloadAll: 'Download All',
+  },
+
+  // Confirmation
+  confirm: {
+    deleteTitle: 'Delete Item',
+    deleteMessage: 'Are you sure you want to delete this item?',
+    deleteConfirm: 'Delete',
+    cancelAction: 'Cancel',
+    unsavedChanges: 'You have unsaved changes',
+    leavePageMessage: 'Are you sure you want to leave? Changes will be lost.',
+    stay: 'Stay',
+    leave: 'Leave',
+  },
+
+  // Empty States
+  empty: {
+    noImages: 'No images yet',
+    noPresets: 'No presets found',
+    noResults: 'No results found',
+    startByUploading: 'Start by uploading an image',
+    tryDifferentSearch: 'Try a different search term',
+  },
+
+  // Time
+  time: {
+    justNow: 'Just now',
+    minutesAgo: 'minutes ago',
+    hoursAgo: 'hours ago',
+    daysAgo: 'days ago',
+    seconds: 's',
+    minutes: 'm',
+  },
 };

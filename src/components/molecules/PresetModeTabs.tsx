@@ -8,6 +8,7 @@
 
 import React from 'react';
 import { Zap, Sliders, Code } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n';
 
 export type PresetMode = 'quick' | 'selective' | 'advanced';
 
@@ -16,13 +17,14 @@ interface PresetModeTabsProps {
   onModeChange: (mode: PresetMode) => void;
 }
 
-const MODES = [
-  { id: 'quick' as PresetMode, label: 'Quick', icon: Zap, description: 'One-click presets' },
-  { id: 'selective' as PresetMode, label: 'Selective', icon: Sliders, description: 'Build your look' },
-  { id: 'advanced' as PresetMode, label: 'Advanced', icon: Code, description: 'Full control' },
-];
-
 export function PresetModeTabs({ activeMode, onModeChange }: PresetModeTabsProps) {
+  const { t } = useLanguage();
+  
+  const MODES = [
+    { id: 'quick' as PresetMode, label: t.presets.quick, icon: Zap },
+    { id: 'selective' as PresetMode, label: t.presets.selective, icon: Sliders },
+    { id: 'advanced' as PresetMode, label: t.presets.advanced, icon: Code },
+  ];
   return (
     <div className="flex rounded-lg border border-white/10 bg-white/[0.02] p-0.5">
       {MODES.map((mode) => {
@@ -38,7 +40,6 @@ export function PresetModeTabs({ activeMode, onModeChange }: PresetModeTabsProps
                 ? 'bg-white/10 text-white shadow-sm'
                 : 'text-white/50 hover:text-white/70'
             }`}
-            title={mode.description}
           >
             <Icon className="h-3 w-3" />
             <span>{mode.label}</span>

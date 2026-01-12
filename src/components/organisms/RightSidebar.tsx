@@ -21,6 +21,7 @@ import { presetPrompts } from '@/lib/preset-prompts';
 import { getPresetById } from '@/data/presets';
 import { createScopedLogger } from '@/lib/logger';
 import { loadGenerationSettings, areSettingsComplete, type GenerationSettings, type FaceVisibility } from '@/lib/generation-settings-storage';
+import { useLanguage } from '@/lib/i18n';
 
 const logger = createScopedLogger('RightSidebar');
 
@@ -43,6 +44,7 @@ interface RightSidebarProps {
 
 export function RightSidebar({ mode = 'studio', onGenerateWithPreset }: RightSidebarProps) {
   const { rightOpen } = useSidebarStore();
+  const { t } = useLanguage();
 
   // Selection states
   const [gender, setGender] = useState<Gender>(null);
@@ -272,8 +274,16 @@ ${libraryPreset.negativePrompt}`;
   // Helper to get current settings summary
   const getSettingsSummary = () => {
     const parts: string[] = [];
-    if (gender) parts.push(gender === 'women' ? 'Women' : 'Men');
-    if (jewelryType) parts.push(jewelryType.charAt(0).toUpperCase() + jewelryType.slice(1));
+    if (gender) parts.push(gender === 'women' ? t.gender.women : t.gender.men);
+    if (jewelryType) {
+      const jewelryLabels: Record<string, string> = {
+        ring: t.jewelry.ring,
+        necklace: t.jewelry.necklace,
+        earring: t.jewelry.earring,
+        bracelet: t.jewelry.bracelet,
+      };
+      parts.push(jewelryLabels[jewelryType] || jewelryType);
+    }
     parts.push(aspectRatio);
     if (showFace === 'hide') parts.push('No Face');
     return parts.length > 1 ? parts.join(' · ') : 'Not configured';
@@ -324,7 +334,7 @@ ${libraryPreset.negativePrompt}`;
           {/* Content - stays on top */}
           <Settings className="relative z-10 h-4 w-4 text-purple-400 transition-transform group-hover:rotate-45" />
           <div className="relative z-10 flex-1 text-left">
-            <div className="text-xs font-medium text-white">Settings</div>
+            <div className="text-xs font-medium text-white">{t.rightSidebar.settings}</div>
             <div className="text-[10px] text-white/50">
               {getSettingsSummary()}
             </div>
@@ -350,7 +360,7 @@ ${libraryPreset.negativePrompt}`;
               {/* Built-in Quick Presets */}
               <div>
                 <div className="mb-2 flex items-center justify-between">
-                  <h3 className="text-[10px] font-medium text-white/50">Built-in Presets</h3>
+                  <h3 className="text-[10px] font-medium text-white/50">{t.presets.quick}</h3>
                 </div>
                 <QuickPresetsGrid 
                   onPresetSelect={handlePresetSelect}
@@ -358,7 +368,7 @@ ${libraryPreset.negativePrompt}`;
                 />
                 {!jewelryType && (
                   <p className="mt-1.5 text-center text-[9px] text-amber-400/70">
-                    Configure settings to enable presets
+                    {t.rightSidebar.configureSettings}
                   </p>
                 )}
               </div>

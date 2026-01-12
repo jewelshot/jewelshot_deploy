@@ -11,6 +11,7 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Settings, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { saveGenerationSettings, areSettingsComplete, FaceVisibility } from '@/lib/generation-settings-storage';
+import { useLanguage } from '@/lib/i18n';
 
 type Gender = 'women' | 'men' | null;
 type JewelryType = 'ring' | 'necklace' | 'earring' | 'bracelet' | null;
@@ -87,9 +88,28 @@ export function GenerationSettingsModal({
   onShowFaceChange,
   isRequired = false,
 }: GenerationSettingsModalProps) {
+  const { t } = useLanguage();
   const [mounted, setMounted] = useState(false);
   const [applyToAll, setApplyToAll] = useState(false);
   const [showValidationError, setShowValidationError] = useState(false);
+  
+  // Translated options
+  const genderOptionsTranslated = [
+    { value: 'women', label: t.gender.women },
+    { value: 'men', label: t.gender.men },
+  ];
+
+  const jewelryOptionsTranslated = [
+    { value: 'ring', label: t.jewelry.ring },
+    { value: 'necklace', label: t.jewelry.necklace },
+    { value: 'bracelet', label: t.jewelry.bracelet },
+    { value: 'earring', label: t.jewelry.earring },
+  ];
+
+  const faceOptionsTranslated = [
+    { value: 'show', label: t.settingsModal.showFace, icon: Eye, description: t.settingsModal.showFaceDesc },
+    { value: 'hide', label: t.settingsModal.hideFace, icon: EyeOff, description: t.settingsModal.hideFaceDesc },
+  ];
 
   useEffect(() => {
     setMounted(true);
@@ -170,7 +190,7 @@ export function GenerationSettingsModal({
                 id="settings-modal-title"
                 className="text-base font-semibold text-white"
               >
-                Generation Settings
+                {t.settingsModal.title}
               </h2>
             </div>
             <button
@@ -187,10 +207,10 @@ export function GenerationSettingsModal({
             {/* Gender Selection */}
             <div>
               <label className="mb-1.5 block text-xs font-medium text-white/70">
-                Gender
+                {t.settingsModal.gender}
               </label>
               <div className="grid grid-cols-2 gap-1.5">
-                {genderOptions.map((option) => (
+                {genderOptionsTranslated.map((option) => (
                   <button
                     key={option.value}
                     onClick={() => onGenderChange(option.value as Gender)}
@@ -209,10 +229,10 @@ export function GenerationSettingsModal({
             {/* Face Visibility Selection */}
             <div>
               <label className="mb-1.5 block text-xs font-medium text-white/70">
-                Model Face
+                {t.settingsModal.faceVisibility}
               </label>
               <div className="grid grid-cols-2 gap-1.5">
-                {faceOptions.map((option) => {
+                {faceOptionsTranslated.map((option) => {
                   const Icon = option.icon;
                   return (
                     <button
@@ -239,10 +259,10 @@ export function GenerationSettingsModal({
             {/* Jewelry Type Selection */}
             <div>
               <label className="mb-1.5 block text-xs font-medium text-white/70">
-                Jewelry Type
+                {t.settingsModal.jewelryType}
               </label>
               <div className="grid grid-cols-4 gap-1.5">
-                {jewelryOptions.map((option) => (
+                {jewelryOptionsTranslated.map((option) => (
                   <button
                     key={option.value}
                     onClick={() => onJewelryChange(option.value as JewelryType)}
@@ -261,7 +281,7 @@ export function GenerationSettingsModal({
             {/* Aspect Ratio Selection */}
             <div>
               <label className="mb-1.5 block text-xs font-medium text-white/70">
-                Aspect Ratio
+                {t.settingsModal.aspectRatio}
               </label>
               <div className="space-y-1.5">
                 {/* Vertical Formats Row */}
@@ -347,10 +367,7 @@ export function GenerationSettingsModal({
               <AlertCircle className="h-4 w-4 flex-shrink-0 text-red-400" />
               <div className="flex-1">
                 <p className="text-xs font-medium text-red-400">
-                  Required Settings Missing
-                </p>
-                <p className="mt-0.5 text-[10px] text-red-400/80">
-                  Please select Gender, Jewelry Type, and Aspect Ratio to continue.
+                  {t.settingsModal.requiredWarning}
                 </p>
               </div>
             </div>
@@ -367,11 +384,8 @@ export function GenerationSettingsModal({
               />
               <div className="flex-1">
                 <span className="text-xs font-medium text-white group-hover:text-white/80 transition-colors">
-                  Remember for all uploads
+                  {t.settingsModal.applyToAll}
                 </span>
-                <p className="mt-0.5 text-[10px] text-white/60">
-                  Use these settings automatically for future images
-                </p>
               </div>
             </label>
           </div>
@@ -383,14 +397,14 @@ export function GenerationSettingsModal({
                 onClick={handleClose}
                 className="rounded-md border border-white/10 px-4 py-1.5 text-xs font-medium text-white/80 transition-colors hover:bg-white/5"
               >
-                Cancel
+                {t.common.cancel}
               </button>
             )}
             <button
               onClick={handleDone}
               className="rounded-md bg-white/10 border border-white/20 px-4 py-1.5 text-xs font-medium text-white transition-colors hover:bg-white/15"
             >
-              {isRequired ? 'Continue' : 'Done'}
+              {t.settingsModal.saveSettings}
             </button>
           </div>
         </div>

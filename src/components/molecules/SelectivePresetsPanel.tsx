@@ -11,6 +11,7 @@ import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { ChevronDown, Sparkles, Shuffle } from 'lucide-react';
 import { FaceVisibility } from '@/lib/generation-settings-storage';
 import { buildSelectivePrompt } from '@/lib/prompt-builder';
+import { useLanguage } from '@/lib/i18n';
 
 // ============================================
 // TYPES
@@ -254,6 +255,8 @@ export function SelectivePresetsPanel({
   onGenerate,
   disabled = false,
 }: SelectivePresetsPanelProps) {
+  const { t } = useLanguage();
+  
   const [selections, setSelections] = useState<SelectivePresetOptions>({
     style: null,
     modelType: null,
@@ -412,7 +415,7 @@ export function SelectivePresetsPanel({
       )}
 
       <CollapsibleSection
-        title="Style"
+        title={t.presets.style}
         isOpen={openSections.style}
         onToggle={() => toggleSection('style')}
         selectedLabel={getSelectedLabel(STYLE_OPTIONS, selections.style)}
@@ -426,7 +429,7 @@ export function SelectivePresetsPanel({
       </CollapsibleSection>
 
       <CollapsibleSection
-        title="Model"
+        title={t.presets.model}
         isOpen={openSections.model}
         onToggle={() => toggleSection('model')}
         selectedLabel={getSelectedLabel(filteredModelOptions, selections.modelType)}
@@ -445,7 +448,7 @@ export function SelectivePresetsPanel({
       </CollapsibleSection>
 
       <CollapsibleSection
-        title="Setting"
+        title={t.presets.setting}
         isOpen={openSections.setting}
         onToggle={() => toggleSection('setting')}
         selectedLabel={getSelectedLabel(filteredSettingOptions, selections.setting)}
@@ -464,7 +467,7 @@ export function SelectivePresetsPanel({
       </CollapsibleSection>
 
       <CollapsibleSection
-        title="Mood"
+        title={t.presets.mood}
         isOpen={openSections.mood}
         onToggle={() => toggleSection('mood')}
         selectedLabel={getSelectedLabel(filteredMoodOptions, selections.mood)}
@@ -487,7 +490,7 @@ export function SelectivePresetsPanel({
         <button
           onClick={handleRandomize}
           disabled={!settingsComplete || disabled}
-          title="Randomize selections"
+          title={t.presets.random}
           className={`flex items-center justify-center rounded-lg px-3 py-2.5 transition-all ${
             settingsComplete && !disabled
               ? 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white border border-white/10'
@@ -508,7 +511,7 @@ export function SelectivePresetsPanel({
           }`}
         >
           <Sparkles className="h-3.5 w-3.5" />
-          Generate
+          {t.presets.generate}
         </button>
 
         {/* Random Generate Button */}
