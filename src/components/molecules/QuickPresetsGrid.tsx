@@ -88,7 +88,17 @@ import {
   Paintbrush,
   Sparkles as SparklesIcon,
   Waves,
-  Ribbon
+  Ribbon,
+  CloudFog,
+  Hexagon,
+  Shield,
+  Flame,
+  Drama,
+  CircleDotDashed,
+  Target,
+  Flashlight,
+  Star,
+  Droplet
 } from 'lucide-react';
 
 interface QuickPreset {
@@ -660,6 +670,76 @@ const QUICK_PRESETS: QuickPreset[] = [
     icon: Ribbon,
     description: 'Champagne cowl, liquid silk',
     color: 'text-yellow-100',
+  },
+  {
+    id: 'angora-cozy',
+    name: 'Angora Cozy',
+    icon: CloudFog,
+    description: 'Fuzzy texture, dreamy warmth',
+    color: 'text-orange-100',
+  },
+  {
+    id: 'blazer-deep-v',
+    name: 'Blazer Deep V',
+    icon: Hexagon,
+    description: 'Oversized beige, sophisticated',
+    color: 'text-amber-200',
+  },
+  {
+    id: 'power-shoulders',
+    name: 'Power Shoulders',
+    icon: Shield,
+    description: 'Strong silhouette, confident',
+    color: 'text-stone-300',
+  },
+  {
+    id: 'sheer-tulle',
+    name: 'Sheer Tulle',
+    icon: Flame,
+    description: 'Semi-transparent, ethereal',
+    color: 'text-rose-100',
+  },
+  {
+    id: 'butterfly-light',
+    name: 'Butterfly Light',
+    icon: Drama,
+    description: 'Paramount lighting, studio',
+    color: 'text-violet-200',
+  },
+  {
+    id: 'rim-halo',
+    name: 'Rim Halo',
+    icon: CircleDotDashed,
+    description: 'Backlight drama, profile',
+    color: 'text-slate-300',
+  },
+  {
+    id: 'high-key-catalog',
+    name: 'High Key Catalog',
+    icon: Target,
+    description: 'White cyclorama, commercial',
+    color: 'text-slate-100',
+  },
+  {
+    id: 'snoot-drama',
+    name: 'Snoot Drama',
+    icon: Flashlight,
+    description: 'Focused beam, chiaroscuro',
+    color: 'text-zinc-300',
+  },
+  {
+    id: 'bright-beauty',
+    name: 'Bright Beauty',
+    icon: Star,
+    description: 'High-key, slicked hair',
+    color: 'text-yellow-100',
+  },
+  {
+    id: 'dewy-studio',
+    name: 'Dewy Studio',
+    icon: Droplet,
+    description: 'Glowing skin, wet-look',
+    color: 'text-cyan-200',
   },
 ];
 

@@ -5569,4 +5569,681 @@ Denim, grey tones
 OUTPUT: Silk slip. Champagne cowl. Liquid fabric. Golden luxury.`;
     },
   },
+
+  'angora-cozy': {
+    name: 'Angora Cozy',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Soft texture photography. A ${genderText} wearing ${jewelryType}, wearing a fuzzy angora or mohair sweater in soft oatmeal color. Off-the-shoulder style revealing neck and collarbone.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+ANGORA TEXTURE:
+Fuzzy angora or mohair sweater
+Soft oatmeal color
+Off-the-shoulder style
+Soft fluffy texture against skin
+Luxurious tactile quality
+
+SKIN & BODY:
+Neck and collarbone revealed
+Natural glowing skin
+Skin contrasts soft fabric
+Warm, healthy appearance
+
+LIGHTING:
+Warm natural light
+Dreamy atmosphere
+Soft, flattering illumination
+Cozy but luxurious feel
+
+MOOD:
+Cozy yet luxurious
+Dreamy, soft
+Comfortable elegance
+Winter warmth
+
+JEWELRY:
+${jewelryType} against soft fabric
+ONLY the specified jewelry
+Contrast with fuzzy texture
+Elegant showcase
+
+TECHNICAL:
+Shot on 85mm lens equivalent
+Soft focus edges
+Dreamy mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Ribbed cotton
+Athletic wear
+Tight clothes
+Hard edges, structured clothing
+Patterns, logos
+Messy setting
+
+OUTPUT: Angora cozy. Fuzzy texture. Off-shoulder. Dreamy warmth.`;
+    },
+  },
+
+  'blazer-deep-v': {
+    name: 'Blazer Deep V',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Fashion editorial portrait. ${genderText === 'woman' ? 'Woman' : 'Model'} wearing an oversized beige structured blazer (worn with nothing underneath). Deep V-neckline created by the lapels showing ${jewelryType}.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+BLAZER STYLING:
+Oversized beige structured blazer
+Nothing visible underneath
+Deep V-neckline from lapels
+Expensive fabric texture
+Sophisticated minimalist
+
+FOCUS:
+Chest and neck area
+${jewelryType} prominently displayed
+Lapel framing jewelry
+Skin visible in V-opening
+
+LIGHTING:
+Sun-drenched lighting
+Warm nude tones
+Golden, flattering
+Luxurious atmosphere
+
+POSE:
+Confident posture
+Editorial stance
+Powerful yet elegant
+Fashion-forward
+
+JEWELRY:
+${jewelryType} in V-neckline
+ONLY the specified jewelry
+Center of attention
+Sharp focus on jewelry
+
+TECHNICAL:
+Shot on Hasselblad equivalent
+Fashion editorial quality
+Sophisticated mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+T-shirt, blouse visible
+Bra visible
+Cheap fabric, wrinkles
+Casual appearance
+Street style, messy hair
+
+OUTPUT: Blazer deep V. Oversized beige. Sophisticated power. Editorial luxury.`;
+    },
+  },
+
+  'power-shoulders': {
+    name: 'Power Shoulders',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `High fashion editorial. ${genderText === 'woman' ? 'Woman' : 'Model'} wearing ${jewelryType}, structured blazer with strong shoulder silhouette. Focus on power dressing meets fine jewelry.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+POWER DRESSING:
+Structured blazer
+Strong shoulder silhouette
+Powerful, confident styling
+Minimalist luxury
+
+FOCUS:
+Shoulders and neckline
+${jewelryType} as statement
+Power meets delicacy
+Strong composition
+
+LIGHTING:
+Dramatic but flattering
+Sun-drenched warmth
+Sculptural shadows
+Fashion lighting
+
+COLOR:
+Warm nude tones
+Beige, camel palette
+Sophisticated neutrals
+Cohesive color story
+
+MOOD:
+Confident and powerful
+Elegant strength
+Modern sophistication
+Fashion-forward
+
+JEWELRY:
+${jewelryType} contrasting structure
+ONLY the specified jewelry
+Delicate vs powerful
+Statement showcase
+
+TECHNICAL:
+Shot on medium format equivalent
+Fashion editorial quality
+Power mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Casual, relaxed styling
+Weak posture
+Busy patterns
+Street style
+Cheap fabric
+
+OUTPUT: Power shoulders. Strong silhouette. Confident luxury. Fashion editorial.`;
+    },
+  },
+
+  'sheer-tulle': {
+    name: 'Sheer Tulle',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Ethereal jewelry photography. Close up of a ${genderText} wearing ${jewelryType}, wearing a sheer nude tulle or chiffon top. Semi-transparent fabric layering over skin.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+SHEER FABRIC:
+Sheer nude tulle or chiffon
+Semi-transparent layering
+Fabric visible over skin
+Gentle folds and draping
+Delicate, feminine
+
+LIGHTING:
+Soft dreamy lighting
+Ethereal illumination
+Glowing, flattering
+High-end aesthetic
+
+COLOR:
+Monochromatic warm palette
+Nude tones throughout
+Harmonious, soft
+Subtle variations
+
+SKIN:
+Glowing, hydrated skin
+Visible through sheer fabric
+Natural, healthy
+Beautiful texture
+
+MOOD:
+Delicate and feminine
+Ethereal, dreamy
+High-end luxury
+Romantic sophistication
+
+JEWELRY:
+${jewelryType} through/over sheer fabric
+ONLY the specified jewelry
+Delicate showcase
+Layered with fabric
+
+AVOID:
+Opaque cotton
+Thick straps
+Sporty appearance
+Heavy clothes
+Dark colors, high contrast
+Rough textures, denim
+
+OUTPUT: Sheer tulle. Semi-transparent. Ethereal layers. Dreamy feminine.`;
+    },
+  },
+
+  'butterfly-light': {
+    name: 'Butterfly Light',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `High-end beauty studio photography. Portrait of a ${genderText} model wearing ${jewelryType}. Distinct "Butterfly Lighting" setup (Paramount lighting) with soft shadows under nose and chin.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+BUTTERFLY LIGHTING:
+Paramount lighting setup
+Soft shadows under nose and chin
+Classic Hollywood technique
+Even, flattering on face
+Professional studio quality
+
+BACKGROUND:
+Light gray seamless background
+Clean, uncluttered
+Professional studio
+No distractions
+
+STYLING:
+Sleek hairstyle
+Hair pulled back
+Clean, polished appearance
+Focus on face and jewelry
+
+SKIN:
+High skin texture detail
+Visible pores (not smoothed)
+Real, authentic texture
+Professional quality
+
+MAKEUP:
+Fresh, natural makeup
+Not heavy
+Enhancing natural beauty
+Clean aesthetic
+
+JEWELRY:
+${jewelryType} sharp focus
+ONLY the specified jewelry
+Professional showcase
+Commercial quality
+
+TECHNICAL:
+Shot on Hasselblad X2D equivalent
+Sharp commercial quality
+Studio precision
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Messy hair
+Casual clothes
+Distracting background
+Flat lighting
+Yellow tones
+Plastic, airbrushed skin
+
+OUTPUT: Butterfly light. Paramount shadows. Studio precision. Commercial beauty.`;
+    },
+  },
+
+  'rim-halo': {
+    name: 'Rim Halo',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Dramatic studio portrait. Profile view of a ${genderText} wearing ${jewelryType}. Dark grey studio background with strong "Rim Lighting" (backlight) highlighting edges of face and sparkle of jewelry.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+RIM LIGHTING:
+Strong backlight (rim lighting)
+Highlighting edges of face
+Creating halo effect
+Jewelry sparkle emphasized
+Dramatic light contrast
+
+PROFILE VIEW:
+Side profile perspective
+Elegant silhouette
+Jawline and neck visible
+Classic portrait angle
+
+BACKGROUND:
+Dark grey studio background
+Moody atmosphere
+High contrast setting
+Minimal, clean
+
+STYLING:
+Minimalist black styling
+Strapless neckline
+Elegant and mysterious
+Dark, sophisticated
+
+SKIN:
+Very detailed texture in light
+Hyper-realistic quality
+Light catching skin
+Professional precision
+
+JEWELRY:
+${jewelryType} catching rim light
+ONLY the specified jewelry
+Sparkle in backlight
+Dramatic showcase
+
+TECHNICAL:
+Shot on Phase One IQ4 equivalent
+Profile perspective
+Dramatic mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Front flash, flat light
+Bright white background
+Casual look
+Smiling, happy expression
+Blurry jewelry
+
+OUTPUT: Rim halo. Backlight drama. Profile mystery. Dark elegance.`;
+    },
+  },
+
+  'high-key-catalog': {
+    name: 'High Key Catalog',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Commercial jewelry photography. Bright "High-Key" studio lighting. ${genderText === 'woman' ? 'Female' : 'Male'} model wearing ${jewelryType}. Pure white cyclorama background with very soft, even lighting.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+HIGH-KEY LIGHTING:
+Bright, high-key studio
+Large Octabox lighting
+Very soft, even illumination
+No harsh shadows
+Pure white environment
+
+BACKGROUND:
+Pure white cyclorama
+Brightly illuminated
+Seamless, infinite white
+Clean commercial quality
+
+FOCUS:
+Crystal clear focus on ${jewelryType}
+Sharp jewelry details
+Commercial precision
+Catalog quality
+
+STYLING:
+Simple strapless neckline
+Focus on skin and jewelry
+Fresh natural makeup
+Clean, minimal
+
+SKIN:
+Distinct skin texture
+Natural, not over-smoothed
+Real, professional quality
+Fresh appearance
+
+JEWELRY:
+${jewelryType} razor sharp
+ONLY the specified jewelry
+Commercial showcase
+Perfect clarity
+
+TECHNICAL:
+Shot on Canon R5 equivalent
+Professional catalog style
+High-key mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Dark shadows, moody
+Grey background
+Noise, grain
+Messy appearance
+Clothes visible
+Colorful makeup
+
+OUTPUT: High key catalog. White cyclorama. Commercial clarity. Professional polish.`;
+    },
+  },
+
+  'snoot-drama': {
+    name: 'Snoot Drama',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      return `Artistic studio photography. Dark moody setting. A focused beam of light (Snoot lighting) hitting only the model's neck/ear and ${jewelryType}. Rest of frame falls into shadow (Chiaroscuro effect).
+
+SNOOT LIGHTING:
+Focused beam of light
+Snoot modifier on strobe
+Light only on jewelry area
+Rest in deep shadow
+Dramatic, precise lighting
+
+CHIAROSCURO:
+High contrast light/dark
+Dramatic shadow play
+Artistic, painterly quality
+Luxurious and mysterious
+Renaissance-inspired
+
+FOCUS:
+Neck or ear area lit
+${jewelryType} in spotlight
+Skin texture very detailed
+Minimal composition
+
+BACKGROUND:
+Black background
+Deep darkness
+Nothing visible
+Total focus on lit area
+
+MOOD:
+Dramatic and luxurious
+Mysterious atmosphere
+High-end artistic
+Gallery quality
+
+JEWELRY:
+${jewelryType} in focused light
+ONLY the specified jewelry
+Every facet illuminated
+Dramatic sparkle
+
+TECHNICAL:
+Shot on 100mm macro lens equivalent
+Artistic perspective
+Dramatic mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Ambient light spillage
+Bright background
+Washed out lighting
+Blurry, cartoon
+Cluttered frame
+
+OUTPUT: Snoot drama. Focused beam. Chiaroscuro luxury. Artistic darkness.`;
+    },
+  },
+
+  'bright-beauty': {
+    name: 'Bright Beauty',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Commercial beauty photography. High-key studio portrait of a ${genderText} model wearing ${jewelryType}. Pure white seamless background illuminated brightly. Extremely soft and even lighting from large softbox sources.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+HIGH-KEY BEAUTY:
+Pure white seamless background
+Brightly illuminated
+Large softbox sources
+No harsh shadows anywhere
+Ultra-clean aesthetic
+
+STYLING:
+Sleeked-back hair
+${genderText === 'woman' ? 'Bright, polished hair' : 'Clean, styled hair'}
+Very fresh "no-makeup" makeup
+Minimal, refined
+
+FOCUS:
+Face and ${jewelryType}
+Sharp, precise focus
+Commercial beauty quality
+Professional clarity
+
+SKIN:
+Highly detailed skin texture
+Natural pores under bright light
+Not over-smoothed
+Real, human quality
+
+LIGHTING:
+Extremely soft, even
+Large softboxes
+No shadows
+Pure, clean light
+
+JEWELRY:
+${jewelryType} in perfect focus
+ONLY the specified jewelry
+Bright, clean showcase
+Commercial quality
+
+TECHNICAL:
+Shot on Hasselblad X2D equivalent
+Commercial beauty style
+Bright mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Clothing visible, straps
+Colored clothes
+Dark shadows, moody contrast
+Grey tones
+Messy hair
+Over-smoothed, plastic skin
+
+OUTPUT: Bright beauty. High-key purity. Slicked hair. Commercial perfection.`;
+    },
+  },
+
+  'dewy-studio': {
+    name: 'Dewy Studio',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Bright studio photography. Close up on a ${genderText} model with incredibly glowing, hydrated "dewy" skin texture wearing ${jewelryType}. Pure white background with bright studio lights reflecting off high points of face and collarbone.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+DEWY SKIN:
+Incredibly glowing, hydrated skin
+"Dewy" texture throughout
+Subtle highlights on high points
+Fresh, healthy appearance
+Glass skin aesthetic
+
+LIGHTING:
+Pure white background
+Bright studio lights
+Reflecting off face and collarbone
+Clean, fresh illumination
+
+STYLING:
+Wet-look hair pulled back
+Sleek, polished
+Focus on skin and jewelry
+Minimal distractions
+
+FOCUS:
+Sparkle of ${jewelryType}
+Skin sheen
+Fresh aesthetic
+Clean composition
+
+SKIN:
+Glowing, luminous
+Hydrated appearance
+Natural texture
+Not matte or dry
+
+JEWELRY:
+${jewelryType} catching bright light
+ONLY the specified jewelry
+Sparkle complementing skin sheen
+Fresh showcase
+
+AVOID:
+Matte, dry skin
+Powder, blush visible
+Colorful makeup
+Dark shadows, contrast
+Messy appearance
+Clothing visible
+
+OUTPUT: Dewy studio. Glowing skin. Wet-look hair. Fresh luminous.`;
+    },
+  },
 };
