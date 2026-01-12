@@ -66,6 +66,9 @@ export const studioCommercial: PresetCategory = {
     createPreset('wavy-framing-calm', 'Wavy Framing Calm', 'Wavy hair, pure white', 'studio-commercial'),
     createPreset('chest-presentation', 'Chest Presentation', 'Chest view, knitwear', 'studio-commercial'),
     createPreset('old-money-library', 'Old Money Library', 'Heritage luxury, warm books', 'studio-commercial'),
+    createPreset('butterfly-lighting-gaze', 'Butterfly Lighting Gaze', 'Hasselblad, hypnotic', 'studio-commercial'),
+    createPreset('pastel-mint-fresh', 'Pastel Mint Fresh', 'Colorful playful studio', 'studio-commercial'),
+    createPreset('all-black-gold-pop', 'All Black Gold Pop', 'Monochrome, gold contrast', 'studio-commercial'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -120,6 +123,8 @@ export const hardLightDrama: PresetCategory = {
     createPreset('gobo-venetian', 'Gobo Venetian', 'Striped shadows, blind effect', 'hard-light-drama'),
     createPreset('monochromatic-flood', 'Monochromatic Flood', 'Single color flood, bold', 'hard-light-drama'),
     createPreset('brutalist-architecture', 'Brutalist Architecture', 'Concrete, geometric shadows', 'hard-light-drama'),
+    createPreset('rim-light-mystery', 'Rim Light Mystery', 'Pitch black, diamond silhouette', 'hard-light-drama'),
+    createPreset('lace-shadow-pattern', 'Lace Shadow Pattern', 'Shadow rhythm, fierce', 'hard-light-drama'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -154,6 +159,10 @@ export const lifestyleCandid: PresetCategory = {
     createPreset('french-new-wave', 'French New Wave', '60s cinema, vintage candid', 'lifestyle-candid'),
     createPreset('old-money-tennis', 'Old Money Tennis', 'Country club, sporty chic', 'lifestyle-candid'),
     createPreset('turkish-hammam', 'Turkish Hammam', 'Marble spa, steam luxury', 'lifestyle-candid'),
+    createPreset('city-night-bokeh', 'City Night Bokeh', 'Urban nightlife, glamour', 'lifestyle-candid'),
+    createPreset('riviera-sun-drenched', 'Riviera Sun Drenched', 'Blue sky, vacation luxury', 'lifestyle-candid'),
+    createPreset('cashmere-cozy-morning', 'Cashmere Cozy Morning', 'Knitwear, quiet luxury', 'lifestyle-candid'),
+    createPreset('golden-hour-intimate', 'Golden Hour Intimate', 'Sun-kissed, Portra warmth', 'lifestyle-candid'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -184,6 +193,8 @@ export const macroDetail: PresetCategory = {
     createPreset('macro-hands-detail', 'Macro Hands Detail', 'Jewelry craftsmanship detail', 'macro-detail'),
     createPreset('intimate-skin-contrast', 'Intimate Skin Contrast', 'Bare skin vs metal', 'macro-detail'),
     createPreset('macro-eye-jewelry', 'Macro Eye Jewelry', 'Extreme eye close-up', 'macro-detail'),
+    createPreset('collarbone-anonymous', 'Collarbone Anonymous', 'No face, anatomical beauty', 'macro-detail'),
+    createPreset('macro-ear-stack', 'Macro Ear Stack', 'Piercing detail, extreme close', 'macro-detail'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -332,6 +343,10 @@ export const artisticSpecial: PresetCategory = {
     createPreset('textured-glass-blur', 'Textured Glass Blur', 'Reeded glass, ethereal', 'artistic-special'),
     createPreset('cyberpunk-glitch', 'Cyberpunk Glitch', 'Neon Tokyo, digital rebel', 'artistic-special'),
     createPreset('prism-spectral-light', 'Prism Spectral Light', 'Rainbow flares, angelic', 'artistic-special'),
+    createPreset('fragmented-mirror-surreal', 'Fragmented Mirror Surreal', '35mm film, dual reflection', 'artistic-special'),
+    createPreset('wet-look-glass-skin', 'Wet Look Glass Skin', 'Dewy glossy, summer luxury', 'artistic-special'),
+    createPreset('sheer-veil-ethereal', 'Sheer Veil Ethereal', 'Silk veil, dream diamonds', 'artistic-special'),
+    createPreset('diamond-ice-frozen', 'Diamond Ice Frozen', 'Crystal ice, cool luxury', 'artistic-special'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
