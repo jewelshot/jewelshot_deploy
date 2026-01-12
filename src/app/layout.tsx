@@ -13,6 +13,7 @@ import { CookieConsent } from '@/components/molecules/CookieConsent';
 import { OrganizationSchema, SoftwareApplicationSchema, WebSiteSchema } from '@/components/seo/StructuredData';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { AILoadingModal } from '@/components/molecules/AILoadingModal';
+import { LanguageProvider } from '@/lib/i18n';
 import './globals.css';
 
 // Note: Environment validation is available in src/lib/env.ts
@@ -164,13 +165,15 @@ export default function RootLayout({
         data-theme="purple"
       >
         <ThemeProvider>
-          <ErrorBoundary>{children}</ErrorBoundary>
-          <GlobalSidebar />
-          <ToastContainer />
-          <AILoadingModal />
-          <GalleryPrefetch />
-          <PlausibleAnalytics />
-          <CookieConsent />
+          <LanguageProvider>
+            <ErrorBoundary>{children}</ErrorBoundary>
+            <GlobalSidebar />
+            <ToastContainer />
+            <AILoadingModal />
+            <GalleryPrefetch />
+            <PlausibleAnalytics />
+            <CookieConsent />
+          </LanguageProvider>
         </ThemeProvider>
         <Analytics />
         <SpeedInsights />

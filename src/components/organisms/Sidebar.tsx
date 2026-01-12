@@ -19,6 +19,7 @@ import { useSidebarStore } from '@/store/sidebarStore';
 import SidebarLogo from '@/components/molecules/SidebarLogo';
 import NavigationItem from '@/components/molecules/NavigationItem';
 import UserProfile from '@/components/molecules/UserProfile';
+import { useLanguage } from '@/lib/i18n';
 import {
   LayoutDashboard,
   Palette,
@@ -49,6 +50,7 @@ const settingsItems: never[] = [
 export function Sidebar() {
   const { leftOpen } = useSidebarStore();
   const pathname = usePathname();
+  const { t } = useLanguage();
   const [galleryCount, setGalleryCount] = useState(0);
 
   // Update gallery count
@@ -85,27 +87,27 @@ export function Sidebar() {
     };
   }, []);
 
-  // Main navigation items
+  // Main navigation items with translations
   const mainNavItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
-    { icon: Palette, label: 'Studio', href: '/studio' },
+    { icon: LayoutDashboard, label: t.nav.home, href: '/dashboard' },
+    { icon: Palette, label: t.nav.studio, href: '/studio' },
     { icon: Edit3, label: 'Editor', href: '/editor' },
     { icon: Box, label: '3D View', href: '/3d-view' },
     { icon: Video, label: 'Motion+', href: '/motion-plus' },
-    { icon: Layers, label: 'Batch', href: '/batch' },
+    { icon: Layers, label: t.nav.batch, href: '/batch' },
     {
       icon: Image,
-      label: 'Gallery',
+      label: t.nav.gallery,
       href: '/gallery',
       badge: galleryCount > 0
         ? { variant: 'count' as const, count: galleryCount }
         : undefined,
     },
-    { icon: Library, label: 'Library', href: '/library' },
+    { icon: Library, label: t.nav.library, href: '/library' },
     { icon: FlaskConical, label: 'Brand Lab', href: '/brand-lab' },
     { icon: PenTool, label: 'Design Office', href: '/design-office' },
     { icon: FileText, label: 'Catalogue', href: '/catalogue' },
-    { icon: User, label: 'Profile', href: '/profile' },
+    { icon: User, label: t.nav.profile, href: '/profile' },
   ];
 
   return (

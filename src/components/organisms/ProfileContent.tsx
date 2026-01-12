@@ -7,26 +7,28 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSidebarStore } from '@/store/sidebarStore';
 import { User, BarChart3, Settings, CreditCard } from 'lucide-react';
 import ProfileInfoSection from '@/components/molecules/ProfileInfoSection';
 import UsageStatsSection from '@/components/molecules/UsageStatsSection';
 import SettingsSection from '@/components/molecules/SettingsSection';
 import BillingSection from '@/components/molecules/BillingSection';
+import { useLanguage } from '@/lib/i18n';
 
 type TabType = 'profile' | 'stats' | 'settings' | 'billing';
 
-const tabs = [
-  { id: 'profile' as TabType, label: 'Profile', icon: User },
-  { id: 'stats' as TabType, label: 'Usage & Stats', icon: BarChart3 },
-  { id: 'settings' as TabType, label: 'Settings', icon: Settings },
-  { id: 'billing' as TabType, label: 'Billing', icon: CreditCard },
-];
-
 export function ProfileContent() {
   const { leftOpen } = useSidebarStore();
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<TabType>('profile');
+
+  const tabs = [
+    { id: 'profile' as TabType, label: t.profile.title, icon: User },
+    { id: 'stats' as TabType, label: t.nav.gallery, icon: BarChart3 },
+    { id: 'settings' as TabType, label: t.nav.settings, icon: Settings },
+    { id: 'billing' as TabType, label: t.profile.plan, icon: CreditCard },
+  ];
 
   return (
     <main
@@ -39,10 +41,10 @@ export function ProfileContent() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="mb-2 bg-gradient-to-r from-white to-white/60 bg-clip-text text-4xl font-bold text-transparent">
-            My Profile
+            {t.profile.title}
           </h1>
           <p className="text-white/60">
-            Manage your account settings and preferences
+            {t.profile.account}
           </p>
         </div>
 

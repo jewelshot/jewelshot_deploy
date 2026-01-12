@@ -9,17 +9,18 @@
 
 import React, { useState, useEffect } from 'react';
 import { Bell, Lock, Globe, Palette, Save, Sun, Moon, Monitor } from 'lucide-react';
-import { useThemeStore, Theme } from '@/store/themeStore';
+import { useThemeStore } from '@/store/themeStore';
+import { useLanguage, AVAILABLE_LANGUAGES, Language } from '@/lib/i18n';
 
 export function SettingsSection() {
   const { theme, setTheme, resolvedTheme } = useThemeStore();
+  const { language, setLanguage, t } = useLanguage();
   
   const [settings, setSettings] = useState({
     emailNotifications: true,
     productUpdates: true,
     marketingEmails: false,
     profileVisibility: 'private',
-    language: 'en',
   });
   
   // Load settings from localStorage on mount
@@ -153,25 +154,51 @@ export function SettingsSection() {
           <div className="mb-4 flex items-center gap-2">
             <Globe className="h-5 w-5 text-purple-400" />
             <h3 className="text-lg font-semibold text-[var(--foreground)]">
-              Language & Region
+              {t.profile.language}
             </h3>
           </div>
           <div>
-            <label className="mb-2 block text-sm text-[var(--foreground-muted)]">
-              Language
+            <label className="mb-3 block text-sm text-[var(--foreground-muted)]">
+              {t.profile.selectLanguage}
             </label>
-            <select
-              value={settings.language}
-              onChange={(e) =>
-                setSettings({ ...settings, language: e.target.value })
-              }
-              className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-4 py-2.5 text-[var(--foreground)] focus:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
-            >
-              <option value="en" className="bg-[var(--background)]">English</option>
-              <option value="tr" className="bg-[var(--background)]">Türkçe</option>
-              <option value="es" className="bg-[var(--background)]">Español</option>
-              <option value="fr" className="bg-[var(--background)]">Français</option>
-            </select>
+            
+            {/* Language Toggle Buttons */}
+            <div className="grid grid-cols-2 gap-3">
+              {AVAILABLE_LANGUAGES.map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => setLanguage(lang.code)}
+                  className={`flex items-center gap-3 rounded-xl border p-4 transition-all ${
+                    language === lang.code
+                      ? 'border-purple-500 bg-purple-500/10'
+                      : 'border-[var(--border)] bg-[var(--surface)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-hover)]'
+                  }`}
+                >
+                  <span className="text-2xl">{lang.flag}</span>
+                  <div className="text-left">
+                    <div className={`text-sm font-medium ${
+                      language === lang.code ? 'text-purple-400' : 'text-[var(--foreground)]'
+                    }`}>
+                      {lang.nativeName}
+                    </div>
+                    <div className="text-xs text-[var(--foreground-muted)]">
+                      {lang.name}
+                    </div>
+                  </div>
+                  {language === lang.code && (
+                    <div className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-purple-500">
+                      <svg className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+            
+            <p className="mt-3 text-xs text-[var(--foreground-faint)]">
+              {language === 'tr' ? 'Arayüz dili değiştirildi' : 'Interface language changed'}
+            </p>
           </div>
         </div>
 

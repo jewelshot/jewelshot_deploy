@@ -10,6 +10,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { useAILoadingStore, OPERATION_LABELS } from '@/store/aiLoadingStore';
+import { useLanguage } from '@/lib/i18n';
 
 // Illusion progress that completes in ~90 seconds with organic, non-linear movement
 function useIllusionProgress(isActive: boolean, isCompleted: boolean): number {
@@ -97,6 +98,7 @@ function useIllusionProgress(isActive: boolean, isCompleted: boolean): number {
 
 export function AILoadingModal() {
   const { isVisible, operation, status, message, subMessage, startTime } = useAILoadingStore();
+  const { t } = useLanguage();
   const [elapsed, setElapsed] = useState(0);
   const [mounted, setMounted] = useState(false);
   
@@ -218,7 +220,7 @@ export function AILoadingModal() {
             {/* Branding */}
             <div className="mb-2 text-center">
               <span className="text-[10px] font-medium uppercase tracking-[0.3em] text-white/30">
-                Processing via
+                {t.ai.processingVia}
               </span>
             </div>
 
@@ -280,18 +282,18 @@ export function AILoadingModal() {
                     <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-white/60" />
                   </span>
                   <span className="text-white/40">
-                    {status === 'submitting' && 'Initializing...'}
-                    {status === 'queued' && 'Queued'}
-                    {status === 'processing' && 'AI Processing'}
-                    {status === 'idle' && 'Preparing...'}
+                    {status === 'submitting' && t.ai.initializing}
+                    {status === 'queued' && t.ai.queued}
+                    {status === 'processing' && t.ai.aiProcessing}
+                    {status === 'idle' && t.ai.preparing}
                   </span>
                 </>
               )}
               {status === 'completed' && (
-                <span className="text-emerald-400/80">Complete</span>
+                <span className="text-emerald-400/80">{t.ai.complete}</span>
               )}
               {status === 'failed' && (
-                <span className="text-red-400/80">Failed</span>
+                <span className="text-red-400/80">{t.ai.failed}</span>
               )}
             </div>
           </div>
