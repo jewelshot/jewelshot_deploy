@@ -13892,4 +13892,1027 @@ Vintage retro
 OUTPUT: Cashmere cozy. Morning warmth. Quiet luxury.`;
     },
   },
+
+  // ============================================
+  // PACK 76-99: HIGH-KEY BEAUTY & COMPOSITION
+  // ============================================
+
+  'profile-jawline-ear': {
+    name: 'Profile Jawline Ear',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'determined expression, facing left' : 'strong profile silhouette';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'hands with jewelry visible in profile'
+        : 'detailed gold ear cuff and hoop earring';
+
+      return `STYLE: Striking side-profile portrait
+
+COMPOSITION:
+${genderDesc}
+Sharp jawline
+Sleeked-back hair bun
+Facing left, looking straight ahead
+${faceDesc}
+
+FOCUS:
+Entirely on ear area
+${jewelryPlacement}
+
+LIGHTING:
+Rembrandt style adapted for profile
+Highlighting face contours
+Edge of jewelry illuminated
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Detail visible on ear/hand
+
+BACKGROUND:
+Solid neutral grey
+Minimalist
+
+MOOD:
+Powerful
+Minimalist
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Front view
+Looking at camera
+Messy hair
+Hair covering ear
+Soft jawline
+Blurry jewelry
+Colorful background
+
+OUTPUT: Profile jawline. Ear focus. Rembrandt power.`;
+    },
+  },
+
+  'hands-framing-face': {
+    name: 'Hands Framing Face',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'intense eye contact' : 'elegant hand positioning';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'stacked diamond rings on fingers'
+        : 'jewelry visible with graceful hands';
+
+      return `STYLE: Stunning high-fashion beauty portrait
+
+COMPOSITION:
+${genderDesc}
+Hands framing face
+Fingers posed gracefully
+Around one eye or cheek
+Drawing attention to jewelry
+
+FOCUS:
+Equally split between eyes and jewelry
+${faceDesc}
+${jewelryPlacement}
+Perfect neutral manicure
+
+LIGHTING:
+Soft but directional
+Highlighting ring sparkle
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Stacked on hands
+
+BACKGROUND:
+Simple blurred gradient
+Clean and elegant
+
+TECHNICAL:
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Messy hands
+Bad manicure
+Ugly fingers
+Distorted hands
+Extra fingers
+AI hands glitch
+Busy background
+
+OUTPUT: Hands framing. Diamond rings. Eye contact beauty.`;
+    },
+  },
+
+  'champagne-satin-lying': {
+    name: 'Champagne Satin Lying',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'sensual relaxed expression' : 'elegant reclined presence';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'jewelry visible on hands against satin'
+        : 'delicate gold pendant on collarbone';
+
+      return `STYLE: Luxurious sensual editorial
+
+COMPOSITION:
+${genderDesc}
+Lying down
+Gathered folds of champagne-colored liquid satin fabric
+${faceDesc}
+
+LIGHTING:
+Soft and diffused
+Smooth highlights on fabric curves
+Model skin glowing
+
+FOCUS:
+${jewelryPlacement}
+Resting naturally on collarbone/hands
+
+COLOR PALETTE:
+Monochromatic gold
+Cream and beige
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Delicate and elegant
+
+MOOD:
+Intimate
+Soft
+Expensive
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Rough fabric
+Cotton wool
+Messy bed
+Dark horror
+Vintage retro
+Harsh contrast
+Neon colors
+
+OUTPUT: Champagne satin. Lying luxury. Soft intimate.`;
+    },
+  },
+
+  'sisterhood-contrast': {
+    name: 'Sisterhood Contrast',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const faceDesc = showFace === 'show' ? 'eyes closed or looking softly at camera, trust and sisterhood' : 'tender posing together';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'matching jewelry on both hands'
+        : 'matching gold hoop earrings and layered necklaces';
+
+      return `STYLE: Tender emotional high-key beauty portrait
+
+COMPOSITION:
+Two female models
+Contrasting skin tones
+One deep melanin rich skin
+One fair skin
+Posing cheek-to-cheek
+${faceDesc}
+
+JEWELRY:
+${jewelryPlacement}
+Matching jewelry on both
+${jewelryType}
+ONLY the specified jewelry
+Uniform gold shine
+
+LIGHTING:
+Soft and flattering
+Highlighting beautiful skin tone difference
+
+SKIN:
+Realistic texture essential
+Natural beauty celebrated
+
+BACKGROUND:
+Pure white
+
+MOOD:
+Trust
+Sisterhood
+Emotional
+Beautiful
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Plastic skin
+Harsh shadows
+Single model
+Competition vibe
+Dark background
+
+OUTPUT: Sisterhood contrast. Skin tones. Matching luxury.`;
+    },
+  },
+
+  'candid-laughter-duo': {
+    name: 'Candid Laughter Duo',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const faceDesc = showFace === 'show' ? 'laughing genuinely, candid moment' : 'joyful body language';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'diamond rings and bracelets visible on hands near faces'
+        : 'jewelry visible during candid moment';
+
+      return `STYLE: Lively high-energy studio shot
+
+COMPOSITION:
+Two diverse models
+${faceDesc}
+One whispering to other
+Or enjoying moment together
+Hands visible near faces
+${jewelryPlacement}
+
+LIGHTING:
+Bright and cheerful
+High-key aesthetic
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Showcased during candid moment
+
+BACKGROUND:
+Seamless white
+
+FEEL:
+Authentic
+Joyful
+Full of life
+Breaking serious model stereotype
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Stiff posed
+Serious expression
+Dark moody
+Single model
+
+OUTPUT: Candid laughter. Duo joy. Authentic energy.`;
+    },
+  },
+
+  'lips-neck-hand-crop': {
+    name: 'Lips Neck Hand Crop',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4'
+    ) => {
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'rings visible on hand touching neck'
+        : 'necklace visible with hand on collarbone';
+
+      return `STYLE: Sensual soft high-key beauty
+
+FRAMING:
+Cropped to show only
+Lower face
+Neck
+Hand
+No eyes visible
+
+COMPOSITION:
+Hand gently resting on neck or collarbone
+${jewelryPlacement}
+Lips slightly parted, relaxed
+
+SKIN TEXTURE:
+Dewy
+Hyper-realistic
+
+LIGHTING:
+Highlighting lip curves
+Jewelry sparkle
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+On hand and neck area
+
+BACKGROUND:
+Stark white
+
+MOOD:
+Intimate
+Calm
+Sensual
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Full face
+Eyes visible
+Harsh lighting
+Dark background
+Messy composition
+
+OUTPUT: Lips neck hand. Dewy crop. Intimate white.`;
+    },
+  },
+
+  'whisper-ear-macro': {
+    name: 'Whisper Ear Macro',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4'
+    ) => {
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'detailed hand jewelry visible'
+        : 'intricate diamond ear stack and cartilage piercings';
+
+      return `STYLE: Tight cinematic crop
+
+COMPOSITION:
+One models ear
+Another models mouth
+As if whispering a secret
+
+FOCUS:
+Sharply on ear
+${jewelryPlacement}
+Realistic texture of lips and ear
+
+LIGHTING:
+Clean but adds depth
+Ear structure visible
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Intricate placement
+
+BACKGROUND:
+White
+Intimate composition
+
+MOOD:
+Playful
+Secretive
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Full faces
+Distant shot
+Blurry details
+
+OUTPUT: Whisper ear. Secret moment. Playful intimacy.`;
+    },
+  },
+
+  'silk-slip-diamonds': {
+    name: 'Silk Slip Diamonds',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'elegant serene expression' : 'graceful presence';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'jewelry visible against silk'
+        : 'delicate diamond pendant necklace and drop earrings';
+
+      return `STYLE: Luxurious high-key beauty portrait
+
+STYLING:
+${genderDesc}
+Champagne-colored silk slip dress
+Fluid and glossy fabric
+Draping softly over shoulders
+${faceDesc}
+
+LIGHTING:
+Captures shimmer of silk
+Sparkle of diamonds simultaneously
+
+FOCUS:
+${jewelryPlacement}
+Against silk texture
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Delicate and sparkling
+
+SKIN:
+Dewy and glowing
+
+BACKGROUND:
+Seamless white
+
+VIBE:
+Elegant
+Expensive
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Matte fabric
+Dark colors
+Harsh lighting
+Casual styling
+
+OUTPUT: Silk slip. Diamond sparkle. Elegant luxury.`;
+    },
+  },
+
+  'white-shirt-gold-chain': {
+    name: 'White Shirt Gold Chain',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'sharp confident expression' : 'minimalist styling';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'large statement watch and rings'
+        : 'heavy gold chain necklace';
+
+      return `STYLE: Sharp modern high-key shot
+
+STYLING:
+${genderDesc}
+Crisp structured white button-down shirt
+Collar popped up
+Minimalist and androgynous
+${faceDesc}
+
+FOCUS:
+Sharp lines of shirt collar
+Bold jewelry
+${jewelryPlacement}
+
+LIGHTING:
+Bright high-contrast
+Emphasizing crispness of cotton fabric
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Bold statement pieces
+
+BACKGROUND:
+Pure white
+
+AESTHETIC:
+Modern
+Sharp
+Architectural
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Colorful clothes
+Patterns
+Soft lighting
+Casual styling
+
+OUTPUT: White shirt. Gold chain. Crisp modern.`;
+    },
+  },
+
+  'feather-trim-diamonds': {
+    name: 'Feather Trim Diamonds',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'angelic high-fashion expression' : 'ethereal presence';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'sharp jewelry against soft feathers'
+        : 'diamond stud earrings and choker sparkling';
+
+      return `STYLE: Glamorous high-key fashion portrait
+
+STYLING:
+${genderDesc}
+White outfit trimmed with ostrich feathers
+Or faux fur
+Soft wispy textures
+Framing face and neck
+Creating dreamy effect
+${faceDesc}
+
+CONTRAST:
+Soft feathers
+${jewelryPlacement}
+Sharp diamonds sparkling intensely
+
+LIGHTING:
+Ethereal and soft-focus
+Angelic high-fashion look
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Intense sparkle against softness
+
+BACKGROUND:
+Pure white
+
+MOOD:
+Dreamy
+Glamorous
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Heavy fabric
+Dark colors
+Harsh lighting
+Masculine styling
+
+OUTPUT: Feather trim. Diamond sparkle. Angelic glamour.`;
+    },
+  },
+
+  'denim-gold-casual': {
+    name: 'Denim Gold Casual',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'fresh youthful expression' : 'casual luxe presence';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'stack of gold rings and bracelets'
+        : 'gold jewelry with casual styling';
+
+      return `STYLE: Casual-luxe high-key shot
+
+COMPOSITION:
+${genderDesc}
+Hand tucked in pocket
+Or gripping collar
+Light blue denim jacket (or jeans)
+Simple white tank top
+${faceDesc}
+
+FOCUS:
+${jewelryPlacement}
+Denim texture visible (threads, stitching)
+Contrasting with polished gold
+
+LIGHTING:
+Bright daylight style
+Fresh and youthful
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Polished gold against denim
+
+BACKGROUND:
+Pure white
+
+VIBE:
+Casual
+Fresh
+Youthful
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Formal wear
+Heavy makeup
+Dark lighting
+Old styling
+
+OUTPUT: Denim gold. Casual luxe. Fresh youth.`;
+    },
+  },
+
+  'freckles-emerald': {
+    name: 'Freckles Emerald',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'minimal makeup, natural freckles celebrated' : 'cheekbone and ear focus';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'jewelry complementing natural beauty'
+        : 'bright emerald green gemstone earrings';
+
+      return `STYLE: Striking high-key beauty macro
+
+SUBJECT:
+${genderDesc}
+Pale skin
+Beautiful heavy natural freckles
+Minimal makeup
+Ginger hair possible
+${faceDesc}
+
+FOCUS:
+Razor-sharp on cheekbone and ear area
+${jewelryPlacement}
+Contrasting vividly with skin tone
+
+LIGHTING:
+Fresh sun-kissed look
+Highlighting individual freckles
+Gem sparkle
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Colorful gemstones pop
+
+BACKGROUND:
+Seamless white
+
+MOOD:
+Natural
+Fresh
+Celebrating uniqueness
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Covered freckles
+Foundation
+Smooth airbrushed skin
+Fake freckles
+Dark lighting
+
+OUTPUT: Freckles emerald. Natural beauty. Unique celebration.`;
+    },
+  },
+
+  'vitiligo-gold-pride': {
+    name: 'Vitiligo Gold Pride',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'proud beautiful expression' : 'elegant presence';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'stacked gold rings and bracelets, bridging skin pigments'
+        : 'gold jewelry bridging skin patterns';
+
+      return `STYLE: Artistic high-key portrait
+
+SUBJECT:
+${genderDesc} with vitiligo
+Distinct patches of light and dark skin
+Holding hand near face
+${faceDesc}
+
+JEWELRY:
+${jewelryPlacement}
+Acts as bridge between contrasting pigments
+${jewelryType}
+ONLY the specified jewelry
+Stacked gold pieces
+
+LIGHTING:
+Even and bright
+Celebrating unique skin patterns
+No harsh shadows
+
+BACKGROUND:
+Pure white
+
+MOOD:
+Proud
+Beautiful
+Celebrating uniqueness
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Hiding vitiligo
+Makeup covering skin
+Low contrast
+Dark background
+Medical photo vibe
+
+OUTPUT: Vitiligo gold. Proud beauty. Unique celebration.`;
+    },
+  },
+
+  'generations-hands': {
+    name: 'Generations Hands',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4'
+    ) => {
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'matching gold bracelets or rings on both hands'
+        : 'matching gold jewelry visible';
+
+      return `STYLE: Heartwarming high-key close-up
+
+COMPOSITION:
+Two hands holding each other
+One older wrinkled hand (grandmother)
+One smooth young hand (granddaughter)
+${jewelryPlacement}
+Both wearing matching jewelry
+
+FOCUS:
+Texture difference between generations
+Timeless nature of gold jewelry
+Connecting them
+
+LIGHTING:
+Soft and angelic
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Matching pieces on both
+
+BACKGROUND:
+Pure white
+
+MOOD:
+Emotional
+Touching
+Timeless connection
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Faces visible (focus is hands)
+Distracting background
+Dark mood
+Separation conflict
+Bad anatomy
+
+OUTPUT: Generations hands. Timeless connection. Emotional gold.`;
+    },
+  },
+
+  'hand-mirror-earring': {
+    name: 'Hand Mirror Earring',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'eye visible in mirror reflection' : 'artistic reflection';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'jewelry on hand holding mirror'
+        : 'dangling diamond earring visible in reflection';
+
+      return `STYLE: Creative high-key beauty shot
+
+COMPOSITION:
+${genderDesc}
+Holding small round frameless mirror
+Near face
+Through reflection we see sharp focus
+${faceDesc}
+${jewelryPlacement}
+Rest of face behind mirror soft-focused
+
+LIGHTING:
+Clean reflection without glare
+Dimension and playfulness
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Sharp in mirror reflection
+
+BACKGROUND:
+Pure white
+
+MOOD:
+Playful
+Creative
+Elegant
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Glare on mirror
+Confusing reflection
+Dark background
+
+OUTPUT: Hand mirror. Earring reflection. Playful dimension.`;
+    },
+  },
+
+  'orchid-gold-rings': {
+    name: 'Orchid Gold Rings',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4'
+    ) => {
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'stacked thin gold rings on fingers'
+        : 'delicate gold jewelry visible';
+
+      return `STYLE: Delicate high-key macro shot
+
+COMPOSITION:
+Model's hand
+Gently holding single white orchid flower
+Or dried branch
+${jewelryPlacement}
+
+TEXTURE CONTRAST:
+Organic flower petals
+Rigid shiny metal of rings
+Natural vs refined
+
+LIGHTING:
+Very soft and natural
+Emphasizing purity and elegance
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Thin stacked rings
+
+BACKGROUND:
+Seamless white
+
+MOOD:
+Pure
+Elegant
+Delicate
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Bold heavy jewelry
+Dark background
+Harsh lighting
+Cluttered composition
+
+OUTPUT: Orchid gold. Delicate contrast. Pure elegance.`;
+    },
+  },
+
+  'negative-space-profile': {
+    name: 'Negative Space Profile',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'male model' : 'female model';
+      const faceDesc = showFace === 'show' ? 'profile visible in corner' : 'minimal presence';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'jewelry on hand in corner'
+        : 'gold necklace visible in profile';
+
+      return `STYLE: Minimalist high-key editorial
+
+COMPOSITION:
+Extreme negative space
+${genderDesc} positioned in far bottom-right corner
+Only profile visible
+${faceDesc}
+${jewelryPlacement}
+Rest of image (80%) pure empty white space
+
+FEELING:
+Airiness
+Luxury
+Perfect for adding text later
+
+LIGHTING:
+Bright and even
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Small but visible
+
+BACKGROUND:
+Pure white
+Expansive
+
+MOOD:
+Minimalist
+Airy
+Luxurious
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Centered subject
+Cluttered composition
+Dark areas
+
+OUTPUT: Negative space. Profile corner. Airy luxury.`;
+    },
+  },
+
+  'symmetry-back-to-back': {
+    name: 'Symmetry Back to Back',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderDesc = gender === 'men' ? 'two male models' : 'two female models';
+      const faceDesc = showFace === 'show' ? 'profiles visible on both sides' : 'architectural silhouettes';
+      const jewelryPlacement = (jewelryType === 'ring' || jewelryType === 'bracelet')
+        ? 'matching jewelry on both'
+        : 'matching hoop earrings on both sides';
+
+      return `STYLE: Perfectly symmetrical high-key shot
+
+COMPOSITION:
+${genderDesc}
+Standing back-to-back
+Heads touching
+Hair blends together
+${faceDesc}
+${jewelryPlacement}
+Striking visual geometry
+
+LIGHTING:
+Hits both profiles equally
+Balanced illumination
+
+JEWELRY:
+${jewelryType}
+ONLY the specified jewelry
+Matching on both
+
+BACKGROUND:
+Pure white
+
+AESTHETIC:
+Architectural
+Balanced
+Geometric
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Asymmetry
+Single model
+Uneven lighting
+Cluttered
+
+OUTPUT: Symmetry duo. Back to back. Geometric balance.`;
+    },
+  },
 };

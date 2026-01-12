@@ -69,6 +69,11 @@ export const studioCommercial: PresetCategory = {
     createPreset('butterfly-lighting-gaze', 'Butterfly Lighting Gaze', 'Hasselblad, hypnotic', 'studio-commercial'),
     createPreset('pastel-mint-fresh', 'Pastel Mint Fresh', 'Colorful playful studio', 'studio-commercial'),
     createPreset('all-black-gold-pop', 'All Black Gold Pop', 'Monochrome, gold contrast', 'studio-commercial'),
+    createPreset('silk-slip-diamonds', 'Silk Slip Diamonds', 'Champagne slip, elegant', 'studio-commercial'),
+    createPreset('white-shirt-gold-chain', 'White Shirt Gold Chain', 'Crisp modern, androgynous', 'studio-commercial'),
+    createPreset('feather-trim-diamonds', 'Feather Trim Diamonds', 'Angelic glamour, soft', 'studio-commercial'),
+    createPreset('negative-space-profile', 'Negative Space Profile', 'Minimalist, airy luxury', 'studio-commercial'),
+    createPreset('symmetry-back-to-back', 'Symmetry Back to Back', 'Geometric duo, balanced', 'studio-commercial'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -91,6 +96,8 @@ export const joyExpression: PresetCategory = {
     createPreset('motion-candid', 'Motion Candid', 'Hair blowing, movement blur', 'joy-expression'),
     createPreset('bracelet-laugh', 'Bracelet Laugh', 'Covering mouth, genuine joy', 'joy-expression'),
     createPreset('smiling-jawline', 'Smiling Jawline', 'Anonymous, gentle smile', 'joy-expression'),
+    createPreset('sisterhood-contrast', 'Sisterhood Contrast', 'Two skin tones, trust', 'joy-expression'),
+    createPreset('candid-laughter-duo', 'Candid Laughter Duo', 'Genuine laughing duo', 'joy-expression'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -163,6 +170,8 @@ export const lifestyleCandid: PresetCategory = {
     createPreset('riviera-sun-drenched', 'Riviera Sun Drenched', 'Blue sky, vacation luxury', 'lifestyle-candid'),
     createPreset('cashmere-cozy-morning', 'Cashmere Cozy Morning', 'Knitwear, quiet luxury', 'lifestyle-candid'),
     createPreset('golden-hour-intimate', 'Golden Hour Intimate', 'Sun-kissed, Portra warmth', 'lifestyle-candid'),
+    createPreset('champagne-satin-lying', 'Champagne Satin Lying', 'Silk luxury, intimate', 'lifestyle-candid'),
+    createPreset('denim-gold-casual', 'Denim Gold Casual', 'Fresh youth, casual luxe', 'lifestyle-candid'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -195,6 +204,13 @@ export const macroDetail: PresetCategory = {
     createPreset('macro-eye-jewelry', 'Macro Eye Jewelry', 'Extreme eye close-up', 'macro-detail'),
     createPreset('collarbone-anonymous', 'Collarbone Anonymous', 'No face, anatomical beauty', 'macro-detail'),
     createPreset('macro-ear-stack', 'Macro Ear Stack', 'Piercing detail, extreme close', 'macro-detail'),
+    createPreset('profile-jawline-ear', 'Profile Jawline Ear', 'Rembrandt profile, ear focus', 'macro-detail'),
+    createPreset('hands-framing-face', 'Hands Framing Face', 'Ring detail, eye contact', 'macro-detail'),
+    createPreset('lips-neck-hand-crop', 'Lips Neck Hand Crop', 'Dewy intimate crop', 'macro-detail'),
+    createPreset('whisper-ear-macro', 'Whisper Ear Macro', 'Secret moment, playful', 'macro-detail'),
+    createPreset('generations-hands', 'Generations Hands', 'Grandmother-daughter, emotional', 'macro-detail'),
+    createPreset('hand-mirror-earring', 'Hand Mirror Earring', 'Reflection focus, creative', 'macro-detail'),
+    createPreset('orchid-gold-rings', 'Orchid Gold Rings', 'Flower contrast, delicate', 'macro-detail'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
@@ -347,6 +363,8 @@ export const artisticSpecial: PresetCategory = {
     createPreset('wet-look-glass-skin', 'Wet Look Glass Skin', 'Dewy glossy, summer luxury', 'artistic-special'),
     createPreset('sheer-veil-ethereal', 'Sheer Veil Ethereal', 'Silk veil, dream diamonds', 'artistic-special'),
     createPreset('diamond-ice-frozen', 'Diamond Ice Frozen', 'Crystal ice, cool luxury', 'artistic-special'),
+    createPreset('freckles-emerald', 'Freckles Emerald', 'Natural beauty, gemstone pop', 'artistic-special'),
+    createPreset('vitiligo-gold-pride', 'Vitiligo Gold Pride', 'Celebrating uniqueness', 'artistic-special'),
   ].filter(Boolean) as PresetCategory['presets'],
 };
 
