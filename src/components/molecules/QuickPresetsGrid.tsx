@@ -20,7 +20,8 @@ import {
   Paintbrush, Waves, Ribbon, CloudFog, Hexagon, Shield, Flame, CircleDotDashed,
   Target, Flashlight, Star, Droplet, PartyPopper, Smile, HandMetal, Shapes,
   Thermometer, CircleUser, Microscope, Move3D, ScanFace, FileSearch, ChevronDown,
-  ChevronRight, Users, Crosshair, Eye, Gauge, Heart, Brush, Timer
+  ChevronRight, Users, Crosshair, Eye, Gauge, Heart, Brush, Timer, Droplet as DropletIcon,
+  PersonStanding, Blend, Shirt as ShirtBlaze, Minus, ArrowDownToLine, Palette as PaletteIcon
 } from 'lucide-react';
 
 interface QuickPreset {
@@ -104,6 +105,8 @@ const PRESET_CATEGORIES: PresetCategory[] = [
       { id: 'shadow-play', name: 'Shadow Play', icon: Blinds, description: 'Venetian patterns, contrast', color: 'text-amber-400' },
       { id: 'chiaroscuro', name: 'Chiaroscuro', icon: Contrast, description: 'Renaissance drama', color: 'text-amber-500' },
       { id: 'hair-strand-shadow', name: 'Hair Strand', icon: Brush, description: 'Hair shadows on face', color: 'text-purple-300' },
+      { id: 'kodak-low-key', name: 'Kodak Low Key', icon: Film, description: 'Cinematic chiaroscuro', color: 'text-amber-600' },
+      { id: 'oily-glow', name: 'Oily Glow', icon: Droplets, description: 'Sweaty sheen, specular', color: 'text-yellow-200' },
     ],
   },
 
@@ -126,6 +129,7 @@ const PRESET_CATEGORIES: PresetCategory[] = [
       { id: 'natural-50mm', name: 'Natural 50mm', icon: Gauge, description: 'Gentle smile, approachable', color: 'text-stone-200' },
       { id: 'urban-cafe', name: 'Urban Cafe', icon: Building, description: 'Bustling coffee shop', color: 'text-orange-400' },
       { id: 'soft-blinds', name: 'Soft Blinds', icon: Grid3X3, description: 'Gentle stripes, peaceful', color: 'text-amber-100' },
+      { id: 'chain-tension', name: 'Chain Tension', icon: Link2, description: 'Pendant pull, tactile', color: 'text-yellow-300' },
     ],
   },
 
@@ -149,6 +153,9 @@ const PRESET_CATEGORIES: PresetCategory[] = [
       { id: 'wet-look-glam', name: 'Wet Look Glam', icon: Droplets, description: 'High-shine, glossy', color: 'text-sky-300' },
       { id: 'peach-fuzz-rim', name: 'Peach Fuzz Rim', icon: CircleDot, description: 'Backlit vellus hair', color: 'text-rose-100' },
       { id: 'tension-grip', name: 'Tension Grip', icon: Hand, description: 'Hand on neck, veins', color: 'text-red-300' },
+      { id: 'ear-cartilage', name: 'Ear Cartilage', icon: Ear, description: 'Ultra-macro, capillaries', color: 'text-rose-300' },
+      { id: 'pendant-hollow', name: 'Pendant Hollow', icon: Minus, description: 'Collarbone dip, intimate', color: 'text-stone-300' },
+      { id: 'lapel-contrast', name: 'Lapel Contrast', icon: Blend, description: 'Fabric vs skin texture', color: 'text-slate-300' },
     ],
   },
 
@@ -171,6 +178,7 @@ const PRESET_CATEGORIES: PresetCategory[] = [
       { id: 'flower-walk', name: 'Flower Walk', icon: Flower2, description: 'Garden stroll, blooms', color: 'text-pink-400' },
       { id: 'glazed-tan', name: 'Glazed Tan', icon: SunMedium, description: 'Golden hour, dewy skin', color: 'text-amber-300' },
       { id: 'rustic-light', name: 'Rustic Light', icon: Armchair, description: 'Sunlit apartment', color: 'text-amber-400' },
+      { id: 'sunset-squint', name: 'Sunset Squint', icon: SunDim, description: 'Golden hour, terracotta', color: 'text-orange-500' },
     ],
   },
 
@@ -193,6 +201,10 @@ const PRESET_CATEGORIES: PresetCategory[] = [
       { id: 'editorial', name: 'Editorial', icon: Film, description: 'Magazine-style luxury', color: 'text-rose-400' },
       { id: 'denim-contrast', name: 'Denim Contrast', icon: Scissors, description: 'Rough vs shiny, casual', color: 'text-blue-300' },
       { id: 'luxury-boudoir', name: 'Luxury Boudoir', icon: BedDouble, description: 'Intimate bedroom elegance', color: 'text-pink-400' },
+      { id: 'blazer-jawline', name: 'Blazer Jawline', icon: Hexagon, description: 'High-key, white blazer', color: 'text-slate-200' },
+      { id: 'dark-glow', name: 'Dark Glow', icon: Star, description: 'Deep dark skin, cashmere', color: 'text-amber-400' },
+      { id: 'silk-shoulder', name: 'Silk Shoulder', icon: Ribbon, description: 'Olive skin, champagne slip', color: 'text-rose-200' },
+      { id: 'freckle-linen', name: 'Freckle Linen', icon: Shirt, description: 'Fair skin, natural freckles', color: 'text-orange-200' },
     ],
   },
 
@@ -232,6 +244,7 @@ const PRESET_CATEGORIES: PresetCategory[] = [
       { id: 'gentle-touch', name: 'Gentle Touch', icon: Fingerprint, description: 'Hand on face, 100mm macro', color: 'text-pink-100' },
       { id: 'curtain-dreams', name: 'Curtain Dreams', icon: FlipHorizontal, description: 'Sheer curtain, diffused', color: 'text-pink-200' },
       { id: 'water-glass', name: 'Water Glass', icon: GlassWater, description: 'Caustic light, fresh morning', color: 'text-teal-200' },
+      { id: 'clean-girl-crop', name: 'Clean Girl Crop', icon: Crop, description: 'Eyes cropped, dekolte', color: 'text-slate-100' },
     ],
   },
 

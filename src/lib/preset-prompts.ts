@@ -7554,4 +7554,787 @@ Overly edited
 OUTPUT: Tension grip. Hand on neck. Visible veins. Raw intensity.`;
     },
   },
+
+  'oily-glow': {
+    name: 'Oily Glow',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Dynamic portrait. Close up of a ${genderText} laughing intensely with head back, wearing ${jewelryType}. Hard studio flash creating specular highlights on slightly sweaty/oily skin.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+OILY SKIN TEXTURE:
+Slightly sweaty/oily skin
+Natural sheen on forehead and nose bridge
+Specular highlights from flash
+Real skin glow, not matte
+Authentic skin moisture
+
+EXPRESSION:
+Laughing intensely
+Head thrown back
+Energetic, dynamic vibe
+Genuine emotion
+
+LIGHTING:
+Hard studio flash
+Creating specular highlights
+White background
+Sharp, revealing light
+
+SKIN DETAIL:
+Visible pores
+Expression lines visible
+Real skin texture
+Not airbrushed
+
+JEWELRY:
+${jewelryType} catching flash
+ONLY the specified jewelry
+Sharp focus
+Dynamic showcase
+
+TECHNICAL:
+Hard flash photography
+Energetic mood
+Sharp focus throughout
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Matte powder finish
+Plastic doll face
+Artificial blur
+Smooth gradient skin
+Perfect makeup
+
+OUTPUT: Oily glow. Sweaty sheen. Specular highlights. Dynamic laughter.`;
+    },
+  },
+
+  'ear-cartilage': {
+    name: 'Ear Cartilage',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      return `Ultra-macro jewelry photography. Extreme detail of a human ear wearing ${jewelryType}. Hard studio lighting showing the unique texture of ear cartilage and skin folds.
+
+EAR ANATOMY:
+Unique texture of ear cartilage
+Skin folds visible
+Earlobe detail
+Ear structure as subject
+
+SKIN MICRO-DETAIL:
+Visible distinct pores on earlobe
+Tiny capillaries under thin skin
+Hyper-realistic texture
+Real human ear quality
+
+LIGHTING:
+Hard studio lighting
+Revealing all texture
+White background
+Sharp, clinical illumination
+
+FOCUS:
+Razor sharp on metal and skin contact point
+Where jewelry meets ear
+Every detail visible
+Extreme precision
+
+JEWELRY:
+${jewelryType} at contact point
+ONLY the specified jewelry
+How it attaches to ear
+Intimate detail
+
+TECHNICAL:
+Ultra-macro perspective
+Hyper-realistic quality
+Clinical mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Wax ear appearance
+Smooth plastic
+Blurry, dreamy
+Painting style
+Softbox only lighting
+
+OUTPUT: Ear cartilage. Capillaries. Contact point. Ultra-macro detail.`;
+    },
+  },
+
+  'kodak-low-key': {
+    name: 'Kodak Low Key',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Cinematic portrait photography. Dramatic low-key lighting (chiaroscuro), side profile of a ${genderText} wearing ${jewelryType}. Deep dark background emerging into shadow.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+CHIAROSCURO LIGHTING:
+Dramatic low-key
+Single directional light source
+Skimming skin surface
+Deep shadows
+Emerging from darkness
+
+SKIN TEXTURE:
+Rough skin texture emphasized
+Pores visible in light
+Fine vellus hair on cheek and neck
+Hyper-realistic dermatology
+Real human quality
+
+FILM AESTHETIC:
+Raw film grain
+Kodak Portra 800 color palette
+Cinematic quality
+Analog warmth
+
+PROFILE VIEW:
+Side profile
+Elegant silhouette
+Dramatic angle
+Classic portrait
+
+JEWELRY:
+${jewelryType} catching edge light
+ONLY the specified jewelry
+Emerging from shadow
+Dramatic showcase
+
+TECHNICAL:
+Kodak Portra 800 equivalent
+Cinematic perspective
+Dramatic mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Bright background
+Flat lighting
+Smooth, plastic skin
+Airbrushed appearance
+Studio white
+
+OUTPUT: Kodak low key. Chiaroscuro. Film grain. Cinematic drama.`;
+    },
+  },
+
+  'sunset-squint': {
+    name: 'Sunset Squint',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Lifestyle photograph. Close up of a ${genderText} outdoors during golden hour sunset, direct warm low sunlight hitting face forcefully, wearing ${jewelryType}.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+GOLDEN HOUR INTENSITY:
+Direct warm low sunlight
+Hitting face forcefully
+Strong golden hour effect
+Warm, intense illumination
+
+NATURAL SKIN:
+Natural oily sheen
+Slight sweat/sunscreen glow
+Not matte or powdered
+Real outdoor skin
+
+AUTHENTIC EXPRESSION:
+Squinting naturally against sun
+Authentic eye crinkles
+Natural reaction
+Not posed perfectly
+
+SKIN DETAIL:
+Visible sun spots
+Authentic skin texture
+Real outdoor appearance
+Natural imperfections
+
+BACKGROUND:
+Blurred warm terracotta wall
+Mediterranean feel
+Warm tones
+Outdoor context
+
+JEWELRY:
+${jewelryType} catching golden light
+ONLY the specified jewelry
+Warm metal glow
+Sunset showcase
+
+TECHNICAL:
+Hyper-realism
+Outdoor perspective
+Golden hour mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Studio lighting
+Cold tones
+Matte, powdered skin
+Plastic appearance
+Artificial blur
+Indoor setting
+
+OUTPUT: Sunset squint. Golden hour. Oily sheen. Terracotta warmth.`;
+    },
+  },
+
+  'blazer-jawline': {
+    name: 'Blazer Jawline',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+
+      return `Editorial jewelry photography. Bright high-key style, cropped shot of a ${genderText}'s neck and jawline wearing ${jewelryType}. Wearing a white blazer, pure white background.
+
+FRAMING:
+Cropped neck and jawline
+Face partially visible
+White blazer in frame
+Elegant crop
+
+LIGHTING:
+Bright high-key style
+Soft directional window lighting
+Gentle shadows for volume
+Pure white background
+
+STYLING:
+White structured blazer
+Professional, clean
+Minimal, elegant
+High-end aesthetic
+
+SKIN:
+Hyper-realistic texture
+Natural moles visible
+Pores visible
+Not smoothed
+
+COMPOSITION:
+Clean and minimalist
+Editorial quality
+Professional aesthetic
+85mm lens perspective
+
+JEWELRY:
+${jewelryType} as focal point
+ONLY the specified jewelry
+Against blazer and skin
+Editorial showcase
+
+TECHNICAL:
+Shot on 85mm lens equivalent
+High-key style
+Clean mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Flat lighting
+Overexposed
+Plastic skin
+Dark black shadows
+Messy background
+
+OUTPUT: Blazer jawline. High-key. White blazer. Editorial clean.`;
+    },
+  },
+
+  'clean-girl-crop': {
+    name: 'Clean Girl Crop',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+
+      return `Editorial jewelry photography. Cropped medium shot focusing on ${genderText}'s neck, chin, and dekolte area (eyes cropped out), wearing ${jewelryType}. White structured blazer or bare skin.
+
+CLEAN GIRL CROP:
+Neck, chin, dekolte focus
+Eyes cropped out of frame
+"Clean girl" aesthetic
+Minimal, fresh
+Modern beauty trend
+
+LIGHTING:
+Soft directional studio lighting
+Gentle shadows defining collarbone
+Pure white background
+Flattering illumination
+
+SKIN DETAIL:
+Hyper-realistic texture
+Natural moles, freckles
+Vellus hair (peach fuzz)
+Not over-smoothed
+
+STYLING:
+High-quality white structured blazer
+Or elegant bare skin
+Clean, minimal
+Modern aesthetic
+
+JEWELRY:
+${jewelryType} as hero
+ONLY the specified jewelry
+Layered look welcome
+Clean girl showcase
+
+TECHNICAL:
+85mm lens equivalent
+Clean girl aesthetic
+Minimalist mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Plastic, over-smoothed skin
+Eyes looking at camera
+Busy background
+Dark shadows
+Messy hair
+
+OUTPUT: Clean girl crop. Dekolte focus. Eyes cropped. Minimal fresh.`;
+    },
+  },
+
+  'pendant-hollow': {
+    name: 'Pendant Hollow',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      return `Editorial jewelry photography. Bright high-key style with soft directional lighting. Tightly cropped shot focused on the collarbone and neck hollow of a woman, ${jewelryType} resting in the dip of the collarbone.
+
+COLLARBONE HOLLOW:
+Tight crop on collarbone
+Neck hollow visible
+Pendant resting in dip
+Natural anatomy as setting
+
+STYLING:
+Bare skin
+Strapless top out of frame
+Clean, uncluttered
+Focus purely on jewelry and skin
+
+LIGHTING:
+Bright high-key style
+Soft directional lighting
+Pure white background
+Minimal shadows
+
+SKIN:
+Hyper-realistic texture
+Natural moles visible
+Fine hairs visible
+Pores visible
+
+COMPOSITION:
+Minimalist and clean
+Tight framing
+Jewelry as focal point
+100mm macro perspective
+
+JEWELRY:
+${jewelryType} in collarbone hollow
+ONLY the specified jewelry
+Natural resting position
+Intimate showcase
+
+TECHNICAL:
+100mm macro lens equivalent
+High-key style
+Intimate mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Plastic skin
+Smooth gradient
+Flat light
+Heavy retouching
+Face in frame
+
+OUTPUT: Pendant hollow. Collarbone dip. Intimate rest. Macro elegance.`;
+    },
+  },
+
+  'lapel-contrast': {
+    name: 'Lapel Contrast',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      return `Editorial detail photography. Bright high-key lighting. Close-up shot of ${jewelryType} resting on skin right next to the lapel of a tailored white blazer.
+
+TEXTURE CONTRAST:
+Fabric weave texture vs skin
+Blazer lapel detail
+Natural skin pores and moles
+Material interplay
+
+LIGHTING:
+Bright high-key lighting
+Soft shadows under lapel
+Clean illumination
+Pure white background
+
+STYLING:
+Tailored white blazer
+High-quality fabric
+Visible weave texture
+Minimalist luxury
+
+SKIN DETAIL:
+Natural pores visible
+Moles, imperfections
+Real skin quality
+Contrast with fabric
+
+COMPOSITION:
+Macro perspective
+Sharp on both textures
+Minimalist luxury vibe
+Detail-oriented
+
+JEWELRY:
+${jewelryType} between fabric and skin
+ONLY the specified jewelry
+Texture contrast showcase
+Luxury detail
+
+TECHNICAL:
+Macro lens equivalent
+High-key style
+Luxury mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Blurry fabric
+Smooth skin
+Flat white light
+Cheap fabric
+Casual clothes
+
+OUTPUT: Lapel contrast. Fabric vs skin. Texture interplay. Luxury detail.`;
+    },
+  },
+
+  'chain-tension': {
+    name: 'Chain Tension',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      return `Lifestyle jewelry photography. High-key soft directional light. Cropped shot of two hands gently holding/pulling ${jewelryType} pendant downwards on the chest, showing slight tension on the fine chain against the neck skin.
+
+TENSION MOMENT:
+Hands holding/pulling pendant
+Slight tension on chain
+Chain pressing against neck skin
+Gentle, not aggressive
+Tactile interaction
+
+HAND DETAIL:
+Realistic finger texture
+Natural manicure
+Authentic hands
+Not perfect
+
+LIGHTING:
+High-key soft directional light
+Simple white background
+Clean, bright
+Flattering illumination
+
+SKIN:
+Hyper-real details on chest
+Natural texture
+Authentic appearance
+Chain marking on skin
+
+COMPOSITION:
+Tactile feeling emphasized
+Intimate gesture
+Jewelry interaction
+Close, personal
+
+JEWELRY:
+${jewelryType} being touched
+ONLY the specified jewelry
+Chain tension visible
+Interactive showcase
+
+TECHNICAL:
+Lifestyle perspective
+Tactile mood
+Intimate feeling
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Heavy, aggressive pulling
+Fake pose
+Plastic hands
+Smooth skin
+Perfect nails
+Dark shadows
+
+OUTPUT: Chain tension. Pendant pull. Tactile interaction. Intimate gesture.`;
+    },
+  },
+
+  'dark-glow': {
+    name: 'Dark Glow',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Editorial jewelry photography. Bright high-key soft directional lighting. Medium cropped shot of a woman with deep dark skin tone wearing ${jewelryType}. Wearing a cozy cream-colored cashmere knit sweater.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+DEEP DARK SKIN:
+Beautiful deep dark skin tone
+Glowing, healthy
+Rich melanin beauty
+Showcasing diversity
+
+STYLING:
+Cozy cream cashmere knit sweater
+Arms crossed softly
+Luxurious fabric texture
+Warm, inviting
+
+LIGHTING:
+Bright high-key
+Soft directional
+White background
+Flattering on dark skin
+
+SKIN DETAIL:
+Hyper-realistic skin details
+Natural glow
+Real texture
+Beautiful contrast with gold
+
+MOOD:
+Minimalist warm vibe
+Cozy but elegant
+Inclusive beauty
+Modern editorial
+
+JEWELRY:
+${jewelryType} on dark skin
+ONLY the specified jewelry
+Gold contrasting beautifully
+Glowing showcase
+
+TECHNICAL:
+Soft directional lighting
+Warm mood
+Inclusive beauty
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Washing out dark skin
+Flat light
+Cheap fabric
+Busy patterns
+Plastic skin
+
+OUTPUT: Dark glow. Deep skin. Cashmere warmth. Inclusive beauty.`;
+    },
+  },
+
+  'silk-shoulder': {
+    name: 'Silk Shoulder',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Editorial jewelry photography. High-key soft directional light. Close-up profile shot of a woman with olive/tan skin tone looking over shoulder, wearing ${jewelryType}. Champagne silk slip top with thin straps.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+OLIVE/TAN SKIN:
+Beautiful olive or tan skin tone
+Warm, Mediterranean
+Dewy texture
+Natural glow
+
+OVER SHOULDER:
+Looking over shoulder
+Neck and shoulder focus
+Elegant pose
+Profile perspective
+
+SILK STYLING:
+Champagne silk slip top
+Thin straps
+Luxurious fabric
+Minimal, elegant
+
+LIGHTING:
+High-key soft directional
+White background
+Flattering on warm skin
+Minimalist luxury
+
+SKIN:
+Dewy skin texture
+Natural, healthy
+Real appearance
+Not matte
+
+JEWELRY:
+${jewelryType} catching soft light
+ONLY the specified jewelry
+Warm metal on warm skin
+Luxurious showcase
+
+TECHNICAL:
+85mm lens equivalent
+Profile perspective
+Luxury mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Thick straps
+Cotton top
+Matte skin
+Dark shadows
+Heavy makeup
+
+OUTPUT: Silk shoulder. Over shoulder. Champagne slip. Olive glow.`;
+    },
+  },
+
+  'freckle-linen': {
+    name: 'Freckle Linen',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Editorial fashion photography. Bright high-key soft lighting. Medium shot (waist-up) of a ${genderText} with fair/pale skin and natural freckles, wearing ${jewelryType}. Unbuttoned white linen shirt.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+FAIR SKIN & FRECKLES:
+Fair/pale skin tone
+Natural freckles prominent
+Celebrating natural beauty
+Real, unfiltered
+
+LINEN STYLING:
+Unbuttoned white linen shirt
+Relaxed, casual
+Textured natural fabric
+Hands in pockets
+
+LIGHTING:
+Bright high-key soft lighting
+Clean and airy
+White background
+Fresh aesthetic
+
+POSE:
+Relaxed stance
+Hands in pockets
+Medium shot (waist-up)
+Natural, unstiff
+
+SKIN:
+Natural skin details visible
+Freckles as feature
+Textured fabric contrast
+Real beauty
+
+JEWELRY:
+${jewelryType} on fair skin
+ONLY the specified jewelry
+Complementing freckles
+Fresh showcase
+
+TECHNICAL:
+High-key lighting
+Airy aesthetic
+Relaxed mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Overly tanned skin
+Stiff pose
+Cotton shirt (use linen)
+Smooth, no-freckle skin
+Dark background
+
+OUTPUT: Freckle linen. Fair skin. Natural freckles. White linen fresh.`;
+    },
+  },
 };
