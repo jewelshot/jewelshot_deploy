@@ -19,7 +19,8 @@ import {
   Image,
   Zap,
   Film,
-  Laugh
+  Laugh,
+  Focus
 } from 'lucide-react';
 
 interface QuickPreset {
@@ -108,6 +109,13 @@ const QUICK_PRESETS: QuickPreset[] = [
     icon: Laugh,
     description: 'Bright, joyful commercial',
     color: 'text-orange-400',
+  },
+  {
+    id: 'macro-ecommerce',
+    name: 'Macro Detail',
+    icon: Focus,
+    description: 'Extreme close-up on skin',
+    color: 'text-teal-400',
   },
 ];
 

@@ -922,4 +922,124 @@ Aspect ratio: ${aspectRatio}
 OUTPUT: High-key commercial beauty. Candid joy. Luxury jewelry editorial. Ultra-clean aesthetic.`;
     },
   },
+
+  'macro-ecommerce': {
+    name: 'Macro E-Commerce',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '4:5',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      const genderText = gender === 'women' ? 'female' : gender === 'men' ? 'male' : '';
+      const type = jewelryType.toLowerCase();
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      // Jewelry-specific body focus
+      const isHandJewelry = type === 'ring' || type === 'bracelet';
+      const isNeckEarJewelry = type === 'necklace' || type === 'earring';
+
+      // Body part focus based on jewelry type
+      const bodyFocus = isHandJewelry
+        ? `Elegant ${genderText} hands with natural manicure, soft skin texture, graceful finger positioning`
+        : isNeckEarJewelry
+        ? `Elegant ${genderText} neck and ear details, smooth skin, refined bone structure`
+        : `Elegant body part where ${jewelryType} is worn, natural skin texture`;
+
+      // Framing based on jewelry type
+      const framingSpec = {
+        ring: 'Extreme close-up of hand and fingers, ring as hero, fingers elegantly positioned',
+        bracelet: 'Close-up of wrist and forearm, bracelet prominently displayed, elegant hand gesture',
+        necklace: 'Close-up of neck and decollete, chain and pendant centered on skin',
+        earring: 'Close-up of ear, jawline, and neck area, earring catching the light',
+      }[type] || 'Extreme close-up focusing on jewelry against skin';
+
+      // Real-world size specifications
+      const sizeSpecs = {
+        ring: 'Ring band 2-3mm wide, face 8-12mm diameter, natural finger proportions',
+        necklace: 'Chain visible 16-20cm length in frame, pendant 10-25mm, natural neck proportions',
+        earring: 'Stud 4-8mm diameter, drop 15-35mm length, natural ear proportions',
+        bracelet: 'Bracelet visible 15-20cm length, links 3-8mm width, natural wrist proportions',
+      }[type] || 'Standard jewelry proportions relative to human body';
+
+      // 3D placement specifications
+      const placementSpecs = {
+        ring: 'Ring WRAPPED AROUND finger, band follows finger curve, TOUCHES skin all around',
+        necklace: 'Chain RESTS ON skin, follows neck contour, pendant LIES FLAT on chest',
+        earring: 'Earring SECURED through earlobe, HANGS naturally, catches light beautifully',
+        bracelet: 'Bracelet WRAPS AROUND wrist, follows wrist curve, natural drape with gravity',
+      }[type] || 'Jewelry makes natural PHYSICAL CONTACT with body';
+
+      return `Macro e-commerce photography shot focusing on a model wearing ${jewelryType}. Close-up crop showing extreme detail of the jewelry against human skin.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+BODY FOCUS & SKIN DETAILS:
+${bodyFocus}
+Skin texture hyper-realistic, visible pores, natural skin imperfections
+NOT airbrushed, NOT plastic, real human skin quality
+Warm natural skin tone with subtle variations
+
+FRAMING & COMPOSITION:
+${framingSpec}
+Jewelry fills 50-70% of the frame - TRUE MACRO close-up
+Camera distance: Intimate, within arm's reach
+Crop: Tight on jewelry zone, exclude unnecessary body parts
+Negative space: Minimal, jewelry is the dominant element
+${sizeSpecs}
+
+CRITICAL 3D PLACEMENT & PHYSICAL CONTACT:
+${placementSpecs}
+Jewelry shows DEPTH and PERSPECTIVE wrapped around body
+DIRECT SKIN CONTACT - no air gaps, no floating appearance
+Natural wearing physics, realistic gravity drape
+Light interacts naturally between metal and skin
+
+CRITICAL PRESERVATION - ABSOLUTE ZERO TOLERANCE:
+JEWELRY DESIGN MUST REMAIN 100% PIXEL-IDENTICAL
+EXACT structure: geometry, shape, form, dimensions UNCHANGED
+EXACT gemstone count: SAME NUMBER, NO additions, NO removals
+EXACT facets: Every cut, angle, reflection PRESERVED
+EXACT setting details: prongs, bezels, metalwork UNTOUCHED
+EXACT proportions: ALL ratios, measurements MAINTAINED
+ONLY lighting and skin context MAY change - JEWELRY FROZEN
+
+PROFESSIONAL STUDIO LIGHTING:
+Highlighting the facets and materials of the jewelry
+Key light: Focused on jewelry, emphasizing sparkle and metal sheen
+Fill light: Soft wrap-around for skin, no harsh shadows
+Rim light: Subtle edge definition on jewelry
+Color temp: 5000-5500K neutral commercial
+Effect: Gemstones brilliance maximized, metal polish gleaming
+
+DEPTH OF FIELD - SHALLOW:
+Shallow depth of field, f/2.8-f/4 aperture
+Jewelry razor-sharp, every facet in focus
+Skin background soft blurred bokeh
+Focus stacking if needed for full jewelry sharpness
+Creates professional separation between jewelry and skin
+
+TECHNICAL SPECIFICATIONS:
+High definition, photorealistic commercial quality
+Resolution: 300 DPI, publication-ready
+Macro lens equivalent: 100mm macro
+Focus: Pin-sharp on jewelry details
+Skin: Soft but detailed, natural texture visible
+Aspect ratio: ${aspectRatio}
+
+STRICTLY FORBIDDEN:
+Blurry jewelry, soft focus on product
+Wide shots, distant framing
+Face in frame (unless showFace is enabled)
+Jewelry floating, not touching skin
+Oversized or miniature jewelry proportions
+Harsh unflattering shadows on skin
+Over-processed airbrushed skin
+Jewelry design modifications
+Low resolution, noise, grain
+
+OUTPUT: Macro e-commerce. Extreme jewelry detail. Photorealistic skin. Commercial catalog quality.`;
+    },
+  },
 };
