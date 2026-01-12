@@ -68,7 +68,17 @@ import {
   Cloud,
   TreePine,
   RotateCcw,
-  GlassWater
+  GlassWater,
+  ShirtIcon,
+  Grid3X3,
+  Brain,
+  Ear,
+  Link2,
+  CircleDashed,
+  Activity,
+  Scissors,
+  SunSnow,
+  Undo2
 } from 'lucide-react';
 
 interface QuickPreset {
@@ -500,6 +510,76 @@ const QUICK_PRESETS: QuickPreset[] = [
     icon: GlassWater,
     description: 'Caustic light, fresh morning',
     color: 'text-teal-200',
+  },
+  {
+    id: 'white-shirt',
+    name: 'White Shirt',
+    icon: ShirtIcon,
+    description: 'Unbuttoned elegance, clean',
+    color: 'text-slate-100',
+  },
+  {
+    id: 'soft-blinds',
+    name: 'Soft Blinds',
+    icon: Grid3X3,
+    description: 'Gentle stripes, peaceful',
+    color: 'text-amber-100',
+  },
+  {
+    id: 'daydreaming',
+    name: 'Daydreaming',
+    icon: Brain,
+    description: 'Window gaze, thoughtful',
+    color: 'text-purple-200',
+  },
+  {
+    id: 'earlobe-macro',
+    name: 'Earlobe Macro',
+    icon: Ear,
+    description: 'Extreme ear detail',
+    color: 'text-rose-200',
+  },
+  {
+    id: 'chain-press',
+    name: 'Chain Press',
+    icon: Link2,
+    description: 'Chain on collarbone',
+    color: 'text-yellow-200',
+  },
+  {
+    id: 'fingerprint-ring',
+    name: 'Fingerprint Ring',
+    icon: CircleDashed,
+    description: 'Real hand texture',
+    color: 'text-orange-200',
+  },
+  {
+    id: 'pulse-point',
+    name: 'Pulse Point',
+    icon: Activity,
+    description: 'Inner wrist, delicate',
+    color: 'text-red-200',
+  },
+  {
+    id: 'denim-contrast',
+    name: 'Denim Contrast',
+    icon: Scissors,
+    description: 'Rough vs shiny, casual',
+    color: 'text-blue-300',
+  },
+  {
+    id: 'sun-shield',
+    name: 'Sun Shield',
+    icon: SunSnow,
+    description: 'Light through fingers',
+    color: 'text-yellow-300',
+  },
+  {
+    id: 'back-necklace',
+    name: 'Back Necklace',
+    icon: Undo2,
+    description: 'Spine elegance, rear view',
+    color: 'text-pink-200',
   },
 ];
 

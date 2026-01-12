@@ -4249,4 +4249,627 @@ Messy background
 OUTPUT: Water glass. Caustic light. Fresh morning. Hydrated glow.`;
     },
   },
+
+  'white-shirt': {
+    name: 'White Shirt',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+
+      return `Fashion detail photography. Close up of a ${genderText}'s chest and neck area, wearing a crisp white cotton shirt with top buttons undone, wearing ${jewelryType}.
+
+FRAMING:
+Close up of chest and neck area
+Face not the focus
+Top buttons undone, showing skin
+Elegant decollete visible
+
+SHIRT & STYLING:
+Crisp white cotton shirt
+Classic, professional but relaxed
+Top buttons undone naturally
+Clean, fresh fabric
+
+LIGHTING:
+Soft daylight lighting
+Clean and bright composition
+Natural illumination
+No harsh shadows
+
+JEWELRY FOCUS:
+${jewelryType} layered on skin
+ONLY the specified jewelry
+Skin texture visible beneath
+Sharp focus on jewelry details
+
+SKIN:
+Natural skin texture visible
+Authentic appearance
+Professional but relaxed feel
+Real human quality
+
+TECHNICAL:
+Shot on Sony A7R IV equivalent
+Clean composition
+Elegant mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Face focus, eyes at camera
+Patterned shirts, silk
+Dark colors
+Busy background
+Studio lights
+Artificial appearance
+
+OUTPUT: White shirt. Unbuttoned elegance. Professional relaxed. Clean daylight.`;
+    },
+  },
+
+  'soft-blinds': {
+    name: 'Soft Blinds',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Aesthetic portrait. A ${genderText} sitting near a window wearing ${jewelryType}. Soft shadows of venetian blinds falling across face and neck with very soft contrast.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+SOFT BLIND SHADOWS:
+Venetian blind shadows on face and neck
+Very SOFT contrast (not harsh noir)
+Gentle light stripes
+Peaceful, calm pattern
+
+COLOR PALETTE:
+Beige and cream tones
+Warm, neutral colors
+Soft, muted palette
+Natural warmth
+
+EXPRESSION:
+Relaxed expression
+Eyes closed or looking down
+Peaceful, serene mood
+Not looking at camera
+
+LIGHTING:
+Warm sunlight through blinds
+Soft, diffused quality
+Gentle shadows
+Minimal composition
+
+SKIN:
+Natural skin texture visible
+Authentic appearance
+Warm light on skin
+Real, human quality
+
+JEWELRY:
+${jewelryType} catching filtered light
+ONLY the specified jewelry
+Soft shadow play on metal
+Peaceful showcase
+
+FILM AESTHETIC:
+Fujifilm Pro 400H color palette
+Warm, nostalgic tones
+Film-like quality
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Harsh black shadows
+Film noir style
+Dark room, scary mood
+High contrast
+Messy room, furniture
+
+OUTPUT: Soft blinds. Gentle stripes. Beige cream. Peaceful calm.`;
+    },
+  },
+
+  'daydreaming': {
+    name: 'Daydreaming',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Candid portrait. A ${genderText} resting head on hand, leaning on a table, wearing ${jewelryType}. Looking out of a window with soft daydreaming expression.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+DAYDREAMING POSE:
+Head resting on hand
+Leaning on a table
+Looking out window (off-camera)
+Soft, thoughtful expression
+Lost in thought
+
+LIGHTING:
+Natural window light illuminating face and hand
+Soft, flattering illumination
+Warm, cozy quality
+Gentle shadows
+
+STYLING:
+${genderText === 'woman' ? 'Soft beige sweater' : 'Comfortable, casual sweater'}
+Cozy, relaxed clothing
+Comfortable atmosphere
+Natural appearance
+
+SKIN:
+Authentic skin texture
+Natural, real appearance
+Not airbrushed
+Human quality
+
+JEWELRY:
+${jewelryType} on visible hand
+ONLY the specified jewelry
+Window light on metal
+Natural showcase
+
+MOOD:
+Comfortable and cozy
+Introspective, peaceful
+Genuine moment
+Authentic feeling
+
+TECHNICAL:
+Shot on 85mm lens equivalent
+Shallow depth of field
+Cozy atmosphere
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Looking at camera
+Stiff pose, forced smile
+Studio background
+Dark colors
+Heavy makeup
+Plastic skin
+Distorted fingers
+
+OUTPUT: Daydreaming. Window gaze. Head on hand. Cozy thoughtful.`;
+    },
+  },
+
+  'earlobe-macro': {
+    name: 'Earlobe Macro',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      return `Extreme macro photography. Ultra close-up shot of a woman's earlobe wearing ${jewelryType}. Focus sharp on the details of the earring and the point it enters the skin.
+
+EXTREME MACRO:
+Ultra close-up of earlobe
+Focus on where jewelry meets skin
+Earring entry point visible
+Intimate, detailed perspective
+
+SKIN DETAIL:
+Visible vellus hair (peach fuzz) on ear skin
+Distinct pores on earlobe
+Natural skin texture with slight imperfections
+Real, authentic ear appearance
+
+LIGHTING:
+Soft daylight illumination
+Gentle, even lighting
+Highlighting skin and jewelry textures
+No harsh shadows
+
+BACKGROUND:
+Neutral, blurred
+Clean, unobtrusive
+Focus entirely on ear and jewelry
+
+JEWELRY:
+${jewelryType} in razor-sharp focus
+ONLY the specified jewelry
+Every detail visible
+How it connects to the ear
+
+TECHNICAL:
+Shot with MP-E 65mm macro lens equivalent
+Highly detailed texture capture
+Extreme close-up
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Smooth, plastic skin
+Blurry jewelry
+Painted or illustrated look
+Perfectly smooth ear
+Artificial shine
+
+OUTPUT: Earlobe macro. Entry point. Vellus hair. Ultra detail.`;
+    },
+  },
+
+  'chain-press': {
+    name: 'Chain Press',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      return `Ultra close-up detail shot. Focusing tightly on the delicate chain of a necklace resting on a woman's collarbone and neck hollow, wearing ${jewelryType}.
+
+CHAIN ON SKIN:
+Delicate chain resting on collarbone
+Neck hollow visible
+Chain weight pressing slightly into skin
+Natural skin folds where chain rests
+
+SKIN DETAIL:
+Visible pores on neck and collarbone
+Goosebumps texture possible
+Natural skin imperfections
+Real, tactile skin quality
+
+LIGHTING:
+Soft side lighting
+Highlighting metal grain against skin
+Showing the contrast between chain and body
+Gentle, flattering illumination
+
+TACTILE QUALITY:
+Hyper-realistic tactile sensation
+Feel of metal on skin
+Weight and presence of jewelry
+Intimate, sensory experience
+
+JEWELRY:
+${jewelryType} as hero
+ONLY the specified jewelry
+Chain detail razor-sharp
+Pressing naturally into skin
+
+AVOID:
+Airbrushed smooth skin
+Smooth, plastic neck
+Mannequin appearance
+Studio lights with excess reflection
+Distorted chain
+
+OUTPUT: Chain press. Collarbone detail. Tactile sensation. Hyper-realistic.`;
+    },
+  },
+
+  'fingerprint-ring': {
+    name: 'Fingerprint Ring',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      return `Extreme macro photograph of a ring on a woman's finger, showing ${jewelryType}. Sharp focus on the metal texture and gemstones, visible unique fingerprint patterns.
+
+HAND REALITY:
+Visible unique fingerprint patterns on finger
+Skin grain and texture
+Natural manicure (clean but not fake)
+Dry skin texture around knuckle visible
+Reality of human hands
+
+MACRO DETAIL:
+Sharp focus on metal texture
+Gemstone details if present
+Every facet and setting visible
+Extreme close-up perspective
+
+LIGHTING:
+Natural daylight
+Even, revealing illumination
+Showing true texture of skin and metal
+No artificial enhancement
+
+JEWELRY:
+${jewelryType} in perfect focus
+ONLY the specified jewelry
+Metal and gem details sharp
+Natural wear and reflection
+
+AUTHENTICITY:
+Real human hand, not perfect
+Natural imperfections
+Authentic, not idealized
+True representation
+
+AVOID:
+Perfect, smooth hands
+Plastic skin texture
+Blurred metal details
+Fake or acrylic nails
+Excessive retouching
+CGI render appearance
+
+OUTPUT: Fingerprint ring. Real hands. Macro detail. Authentic texture.`;
+    },
+  },
+
+  'pulse-point': {
+    name: 'Pulse Point',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      return `Macro beauty photography. Extreme close-up of a bracelet on a woman's inner wrist (pulse point), wearing ${jewelryType}. Showing thin translucent skin with faint blue veins visible beneath.
+
+INNER WRIST FOCUS:
+Inner wrist / pulse point area
+Thin, delicate skin visible
+Faint blue veins beneath skin surface
+Vulnerable, intimate area
+
+SKIN DETAIL:
+Translucent skin quality
+Visible pores
+Natural skin folds where wrist bends
+Soft, delicate texture
+
+LIGHTING:
+Very soft diffused lighting
+Gentle, flattering illumination
+Highlighting jewelry against vulnerable skin
+No harsh shadows
+
+JEWELRY:
+${jewelryType} on the pulse point
+ONLY the specified jewelry
+Focus on jewelry against delicate skin
+Contrast of metal and vulnerability
+
+MOOD:
+Intimate, delicate
+Soft and vulnerable
+Sensory, tactile
+Refined elegance
+
+AVOID:
+Thick, opaque skin
+Smooth plastic appearance
+Harsh light
+Shiny, sweaty skin
+Fake or illustrated look
+
+OUTPUT: Pulse point. Inner wrist. Translucent skin. Delicate intimacy.`;
+    },
+  },
+
+  'denim-contrast': {
+    name: 'Denim Contrast',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+
+      return `Close up detail shot. A ${genderText} wearing ${jewelryType}, wearing a vintage washed blue denim jacket (collar detail). Sun-drenched lighting, casual aesthetic.
+
+TEXTURE CONTRAST:
+Rough denim texture vs shiny jewelry
+Worn, vintage fabric
+Metal gleaming against matte denim
+Material interplay
+
+DENIM STYLING:
+Vintage washed blue denim jacket
+Collar area detail visible
+Authentic, broken-in fabric
+Casual, effortless style
+
+LIGHTING:
+Sun-drenched lighting
+Warm, golden tones
+Natural daylight
+Casual, outdoor feel
+
+SKIN:
+Natural skin texture on neck or hand
+Authentic appearance
+Relaxed vibe
+Real human quality
+
+JEWELRY:
+${jewelryType} contrasting with denim
+ONLY the specified jewelry
+Shiny metal vs rough fabric
+Sharp focus on jewelry
+
+FILM AESTHETIC:
+Shot on 35mm film look
+Authentic, vintage colors
+Natural grain
+Casual aesthetic
+
+AVOID:
+Brand logos
+New, stiff denim
+Dark studio lighting
+Plastic appearance
+Shiny synthetic clothes
+Messy background
+Face as main focus
+
+OUTPUT: Denim contrast. Rough vs shiny. Sun-drenched. Vintage casual.`;
+    },
+  },
+
+  'sun-shield': {
+    name: 'Sun Shield',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Portrait photography. A ${genderText} holding hand up to shield eyes from the sun, wearing ${jewelryType} (on visible hand). Sunlight passing through fingers creating a reddish glow (subsurface scattering).
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+SUBSURFACE SCATTERING:
+Hand shielding eyes from sun
+Sunlight passing through fingers
+Reddish glow through skin (translucent)
+Natural light phenomenon
+
+SHADOWS & LIGHT:
+Hand shadows cast on face
+Dramatic but natural lighting
+Blue sky background
+Bright, summery atmosphere
+
+EXPRESSION:
+Squinting slightly (natural reaction)
+Natural expression
+Not posed perfectly
+Authentic moment
+
+STYLING:
+${genderText === 'woman' ? 'Simple, summery attire' : 'Casual, light clothing'}
+Wind in hair
+Natural appearance
+Outdoor summer feel
+
+SKIN:
+Natural skin texture
+Translucent quality in backlight
+Real human appearance
+Warm tones from sun
+
+JEWELRY:
+${jewelryType} on raised hand
+ONLY the specified jewelry
+Catching direct sunlight
+Dramatic showcase
+
+TECHNICAL:
+Shot on Canon R5 equivalent
+Natural light mastery
+Summer mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Sunglasses
+Perfect, posed stance
+Studio or flat lighting
+Plastic, opaque skin
+Dark, gloomy atmosphere
+
+OUTPUT: Sun shield. Subsurface scattering. Light through fingers. Summer brightness.`;
+    },
+  },
+
+  'back-necklace': {
+    name: 'Back Necklace',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+
+      return `Rear view aesthetic photography. Close up of a ${genderText}'s back, wearing ${jewelryType} hanging down the back (backwards necklace). Wearing a low-back top.
+
+REAR VIEW COMPOSITION:
+Close up of back
+${jewelryType} hanging down spine
+Low-back top revealing skin
+Elegant back silhouette
+
+ANATOMY:
+Soft daylight highlighting spine
+Shoulder blades visible
+Natural back curves
+Elegant, refined lines
+
+SKIN:
+Natural skin texture
+Moles and natural marks
+Real human appearance
+Authentic, not airbrushed
+
+BACKGROUND:
+Creamy, soft background
+Minimalist composition
+Clean, uncluttered
+Focus on back and jewelry
+
+STYLING:
+Low-back top or dress
+Elegant, sensual but simple
+Refined appearance
+Minimal distraction
+
+JEWELRY:
+${jewelryType} as dramatic back detail
+ONLY the specified jewelry
+Hanging down spine
+Unique, artistic showcase
+
+MOOD:
+Elegant and sensual
+Simple beauty
+Artistic, refined
+Unique perspective
+
+TECHNICAL:
+Shot on 85mm lens equivalent
+Close up rear view
+Elegant composition
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Face visible
+Hair covering jewelry
+Dark shadows
+Tattoos (unless specified)
+Clothing labels
+Busy patterns
+Studio strobe
+Plastic skin
+
+OUTPUT: Back necklace. Spine elegance. Rear view. Sensual simplicity.`;
+    },
+  },
 };
