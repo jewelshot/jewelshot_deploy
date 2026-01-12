@@ -58,7 +58,17 @@ import {
   SunMedium,
   Shirt,
   UserCircle,
-  SunDim
+  SunDim,
+  Layers,
+  Fingerprint,
+  Sparkle,
+  Crop,
+  Wind,
+  HeartHandshake,
+  Cloud,
+  TreePine,
+  RotateCcw,
+  GlassWater
 } from 'lucide-react';
 
 interface QuickPreset {
@@ -420,6 +430,76 @@ const QUICK_PRESETS: QuickPreset[] = [
     icon: SunDim,
     description: 'Golden hour shadows, warm',
     color: 'text-orange-300',
+  },
+  {
+    id: 'silk-ethereal',
+    name: 'Silk Ethereal',
+    icon: Layers,
+    description: 'Soft silk, dreamy blur',
+    color: 'text-pink-100',
+  },
+  {
+    id: 'gentle-touch',
+    name: 'Gentle Touch',
+    icon: Fingerprint,
+    description: 'Hand on face, macro',
+    color: 'text-rose-100',
+  },
+  {
+    id: 'clean-girl',
+    name: 'Clean Girl',
+    icon: Sparkle,
+    description: 'Fresh glow, minimal beauty',
+    color: 'text-cyan-200',
+  },
+  {
+    id: 'collarbone-crop',
+    name: 'Collarbone Crop',
+    icon: Crop,
+    description: 'Artistic neck focus',
+    color: 'text-neutral-300',
+  },
+  {
+    id: 'motion-candid',
+    name: 'Motion Candid',
+    icon: Wind,
+    description: 'Hair blowing, movement',
+    color: 'text-sky-300',
+  },
+  {
+    id: 'adorning-moment',
+    name: 'Adorning Moment',
+    icon: HeartHandshake,
+    description: 'Putting on jewelry',
+    color: 'text-violet-200',
+  },
+  {
+    id: 'blue-sky',
+    name: 'Blue Sky',
+    icon: Cloud,
+    description: 'Low angle, clear sky',
+    color: 'text-blue-400',
+  },
+  {
+    id: 'dappled-light',
+    name: 'Dappled Light',
+    icon: TreePine,
+    description: 'Tree shadows, sunspots',
+    color: 'text-emerald-300',
+  },
+  {
+    id: 'shoulder-glance',
+    name: 'Shoulder Glance',
+    icon: RotateCcw,
+    description: 'Over shoulder, elegant',
+    color: 'text-amber-200',
+  },
+  {
+    id: 'water-glass',
+    name: 'Water Glass',
+    icon: GlassWater,
+    description: 'Caustic light, fresh morning',
+    color: 'text-teal-200',
   },
 ];
 

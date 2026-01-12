@@ -3554,4 +3554,699 @@ Messy compositions
 OUTPUT: Shadow play. Golden hour. Geometric light. Warm dreamy.`;
     },
   },
+
+  'silk-ethereal': {
+    name: 'Silk Ethereal',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+
+      return `Close up detail shot. A ${genderText} wearing ${jewelryType}, leaning gently on a soft white silk fabric. Blurred creamy background.
+
+FRAMING:
+Close up detail shot
+Focus strictly on ${jewelryType} and natural skin texture
+Avoid face focus, show body/hands with jewelry
+Serene, ethereal composition
+
+SILK & TEXTURE:
+Soft white silk fabric as surface/prop
+Luxurious fabric texture visible
+Creamy, blurred background
+Sense of comfort and luxury
+
+LIGHTING:
+Soft focus photography style
+Ethereal lighting quality
+Gentle, diffused illumination
+Dreamy, otherworldly glow
+
+SKIN & STYLING:
+Natural manicure
+Very light or no makeup
+Natural skin texture visible
+Serene, calm appearance
+
+JEWELRY:
+Focus strictly on ${jewelryType}
+ONLY the specified jewelry
+Ethereal light on metal and gems
+Luxurious presentation
+
+MOOD:
+Serene and peaceful
+Comfort and luxury
+Ethereal, dreamy vibe
+Soft, gentle atmosphere
+
+AVOID:
+Sharp edges, concrete
+Dark colors
+Busy patterns
+Face focused shots
+Full body views
+Clutter, artificial elements
+
+OUTPUT: Silk ethereal. Soft focus. Creamy blur. Serene luxury.`;
+    },
+  },
+
+  'gentle-touch': {
+    name: 'Gentle Touch',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Close up portrait photography. A ${genderText} touching neck or face gently with hand, wearing ${jewelryType}. Focus on the hand and the jewelry.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+POSE:
+Touching neck or face gently with hand
+Focus on hand and ${jewelryType}
+Calm, thoughtful mood
+Natural, unforced gesture
+
+BACKGROUND:
+Neutral beige wall background
+Simple, uncluttered
+Soft, minimal environment
+No distracting elements
+
+STYLING:
+${genderText === 'woman' ? 'Simple knitted tank top' : 'Simple, minimal top'}
+Natural manicure (no bright colors)
+Authentic skin texture
+Calm expression
+
+LIGHTING:
+Soft natural light
+Even, flattering illumination
+No harsh contrast
+Gentle shadows
+
+SKIN & HANDS:
+Authentic skin texture visible
+Natural hand appearance
+No distorted fingers
+Real, human quality
+
+JEWELRY:
+${jewelryType} as focal point
+ONLY the specified jewelry
+Macro lens detail quality
+Sharp focus on craftsmanship
+
+TECHNICAL:
+Shot on 100mm macro lens equivalent
+Close up perspective
+Calm mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Holding objects
+Heavy makeup
+Bright nail polish
+Messy background
+Studio strobe lighting
+Harsh contrast
+Plastic skin texture
+Distorted fingers
+
+OUTPUT: Gentle touch. Hand focus. Macro detail. Thoughtful calm.`;
+    },
+  },
+
+  'clean-girl': {
+    name: 'Clean Girl',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Fresh beauty photography. Close up of a ${genderText} with fresh glowing skin wearing ${jewelryType}. "Clean girl" aesthetic, minimal makeup.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+CLEAN GIRL AESTHETIC:
+Fresh, glowing skin
+Minimal to no makeup
+Hair slicked back or slightly damp
+Pure, hygienic vibe
+Natural beauty emphasized
+
+SETTING:
+Soft bathroom window light
+White cotton bathrobe or towel (blurred)
+Fresh, clean environment
+Bright, pure atmosphere
+
+LIGHTING:
+Soft window light
+Pure, clean illumination
+Fresh morning quality
+No harsh shadows
+
+SKIN:
+Fresh, glowing appearance
+Natural pores visible
+Realistic beauty
+Hydrated, healthy texture
+
+JEWELRY:
+Sharp details on ${jewelryType}
+ONLY the specified jewelry
+Clean, minimal showcase
+Fresh light on metal
+
+TECHNICAL:
+Close up framing
+Fresh, pure mood
+Natural beauty
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Heavy eyeliner
+Red lipstick
+Dry skin
+Messy hair
+Dark room, night
+Fashion studio setup
+Complex background
+
+OUTPUT: Clean girl. Fresh glow. Minimal beauty. Pure aesthetic.`;
+    },
+  },
+
+  'collarbone-crop': {
+    name: 'Collarbone Crop',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+
+      return `Artistic cropped photography. Focus only on the collarbone and chin area of a ${genderText} wearing ${jewelryType}. Face partially cropped out, head tilted slightly back.
+
+FRAMING:
+Focus ONLY on collarbone and chin area
+Face partially cropped out of frame
+Head tilted slightly back
+Elegant neck curves emphasized
+
+LIGHTING:
+Soft sunlight hitting the neck
+Gentle, flattering illumination
+Natural light quality
+Highlighting skin and jewelry
+
+BACKGROUND:
+Plain cream background
+Simple, uncluttered
+Minimalist composition
+No distractions
+
+STYLING:
+${genderText === 'woman' ? 'Strapless top (skin focus)' : 'Minimal top showing neck area'}
+High detail skin texture
+Elegant body lines
+Refined, artistic pose
+
+JEWELRY:
+${jewelryType} as the hero
+ONLY the specified jewelry
+Sharp focus on details
+Elegant placement
+
+SKIN:
+High detail skin texture visible
+Natural, authentic appearance
+Elegant curves highlighted
+Real human quality
+
+AVOID:
+Full face in frame
+Eyes looking at camera
+Busy clothes or patterns
+Hair covering jewelry
+Dark shadows
+Noise, grain
+
+OUTPUT: Collarbone crop. Artistic frame. Elegant curves. Minimalist focus.`;
+    },
+  },
+
+  'motion-candid': {
+    name: 'Motion Candid',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Candid lifestyle shot. A ${genderText} caught in slight movement turning head, wearing ${jewelryType}. Hair blowing slightly, slight motion blur on edges but sharp focus on jewelry.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+MOTION CAPTURE:
+Caught in slight movement
+Turning head naturally
+Hair blowing slightly
+Authentic moment, not posed
+
+FOCUS TECHNIQUE:
+Slight motion blur on edges
+SHARP focus on ${jewelryType}
+Dynamic yet controlled
+Professional action capture
+
+LIGHTING:
+Soft daylight
+Natural, outdoor quality
+Even illumination
+Flattering on movement
+
+STYLING:
+${genderText === 'woman' ? 'Simple linen shirt' : 'Simple, casual attire'}
+Genuine smile or laugh
+Authentic expression
+Natural movement
+
+BACKGROUND:
+Neutral, unobtrusive
+Softly blurred
+Not distracting from subject
+Clean environment
+
+JEWELRY:
+${jewelryType} razor-sharp despite motion
+ONLY the specified jewelry
+Catching light in movement
+Dynamic showcase
+
+MOOD:
+Snapshot aesthetic
+Authentic moment
+Natural, unposed
+Genuine expression
+
+AVOID:
+Static, frozen pose
+Mannequin appearance
+Studio lighting
+Perfect styled hair
+Heavy editing
+CGI, 3D render
+Sharp edges everywhere
+
+OUTPUT: Motion candid. Hair blowing. Sharp jewelry. Authentic moment.`;
+    },
+  },
+
+  'adorning-moment': {
+    name: 'Adorning Moment',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Candid photography. A ${genderText} in the middle of putting on ${jewelryType}. Arms raised, elbows bent, natural pose. Focus on the hands and the jewelry.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+AUTHENTIC MOMENT:
+In the middle of putting on ${jewelryType}
+Arms raised, elbows bent
+Natural, unposed gesture
+Not looking at camera
+Authentic action captured
+
+FOCUS:
+Hands and ${jewelryType} as focal point
+Natural skin texture visible
+Arm details visible
+Genuine moment
+
+LIGHTING:
+Soft daylight
+Natural, flattering
+Even illumination
+No harsh shadows
+
+STYLING:
+${genderText === 'woman' ? 'Sleeveless white top' : 'Simple sleeveless top'}
+Natural appearance
+Casual, authentic look
+Not overly styled
+
+BACKGROUND:
+Neutral, blurry
+Unobtrusive
+Clean environment
+Not distracting
+
+JEWELRY:
+${jewelryType} being adorned
+ONLY the specified jewelry
+Focus on the action
+Natural showcase
+
+TECHNICAL:
+Shot on 50mm lens equivalent
+Candid perspective
+Authentic mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Looking at camera
+Perfect smile
+Stiff, mannequin pose
+Studio lighting
+Heavy makeup
+Plastic skin
+Distorted hands
+Extra fingers
+
+OUTPUT: Adorning moment. Putting on jewelry. Candid action. Authentic capture.`;
+    },
+  },
+
+  'blue-sky': {
+    name: 'Blue Sky',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Low angle portrait photography. A ${genderText} wearing ${jewelryType} standing against a clear blue sky. Soft sunlight hitting face, wind blowing hair slightly.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+LOW ANGLE PERSPECTIVE:
+Looking up at subject
+Clear blue sky as background
+Expansive, airy feeling
+Dramatic yet peaceful
+
+SKY & ATMOSPHERE:
+Clear blue sky, no clouds
+Minimalist natural backdrop
+Summer vibe
+Bright, optimistic mood
+
+LIGHTING:
+Soft sunlight hitting face
+Natural daylight quality
+Flattering from below/side
+No harsh shadows
+
+EXPRESSION:
+Closed eyes or looking up
+Peaceful expression
+Wind blowing hair slightly
+Serene, contemplative mood
+
+STYLING:
+${genderText === 'woman' ? 'White linen shirt' : 'Simple, light attire'}
+Minimalist and airy
+Summer aesthetic
+Natural beauty
+
+JEWELRY:
+Sharp focus on ${jewelryType}
+ONLY the specified jewelry
+Sky light on metal and gems
+Bright, clean showcase
+
+TECHNICAL:
+Shot on 35mm lens equivalent
+Low angle perspective
+Summer mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Buildings, trees, clouds
+Messy background
+Studio wall
+Grey tones
+Dark shadows
+Flash photography
+Artificial look
+
+OUTPUT: Blue sky. Low angle. Summer light. Peaceful clarity.`;
+    },
+  },
+
+  'dappled-light': {
+    name: 'Dappled Light',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Outdoor portrait. Close up of a ${genderText} wearing ${jewelryType}. Dappled sunlight filtering through tree leaves onto face and neck, creating natural light and shadow play.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+DAPPLED LIGHT EFFECT:
+Sunlight filtering through tree leaves
+Natural light and shadow patterns on skin
+Sunspots on face and jewelry
+Organic, natural pattern
+
+BACKGROUND:
+Soft bokeh of green nature
+Trees and foliage blurred
+Outdoor, natural setting
+Organic environment
+
+LIGHTING:
+Dappled sunlight (not harsh geometric)
+Warm, golden tones
+Natural tree-filtered light
+Beautiful light spots
+
+STYLING:
+${genderText === 'woman' ? 'Simple beige dress' : 'Simple, natural attire'}
+Natural makeup
+Serene expression
+Relaxed, organic pose
+
+SKIN:
+Natural texture visible
+Sunlight patterns on skin
+Warm, healthy glow
+Authentic appearance
+
+JEWELRY:
+${jewelryType} catching dappled light
+ONLY the specified jewelry
+Organic light on metal
+Natural showcase
+
+TECHNICAL:
+Shot on Canon R5 equivalent
+Outdoor natural light
+Serene mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Hard geometric shadows (blinds)
+Indoor settings
+Studio lighting
+Dark backgrounds
+Neon colors
+Plastic skin
+Heavy retouching
+Messy composition
+
+OUTPUT: Dappled light. Tree shadows. Green bokeh. Organic nature.`;
+    },
+  },
+
+  'shoulder-glance': {
+    name: 'Shoulder Glance',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Rear view portrait. A ${genderText} turning head looking over shoulder, wearing ${jewelryType}. Hair tucked behind ear to reveal the jewelry, soft neck curve.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+REAR VIEW PERSPECTIVE:
+Looking over shoulder
+Turning head to reveal ${jewelryType}
+Hair tucked behind ear
+Soft neck curve visible
+
+FOCUS:
+Ear and neck area primary focus
+${jewelryType} prominently visible
+Elegant shoulder line
+Graceful pose
+
+BACKGROUND:
+Creamy white background
+Soft, diffused
+Minimal, elegant
+Clean and uncluttered
+
+LIGHTING:
+Soft diffused lighting
+Gentle, flattering
+Even illumination on skin
+Highlighting jewelry
+
+STYLING:
+${genderText === 'woman' ? 'Off-shoulder cream top' : 'Simple, elegant attire'}
+Elegant and minimal
+Refined appearance
+Natural beauty
+
+SKIN & TEXTURE:
+Realistic skin texture
+Vellus hair (peach fuzz) visible
+Natural, authentic
+High detail quality
+
+JEWELRY:
+${jewelryType} revealed by pose
+ONLY the specified jewelry
+Elegant showcase
+Sharp focus on details
+
+TECHNICAL:
+Shot on 85mm lens equivalent
+Portrait perspective
+Elegant mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Full frontal face
+Angry expression
+Dark clothes
+Busy background
+Patterns, tattoos
+Messy hair
+Plastic skin
+
+OUTPUT: Shoulder glance. Rear view. Neck curve. Elegant reveal.`;
+    },
+  },
+
+  'water-glass': {
+    name: 'Water Glass',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Lifestyle close up. A ${genderText} holding a clear glass of water near chest or chin, wearing ${jewelryType}. Sunlight passing through the water creating natural caustics and refractions on skin.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+WATER & LIGHT:
+Clear glass of water as prop
+Sunlight passing through water
+Natural caustics/refractions on skin
+Beautiful light patterns from water
+
+FOCUS:
+Hand holding glass and ${jewelryType}
+Water light effects on skin
+Fresh morning vibe
+Aesthetic composition
+
+STYLING:
+${genderText === 'woman' ? 'White tank top' : 'Simple white top'}
+Natural manicure
+Fresh, clean appearance
+Minimal styling
+
+SKIN:
+Hydrated, healthy skin appearance
+Caustic light patterns on skin
+Natural texture
+Fresh, morning glow
+
+MOOD:
+Fresh morning vibe
+Healthy, hydrated aesthetic
+Clean and pure
+Aspirational wellness
+
+JEWELRY:
+${jewelryType} catching water light
+ONLY the specified jewelry
+Fresh, clean showcase
+Light playing on metal
+
+TECHNICAL:
+Shot on 50mm lens equivalent
+Lifestyle perspective
+Fresh aesthetic
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Plastic bottle
+Brand logos
+Colored drinks, alcohol
+Dark room
+Flash photography
+Heavy makeup
+Messy background
+
+OUTPUT: Water glass. Caustic light. Fresh morning. Hydrated glow.`;
+    },
+  },
 };
