@@ -6246,4 +6246,847 @@ Clothing visible
 OUTPUT: Dewy studio. Glowing skin. Wet-look hair. Fresh luminous.`;
     },
   },
+
+  'joy-burst': {
+    name: 'Joy Burst',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'female' : gender === 'men' ? 'male' : '';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Commercial studio photography. A ${genderText} model laughing out loud with head thrown back in genuine joy, wearing ${jewelryType}. Pure white seamless background with bright high-key lighting.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+GENUINE JOY:
+Laughing out loud
+Head thrown back
+Authentic expression
+Crinkled eyes, natural smile lines
+Dynamic, energetic vibe
+
+MOVEMENT:
+Hair slightly moving from laughter
+Natural body movement
+Not stiff or posed
+Spontaneous moment
+
+LIGHTING:
+Bright high-key lighting
+Pure white seamless background
+Clean, commercial quality
+Sharp shadows
+
+SKIN:
+Natural skin texture
+Real smile lines visible
+Not plastic or airbrushed
+Authentic appearance
+
+JEWELRY:
+${jewelryType} sharp focus
+ONLY the specified jewelry
+Catching bright light
+Happy showcase
+
+TECHNICAL:
+Shot on Canon R5 equivalent
+Commercial quality
+Energetic mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Stiff pose, fake smile
+Serious, bored expression
+Dark shadows
+Grey background
+Plastic skin
+Heavy makeup
+Blurry jewelry
+
+OUTPUT: Joy burst. Head back laughter. Genuine happiness. Commercial energy.`;
+    },
+  },
+
+  'beaming-smile': {
+    name: 'Beaming Smile',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Close up studio portrait. A ${genderText} with a huge beaming smile looking at the camera, wearing ${jewelryType}. Eyes sparkling with happiness (genuine Duchenne smile).
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+DUCHENNE SMILE:
+Huge beaming smile
+Eyes sparkling with happiness
+Genuine, authentic expression
+Healthy teeth showing
+Positive energy
+
+LIGHTING:
+Pure white background
+Soft bright studio lights
+Fresh, clean illumination
+Commercial beauty quality
+
+SKIN:
+Fresh glowing skin
+Natural texture
+Not over-smoothed
+Healthy appearance
+
+MOOD:
+Positive energy
+Fun atmosphere
+Happy, joyful
+Commercial appeal
+
+JEWELRY:
+Sharp focus on ${jewelryType}
+ONLY the specified jewelry
+Complementing happy expression
+Bright showcase
+
+TECHNICAL:
+Commercial beauty style
+Close-up perspective
+Positive mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Smirk, closed mouth
+Angry, moody expression
+Dark, grey studio
+Messy hair
+Casual clothes
+Artificial, fake smile
+Plastic skin
+
+OUTPUT: Beaming smile. Duchenne joy. Sparkling eyes. Positive energy.`;
+    },
+  },
+
+  'playful-giggle': {
+    name: 'Playful Giggle',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Candid studio shot. A ${genderText} giggling and covering mouth/cheek with hand playfully, wearing ${jewelryType}. Pure white background with bright lighting.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+PLAYFUL GESTURE:
+Giggling, laughing
+Covering mouth or cheek with hand
+Playful, spontaneous moment
+Eyes squinting from laughter
+Bubbly, happy vibe
+
+HAND DETAIL:
+Natural manicure
+Hand near face
+${jewelryType} visible on hand
+Authentic hand texture
+
+LIGHTING:
+Pure white background
+Bright, even lighting
+Clean studio quality
+Commercial appeal
+
+SKIN:
+Detailed skin texture
+Natural on hand and face
+Real, authentic appearance
+Happy expression lines
+
+JEWELRY:
+${jewelryType} sharp focus
+ONLY the specified jewelry
+Visible on hands/body
+Playful showcase
+
+TECHNICAL:
+Candid studio perspective
+Spontaneous mood
+Happy atmosphere
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Stiff posing
+Awkward hand position
+Fake nails
+Serious, sad expression
+Dark contrast
+Messy, blurry
+
+OUTPUT: Playful giggle. Hand to mouth. Spontaneous joy. Bubbly energy.`;
+    },
+  },
+
+  'hair-motion': {
+    name: 'Hair Motion',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Dynamic studio photography. A ${genderText} turning quickly and laughing, hair flying in motion (frozen action), wearing ${jewelryType}. Pure white background with high shutter speed.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+FROZEN MOTION:
+Hair flying in motion
+Turning quickly
+Frozen action moment
+High shutter speed capture
+Dynamic energy
+
+EXPRESSION:
+Genuine smile
+Laughing naturally
+Energetic, fun mood
+Authentic happiness
+
+LIGHTING:
+Bright commercial lighting
+Pure white background
+Sharp, frozen action
+Clean studio quality
+
+MOVEMENT:
+Body in motion
+Natural movement captured
+Not static or stiff
+Lively atmosphere
+
+JEWELRY:
+${jewelryType} sharp focus despite motion
+ONLY the specified jewelry
+Movement showcasing jewelry
+Dynamic presentation
+
+TECHNICAL:
+Shot on Hasselblad equivalent
+High shutter speed
+Fresh beauty look
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Static, frozen pose
+Mannequin appearance
+Sad, serious expression
+Dark shadows
+Blurry face or jewelry
+Ghosting, motion blur
+Plastic skin
+
+OUTPUT: Hair motion. Flying hair. Frozen joy. Dynamic energy.`;
+    },
+  },
+
+  'hard-sun-joy': {
+    name: 'Hard Sun Joy',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'female' : gender === 'men' ? 'male' : '';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Commercial studio photography. A ${genderText} model laughing joyfully with head thrown back, wearing ${jewelryType}. Pure white background illuminated by "Direct Hard Sun Lighting" casting crisp sharp shadows.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+HARD SUN LIGHTING:
+Direct hard sun simulation
+Crisp sharp shadows on neck
+High contrast lighting
+Sparkling gemstones from hard light
+Studio sun effect
+
+EXPRESSION:
+Laughing joyfully
+Head thrown back
+Energetic, happy vibe
+Authentic joy
+
+STYLING:
+Wet-look sleek hair
+Polished appearance
+Focus on skin and jewelry
+Clean aesthetic
+
+SKIN:
+Very distinct texture
+Realistic, not smooth
+Real skin quality
+High contrast reveals detail
+
+JEWELRY:
+${jewelryType} sparkling in hard light
+ONLY the specified jewelry
+Gemstones catching direct light
+Brilliant showcase
+
+TECHNICAL:
+Shot on Hasselblad X2D equivalent
+Direct hard lighting
+Energetic mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Soft, diffuse light
+Cloudy, overcast look
+Plastic skin
+Blurry jewelry
+Dull metal/gems
+Grey background
+
+OUTPUT: Hard sun joy. Sharp shadows. Sparkling gems. High contrast happiness.`;
+    },
+  },
+
+  'diamond-sparkle': {
+    name: 'Diamond Sparkle',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      return `Extreme macro jewelry photography. Close up of ${jewelryType} on a woman's finger/body. Pure white background with hard direct lighting source (snoot) creating intense sparkle and fire in the gemstones.
+
+EXTREME MACRO:
+Ultra-close jewelry focus
+Hard direct lighting (snoot)
+Intense sparkle and fire
+Gemstone brilliance
+Maximum detail
+
+LIGHTING:
+Hard direct light source
+Creating sharp defined shadow
+Jewelry casting shadow onto skin
+Intense, focused illumination
+White background
+
+SKIN DETAIL:
+Visible skin texture
+Fingerprints visible if hands
+Realistic manicure
+Natural, authentic
+Human quality
+
+SPARKLE:
+Intense fire in gemstones
+Light bouncing off facets
+Brilliant, alive jewelry
+Maximum sparkle effect
+
+JEWELRY:
+${jewelryType} in absolute focus
+ONLY the specified jewelry
+Every facet visible
+High-end editorial showcase
+
+TECHNICAL:
+100mm macro lens equivalent
+High-end editorial style
+Crisp clarity
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Soft focus, romantic lighting
+Flat, even light
+Plastic skin appearance
+CGI render look
+Blurry metal
+
+OUTPUT: Diamond sparkle. Hard light fire. Macro brilliance. Gemstone showcase.`;
+    },
+  },
+
+  'hand-shadow': {
+    name: 'Hand Shadow',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Fashion editorial portrait. ${genderText === 'woman' ? 'Woman' : 'Model'} looking at camera with a confident smile, holding hand up casting a sharp geometric shadow across eye or neck, wearing ${jewelryType}.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+GEOMETRIC SHADOWS:
+Hand casting sharp shadow
+Geometric shadow pattern
+Across eye or neck area
+Dynamic composition
+Creative lighting effect
+
+LIGHTING:
+Hard studio strobe
+Simulating sunlight
+High contrast light/shadow
+Pure white background
+Editorial quality
+
+EXPRESSION:
+Confident smile
+Looking at camera
+Strong, assured
+Fashion-forward
+
+SKIN & MAKEUP:
+Distinct pores visible
+Makeup texture visible
+Glistening lip gloss
+Real, detailed
+
+JEWELRY:
+${jewelryType} in focus
+ONLY the specified jewelry
+Shadow interacting with jewelry
+Creative showcase
+
+TECHNICAL:
+Fashion editorial quality
+Dynamic composition
+Confident mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Diffuse, soft light
+Overcast, boring lighting
+Plastic skin
+Heavy retouching
+Messy appearance
+
+OUTPUT: Hand shadow. Geometric pattern. Creative lighting. Editorial confidence.`;
+    },
+  },
+
+  'golden-studio': {
+    name: 'Golden Studio',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Warm studio photography. Radiant ${genderText} smiling gently, wearing ${jewelryType}. Pure white background but illuminated by warm "Golden Hour" hard light.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+GOLDEN HOUR STUDIO:
+Warm golden hour light in studio
+Hard light with warm tones
+Skin looks golden and glowing
+Sharp shadows
+Summer studio vibe
+
+EXPRESSION:
+Smiling gently
+Radiant, warm
+Happy, relaxed
+Natural beauty
+
+STYLING:
+Sleek bun hairstyle
+Polished appearance
+Fresh summer vibe
+Minimal, elegant
+
+LIGHTING:
+Golden warm tones
+Sharp defined shadows
+Jewelry reflecting warm light
+Studio controlled
+
+SKIN:
+Golden, glowing appearance
+High detailed texture
+Warm, healthy
+Real, authentic
+
+JEWELRY:
+${jewelryType} reflecting warm tones
+ONLY the specified jewelry
+Golden light on metal
+Warm showcase
+
+TECHNICAL:
+Shot on Canon R5 equivalent
+Studio precision
+Warm summer mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Cold light, blue tones
+Grey shadows
+Winter vibe
+Plastic skin
+Artificial blur
+
+OUTPUT: Golden studio. Warm hard light. Summer glow. Radiant smile.`;
+    },
+  },
+
+  'portrait-85mm': {
+    name: 'Portrait 85mm',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'female' : gender === 'men' ? 'male' : '';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Commercial beauty portrait. Shot on 85mm lens, bust-up framing of a smiling ${genderText} model wearing ${jewelryType}. Pure white studio background with hard studio lighting.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+85MM PORTRAIT:
+Classic 85mm perspective
+Bust-up framing
+Flattering compression
+Professional portrait lens
+Elegant proportions
+
+LIGHTING:
+Hard studio lighting
+Defined shadows under chin
+Pure white background
+Commercial quality
+Clean, professional
+
+EXPRESSION:
+Smiling naturally
+Confident, approachable
+Commercial appeal
+Genuine expression
+
+SKIN:
+Showing skin texture
+Natural, detailed
+Not over-smoothed
+Professional quality
+
+JEWELRY:
+Sharp focus on ${jewelryType}
+ONLY the specified jewelry
+Focus on jewelry and eyes
+Elegant composition
+
+TECHNICAL:
+85mm lens equivalent
+Commercial quality
+Classic portrait
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Wide angle distortion
+Big nose effect
+Messy appearance
+Full body shot
+Tiny jewelry
+Soft focus
+
+OUTPUT: Portrait 85mm. Bust-up frame. Classic lens. Commercial elegance.`;
+    },
+  },
+
+  'clinical-macro': {
+    name: 'Clinical Macro',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      return `Macro studio photography. Shot on 100mm macro lens, ultra-tight framing centered on the collarbone and neck hollow of a model wearing ${jewelryType}. Pure white background with hard side lighting.
+
+CLINICAL MACRO:
+100mm macro lens perspective
+Ultra-tight framing
+Collarbone and neck hollow focus
+Minimalist composition
+Clinical detail focus
+
+LIGHTING:
+Hard side lighting
+Emphasizing metal against skin
+Strong texture revelation
+Pure white background
+Editorial precision
+
+SKIN DETAIL:
+Pores visible
+Vellus hair visible
+Real skin texture
+Clinical accuracy
+Natural imperfections
+
+JEWELRY:
+${jewelryType} against skin
+ONLY the specified jewelry
+Metal texture emphasized
+Sharp detailed focus
+
+COMPOSITION:
+Minimalist framing
+Clinical, precise
+Detail-oriented
+No distractions
+
+TECHNICAL:
+100mm macro equivalent
+Clinical precision
+Minimalist mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Face visible
+Blurry jewelry
+Soft, dreamy light
+Romantic mood
+Messy background
+Zoomed out
+
+OUTPUT: Clinical macro. Collarbone focus. Hard side light. Minimalist precision.`;
+    },
+  },
+
+  'dynamic-35mm': {
+    name: 'Dynamic 35mm',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Dynamic fashion photography in studio. Shot on 35mm lens, medium shot (waist up) of a ${genderText} laughing and gesturing with hands, wearing ${jewelryType}. Pure white background.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+35MM DYNAMIC:
+35mm wider perspective
+Medium shot (waist up)
+More body language visible
+Slightly wider framing
+Environmental context
+
+MOVEMENT:
+Laughing and gesturing
+Hands in motion
+Energetic pose
+Dynamic, lively
+Not static
+
+LIGHTING:
+Hard direct flash lighting
+Pure white background
+Sharp, commercial
+Energetic atmosphere
+
+MOOD:
+Lively atmosphere
+Energetic, fun
+Spontaneous feeling
+Fashion energy
+
+JEWELRY:
+${jewelryType} sharp focus
+ONLY the specified jewelry
+Visible in gesture
+Dynamic showcase
+
+TECHNICAL:
+35mm lens equivalent
+Medium shot framing
+Energetic mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Fisheye distortion
+Static, bored pose
+Telephoto compression
+Tight macro crop
+Stiff appearance
+
+OUTPUT: Dynamic 35mm. Waist up. Gesturing hands. Energetic fashion.`;
+    },
+  },
+
+  'hyper-real': {
+    name: 'Hyper Real',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'female' : gender === 'men' ? 'male' : '';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Commercial studio photography. A ${genderText} model laughing naturally with head tilted back, wearing ${jewelryType}. Illuminated by "Hard Direct Studio Strobe" simulating bright sunlight.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+HYPER-REALISTIC SKIN:
+Extremely realistic texture
+Showing pores in detail
+Laugh lines visible
+Fine vellus hair on cheeks
+Authentic human skin
+
+LIGHTING:
+Hard direct studio strobe
+Simulating bright sunlight
+Sharp distinct shadows on neck
+High contrast
+Pure white background
+
+EXPRESSION:
+Laughing naturally
+Head tilted back
+Energetic, authentic
+Genuine happiness
+
+MAKEUP:
+Shiny lip gloss
+Natural, minimal
+Enhancing features
+Not heavy
+
+JEWELRY:
+${jewelryType} in sharp focus
+ONLY the specified jewelry
+Catching hard light
+Authentic showcase
+
+TECHNICAL:
+Shot on Phase One IQ4 150MP equivalent
+Extreme resolution
+Authentic mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Plastic, airbrushed skin
+Smooth wax texture
+Blur, soft filter
+Doll-like appearance
+Cartoon, illustration
+
+OUTPUT: Hyper real. 150MP detail. Authentic skin. Natural laughter.`;
+    },
+  },
+
+  'derma-detail': {
+    name: 'Derma Detail',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'hide'
+    ) => {
+      return `Macro editorial photography. Close-up of a woman's collarbone and neck wearing ${jewelryType}. Direct hard lighting creating a high-contrast look with focus on interplay between metal and skin.
+
+DERMATOLOGY DETAIL:
+Visible goosebumps
+Micro-skin texture
+Natural imperfections
+Freckles, moles welcome
+Hyper-realistic dermatology
+
+LIGHTING:
+Direct hard lighting
+High-contrast look
+Pure white background
+Revealing all texture
+Editorial precision
+
+METAL & SKIN:
+Interplay between chain and skin
+Metal against human texture
+Sharp detailed metalwork
+Contrast of materials
+
+SKIN AUTHENTICITY:
+Not smooth gradient
+Real skin imperfections
+Micro-texture visible
+Clinical accuracy
+
+JEWELRY:
+${jewelryType} sharp detailed
+ONLY the specified jewelry
+Metal texture emphasized
+Editorial showcase
+
+TECHNICAL:
+Macro editorial perspective
+Hyper-realistic quality
+Clinical mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Smooth gradient skin
+Plastic mannequin
+Blur, soft focus
+Softbox lighting
+Dull metal
+Painting, CGI render
+
+OUTPUT: Derma detail. Goosebumps. Micro-texture. Hyper-realistic skin.`;
+    },
+  },
 };
