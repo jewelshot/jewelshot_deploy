@@ -1,15 +1,22 @@
 import { PresetCategory, Preset, PresetGender, PresetJewelryType, PresetTab } from '@/types/preset';
+import { WOMEN_PRESET_CATEGORIES, WOMEN_PRESET_COUNT } from './presets/women';
 
 /**
  * Master Preset Library
  * All available presets organized by category
- * ONLY includes presets with actual images in public/presets/
+ * 
+ * STRUCTURE:
+ * - Women On-Model: 150+ presets (All Jewelry Types)
+ * - Men On-Model: Coming soon
+ * - Still Life: Coming soon
  * 
  * tab: 'women' (kadın mankenli), 'men' (erkek mankenli), 'studio' (sadece ürün)
  * gender: 'women' | 'men' | 'all' (default: 'all')
  * jewelryType: 'ring' | 'necklace' | 'earring' | 'bracelet' | 'all' (default: 'all')
  */
-export const PRESET_CATEGORIES: PresetCategory[] = [
+
+// Legacy presets (with actual images)
+const LEGACY_PRESETS: PresetCategory[] = [
   // ========================================
   // ON MODEL - Women
   // ========================================
@@ -83,6 +90,19 @@ Technical: Macro or short telephoto lens for shallow DoF, slightly warm color gr
     ],
   },
 ];
+
+// ============================================================================
+// COMBINED PRESET CATEGORIES
+// Merges legacy presets with new modular presets
+// ============================================================================
+export const PRESET_CATEGORIES: PresetCategory[] = [
+  ...LEGACY_PRESETS,
+  ...WOMEN_PRESET_CATEGORIES,
+];
+
+// Export counts for stats
+export { WOMEN_PRESET_COUNT };
+export const TOTAL_PRESET_COUNT = LEGACY_PRESETS.reduce((sum, cat) => sum + cat.presets.length, 0) + WOMEN_PRESET_COUNT;
 
 /**
  * Helper function to get a preset by ID
