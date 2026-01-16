@@ -9,36 +9,11 @@ import { toast } from 'sonner';
 import { createScopedLogger } from '@/lib/logger';
 import { useSidebarStore } from '@/store/sidebarStore';
 import { loadGenerationSettings } from '@/lib/generation-settings-storage';
+import { useLanguage } from '@/lib/i18n';
 
 const logger = createScopedLogger('Library');
 
-// Jewelry type dropdown options
-const JEWELRY_OPTIONS = [
-  { id: 'all', label: 'All Jewelry Types' },
-  { id: 'ring', label: 'Rings' },
-  { id: 'necklace', label: 'Necklaces' },
-  { id: 'earring', label: 'Earrings' },
-  { id: 'bracelet', label: 'Bracelets' },
-];
-
-// Gender segmented control options
-const GENDER_OPTIONS = [
-  { id: 'women', label: 'Women' },
-  { id: 'men', label: 'Men' },
-  { id: 'unisex', label: 'Unisex' },
-];
-
-// Shot type segmented control options
-const SHOT_TYPE_OPTIONS = [
-  { id: 'product', label: 'Product Only' },
-  { id: 'on-model', label: 'On Model' },
-];
-
-// Tab definitions for saved/favorites
-const SPECIAL_TABS: { id: 'saved' | 'favorites'; label: string }[] = [
-  { id: 'saved', label: 'Saved' },
-  { id: 'favorites', label: 'Favorites' },
-];
+// Options will be dynamically translated inside component
 
 /**
  * Library Content
@@ -47,7 +22,33 @@ const SPECIAL_TABS: { id: 'saved' | 'favorites'; label: string }[] = [
  */
 export function LibraryContent() {
   const { leftOpen, rightOpen, topOpen, bottomOpen } = useSidebarStore();
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Translated options
+  const JEWELRY_OPTIONS = [
+    { id: 'all', label: t.jewelry.all },
+    { id: 'ring', label: t.jewelry.ring },
+    { id: 'necklace', label: t.jewelry.necklace },
+    { id: 'earring', label: t.jewelry.earring },
+    { id: 'bracelet', label: t.jewelry.bracelet },
+  ];
+
+  const GENDER_OPTIONS = [
+    { id: 'women', label: t.gender.women },
+    { id: 'men', label: t.gender.men },
+    { id: 'unisex', label: t.gender.unisex },
+  ];
+
+  const SHOT_TYPE_OPTIONS = [
+    { id: 'product', label: t.library.productOnly },
+    { id: 'on-model', label: t.library.onModel },
+  ];
+
+  const SPECIAL_TABS: { id: 'saved' | 'favorites'; label: string }[] = [
+    { id: 'saved', label: t.common.save },
+    { id: 'favorites', label: 'Favorites' },
+  ];
   
   // New filter states
   const [jewelryType, setJewelryType] = useState<string>('all');

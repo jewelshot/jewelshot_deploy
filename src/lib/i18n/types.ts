@@ -38,6 +38,44 @@ export interface TranslationKeys {
     no: string;
     or: string;
     and: string;
+    done: string;
+    continue: string;
+    retry: string;
+    remove: string;
+    add: string;
+    select: string;
+    selected: string;
+    deselect: string;
+    enabled: string;
+    disabled: string;
+    on: string;
+    off: string;
+    show: string;
+    hide: string;
+    expand: string;
+    collapse: string;
+    refresh: string;
+    fit: string;
+    compare: string;
+    original: string;
+    processed: string;
+    result: string;
+    preview: string;
+    details: string;
+    info: string;
+    warning: string;
+    pleaseWait: string;
+    processing: string;
+    preparing: string;
+    complete: string;
+    failed: string;
+    pending: string;
+    active: string;
+    inactive: string;
+    free: string;
+    pro: string;
+    premium: string;
+    basic: string;
   };
 
   // Navigation
@@ -53,6 +91,11 @@ export interface TranslationKeys {
     logout: string;
     login: string;
     signup: string;
+    pricing: string;
+    about: string;
+    contact: string;
+    terms: string;
+    privacy: string;
   };
 
   // Studio
@@ -84,6 +127,16 @@ export interface TranslationKeys {
     settingsComplete: string;
     settingsIncomplete: string;
     configureSettings: string;
+    builtInPresets: string;
+    browseLibrary: string;
+    mostUsed: string;
+    oneClickPresets: string;
+    buildYourLook: string;
+    fullControl: string;
+    randomize: string;
+    randomGenerate: string;
+    requiredMissing: string;
+    configureFirst: string;
   };
 
   // Jewelry Types
@@ -93,6 +146,10 @@ export interface TranslationKeys {
     earring: string;
     bracelet: string;
     all: string;
+    pendant: string;
+    brooch: string;
+    watch: string;
+    anklet: string;
   };
 
   // Gender
@@ -114,6 +171,8 @@ export interface TranslationKeys {
     failed: string;
     tryAgain: string;
     estimatedTime: string;
+    pleaseWait: string;
+    operationInProgress: string;
   };
 
   // Gallery
@@ -126,6 +185,18 @@ export interface TranslationKeys {
     downloadSelected: string;
     emptyGallery: string;
     startCreating: string;
+    viewMode: string;
+    gridView: string;
+    listView: string;
+    sortBy: string;
+    dateNewest: string;
+    dateOldest: string;
+    nameAZ: string;
+    nameZA: string;
+    filterByType: string;
+    allTypes: string;
+    manual: string;
+    aiGenerated: string;
   };
 
   // Library
@@ -137,6 +208,12 @@ export interface TranslationKeys {
     allCategories: string;
     noResults: string;
     usePreset: string;
+    presetsCount: string;
+    filterByJewelry: string;
+    filterByGender: string;
+    filterByShotType: string;
+    onModel: string;
+    productOnly: string;
   };
 
   // Profile
@@ -159,6 +236,19 @@ export interface TranslationKeys {
     twoFactor: string;
     deleteAccount: string;
     signOut: string;
+    editProfile: string;
+    subscription: string;
+    billingHistory: string;
+    preferences: string;
+    fullName: string;
+    bio: string;
+    avatar: string;
+    updateProfile: string;
+    accountSettings: string;
+    appearance: string;
+    languageRegion: string;
+    notificationSettings: string;
+    privacySettings: string;
   };
 
   // Auth
@@ -179,6 +269,19 @@ export interface TranslationKeys {
     termsAgree: string;
     verifyEmail: string;
     checkEmail: string;
+    sendResetLink: string;
+    backToLogin: string;
+    passwordRequirements: string;
+    invalidCredentials: string;
+    accountCreated: string;
+    passwordReset: string;
+    emailVerified: string;
+    welcomeBack: string;
+    signInToContinue: string;
+    createAccountToContinue: string;
+    google: string;
+    apple: string;
+    github: string;
   };
 
   // Errors
@@ -193,6 +296,19 @@ export interface TranslationKeys {
     invalidFile: string;
     fileTooLarge: string;
     sessionExpired: string;
+    invalidEmail: string;
+    invalidPassword: string;
+    passwordMismatch: string;
+    requiredField: string;
+    minLength: string;
+    maxLength: string;
+    invalidFormat: string;
+    rateLimited: string;
+    insufficientCredits: string;
+    noImageSelected: string;
+    noPresetSelected: string;
+    settingsRequired: string;
+    unprocessableEntity: string;
   };
 
   // Success Messages
@@ -204,6 +320,13 @@ export interface TranslationKeys {
     copied: string;
     generated: string;
     updated: string;
+    sent: string;
+    applied: string;
+    reset: string;
+    imageProcessed: string;
+    settingsSaved: string;
+    passwordChanged: string;
+    profileUpdated: string;
   };
 
   // Tooltips
@@ -217,6 +340,29 @@ export interface TranslationKeys {
     eraser: string;
     download: string;
     share: string;
+    close: string;
+    delete: string;
+    edit: string;
+    save: string;
+    compare: string;
+    zoomIn: string;
+    zoomOut: string;
+    fitScreen: string;
+    normalView: string;
+    sideBySide: string;
+    rotate: string;
+    crop: string;
+    adjust: string;
+    filters: string;
+    effects: string;
+    metadata: string;
+    history: string;
+    layers: string;
+    upscale: string;
+    removeBg: string;
+    inpaint: string;
+    aiGenerate: string;
+    generateVideo: string;
   };
 
   // Settings Modal
@@ -243,6 +389,8 @@ export interface TranslationKeys {
     square: string;
     landscape: string;
     ultrawide: string;
+    rememberSettings: string;
+    rememberSettingsDesc: string;
   };
 
   // Right Sidebar
@@ -274,6 +422,20 @@ export interface TranslationKeys {
     makeup: string;
     skinTone: string;
     facialHair: string;
+    hairType: string;
+    hairColor: string;
+    nailType: string;
+    nailColor: string;
+    hairStyle: string;
+    angle: string;
+    depthOfField: string;
+    focalLength: string;
+    lightingType: string;
+    lightingDirection: string;
+    lightingIntensity: string;
+    temperature: string;
+    modelAppearance: string;
+    modelPose: string;
   };
 
   // Dashboard
@@ -285,6 +447,47 @@ export interface TranslationKeys {
     startCreating: string;
     viewGallery: string;
     openStudio: string;
+    recentImages: string;
+    usageStats: string;
+    creditsUsed: string;
+    imagesCreated: string;
+    thisMonth: string;
+    allTime: string;
+    plan: string;
+    creditUsage: string;
+    topPresets: string;
+    storage: string;
+    quickGenerate: string;
+    batches: string;
+    notifications: string;
+    keyboardShortcuts: string;
+    upgradePlan: string;
+    renewsOn: string;
+    creditsDepleted: string;
+    runningLowOnCredits: string;
+    noDataYet: string;
+    noFilesYet: string;
+    lastUsed: string;
+    generate: string;
+    noRecentPreset: string;
+    goToStudio: string;
+    viewAll: string;
+    noBatches: string;
+    createFirstImage: string;
+    noNotifications: string;
+    markAllRead: string;
+    editInStudio: string;
+    openInNew: string;
+    markAsRead: string;
+    ofUsed: string;
+    createImages: string;
+    processMultiple: string;
+    viewWork: string;
+    settingsBilling: string;
+    images: string;
+    activity: string;
+    day: string;
+    batchProjects: string;
   };
 
   // Batch
@@ -303,6 +506,12 @@ export interface TranslationKeys {
     imagesSelected: string;
     clearAll: string;
     downloadAll: string;
+    batchProgress: string;
+    estimatedTime: string;
+    pauseProcessing: string;
+    resumeProcessing: string;
+    cancelProcessing: string;
+    compareInStudio: string;
   };
 
   // Confirmation
@@ -315,6 +524,10 @@ export interface TranslationKeys {
     leavePageMessage: string;
     stay: string;
     leave: string;
+    areYouSure: string;
+    cannotBeUndone: string;
+    deleteMultiple: string;
+    deleteMultipleMessage: string;
   };
 
   // Empty States
@@ -324,6 +537,9 @@ export interface TranslationKeys {
     noResults: string;
     startByUploading: string;
     tryDifferentSearch: string;
+    uploadFirstImage: string;
+    noCredits: string;
+    noBatchImages: string;
   };
 
   // Time
@@ -334,6 +550,348 @@ export interface TranslationKeys {
     daysAgo: string;
     seconds: string;
     minutes: string;
+    hours: string;
+    days: string;
+    ago: string;
+  };
+
+  // Canvas/Editor
+  canvas: {
+    brightness: string;
+    contrast: string;
+    exposure: string;
+    highlights: string;
+    shadows: string;
+    whites: string;
+    blacks: string;
+    clarity: string;
+    sharpness: string;
+    dehaze: string;
+    temperature: string;
+    tint: string;
+    saturation: string;
+    vibrance: string;
+    amount: string;
+    size: string;
+    feather: string;
+    vignette: string;
+    grain: string;
+    blur: string;
+    filters: string;
+    adjustments: string;
+    colors: string;
+    effects: string;
+    tools: string;
+    crop: string;
+    rotate: string;
+    flip: string;
+    flipHorizontal: string;
+    flipVertical: string;
+    aspectRatio: string;
+    freeform: string;
+    original: string;
+    custom: string;
+    presets: string;
+    applyChanges: string;
+    discardChanges: string;
+    resetAll: string;
+    undo: string;
+    redo: string;
+    history: string;
+    layers: string;
+    background: string;
+    foreground: string;
+    mask: string;
+    selection: string;
+    invert: string;
+    featherSelection: string;
+    expandSelection: string;
+    contractSelection: string;
+    selectAll: string;
+    deselectAll: string;
+    brushSize: string;
+    brushHardness: string;
+    brushOpacity: string;
+    eraseMode: string;
+    paintMode: string;
+    closeImage: string;
+    fitToScreen: string;
+    actualSize: string;
+    zoomIn: string;
+    zoomOut: string;
+    panTool: string;
+    selectTool: string;
+    brushTool: string;
+    eraserTool: string;
+    cropTool: string;
+    rotateTool: string;
+    textTool: string;
+    shapeTool: string;
+  };
+
+  // Modals
+  modals: {
+    close: string;
+    closeEsc: string;
+    keyboardShortcuts: string;
+    imageMetadata: string;
+    fileName: string;
+    description: string;
+    notes: string;
+    tags: string;
+    dimensions: string;
+    fileSize: string;
+    format: string;
+    createdAt: string;
+    updatedAt: string;
+    catalogueSettings: string;
+    companyName: string;
+    phone: string;
+    address: string;
+    website: string;
+    logo: string;
+    front: string;
+    backSide: string;
+    watermark: string;
+    enableWatermark: string;
+    watermarkPosition: string;
+    watermarkOpacity: string;
+  };
+
+  // Selective Presets
+  selectivePresets: {
+    studioCommercial: string;
+    studioCommercialDesc: string;
+    editorial: string;
+    editorialDesc: string;
+    lifestyle: string;
+    lifestyleDesc: string;
+    luxury: string;
+    luxuryDesc: string;
+    artistic: string;
+    artisticDesc: string;
+    minimal: string;
+    minimalDesc: string;
+    dramatic: string;
+    dramaticDesc: string;
+    natural: string;
+    naturalDesc: string;
+    elegantHands: string;
+    elegantHandsDesc: string;
+    neckFocus: string;
+    neckFocusDesc: string;
+    fullBody: string;
+    fullBodyDesc: string;
+    halfBody: string;
+    halfBodyDesc: string;
+    closeUp: string;
+    closeUpDesc: string;
+    profileView: string;
+    profileViewDesc: string;
+    backView: string;
+    backViewDesc: string;
+    studioWhite: string;
+    studioWhiteDesc: string;
+    studioBlack: string;
+    studioBlackDesc: string;
+    naturalLight: string;
+    naturalLightDesc: string;
+    urbanCity: string;
+    urbanCityDesc: string;
+    luxuryInterior: string;
+    luxuryInteriorDesc: string;
+    outdoorNature: string;
+    outdoorNatureDesc: string;
+    beachCoastal: string;
+    beachCoastalDesc: string;
+    cafeRestaurant: string;
+    cafeRestaurantDesc: string;
+    elegantSophisticated: string;
+    elegantSophisticatedDesc: string;
+    playfulJoyful: string;
+    playfulJoyfulDesc: string;
+    mysteriousDark: string;
+    mysteriousDarkDesc: string;
+    romanticSoft: string;
+    romanticSoftDesc: string;
+    boldConfident: string;
+    boldConfidentDesc: string;
+    serenePeaceful: string;
+    serenePeacefulDesc: string;
+  };
+
+  // Advanced Presets
+  advancedPresets: {
+    straightWavy: string;
+    curlyCoiled: string;
+    shortPixie: string;
+    longFlowing: string;
+    updoBun: string;
+    braided: string;
+    slickedBack: string;
+    blonde: string;
+    brunette: string;
+    black: string;
+    red: string;
+    gray: string;
+    highlighted: string;
+    ombre: string;
+    classicManicure: string;
+    frenchTips: string;
+    natural: string;
+    longShaped: string;
+    shortNatural: string;
+    glossy: string;
+    matte: string;
+    nude: string;
+    redNail: string;
+    darkNail: string;
+    pastel: string;
+    metallicGold: string;
+    glitter: string;
+    ombr: string;
+    noMakeup: string;
+    naturalGlow: string;
+    softGlam: string;
+    fullGlam: string;
+    smokyEye: string;
+    boldLip: string;
+    dewyFresh: string;
+    matteFinish: string;
+    bronzed: string;
+    fair: string;
+    light: string;
+    medium: string;
+    tan: string;
+    olive: string;
+    deep: string;
+    rich: string;
+    ebony: string;
+    cleanShaven: string;
+    stubble: string;
+    shortBeard: string;
+    fullBeard: string;
+    goatee: string;
+    mustache: string;
+    shortCrop: string;
+    mediumLength: string;
+    longMens: string;
+    buzzCut: string;
+    undercut: string;
+    pompadour: string;
+    straightOn: string;
+    threeQuarter: string;
+    profileSide: string;
+    topDown: string;
+    lowAngle: string;
+    highAngle: string;
+    shallow: string;
+    mediumDof: string;
+    deepDof: string;
+    veryShallow: string;
+    wide24mm: string;
+    standard50mm: string;
+    portrait85mm: string;
+    telephoto135mm: string;
+    macro100mm: string;
+    softDiffused: string;
+    hardDirectional: string;
+    naturalWindow: string;
+    studioStrobe: string;
+    ringLight: string;
+    rimLight: string;
+    rembrandt: string;
+    frontFacing: string;
+    sideLight: string;
+    backlit: string;
+    topLight: string;
+    underLight: string;
+    lowIntensity: string;
+    mediumIntensity: string;
+    highIntensity: string;
+    dramaticContrast: string;
+    warmTones: string;
+    coolTones: string;
+    neutralBalance: string;
+    goldenHour: string;
+    blueHour: string;
+    cinematic: string;
+    vintage: string;
+    highContrast: string;
+    lowContrast: string;
+    desaturated: string;
+    vibrant: string;
+  };
+
+  // Placeholders
+  placeholders: {
+    enterName: string;
+    enterEmail: string;
+    enterPassword: string;
+    enterDescription: string;
+    enterNotes: string;
+    searchPlaceholder: string;
+    selectOption: string;
+    typeHere: string;
+    describeVision: string;
+    enterCompanyName: string;
+    enterPhone: string;
+    enterAddress: string;
+    enterWebsite: string;
+  };
+
+  // Labels
+  labels: {
+    required: string;
+    optional: string;
+    recommended: string;
+    new: string;
+    popular: string;
+    featured: string;
+    beta: string;
+    comingSoon: string;
+    deprecated: string;
+    experimental: string;
+    stable: string;
+  };
+
+  // Actions
+  actions: {
+    uploadImage: string;
+    selectFromGallery: string;
+    takePhoto: string;
+    pasteFromClipboard: string;
+    dragAndDrop: string;
+    browseFiles: string;
+    generateWithAI: string;
+    enhanceImage: string;
+    removeBackground: string;
+    upscaleImage: string;
+    inpaintImage: string;
+    createVideo: string;
+    exportAs: string;
+    shareLink: string;
+    copyLink: string;
+    downloadOriginal: string;
+    downloadProcessed: string;
+    viewFullSize: string;
+    openInEditor: string;
+    duplicateImage: string;
+    moveToFolder: string;
+    addToFavorites: string;
+    removeFromFavorites: string;
+    reportIssue: string;
+    provideFeedback: string;
+    learnMore: string;
+    getStarted: string;
+    seeAll: string;
+    loadMore: string;
+    showAll: string;
+    hideAll: string;
+    expandAll: string;
+    collapseAll: string;
+    selectFiles: string;
+    clearSelection: string;
   };
 }
 

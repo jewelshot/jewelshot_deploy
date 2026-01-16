@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Loader2 } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n';
 
 interface AIGenerateButtonProps {
   onClick: () => void;
@@ -14,13 +15,15 @@ export function AIGenerateButton({
   disabled = false,
   loading = false,
 }: AIGenerateButtonProps) {
+  const { t } = useLanguage();
+  
   return (
     <button
       onClick={onClick}
       disabled={disabled || loading}
       className="group relative overflow-hidden rounded-lg border border-[rgba(139,92,246,0.4)] bg-gradient-to-br from-[rgba(10,10,10,0.9)] to-[rgba(20,10,30,0.9)] px-4 py-2 text-white backdrop-blur-2xl transition-all duration-200 hover:border-[rgba(139,92,246,0.6)] hover:shadow-[0_0_16px_rgba(139,92,246,0.4)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
-      title="Generate with AI"
-      aria-label="Generate with AI"
+      title={t.tooltips.aiGenerate}
+      aria-label={t.tooltips.aiGenerate}
       style={{
         textShadow: '0 1px 2px rgba(0, 0, 0, 0.8)',
       }}
@@ -46,10 +49,10 @@ export function AIGenerateButton({
                 filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8))',
               }}
             />
-            <span className="text-xs font-medium">Generating...</span>
+            <span className="text-xs font-medium">{t.studio.generating}</span>
           </>
         ) : (
-          <span className="text-xs font-medium">Generate</span>
+          <span className="text-xs font-medium">{t.studio.generate}</span>
         )}
       </div>
     </button>

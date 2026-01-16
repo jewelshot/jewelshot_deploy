@@ -4,6 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import { X, Download, Eye, FolderOpen, Palette } from 'lucide-react';
 import { useSidebarStore } from '@/store/sidebarStore';
+import { useLanguage } from '@/lib/i18n';
 
 interface BatchImage {
   id: string;
@@ -51,6 +52,7 @@ export function BatchDetailModal({
   onDownloadImage,
 }: BatchDetailModalProps) {
   const { leftOpen, rightOpen, topOpen, bottomOpen } = useSidebarStore();
+  const { t } = useLanguage();
 
   if (!isOpen) return null;
 
@@ -83,13 +85,13 @@ export function BatchDetailModal({
                 <span>{new Date(project.created_at).toLocaleString()}</span>
                 <span>•</span>
                 <span>
-                  {project.completed_images} of {project.total_images} completed
+                  {project.completed_images} / {project.total_images} {t.batch.completed.toLowerCase()}
                 </span>
                 {project.failed_images > 0 && (
                   <>
                     <span>•</span>
                     <span className="text-red-400">
-                      {project.failed_images} failed
+                      {project.failed_images} {t.batch.failed.toLowerCase()}
                     </span>
                   </>
                 )}
@@ -101,7 +103,7 @@ export function BatchDetailModal({
           <button
             onClick={onClose}
             className="rounded-full bg-white/5 p-2 text-white/60 shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-110 hover:bg-white/10 hover:text-white"
-            title="Close (Esc)"
+            title={t.modals.closeEsc}
           >
             <X className="h-6 w-6" />
           </button>
@@ -158,17 +160,17 @@ export function BatchDetailModal({
                   <div className="absolute right-2 top-2">
                     {image.status === 'completed' && (
                       <div className="rounded-full bg-white/20 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
-                        ✓ Done
+                        ✓ {t.batch.completed}
                       </div>
                     )}
                     {image.status === 'failed' && (
                       <div className="rounded-full bg-white/20 px-2 py-1 text-xs font-medium text-white/60 backdrop-blur-sm">
-                        ✗ Failed
+                        ✗ {t.batch.failed}
                       </div>
                     )}
                     {image.status === 'processing' && (
                       <div className="rounded-full bg-white/20 px-2 py-1 text-xs font-medium text-white/60 backdrop-blur-sm">
-                        ⋯ Processing
+                        ⋯ {t.batch.processing}
                       </div>
                     )}
                   </div>
@@ -186,7 +188,7 @@ export function BatchDetailModal({
                           })
                         }
                         className="rounded-lg bg-white/10 p-2.5 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
-                        title="Compare in Studio"
+                        title={t.batch.compareInStudio}
                       >
                         <Eye className="h-4 w-4" />
                       </button>
@@ -204,8 +206,8 @@ export function BatchDetailModal({
                           className="rounded-lg bg-white/10 p-2.5 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
                           title={
                             image.original_url
-                              ? 'Compare in Studio'
-                              : 'Open in Studio'
+                              ? t.batch.compareInStudio
+                              : t.dashboard.openStudio
                           }
                         >
                           <Palette className="h-4 w-4" />
@@ -218,7 +220,7 @@ export function BatchDetailModal({
                             )
                           }
                           className="rounded-lg bg-white/10 p-2.5 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
-                          title="Download"
+                          title={t.common.download}
                         >
                           <Download className="h-4 w-4" />
                         </button>
@@ -250,7 +252,7 @@ export function BatchDetailModal({
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <div className="mb-4 text-4xl opacity-30">📷</div>
-            <p className="text-white/50">No images in this batch</p>
+            <p className="text-white/50">{t.empty.noBatchImages}</p>
           </div>
         )}
       </div>

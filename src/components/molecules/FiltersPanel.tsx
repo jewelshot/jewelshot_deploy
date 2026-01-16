@@ -12,6 +12,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { AdjustSlider } from '@/components/atoms/AdjustSlider';
+import { useLanguage } from '@/lib/i18n';
 
 interface FiltersPanelProps {
   /**
@@ -34,6 +35,7 @@ export interface FilterEffects {
  * Provides professional filter effect controls
  */
 export function FiltersPanel({ onFilterChange }: FiltersPanelProps) {
+  const { t } = useLanguage();
   // Vignette state
   const [vignetteAmount, setVignetteAmount] = useState(0);
   const [vignetteSize, setVignetteSize] = useState(50);
@@ -73,11 +75,11 @@ export function FiltersPanel({ onFilterChange }: FiltersPanelProps) {
       {/* Vignette Section */}
       <div className="flex flex-col gap-3">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-white/50">
-          Vignette
+          {t.canvas.vignette}
         </h3>
 
         <AdjustSlider
-          label="Amount"
+          label={t.canvas.amount}
           value={vignetteAmount}
           min={0}
           max={75}
@@ -85,7 +87,7 @@ export function FiltersPanel({ onFilterChange }: FiltersPanelProps) {
         />
 
         <AdjustSlider
-          label="Size"
+          label={t.canvas.size}
           value={vignetteSize}
           min={25}
           max={75}
@@ -93,7 +95,7 @@ export function FiltersPanel({ onFilterChange }: FiltersPanelProps) {
         />
 
         <AdjustSlider
-          label="Feather"
+          label={t.canvas.feather}
           value={vignetteFeather}
           min={25}
           max={75}
@@ -104,11 +106,11 @@ export function FiltersPanel({ onFilterChange }: FiltersPanelProps) {
       {/* Grain Section */}
       <div className="flex flex-col gap-3">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-white/50">
-          Film Grain
+          {t.canvas.grain}
         </h3>
 
         <AdjustSlider
-          label="Amount"
+          label={t.canvas.amount}
           value={grainAmount}
           min={0}
           max={75}
@@ -116,7 +118,7 @@ export function FiltersPanel({ onFilterChange }: FiltersPanelProps) {
         />
 
         <AdjustSlider
-          label="Size"
+          label={t.canvas.size}
           value={grainSize}
           min={25}
           max={75}
@@ -127,11 +129,11 @@ export function FiltersPanel({ onFilterChange }: FiltersPanelProps) {
       {/* Fade Section */}
       <div className="flex flex-col gap-3">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-white/50">
-          Film Fade
+          {t.canvas.effects}
         </h3>
 
         <AdjustSlider
-          label="Amount"
+          label={t.canvas.amount}
           value={fadeAmount}
           min={0}
           max={75}

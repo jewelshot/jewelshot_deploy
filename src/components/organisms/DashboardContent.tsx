@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import { createScopedLogger } from '@/lib/logger';
 import Link from 'next/link';
+import { useLanguage } from '@/lib/i18n';
 
 const logger = createScopedLogger('Dashboard');
 
@@ -133,6 +134,7 @@ export function DashboardContent() {
   const router = useRouter();
   const { leftOpen } = useSidebarStore();
   const { credits, loading: creditsLoading, fetchCredits } = useCreditStore();
+  const { t } = useLanguage();
 
   // Core State
   const [loading, setLoading] = useState(true);
@@ -630,7 +632,7 @@ export function DashboardContent() {
             <p className="text-[10px] text-white/30 mt-1">all time</p>
           </div>
           <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
-            <p className="text-[10px] uppercase tracking-wider text-white/40 mb-1">Storage</p>
+            <p className="text-[10px] uppercase tracking-wider text-white/40 mb-1">{t.dashboard.storage}</p>
             <p className="text-2xl font-semibold text-white">{formatBytes(totalStorage)}</p>
             <p className="text-[10px] text-white/30 mt-1">used</p>
           </div>
@@ -704,7 +706,7 @@ export function DashboardContent() {
           {/* Plan & Limits (1/3) */}
           <div className="col-span-1 rounded-xl border border-white/10 bg-white/[0.03] p-5">
             <div className="flex items-center justify-between mb-4">
-              <p className="text-[10px] uppercase tracking-wider text-white/40">Plan</p>
+              <p className="text-[10px] uppercase tracking-wider text-white/40">{t.dashboard.plan}</p>
               <span className="text-[10px] px-2 py-0.5 rounded bg-white/10 text-white/60">
                 {planInfo.name}
               </span>
@@ -712,7 +714,7 @@ export function DashboardContent() {
 
             <div className="mb-3">
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] text-white/50">Credit Usage</span>
+                <span className="text-[10px] text-white/50">{t.dashboard.creditUsage}</span>
                 <span className="text-[10px] text-white/50">{planInfo.percentUsed}%</span>
               </div>
               <div className="h-2 rounded-full bg-white/10 overflow-hidden">
@@ -753,7 +755,7 @@ export function DashboardContent() {
                 href="/profile?tab=billing"
                 className="flex items-center justify-center gap-1 w-full py-2 rounded-lg bg-white/5 hover:bg-white/10 text-[10px] text-white/60 hover:text-white/80 transition-colors"
               >
-                Upgrade Plan
+                {t.dashboard.upgradePlan}
                 <ArrowUpRight className="h-3 w-3" />
               </Link>
             )}
@@ -765,7 +767,7 @@ export function DashboardContent() {
           {/* Most Used Presets */}
           <div className="col-span-1 rounded-xl border border-white/10 bg-white/[0.03] p-5">
             <p className="text-[10px] uppercase tracking-wider text-white/40 mb-4">
-              Top Presets
+              {t.dashboard.topPresets}
             </p>
 
             {presetUsage.length > 0 ? (
@@ -787,7 +789,7 @@ export function DashboardContent() {
                 ))}
               </div>
             ) : (
-              <p className="text-[11px] text-white/30">No data yet</p>
+              <p className="text-[11px] text-white/30">{t.dashboard.noDataYet}</p>
             )}
           </div>
 
@@ -795,7 +797,7 @@ export function DashboardContent() {
           <div className="col-span-1 rounded-xl border border-white/10 bg-white/[0.03] p-5">
             <div className="flex items-center justify-between mb-4">
               <p className="text-[10px] uppercase tracking-wider text-white/40">
-                Storage
+                {t.dashboard.storage}
               </p>
               <HardDrive className="h-3.5 w-3.5 text-white/30" />
             </div>
@@ -829,38 +831,38 @@ export function DashboardContent() {
                 </div>
               </>
             ) : (
-              <p className="text-[11px] text-white/30">No files yet</p>
+              <p className="text-[11px] text-white/30">{t.dashboard.noFilesYet}</p>
             )}
           </div>
 
           {/* Quick Generation */}
           <div className="col-span-1 rounded-xl border border-white/10 bg-white/[0.03] p-5">
             <p className="text-[10px] uppercase tracking-wider text-white/40 mb-4">
-              Quick Generate
+              {t.dashboard.quickGenerate}
             </p>
 
             {lastUsedPreset ? (
               <div>
                 <div className="rounded-lg border border-white/10 bg-white/[0.03] p-2.5 mb-3">
                   <p className="text-[11px] text-white truncate">{lastUsedPreset.name}</p>
-                  <p className="text-[10px] text-white/40">Last used</p>
+                  <p className="text-[10px] text-white/40">{t.dashboard.lastUsed}</p>
                 </div>
                 <button
                   onClick={handleQuickGenerate}
                   className="flex items-center justify-center gap-2 w-full py-2 rounded-lg bg-purple-600/80 hover:bg-purple-600 text-[11px] text-white transition-colors"
                 >
                   <Sparkles className="h-3 w-3" />
-                  Generate
+                  {t.dashboard.generate}
                 </button>
               </div>
             ) : (
               <div className="text-center py-2">
-                <p className="text-[11px] text-white/40 mb-2">No recent preset</p>
+                <p className="text-[11px] text-white/40 mb-2">{t.dashboard.noRecentPreset}</p>
                 <Link
                   href="/studio"
                   className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] text-white/60 transition-colors"
                 >
-                  Go to Studio
+                  {t.dashboard.goToStudio}
                   <ArrowRight className="h-3 w-3" />
                 </Link>
               </div>
@@ -871,7 +873,7 @@ export function DashboardContent() {
           <div className="col-span-1 rounded-xl border border-white/10 bg-white/[0.03] p-5">
             <div className="flex items-center justify-between mb-4">
               <p className="text-[10px] uppercase tracking-wider text-white/40">
-                Batches
+                {t.dashboard.batches}
               </p>
               {activeBatches.length > 0 && (
                 <span className="flex items-center gap-1 text-[10px] text-yellow-500">
@@ -959,14 +961,14 @@ export function DashboardContent() {
                       <button
                         onClick={() => handleOpenInStudio(image)}
                         className="p-1.5 rounded-md bg-white/10 hover:bg-white/20 transition-colors"
-                        title="Edit in Studio"
+                        title={t.dashboard.editInStudio}
                       >
                         <Edit3 className="h-3.5 w-3.5 text-white" />
                       </button>
                       <button
                         onClick={() => handleDownload(image)}
                         className="p-1.5 rounded-md bg-white/10 hover:bg-white/20 transition-colors"
-                        title="Download"
+                        title={t.common.download}
                       >
                         <Download className="h-3.5 w-3.5 text-white" />
                       </button>
@@ -975,7 +977,7 @@ export function DashboardContent() {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="p-1.5 rounded-md bg-white/10 hover:bg-white/20 transition-colors"
-                        title="Open"
+                        title={t.dashboard.openInNew}
                       >
                         <ExternalLink className="h-3.5 w-3.5 text-white" />
                       </a>
@@ -986,9 +988,9 @@ export function DashboardContent() {
             </div>
           ) : (
             <div className="py-12 text-center">
-              <p className="text-white/30 mb-2">No images yet</p>
+              <p className="text-white/30 mb-2">{t.empty.noImages}</p>
               <Link href="/studio" className="text-xs text-purple-400/80 hover:text-purple-400">
-                Create your first image →
+                {t.dashboard.createFirstImage} →
               </Link>
             </div>
           )}
@@ -1022,13 +1024,13 @@ export function DashboardContent() {
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between p-4 border-b border-white/10">
-              <h3 className="text-sm font-semibold text-white">Notifications</h3>
+              <h3 className="text-sm font-semibold text-white">{t.dashboard.notifications}</h3>
               {unreadCount > 0 && (
                 <button
                   onClick={markAllNotificationsRead}
                   className="text-[10px] text-purple-400 hover:text-purple-300"
                 >
-                  Mark all read
+                  {t.dashboard.markAllRead}
                 </button>
               )}
             </div>
@@ -1054,7 +1056,7 @@ export function DashboardContent() {
                           <button
                             onClick={() => markNotificationRead(notif.id)}
                             className="p-1 rounded hover:bg-white/10"
-                            title="Mark as read"
+                            title={t.dashboard.markAsRead}
                           >
                             <Check className="h-3 w-3 text-white/40" />
                           </button>
@@ -1062,7 +1064,7 @@ export function DashboardContent() {
                         <button
                           onClick={() => deleteNotification(notif.id)}
                           className="p-1 rounded hover:bg-white/10"
-                          title="Delete"
+                          title={t.common.delete}
                         >
                           <Trash2 className="h-3 w-3 text-white/40" />
                         </button>
@@ -1073,7 +1075,7 @@ export function DashboardContent() {
               ) : (
                 <div className="p-8 text-center">
                   <Bell className="h-8 w-8 text-white/20 mx-auto mb-2" />
-                  <p className="text-xs text-white/40">No notifications</p>
+                  <p className="text-xs text-white/40">{t.dashboard.noNotifications}</p>
                 </div>
               )}
             </div>
@@ -1086,7 +1088,7 @@ export function DashboardContent() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-xl border border-white/10 bg-[#0a0a0a] p-6 shadow-2xl">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-white">Keyboard Shortcuts</h3>
+              <h3 className="text-lg font-semibold text-white">{t.dashboard.keyboardShortcuts}</h3>
               <button
                 onClick={() => setShowShortcuts(false)}
                 className="p-1 rounded hover:bg-white/10 transition-colors"

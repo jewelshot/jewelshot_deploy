@@ -9,9 +9,11 @@ import { PrimaryButton } from '@/components/atoms/PrimaryButton';
 import { SocialButton } from '@/components/atoms/SocialButton';
 import { createClient } from '@/lib/supabase/client';
 import { AuroraBackground } from '@/components/atoms/AuroraBackground';
+import { useLanguage } from '@/lib/i18n';
 
 export default function SignupPage() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -26,7 +28,7 @@ export default function SignupPage() {
 
     try {
       if (password.length < 8) {
-        throw new Error('Password must be at least 8 characters');
+        throw new Error(t.auth.passwordRequirements);
       }
 
       const supabase = createClient();
@@ -44,7 +46,7 @@ export default function SignupPage() {
 
       setSuccess(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create account');
+      setError(err instanceof Error ? err.message : t.errors.generic);
     } finally {
       setLoading(false);
     }
@@ -62,7 +64,7 @@ export default function SignupPage() {
 
       if (signInError) throw signInError;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to sign up');
+      setError(err instanceof Error ? err.message : t.errors.generic);
     }
   };
 
@@ -141,8 +143,8 @@ export default function SignupPage() {
 
           {/* Footer */}
           <div className="flex items-center gap-6 text-sm text-white/40">
-            <Link href="/privacy" className="hover:text-white/60">Privacy</Link>
-            <Link href="/terms" className="hover:text-white/60">Terms</Link>
+            <Link href="/privacy" className="hover:text-white/60">{t.nav.privacy}</Link>
+            <Link href="/terms" className="hover:text-white/60">{t.nav.terms}</Link>
             <Link href="/security" className="hover:text-white/60">Security</Link>
           </div>
         </div>
@@ -156,7 +158,7 @@ export default function SignupPage() {
               className="group mb-8 flex items-center gap-2 text-white/60 transition-colors hover:text-white lg:hidden"
             >
               <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-              <span className="text-sm">Back to home</span>
+              <span className="text-sm">{t.common.back}</span>
             </Link>
 
             {/* Signup Card */}
@@ -166,9 +168,9 @@ export default function SignupPage() {
                   <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-500/20">
                     <CheckCircle2 className="h-8 w-8 text-green-500" />
                   </div>
-                  <h2 className="mb-2 text-2xl font-bold text-white">Check your email</h2>
+                  <h2 className="mb-2 text-2xl font-bold text-white">{t.auth.checkEmail}</h2>
                   <p className="mb-6 text-white/60">
-                    We've sent a verification link to <span className="font-medium text-white">{email}</span>
+                    {t.auth.verifyEmail} <span className="font-medium text-white">{email}</span>
                   </p>
                   <p className="mb-6 text-sm text-white/40">
                     Click the link in your email to verify your account and get started.
@@ -178,13 +180,13 @@ export default function SignupPage() {
                       onClick={() => router.push('/studio')}
                       className="w-full"
                     >
-                      Continue to Dashboard
+                      {t.common.continue}
                     </PrimaryButton>
                     <button
                       onClick={() => setSuccess(false)}
                       className="w-full text-sm text-white/60 hover:text-white"
                     >
-                      Didn't receive the email? Try again
+                      {t.common.retry}
                     </button>
                   </div>
                 </div>
@@ -197,9 +199,9 @@ export default function SignupPage() {
                         <span className="text-xl font-bold text-white">J</span>
                       </div>
                     </div>
-                    <h2 className="text-2xl font-bold text-white">Create your account</h2>
+                    <h2 className="text-2xl font-bold text-white">{t.auth.createAccount}</h2>
                     <p className="mt-2 text-white/60">
-                      Start your 14-day free trial. No credit card required.
+                      {t.auth.createAccountToContinue}
                     </p>
                   </div>
 
@@ -213,7 +215,7 @@ export default function SignupPage() {
                   {/* Divider */}
                   <div className="my-6 flex items-center gap-3">
                     <div className="h-px flex-1 bg-white/10" />
-                    <span className="text-sm text-white/40">or sign up with email</span>
+                    <span className="text-sm text-white/40">{t.auth.orContinueWith}</span>
                     <div className="h-px flex-1 bg-white/10" />
                   </div>
 
@@ -221,11 +223,11 @@ export default function SignupPage() {
                     {/* Full Name */}
                     <div>
                       <label htmlFor="fullName" className="mb-2 block text-sm font-medium text-white/80">
-                        Full name
+                        {t.profile.fullName}
                       </label>
                       <AuthInput
                         type="text"
-                        placeholder="John Smith"
+                        placeholder={t.placeholders.enterName}
                         value={fullName}
                         onChange={setFullName}
                         icon={User}
@@ -236,11 +238,11 @@ export default function SignupPage() {
                     {/* Email */}
                     <div>
                       <label htmlFor="email" className="mb-2 block text-sm font-medium text-white/80">
-                        Work email
+                        {t.auth.email}
                       </label>
                       <AuthInput
                         type="email"
-                        placeholder="you@company.com"
+                        placeholder={t.placeholders.enterEmail}
                         value={email}
                         onChange={setEmail}
                         icon={Mail}
@@ -251,18 +253,18 @@ export default function SignupPage() {
                     {/* Password */}
                     <div>
                       <label htmlFor="password" className="mb-2 block text-sm font-medium text-white/80">
-                        Password
+                        {t.auth.password}
                       </label>
                       <AuthInput
                         type="password"
-                        placeholder="Min. 8 characters"
+                        placeholder={t.placeholders.enterPassword}
                         value={password}
                         onChange={setPassword}
                         icon={Lock}
                         disabled={loading}
                       />
                       <p className="mt-1 text-xs text-white/40">
-                        Use 8+ characters with a mix of letters and numbers
+                        {t.auth.passwordRequirements}
                       </p>
                     </div>
 
@@ -275,13 +277,13 @@ export default function SignupPage() {
 
                     {/* Terms */}
                     <p className="text-xs text-white/50">
-                      By creating an account, you agree to our{' '}
+                      {t.auth.termsAgree.split('Terms')[0]}
                       <Link href="/terms" className="text-purple-400 hover:text-purple-300">
-                        Terms of Service
-                      </Link>{' '}
-                      and{' '}
+                        {t.nav.terms}
+                      </Link>
+                      {' & '}
                       <Link href="/privacy" className="text-purple-400 hover:text-purple-300">
-                        Privacy Policy
+                        {t.nav.privacy}
                       </Link>
                     </p>
 
@@ -292,18 +294,18 @@ export default function SignupPage() {
                       size="lg"
                       disabled={loading}
                     >
-                      {loading ? 'Creating account...' : 'Create free account'}
+                      {loading ? t.common.loading : t.auth.createAccount}
                     </PrimaryButton>
                   </form>
 
                   {/* Login Link */}
                   <div className="mt-6 text-center text-sm text-white/60">
-                    Already have an account?{' '}
+                    {t.auth.alreadyHaveAccount}{' '}
                     <Link
                       href="/auth/login"
                       className="font-medium text-purple-400 transition-colors hover:text-purple-300"
                     >
-                      Sign in
+                      {t.auth.login}
                     </Link>
                   </div>
                 </>

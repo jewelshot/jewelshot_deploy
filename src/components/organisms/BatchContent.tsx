@@ -2,6 +2,7 @@
 
 import { useRef, useCallback } from 'react';
 import { useSidebarStore } from '@/store/sidebarStore';
+import { useLanguage } from '@/lib/i18n';
 import { BatchImageGrid } from '@/components/molecules/BatchImageGrid';
 import type { BatchImage } from '@/components/molecules/BatchImageGrid';
 import type { SelectedBatchPreset } from '@/components/templates/BatchPage';
@@ -54,6 +55,7 @@ export function BatchContent({
   currentProgress,
 }: BatchContentProps) {
   const { leftOpen, rightOpen, topOpen, bottomOpen } = useSidebarStore();
+  const { t } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Nano Banana supported aspect ratios
@@ -136,7 +138,7 @@ export function BatchContent({
                   type="text"
                   value={batchName}
                   onChange={(e) => onBatchNameChange?.(e.target.value)}
-                  placeholder="Enter batch name"
+                  placeholder={t.placeholders.enterName}
                   className={`w-48 rounded-lg border px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-1 ${
                     batchName.trim() 
                       ? 'border-green-500/50 bg-green-500/5 focus:ring-green-500/50' 

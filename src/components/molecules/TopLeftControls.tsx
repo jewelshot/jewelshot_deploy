@@ -1,5 +1,8 @@
+'use client';
+
 import FileInfo from './FileInfo';
 import CloseButton from '@/components/atoms/CloseButton';
+import { useLanguage } from '@/lib/i18n';
 
 interface TopLeftControlsProps {
   /**
@@ -26,13 +29,15 @@ export function TopLeftControls({
   onClose,
   visible,
 }: TopLeftControlsProps) {
+  const { t } = useLanguage();
+  
   if (!visible) return null;
 
   return (
     <div className="flex items-center gap-1.5 rounded-lg border border-[rgba(139,92,246,0.2)] bg-[rgba(10,10,10,0.8)] p-1.5 backdrop-blur-[16px]">
       <FileInfo fileName={fileName} fileSizeInBytes={fileSizeInBytes} />
       <div className="h-4 w-px bg-[rgba(139,92,246,0.2)]" />
-      <CloseButton onClick={onClose} ariaLabel="Close Image" />
+      <CloseButton onClick={onClose} ariaLabel={t.canvas.closeImage} />
     </div>
   );
 }

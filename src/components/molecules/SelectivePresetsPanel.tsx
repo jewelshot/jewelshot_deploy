@@ -518,7 +518,7 @@ export function SelectivePresetsPanel({
         <button
           onClick={handleRandomGenerate}
           disabled={!settingsComplete || disabled}
-          title="Random generate"
+          title={t.studio.randomGenerate}
           className={`flex items-center justify-center gap-1.5 rounded-lg px-3 py-2.5 text-xs font-medium transition-all ${
             settingsComplete && !disabled
               ? 'bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 border border-purple-500/30'

@@ -12,6 +12,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { AdjustSlider } from '@/components/atoms/AdjustSlider';
+import { useLanguage } from '@/lib/i18n';
 
 interface ColorsPanelProps {
   /**
@@ -32,6 +33,7 @@ export interface ColorFilters {
  * Provides professional color adjustment controls
  */
 export function ColorsPanel({ onColorChange }: ColorsPanelProps) {
+  const { t } = useLanguage();
   // Color state
   const [temperature, setTemperature] = useState(0);
   const [tint, setTint] = useState(0);
@@ -56,18 +58,18 @@ export function ColorsPanel({ onColorChange }: ColorsPanelProps) {
       {/* Color Balance Section */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-1.5">
-          <h4 className="text-xs font-semibold text-white/80">Color Balance</h4>
+          <h4 className="text-xs font-semibold text-white/80">{t.canvas.colors}</h4>
         </div>
         <div className="flex flex-col gap-3">
           <AdjustSlider
-            label="Temperature"
+            label={t.canvas.temperature}
             value={temperature}
             min={-75}
             max={75}
             onChange={setTemperature}
           />
           <AdjustSlider
-            label="Tint"
+            label={t.canvas.tint}
             value={tint}
             min={-75}
             max={75}
@@ -79,18 +81,18 @@ export function ColorsPanel({ onColorChange }: ColorsPanelProps) {
       {/* Color Intensity Section */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-1.5">
-          <h4 className="text-xs font-semibold text-white/80">Color Intensity</h4>
+          <h4 className="text-xs font-semibold text-white/80">{t.canvas.vibrance}</h4>
         </div>
         <div className="flex flex-col gap-3">
           <AdjustSlider
-            label="Saturation"
+            label={t.canvas.saturation}
             value={saturation}
             min={-75}
             max={75}
             onChange={setSaturation}
           />
           <AdjustSlider
-            label="Vibrance"
+            label={t.canvas.vibrance}
             value={vibrance}
             min={-75}
             max={75}

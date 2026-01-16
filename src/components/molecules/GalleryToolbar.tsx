@@ -3,6 +3,7 @@
 import GallerySearchInput from '@/components/atoms/GallerySearchInput';
 import FilterChip from '@/components/atoms/FilterChip';
 import SortButton, { SortOption } from '@/components/atoms/SortButton';
+import { useLanguage } from '@/lib/i18n';
 
 interface GalleryToolbarProps {
   searchValue: string;
@@ -21,6 +22,8 @@ export function GalleryToolbar({
   sortValue,
   onSortChange,
 }: GalleryToolbarProps) {
+  const { t } = useLanguage();
+  
   return (
     <div className="flex flex-col gap-4 rounded-lg border border-[rgba(139,92,246,0.2)] bg-[rgba(10,10,10,0.6)] p-4 backdrop-blur-[16px]">
       {/* Search */}
@@ -31,17 +34,17 @@ export function GalleryToolbar({
         {/* Filters */}
         <div className="flex flex-wrap gap-2">
           <FilterChip
-            label="All"
+            label={t.common.all}
             active={activeFilter === 'all'}
             onClick={() => onFilterChange('all')}
           />
           <FilterChip
-            label="AI Edited"
+            label={t.gallery.aiGenerated}
             active={activeFilter === 'ai-edited'}
             onClick={() => onFilterChange('ai-edited')}
           />
           <FilterChip
-            label="Manual"
+            label={t.gallery.manual}
             active={activeFilter === 'manual'}
             onClick={() => onFilterChange('manual')}
           />

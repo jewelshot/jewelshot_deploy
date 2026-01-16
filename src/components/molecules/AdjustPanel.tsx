@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { AdjustSlider } from '@/components/atoms/AdjustSlider';
+import { useLanguage } from '@/lib/i18n';
 
 export interface AdjustState {
   // Temel Işık
@@ -30,6 +31,7 @@ interface AdjustPanelProps {
  * AdjustPanel - Molecule component for image adjustment controls
  */
 export function AdjustPanel({ onAdjustChange }: AdjustPanelProps) {
+  const { t } = useLanguage();
   const [adjust, setAdjust] = useState<AdjustState>({
     brightness: 0,
     contrast: 0,
@@ -60,25 +62,25 @@ export function AdjustPanel({ onAdjustChange }: AdjustPanelProps) {
       {/* Basic Light */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-1.5">
-          <h4 className="text-xs font-semibold text-white/80">Basic Light</h4>
+          <h4 className="text-xs font-semibold text-white/80">{t.canvas.adjustments}</h4>
         </div>
         <div className="flex flex-col gap-3">
           <AdjustSlider
-            label="Brightness"
+            label={t.canvas.brightness}
             value={adjust.brightness}
             min={-75}
             max={75}
             onChange={(v) => handleChange('brightness', v)}
           />
           <AdjustSlider
-            label="Contrast"
+            label={t.canvas.contrast}
             value={adjust.contrast}
             min={-75}
             max={75}
             onChange={(v) => handleChange('contrast', v)}
           />
           <AdjustSlider
-            label="Exposure"
+            label={t.canvas.exposure}
             value={adjust.exposure}
             min={-75}
             max={75}
@@ -91,33 +93,33 @@ export function AdjustPanel({ onAdjustChange }: AdjustPanelProps) {
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-1.5">
           <h4 className="text-xs font-semibold text-white/80">
-            Advanced Tone Control
+            {t.canvas.colors}
           </h4>
         </div>
         <div className="flex flex-col gap-3">
           <AdjustSlider
-            label="Highlights"
+            label={t.canvas.highlights}
             value={adjust.highlights}
             min={-75}
             max={75}
             onChange={(v) => handleChange('highlights', v)}
           />
           <AdjustSlider
-            label="Shadows"
+            label={t.canvas.shadows}
             value={adjust.shadows}
             min={-75}
             max={75}
             onChange={(v) => handleChange('shadows', v)}
           />
           <AdjustSlider
-            label="Whites"
+            label={t.canvas.whites}
             value={adjust.whites}
             min={-75}
             max={75}
             onChange={(v) => handleChange('whites', v)}
           />
           <AdjustSlider
-            label="Blacks"
+            label={t.canvas.blacks}
             value={adjust.blacks}
             min={-75}
             max={75}
@@ -130,26 +132,26 @@ export function AdjustPanel({ onAdjustChange }: AdjustPanelProps) {
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-1.5">
           <h4 className="text-xs font-semibold text-white/80">
-            Clarity & Detail
+            {t.canvas.clarity}
           </h4>
         </div>
         <div className="flex flex-col gap-3">
           <AdjustSlider
-            label="Clarity"
+            label={t.canvas.clarity}
             value={adjust.clarity}
             min={-75}
             max={75}
             onChange={(v) => handleChange('clarity', v)}
           />
           <AdjustSlider
-            label="Sharpness"
+            label={t.canvas.sharpness}
             value={adjust.sharpness}
             min={0}
             max={75}
             onChange={(v) => handleChange('sharpness', v)}
           />
           <AdjustSlider
-            label="Dehaze"
+            label={t.canvas.dehaze}
             value={adjust.dehaze}
             min={-75}
             max={75}

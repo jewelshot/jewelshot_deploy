@@ -2,6 +2,7 @@
 
 import React, { useEffect } from 'react';
 import { AlertCircle, CheckCircle, Info, X, AlertTriangle } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -41,17 +42,6 @@ const iconColorMap = {
  *
  * Smart positioned notification system that adapts to sidebar states
  * Ensures toasts never overlap with UI bars
- *
- * @example
- * ```tsx
- * <Toast
- *   message="File uploaded successfully!"
- *   type="success"
- *   onClose={() => setShowToast(false)}
- *   isTopBarOpen={topOpen}
- *   isRightSidebarOpen={rightOpen}
- * />
- * ```
  */
 export function Toast({
   message,
@@ -62,6 +52,7 @@ export function Toast({
   isRightSidebarOpen = false,
 }: ToastProps) {
   const Icon = iconMap[type];
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (duration > 0) {
@@ -87,7 +78,7 @@ export function Toast({
       <button
         onClick={onClose}
         className="flex-shrink-0 rounded p-1 transition-colors hover:bg-white/10"
-        aria-label="Close notification"
+        aria-label={t.common.close}
       >
         <X className="h-4 w-4" />
       </button>

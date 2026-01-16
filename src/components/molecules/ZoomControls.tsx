@@ -3,6 +3,7 @@
 import { ZoomIn, ZoomOut, Locate } from 'lucide-react';
 import ZoomButton from '@/components/atoms/ZoomButton';
 import ZoomDisplay from '@/components/atoms/ZoomDisplay';
+import { useLanguage } from '@/lib/i18n';
 
 interface ZoomControlsProps {
   scale: number;
@@ -19,14 +20,16 @@ export function ZoomControls({
   onZoomOut,
   onFitScreen,
   minZoom = 0.1,
-  maxZoom = 3.0,
+  maxZoom = 8.0,
 }: ZoomControlsProps) {
+  const { t } = useLanguage();
+  
   return (
     <div className="flex items-center gap-1 rounded-lg border border-[rgba(139,92,246,0.2)] bg-[rgba(10,10,10,0.8)] p-1.5 backdrop-blur-[16px]">
       <ZoomButton
         onClick={onZoomOut}
         icon={<ZoomOut className="h-3 w-3" />}
-        title="Zoom Out"
+        title={t.tooltips.zoomOut}
         disabled={scale <= minZoom}
       />
 
@@ -35,7 +38,7 @@ export function ZoomControls({
       <ZoomButton
         onClick={onZoomIn}
         icon={<ZoomIn className="h-3 w-3" />}
-        title="Zoom In"
+        title={t.tooltips.zoomIn}
         disabled={scale >= maxZoom}
       />
 
@@ -44,7 +47,7 @@ export function ZoomControls({
       <ZoomButton
         onClick={onFitScreen}
         icon={<Locate className="h-3 w-3" />}
-        title="Fit Screen"
+        title={t.tooltips.fitScreen}
       />
     </div>
   );

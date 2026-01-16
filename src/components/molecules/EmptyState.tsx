@@ -1,12 +1,16 @@
+'use client';
+
 import { Camera, Upload } from 'lucide-react';
 import React from 'react';
-
+import { useLanguage } from '@/lib/i18n';
 
 interface EmptyStateProps {
   onUploadClick: () => void;
 }
 
 export function EmptyState({ onUploadClick }: EmptyStateProps) {
+  const { t } = useLanguage();
+  
   return (
     <div className="flex h-full items-center justify-center">
       <div className="space-y-6 text-center">
@@ -27,7 +31,7 @@ export function EmptyState({ onUploadClick }: EmptyStateProps) {
             opacity: 0,
           }}
         >
-          Welcome to Jewelshot Studio
+          {t.studio.title}
         </h2>
 
         {/* Subtitle - Third to appear */}
@@ -38,7 +42,7 @@ export function EmptyState({ onUploadClick }: EmptyStateProps) {
             opacity: 0,
           }}
         >
-          Upload an image to start editing
+          {t.empty.startByUploading}
         </p>
 
         {/* Button - Last to appear with pulse + floating effect */}
@@ -66,11 +70,11 @@ export function EmptyState({ onUploadClick }: EmptyStateProps) {
           <button
             onClick={onUploadClick}
             className="relative inline-flex items-center gap-2 rounded-xl border border-theme-primary/40 bg-gradient-to-br from-theme-primary/15 to-theme-primary-dark/10 px-6 py-3 font-semibold text-white transition-all hover:scale-105 hover:border-theme-primary/60 hover:shadow-[0_4px_16px_var(--theme-glow)]"
-            title="Upload Image (Ctrl+O)"
-            aria-label="Upload Image"
+            title={t.studio.uploadImage + ' (Ctrl+O)'}
+            aria-label={t.studio.uploadImage}
           >
             <Upload className="h-5 w-5" aria-hidden="true" />
-            Upload Image
+            {t.studio.uploadImage}
           </button>
         </div>
       </div>

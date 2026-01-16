@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useLanguage } from '@/lib/i18n';
 
 interface ViewModeSelectorProps {
   viewMode: 'normal' | 'side-by-side';
@@ -13,6 +14,8 @@ export function ViewModeSelector({
   onViewModeChange,
   disabled = false,
 }: ViewModeSelectorProps) {
+  const { t } = useLanguage();
+  
   return (
     <div className="flex items-center gap-0.5 rounded-lg border border-[rgba(139,92,246,0.2)] bg-[rgba(10,10,10,0.8)] p-0.5 backdrop-blur-[16px]">
       {/* Normal View */}
@@ -24,7 +27,7 @@ export function ViewModeSelector({
             ? 'bg-[rgba(139,92,246,0.2)] text-[rgba(196,181,253,1)]'
             : 'text-[rgba(196,181,253,0.6)] hover:text-[rgba(196,181,253,0.8)]'
         } ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
-        title="Normal View"
+        title={t.tooltips.normalView}
       >
         <svg
           width="14"
@@ -38,7 +41,7 @@ export function ViewModeSelector({
         >
           <rect x="3" y="3" width="18" height="18" rx="2" />
         </svg>
-        <span>Normal</span>
+        <span>{t.tooltips.normalView}</span>
       </button>
 
       {/* Side by Side View */}
@@ -50,7 +53,7 @@ export function ViewModeSelector({
             ? 'bg-[rgba(139,92,246,0.2)] text-[rgba(196,181,253,1)]'
             : 'text-[rgba(196,181,253,0.6)] hover:text-[rgba(196,181,253,0.8)]'
         } ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
-        title="Side by Side Comparison"
+        title={t.tooltips.sideBySide}
       >
         <svg
           width="14"
@@ -65,7 +68,7 @@ export function ViewModeSelector({
           <rect x="3" y="3" width="7" height="18" rx="1" />
           <rect x="14" y="3" width="7" height="18" rx="1" />
         </svg>
-        <span>Compare</span>
+        <span>{t.common.compare}</span>
       </button>
     </div>
   );

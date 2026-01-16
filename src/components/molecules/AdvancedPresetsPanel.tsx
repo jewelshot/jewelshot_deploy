@@ -11,6 +11,7 @@ import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { ChevronDown, Sparkles, RotateCcw, Shuffle } from 'lucide-react';
 import { FaceVisibility } from '@/lib/generation-settings-storage';
 import { buildAdvancedPrompt } from '@/lib/prompt-builder';
+import { useLanguage } from '@/lib/i18n';
 
 // ============================================
 // TYPES
@@ -411,6 +412,7 @@ export function AdvancedPresetsPanel({
   onGenerate,
   disabled = false,
 }: AdvancedPresetsPanelProps) {
+  const { t } = useLanguage();
   const initialSelections: AdvancedSelections = {
     style: null, modelPose: null, setting: null, mood: null,
     hairType: null, hairColor: null, nailType: null, nailColor: null, skinTone: null, makeup: null,
@@ -637,7 +639,7 @@ export function AdvancedPresetsPanel({
       )}
 
       {/* Style */}
-      <CollapsibleSection title="Style" isOpen={openSections.style} onToggle={() => toggleSection('style')} badge={selections.style ? '1' : undefined}>
+      <CollapsibleSection title={t.presets.style} isOpen={openSections.style} onToggle={() => toggleSection('style')} badge={selections.style ? '1' : undefined}>
         <div className="grid grid-cols-2 gap-1">
           {STYLE_OPTIONS.map(o => (
             <OptionButton key={o.id} label={o.label} description={o.description} isSelected={selections.style === o.id} onClick={() => updateSelection('style', o.id)} />
@@ -646,7 +648,7 @@ export function AdvancedPresetsPanel({
       </CollapsibleSection>
 
       {/* Model Pose */}
-      <CollapsibleSection title="Model Pose" isOpen={openSections.model} onToggle={() => toggleSection('model')} badge={selections.modelPose ? '1' : undefined}>
+      <CollapsibleSection title={t.presets.modelPose} isOpen={openSections.model} onToggle={() => toggleSection('model')} badge={selections.modelPose ? '1' : undefined}>
         <div className="grid grid-cols-2 gap-1">
           {filteredModelPoses.map(o => (
             <OptionButton key={o.id} label={o.label} description={o.description} isSelected={selections.modelPose === o.id} onClick={() => updateSelection('modelPose', o.id)} />
@@ -657,7 +659,7 @@ export function AdvancedPresetsPanel({
       {/* Model Appearance */}
       {selections.modelPose && selections.modelPose !== 'product-only' && (
         <CollapsibleSection 
-          title="Model Appearance" 
+          title={t.presets.modelAppearance} 
           isOpen={openSections.appearance} 
           onToggle={() => toggleSection('appearance')}
           badge={gender === 'women' 
@@ -667,7 +669,7 @@ export function AdvancedPresetsPanel({
         >
           {gender === 'women' ? (
             <>
-              <SubSection title="Hair Type">
+              <SubSection title={t.presets.hairType}>
                 <div className="grid grid-cols-2 gap-1">
                   {HAIR_TYPE_WOMEN.map(o => (
                     <OptionButton key={o.id} label={o.label} isSelected={selections.hairType === o.id} onClick={() => updateSelection('hairType', o.id)} />
@@ -675,7 +677,7 @@ export function AdvancedPresetsPanel({
                 </div>
               </SubSection>
 
-              <SubSection title="Hair Color">
+              <SubSection title={t.presets.hairColor}>
                 <div className="flex flex-wrap gap-2">
                   {HAIR_COLORS.map(c => (
                     <ColorDot key={c.id} color={c.hex} label={c.label} isSelected={selections.hairColor === c.id} onClick={() => updateSelection('hairColor', c.id)} />
@@ -683,7 +685,7 @@ export function AdvancedPresetsPanel({
                 </div>
               </SubSection>
 
-              <SubSection title="Nail Type">
+              <SubSection title={t.presets.nailType}>
                 <div className="grid grid-cols-2 gap-1">
                   {NAIL_TYPES.map(o => (
                     <OptionButton key={o.id} label={o.label} isSelected={selections.nailType === o.id} onClick={() => updateSelection('nailType', o.id)} />
@@ -691,7 +693,7 @@ export function AdvancedPresetsPanel({
                 </div>
               </SubSection>
 
-              <SubSection title="Nail Color">
+              <SubSection title={t.presets.nailColor}>
                 <div className="flex flex-wrap gap-2">
                   {NAIL_COLORS.map(c => (
                     <ColorDot key={c.id} color={c.hex} label={c.label} isSelected={selections.nailColor === c.id} onClick={() => updateSelection('nailColor', c.id)} />
@@ -699,7 +701,7 @@ export function AdvancedPresetsPanel({
                 </div>
               </SubSection>
 
-              <SubSection title="Makeup">
+              <SubSection title={t.presets.makeup}>
                 <div className="grid grid-cols-2 gap-1">
                   {MAKEUP_STYLES.map(o => (
                     <OptionButton key={o.id} label={o.label} isSelected={selections.makeup === o.id} onClick={() => updateSelection('makeup', o.id)} />
@@ -709,7 +711,7 @@ export function AdvancedPresetsPanel({
             </>
           ) : (
             <>
-              <SubSection title="Hair Style">
+              <SubSection title={t.presets.hairStyle}>
                 <div className="grid grid-cols-2 gap-1">
                   {HAIR_TYPE_MEN.map(o => (
                     <OptionButton key={o.id} label={o.label} isSelected={selections.hairStyleM === o.id} onClick={() => updateSelection('hairStyleM', o.id)} />
@@ -717,7 +719,7 @@ export function AdvancedPresetsPanel({
                 </div>
               </SubSection>
 
-              <SubSection title="Hair Color">
+              <SubSection title={t.presets.hairColor}>
                 <div className="flex flex-wrap gap-2">
                   {HAIR_COLORS.map(c => (
                     <ColorDot key={c.id} color={c.hex} label={c.label} isSelected={selections.hairColorM === c.id} onClick={() => updateSelection('hairColorM', c.id)} />
@@ -725,7 +727,7 @@ export function AdvancedPresetsPanel({
                 </div>
               </SubSection>
 
-              <SubSection title="Facial Hair">
+              <SubSection title={t.presets.facialHair}>
                 <div className="grid grid-cols-2 gap-1">
                   {FACIAL_HAIR.map(o => (
                     <OptionButton key={o.id} label={o.label} isSelected={selections.facialHair === o.id} onClick={() => updateSelection('facialHair', o.id)} />
@@ -735,7 +737,7 @@ export function AdvancedPresetsPanel({
             </>
           )}
 
-          <SubSection title="Skin Tone">
+          <SubSection title={t.presets.skinTone}>
             <div className="flex flex-wrap gap-2">
               {SKIN_TONES.map(c => (
                 <ColorDot key={c.id} color={c.hex} label={c.label} isSelected={selections.skinTone === c.id} onClick={() => updateSelection('skinTone', c.id)} />
@@ -746,7 +748,7 @@ export function AdvancedPresetsPanel({
       )}
 
       {/* Setting */}
-      <CollapsibleSection title="Setting" isOpen={openSections.setting} onToggle={() => toggleSection('setting')} badge={selections.setting ? '1' : undefined} disabled={!selections.style}>
+      <CollapsibleSection title={t.presets.setting} isOpen={openSections.setting} onToggle={() => toggleSection('setting')} badge={selections.setting ? '1' : undefined} disabled={!selections.style}>
         <div className="grid grid-cols-2 gap-1">
           {filteredSettings.map(o => (
             <OptionButton key={o.id} label={o.label} description={o.description} isSelected={selections.setting === o.id} onClick={() => updateSelection('setting', o.id)} />
@@ -755,7 +757,7 @@ export function AdvancedPresetsPanel({
       </CollapsibleSection>
 
       {/* Mood */}
-      <CollapsibleSection title="Mood" isOpen={openSections.mood} onToggle={() => toggleSection('mood')} badge={selections.mood ? '1' : undefined}>
+      <CollapsibleSection title={t.presets.mood} isOpen={openSections.mood} onToggle={() => toggleSection('mood')} badge={selections.mood ? '1' : undefined}>
         <div className="grid grid-cols-2 gap-1">
           {filteredMoods.map(o => (
             <OptionButton key={o.id} label={o.label} description={o.description} isSelected={selections.mood === o.id} onClick={() => updateSelection('mood', o.id)} />
@@ -765,12 +767,12 @@ export function AdvancedPresetsPanel({
 
       {/* Camera Settings */}
       <CollapsibleSection 
-        title="Camera" 
+        title={t.presets.camera} 
         isOpen={openSections.camera} 
         onToggle={() => toggleSection('camera')}
         badge={[selections.cameraAngle, selections.depthOfField, selections.focalLength].filter(Boolean).length.toString() || undefined}
       >
-        <SubSection title="Angle">
+        <SubSection title={t.presets.angle}>
           <div className="grid grid-cols-2 gap-1">
             {CAMERA_ANGLES.map(o => (
               <OptionButton key={o.id} label={o.label} isSelected={selections.cameraAngle === o.id} onClick={() => updateSelection('cameraAngle', o.id)} />
@@ -778,7 +780,7 @@ export function AdvancedPresetsPanel({
           </div>
         </SubSection>
 
-        <SubSection title="Depth of Field">
+        <SubSection title={t.presets.depthOfField}>
           <div className="grid grid-cols-2 gap-1">
             {DEPTH_OF_FIELD.map(o => (
               <OptionButton key={o.id} label={o.label} description={o.description} isSelected={selections.depthOfField === o.id} onClick={() => updateSelection('depthOfField', o.id)} />
@@ -786,7 +788,7 @@ export function AdvancedPresetsPanel({
           </div>
         </SubSection>
 
-        <SubSection title="Focal Length">
+        <SubSection title={t.presets.focalLength}>
           <div className="grid grid-cols-2 gap-1">
             {FOCAL_LENGTHS.map(o => (
               <OptionButton key={o.id} label={o.label} description={o.description} isSelected={selections.focalLength === o.id} onClick={() => updateSelection('focalLength', o.id)} />
@@ -797,12 +799,12 @@ export function AdvancedPresetsPanel({
 
       {/* Lighting */}
       <CollapsibleSection 
-        title="Lighting" 
+        title={t.presets.lighting} 
         isOpen={openSections.lighting} 
         onToggle={() => toggleSection('lighting')}
         badge={[selections.lightingType, selections.lightingDirection, selections.lightingIntensity].filter(Boolean).length.toString() || undefined}
       >
-        <SubSection title="Type">
+        <SubSection title={t.presets.lightingType}>
           <div className="grid grid-cols-2 gap-1">
             {LIGHTING_TYPES.map(o => (
               <OptionButton key={o.id} label={o.label} isSelected={selections.lightingType === o.id} onClick={() => updateSelection('lightingType', o.id)} />
@@ -810,7 +812,7 @@ export function AdvancedPresetsPanel({
           </div>
         </SubSection>
 
-        <SubSection title="Direction">
+        <SubSection title={t.presets.lightingDirection}>
           <div className="grid grid-cols-2 gap-1">
             {LIGHTING_DIRECTIONS.map(o => (
               <OptionButton key={o.id} label={o.label} isSelected={selections.lightingDirection === o.id} onClick={() => updateSelection('lightingDirection', o.id)} />
@@ -818,7 +820,7 @@ export function AdvancedPresetsPanel({
           </div>
         </SubSection>
 
-        <SubSection title="Intensity">
+        <SubSection title={t.presets.lightingIntensity}>
           <div className="grid grid-cols-2 gap-1">
             {LIGHTING_INTENSITY.map(o => (
               <OptionButton key={o.id} label={o.label} isSelected={selections.lightingIntensity === o.id} onClick={() => updateSelection('lightingIntensity', o.id)} />
@@ -829,12 +831,12 @@ export function AdvancedPresetsPanel({
 
       {/* Color Grading */}
       <CollapsibleSection 
-        title="Color Grading" 
+        title={t.presets.colorGrading} 
         isOpen={openSections.color} 
         onToggle={() => toggleSection('color')}
         badge={selections.colorTemperature ? '1' : undefined}
       >
-        <SubSection title="Temperature">
+        <SubSection title={t.presets.temperature}>
           <div className="grid grid-cols-2 gap-1">
             {COLOR_TEMPERATURES.map(o => (
               <OptionButton key={o.id} label={o.label} description={o.description} isSelected={selections.colorTemperature === o.id} onClick={() => updateSelection('colorTemperature', o.id)} />
@@ -849,7 +851,7 @@ export function AdvancedPresetsPanel({
         <button
           onClick={handleRandomize}
           disabled={disabled}
-          title="Randomize all settings"
+          title={t.studio.randomize}
           className={`flex items-center justify-center rounded-lg px-3 py-2.5 transition-all ${
             !disabled
               ? 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white border border-white/10'
@@ -870,14 +872,14 @@ export function AdvancedPresetsPanel({
           }`}
         >
           <Sparkles className="h-3.5 w-3.5" />
-          Generate
+          {t.studio.generate}
         </button>
 
         {/* Random Generate Button */}
         <button
           onClick={handleRandomGenerate}
           disabled={disabled}
-          title="Random generate"
+          title={t.studio.randomGenerate}
           className={`flex items-center justify-center gap-1.5 rounded-lg px-3 py-2.5 text-xs font-medium transition-all ${
             !disabled
               ? 'bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 border border-purple-500/30'

@@ -2,6 +2,7 @@
 import React from 'react';
 
 import { X, Keyboard } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n';
 
 interface KeyboardShortcutsModalProps {
   isOpen: boolean;
@@ -10,41 +11,41 @@ interface KeyboardShortcutsModalProps {
 
 interface Shortcut {
   keys: string[];
-  description: string;
-  category: 'File' | 'View' | 'Edit' | 'Navigation';
+  descriptionKey: string;
+  category: 'file' | 'view' | 'edit' | 'navigation';
 }
 
 const shortcuts: Shortcut[] = [
   // File Operations
-  { keys: ['Ctrl', 'O'], description: 'Open image', category: 'File' },
-  { keys: ['Ctrl', 'S'], description: 'Download image', category: 'File' },
-  { keys: ['Delete'], description: 'Close image', category: 'File' },
-  { keys: ['Backspace'], description: 'Close image', category: 'File' },
+  { keys: ['Ctrl', 'O'], descriptionKey: 'openImage', category: 'file' },
+  { keys: ['Ctrl', 'S'], descriptionKey: 'downloadImage', category: 'file' },
+  { keys: ['Delete'], descriptionKey: 'closeImage', category: 'file' },
+  { keys: ['Backspace'], descriptionKey: 'closeImage', category: 'file' },
 
   // View Controls
-  { keys: ['+', '='], description: 'Zoom in', category: 'View' },
-  { keys: ['-'], description: 'Zoom out', category: 'View' },
-  { keys: ['0'], description: 'Fit to screen', category: 'View' },
-  { keys: ['F'], description: 'Toggle fullscreen', category: 'View' },
-  { keys: ['C'], description: 'Toggle canvas controls', category: 'View' },
+  { keys: ['+', '='], descriptionKey: 'zoomIn', category: 'view' },
+  { keys: ['-'], descriptionKey: 'zoomOut', category: 'view' },
+  { keys: ['0'], descriptionKey: 'fitScreen', category: 'view' },
+  { keys: ['F'], descriptionKey: 'fullscreen', category: 'view' },
+  { keys: ['C'], descriptionKey: 'canvasControls', category: 'view' },
 
   // Edit Operations
-  { keys: ['E'], description: 'Toggle edit panel', category: 'Edit' },
-  { keys: ['Esc'], description: 'Close edit panel/crop', category: 'Edit' },
+  { keys: ['E'], descriptionKey: 'editPanel', category: 'edit' },
+  { keys: ['Esc'], descriptionKey: 'closePanel', category: 'edit' },
 
   // Navigation
   {
     keys: ['?'],
-    description: 'Show keyboard shortcuts',
-    category: 'Navigation',
+    descriptionKey: 'shortcuts',
+    category: 'navigation',
   },
 ];
 
 const categoryOrder: Shortcut['category'][] = [
-  'File',
-  'View',
-  'Edit',
-  'Navigation',
+  'file',
+  'view',
+  'edit',
+  'navigation',
 ];
 
 /**
@@ -54,7 +55,30 @@ export function KeyboardShortcutsModal({
   isOpen,
   onClose,
 }: KeyboardShortcutsModalProps) {
+  const { t } = useLanguage();
+  
   if (!isOpen) return null;
+
+  const descriptionMap: Record<string, string> = {
+    openImage: t.actions.uploadImage,
+    downloadImage: t.common.download,
+    closeImage: t.canvas.closeImage,
+    zoomIn: t.canvas.zoomIn,
+    zoomOut: t.canvas.zoomOut,
+    fitScreen: t.canvas.fitToScreen,
+    fullscreen: 'Fullscreen',
+    canvasControls: 'Canvas Controls',
+    editPanel: t.common.edit,
+    closePanel: t.common.close,
+    shortcuts: t.modals.keyboardShortcuts,
+  };
+
+  const categoryLabelMap: Record<string, string> = {
+    file: 'File',
+    view: t.common.view,
+    edit: t.common.edit,
+    navigation: 'Navigation',
+  };
 
   const groupedShortcuts = shortcuts.reduce(
     (acc, shortcut) => {
@@ -84,17 +108,17 @@ export function KeyboardShortcutsModal({
             </div>
             <div>
               <h2 className="text-xl font-bold text-white">
-                Keyboard Shortcuts
+                {t.modals.keyboardShortcuts}
               </h2>
               <p className="text-sm text-white/60">
-                Speed up your workflow with these shortcuts
+                Speed up your workflow
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
             className="rounded-lg p-2 text-white/60 transition-colors hover:bg-white/10 hover:text-white"
-            aria-label="Close"
+            aria-label={t.common.close}
           >
             <X className="h-5 w-5" />
           </button>
@@ -109,7 +133,7 @@ export function KeyboardShortcutsModal({
             return (
               <div key={category}>
                 <h3 className="mb-3 text-sm font-semibold text-purple-400">
-                  {category}
+                  {categoryLabelMap[category]}
                 </h3>
                 <div className="space-y-2">
                   {categoryShortcuts.map((shortcut, index) => (
@@ -118,7 +142,7 @@ export function KeyboardShortcutsModal({
                       className="flex items-center justify-between gap-4 rounded-lg bg-white/5 p-3"
                     >
                       <span className="text-sm text-white/80">
-                        {shortcut.description}
+                        {descriptionMap[shortcut.descriptionKey] || shortcut.descriptionKey}
                       </span>
                       <div className="flex gap-1">
                         {shortcut.keys.map((key, keyIndex) => (
@@ -149,7 +173,7 @@ export function KeyboardShortcutsModal({
             onClick={onClose}
             className="rounded-lg border border-purple-500/40 bg-purple-600/20 px-4 py-2 text-sm font-semibold text-white transition-all hover:border-purple-500/60 hover:bg-purple-600/30"
           >
-            Got it
+            {t.common.done}
           </button>
         </div>
       </div>

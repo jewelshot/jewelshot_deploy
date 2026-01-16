@@ -9,9 +9,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { Upload, Camera, Save, X } from 'lucide-react';
+import { Camera, Save, X } from 'lucide-react';
 import Avatar from '@/components/atoms/Avatar';
 import { createScopedLogger } from '@/lib/logger';
+import { useLanguage } from '@/lib/i18n';
 
 const logger = createScopedLogger('ProfileInfo');
 
@@ -23,6 +24,7 @@ interface ProfileData {
 }
 
 export function ProfileInfoSection() {
+  const { t } = useLanguage();
   const [profile, setProfile] = useState<ProfileData>({
     full_name: '',
     email: '',
@@ -86,13 +88,13 @@ export function ProfileInfoSection() {
 
     // Validate file size (max 2MB)
     if (file.size > 2 * 1024 * 1024) {
-      setMessage({ type: 'error', text: 'File size must be less than 2MB' });
+      setMessage({ type: 'error', text: t.errors.fileTooLarge });
       return;
     }
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      setMessage({ type: 'error', text: 'Please upload an image file' });
+      setMessage({ type: 'error', text: t.errors.invalidFile });
       return;
     }
 
@@ -122,7 +124,7 @@ export function ProfileInfoSection() {
       if (uploadError) {
         logger.error('Upload error details:', uploadError);
         throw new Error(
-          uploadError.message || 'Storage upload failed. Please check Supabase Storage configuration.'
+          uploadError.message || t.errors.uploadFailed
         );
       }
 
@@ -151,7 +153,7 @@ export function ProfileInfoSection() {
 
       if (profileError) {
         logger.error('Profile update error:', profileError);
-        throw new Error('Avatar uploaded but failed to save to profile');
+        throw new Error(t.errors.uploadFailed);
       }
 
       // Also update auth user metadata
@@ -162,7 +164,7 @@ export function ProfileInfoSection() {
         },
       });
 
-      setMessage({ type: 'success', text: 'Avatar uploaded successfully! Refreshing...' });
+      setMessage({ type: 'success', text: t.success.uploaded });
 
       // Reload page after 1 second to update sidebar avatar
       setTimeout(() => {
@@ -172,7 +174,7 @@ export function ProfileInfoSection() {
       logger.error('Avatar upload error:', error);
       setMessage({
         type: 'error',
-        text: error.message || 'Failed to upload avatar. Please check console for details.',
+        text: error.message || t.errors.uploadFailed,
       });
     } finally {
       setUploadingAvatar(false);
@@ -218,7 +220,7 @@ export function ProfileInfoSection() {
 
       if (metadataError) throw metadataError;
 
-      setMessage({ type: 'success', text: 'Profile updated successfully!' });
+      setMessage({ type: 'success', text: t.success.profileUpdated });
 
       // Reload window after 1s to refresh sidebar
       setTimeout(() => window.location.reload(), 1000);
@@ -226,7 +228,7 @@ export function ProfileInfoSection() {
       logger.error('Profile update error:', error);
       setMessage({
         type: 'error',
-        text: 'Failed to update profile. Please try again.',
+        text: t.errors.generic,
       });
     } finally {
       setSaving(false);
@@ -238,7 +240,7 @@ export function ProfileInfoSection() {
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-purple-500 border-t-transparent"></div>
-          <p className="text-sm text-white/70">Loading profile...</p>
+          <p className="text-sm text-white/70">{t.common.loading}</p>
         </div>
       </div>
     );
@@ -269,7 +271,7 @@ export function ProfileInfoSection() {
         {/* Avatar Section */}
         <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
           <h3 className="mb-4 text-lg font-semibold text-white">
-            Profile Picture
+            {t.profile.avatar}
           </h3>
           <div className="flex items-center gap-6">
             {/* Avatar Preview */}
@@ -313,10 +315,10 @@ export function ProfileInfoSection() {
                 className="flex items-center gap-2 rounded-lg border border-purple-500/30 bg-purple-500/10 px-4 py-2 text-sm font-medium text-purple-400 transition-all hover:border-purple-500/50 hover:bg-purple-500/20 disabled:opacity-50"
               >
                 <Camera className="h-4 w-4" />
-                {uploadingAvatar ? 'Uploading...' : 'Change Avatar'}
+                {uploadingAvatar ? t.common.loading : t.common.upload}
               </button>
               <p className="mt-2 text-xs text-white/50">
-                JPG, PNG or GIF. Max 2MB.
+                JPG, PNG, GIF. Max 2MB.
               </p>
             </div>
           </div>
@@ -325,7 +327,7 @@ export function ProfileInfoSection() {
         {/* Profile Information */}
         <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
           <h3 className="mb-4 text-lg font-semibold text-white">
-            Personal Information
+            {t.profile.account}
           </h3>
           <div className="space-y-4">
             {/* Full Name */}
@@ -334,7 +336,7 @@ export function ProfileInfoSection() {
                 htmlFor="full_name"
                 className="mb-2 block text-sm font-medium text-white/80"
               >
-                Full Name
+                {t.profile.fullName}
               </label>
               <input
                 type="text"
@@ -344,7 +346,7 @@ export function ProfileInfoSection() {
                   setProfile({ ...profile, full_name: e.target.value })
                 }
                 className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white placeholder-white/40 transition-all focus:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
-                placeholder="Enter your full name"
+                placeholder={t.placeholders.enterName}
               />
             </div>
 
@@ -354,7 +356,7 @@ export function ProfileInfoSection() {
                 htmlFor="email"
                 className="mb-2 block text-sm font-medium text-white/80"
               >
-                Email
+                {t.profile.email}
               </label>
               <input
                 type="email"
@@ -363,9 +365,6 @@ export function ProfileInfoSection() {
                 disabled
                 className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white/60 placeholder-white/40 opacity-60"
               />
-              <p className="mt-1 text-xs text-white/50">
-                Email cannot be changed
-              </p>
             </div>
 
             {/* Bio */}
@@ -374,7 +373,7 @@ export function ProfileInfoSection() {
                 htmlFor="bio"
                 className="mb-2 block text-sm font-medium text-white/80"
               >
-                Bio
+                {t.profile.bio}
               </label>
               <textarea
                 id="bio"
@@ -384,7 +383,7 @@ export function ProfileInfoSection() {
                 }
                 rows={4}
                 className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white placeholder-white/40 transition-all focus:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
-                placeholder="Tell us about yourself..."
+                placeholder={t.placeholders.enterDescription}
               />
             </div>
           </div>
@@ -398,7 +397,7 @@ export function ProfileInfoSection() {
             className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-2.5 text-sm font-medium text-white transition-all hover:from-purple-600 hover:to-pink-600 disabled:opacity-50"
           >
             <Save className="h-4 w-4" />
-            {saving ? 'Saving...' : 'Save Changes'}
+            {saving ? t.common.loading : t.common.save}
           </button>
         </div>
       </form>
@@ -407,4 +406,3 @@ export function ProfileInfoSection() {
 }
 
 export default ProfileInfoSection;
-

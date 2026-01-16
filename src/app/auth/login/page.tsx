@@ -9,11 +9,13 @@ import { PrimaryButton } from '@/components/atoms/PrimaryButton';
 import { SocialButton } from '@/components/atoms/SocialButton';
 import { createClient } from '@/lib/supabase/client';
 import { AuroraBackground } from '@/components/atoms/AuroraBackground';
+import { useLanguage } from '@/lib/i18n';
 
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get('redirectTo') || '/studio';
+  const { t } = useLanguage();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -36,7 +38,7 @@ function LoginContent() {
 
       router.push(redirectTo);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to sign in');
+      setError(err instanceof Error ? err.message : t.errors.generic);
     } finally {
       setLoading(false);
     }
@@ -54,7 +56,7 @@ function LoginContent() {
 
       if (signInError) throw signInError;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to sign in');
+      setError(err instanceof Error ? err.message : t.errors.generic);
     }
   };
 
@@ -126,8 +128,8 @@ function LoginContent() {
 
           {/* Footer */}
           <div className="flex items-center gap-6 text-sm text-white/40">
-            <Link href="/privacy" className="hover:text-white/60">Privacy</Link>
-            <Link href="/terms" className="hover:text-white/60">Terms</Link>
+            <Link href="/privacy" className="hover:text-white/60">{t.nav.privacy}</Link>
+            <Link href="/terms" className="hover:text-white/60">{t.nav.terms}</Link>
             <Link href="/security" className="hover:text-white/60">Security</Link>
           </div>
         </div>
@@ -141,7 +143,7 @@ function LoginContent() {
               className="group mb-8 flex items-center gap-2 text-white/60 transition-colors hover:text-white lg:hidden"
             >
               <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-              <span className="text-sm">Back to home</span>
+              <span className="text-sm">{t.common.back}</span>
             </Link>
 
             {/* Login Card */}
@@ -153,9 +155,9 @@ function LoginContent() {
                     <span className="text-xl font-bold text-white">J</span>
                   </div>
                 </div>
-                <h2 className="text-2xl font-bold text-white">Welcome back</h2>
+                <h2 className="text-2xl font-bold text-white">{t.auth.welcomeBack}</h2>
                 <p className="mt-2 text-white/60">
-                  Sign in to continue to your dashboard
+                  {t.auth.signInToContinue}
                 </p>
               </div>
 
@@ -163,11 +165,11 @@ function LoginContent() {
                 {/* Email */}
                 <div>
                   <label htmlFor="email" className="mb-2 block text-sm font-medium text-white/80">
-                    Email address
+                    {t.auth.email}
                   </label>
                   <AuthInput
                     type="email"
-                    placeholder="you@company.com"
+                    placeholder={t.placeholders.enterEmail}
                     value={email}
                     onChange={setEmail}
                     icon={Mail}
@@ -179,18 +181,18 @@ function LoginContent() {
                 <div>
                   <div className="mb-2 flex items-center justify-between">
                     <label htmlFor="password" className="text-sm font-medium text-white/80">
-                      Password
+                      {t.auth.password}
                     </label>
                     <Link
                       href="/auth/reset-password"
                       className="text-sm text-purple-400 transition-colors hover:text-purple-300"
                     >
-                      Forgot password?
+                      {t.auth.forgotPassword}
                     </Link>
                   </div>
                   <AuthInput
                     type="password"
-                    placeholder="Enter your password"
+                    placeholder={t.placeholders.enterPassword}
                     value={password}
                     onChange={setPassword}
                     icon={Lock}
@@ -212,14 +214,14 @@ function LoginContent() {
                   size="lg"
                   disabled={loading}
                 >
-                  {loading ? 'Signing in...' : 'Sign in'}
+                  {loading ? t.common.loading : t.auth.login}
                 </PrimaryButton>
               </form>
 
               {/* Divider */}
               <div className="my-6 flex items-center gap-3">
                 <div className="h-px flex-1 bg-white/10" />
-                <span className="text-sm text-white/40">or continue with</span>
+                <span className="text-sm text-white/40">{t.auth.orContinueWith}</span>
                 <div className="h-px flex-1 bg-white/10" />
               </div>
 
@@ -232,12 +234,12 @@ function LoginContent() {
 
               {/* Sign Up Link */}
               <div className="mt-6 text-center text-sm text-white/60">
-                New to Jewelshot?{' '}
+                {t.auth.dontHaveAccount}{' '}
                 <Link
                   href="/auth/signup"
                   className="font-medium text-purple-400 transition-colors hover:text-purple-300"
                 >
-                  Create an account
+                  {t.auth.createAccount}
                 </Link>
               </div>
 
@@ -255,13 +257,15 @@ function LoginContent() {
 }
 
 export default function LoginPage() {
+  const { t } = useLanguage();
+  
   return (
     <Suspense
       fallback={
         <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
           <div className="flex items-center gap-2 text-white/60">
             <RefreshCw className="h-5 w-5 animate-spin" />
-            <span>Loading...</span>
+            <span>{t.common.loading}</span>
           </div>
         </div>
       }

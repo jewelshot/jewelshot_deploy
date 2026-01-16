@@ -293,27 +293,32 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
   // ZOOM CONTROLS
   // ============================================================================
 
+  // Zoom constants
+  const ZOOM_STEP = 0.2; // 20% zoom per click
+  const MIN_ZOOM = 0.1;  // 10% minimum
+  const MAX_ZOOM = 8.0;  // 800% maximum
+
   const handleZoomIn = useCallback(() => {
     if (viewMode === 'side-by-side') {
       if (activeImage === 'left') {
-        setLeftImageScale((prev) => Math.min(prev + 0.1, 3.0));
+        setLeftImageScale((prev) => Math.min(prev + ZOOM_STEP, MAX_ZOOM));
       } else {
-        setRightImageScale((prev) => Math.min(prev + 0.1, 3.0));
+        setRightImageScale((prev) => Math.min(prev + ZOOM_STEP, MAX_ZOOM));
       }
     } else {
-      setScale((prev) => Math.min(prev + 0.1, 3.0));
+      setScale((prev) => Math.min(prev + ZOOM_STEP, MAX_ZOOM));
     }
   }, [viewMode, activeImage, setScale, setLeftImageScale, setRightImageScale]);
 
   const handleZoomOut = useCallback(() => {
     if (viewMode === 'side-by-side') {
       if (activeImage === 'left') {
-        setLeftImageScale((prev) => Math.max(prev - 0.1, 0.1));
+        setLeftImageScale((prev) => Math.max(prev - ZOOM_STEP, MIN_ZOOM));
       } else {
-        setRightImageScale((prev) => Math.max(prev - 0.1, 0.1));
+        setRightImageScale((prev) => Math.max(prev - ZOOM_STEP, MIN_ZOOM));
       }
     } else {
-      setScale((prev) => Math.max(prev - 0.1, 0.1));
+      setScale((prev) => Math.max(prev - ZOOM_STEP, MIN_ZOOM));
     }
   }, [viewMode, activeImage, setScale, setLeftImageScale, setRightImageScale]);
 
