@@ -58,7 +58,7 @@ export const studioCommercial: PresetCategory = {
     createPreset('dewy-studio', 'Dewy Studio', 'Glowing skin, wet-look', 'studio-commercial'),
     createPreset('butterfly-light', 'Butterfly Light', 'Paramount lighting, studio', 'studio-commercial'),
     createPreset('diamond-studio', 'Diamond Studio', 'Professional gemstone', 'studio-commercial'),
-    createPreset('macro', 'Macro', 'Extreme close-up details', 'studio-commercial'),
+    createPreset('close-up', 'Macro', 'Extreme close-up details', 'studio-commercial'),
     createPreset('sharp-strobe', 'Sharp Strobe', 'Hard light, facet sparkle', 'studio-commercial'),
     createPreset('octabox-luxury', 'Octabox Luxury', 'Clamshell lighting, minimal', 'studio-commercial'),
     createPreset('ceo-diamond', 'CEO Diamond', 'Low angle, tuxedo power', 'studio-commercial'),
