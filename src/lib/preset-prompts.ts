@@ -7219,6 +7219,70 @@ OUTPUT: Crows feet joy. Hysterical laughter. Expression lines. Raw authentic.`;
     },
   },
 
+  'candid-laugh': {
+    name: 'Candid Laugh',
+    requiresModel: true,
+    buildPrompt: (
+      jewelryType: string,
+      gender?: string,
+      aspectRatio: string = '3:4',
+      showFace: FaceVisibility = 'show'
+    ) => {
+      const genderText = gender === 'women' ? 'woman' : gender === 'men' ? 'man' : 'model';
+      const faceInstructions = getFaceInstructions(showFace, jewelryType);
+
+      return `Candid studio portrait capturing a genuine moment. A ${genderText} caught mid-laugh in a real, unposed moment, wearing ${jewelryType}. Soft studio lighting with clean background.
+
+${faceInstructions.framing}
+${faceInstructions.forbidden ? `\n${faceInstructions.forbidden}\n` : ''}
+CANDID MOMENT:
+Caught mid-laugh
+Unposed, spontaneous
+Real emotional moment
+Not looking at camera
+Natural body language
+
+EXPRESSION:
+Genuine laughter
+Eyes crinkled naturally
+Relaxed, authentic
+True emotion captured
+
+LIGHTING:
+Soft studio lighting
+Clean white/grey background
+Natural, flattering
+Documentary feel
+
+SKIN:
+Natural texture
+Real appearance
+Not heavily retouched
+Authentic beauty
+
+JEWELRY:
+${jewelryType} in sharp focus
+ONLY the specified jewelry
+Natural placement
+Real-life showcase
+
+TECHNICAL:
+85mm lens equivalent
+Candid perspective
+Documentary mood
+Aspect ratio: ${aspectRatio}
+
+AVOID:
+Posed, fake expression
+Looking at camera
+Over-styled appearance
+Heavy makeup
+Artificial lighting
+
+OUTPUT: Candid laugh. Real moment. Genuine emotion. Unposed beauty.`;
+    },
+  },
+
   'duo-friends': {
     name: 'Duo Friends',
     requiresModel: true,
