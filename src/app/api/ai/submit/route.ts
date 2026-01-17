@@ -22,6 +22,8 @@ import { createApiError, ApiErrorCode, withErrorHandling } from '@/lib/api-error
 import { validateAIParams, ValidationError } from '@/lib/validation';
 import { addJob, isQueueAvailable } from '@/lib/queue/client';
 import { processAIJob } from '@/lib/queue/processors/ai-processor';
+import { tryAcquireUserSlot, UserTier } from '@/lib/queue/user-concurrency';
+import { hasKeyCapacity, getKeyPoolStats } from '@/lib/queue/api-key-manager';
 
 // ============================================
 // POST /api/ai/submit
@@ -105,11 +107,52 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     }
 
     // ============================================
+    // SYSTEM CAPACITY CHECK
+    // ============================================
+    
+    if (!hasKeyCapacity()) {
+      const stats = getKeyPoolStats();
+      console.warn(`[API/submit] System at capacity: ${stats.utilizationPercent}%`);
+      return NextResponse.json(
+        { 
+          error: 'System busy', 
+          message: 'The system is currently processing many requests. Please try again in a few seconds.',
+          stats: {
+            utilization: stats.utilizationPercent,
+            available: stats.availableCapacity,
+          },
+        },
+        { status: 503 }
+      );
+    }
+
+    // ============================================
+    // PER-USER CONCURRENCY CHECK
+    // ============================================
+    
+    // Determine user tier (default to 'free', can be enhanced with profile lookup)
+    const userTier: UserTier = 'basic'; // TODO: Get from user profile
+    
+    const userSlot = tryAcquireUserSlot(user.id, userTier);
+    if (!userSlot.acquired) {
+      return NextResponse.json(
+        { 
+          error: 'Too many concurrent requests', 
+          message: `You have ${userSlot.activeCount} active requests. Maximum allowed: ${userSlot.limit}. Please wait for current requests to complete.`,
+          activeRequests: userSlot.activeCount,
+          limit: userSlot.limit,
+        },
+        { status: 429 }
+      );
+    }
+
+    // ============================================
     // CREDIT CHECK & RESERVATION
     // ============================================
     
     const availableCredits = await getAvailableCredits(user.id);
     if (availableCredits <= 0) {
+      userSlot.release(); // Release user slot
       return createApiError(ApiErrorCode.INSUFFICIENT_CREDITS);
     }
 
@@ -117,6 +160,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     try {
       creditReservation = await reserveCredit(user.id, operation);
     } catch (error: any) {
+      userSlot.release(); // Release user slot
       console.error('[API] Credit reservation failed:', error);
       return NextResponse.json(
         { error: error.message || 'Insufficient credits' },
@@ -127,6 +171,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     // Check FAL API key
     const hasFalKey = !!(process.env.FAL_KEY || process.env.FAL_AI_KEY_1);
     if (!hasFalKey) {
+      userSlot.release(); // Release user slot
       await refundCredit(creditReservation.transactionId);
       return NextResponse.json(
         { error: 'AI service not configured' },
@@ -173,11 +218,16 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
           params, 
           priority, 
           metadata, 
-          creditReservation
+          creditReservation,
+          userSlot.release
         );
       }
 
       console.log(`[API/submit] Job queued: ${queueResult.jobId} in ${queueResult.queueName}`);
+
+      // Note: User slot will be released when job completes via worker
+      // For queue-based processing, we track via job metadata
+      userSlot.release(); // Release immediately for queue (worker handles capacity)
 
       // Return immediately with job ID
       return NextResponse.json({
@@ -205,7 +255,8 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
       params,
       priority,
       metadata,
-      creditReservation
+      creditReservation,
+      userSlot.release
     );
 });
 
@@ -220,7 +271,8 @@ async function processSynchronously(
   params: Record<string, any>,
   priority: JobPriority,
   metadata: any,
-  creditReservation: { transactionId: string; amount: number }
+  creditReservation: { transactionId: string; amount: number },
+  releaseUserSlot: () => void
 ) {
   console.log(`[API/submit] Processing ${operation} synchronously for user ${userId}`);
 
@@ -237,6 +289,9 @@ async function processSynchronously(
         jobId,
       },
     });
+
+    // Always release user slot when done
+    releaseUserSlot();
 
     if (result.success) {
       await confirmCredit(creditReservation.transactionId, userId);
@@ -274,6 +329,9 @@ async function processSynchronously(
       );
     }
   } catch (error: any) {
+    // Always release user slot on error
+    releaseUserSlot();
+    
     await refundCredit(creditReservation.transactionId);
     console.error(`[API/submit] Error: ${jobId}`, error);
 

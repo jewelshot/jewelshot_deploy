@@ -74,6 +74,8 @@ export interface AIJobResult {
     apiKeyUsed?: number; // Which key index was used (for debugging)
     retryCount?: number;
     processingTime?: number;
+    keyIndex?: number; // API key index used
+    attempt?: number; // Which retry attempt succeeded
   };
 }
 
