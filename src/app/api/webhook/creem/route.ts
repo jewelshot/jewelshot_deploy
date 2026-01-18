@@ -23,12 +23,24 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// Plan configurations - credits per plan
+// Plan configurations - credits per plan (BASIC, STUDIO, PRO, ENTERPRISE)
 const PLAN_CREDITS: Record<string, number> = {
-  'free': 10,
-  'pro': 500,
-  'enterprise': 999999, // Unlimited
+  'free': 5,          // Welcome credits only
+  'basic': 50,        // $9/month
+  'studio': 200,      // $29/month
+  'pro': 500,         // $79/month
+  'enterprise': 999999, // $199/month - Unlimited
 };
+
+// Helper to normalize plan name from product name
+function normalizePlanName(productName: string): string {
+  const lower = productName.toLowerCase();
+  if (lower.includes('enterprise')) return 'enterprise';
+  if (lower.includes('pro')) return 'pro';
+  if (lower.includes('studio')) return 'studio';
+  if (lower.includes('basic')) return 'basic';
+  return 'basic'; // Default to basic for unknown plans
+}
 
 /**
  * Grant subscription credits using unified RPC function
@@ -43,14 +55,9 @@ async function grantSubscriptionCredits(
   console.log(`[Creem Webhook] Granting subscription credits to user ${userId} (${email}) for ${productName}`);
   
   try {
-    // Determine plan from product name
-    const planName = productName.toLowerCase().includes('enterprise') 
-      ? 'enterprise' 
-      : productName.toLowerCase().includes('pro') 
-        ? 'pro' 
-        : 'free';
-    
-    const credits = PLAN_CREDITS[planName] || PLAN_CREDITS['pro'];
+    // Determine plan from product name using helper
+    const planName = normalizePlanName(productName);
+    const credits = PLAN_CREDITS[planName] || PLAN_CREDITS['basic'];
     
     // Calculate renewal date (default: 30 days from now if not provided)
     const nextRenewal = renewalDate 
@@ -166,8 +173,8 @@ async function revokeSubscriptionCredits(
         type: reason === 'expired' ? 'subscription_expired' : 'subscription_canceled',
         title: reason === 'expired' ? 'Subscription Expired' : 'Subscription Canceled',
         message: reason === 'expired' 
-          ? 'Your subscription has expired due to payment failure. You have been downgraded to the free plan with 10 credits.'
-          : 'Your subscription has been canceled. You have been downgraded to the free plan with 10 credits.',
+          ? 'Your subscription has expired due to payment failure. You have been downgraded to the free plan with 5 credits.'
+          : 'Your subscription has been canceled. You have been downgraded to the free plan with 5 credits.',
         metadata: { reason, credits: PLAN_CREDITS['free'] },
       });
     

@@ -24,7 +24,7 @@ interface CreditState {
   totalPurchased: number; // Total earned/purchased
   
   // Plan info
-  plan: string;           // 'free', 'pro', 'enterprise'
+  plan: string;           // 'free', 'basic', 'studio', 'pro', 'enterprise'
   status: string;         // 'active', 'canceled', 'expired'
   renewalDate: string | null;
   

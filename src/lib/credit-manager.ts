@@ -185,12 +185,12 @@ export async function getUserCredits(userId: string): Promise<UserCredits> {
     .single();
 
   if (error || !data) {
-    // User doesn't have credits record yet, return defaults
+    // User doesn't have credits record yet, return welcome credits default
     return {
-      balance: 500,
+      balance: 5,
       reserved: 0,
-      available: 500,
-      totalEarned: 500,
+      available: 5,
+      totalEarned: 5,
       totalSpent: 0,
     };
   }

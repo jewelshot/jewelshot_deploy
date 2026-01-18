@@ -11,55 +11,88 @@ import { PrimaryButton } from '@/components/atoms/PrimaryButton';
 export function PricingSection() {
   const plans = [
     {
-      name: 'Free',
-      price: '$0',
-      period: 'forever',
-      description: 'Perfect for trying out Jewelshot',
+      id: 'basic',
+      name: 'Basic',
+      price: '$9',
+      period: 'per month',
+      description: 'Perfect for small jewelry shops',
+      credits: '50',
       features: [
-        '5 images per month',
-        'Basic AI enhancement',
-        'Standard quality exports',
-        'Community support',
-        '7-day history',
+        '50 credits/month',
+        '3 concurrent requests',
+        '10GB storage',
+        'Email support',
+        '30-day history',
+        'Standard quality',
       ],
-      cta: 'Start Free',
+      cta: 'Start Basic',
       popular: false,
+      highlight: false,
     },
     {
-      name: 'Pro',
+      id: 'studio',
+      name: 'Studio',
       price: '$29',
       period: 'per month',
-      description: 'For serious jewelry businesses',
+      description: 'For growing businesses',
+      credits: '200',
       features: [
-        'Unlimited images',
-        'Advanced AI enhancement',
-        'High-resolution exports',
+        '200 credits/month',
+        '5 concurrent requests',
+        '25GB storage',
         'Priority support',
         'Unlimited history',
-        'Custom watermarks',
+        'High quality',
         'Batch processing',
-        'API access',
       ],
-      cta: 'Start Pro Trial',
+      cta: 'Start Studio',
       popular: true,
+      highlight: true,
     },
     {
-      name: 'Enterprise',
-      price: 'Custom',
-      period: 'contact us',
-      description: 'For large teams and agencies',
+      id: 'pro',
+      name: 'Pro',
+      price: '$79',
+      period: 'per month',
+      description: 'For serious jewelry businesses',
+      credits: '500',
       features: [
-        'Everything in Pro',
-        'Custom AI models',
-        'Dedicated support',
-        'SLA guarantee',
-        'Team collaboration',
-        'White-label options',
+        '500 credits/month',
+        '10 concurrent requests',
+        '100GB storage',
+        'Priority support',
+        'Unlimited history',
+        'Maximum quality',
+        'Batch processing',
+        'API access',
+        'Custom presets',
+      ],
+      cta: 'Start Pro',
+      popular: false,
+      highlight: false,
+    },
+    {
+      id: 'enterprise',
+      name: 'Enterprise',
+      price: '$199',
+      period: 'per month',
+      description: 'For large teams and agencies',
+      credits: 'Unlimited',
+      features: [
+        'Unlimited credits',
+        '25 concurrent requests',
+        '500GB storage',
+        '24/7 dedicated support',
+        'Unlimited history',
+        'Maximum quality',
+        'Full API access',
         'Custom integrations',
-        'Training & onboarding',
+        'White-label options',
+        'Team management',
       ],
       cta: 'Contact Sales',
       popular: false,
+      highlight: false,
     },
   ];
 
@@ -84,10 +117,10 @@ export function PricingSection() {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid gap-8 lg:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           {plans.map((plan, index) => (
             <div
-              key={plan.name}
+              key={plan.id}
               className="animate-in fade-in slide-in-from-bottom-4 group relative"
               style={{
                 animationDelay: `${index * 100}ms`,
@@ -95,7 +128,7 @@ export function PricingSection() {
             >
               {/* Popular Badge */}
               {plan.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                <div className="absolute -top-4 left-1/2 z-20 -translate-x-1/2">
                   <div className="flex items-center gap-1 rounded-full border border-purple-500/30 bg-purple-500/20 px-4 py-1 backdrop-blur-xl">
                     <Sparkles className="h-3 w-3 text-purple-400" />
                     <span className="text-xs font-semibold text-purple-300">
@@ -107,9 +140,9 @@ export function PricingSection() {
 
               {/* Card */}
               <div
-                className={`relative h-full overflow-hidden rounded-2xl border p-8 backdrop-blur-xl transition-all duration-300 ${
-                  plan.popular
-                    ? 'scale-105 border-purple-500/30 bg-white/10'
+                className={`relative h-full overflow-hidden rounded-2xl border p-6 backdrop-blur-xl transition-all duration-300 ${
+                  plan.highlight
+                    ? 'border-purple-500/30 bg-white/10 ring-2 ring-purple-500/20'
                     : 'border-white/10 bg-white/5 hover:border-purple-500/20 hover:bg-white/10'
                 }`}
               >
@@ -150,7 +183,7 @@ export function PricingSection() {
                 </div>
 
                 {/* Hover glow effect */}
-                {plan.popular && (
+                {plan.highlight && (
                   <div className="absolute inset-0 -z-10 bg-gradient-to-br from-purple-500/20 to-transparent opacity-50 blur-xl" />
                 )}
               </div>

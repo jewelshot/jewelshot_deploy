@@ -26,8 +26,11 @@ import { createScopedLogger } from '@/lib/logger';
 
 const logger = createScopedLogger('BillingSection');
 
+// Plan type for subscription levels
+type PlanType = 'free' | 'basic' | 'studio' | 'pro' | 'enterprise';
+
 interface BillingInfo {
-  plan: 'free' | 'pro' | 'enterprise';
+  plan: PlanType;
   status: 'active' | 'canceled' | 'expired' | 'trialing' | null;
   customerId: string | null;
   nextBillingDate: string | null;
@@ -35,41 +38,77 @@ interface BillingInfo {
 
 // Plan configurations - REPLACE WITH YOUR CREEM PRODUCT IDs
 const PLANS = {
+  basic: {
+    id: 'basic',
+    name: 'Basic',
+    productId: 'prod_REPLACE_WITH_BASIC_ID', // Replace with actual Creem product ID
+    price: 9,
+    period: '/month',
+    credits: 50,
+    icon: CreditCard,
+    color: 'from-blue-500 to-cyan-500',
+    features: [
+      '50 credits/month (+5 bonus)',
+      '3 concurrent requests',
+      '10GB storage',
+      'Email support',
+      '30-day history',
+    ],
+  },
+  studio: {
+    id: 'studio',
+    name: 'Studio',
+    productId: 'prod_REPLACE_WITH_STUDIO_ID', // Replace with actual Creem product ID
+    price: 29,
+    period: '/month',
+    credits: 200,
+    icon: Zap,
+    color: 'from-purple-500 to-pink-500',
+    popular: true,
+    features: [
+      '200 credits/month (+5 bonus)',
+      '5 concurrent requests',
+      '25GB storage',
+      'Priority support',
+      'Unlimited history',
+      'Batch processing',
+    ],
+  },
   pro: {
     id: 'pro',
     name: 'Pro',
     productId: 'prod_2rAu8IudVOTetQiqDJfYrt', // Replace with actual Creem product ID
-    price: 29,
+    price: 79,
     period: '/month',
     credits: 500,
-    icon: Zap,
-    color: 'from-purple-500 to-pink-500',
+    icon: Crown,
+    color: 'from-amber-500 to-orange-500',
     features: [
-      '500 credits/month',
-      '50 AI requests/min',
-      '50GB storage',
+      '500 credits/month (+5 bonus)',
+      '10 concurrent requests',
+      '100GB storage',
       'Priority support',
-      'Advanced features',
-      'Batch processing',
+      'API access',
+      'Custom presets',
     ],
   },
   enterprise: {
     id: 'enterprise',
     name: 'Enterprise',
     productId: 'prod_REPLACE_WITH_ENTERPRISE_ID', // Replace with actual Creem product ID
-    price: 99,
+    price: 199,
     period: '/month',
     credits: 999999,
-    icon: Crown,
-    color: 'from-amber-500 to-orange-500',
+    icon: Building,
+    color: 'from-emerald-500 to-teal-500',
     features: [
-      'Unlimited credits',
-      'Unlimited AI requests',
-      'Unlimited storage',
-      '24/7 priority support',
+      'Unlimited credits (+5 bonus)',
+      '25 concurrent requests',
+      '500GB storage',
+      '24/7 dedicated support',
+      'Full API access',
       'Custom integrations',
-      'API access',
-      'Dedicated account manager',
+      'White-label options',
     ],
   },
 };
@@ -112,7 +151,7 @@ export function BillingSection() {
           };
           
           setBilling({
-            plan: (profileData.subscription_plan as 'free' | 'pro' | 'enterprise') || 'free',
+            plan: (profileData.subscription_plan as PlanType) || 'free',
             status: profileData.subscription_status as BillingInfo['status'] || null,
             customerId: profileData.creem_customer_id || null,
             nextBillingDate: null, // Could be fetched from Creem API
@@ -198,28 +237,31 @@ export function BillingSection() {
           {currentPlan === 'free' ? 'Upgrade Your Plan' : 'Available Plans'}
         </h3>
         
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {Object.values(PLANS).map((plan) => {
             const Icon = plan.icon;
             const isCurrent = currentPlan === plan.id;
+            const isPopular = 'popular' in plan && plan.popular;
             
             return (
               <div
                 key={plan.id}
-                className={`relative rounded-2xl border p-6 backdrop-blur-sm transition-all hover:scale-[1.02] ${
+                className={`relative rounded-2xl border p-5 backdrop-blur-sm transition-all hover:scale-[1.02] ${
                   isCurrent
                     ? 'border-purple-500/40 bg-purple-500/10'
+                    : isPopular
+                    ? 'border-purple-500/30 bg-white/5 ring-2 ring-purple-500/20'
                     : 'border-white/10 bg-white/5 hover:border-white/20'
                 }`}
               >
                 {isCurrent && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-1 text-xs font-semibold text-white">
-                    Current Plan
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 px-3 py-1 text-xs font-semibold text-white">
+                    Current
                   </div>
                 )}
                 
-                {plan.id === 'pro' && currentPlan === 'free' && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-1 text-xs font-semibold text-white">
+                {isPopular && !isCurrent && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-3 py-1 text-xs font-semibold text-white">
                     Popular
                   </div>
                 )}
@@ -289,26 +331,25 @@ export function BillingSection() {
         <div className="mb-8 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
           <div className="flex items-start gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/10">
-              <Building className="h-6 w-6 text-white/60" />
+              <Sparkles className="h-6 w-6 text-purple-400" />
             </div>
             <div>
-              <h4 className="text-lg font-semibold text-white">Free Plan</h4>
+              <h4 className="text-lg font-semibold text-white">Free Plan - Welcome Credits</h4>
               <p className="mt-1 text-white/60">
-                You're currently on the free plan with 10 credits per month.
-                Upgrade to unlock more features and credits.
+                You have 5 welcome credits. When you subscribe, these credits will be added as a bonus!
               </p>
               <ul className="mt-3 space-y-1 text-sm text-white/50">
                 <li className="flex items-center gap-2">
-                  <Check className="h-3 w-3" /> 10 credits/month
+                  <Check className="h-3 w-3" /> 5 welcome credits
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="h-3 w-3" /> 5 AI requests/min
+                  <Check className="h-3 w-3" /> 2 concurrent requests
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="h-3 w-3" /> 1GB storage
+                  <Check className="h-3 w-3" /> 5GB storage
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="h-3 w-3" /> Basic support
+                  <Check className="h-3 w-3" /> +5 bonus when you subscribe!
                 </li>
               </ul>
             </div>
