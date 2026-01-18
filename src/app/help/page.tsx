@@ -15,7 +15,8 @@ import {
   Mail,
   MessageCircle,
   Book,
-  ExternalLink
+  ExternalLink,
+  type LucideIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -27,7 +28,7 @@ interface FAQItem {
 interface FAQCategory {
   id: string;
   title: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   color: string;
   items: FAQItem[];
 }
@@ -184,7 +185,7 @@ export default function HelpPage() {
     });
   };
 
-  const filteredCategories = FAQ_CATEGORIES.map((category) => ({
+  const filteredCategories: FAQCategory[] = FAQ_CATEGORIES.map((category) => ({
     ...category,
     items: category.items.filter(
       (item) =>
@@ -255,11 +256,13 @@ export default function HelpPage() {
       {/* FAQ Categories */}
       <div className="mx-auto max-w-5xl px-6 py-8">
         <div className="space-y-8">
-          {filteredCategories.map((category) => (
+          {filteredCategories.map((category: FAQCategory) => {
+            const Icon = category.icon;
+            return (
             <div key={category.id} className="rounded-2xl border border-white/10 bg-white/5 overflow-hidden">
               {/* Category Header */}
               <div className="flex items-center gap-3 p-6 border-b border-white/10 bg-white/5">
-                <category.icon className={`h-6 w-6 ${category.color}`} />
+                <Icon className={`h-6 w-6 ${category.color}`} />
                 <h2 className="text-xl font-semibold text-white">{category.title}</h2>
                 <span className="ml-auto text-sm text-white/40">{category.items.length} articles</span>
               </div>
@@ -301,7 +304,8 @@ export default function HelpPage() {
                 })}
               </div>
             </div>
-          ))}
+          );
+          })}
         </div>
 
         {/* No Results */}

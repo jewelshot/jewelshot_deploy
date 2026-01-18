@@ -13,13 +13,14 @@ import {
   CheckCircle2,
   Palette,
   Zap,
-  Image as ImageIcon
+  Image as ImageIcon,
+  type LucideIcon
 } from 'lucide-react';
 
 interface OnboardingStep {
   title: string;
   description: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   image?: string;
   tip?: string;
 }

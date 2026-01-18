@@ -128,7 +128,6 @@ export const metadata: Metadata = {
     creator: '@jewelshot',
     site: '@jewelshot',
   },
-  manifest: '/manifest.json',
   alternates: {
     canonical: 'https://jewelshot.com',
   },
