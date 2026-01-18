@@ -16,8 +16,10 @@ export function PricingSection() {
       price: '$29',
       originalPrice: '$39',
       discount: '25%',
+      savings: 10,
       period: 'per month',
       description: 'Entry level for small shops',
+      status: 'Giriş',
       credits: '100',
       features: [
         '100 credits/month',
@@ -38,8 +40,10 @@ export function PricingSection() {
       price: '$79',
       originalPrice: '$119',
       discount: '33%',
+      savings: 40,
       period: 'per month',
       description: 'For designers & creators',
+      status: 'Tasarımcı',
       credits: '300',
       features: [
         '300 credits/month',
@@ -61,8 +65,10 @@ export function PricingSection() {
       price: '$199',
       originalPrice: '$249',
       discount: '20%',
+      savings: 50,
       period: 'per month',
       description: 'For professional businesses',
+      status: 'Profesyonel',
       credits: '750',
       features: [
         '750 credits/month',
@@ -86,8 +92,10 @@ export function PricingSection() {
       price: '$129',
       originalPrice: '$249',
       discount: '48%',
+      savings: 120,
       period: 'per month',
       description: 'Limited spots for early supporters',
+      status: 'Kurucu Üye',
       credits: '500',
       features: [
         '500 credits/month',
@@ -112,8 +120,10 @@ export function PricingSection() {
       price: '$499',
       originalPrice: '$999',
       discount: '50%',
+      savings: 500,
       period: 'per month',
       description: 'For agencies & large teams',
+      status: 'Kurumsal',
       credits: 'Unlimited',
       features: [
         'Unlimited credits',
@@ -216,9 +226,23 @@ export function PricingSection() {
                 </div>
                 
                 {/* Original Price */}
-                <div className="mb-4">
+                <div className="mb-3">
                   <span className="text-sm text-white/40 line-through">
                     {plan.originalPrice}
+                  </span>
+                </div>
+
+                {/* Savings Badge */}
+                <div className={`mb-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg ${
+                  plan.id === 'founder' 
+                    ? 'bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30' 
+                    : 'bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20'
+                }`}>
+                  <span className="text-lg">💰</span>
+                  <span className={`text-sm font-bold ${
+                    plan.id === 'founder' ? 'text-orange-400' : 'text-green-400'
+                  }`}>
+                    YOU SAVE: ${plan.savings}
                   </span>
                 </div>
 
