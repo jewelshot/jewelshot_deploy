@@ -31,10 +31,14 @@ export interface FileValidationResult {
 const DEFAULT_FILE_OPTIONS: FileValidationOptions = {
   maxSizeMB: 10,
   minSizeMB: 0.001, // 1KB
-  allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+  allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/avif'],
   maxDimensions: { width: 8000, height: 8000 },
   minDimensions: { width: 100, height: 100 },
 };
+
+// Export for use in UI components
+export const SUPPORTED_IMAGE_FORMATS = ['JPG', 'PNG', 'WEBP', 'AVIF'];
+export const MAX_FILE_SIZE_MB = 10;
 
 /**
  * Validate file upload with comprehensive checks

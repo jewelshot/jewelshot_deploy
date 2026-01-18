@@ -65,7 +65,7 @@ export function UploadZone({
         type="file"
         id="batch-upload"
         multiple
-        accept="image/*"
+        accept="image/jpeg,image/png,image/webp,image/avif"
         onChange={handleFileInput}
         disabled={disabled || isFull}
         className="hidden"
@@ -103,7 +103,7 @@ export function UploadZone({
                 Drop images here or click to browse
               </p>
               <p className="mt-1 text-xs text-white/40">
-                PNG, JPG, WEBP up to 10MB each
+                JPG, PNG, WEBP, AVIF up to 10MB each
               </p>
               <p className="mt-2 text-[10px] text-purple-400">
                 {currentCount} / {maxFiles} images

@@ -19,7 +19,7 @@ import { useSidebarStore } from '@/store/sidebarStore';
 import SidebarLogo from '@/components/molecules/SidebarLogo';
 import NavigationItem from '@/components/molecules/NavigationItem';
 import UserProfile from '@/components/molecules/UserProfile';
-import { NotificationCenter } from '@/components/molecules/NotificationCenter';
+// NotificationCenter moved to RightSidebar
 import { useLanguage } from '@/lib/i18n';
 import {
   LayoutDashboard,
@@ -117,10 +117,9 @@ export function Sidebar() {
     >
       {/* Sidebar Content */}
       <div className="sidebar-scroll flex h-full flex-col overflow-y-auto px-4 py-3">
-        {/* Logo & Notifications */}
+        {/* Logo */}
         <div className="flex items-center justify-between">
           <SidebarLogo />
-          <NotificationCenter />
         </div>
 
         {/* Divider */}

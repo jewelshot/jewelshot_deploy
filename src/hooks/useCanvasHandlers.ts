@@ -138,7 +138,7 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
       const validation = await validateFile(file, {
         maxSizeMB: 10,
         minSizeMB: 0.001,
-        allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+        allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/avif'],
         maxDimensions: { width: 8000, height: 8000 },
         minDimensions: { width: 100, height: 100 },
       });

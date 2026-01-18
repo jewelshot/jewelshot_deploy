@@ -1,25 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X } from 'lucide-react';
+import { X, Sparkles, Settings, Image as ImageIcon } from 'lucide-react';
 
 interface PresetConfirmModalProps {
   presetName: string;
   jewelryType: string | null;
   requiresModel?: boolean;
   gender?: string;
+  aspectRatio?: string;
   onConfirm: (jewelryType?: string) => void;
   onCancel: () => void;
 }
 
 /**
- * PresetConfirmModal - Confirmation dialog before AI generation
- * Renders as full-screen overlay using React Portal
+ * PresetConfirmModal - Generation Settings confirmation before AI generation
+ * Shows summary of selected preset and allows last-minute changes
  */
 export function PresetConfirmModal({
   presetName,
   jewelryType: initialJewelryType,
   requiresModel,
   gender,
+  aspectRatio = '1:1',
   onConfirm,
   onCancel,
 }: PresetConfirmModalProps) {
@@ -30,9 +32,7 @@ export function PresetConfirmModal({
   );
 
   useEffect(() => {
-    // Prevent body scroll when modal is open
     document.body.style.overflow = 'hidden';
-    // Set mounted flag asynchronously to avoid cascading renders
     const timer = setTimeout(() => setMounted(true), 0);
     return () => {
       document.body.style.overflow = '';
@@ -40,43 +40,33 @@ export function PresetConfirmModal({
     };
   }, []);
 
-  // Handle close with animation
   const handleClose = () => {
     setIsClosing(true);
-    // Wait for animation to complete before calling onCancel
     setTimeout(() => {
       onCancel();
-    }, 200); // Match animation duration
+    }, 150);
   };
 
-  // Handle confirm with animation
   const handleConfirm = () => {
-    if (!selectedJewelryType) {
-      // Shouldn't happen due to UI restrictions, but just in case
-      return;
-    }
+    if (!selectedJewelryType) return;
     setIsClosing(true);
     setTimeout(() => {
       onConfirm(selectedJewelryType);
-    }, 200);
+    }, 150);
   };
 
   const jewelryOptions = [
-    { value: 'ring', label: 'Ring' },
-    { value: 'necklace', label: 'Necklace' },
-    { value: 'bracelet', label: 'Bracelet' },
-    { value: 'earring', label: 'Earring' },
+    { value: 'ring', label: 'Ring', emoji: '💍' },
+    { value: 'necklace', label: 'Necklace', emoji: '📿' },
+    { value: 'bracelet', label: 'Bracelet', emoji: '⌚' },
+    { value: 'earring', label: 'Earring', emoji: '✨' },
   ];
-
-  const description = requiresModel
-    ? `This will generate a luxury editorial style ${selectedJewelryType || 'jewelry'} photo featuring a ${gender?.toLowerCase() || 'model'}. The process may take 15-30 seconds.`
-    : `This will generate a professional ${selectedJewelryType || 'jewelry'} photo using AI. The process may take 10-30 seconds.`;
 
   const modalContent = (
     <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
       {/* Backdrop */}
       <div
-        className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-200 ease-in-out ${
+        className={`absolute inset-0 bg-black/70 transition-opacity duration-150 ${
           isClosing ? 'opacity-0' : 'opacity-100'
         }`}
         onClick={handleClose}
@@ -84,69 +74,94 @@ export function PresetConfirmModal({
 
       {/* Modal */}
       <div
-        className={`relative z-10 w-full max-w-sm rounded-xl border border-purple-500/20 bg-[rgba(17,17,17,0.95)] p-5 shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-[24px] backdrop-saturate-[200%] transition-all duration-200 ease-in-out ${
+        className={`relative z-10 w-full max-w-md rounded-2xl border border-white/10 bg-[#151515] shadow-2xl transition-all duration-150 ${
           isClosing
             ? 'translate-y-2 scale-95 opacity-0'
             : 'translate-y-0 scale-100 opacity-100'
         }`}
       >
-        {/* Close Button */}
-        <button
-          onClick={handleClose}
-          className="absolute right-3 top-3 rounded-lg p-1 text-white/40 transition-colors duration-200 hover:bg-white/10 hover:text-white/80"
-        >
-          <X className="h-4 w-4" />
-        </button>
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+          <div className="flex items-center gap-2">
+            <Settings className="h-4 w-4 text-white/60" />
+            <h3 className="text-sm font-medium text-white">Generation Settings</h3>
+          </div>
+          <button
+            onClick={handleClose}
+            className="rounded-lg p-1.5 text-white/40 transition-colors hover:bg-white/10 hover:text-white"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
 
-        {/* Title */}
-        <h3 className="mb-2 pr-6 text-base font-semibold text-white">
-          Generate with {presetName}?
-        </h3>
+        {/* Content */}
+        <div className="px-5 py-4 space-y-4">
+          {/* Preset Summary */}
+          <div className="rounded-xl bg-white/5 p-4">
+            <div className="flex items-start gap-3">
+              <div className="rounded-lg bg-purple-500/20 p-2">
+                <ImageIcon className="h-5 w-5 text-purple-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-white/50 mb-0.5">Selected Preset</p>
+                <p className="text-sm font-medium text-white truncate">{presetName}</p>
+                <div className="flex items-center gap-3 mt-2 text-xs text-white/50">
+                  <span>Aspect: {aspectRatio}</span>
+                  {requiresModel && <span>Model: {gender || 'Any'}</span>}
+                </div>
+              </div>
+            </div>
+          </div>
 
-        {/* Description */}
-        <p className="mb-3 text-xs leading-relaxed text-white/60">
-          {description}
-        </p>
-
-        {/* Jewelry Type Selection (if not already selected) */}
-        {!initialJewelryType && (
-          <div className="mb-4">
-            <label className="mb-1.5 block text-[10px] font-medium text-white/70">
-              Select Jewelry Type
+          {/* Jewelry Type Selection */}
+          <div>
+            <label className="mb-2 flex items-center gap-2 text-xs font-medium text-white/70">
+              <Sparkles className="h-3 w-3" />
+              Jewelry Type
             </label>
-            <div className="grid grid-cols-2 gap-1.5">
+            <div className="grid grid-cols-4 gap-2">
               {jewelryOptions.map((option) => (
                 <button
                   key={option.value}
                   onClick={() => setSelectedJewelryType(option.value)}
-                  className={`rounded-lg border px-3 py-2 text-xs font-medium transition-all duration-200 ${
+                  className={`rounded-lg border p-3 text-center transition-all ${
                     selectedJewelryType === option.value
-                      ? 'border-purple-500/50 bg-purple-500/20 text-purple-300'
-                      : 'border-white/10 bg-white/[0.02] text-white/60 hover:border-white/20 hover:bg-white/[0.05] hover:text-white'
+                      ? 'border-purple-500/50 bg-purple-500/10'
+                      : 'border-white/10 bg-white/[0.02] hover:border-white/20 hover:bg-white/5'
                   }`}
                 >
-                  {option.label}
+                  <span className="block text-lg mb-1">{option.emoji}</span>
+                  <span className={`text-[10px] font-medium ${
+                    selectedJewelryType === option.value ? 'text-purple-300' : 'text-white/60'
+                  }`}>
+                    {option.label}
+                  </span>
                 </button>
               ))}
             </div>
           </div>
-        )}
 
-        {/* Actions */}
-        <div className="flex gap-2">
+          {/* Info */}
+          <p className="text-[11px] text-white/40 text-center">
+            Generation takes 10-30 seconds • Uses 1 credit
+          </p>
+        </div>
+
+        {/* Footer */}
+        <div className="flex gap-3 border-t border-white/10 px-5 py-4">
           <button
             onClick={handleClose}
-            className="flex-1 rounded-lg border border-white/10 bg-white/[0.02] px-4 py-2 text-xs font-medium text-white/80 transition-all duration-200 hover:bg-white/[0.05]"
+            className="flex-1 rounded-lg border border-white/10 bg-transparent px-4 py-2.5 text-sm font-medium text-white/70 transition-colors hover:bg-white/5 hover:text-white"
           >
             Cancel
           </button>
           <button
             onClick={handleConfirm}
             disabled={!selectedJewelryType}
-            className={`flex-1 rounded-lg px-4 py-2 text-xs font-medium text-white transition-all duration-200 ${
+            className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition-all ${
               selectedJewelryType
-                ? 'bg-purple-600 hover:bg-purple-500'
-                : 'cursor-not-allowed bg-purple-600/40'
+                ? 'bg-white text-black hover:bg-white/90'
+                : 'cursor-not-allowed bg-white/20 text-white/40'
             }`}
           >
             Generate
@@ -156,8 +171,6 @@ export function PresetConfirmModal({
     </div>
   );
 
-  // Only render portal on client-side
   if (!mounted) return null;
-
   return createPortal(modalContent, document.body);
 }
