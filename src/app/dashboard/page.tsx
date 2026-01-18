@@ -28,6 +28,11 @@ const DashboardContent = dynamic(
   }
 );
 
+const OnboardingModal = dynamic(
+  () => import('@/components/organisms/OnboardingModal').then(mod => ({ default: mod.OnboardingModal })),
+  { ssr: false }
+);
+
 // Fallback component for errors
 function DashboardFallback() {
   return (
@@ -79,6 +84,9 @@ export default function DashboardPage() {
       <ErrorBoundary fallback={<DashboardFallback />}>
         <DashboardContent />
       </ErrorBoundary>
+
+      {/* Onboarding Modal for new users */}
+      <OnboardingModal />
     </>
   );
 }
