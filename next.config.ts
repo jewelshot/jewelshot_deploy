@@ -117,14 +117,14 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://va.vercel-scripts.com https://vercel.live https://plausible.io https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://www.google.com https://www.gstatic.com https://t.contentsquare.net", // Analytics + reCAPTCHA
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://va.vercel-scripts.com https://vercel.live https://plausible.io https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://www.google.com https://www.gstatic.com https://t.contentsquare.net https://code.jivosite.com", // Analytics + reCAPTCHA + JivoChat
               "style-src 'self' 'unsafe-inline'", // Tailwind requires unsafe-inline
               "img-src 'self' data: https: blob:", // Allow images from FAL.AI and Supabase
               "font-src 'self' data: https://vercel.live", // Added Vercel Live fonts
-              "connect-src 'self' https://*.supabase.co https://*.fal.media https://fal.ai wss://*.supabase.co https://va.vercel-scripts.com https://vitals.vercel-insights.com https://*.ingest.de.sentry.io https://*.sentry.io https://plausible.io https://www.google-analytics.com https://analytics.google.com https://www.facebook.com https://region1.google-analytics.com https://www.google.com https://www.gstatic.com blob: data:", // Added reCAPTCHA domains
+              "connect-src 'self' https://*.supabase.co https://*.fal.media https://fal.ai wss://*.supabase.co wss://*.jivosite.com https://*.jivosite.com https://va.vercel-scripts.com https://vitals.vercel-insights.com https://*.ingest.de.sentry.io https://*.sentry.io https://plausible.io https://www.google-analytics.com https://analytics.google.com https://www.facebook.com https://region1.google-analytics.com https://www.google.com https://www.gstatic.com blob: data:", // Added reCAPTCHA + JivoChat domains
               "media-src 'self' https: blob:",
               "worker-src 'self' blob:", // Allow web workers for image compression
-              "frame-src 'self' blob: https://vercel.live https://www.google.com https://recaptcha.google.com", // Allow Vercel Live + reCAPTCHA
+              "frame-src 'self' blob: https://vercel.live https://www.google.com https://recaptcha.google.com https://*.jivosite.com", // Allow Vercel Live + reCAPTCHA + JivoChat
               "object-src 'none'",
               "base-uri 'self'",
               "form-action 'self'",

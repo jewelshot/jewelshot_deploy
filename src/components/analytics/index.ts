@@ -51,5 +51,14 @@ export {
   hjPageView,
 } from './Hotjar';
 
+// JivoChat
+export { JivoChat } from './JivoChat';
+export {
+  openJivoChat,
+  closeJivoChat,
+  setJivoContactInfo,
+  setJivoCustomData,
+} from './JivoChat';
+
 // Plausible (zaten var)
 export { PlausibleAnalytics } from './PlausibleAnalytics';
