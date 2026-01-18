@@ -42,10 +42,12 @@ CREATE INDEX IF NOT EXISTS idx_trusted_devices_hash
 -- RLS
 ALTER TABLE public.trusted_devices ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own devices" ON public.trusted_devices;
 CREATE POLICY "Users can view own devices"
   ON public.trusted_devices FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete own devices" ON public.trusted_devices;
 CREATE POLICY "Users can delete own devices"
   ON public.trusted_devices FOR UPDATE
   USING (auth.uid() = user_id);
@@ -70,6 +72,7 @@ CREATE INDEX IF NOT EXISTS idx_device_codes_user
 ALTER TABLE public.device_verification_codes ENABLE ROW LEVEL SECURITY;
 
 -- Only service role can access
+DROP POLICY IF EXISTS "Service role only" ON public.device_verification_codes;
 CREATE POLICY "Service role only"
   ON public.device_verification_codes
   USING (false);
@@ -103,6 +106,7 @@ CREATE INDEX IF NOT EXISTS idx_sessions_created
 -- RLS
 ALTER TABLE public.user_sessions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own sessions" ON public.user_sessions;
 CREATE POLICY "Users can view own sessions"
   ON public.user_sessions FOR SELECT
   USING (auth.uid() = user_id);
@@ -128,6 +132,7 @@ CREATE INDEX IF NOT EXISTS idx_phone_otp_user
 ALTER TABLE public.phone_otp_codes ENABLE ROW LEVEL SECURITY;
 
 -- Only service role can access
+DROP POLICY IF EXISTS "Service role only" ON public.phone_otp_codes;
 CREATE POLICY "Service role only"
   ON public.phone_otp_codes
   USING (false);
@@ -152,6 +157,7 @@ CREATE INDEX IF NOT EXISTS idx_credit_unlocks_user
 -- RLS
 ALTER TABLE public.credit_unlocks ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own unlocks" ON public.credit_unlocks;
 CREATE POLICY "Users can view own unlocks"
   ON public.credit_unlocks FOR SELECT
   USING (auth.uid() = user_id);
@@ -169,17 +175,40 @@ CREATE TABLE IF NOT EXISTS public.signup_ips (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Add device_fingerprint column if table exists but column doesn't
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'signup_ips' AND column_name = 'device_fingerprint'
+  ) THEN
+    ALTER TABLE public.signup_ips ADD COLUMN device_fingerprint VARCHAR(64);
+  END IF;
+END $$;
+
 CREATE INDEX IF NOT EXISTS idx_signup_ips_ip 
   ON public.signup_ips(ip_address);
 
-CREATE INDEX IF NOT EXISTS idx_signup_ips_fingerprint 
-  ON public.signup_ips(device_fingerprint) 
-  WHERE device_fingerprint IS NOT NULL;
+-- Create fingerprint index only if column exists
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'signup_ips' AND column_name = 'device_fingerprint'
+  ) THEN
+    CREATE INDEX IF NOT EXISTS idx_signup_ips_fingerprint 
+      ON public.signup_ips(device_fingerprint) 
+      WHERE device_fingerprint IS NOT NULL;
+  END IF;
+EXCEPTION WHEN others THEN
+  NULL; -- Ignore if index already exists
+END $$;
 
 -- RLS
 ALTER TABLE public.signup_ips ENABLE ROW LEVEL SECURITY;
 
 -- Only service role can access
+DROP POLICY IF EXISTS "Service role only" ON public.signup_ips;
 CREATE POLICY "Service role only"
   ON public.signup_ips
   USING (false);
