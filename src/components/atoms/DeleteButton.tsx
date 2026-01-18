@@ -16,11 +16,11 @@ export function DeleteButton({ onClick }: DeleteButtonProps) {
   const { t } = useLanguage();
   
   return (
-    <Tooltip content={t.common.delete} side="bottom">
+    <Tooltip content={t.tooltips.deleteImage} side="bottom">
       <button
         onClick={onClick}
         className="flex h-7 w-7 items-center justify-center rounded-md border border-red-500/30 bg-red-500/10 text-red-400 transition-all hover:border-red-500/60 hover:bg-red-500/20 hover:text-red-300"
-        aria-label={t.common.delete}
+        aria-label={t.tooltips.deleteImage}
       >
         <Trash2 className="h-3.5 w-3.5" />
       </button>

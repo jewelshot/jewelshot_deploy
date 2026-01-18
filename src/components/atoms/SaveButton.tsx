@@ -16,11 +16,11 @@ export function SaveButton({ onClick }: SaveButtonProps) {
   const { t } = useLanguage();
   
   return (
-    <Tooltip content={t.common.save} side="bottom">
+    <Tooltip content={t.tooltips.saveToGallery} side="bottom">
       <button
         onClick={onClick}
         className="flex h-7 w-7 items-center justify-center rounded-md border border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] text-white/80 transition-all hover:border-[rgba(139,92,246,0.5)] hover:bg-[rgba(139,92,246,0.15)] hover:text-white"
-        aria-label={t.common.save}
+        aria-label={t.tooltips.saveToGallery}
       >
         <Save className="h-3.5 w-3.5" />
       </button>

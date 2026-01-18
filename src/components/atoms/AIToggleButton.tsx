@@ -3,6 +3,7 @@
 import React from 'react';
 import { ChevronUp } from 'lucide-react';
 import { Tooltip } from '@/components/atoms/Tooltip';
+import { useLanguage } from '@/lib/i18n';
 
 interface AIToggleButtonProps {
   isExpanded: boolean;
@@ -15,7 +16,8 @@ export function AIToggleButton({
   onClick,
   disabled = false,
 }: AIToggleButtonProps) {
-  const label = isExpanded ? 'Hide Prompt' : 'Show Prompt';
+  const { t } = useLanguage();
+  const label = isExpanded ? t.tooltips.hidePrompt : t.tooltips.showPrompt;
   
   return (
     <Tooltip content={label} side="top">

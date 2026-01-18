@@ -329,8 +329,9 @@ export const en: TranslationKeys = {
     profileUpdated: 'Profile updated successfully',
   },
 
-  // Tooltips
+  // Tooltips - All tooltip translations
   tooltips: {
+    // Basic tools
     zoom: 'Zoom',
     pan: 'Pan',
     reset: 'Reset View',
@@ -345,11 +346,6 @@ export const en: TranslationKeys = {
     edit: 'Edit',
     save: 'Save',
     compare: 'Compare',
-    zoomIn: 'Zoom In',
-    zoomOut: 'Zoom Out',
-    fitScreen: 'Fit to Screen',
-    normalView: 'Normal View',
-    sideBySide: 'Side by Side Comparison',
     rotate: 'Rotate',
     crop: 'Crop',
     adjust: 'Adjust',
@@ -361,8 +357,83 @@ export const en: TranslationKeys = {
     upscale: 'Upscale',
     removeBg: 'Remove Background',
     inpaint: 'Inpaint',
-    aiGenerate: 'Generate with AI',
     generateVideo: 'Generate Video from Image',
+    
+    // Zoom controls
+    zoomIn: 'Zoom In',
+    zoomOut: 'Zoom Out',
+    fitScreen: 'Fit to Screen',
+    fitToScreen: 'Fit to Screen',
+    resetZoom: 'Reset Zoom (100%)',
+    
+    // View controls
+    toggleFullscreen: 'Toggle Fullscreen',
+    toggleSidebar: 'Toggle Sidebar',
+    toggleUI: 'Toggle UI Controls',
+    toggleEditPanel: 'Toggle Edit Panel',
+    viewModeNormal: 'Normal View',
+    viewModeCompare: 'Compare View (Before/After)',
+    normalView: 'Normal',
+    sideBySide: 'Side by Side Comparison',
+    
+    // Image actions
+    uploadImage: 'Upload a jewelry image',
+    closeImage: 'Close current image',
+    deleteImage: 'Delete image permanently',
+    saveToGallery: 'Save to your gallery',
+    downloadImage: 'Download image to your device',
+    
+    // AI actions
+    generateWithAI: 'Generate AI-enhanced image',
+    aiSettings: 'Configure AI generation settings',
+    selectPreset: 'Choose a preset style',
+    aiGenerate: 'Generate with AI',
+    showPrompt: 'Show Prompt',
+    hidePrompt: 'Hide Prompt',
+    
+    // Quick actions
+    removeBackground: 'Remove background automatically',
+    upscaleImage: 'Upscale to 2x higher resolution',
+    enhanceGemstones: 'Enhance gemstone sparkle and clarity',
+    changeMetalColor: 'Change metal color (gold, silver, etc.)',
+    polishMetal: 'Add metallic polish and shine',
+    addNaturalLight: 'Apply natural lighting enhancement',
+    rotateLeft: 'Rotate image left',
+    rotateRight: 'Rotate image right',
+    closeUp: 'Create close-up detail shot',
+    turntableVideo: '360° Turntable Video',
+    
+    // Processing states
+    upscaling: 'Upscaling...',
+    removingBg: 'Removing Background...',
+    rotating: 'Rotating...',
+    creating: 'Creating...',
+    enhancing: 'Enhancing...',
+    recoloring: 'Recoloring...',
+    polishing: 'Polishing...',
+    addingLight: 'Adding Light...',
+    generating: 'Generating...',
+    
+    // Settings
+    generationSettings: 'Open generation settings',
+    aspectRatio: 'Select output aspect ratio',
+    jewelryType: 'Select jewelry type for better results',
+    gender: 'Select model gender',
+    faceVisibility: 'Control face visibility in output',
+    
+    // Gallery
+    openGallery: 'Open your image gallery',
+    selectFromGallery: 'Select an image from gallery',
+    
+    // Other
+    copyToClipboard: 'Copy to clipboard',
+    undoAction: 'Undo last action',
+    redoAction: 'Redo last action',
+    cropImage: 'Crop image',
+    adjustFilters: 'Adjust image filters',
+    notifications: 'View notifications',
+    credits: 'View your credits balance',
+    userProfile: 'View your profile',
   },
 
   // Settings Modal
@@ -893,4 +964,5 @@ export const en: TranslationKeys = {
     selectFiles: 'Select Files',
     clearSelection: 'Clear Selection',
   },
+
 };

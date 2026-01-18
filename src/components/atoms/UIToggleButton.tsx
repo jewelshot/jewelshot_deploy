@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Tooltip } from '@/components/atoms/Tooltip';
+import { useLanguage } from '@/lib/i18n';
 
 interface UIToggleButtonProps {
   controlsVisible: boolean;
@@ -12,10 +13,10 @@ export default function UIToggleButton({
   controlsVisible,
   onToggle,
 }: UIToggleButtonProps) {
-  const label = controlsVisible ? 'Hide Controls' : 'Show Controls';
+  const { t } = useLanguage();
   
   return (
-    <Tooltip content={label} side="bottom">
+    <Tooltip content={t.tooltips.toggleUI} side="bottom">
       <button
         onClick={onToggle}
         className={`group relative z-50 flex h-6 w-6 items-center justify-center rounded-md border transition-all duration-300 ${
@@ -23,7 +24,7 @@ export default function UIToggleButton({
             ? 'border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] text-white/70 hover:border-purple-500/40 hover:bg-purple-500/20 hover:text-purple-400'
             : 'border-purple-500/40 bg-purple-500/20 text-purple-400 shadow-[0_0_12px_rgba(168,85,247,0.3)] hover:border-purple-500/60 hover:bg-purple-500/30'
         }`}
-        aria-label={label}
+        aria-label={t.tooltips.toggleUI}
         style={{ cursor: 'pointer' }}
       >
       {/* Icon */}

@@ -329,8 +329,9 @@ export interface TranslationKeys {
     profileUpdated: string;
   };
 
-  // Tooltips
+  // Tooltips - All tooltip translations
   tooltips: {
+    // Basic tools
     zoom: string;
     pan: string;
     reset: string;
@@ -345,11 +346,6 @@ export interface TranslationKeys {
     edit: string;
     save: string;
     compare: string;
-    zoomIn: string;
-    zoomOut: string;
-    fitScreen: string;
-    normalView: string;
-    sideBySide: string;
     rotate: string;
     crop: string;
     adjust: string;
@@ -361,8 +357,83 @@ export interface TranslationKeys {
     upscale: string;
     removeBg: string;
     inpaint: string;
-    aiGenerate: string;
     generateVideo: string;
+    
+    // Zoom controls
+    zoomIn: string;
+    zoomOut: string;
+    fitScreen: string;
+    fitToScreen: string;
+    resetZoom: string;
+    
+    // View controls
+    toggleFullscreen: string;
+    toggleSidebar: string;
+    toggleUI: string;
+    toggleEditPanel: string;
+    viewModeNormal: string;
+    viewModeCompare: string;
+    normalView: string;
+    sideBySide: string;
+    
+    // Image actions
+    uploadImage: string;
+    closeImage: string;
+    deleteImage: string;
+    saveToGallery: string;
+    downloadImage: string;
+    
+    // AI actions
+    generateWithAI: string;
+    aiSettings: string;
+    selectPreset: string;
+    aiGenerate: string;
+    showPrompt: string;
+    hidePrompt: string;
+    
+    // Quick actions
+    removeBackground: string;
+    upscaleImage: string;
+    enhanceGemstones: string;
+    changeMetalColor: string;
+    polishMetal: string;
+    addNaturalLight: string;
+    rotateLeft: string;
+    rotateRight: string;
+    closeUp: string;
+    turntableVideo: string;
+    
+    // Processing states
+    upscaling: string;
+    removingBg: string;
+    rotating: string;
+    creating: string;
+    enhancing: string;
+    recoloring: string;
+    polishing: string;
+    addingLight: string;
+    generating: string;
+    
+    // Settings
+    generationSettings: string;
+    aspectRatio: string;
+    jewelryType: string;
+    gender: string;
+    faceVisibility: string;
+    
+    // Gallery
+    openGallery: string;
+    selectFromGallery: string;
+    
+    // Other
+    copyToClipboard: string;
+    undoAction: string;
+    redoAction: string;
+    cropImage: string;
+    adjustFilters: string;
+    notifications: string;
+    credits: string;
+    userProfile: string;
   };
 
   // Settings Modal
@@ -893,6 +964,7 @@ export interface TranslationKeys {
     selectFiles: string;
     clearSelection: string;
   };
+
 }
 
 export type Translations = {

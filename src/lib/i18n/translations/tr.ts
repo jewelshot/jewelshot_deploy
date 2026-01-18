@@ -329,8 +329,9 @@ export const tr: TranslationKeys = {
     profileUpdated: 'Profil başarıyla güncellendi',
   },
 
-  // Araç İpuçları
+  // Araç İpuçları - Tüm tooltip çevirileri
   tooltips: {
+    // Temel araçlar
     zoom: 'Yakınlaştır',
     pan: 'Kaydır',
     reset: 'Görünümü Sıfırla',
@@ -345,11 +346,6 @@ export const tr: TranslationKeys = {
     edit: 'Düzenle',
     save: 'Kaydet',
     compare: 'Karşılaştır',
-    zoomIn: 'Yakınlaştır',
-    zoomOut: 'Uzaklaştır',
-    fitScreen: 'Ekrana Sığdır',
-    normalView: 'Normal Görünüm',
-    sideBySide: 'Yan Yana Karşılaştır',
     rotate: 'Döndür',
     crop: 'Kırp',
     adjust: 'Ayarla',
@@ -361,8 +357,83 @@ export const tr: TranslationKeys = {
     upscale: 'Çözünürlük Artır',
     removeBg: 'Arka Planı Kaldır',
     inpaint: 'Düzeltme Boyası',
-    aiGenerate: 'AI ile Oluştur',
     generateVideo: 'Görselden Video Oluştur',
+    
+    // Zoom kontrolleri
+    zoomIn: 'Yakınlaştır',
+    zoomOut: 'Uzaklaştır',
+    fitScreen: 'Ekrana Sığdır',
+    fitToScreen: 'Ekrana Sığdır',
+    resetZoom: 'Yakınlaştırmayı Sıfırla (%100)',
+    
+    // Görünüm kontrolleri
+    toggleFullscreen: 'Tam Ekran Aç/Kapat',
+    toggleSidebar: 'Kenar Çubuğunu Aç/Kapat',
+    toggleUI: 'Arayüz Kontrollerini Aç/Kapat',
+    toggleEditPanel: 'Düzenleme Panelini Aç/Kapat',
+    viewModeNormal: 'Normal Görünüm',
+    viewModeCompare: 'Karşılaştırma Görünümü (Önce/Sonra)',
+    normalView: 'Normal',
+    sideBySide: 'Yan Yana Karşılaştırma',
+    
+    // Görsel işlemleri
+    uploadImage: 'Mücevher görseli yükle',
+    closeImage: 'Mevcut görseli kapat',
+    deleteImage: 'Görseli kalıcı olarak sil',
+    saveToGallery: 'Galerine kaydet',
+    downloadImage: 'Görseli cihazına indir',
+    
+    // AI işlemleri
+    generateWithAI: 'AI ile geliştirilmiş görsel oluştur',
+    aiSettings: 'AI oluşturma ayarlarını yapılandır',
+    selectPreset: 'Bir preset stili seç',
+    aiGenerate: 'AI ile Oluştur',
+    showPrompt: 'Prompt\'u Göster',
+    hidePrompt: 'Prompt\'u Gizle',
+    
+    // Hızlı işlemler
+    removeBackground: 'Arka planı otomatik kaldır',
+    upscaleImage: '2x yüksek çözünürlüğe ölçekle',
+    enhanceGemstones: 'Taş parlaklığını ve netliğini artır',
+    changeMetalColor: 'Metal rengini değiştir (altın, gümüş vb.)',
+    polishMetal: 'Metalik parlaklık ve cila ekle',
+    addNaturalLight: 'Doğal aydınlatma iyileştirmesi uygula',
+    rotateLeft: 'Görseli sola döndür',
+    rotateRight: 'Görseli sağa döndür',
+    closeUp: 'Yakın çekim detay fotoğrafı oluştur',
+    turntableVideo: '360° Döner Video',
+    
+    // İşlem durumları
+    upscaling: 'Ölçekleniyor...',
+    removingBg: 'Arka Plan Kaldırılıyor...',
+    rotating: 'Döndürülüyor...',
+    creating: 'Oluşturuluyor...',
+    enhancing: 'İyileştiriliyor...',
+    recoloring: 'Renklendiriliyor...',
+    polishing: 'Cilalanıyor...',
+    addingLight: 'Işık Ekleniyor...',
+    generating: 'Üretiliyor...',
+    
+    // Ayarlar
+    generationSettings: 'Oluşturma ayarlarını aç',
+    aspectRatio: 'Çıktı en-boy oranını seç',
+    jewelryType: 'Daha iyi sonuçlar için mücevher türünü seç',
+    gender: 'Model cinsiyetini seç',
+    faceVisibility: 'Çıktıda yüz görünürlüğünü kontrol et',
+    
+    // Galeri
+    openGallery: 'Görsel galerini aç',
+    selectFromGallery: 'Galeriden görsel seç',
+    
+    // Diğer
+    copyToClipboard: 'Panoya kopyala',
+    undoAction: 'Son işlemi geri al',
+    redoAction: 'Son işlemi yinele',
+    cropImage: 'Görseli kırp',
+    adjustFilters: 'Görsel filtrelerini ayarla',
+    notifications: 'Bildirimleri görüntüle',
+    credits: 'Kredi bakiyeni görüntüle',
+    userProfile: 'Profilini görüntüle',
   },
 
   // Ayarlar Modalı
@@ -893,4 +964,5 @@ export const tr: TranslationKeys = {
     selectFiles: 'Dosyaları Seç',
     clearSelection: 'Seçimi Temizle',
   },
+
 };

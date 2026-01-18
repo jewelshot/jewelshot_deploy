@@ -3,6 +3,7 @@
 import React from 'react';
 import { Maximize, Minimize } from 'lucide-react';
 import { Tooltip } from '@/components/atoms/Tooltip';
+import { useLanguage } from '@/lib/i18n';
 
 interface FullscreenButtonProps {
   /**
@@ -19,14 +20,14 @@ export function FullscreenButton({
   isFullscreen,
   onClick,
 }: FullscreenButtonProps) {
-  const label = isFullscreen ? 'Exit Fullscreen' : 'Fullscreen';
+  const { t } = useLanguage();
   
   return (
-    <Tooltip content={label} side="bottom">
+    <Tooltip content={t.tooltips.toggleFullscreen} side="bottom">
       <button
         onClick={onClick}
         className="flex h-7 w-7 items-center justify-center rounded-md border border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] text-white/80 transition-all hover:border-[rgba(139,92,246,0.5)] hover:bg-[rgba(139,92,246,0.15)] hover:text-white"
-        aria-label={label}
+        aria-label={t.tooltips.toggleFullscreen}
       >
         {isFullscreen ? (
           <Minimize className="h-3.5 w-3.5" />

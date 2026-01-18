@@ -16,11 +16,11 @@ export function DownloadButton({ onClick }: DownloadButtonProps) {
   const { t } = useLanguage();
   
   return (
-    <Tooltip content={t.common.download} side="bottom">
+    <Tooltip content={t.tooltips.downloadImage} side="bottom">
       <button
         onClick={onClick}
         className="flex h-7 w-7 items-center justify-center rounded-md border border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] text-white/80 transition-all hover:border-[rgba(139,92,246,0.5)] hover:bg-[rgba(139,92,246,0.15)] hover:text-white"
-        aria-label={t.common.download}
+        aria-label={t.tooltips.downloadImage}
       >
         <Download className="h-3.5 w-3.5" />
       </button>

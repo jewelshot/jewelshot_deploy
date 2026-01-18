@@ -37,6 +37,7 @@ import {
 import { Tooltip } from '@/components/atoms/Tooltip';
 import { MetalColorPicker } from './MetalColorPicker';
 import { MetalType } from '@/hooks/useMetalRecolor';
+import { useLanguage } from '@/lib/i18n';
 
 interface QuickActionsBarProps {
   /** Callback when upscale button is clicked */
@@ -115,6 +116,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
   isTopBarOpen, // eslint-disable-line @typescript-eslint/no-unused-vars
   controlsVisible,
 }) => {
+  const { t } = useLanguage();
   // State for metal color picker
   const [isMetalPickerOpen, setIsMetalPickerOpen] = useState(false);
 
@@ -175,7 +177,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
       <div className="flex flex-col gap-1.5 rounded-lg border border-[rgba(139,92,246,0.2)] bg-[rgba(10,10,10,0.8)] p-1.5 backdrop-blur-[16px]">
         {/* Upscale Button */}
         <Tooltip
-          content={isUpscaling ? 'Upscaling...' : 'Upscale 2x'}
+          content={isUpscaling ? t.tooltips.upscaling : t.tooltips.upscaleImage}
           side="left"
         >
           <button
@@ -200,9 +202,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
 
         {/* Remove Background Button */}
         <Tooltip
-          content={
-            isRemovingBackground ? 'Removing BG...' : 'Remove Background'
-          }
+          content={isRemovingBackground ? t.tooltips.removingBg : t.tooltips.removeBackground}
           side="left"
         >
           <button
@@ -227,7 +227,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
 
         {/* Rotate Left Button */}
         <Tooltip
-          content={isRotatingLeft ? 'Rotating...' : 'Rotate Left'}
+          content={isRotatingLeft ? t.tooltips.rotating : t.tooltips.rotateLeft}
           side="left"
         >
           <button
@@ -249,7 +249,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
 
         {/* Rotate Right Button */}
         <Tooltip
-          content={isRotatingRight ? 'Rotating...' : 'Rotate Right'}
+          content={isRotatingRight ? t.tooltips.rotating : t.tooltips.rotateRight}
           side="left"
         >
           <button
@@ -270,7 +270,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
         </Tooltip>
 
         {/* Close-Up Button */}
-        <Tooltip content={isClosingUp ? 'Creating...' : 'Close-Up'} side="left">
+        <Tooltip content={isClosingUp ? t.tooltips.creating : t.tooltips.closeUp} side="left">
           <button
             onClick={onCloseUp}
             disabled={!hasActiveImage || isClosingUp}
@@ -293,7 +293,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
 
         {/* Gemstone Enhancement Button */}
         <Tooltip
-          content={isEnhancingGemstones ? 'Enhancing...' : 'Enhance Gemstones'}
+          content={isEnhancingGemstones ? t.tooltips.enhancing : t.tooltips.enhanceGemstones}
           side="left"
         >
           <button
@@ -315,7 +315,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
 
         {/* Metal Recolor Button */}
         <Tooltip
-          content={isRecoloringMetal ? 'Recoloring...' : 'Metal Color'}
+          content={isRecoloringMetal ? t.tooltips.recoloring : t.tooltips.changeMetalColor}
           side="left"
         >
           <button
@@ -337,7 +337,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
 
         {/* Metal Polish Button */}
         <Tooltip
-          content={isPolishingMetal ? 'Polishing...' : 'Metal Polish'}
+          content={isPolishingMetal ? t.tooltips.polishing : t.tooltips.polishMetal}
           side="left"
         >
           <button
@@ -362,7 +362,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
 
         {/* Natural Light Button */}
         <Tooltip
-          content={isEnhancingLight ? 'Adding Light...' : 'Natural Light'}
+          content={isEnhancingLight ? t.tooltips.addingLight : t.tooltips.addNaturalLight}
           side="left"
         >
           <button
@@ -384,7 +384,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
 
         {/* 360° Turntable Video Button */}
         <Tooltip
-          content={isGeneratingTurntable ? 'Generating...' : '360° Video'}
+          content={isGeneratingTurntable ? t.tooltips.generating : t.tooltips.turntableVideo}
           side="left"
         >
           <button

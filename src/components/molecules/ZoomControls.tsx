@@ -47,7 +47,7 @@ export function ZoomControls({
       <ZoomButton
         onClick={onFitScreen}
         icon={<Locate className="h-3 w-3" />}
-        title={t.tooltips.fitScreen}
+        title={t.tooltips.fitToScreen}
       />
     </div>
   );
