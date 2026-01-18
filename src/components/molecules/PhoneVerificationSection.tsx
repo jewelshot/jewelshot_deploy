@@ -11,7 +11,8 @@
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Phone, CheckCircle2, Loader2, ShieldCheck, AlertCircle } from 'lucide-react';
-import PhoneInput, { isValidPhoneNumber, getCountryCallingCode } from 'react-phone-number-input';
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
+import flags from 'react-phone-number-input/flags';
 import 'react-phone-number-input/style.css';
 import { createScopedLogger } from '@/lib/logger';
 import { useLanguage } from '@/lib/i18n';
@@ -253,6 +254,7 @@ export function PhoneVerificationSection() {
                 <PhoneInput
                   international
                   defaultCountry="TR"
+                  flags={flags}
                   value={phoneNumber}
                   onChange={(value) => setPhoneNumber(value || '')}
                   placeholder="5XX XXX XX XX"
