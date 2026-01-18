@@ -1,25 +1,66 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Mail, Lock, User, ArrowLeft, CheckCircle2, Sparkles, Shield, Clock, CreditCard } from 'lucide-react';
+import { Mail, Lock, User, ArrowLeft, CheckCircle2, Sparkles, Shield, Clock, CreditCard, AlertTriangle } from 'lucide-react';
 import { AuthInput } from '@/components/atoms/AuthInput';
 import { PrimaryButton } from '@/components/atoms/PrimaryButton';
 import { SocialButton } from '@/components/atoms/SocialButton';
 import { createClient } from '@/lib/supabase/client';
 import { AuroraBackground } from '@/components/atoms/AuroraBackground';
 import { useLanguage } from '@/lib/i18n';
+import { useDeviceFingerprint } from '@/hooks/useDeviceFingerprint';
+import { useRecaptcha } from '@/components/atoms/RecaptchaProvider';
 
 export default function SignupPage() {
   const router = useRouter();
   const { t } = useLanguage();
+  const deviceFingerprint = useDeviceFingerprint();
+  const { executeRecaptcha, isLoaded: recaptchaLoaded } = useRecaptcha();
+  
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  
+  // Fraud prevention
+  const [honeypot, setHoneypot] = useState('');
+  const [formTimestamp, setFormTimestamp] = useState<number>(0);
+  const [validationPassed, setValidationPassed] = useState(false);
+
+  // Set form timestamp on mount
+  useEffect(() => {
+    setFormTimestamp(Date.now());
+  }, []);
+
+  // Validate signup before submitting
+  const validateSignup = async (): Promise<{ allowed: boolean; reason?: string }> => {
+    try {
+      // Get reCAPTCHA token
+      const recaptchaToken = recaptchaLoaded ? await executeRecaptcha('signup') : null;
+
+      const response = await fetch('/api/auth/validate-signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          deviceFingerprint,
+          honeypot,
+          formTimestamp,
+          recaptchaToken,
+        }),
+      });
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Validation error:', error);
+      return { allowed: true }; // Fail open
+    }
+  };
 
   const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,9 +68,18 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
+      // Basic validation
       if (password.length < 8) {
         throw new Error(t.auth.passwordRequirements);
       }
+
+      // Anti-abuse validation
+      const validation = await validateSignup();
+      if (!validation.allowed) {
+        throw new Error(validation.reason || 'Unable to create account. Please try again.');
+      }
+
+      setValidationPassed(true);
 
       const supabase = createClient();
       
@@ -59,6 +109,13 @@ export default function SignupPage() {
 
   const handleGoogleSignup = async () => {
     try {
+      // Validate before OAuth
+      const validation = await validateSignup();
+      if (!validation.allowed) {
+        setError(validation.reason || 'Unable to create account. Please try again.');
+        return;
+      }
+
       const supabase = createClient();
       
       // Get the correct site URL for OAuth redirect
@@ -229,6 +286,23 @@ export default function SignupPage() {
                   </div>
 
                   <form onSubmit={handleEmailSignup} className="space-y-4">
+                    {/* Honeypot - Hidden from users, visible to bots */}
+                    <input
+                      type="text"
+                      name="website"
+                      value={honeypot}
+                      onChange={(e) => setHoneypot(e.target.value)}
+                      autoComplete="off"
+                      tabIndex={-1}
+                      aria-hidden="true"
+                      style={{
+                        position: 'absolute',
+                        left: '-9999px',
+                        opacity: 0,
+                        pointerEvents: 'none',
+                      }}
+                    />
+
                     {/* Full Name */}
                     <div>
                       <label htmlFor="fullName" className="mb-2 block text-sm font-medium text-white/80">
@@ -279,8 +353,9 @@ export default function SignupPage() {
 
                     {/* Error Message */}
                     {error && (
-                      <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
-                        {error}
+                      <div className="flex items-start gap-3 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+                        <AlertTriangle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                        <span>{error}</span>
                       </div>
                     )}
 
@@ -317,6 +392,14 @@ export default function SignupPage() {
                       {t.auth.login}
                     </Link>
                   </div>
+
+                  {/* reCAPTCHA Notice */}
+                  <p className="mt-4 text-center text-xs text-white/30">
+                    Protected by reCAPTCHA and Google{' '}
+                    <a href="https://policies.google.com/privacy" target="_blank" rel="noopener" className="underline">Privacy</a>
+                    {' & '}
+                    <a href="https://policies.google.com/terms" target="_blank" rel="noopener" className="underline">Terms</a>
+                  </p>
                 </>
               )}
             </div>

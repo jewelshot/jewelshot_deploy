@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { RecaptchaProvider } from '@/components/atoms/RecaptchaProvider';
 
 export const metadata: Metadata = {
   title: 'Authentication | Jewelshot',
@@ -19,5 +20,5 @@ export default function AuthLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return <RecaptchaProvider>{children}</RecaptchaProvider>;
 }

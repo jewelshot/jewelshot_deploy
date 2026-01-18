@@ -3,11 +3,16 @@
  * 
  * POST /api/phone/send-otp
  * Sends a verification code to the user's phone
+ * 
+ * Security checks:
+ * - VoIP/virtual number detection
+ * - Phone number uniqueness (1 phone = 1 account)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { sendPhoneOTP } from '@/lib/security/phone-verification';
+import { validatePhoneForVerification } from '@/lib/anti-abuse';
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,6 +34,15 @@ export async function POST(request: NextRequest) {
     if (!phoneNumber) {
       return NextResponse.json(
         { error: 'Phone number is required' },
+        { status: 400 }
+      );
+    }
+
+    // Anti-abuse validation: Check VoIP and uniqueness
+    const validation = await validatePhoneForVerification(phoneNumber);
+    if (!validation.allowed) {
+      return NextResponse.json(
+        { error: validation.reason },
         { status: 400 }
       );
     }
