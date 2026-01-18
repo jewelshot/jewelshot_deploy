@@ -1,79 +1,78 @@
 {
-  "name": "Jewelshot - AI-Powered Image Editing Studio",
+  "name": "Jewelshot - AI Jewelry Photography",
   "short_name": "Jewelshot",
-  "description": "Professional AI-powered image editing studio. Transform, enhance, and edit your images with cutting-edge artificial intelligence.",
-  "start_url": "/studio?source=pwa",
+  "description": "Transform your jewelry photos into stunning visuals with AI",
+  "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#0a0a0a",
-  "theme_color": "#9333ea",
-  "orientation": "any",
-  "scope": "/",
-  "lang": "en-US",
-  "dir": "ltr",
+  "theme_color": "#8b5cf6",
+  "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "maskable any"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "/apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png",
-      "purpose": "any"
-    }
-  ],
-  "categories": ["photo", "productivity", "graphics", "design", "utilities"],
-  "shortcuts": [
-    {
-      "name": "Studio",
-      "short_name": "Studio",
-      "description": "Open image editing studio",
-      "url": "/studio",
-      "icons": [
-        {
-          "src": "/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "Gallery",
-      "short_name": "Gallery",
-      "description": "View your image gallery",
-      "url": "/gallery",
-      "icons": [
-        {
-          "src": "/icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
+      "purpose": "maskable any"
     }
   ],
   "screenshots": [
     {
-      "src": "/og-image.jpg",
-      "sizes": "1200x630",
-      "type": "image/jpeg",
+      "src": "/screenshots/studio.png",
+      "sizes": "1280x720",
+      "type": "image/png",
       "form_factor": "wide",
-      "label": "Jewelshot Studio - AI Image Editor"
+      "label": "Jewelshot Studio"
+    },
+    {
+      "src": "/screenshots/mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Jewelshot Mobile"
     }
   ],
-  "related_applications": [],
+  "categories": ["photo", "productivity", "business"],
   "prefer_related_applications": false
 }

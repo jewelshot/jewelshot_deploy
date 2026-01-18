@@ -61,6 +61,12 @@ export const metadata: Metadata = {
   authors: [{ name: 'Jewelshot Team', url: 'https://jewelshot.com' }],
   creator: 'Jewelshot',
   publisher: 'Jewelshot',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Jewelshot',
+  },
   icons: {
     icon: [
       { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
