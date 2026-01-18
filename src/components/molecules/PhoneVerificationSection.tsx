@@ -3,6 +3,7 @@
  *
  * Phone number verification with OTP.
  * Integrates with Twilio for SMS verification.
+ * Uses react-phone-number-input for country code selection.
  */
 
 'use client';
@@ -10,6 +11,8 @@
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Phone, CheckCircle2, Loader2, ShieldCheck, AlertCircle } from 'lucide-react';
+import PhoneInput, { isValidPhoneNumber, getCountryCallingCode } from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
 import { createScopedLogger } from '@/lib/logger';
 import { useLanguage } from '@/lib/i18n';
 
@@ -247,21 +250,27 @@ export function PhoneVerificationSection() {
                 <label className="mb-2 block text-sm font-medium text-white/80">
                   Phone Number
                 </label>
-                <input
-                  type="tel"
+                <PhoneInput
+                  international
+                  defaultCountry="TR"
                   value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  placeholder="+90 5XX XXX XX XX"
-                  className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white placeholder-white/40 transition-all focus:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                  onChange={(value) => setPhoneNumber(value || '')}
+                  placeholder="5XX XXX XX XX"
+                  className="phone-input-dark"
                 />
                 <p className="mt-1 text-xs text-white/40">
-                  Enter your mobile number with country code
+                  Select your country and enter your mobile number
                 </p>
+                {phoneNumber && !isValidPhoneNumber(phoneNumber) && (
+                  <p className="mt-1 text-xs text-red-400">
+                    Please enter a valid phone number
+                  </p>
+                )}
               </div>
 
               <button
                 onClick={handleSendOTP}
-                disabled={sending || !phoneNumber.trim()}
+                disabled={sending || !phoneNumber || !isValidPhoneNumber(phoneNumber)}
                 className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 py-2.5 text-sm font-medium text-white transition-all hover:from-purple-600 hover:to-pink-600 disabled:opacity-50"
               >
                 {sending ? (

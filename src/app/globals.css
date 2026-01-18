@@ -242,3 +242,59 @@ body.no-scroll {
 .animate-slide-out {
   animation: slideOutToLeft 400ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
+
+/* ============================================
+   Phone Input Dark Theme
+   ============================================ */
+
+.phone-input-dark {
+  --PhoneInputCountryFlag-height: 1em;
+  --PhoneInputCountryFlag-borderColor: rgba(255, 255, 255, 0.1);
+  --PhoneInputCountrySelectArrow-color: rgba(255, 255, 255, 0.5);
+  --PhoneInputCountrySelectArrow-opacity: 1;
+}
+
+.phone-input-dark .PhoneInputInput {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  padding: 0.625rem 1rem;
+  color: white;
+  font-size: 0.875rem;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.phone-input-dark .PhoneInputInput:focus {
+  border-color: rgba(168, 85, 247, 0.5);
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2);
+}
+
+.phone-input-dark .PhoneInputInput::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.phone-input-dark .PhoneInputCountry {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  margin-right: 0.5rem;
+}
+
+.phone-input-dark .PhoneInputCountrySelect {
+  background: #1a1a1a;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.5rem;
+}
+
+.phone-input-dark .PhoneInputCountrySelect option {
+  background: #1a1a1a;
+  color: white;
+  padding: 0.5rem;
+}
+
+.phone-input-dark .PhoneInputCountrySelectArrow {
+  border-color: rgba(255, 255, 255, 0.5);
+}
