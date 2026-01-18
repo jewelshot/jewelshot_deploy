@@ -9,7 +9,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { Camera, Save, X } from 'lucide-react';
+import { Camera, Save, X, Building2, Briefcase } from 'lucide-react';
 import Avatar from '@/components/atoms/Avatar';
 import { PhoneVerificationSection } from '@/components/molecules/PhoneVerificationSection';
 import { createScopedLogger } from '@/lib/logger';
@@ -22,7 +22,20 @@ interface ProfileData {
   email: string;
   avatar_url: string;
   bio?: string;
+  company_name?: string;
+  business_type?: string;
 }
+
+const BUSINESS_TYPES = [
+  { value: '', label: 'Select your business type' },
+  { value: 'jewelry_retailer', label: 'Jewelry Retailer' },
+  { value: 'jewelry_manufacturer', label: 'Jewelry Manufacturer' },
+  { value: 'ecommerce', label: 'E-commerce Store' },
+  { value: 'photographer', label: 'Product Photographer' },
+  { value: 'marketing_agency', label: 'Marketing Agency' },
+  { value: 'individual', label: 'Individual / Freelancer' },
+  { value: 'other', label: 'Other' },
+];
 
 export function ProfileInfoSection() {
   const { t } = useLanguage();
@@ -31,6 +44,8 @@ export function ProfileInfoSection() {
     email: '',
     avatar_url: '',
     bio: '',
+    company_name: '',
+    business_type: '',
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -55,7 +70,7 @@ export function ProfileInfoSection() {
            
           const { data: profileData } = (await supabase
             .from('profiles')
-            .select('full_name, avatar_url, bio')
+            .select('full_name, avatar_url, bio, company_name, business_type')
             .eq('id', user.id)
             .maybeSingle()) as { data: any };
 
@@ -68,6 +83,8 @@ export function ProfileInfoSection() {
             avatar_url:
               profileData?.avatar_url || user.user_metadata?.avatar_url || '',
             bio: profileData?.bio || '',
+            company_name: profileData?.company_name || user.user_metadata?.company_name || '',
+            business_type: profileData?.business_type || user.user_metadata?.business_type || '',
           });
         }
       } catch (error) {
@@ -149,6 +166,8 @@ export function ProfileInfoSection() {
           full_name: profile.full_name,
           avatar_url: publicUrl, // Save new avatar URL
           bio: profile.bio,
+          company_name: profile.company_name,
+          business_type: profile.business_type,
           updated_at: new Date().toISOString(),
         })) as { error: any };
 
@@ -206,6 +225,8 @@ export function ProfileInfoSection() {
           full_name: profile.full_name,
           avatar_url: profile.avatar_url,
           bio: profile.bio,
+          company_name: profile.company_name,
+          business_type: profile.business_type,
           updated_at: new Date().toISOString(),
         })) as { error: any };
 
@@ -216,6 +237,8 @@ export function ProfileInfoSection() {
         data: {
           full_name: profile.full_name,
           avatar_url: profile.avatar_url,
+          company_name: profile.company_name,
+          business_type: profile.business_type,
         },
       });
 
@@ -386,6 +409,65 @@ export function ProfileInfoSection() {
                 className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white placeholder-white/40 transition-all focus:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
                 placeholder={t.placeholders.enterDescription}
               />
+            </div>
+          </div>
+        </div>
+
+        {/* Business Information */}
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+          <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-white">
+            <Briefcase className="h-5 w-5 text-purple-400" />
+            Business Information
+          </h3>
+          <p className="mb-4 text-sm text-white/50">
+            Optional: Help us understand your business better
+          </p>
+          <div className="space-y-4">
+            {/* Company Name */}
+            <div>
+              <label
+                htmlFor="company_name"
+                className="mb-2 block text-sm font-medium text-white/80"
+              >
+                <span className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4 text-white/50" />
+                  Company Name
+                </span>
+              </label>
+              <input
+                type="text"
+                id="company_name"
+                value={profile.company_name}
+                onChange={(e) =>
+                  setProfile({ ...profile, company_name: e.target.value })
+                }
+                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white placeholder-white/40 transition-all focus:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+                placeholder="Enter your company name"
+              />
+            </div>
+
+            {/* Business Type */}
+            <div>
+              <label
+                htmlFor="business_type"
+                className="mb-2 block text-sm font-medium text-white/80"
+              >
+                Business Type
+              </label>
+              <select
+                id="business_type"
+                value={profile.business_type}
+                onChange={(e) =>
+                  setProfile({ ...profile, business_type: e.target.value })
+                }
+                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white transition-all focus:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+              >
+                {BUSINESS_TYPES.map((type) => (
+                  <option key={type.value} value={type.value} className="bg-[#1a1a1a] text-white">
+                    {type.label}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </div>

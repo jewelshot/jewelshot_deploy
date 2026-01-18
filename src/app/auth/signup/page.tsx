@@ -3,40 +3,23 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Mail, Lock, User, ArrowLeft, CheckCircle2, Sparkles, Shield, Clock, CreditCard, Building2, Phone } from 'lucide-react';
+import { Mail, Lock, User, ArrowLeft, CheckCircle2, Sparkles, Shield, Clock, CreditCard } from 'lucide-react';
 import { AuthInput } from '@/components/atoms/AuthInput';
 import { PrimaryButton } from '@/components/atoms/PrimaryButton';
 import { SocialButton } from '@/components/atoms/SocialButton';
 import { createClient } from '@/lib/supabase/client';
 import { AuroraBackground } from '@/components/atoms/AuroraBackground';
 import { useLanguage } from '@/lib/i18n';
-import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
-import flags from 'react-phone-number-input/flags';
-import 'react-phone-number-input/style.css';
 
 export default function SignupPage() {
   const router = useRouter();
   const { t } = useLanguage();
   const [fullName, setFullName] = useState('');
-  const [companyName, setCompanyName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [businessType, setBusinessType] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-
-  const businessTypes = [
-    { value: '', label: 'Select your business type' },
-    { value: 'jewelry_retailer', label: 'Jewelry Retailer' },
-    { value: 'jewelry_manufacturer', label: 'Jewelry Manufacturer' },
-    { value: 'ecommerce', label: 'E-commerce Store' },
-    { value: 'photographer', label: 'Product Photographer' },
-    { value: 'marketing_agency', label: 'Marketing Agency' },
-    { value: 'individual', label: 'Individual / Freelancer' },
-    { value: 'other', label: 'Other' },
-  ];
 
   const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,13 +27,6 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      // Validation
-      if (!companyName.trim()) {
-        throw new Error('Company name is required');
-      }
-      if (!phoneNumber || !isValidPhoneNumber(phoneNumber)) {
-        throw new Error('Please enter a valid phone number');
-      }
       if (password.length < 8) {
         throw new Error(t.auth.passwordRequirements);
       }
@@ -66,9 +42,6 @@ export default function SignupPage() {
         options: {
           data: {
             full_name: fullName,
-            company_name: companyName,
-            phone_number: phoneNumber,
-            business_type: businessType,
           },
           emailRedirectTo: `${siteUrl}/auth/callback`,
         },
@@ -105,7 +78,7 @@ export default function SignupPage() {
   };
 
   const benefits = [
-    { icon: Sparkles, text: '10 free credits to start', subtext: 'No credit card required' },
+    { icon: Sparkles, text: '5 free credits to start', subtext: 'No credit card required' },
     { icon: Clock, text: 'Set up in 60 seconds', subtext: 'Start creating immediately' },
     { icon: Shield, text: 'Enterprise-grade security', subtext: 'SOC 2 compliant infrastructure' },
     { icon: CreditCard, text: 'Cancel anytime', subtext: 'No long-term commitments' },
@@ -259,7 +232,7 @@ export default function SignupPage() {
                     {/* Full Name */}
                     <div>
                       <label htmlFor="fullName" className="mb-2 block text-sm font-medium text-white/80">
-                        {t.profile.fullName} <span className="text-red-400">*</span>
+                        {t.profile.fullName}
                       </label>
                       <AuthInput
                         type="text"
@@ -271,66 +244,10 @@ export default function SignupPage() {
                       />
                     </div>
 
-                    {/* Company Name */}
-                    <div>
-                      <label htmlFor="companyName" className="mb-2 block text-sm font-medium text-white/80">
-                        Company Name <span className="text-red-400">*</span>
-                      </label>
-                      <AuthInput
-                        type="text"
-                        placeholder="Enter your company name"
-                        value={companyName}
-                        onChange={setCompanyName}
-                        icon={Building2}
-                        disabled={loading}
-                      />
-                    </div>
-
-                    {/* Phone Number */}
-                    <div>
-                      <label htmlFor="phoneNumber" className="mb-2 block text-sm font-medium text-white/80">
-                        Phone Number <span className="text-red-400">*</span>
-                      </label>
-                      <PhoneInput
-                        international
-                        defaultCountry="TR"
-                        flags={flags}
-                        value={phoneNumber}
-                        onChange={(value) => setPhoneNumber(value || '')}
-                        placeholder="5XX XXX XX XX"
-                        className="phone-input-dark"
-                        disabled={loading}
-                      />
-                      {phoneNumber && !isValidPhoneNumber(phoneNumber) && (
-                        <p className="mt-1 text-xs text-red-400">
-                          Please enter a valid phone number
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Business Type */}
-                    <div>
-                      <label htmlFor="businessType" className="mb-2 block text-sm font-medium text-white/80">
-                        Business Type
-                      </label>
-                      <select
-                        value={businessType}
-                        onChange={(e) => setBusinessType(e.target.value)}
-                        disabled={loading}
-                        className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-white transition-all focus:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
-                      >
-                        {businessTypes.map((type) => (
-                          <option key={type.value} value={type.value} className="bg-[#1a1a1a] text-white">
-                            {type.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
                     {/* Email */}
                     <div>
                       <label htmlFor="email" className="mb-2 block text-sm font-medium text-white/80">
-                        {t.auth.email} <span className="text-red-400">*</span>
+                        {t.auth.email}
                       </label>
                       <AuthInput
                         type="email"
@@ -345,7 +262,7 @@ export default function SignupPage() {
                     {/* Password */}
                     <div>
                       <label htmlFor="password" className="mb-2 block text-sm font-medium text-white/80">
-                        {t.auth.password} <span className="text-red-400">*</span>
+                        {t.auth.password}
                       </label>
                       <AuthInput
                         type="password"
