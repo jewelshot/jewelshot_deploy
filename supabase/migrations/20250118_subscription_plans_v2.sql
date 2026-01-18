@@ -245,21 +245,23 @@ CREATE TABLE IF NOT EXISTS public.subscription_plans (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Insert the 4 plans + free tier
+-- Insert the 5 plans + free tier
 INSERT INTO public.subscription_plans (
   id, name, display_name, credits, price_monthly, price_yearly, 
   concurrency_limit, storage_gb, sort_order, features
 ) VALUES
   ('free', 'FREE', 'Free', 5, 0, 0, 2, 5, 0, 
    '["5 welcome credits", "2 concurrent requests", "5GB storage", "Basic support", "7-day history"]'::jsonb),
-  ('basic', 'BASIC', 'Basic', 50, 9.00, 90.00, 3, 10, 1,
-   '["50 credits/month", "3 concurrent requests", "10GB storage", "Email support", "30-day history", "Standard quality"]'::jsonb),
-  ('studio', 'STUDIO', 'Studio', 200, 29.00, 290.00, 5, 25, 2,
-   '["200 credits/month", "5 concurrent requests", "25GB storage", "Priority support", "Unlimited history", "High quality", "Batch processing"]'::jsonb),
-  ('pro', 'PRO', 'Pro', 500, 79.00, 790.00, 10, 100, 3,
-   '["500 credits/month", "10 concurrent requests", "100GB storage", "Priority support", "Unlimited history", "Maximum quality", "Batch processing", "API access", "Custom presets"]'::jsonb),
-  ('enterprise', 'ENTERPRISE', 'Enterprise', 999999, 199.00, 1990.00, 25, 500, 4,
-   '["Unlimited credits", "25 concurrent requests", "500GB storage", "24/7 dedicated support", "Unlimited history", "Maximum quality", "Batch processing", "Full API access", "Custom integrations", "White-label options", "Team management"]'::jsonb)
+  ('basic', 'BASIC', 'Basic', 100, 29.00, 290.00, 3, 10, 1,
+   '["100 credits/month", "3 concurrent requests", "10GB storage", "Email support", "30-day history", "Standard quality"]'::jsonb),
+  ('studio', 'STUDIO', 'Studio', 300, 79.00, 790.00, 5, 25, 2,
+   '["300 credits/month", "5 concurrent requests", "25GB storage", "Priority support", "Unlimited history", "High quality", "Batch processing"]'::jsonb),
+  ('pro', 'PRO', 'Pro', 750, 199.00, 1990.00, 10, 100, 3,
+   '["750 credits/month", "10 concurrent requests", "100GB storage", "Priority support", "Unlimited history", "Maximum quality", "Batch processing", "API access", "Custom presets"]'::jsonb),
+  ('founder', 'FOUNDER', 'Founder', 500, 129.00, 1290.00, 10, 100, 4,
+   '["500 credits/month", "10 concurrent requests", "100GB storage", "Founder badge", "Early access features", "Priority support", "LIMITED: Only 20 spots"]'::jsonb),
+  ('enterprise', 'ENTERPRISE', 'Enterprise', 999999, 499.00, 4990.00, 25, 500, 5,
+   '["Unlimited credits", "25 concurrent requests", "500GB storage", "24/7 dedicated support", "Unlimited history", "Maximum quality", "Full API access", "Custom integrations", "White-label options", "Team management"]'::jsonb)
 ON CONFLICT (id) DO UPDATE SET
   name = EXCLUDED.name,
   display_name = EXCLUDED.display_name,

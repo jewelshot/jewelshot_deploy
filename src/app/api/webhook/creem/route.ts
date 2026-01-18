@@ -23,19 +23,21 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// Plan configurations - credits per plan (BASIC, STUDIO, PRO, ENTERPRISE)
+// Plan configurations - credits per plan (BASIC, STUDIO, PRO, FOUNDER, ENTERPRISE)
 const PLAN_CREDITS: Record<string, number> = {
   'free': 5,          // Welcome credits only
-  'basic': 50,        // $9/month
-  'studio': 200,      // $29/month
-  'pro': 500,         // $79/month
-  'enterprise': 999999, // $199/month - Unlimited
+  'basic': 100,       // $29/month
+  'studio': 300,      // $79/month
+  'pro': 750,         // $199/month
+  'founder': 500,     // $129/month - LIMITED SPOTS
+  'enterprise': 999999, // $499/month - Unlimited
 };
 
 // Helper to normalize plan name from product name
 function normalizePlanName(productName: string): string {
   const lower = productName.toLowerCase();
   if (lower.includes('enterprise')) return 'enterprise';
+  if (lower.includes('founder')) return 'founder';
   if (lower.includes('pro')) return 'pro';
   if (lower.includes('studio')) return 'studio';
   if (lower.includes('basic')) return 'basic';

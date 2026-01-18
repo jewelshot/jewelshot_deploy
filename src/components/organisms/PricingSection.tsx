@@ -13,12 +13,14 @@ export function PricingSection() {
     {
       id: 'basic',
       name: 'Basic',
-      price: '$9',
+      price: '$29',
+      originalPrice: '$39',
+      discount: '25%',
       period: 'per month',
-      description: 'Perfect for small jewelry shops',
-      credits: '50',
+      description: 'Entry level for small shops',
+      credits: '100',
       features: [
-        '50 credits/month',
+        '100 credits/month',
         '3 concurrent requests',
         '10GB storage',
         'Email support',
@@ -28,16 +30,19 @@ export function PricingSection() {
       cta: 'Start Basic',
       popular: false,
       highlight: false,
+      badge: null,
     },
     {
       id: 'studio',
       name: 'Studio',
-      price: '$29',
+      price: '$79',
+      originalPrice: '$119',
+      discount: '33%',
       period: 'per month',
-      description: 'For growing businesses',
-      credits: '200',
+      description: 'For designers & creators',
+      credits: '300',
       features: [
-        '200 credits/month',
+        '300 credits/month',
         '5 concurrent requests',
         '25GB storage',
         'Priority support',
@@ -46,18 +51,21 @@ export function PricingSection() {
         'Batch processing',
       ],
       cta: 'Start Studio',
-      popular: true,
-      highlight: true,
+      popular: false,
+      highlight: false,
+      badge: null,
     },
     {
       id: 'pro',
       name: 'Pro',
-      price: '$79',
+      price: '$199',
+      originalPrice: '$249',
+      discount: '20%',
       period: 'per month',
-      description: 'For serious jewelry businesses',
-      credits: '500',
+      description: 'For professional businesses',
+      credits: '750',
       features: [
-        '500 credits/month',
+        '750 credits/month',
         '10 concurrent requests',
         '100GB storage',
         'Priority support',
@@ -68,15 +76,44 @@ export function PricingSection() {
         'Custom presets',
       ],
       cta: 'Start Pro',
+      popular: true,
+      highlight: true,
+      badge: 'STANDARD',
+    },
+    {
+      id: 'founder',
+      name: 'Founder',
+      price: '$129',
+      originalPrice: '$249',
+      discount: '48%',
+      period: 'per month',
+      description: 'Limited spots for early supporters',
+      credits: '500',
+      features: [
+        '500 credits/month',
+        '10 concurrent requests',
+        '100GB storage',
+        'Priority support',
+        'Unlimited history',
+        'Maximum quality',
+        'API access',
+        'Founder badge',
+        'Early access features',
+      ],
+      cta: 'Claim Founder Spot',
       popular: false,
-      highlight: false,
+      highlight: true,
+      badge: '🔥 ONLY 20 SPOTS',
+      limited: true,
     },
     {
       id: 'enterprise',
       name: 'Enterprise',
-      price: '$199',
+      price: '$499',
+      originalPrice: '$999',
+      discount: '50%',
       period: 'per month',
-      description: 'For large teams and agencies',
+      description: 'For agencies & large teams',
       credits: 'Unlimited',
       features: [
         'Unlimited credits',
@@ -89,10 +126,12 @@ export function PricingSection() {
         'Custom integrations',
         'White-label options',
         'Team management',
+        'Dedicated account manager',
       ],
       cta: 'Contact Sales',
       popular: false,
       highlight: false,
+      badge: '5 COMPANIES',
     },
   ];
 
@@ -117,7 +156,7 @@ export function PricingSection() {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {plans.map((plan, index) => (
             <div
               key={plan.id}
@@ -126,13 +165,21 @@ export function PricingSection() {
                 animationDelay: `${index * 100}ms`,
               }}
             >
-              {/* Popular Badge */}
-              {plan.popular && (
+              {/* Badge */}
+              {plan.badge && (
                 <div className="absolute -top-4 left-1/2 z-20 -translate-x-1/2">
-                  <div className="flex items-center gap-1 rounded-full border border-purple-500/30 bg-purple-500/20 px-4 py-1 backdrop-blur-xl">
-                    <Sparkles className="h-3 w-3 text-purple-400" />
-                    <span className="text-xs font-semibold text-purple-300">
-                      MOST POPULAR
+                  <div className={`flex items-center gap-1 rounded-full border px-3 py-1 backdrop-blur-xl whitespace-nowrap ${
+                    plan.id === 'founder' 
+                      ? 'border-orange-500/30 bg-orange-500/20' 
+                      : plan.popular 
+                      ? 'border-purple-500/30 bg-purple-500/20'
+                      : 'border-white/20 bg-white/10'
+                  }`}>
+                    {plan.popular && <Sparkles className="h-3 w-3 text-purple-400" />}
+                    <span className={`text-xs font-semibold ${
+                      plan.id === 'founder' ? 'text-orange-300' : plan.popular ? 'text-purple-300' : 'text-white/70'
+                    }`}>
+                      {plan.badge}
                     </span>
                   </div>
                 </div>
@@ -146,21 +193,37 @@ export function PricingSection() {
                     : 'border-white/10 bg-white/5 hover:border-purple-500/20 hover:bg-white/10'
                 }`}
               >
-                {/* Plan Name */}
-                <h3 className="mb-2 text-2xl font-bold text-white">
-                  {plan.name}
-                </h3>
+                {/* Plan Name & Discount */}
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-xl font-bold text-white">
+                    {plan.name}
+                  </h3>
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                    plan.id === 'founder' 
+                      ? 'bg-orange-500/20 text-orange-400' 
+                      : 'bg-green-500/20 text-green-400'
+                  }`}>
+                    -{plan.discount}
+                  </span>
+                </div>
 
                 {/* Price */}
-                <div className="mb-4">
-                  <span className="text-5xl font-bold text-white">
+                <div className="mb-1">
+                  <span className="text-3xl font-bold text-white">
                     {plan.price}
                   </span>
-                  <span className="ml-2 text-white/60">/{plan.period}</span>
+                  <span className="ml-1 text-sm text-white/60">/{plan.period}</span>
+                </div>
+                
+                {/* Original Price */}
+                <div className="mb-4">
+                  <span className="text-sm text-white/40 line-through">
+                    {plan.originalPrice}
+                  </span>
                 </div>
 
                 {/* Description */}
-                <p className="mb-6 text-white/60">{plan.description}</p>
+                <p className="mb-4 text-sm text-white/60">{plan.description}</p>
 
                 {/* CTA Button */}
                 <PrimaryButton

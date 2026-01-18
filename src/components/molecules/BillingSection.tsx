@@ -27,7 +27,7 @@ import { createScopedLogger } from '@/lib/logger';
 const logger = createScopedLogger('BillingSection');
 
 // Plan type for subscription levels
-type PlanType = 'free' | 'basic' | 'studio' | 'pro' | 'enterprise';
+type PlanType = 'free' | 'basic' | 'studio' | 'pro' | 'founder' | 'enterprise';
 
 interface BillingInfo {
   plan: PlanType;
@@ -41,14 +41,15 @@ const PLANS = {
   basic: {
     id: 'basic',
     name: 'Basic',
-    productId: 'prod_REPLACE_WITH_BASIC_ID', // Replace with actual Creem product ID
-    price: 9,
+    productId: 'prod_REPLACE_WITH_BASIC_ID',
+    price: 29,
+    originalPrice: 39,
     period: '/month',
-    credits: 50,
+    credits: 100,
     icon: CreditCard,
     color: 'from-blue-500 to-cyan-500',
     features: [
-      '50 credits/month (+5 bonus)',
+      '100 credits/month (+5 bonus)',
       '3 concurrent requests',
       '10GB storage',
       'Email support',
@@ -58,15 +59,15 @@ const PLANS = {
   studio: {
     id: 'studio',
     name: 'Studio',
-    productId: 'prod_REPLACE_WITH_STUDIO_ID', // Replace with actual Creem product ID
-    price: 29,
+    productId: 'prod_REPLACE_WITH_STUDIO_ID',
+    price: 79,
+    originalPrice: 119,
     period: '/month',
-    credits: 200,
+    credits: 300,
     icon: Zap,
     color: 'from-purple-500 to-pink-500',
-    popular: true,
     features: [
-      '200 credits/month (+5 bonus)',
+      '300 credits/month (+5 bonus)',
       '5 concurrent requests',
       '25GB storage',
       'Priority support',
@@ -77,14 +78,16 @@ const PLANS = {
   pro: {
     id: 'pro',
     name: 'Pro',
-    productId: 'prod_2rAu8IudVOTetQiqDJfYrt', // Replace with actual Creem product ID
-    price: 79,
+    productId: 'prod_REPLACE_WITH_PRO_ID',
+    price: 199,
+    originalPrice: 249,
     period: '/month',
-    credits: 500,
+    credits: 750,
     icon: Crown,
     color: 'from-amber-500 to-orange-500',
+    popular: true,
     features: [
-      '500 credits/month (+5 bonus)',
+      '750 credits/month (+5 bonus)',
       '10 concurrent requests',
       '100GB storage',
       'Priority support',
@@ -92,11 +95,32 @@ const PLANS = {
       'Custom presets',
     ],
   },
+  founder: {
+    id: 'founder',
+    name: 'Founder',
+    productId: 'prod_REPLACE_WITH_FOUNDER_ID',
+    price: 129,
+    originalPrice: 249,
+    period: '/month',
+    credits: 500,
+    icon: Crown,
+    color: 'from-orange-500 to-red-500',
+    limited: true,
+    features: [
+      '500 credits/month (+5 bonus)',
+      '10 concurrent requests',
+      '100GB storage',
+      'Founder badge',
+      'Early access features',
+      'Priority support',
+    ],
+  },
   enterprise: {
     id: 'enterprise',
     name: 'Enterprise',
-    productId: 'prod_REPLACE_WITH_ENTERPRISE_ID', // Replace with actual Creem product ID
-    price: 199,
+    productId: 'prod_REPLACE_WITH_ENTERPRISE_ID',
+    price: 499,
+    originalPrice: 999,
     period: '/month',
     credits: 999999,
     icon: Building,

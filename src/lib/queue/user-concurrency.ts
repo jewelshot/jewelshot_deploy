@@ -19,14 +19,15 @@ const logger = createScopedLogger('UserConcurrency');
 // ============================================
 
 // Plan tiers matching subscription_plans table
-export type UserTier = 'free' | 'basic' | 'studio' | 'pro' | 'enterprise';
+export type UserTier = 'free' | 'basic' | 'studio' | 'pro' | 'founder' | 'enterprise';
 
 const CONCURRENCY_LIMITS: Record<UserTier, number> = {
   free: 2,        // Free: 2 concurrent (5 welcome credits)
-  basic: 3,       // Basic $9/mo: 3 concurrent (50 credits)
-  studio: 5,      // Studio $29/mo: 5 concurrent (200 credits)
-  pro: 10,        // Pro $79/mo: 10 concurrent (500 credits)
-  enterprise: 25, // Enterprise $199/mo: 25 concurrent (unlimited)
+  basic: 3,       // Basic $29/mo: 3 concurrent (100 credits)
+  studio: 5,      // Studio $79/mo: 5 concurrent (300 credits)
+  pro: 10,        // Pro $199/mo: 10 concurrent (750 credits)
+  founder: 10,    // Founder $129/mo: 10 concurrent (500 credits) - LIMITED
+  enterprise: 25, // Enterprise $499/mo: 25 concurrent (unlimited)
 };
 
 // ============================================
