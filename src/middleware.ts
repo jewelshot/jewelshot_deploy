@@ -23,7 +23,7 @@ const redis = process.env.UPSTASH_REDIS_REST_URL
 const ipRateLimiter = redis
   ? new Ratelimit({
       redis,
-      limiter: Ratelimit.slidingWindow(100, '1 m'), // 100 requests per minute per IP
+      limiter: Ratelimit.slidingWindow(500, '1 m'), // 500 requests per minute per IP (increased from 100)
       analytics: true,
       prefix: 'ratelimit:global:ip',
     })
@@ -63,11 +63,16 @@ export async function middleware(request: NextRequest) {
   // - Static assets (_next/static, images, etc.)
   // - Health check endpoint
   // - Auth callbacks (to prevent login issues)
+  // - Credits balance (frequent polling)
+  // - Page navigations (non-API routes)
   const skipRateLimit = 
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api/health') ||
+    pathname.startsWith('/api/credits/balance') ||
     pathname === '/auth/callback' ||
-    pathname.includes('.'); // Static files
+    pathname.startsWith('/auth/') ||
+    pathname.includes('.') || // Static files
+    !pathname.startsWith('/api'); // Skip rate limit for non-API routes (pages)
 
   if (!skipRateLimit && ipRateLimiter) {
     const ip = getClientIp(request);

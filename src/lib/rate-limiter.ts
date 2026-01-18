@@ -252,9 +252,9 @@ export function formatWaitTime(seconds: number): string {
 /**
  * Pre-configured rate limiters for different use cases
  */
-export const aiRateLimiter = new RateLimiter({ maxRequests: 5, windowMs: 60000, storageKey: 'rate_limit_ai' });
-export const galleryRateLimiter = new RateLimiter({ maxRequests: 20, windowMs: 60000, storageKey: 'rate_limit_gallery' });
-export const uploadRateLimiter = new RateLimiter({ maxRequests: 10, windowMs: 60000, storageKey: 'rate_limit_upload' });
+export const aiRateLimiter = new RateLimiter({ maxRequests: 15, windowMs: 60000, storageKey: 'rate_limit_ai' }); // Increased from 5
+export const galleryRateLimiter = new RateLimiter({ maxRequests: 100, windowMs: 60000, storageKey: 'rate_limit_gallery' }); // Increased from 20
+export const uploadRateLimiter = new RateLimiter({ maxRequests: 30, windowMs: 60000, storageKey: 'rate_limit_upload' }); // Increased from 10
 
 export const rateLimiters = {
   ai: aiRateLimiter,

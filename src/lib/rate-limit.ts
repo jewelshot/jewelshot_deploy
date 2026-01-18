@@ -31,19 +31,19 @@ const redis = process.env.UPSTASH_REDIS_REST_URL
 
 const rateLimitConfigs: Record<RateLimitType, RateLimitConfig> = {
   anonymous: {
-    requests: 20,    // Very restrictive for anonymous users
+    requests: 100,   // Anonymous users (increased from 20)
     window: '1 m',
   },
   user: {
-    requests: 100,   // Standard authenticated users
+    requests: 300,   // Standard authenticated users (increased from 100)
     window: '1 m',
   },
   premium: {
-    requests: 500,   // Premium users get more quota
+    requests: 1000,  // Premium users get more quota (increased from 500)
     window: '1 m',
   },
   admin: {
-    requests: 1000,  // Admins get highest quota
+    requests: 2000,  // Admins get highest quota (increased from 1000)
     window: '1 m',
   },
 };
