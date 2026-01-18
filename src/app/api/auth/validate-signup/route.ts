@@ -81,9 +81,11 @@ export async function POST(request: NextRequest) {
     // Get client IP
     const ip = getClientIP(request);
 
-    // Check 1: Honeypot (bot detection)
-    if (checkHoneypot({ honeypot, timestamp: formTimestamp })) {
+    // Check 1: Honeypot (bot detection) - only check if honeypot field is filled
+    // Timestamp check disabled as it causes false positives
+    if (honeypot && honeypot.length > 0) {
       // Don't reveal we detected a bot - just reject silently
+      console.log('Bot detected via honeypot field');
       return NextResponse.json({
         allowed: false,
         reason: 'Unable to process your request. Please try again.',
