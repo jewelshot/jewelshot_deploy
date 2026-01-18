@@ -9,6 +9,7 @@ import ToastContainer from '@/components/organisms/ToastContainer';
 import { GalleryPrefetch } from '@/components/organisms/GalleryPrefetch';
 import GlobalSidebar from '@/components/organisms/GlobalSidebar';
 import { PlausibleAnalytics } from '@/components/analytics/PlausibleAnalytics';
+import { AnalyticsProvider } from '@/components/analytics/AnalyticsProvider';
 import { CookieConsent } from '@/components/molecules/CookieConsent';
 import { OrganizationSchema, SoftwareApplicationSchema, WebSiteSchema } from '@/components/seo/StructuredData';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
@@ -172,6 +173,7 @@ export default function RootLayout({
             <AILoadingModal />
             <GalleryPrefetch />
             <PlausibleAnalytics />
+            <AnalyticsProvider />
             <CookieConsent />
           </LanguageProvider>
         </ThemeProvider>
