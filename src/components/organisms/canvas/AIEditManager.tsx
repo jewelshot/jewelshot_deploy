@@ -58,12 +58,11 @@ export default function AIEditManager({
       if (result.images && result.images.length > 0) {
         onLoadingChange(true); // Start loading overlay
         const aiImageUrl = result.images[0].url;
-        onImageUpdate(aiImageUrl);
         onSuccess('Image edited successfully!');
 
-        // 🎯 AUTO-SAVE to gallery
+        // 🎯 AUTO-SAVE to gallery & get stable URL
         try {
-          await saveImageToGallery(
+          const savedImage = await saveImageToGallery(
             aiImageUrl,
             fileName || 'ai-generated-image.jpg',
             'ai-edited',
@@ -72,6 +71,10 @@ export default function AIEditManager({
             }
           );
 
+          // Use the stable Supabase Storage URL for canvas display
+          onImageUpdate(savedImage.src);
+          onLoadingChange(false);
+
           // Dispatch custom event for gallery sync
           window.dispatchEvent(new Event('gallery-updated'));
 
@@ -79,8 +82,9 @@ export default function AIEditManager({
           onSuccess('Saved to gallery!');
         } catch (error) {
           logger.error('Failed to auto-save to gallery:', error);
-          // Don't show error toast - image generation was successful
-          // User can manually save from Save button if needed
+          // Fallback: use original AI URL if gallery save fails
+          onImageUpdate(aiImageUrl);
+          onLoadingChange(false);
         }
       }
     },

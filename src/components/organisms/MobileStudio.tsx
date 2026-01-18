@@ -71,18 +71,20 @@ export function MobileStudio() {
   const { edit, isEditing, progress } = useImageEdit({
     onSuccess: async (result) => {
       if (result.images && result.images.length > 0) {
-        const newImage = result.images[0].url;
-        setImage(newImage);
-        setHasUnsavedChanges(true);
+        const aiImageUrl = result.images[0].url;
         logger.info('[MobileStudio] AI edit successful');
 
-        // Auto-save to gallery (Supabase)
+        // Auto-save to gallery & get stable URL
         try {
-          await saveImageToGallery(
-            newImage,
+          const savedImage = await saveImageToGallery(
+            aiImageUrl,
             `mobile-${Date.now()}.jpg`,
             'ai-edited'
           );
+          
+          // Use the stable Supabase Storage URL
+          setImage(savedImage.src);
+          setHasUnsavedChanges(true);
           logger.info('[MobileStudio] Image auto-saved to gallery');
 
           // Trigger gallery refresh event
@@ -92,7 +94,9 @@ export function MobileStudio() {
             '[MobileStudio] Failed to auto-save to gallery:',
             saveError
           );
-          // Don't block user, just log the error
+          // Fallback: use original AI URL
+          setImage(aiImageUrl);
+          setHasUnsavedChanges(true);
         }
       }
     },

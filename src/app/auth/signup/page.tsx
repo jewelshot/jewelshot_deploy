@@ -32,6 +32,10 @@ export default function SignupPage() {
       }
 
       const supabase = createClient();
+      
+      // Get the correct site URL for email redirect
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+      
       const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
@@ -39,6 +43,7 @@ export default function SignupPage() {
           data: {
             full_name: fullName,
           },
+          emailRedirectTo: `${siteUrl}/auth/callback`,
         },
       });
 
@@ -55,10 +60,14 @@ export default function SignupPage() {
   const handleGoogleSignup = async () => {
     try {
       const supabase = createClient();
+      
+      // Get the correct site URL for OAuth redirect
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+      
       const { error: signInError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${siteUrl}/auth/callback`,
         },
       });
 

@@ -55,9 +55,16 @@ function VerifyEmailContent() {
 
     try {
       const supabase = createClient();
+      
+      // Get the correct site URL for email redirect
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+      
       const { error } = await supabase.auth.resend({
         type: 'signup',
         email,
+        options: {
+          emailRedirectTo: `${siteUrl}/auth/callback`,
+        },
       });
 
       if (error) {

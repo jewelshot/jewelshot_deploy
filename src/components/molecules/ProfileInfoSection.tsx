@@ -11,6 +11,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Camera, Save, X } from 'lucide-react';
 import Avatar from '@/components/atoms/Avatar';
+import { PhoneVerificationSection } from '@/components/molecules/PhoneVerificationSection';
 import { createScopedLogger } from '@/lib/logger';
 import { useLanguage } from '@/lib/i18n';
 
@@ -401,6 +402,11 @@ export function ProfileInfoSection() {
           </button>
         </div>
       </form>
+
+      {/* Phone Verification Section */}
+      <div className="mt-8">
+        <PhoneVerificationSection />
+      </div>
     </div>
   );
 }

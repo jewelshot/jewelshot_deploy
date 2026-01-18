@@ -222,12 +222,11 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
       if (result.images && result.images.length > 0) {
         setIsAIImageLoading(true); // Start loading overlay
         const aiImageUrl = result.images[0].url;
-        setUploadedImage(aiImageUrl);
         toastManager.success('Image edited successfully!');
 
-        // 🎯 AUTO-SAVE to gallery
+        // 🎯 AUTO-SAVE to gallery & get stable URL
         try {
-          await saveImageToGallery(
+          const savedImage = await saveImageToGallery(
             aiImageUrl,
             fileName || 'ai-generated-image.jpg',
             'ai-edited',
@@ -236,6 +235,11 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
             }
           );
 
+          // Use the stable Supabase Storage URL for canvas display
+          // This ensures the image URL is always accessible
+          setUploadedImage(savedImage.src);
+          setIsAIImageLoading(false);
+
           // Dispatch custom event for gallery sync
           window.dispatchEvent(new Event('gallery-updated'));
 
@@ -243,8 +247,10 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
           toastManager.success('Saved to gallery!');
         } catch (error) {
           logger.error('Failed to auto-save to gallery:', error);
-          // Don't show error toast - image generation was successful
-          // User can manually save from Save button if needed
+          // Fallback: use original AI URL if gallery save fails
+          setUploadedImage(aiImageUrl);
+          setIsAIImageLoading(false);
+          toastManager.warning('Image ready but gallery save failed');
         }
       }
     },

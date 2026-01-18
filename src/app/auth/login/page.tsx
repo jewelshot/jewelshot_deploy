@@ -47,10 +47,14 @@ function LoginContent() {
   const handleGoogleLogin = async () => {
     try {
       const supabase = createClient();
+      
+      // Get the correct site URL for OAuth redirect
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+      
       const { error: signInError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback?redirectTo=${encodeURIComponent(redirectTo)}`,
+          redirectTo: `${siteUrl}/auth/callback?redirectTo=${encodeURIComponent(redirectTo)}`,
         },
       });
 
