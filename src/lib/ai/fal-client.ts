@@ -16,6 +16,65 @@ import { showAILoading, showAISuccess, showAIError } from './ai-request';
 const logger = createScopedLogger('FAL.AI');
 
 // ============================================================================
+// IMAGE COMPRESSION HELPER
+// ============================================================================
+
+/**
+ * Compress base64 image to reduce size before sending to API
+ * Prevents Vercel 4.5MB body limit error (HTTP 413)
+ */
+async function compressBase64Image(dataUrl: string, maxSizeMB: number = 2): Promise<string> {
+  // If it's not a data URL, return as-is (external URL)
+  if (!dataUrl.startsWith('data:')) {
+    return dataUrl;
+  }
+
+  try {
+    // Convert data URL to blob
+    const response = await fetch(dataUrl);
+    const blob = await response.blob();
+    
+    // If already small enough, return as-is
+    const sizeMB = blob.size / (1024 * 1024);
+    if (sizeMB <= maxSizeMB) {
+      logger.info(`Image already small (${sizeMB.toFixed(2)}MB), skipping compression`);
+      return dataUrl;
+    }
+
+    logger.info(`Compressing image from ${sizeMB.toFixed(2)}MB to ~${maxSizeMB}MB`);
+
+    // Lazy load browser-image-compression
+    const imageCompression = (await import('browser-image-compression')).default;
+    
+    // Create File from Blob for compression library
+    const file = new File([blob], 'image.jpg', { type: blob.type || 'image/jpeg' });
+    
+    const compressedFile = await imageCompression(file, {
+      maxSizeMB,
+      maxWidthOrHeight: 2048,
+      useWebWorker: true,
+      fileType: 'image/jpeg',
+    });
+
+    // Convert back to data URL
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        const newSizeMB = (result.length * 0.75) / (1024 * 1024); // Approximate size
+        logger.info(`Compression complete: ${sizeMB.toFixed(2)}MB → ~${newSizeMB.toFixed(2)}MB`);
+        resolve(result);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(compressedFile);
+    });
+  } catch (error) {
+    logger.error('Compression failed, using original:', error);
+    return dataUrl; // Fallback to original
+  }
+}
+
+// ============================================================================
 // TYPES - Based on official fal.ai documentation
 // ============================================================================
 
@@ -307,6 +366,10 @@ export async function editImage(
   showAILoading('edit');
 
   try {
+    // Compress image before sending to prevent HTTP 413 (Payload Too Large)
+    if (onProgress) onProgress('COMPRESSING', 'Optimizing image...');
+    const compressedImageUrl = await compressBase64Image(input.image_url, 2);
+    
     if (onProgress) onProgress('EDITING', 'Processing with AI...');
 
     // Submit job - synchronous processing
@@ -321,7 +384,7 @@ export async function editImage(
           operation: 'edit',
           params: {
             prompt: input.prompt,
-            image_url: input.image_url,
+            image_url: compressedImageUrl, // Use compressed image
             num_images: input.num_images ?? 1,
             output_format: input.output_format ?? 'jpeg',
             aspect_ratio: input.aspect_ratio ?? '1:1',

@@ -60,40 +60,11 @@ DROP POLICY IF EXISTS "Service role manages referrals" ON public.referrals;
 CREATE POLICY "Service role manages referrals" ON public.referrals
   FOR ALL USING (auth.role() = 'service_role');
 
--- 4. Add credits function (if not exists)
-CREATE OR REPLACE FUNCTION add_credits(
-  p_user_id UUID,
-  p_amount INTEGER,
-  p_description TEXT DEFAULT NULL,
-  p_transaction_type TEXT DEFAULT 'bonus'
-)
-RETURNS VOID AS $$
-BEGIN
-  -- Update user credits
-  UPDATE public.user_credits
-  SET 
-    balance = balance + p_amount,
-    updated_at = NOW()
-  WHERE user_id = p_user_id;
-
-  -- Log transaction
-  INSERT INTO public.credit_transactions (
-    user_id,
-    amount,
-    type,
-    description
-  ) VALUES (
-    p_user_id,
-    p_amount,
-    p_transaction_type,
-    p_description
-  );
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- 5. Grant permissions
+-- 4. Grant permissions
 GRANT SELECT ON public.referral_codes TO authenticated;
 GRANT SELECT ON public.referrals TO authenticated;
 GRANT SELECT, INSERT, UPDATE ON public.referral_codes TO service_role;
 GRANT SELECT, INSERT, UPDATE ON public.referrals TO service_role;
-GRANT EXECUTE ON FUNCTION add_credits TO service_role;
+
+-- NOTE: Credits are managed via existing system (user_credits table)
+-- No separate add_credits function needed - use direct UPDATE or existing grant_subscription_credits
