@@ -9,14 +9,15 @@
 
 import React, { useState } from 'react';
 import { useSidebarStore } from '@/store/sidebarStore';
-import { User, BarChart3, Settings, CreditCard } from 'lucide-react';
+import { User, BarChart3, Settings, CreditCard, Gift } from 'lucide-react';
 import ProfileInfoSection from '@/components/molecules/ProfileInfoSection';
 import UsageStatsSection from '@/components/molecules/UsageStatsSection';
 import SettingsSection from '@/components/molecules/SettingsSection';
 import BillingSection from '@/components/molecules/BillingSection';
+import { ReferralSection } from '@/components/molecules/ReferralSection';
 import { useLanguage } from '@/lib/i18n';
 
-type TabType = 'profile' | 'stats' | 'settings' | 'billing';
+type TabType = 'profile' | 'stats' | 'settings' | 'billing' | 'referral';
 
 export function ProfileContent() {
   const { leftOpen } = useSidebarStore();
@@ -26,6 +27,7 @@ export function ProfileContent() {
   const tabs = [
     { id: 'profile' as TabType, label: t.profile.title, icon: User },
     { id: 'stats' as TabType, label: t.nav.gallery, icon: BarChart3 },
+    { id: 'referral' as TabType, label: 'Referral', icon: Gift },
     { id: 'settings' as TabType, label: t.nav.settings, icon: Settings },
     { id: 'billing' as TabType, label: t.profile.plan, icon: CreditCard },
   ];
@@ -79,6 +81,7 @@ export function ProfileContent() {
         <div className="animate-fadeIn">
           {activeTab === 'profile' && <ProfileInfoSection />}
           {activeTab === 'stats' && <UsageStatsSection />}
+          {activeTab === 'referral' && <ReferralSection />}
           {activeTab === 'settings' && <SettingsSection />}
           {activeTab === 'billing' && <BillingSection />}
         </div>
