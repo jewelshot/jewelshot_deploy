@@ -1327,44 +1327,36 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
     }, 500); // 500ms debounce
   }, [uploadedImage]);
 
+  // Store original scale/position before entering compare mode
+  const [savedNormalScale, setSavedNormalScale] = useState<number | null>(null);
+  const [savedNormalPosition, setSavedNormalPosition] = useState<{ x: number; y: number } | null>(null);
+
   // Sync comparison states when switching view modes
   useEffect(() => {
     if (viewMode === 'side-by-side') {
-      // Initialize side-by-side states with current values
-      setLeftImageScale(scale);
-      setLeftImagePosition(position);
-      setRightImageScale(scale);
-      setRightImagePosition(position);
+      // Save current normal view zoom before entering compare mode
+      setSavedNormalScale(scale);
+      setSavedNormalPosition(position);
+      // Initialize compare view with fit-to-view (1.0)
+      setLeftImageScale(1.0);
+      setLeftImagePosition({ x: 0, y: 0 });
+      setRightImageScale(1.0);
+      setRightImagePosition({ x: 0, y: 0 });
       setActiveImage('right');
     } else {
-      // Sync back to single state when switching to normal
-      // Use right image state as the source (AI generated)
-      setScale(rightImageScale);
-      setPosition(rightImagePosition);
+      // Restore saved normal view zoom when exiting compare mode
+      if (savedNormalScale !== null) {
+        setScale(savedNormalScale);
+      }
+      if (savedNormalPosition !== null) {
+        setPosition(savedNormalPosition);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewMode]); // Only run when viewMode changes
 
-  // Update main zoom/position based on active image in compare mode
-  useEffect(() => {
-    if (viewMode === 'side-by-side') {
-      if (activeImage === 'left') {
-        setScale(leftImageScale);
-        setPosition(leftImagePosition);
-      } else {
-        setScale(rightImageScale);
-        setPosition(rightImagePosition);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    activeImage,
-    leftImageScale,
-    leftImagePosition,
-    rightImageScale,
-    rightImagePosition,
-    viewMode,
-  ]);
+  // Note: Compare mode zoom is independent - no longer syncing to main scale
+  // The left/right scale states are used directly in the compare view components
 
   // ============================================================================
   // FILE & ACTION HANDLERS - Moved to useCanvasHandlers hook

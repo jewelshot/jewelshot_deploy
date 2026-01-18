@@ -8,6 +8,7 @@ interface PresetConfirmModalProps {
   requiresModel?: boolean;
   gender?: string;
   aspectRatio?: string;
+  imageUrl?: string; // Canvas image preview
   onConfirm: (jewelryType?: string) => void;
   onCancel: () => void;
 }
@@ -22,6 +23,7 @@ export function PresetConfirmModal({
   requiresModel,
   gender,
   aspectRatio = '1:1',
+  imageUrl,
   onConfirm,
   onCancel,
 }: PresetConfirmModalProps) {
@@ -96,18 +98,31 @@ export function PresetConfirmModal({
 
         {/* Content */}
         <div className="px-5 py-4 space-y-4">
-          {/* Preset Summary */}
+          {/* Image Preview + Preset Summary */}
           <div className="rounded-xl bg-white/5 p-4">
-            <div className="flex items-start gap-3">
-              <div className="rounded-lg bg-purple-500/20 p-2">
-                <ImageIcon className="h-5 w-5 text-purple-400" />
-              </div>
+            <div className="flex items-start gap-4">
+              {/* Canvas Image Thumbnail */}
+              {imageUrl ? (
+                <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg border border-white/10">
+                  <img 
+                    src={imageUrl} 
+                    alt="Source" 
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5">
+                  <ImageIcon className="h-8 w-8 text-white/20" />
+                </div>
+              )}
+              
+              {/* Preset Info */}
               <div className="flex-1 min-w-0">
                 <p className="text-xs text-white/50 mb-0.5">Selected Preset</p>
                 <p className="text-sm font-medium text-white truncate">{presetName}</p>
-                <div className="flex items-center gap-3 mt-2 text-xs text-white/50">
-                  <span>Aspect: {aspectRatio}</span>
-                  {requiresModel && <span>Model: {gender || 'Any'}</span>}
+                <div className="flex flex-wrap items-center gap-2 mt-2 text-xs text-white/50">
+                  <span className="rounded bg-white/10 px-2 py-0.5">{aspectRatio}</span>
+                  {requiresModel && <span className="rounded bg-white/10 px-2 py-0.5">{gender || 'Model'}</span>}
                 </div>
               </div>
             </div>

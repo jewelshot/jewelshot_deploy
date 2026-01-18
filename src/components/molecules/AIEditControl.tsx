@@ -100,8 +100,8 @@ export function AIEditControl({
             : 'pointer-events-none -translate-y-2 scale-95 opacity-0'
         }`}
       >
-        {/* Scrollable container with max-height */}
-        <div className="max-h-[400px] space-y-2 overflow-y-auto">
+        {/* Scrollable container with max-height and solid background */}
+        <div className="max-h-[400px] space-y-2 overflow-y-auto rounded-xl border border-white/10 bg-[#0f0f0f] p-3 shadow-xl">
           {/* Aspect Ratio Selector */}
           <div className="w-full">
             <label className="mb-1 block text-xs text-white/60">
@@ -110,11 +110,11 @@ export function AIEditControl({
             <select
               value={aspectRatio}
               onChange={(e) => setAspectRatio(e.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-white/[0.02] px-4 py-2 text-sm text-white focus:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
+              className="w-full rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-2 text-sm text-white focus:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
               disabled={isEditing}
             >
               {aspectRatios.map((ratio) => (
-                <option key={ratio.value} value={ratio.value}>
+                <option key={ratio.value} value={ratio.value} className="bg-[#1a1a1a] text-white">
                   {ratio.label}
                 </option>
               ))}

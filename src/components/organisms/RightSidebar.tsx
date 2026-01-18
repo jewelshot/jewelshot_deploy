@@ -440,6 +440,8 @@ ${libraryPreset.negativePrompt}`;
             jewelryType={jewelryType}
             requiresModel={confirmModal.requiresModel}
             gender={gender || undefined}
+            aspectRatio={aspectRatio}
+            imageUrl={thumbnailUrl || undefined}
             onConfirm={handleConfirmGeneration}
             onCancel={() => setConfirmModal(null)}
           />
