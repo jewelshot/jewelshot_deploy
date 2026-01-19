@@ -327,7 +327,7 @@ function Model({
   );
 }
 
-// Layer Model component
+// Layer Model component with advanced materials
 function LayerModel({ 
   layer,
   material,
@@ -337,17 +337,39 @@ function LayerModel({
   material: MaterialPreset;
   wireframe?: boolean;
 }) {
+  const meshRef = useRef<THREE.Mesh>(null);
+  
   if (!layer.visible) return null;
   
+  // Determine if this is a stone/gem material
+  const isGem = layer.category === 'stone';
+  
   return (
-    <mesh geometry={layer.geometry} castShadow receiveShadow>
-      <meshStandardMaterial
-        color={material.color}
-        metalness={material.metalness}
-        roughness={material.roughness}
-        envMapIntensity={material.envMapIntensity}
-        wireframe={wireframe}
-      />
+    <mesh ref={meshRef} geometry={layer.geometry} castShadow receiveShadow>
+      {isGem ? (
+        // Enhanced gem material with transparency and refraction
+        <meshPhysicalMaterial
+          color={material.color}
+          metalness={0}
+          roughness={material.roughness}
+          transmission={0.95}
+          thickness={0.5}
+          ior={2.42} // Diamond IOR
+          envMapIntensity={2.5}
+          clearcoat={1}
+          clearcoatRoughness={0}
+          wireframe={wireframe}
+        />
+      ) : (
+        // Metal material
+        <meshStandardMaterial
+          color={material.color}
+          metalness={material.metalness}
+          roughness={material.roughness}
+          envMapIntensity={material.envMapIntensity}
+          wireframe={wireframe}
+        />
+      )}
     </mesh>
   );
 }
@@ -860,7 +882,7 @@ export default function ThreeDViewContent() {
       };
       reader.readAsArrayBuffer(file);
     } else {
-      alert('Unsupported file format. Please use STL files.');
+      alert('Unsupported file format. Please use STL or 3DM files.');
       setIsLoading(false);
       setLoadingStatus('');
     }
@@ -1686,9 +1708,27 @@ export default function ThreeDViewContent() {
                           />
                           <button
                             onClick={() => setSelectedLayerId(selectedLayerId === layer.id ? null : layer.id)}
-                            className="flex-1 text-left text-xs text-white/70 truncate"
+                            className="flex-1 text-left overflow-hidden"
                           >
-                            {layer.name}
+                            <div className="text-xs text-white/70 truncate">{layer.name}</div>
+                            <div className="flex items-center gap-1.5 text-[10px] text-white/40">
+                              <span className={`px-1 py-0.5 rounded text-[9px] ${
+                                layer.category === 'metal' || layer.category === 'setting'
+                                  ? 'bg-yellow-500/20 text-yellow-400'
+                                  : layer.category === 'stone'
+                                  ? 'bg-cyan-500/20 text-cyan-400'
+                                  : 'bg-white/10 text-white/40'
+                              }`}>
+                                {layer.category || 'unknown'}
+                              </span>
+                              {layer.volumeInfo && (
+                                <span>
+                                  {layer.category === 'stone'
+                                    ? `${layer.volumeInfo.carats?.toFixed(2) || '0.00'} ct`
+                                    : `${layer.volumeInfo.weight?.toFixed(2) || '0.00'} g`}
+                                </span>
+                              )}
+                            </div>
                           </button>
                         </div>
                         
@@ -1697,7 +1737,7 @@ export default function ThreeDViewContent() {
                           <div className="mt-2 border-t border-white/10 pt-2">
                             <p className="mb-2 text-[10px] text-white/40">Assign Material:</p>
                             <div className="grid grid-cols-5 gap-1">
-                              {[...METAL_PRESETS, ...STONE_PRESETS].map((preset) => (
+                              {(layer.category === 'stone' ? STONE_PRESETS : METAL_PRESETS).map((preset) => (
                                 <button
                                   key={preset.id}
                                   onClick={() => {
@@ -1712,7 +1752,9 @@ export default function ThreeDViewContent() {
                                       : 'border-white/10 hover:border-white/30'
                                   }`}
                                   style={{ 
-                                    background: `linear-gradient(135deg, ${preset.color} 0%, ${preset.color}88 100%)`
+                                    background: layer.category === 'stone'
+                                      ? `radial-gradient(circle at 30% 30%, white 0%, ${preset.color} 50%)`
+                                      : `linear-gradient(135deg, ${preset.color} 0%, ${preset.color}88 100%)`
                                   }}
                                   title={preset.name}
                                 />
@@ -1722,6 +1764,33 @@ export default function ThreeDViewContent() {
                         )}
                       </div>
                     ))}
+                    
+                    {/* Weight Summary for 3DM */}
+                    {layers.some(l => l.volumeInfo) && (
+                      <div className="mt-3 rounded-lg border border-white/10 bg-white/5 p-3">
+                        <h4 className="text-[10px] font-medium uppercase tracking-wider text-white/50 mb-2">Weight Summary</h4>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="rounded bg-yellow-500/10 border border-yellow-500/20 p-2">
+                            <div className="text-[10px] text-yellow-400/70">Metal</div>
+                            <div className="text-sm font-semibold text-yellow-300">
+                              {layers
+                                .filter(l => l.category !== 'stone' && l.volumeInfo)
+                                .reduce((acc, l) => acc + (l.volumeInfo?.weight || 0), 0)
+                                .toFixed(2)} g
+                            </div>
+                          </div>
+                          <div className="rounded bg-cyan-500/10 border border-cyan-500/20 p-2">
+                            <div className="text-[10px] text-cyan-400/70">Gemstones</div>
+                            <div className="text-sm font-semibold text-cyan-300">
+                              {layers
+                                .filter(l => l.category === 'stone' && l.volumeInfo)
+                                .reduce((acc, l) => acc + (l.volumeInfo?.carats || 0), 0)
+                                .toFixed(2)} ct
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="rounded-lg border border-white/10 bg-white/5 p-4 text-center">
@@ -1747,8 +1816,8 @@ export default function ThreeDViewContent() {
                     <span>STL - Single mesh models</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Circle className="h-3 w-3 text-yellow-400" />
-                    <span>3DM - Coming soon</span>
+                    <Check className="h-3 w-3 text-green-400" />
+                    <span>3DM - Rhino with layers</span>
                   </div>
                 </div>
               </div>
@@ -1761,7 +1830,7 @@ export default function ThreeDViewContent() {
       <input
         ref={fileInputRef}
         type="file"
-        accept=".stl"
+        accept=".stl,.3dm"
         onChange={handleFileUpload}
         className="hidden"
       />
