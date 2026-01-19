@@ -56,29 +56,59 @@ let loadingPromise: Promise<any> | null = null;
  * Load rhino3dm via CDN script tag (avoids bundler issues with fs/path)
  */
 async function loadRhino3dmFromCDN(): Promise<any> {
+  console.log('[Rhino3dm] loadRhino3dmFromCDN called');
+  
   return new Promise((resolve, reject) => {
     // Check if already loaded globally
     if ((window as any).rhino3dm) {
+      console.log('[Rhino3dm] Already loaded globally');
       return resolve((window as any).rhino3dm);
     }
     
+    // Check if script is already in DOM
+    const existingScript = document.querySelector('script[src*="rhino3dm"]');
+    if (existingScript) {
+      console.log('[Rhino3dm] Script tag already exists, waiting for load...');
+      // Wait a bit for it to load
+      const checkInterval = setInterval(() => {
+        if ((window as any).rhino3dm) {
+          clearInterval(checkInterval);
+          resolve((window as any).rhino3dm);
+        }
+      }, 100);
+      setTimeout(() => {
+        clearInterval(checkInterval);
+        if (!(window as any).rhino3dm) {
+          reject(new Error('Timeout waiting for existing rhino3dm script'));
+        }
+      }, 10000);
+      return;
+    }
+    
+    console.log('[Rhino3dm] Creating script tag for CDN...');
     const script = document.createElement('script');
     script.src = 'https://cdn.jsdelivr.net/npm/rhino3dm@8.9.0/rhino3dm.min.js';
     script.async = true;
+    script.crossOrigin = 'anonymous';
     
     script.onload = () => {
+      console.log('[Rhino3dm] Script loaded from CDN');
       if ((window as any).rhino3dm) {
+        console.log('[Rhino3dm] rhino3dm found on window');
         resolve((window as any).rhino3dm);
       } else {
+        console.error('[Rhino3dm] Script loaded but rhino3dm not on window');
         reject(new Error('rhino3dm not found on window after script load'));
       }
     };
     
-    script.onerror = () => {
-      reject(new Error('Failed to load rhino3dm from CDN'));
+    script.onerror = (error) => {
+      console.error('[Rhino3dm] Failed to load script from CDN:', error);
+      reject(new Error('Failed to load rhino3dm from CDN. Check your internet connection and CSP settings.'));
     };
     
     document.head.appendChild(script);
+    console.log('[Rhino3dm] Script tag added to document head');
   });
 }
 
@@ -87,26 +117,47 @@ async function loadRhino3dmFromCDN(): Promise<any> {
  * Only runs on client-side
  */
 export async function initRhino3dm(): Promise<any> {
+  console.log('[Rhino3dm] initRhino3dm called');
+  
   // Check if we're on the server
   if (typeof window === 'undefined') {
+    console.error('[Rhino3dm] Cannot load on server side');
     throw new Error('rhino3dm can only be loaded on the client side');
   }
 
   if (rhino3dmModule) {
+    console.log('[Rhino3dm] Returning cached module');
     return rhino3dmModule;
   }
 
   if (loadingPromise) {
+    console.log('[Rhino3dm] Returning existing loading promise');
     return loadingPromise;
   }
 
+  console.log('[Rhino3dm] Starting new load sequence...');
+  
   loadingPromise = (async () => {
     try {
       // Load via CDN script tag to avoid bundler issues
-      console.log('[Rhino3dm] Loading from CDN...');
+      console.log('[Rhino3dm] Step 1: Loading script from CDN...');
       const rhino3dm = await loadRhino3dmFromCDN();
-      rhino3dmModule = await rhino3dm();
+      
+      console.log('[Rhino3dm] Step 2: Initializing WASM module...');
+      console.log('[Rhino3dm] rhino3dm type:', typeof rhino3dm);
+      
+      // rhino3dm is a function that returns a promise
+      if (typeof rhino3dm === 'function') {
+        rhino3dmModule = await rhino3dm();
+      } else if (rhino3dm && typeof rhino3dm.then === 'function') {
+        rhino3dmModule = await rhino3dm;
+      } else {
+        rhino3dmModule = rhino3dm;
+      }
+      
       console.log('[Rhino3dm] WASM module loaded successfully');
+      console.log('[Rhino3dm] Module keys:', Object.keys(rhino3dmModule || {}).slice(0, 10));
+      
       return rhino3dmModule;
     } catch (error) {
       console.error('[Rhino3dm] Failed to load WASM module:', error);

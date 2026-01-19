@@ -844,20 +844,35 @@ export default function ThreeDViewContent() {
       reader.readAsArrayBuffer(file);
     } else if (file.name.toLowerCase().endsWith('.3dm')) {
       // 3DM File Support
+      console.log('[3DM] Starting 3DM file processing:', file.name);
       reader.onload = async (event) => {
         const contents = event.target?.result;
+        console.log('[3DM] File read complete, size:', contents ? (contents as ArrayBuffer).byteLength : 0);
         if (contents) {
           try {
             setLoadingStatus('Loading rhino3dm...');
+            console.log('[3DM] Importing rhino-loader module...');
             
             // Dynamic import of rhino3dm loader (separate from index to avoid SSR issues)
-            const { parse3DMFile } = await import('@/lib/3d/rhino-loader');
-            const { detectLayerType } = await import('@/lib/3d/layer-detector');
-            const { calculateMeshVolume, calculateWeight } = await import('@/lib/3d/weight-calculator');
-            const { getMaterialById } = await import('@/lib/3d/materials-database');
+            const rhinoLoader = await import('@/lib/3d/rhino-loader');
+            console.log('[3DM] rhino-loader imported:', Object.keys(rhinoLoader));
+            const { parse3DMFile } = rhinoLoader;
+            
+            const layerDetector = await import('@/lib/3d/layer-detector');
+            const { detectLayerType } = layerDetector;
+            
+            const weightCalc = await import('@/lib/3d/weight-calculator');
+            const { calculateMeshVolume, calculateWeight } = weightCalc;
+            
+            const materialsDb = await import('@/lib/3d/materials-database');
+            const { getMaterialById } = materialsDb;
+            
+            console.log('[3DM] All modules imported successfully');
             
             setLoadingStatus('Parsing 3DM file...');
+            console.log('[3DM] Calling parse3DMFile...');
             const doc = await parse3DMFile(contents as ArrayBuffer, file.name);
+            console.log('[3DM] parse3DMFile returned:', doc ? `${doc.objects.length} objects, ${doc.layers.length} layers` : 'null');
             
             setLoadingStatus('Processing layers...');
             
