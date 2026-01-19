@@ -805,6 +805,20 @@ export default function ThreeDViewContent() {
 
   // Process file (shared between click and drag&drop)
   const processFile = useCallback((file: File) => {
+    console.log('[ProcessFile] ========================================');
+    console.log('[ProcessFile] File received:', file.name);
+    console.log('[ProcessFile] File type:', file.type);
+    console.log('[ProcessFile] File size:', file.size, 'bytes');
+    console.log('[ProcessFile] File name lowercase:', file.name.toLowerCase());
+    
+    const fileName = file.name.toLowerCase();
+    const isSTL = fileName.endsWith('.stl');
+    const is3DM = fileName.endsWith('.3dm');
+    
+    console.log('[ProcessFile] Is STL?', isSTL);
+    console.log('[ProcessFile] Is 3DM?', is3DM);
+    console.log('[ProcessFile] ========================================');
+    
     setIsLoading(true);
     setLoadingStatus('Reading file...');
     setFileName(file.name);
@@ -816,7 +830,7 @@ export default function ThreeDViewContent() {
 
     const reader = new FileReader();
     
-    if (file.name.toLowerCase().endsWith('.stl')) {
+    if (isSTL) {
       reader.onload = (event) => {
         const contents = event.target?.result;
         if (contents) {
@@ -842,7 +856,7 @@ export default function ThreeDViewContent() {
         setLoadingStatus('');
       };
       reader.readAsArrayBuffer(file);
-    } else if (file.name.toLowerCase().endsWith('.3dm')) {
+    } else if (is3DM) {
       // 3DM File Support
       console.log('[3DM] Starting 3DM file processing:', file.name);
       reader.onload = async (event) => {
@@ -949,7 +963,9 @@ export default function ThreeDViewContent() {
 
   // Handle file input change
   const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('[FileUpload] Input change event triggered');
     const file = e.target.files?.[0];
+    console.log('[FileUpload] File from input:', file?.name, file?.size);
     if (file) {
       processFile(file);
     }
@@ -968,12 +984,16 @@ export default function ThreeDViewContent() {
   }, []);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
+    console.log('[DragDrop] Drop event triggered');
     e.preventDefault();
     setIsDragging(false);
     
     const file = e.dataTransfer.files[0];
+    console.log('[DragDrop] File from drop:', file?.name, file?.size);
     if (file) {
       processFile(file);
+    } else {
+      console.warn('[DragDrop] No file in dataTransfer');
     }
   }, [processFile]);
 
