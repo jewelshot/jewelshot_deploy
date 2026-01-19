@@ -1114,7 +1114,7 @@ export default function ThreeDViewContent() {
           {/* Zoom Controls */}
           <button
             onClick={handleZoomIn}
-            disabled={!loadedGeometry}
+            disabled={!loadedGeometry && layers.length === 0}
             className="flex h-8 w-8 items-center justify-center rounded-md bg-white/5 text-white/60 hover:bg-white/10 disabled:opacity-30"
             title="Zoom In"
           >
@@ -1122,7 +1122,7 @@ export default function ThreeDViewContent() {
           </button>
           <button
             onClick={handleZoomOut}
-            disabled={!loadedGeometry}
+            disabled={!loadedGeometry && layers.length === 0}
             className="flex h-8 w-8 items-center justify-center rounded-md bg-white/5 text-white/60 hover:bg-white/10 disabled:opacity-30"
             title="Zoom Out"
           >
@@ -1174,7 +1174,7 @@ export default function ThreeDViewContent() {
           <div className="flex items-center gap-0.5 rounded-md border border-white/10 bg-white/5 px-1">
             <button
               onClick={handleRotateX}
-              disabled={!loadedGeometry}
+              disabled={!loadedGeometry && layers.length === 0}
               className="flex h-7 w-7 items-center justify-center rounded text-white/60 hover:bg-white/10 disabled:opacity-30"
               title="Rotate X (90°)"
             >
@@ -1182,7 +1182,7 @@ export default function ThreeDViewContent() {
             </button>
             <button
               onClick={handleRotateY}
-              disabled={!loadedGeometry}
+              disabled={!loadedGeometry && layers.length === 0}
               className="flex h-7 w-7 items-center justify-center rounded text-white/60 hover:bg-white/10 disabled:opacity-30"
               title="Rotate Y (90°)"
             >
@@ -1190,7 +1190,7 @@ export default function ThreeDViewContent() {
             </button>
             <button
               onClick={handleRotateZ}
-              disabled={!loadedGeometry}
+              disabled={!loadedGeometry && layers.length === 0}
               className="flex h-7 w-7 items-center justify-center rounded text-white/60 hover:bg-white/10 disabled:opacity-30"
               title="Rotate Z (90°)"
             >
@@ -1202,7 +1202,7 @@ export default function ThreeDViewContent() {
 
           <button
             onClick={() => fitToViewFn?.()}
-            disabled={!loadedGeometry}
+            disabled={!loadedGeometry && layers.length === 0}
             className="flex h-8 items-center gap-1.5 rounded-md bg-white/5 px-2.5 text-xs text-white/60 hover:bg-white/10 disabled:opacity-30"
             title="Fit to View (Center model)"
           >
@@ -1234,7 +1234,7 @@ export default function ThreeDViewContent() {
           
           <button
             onClick={handleSnapshot}
-            disabled={!loadedGeometry}
+            disabled={!loadedGeometry && layers.length === 0}
             className="flex h-8 items-center gap-1.5 rounded-md bg-purple-500 px-3 text-xs font-medium text-white hover:bg-purple-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Camera className="h-3.5 w-3.5" />
@@ -1246,7 +1246,7 @@ export default function ThreeDViewContent() {
           {/* Shutter Button - Take snapshot and open in Studio */}
           <button
             onClick={handleShutterClick}
-            disabled={!loadedGeometry}
+            disabled={!loadedGeometry && layers.length === 0}
             className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-rose-500 to-orange-500 text-white shadow-lg hover:from-rose-600 hover:to-orange-600 disabled:cursor-not-allowed disabled:opacity-50 transition-all hover:scale-105"
             title="Capture & Open in Studio"
           >
@@ -1271,7 +1271,8 @@ export default function ThreeDViewContent() {
             <div className="absolute inset-0 z-20 flex items-center justify-center bg-purple-500/20 backdrop-blur-sm">
               <div className="rounded-2xl border-2 border-dashed border-purple-400 bg-purple-500/10 p-12 text-center">
                 <Upload className="mx-auto h-12 w-12 text-purple-400" />
-                <p className="mt-4 text-lg font-medium text-white">Drop STL file here</p>
+                <p className="mt-4 text-lg font-medium text-white">Drop 3D model here</p>
+                <p className="mt-2 text-sm text-purple-300">STL or 3DM format</p>
               </div>
             </div>
           )}
@@ -1285,7 +1286,7 @@ export default function ThreeDViewContent() {
             </div>
           )}
 
-          {!loadedGeometry && !isLoading && (
+          {!loadedGeometry && layers.length === 0 && !isLoading && (
             <div className="absolute inset-0 z-10 flex items-center justify-center">
               <div className="text-center">
                 <button
@@ -1297,7 +1298,7 @@ export default function ThreeDViewContent() {
                     Upload 3D Model
                   </span>
                   <span className="mt-2 text-sm text-white/40">
-                    Supports STL format
+                    Supports STL and 3DM formats
                   </span>
                 </button>
                 <p className="text-xs text-white/30">
