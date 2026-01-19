@@ -366,15 +366,11 @@ function LayerModel({
   layer,
   material,
   wireframe = false,
-  isSelected = false,
-  isHovered = false,
   onMeshRef,
 }: { 
   layer: ModelLayer;
   material: MaterialPreset;
   wireframe?: boolean;
-  isSelected?: boolean;
-  isHovered?: boolean;
   onMeshRef?: (mesh: THREE.Mesh | null, layerId: string) => void;
 }) {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -396,8 +392,8 @@ function LayerModel({
   // Determine if this is a stone/gem material
   const isGem = layer.category === 'stone';
   
-  // Emissive boost when hovered
-  const emissiveIntensity = isHovered ? 0.1 : 0;
+  // NO emissive changes - keep original material colors
+  // Selection is handled by OutlinePass (orange edge line only)
   
   return (
     <mesh 
@@ -420,19 +416,15 @@ function LayerModel({
           clearcoat={1}
           clearcoatRoughness={0}
           wireframe={wireframe}
-          emissive={isHovered ? '#ff6600' : '#000000'}
-          emissiveIntensity={emissiveIntensity}
         />
       ) : (
-        // Metal material
+        // Metal material - keeps original color
         <meshStandardMaterial
           color={material.color}
           metalness={material.metalness}
           roughness={material.roughness}
           envMapIntensity={material.envMapIntensity}
           wireframe={wireframe}
-          emissive={isHovered ? '#ff6600' : '#000000'}
-          emissiveIntensity={emissiveIntensity}
         />
       )}
     </mesh>
@@ -537,10 +529,11 @@ function ObjectSelectionController({
   // Outline effect
   const composer = useRef<EffectComposer | null>(null);
   const outlinePass = useRef<OutlinePass | null>(null);
+  const isInitialized = useRef(false);
   
-  // Setup outline composer
+  // Setup outline composer - only once
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled || isInitialized.current) return;
     
     const effectComposer = new EffectComposer(gl);
     composer.current = effectComposer;
@@ -548,17 +541,19 @@ function ObjectSelectionController({
     const renderPass = new RenderPass(scene, camera);
     effectComposer.addPass(renderPass);
     
+    // Orange outline like iJewel3D
     const outline = new OutlinePass(
       new THREE.Vector2(size.width, size.height),
       scene,
       camera
     );
-    outline.edgeStrength = 4;
-    outline.edgeGlow = 0.3;
-    outline.edgeThickness = 1.5;
-    outline.pulsePeriod = 0;
-    outline.visibleEdgeColor.set('#ff6600');
-    outline.hiddenEdgeColor.set('#ff660066');
+    // Strong, visible orange outline
+    outline.edgeStrength = 6;       // Stronger edge
+    outline.edgeGlow = 0.5;         // More glow
+    outline.edgeThickness = 2;      // Thicker line
+    outline.pulsePeriod = 0;        // No pulsing
+    outline.visibleEdgeColor.set('#ff6600');  // Orange
+    outline.hiddenEdgeColor.set('#ff660044'); // Faded orange for hidden parts
     outlinePass.current = outline;
     effectComposer.addPass(outline);
     
@@ -566,33 +561,57 @@ function ObjectSelectionController({
     fxaaPass.uniforms['resolution'].value.set(1 / size.width, 1 / size.height);
     effectComposer.addPass(fxaaPass);
     
+    isInitialized.current = true;
+    
     return () => {
       effectComposer.dispose();
+      isInitialized.current = false;
     };
   }, [enabled, gl, scene, camera, size]);
   
-  // Update selected objects for outline
+  // Update selected/hovered objects for outline
   useEffect(() => {
-    if (outlinePass.current && selectedLayerId) {
+    if (!outlinePass.current) return;
+    
+    const selectedObjects: THREE.Object3D[] = [];
+    
+    // Add selected object with strong outline
+    if (selectedLayerId) {
       const mesh = meshRegistry.get(selectedLayerId);
-      outlinePass.current.selectedObjects = mesh ? [mesh] : [];
-    } else if (outlinePass.current) {
-      outlinePass.current.selectedObjects = [];
+      if (mesh) selectedObjects.push(mesh);
     }
-  }, [selectedLayerId, meshRegistry]);
+    
+    // Optionally add hovered object if different from selected
+    if (hoveredLayerId && hoveredLayerId !== selectedLayerId) {
+      const mesh = meshRegistry.get(hoveredLayerId);
+      if (mesh) selectedObjects.push(mesh);
+    }
+    
+    outlinePass.current.selectedObjects = selectedObjects;
+  }, [selectedLayerId, hoveredLayerId, meshRegistry]);
   
   // Handle resize
   useEffect(() => {
     if (composer.current) {
       composer.current.setSize(size.width, size.height);
     }
+    if (outlinePass.current) {
+      outlinePass.current.resolution.set(size.width, size.height);
+    }
   }, [size]);
   
-  // Render with outline
-  useFrame(() => {
-    if (enabled && composer.current && selectedLayerId) {
+  // ALWAYS render with composer when we have selection or hover
+  // This replaces the default R3F render
+  useFrame(({ gl: renderer }) => {
+    if (!enabled || !composer.current) return;
+    
+    const hasOutlineTargets = selectedLayerId || hoveredLayerId;
+    
+    if (hasOutlineTargets) {
+      // Render with outline effect
       composer.current.render();
     }
+    // When no selection, let R3F render normally (don't call composer)
   }, 1);
   
   // Mouse event handlers
@@ -957,8 +976,6 @@ function SceneContent({
               layer={layer}
               material={layerMaterials[layer.id] || METAL_PRESETS[0]}
               wireframe={wireframe}
-              isSelected={selectedLayerId === layer.id}
-              isHovered={hoveredLayerId === layer.id}
               onMeshRef={handleMeshRef}
             />
           ))}
