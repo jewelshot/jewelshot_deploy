@@ -911,6 +911,11 @@ export default function ThreeDViewContent() {
             setModelInfo({ vertices: totalVertices, faces: totalFaces });
             
             console.log(`[3DM] Loaded ${processedLayers.length} layers from ${file.name}`);
+            
+            // Warn if no meshable objects found
+            if (processedLayers.length === 0) {
+              alert(`No displayable objects found in ${file.name}.\n\nPossible reasons:\n- File contains only curves, points, or annotations\n- Geometry could not be converted to mesh\n- File might be from an unsupported Rhino version\n\nCheck browser console (F12) for details.`);
+            }
           } catch (error) {
             console.error('Error parsing 3DM:', error);
             alert(`Error loading 3DM file: ${error instanceof Error ? error.message : 'Unknown error'}`);

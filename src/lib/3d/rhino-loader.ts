@@ -314,14 +314,28 @@ function mergeBufferGeometries(geometries: THREE.BufferGeometry[]): THREE.Buffer
  * Parse a 3DM file and extract layers, objects, and metadata
  */
 export async function parse3DMFile(buffer: ArrayBuffer, fileName: string = 'model.3dm'): Promise<Rhino3dmDocument> {
+  console.log(`[Rhino3dm] Starting to parse: ${fileName} (${(buffer.byteLength / 1024).toFixed(1)} KB)`);
+  
   const rhino = await initRhino3dm();
+  
+  if (!rhino) {
+    throw new Error('rhino3dm module not loaded');
+  }
   
   // Parse the file
   const uint8Array = new Uint8Array(buffer);
-  const doc = rhino.File3dm.fromByteArray(uint8Array);
+  console.log('[Rhino3dm] Calling File3dm.fromByteArray...');
+  
+  let doc;
+  try {
+    doc = rhino.File3dm.fromByteArray(uint8Array);
+  } catch (parseError) {
+    console.error('[Rhino3dm] Parse error:', parseError);
+    throw new Error(`Failed to parse 3DM file: ${parseError instanceof Error ? parseError.message : 'Unknown parsing error'}`);
+  }
   
   if (!doc) {
-    throw new Error('Failed to parse 3DM file. The file may be corrupted or in an unsupported format.');
+    throw new Error('Failed to parse 3DM file. The file may be corrupted, in an unsupported Rhino version, or not a valid 3DM file.');
   }
   
   console.log('[Rhino3dm] Document parsed successfully');
@@ -350,70 +364,119 @@ export async function parse3DMFile(buffer: ArrayBuffer, fileName: string = 'mode
   // Extract objects
   const objects: RhinoObject[] = [];
   const objectTable = doc.objects();
+  const totalObjects = objectTable.count;
   
-  for (let i = 0; i < objectTable.count; i++) {
-    const obj = objectTable.get(i);
-    const attributes = obj.attributes();
-    const geometry = obj.geometry();
-    
-    if (!geometry) continue;
-    
-    let bufferGeometry: THREE.BufferGeometry | null = null;
-    const geometryType = geometry.objectType;
-    
-    // Convert based on geometry type
-    switch (geometryType) {
-      case rhino.ObjectType.Mesh:
-        bufferGeometry = rhinoMeshToBufferGeometry(geometry);
-        break;
-        
-      case rhino.ObjectType.Brep:
-      case rhino.ObjectType.Extrusion:
-        bufferGeometry = rhinoBrepToMesh(geometry, rhino);
-        break;
-        
-      case rhino.ObjectType.SubD:
-        // SubD needs to be converted to mesh first
-        try {
+  console.log(`[Rhino3dm] Processing ${totalObjects} objects...`);
+  
+  let skippedCount = 0;
+  let errorCount = 0;
+  
+  for (let i = 0; i < totalObjects; i++) {
+    try {
+      const obj = objectTable.get(i);
+      if (!obj) {
+        console.warn(`[Rhino3dm] Object ${i} is null`);
+        skippedCount++;
+        continue;
+      }
+      
+      const attributes = obj.attributes();
+      const geometry = obj.geometry();
+      
+      if (!geometry) {
+        console.log(`[Rhino3dm] Object ${i} has no geometry`);
+        skippedCount++;
+        continue;
+      }
+      
+      let bufferGeometry: THREE.BufferGeometry | null = null;
+      const geometryType = geometry.objectType;
+      
+      // Log geometry type for debugging
+      console.log(`[Rhino3dm] Object ${i}: type=${geometryType}`);
+      
+      // Convert based on geometry type
+      // ObjectType enum values: https://mcneel.github.io/rhino3dm/javascript/api/ObjectType.html
+      try {
+        if (geometryType === rhino.ObjectType.Mesh || geometryType === 32) {
+          bufferGeometry = rhinoMeshToBufferGeometry(geometry);
+        } else if (geometryType === rhino.ObjectType.Brep || geometryType === 16) {
+          bufferGeometry = rhinoBrepToMesh(geometry, rhino);
+        } else if (geometryType === rhino.ObjectType.Extrusion || geometryType === 1073741824) {
+          bufferGeometry = rhinoBrepToMesh(geometry, rhino);
+        } else if (geometryType === rhino.ObjectType.SubD || geometryType === 8388608) {
+          // SubD needs to be converted to mesh first
           const subdMesh = geometry.toMesh(rhino.MeshType.Any);
           if (subdMesh) {
             bufferGeometry = rhinoMeshToBufferGeometry(subdMesh);
           }
-        } catch (e) {
-          console.warn('[Rhino3dm] Failed to convert SubD:', e);
+        } else if (geometryType === rhino.ObjectType.Surface || geometryType === 8) {
+          // Try to convert surface to brep then mesh
+          try {
+            const brep = geometry.toBrep();
+            if (brep) {
+              bufferGeometry = rhinoBrepToMesh(brep, rhino);
+            }
+          } catch (e) {
+            console.log(`[Rhino3dm] Could not convert Surface to mesh`);
+          }
+        } else if (geometryType === rhino.ObjectType.PolysrfFilter || geometryType === 16) {
+          bufferGeometry = rhinoBrepToMesh(geometry, rhino);
+        } else {
+          // Skip non-mesh geometry types (curves, points, annotations, etc.)
+          console.log(`[Rhino3dm] Skipping geometry type: ${geometryType} (not meshable)`);
+          skippedCount++;
+          continue;
         }
-        break;
-        
-      default:
-        console.log(`[Rhino3dm] Skipping unsupported geometry type: ${geometryType}`);
+      } catch (conversionError) {
+        console.warn(`[Rhino3dm] Failed to convert object ${i}:`, conversionError);
+        errorCount++;
         continue;
-    }
-    
-    if (bufferGeometry) {
-      const layerIndex = attributes.layerIndex;
-      const layer = layers[layerIndex] || layers[0];
-      
-      // Get object color (from attributes or layer)
-      let objColor: string | null = null;
-      const colorSource = attributes.colorSource;
-      if (colorSource === rhino.ObjectColorSource.ColorFromObject) {
-        const c = attributes.objectColor;
-        objColor = rgbToHex(c.r, c.g, c.b);
       }
       
-      objects.push({
-        id: attributes.id || `object-${i}`,
-        layerIndex,
-        layerId: layer.id,
-        geometry: bufferGeometry,
-        objectType: geometryType.toString(),
-        name: attributes.name || `Object ${i}`,
-        color: objColor,
-      });
+      if (bufferGeometry) {
+        const layerIndex = attributes.layerIndex;
+        const layer = layers[layerIndex] || layers[0];
+        
+        // Get object color (from attributes or layer)
+        let objColor: string | null = null;
+        try {
+          const colorSource = attributes.colorSource;
+          if (colorSource === rhino.ObjectColorSource.ColorFromObject) {
+            const c = attributes.objectColor;
+            objColor = rgbToHex(c.r, c.g, c.b);
+          }
+        } catch (e) {
+          // Use layer color as fallback
+        }
+        
+        objects.push({
+          id: attributes.id || `object-${i}`,
+          layerIndex,
+          layerId: layer.id,
+          geometry: bufferGeometry,
+          objectType: geometryType.toString(),
+          name: attributes.name || `Object ${i}`,
+          color: objColor,
+        });
+        
+        console.log(`[Rhino3dm] Object ${i} converted successfully (${bufferGeometry.getAttribute('position')?.count || 0} vertices)`);
+      } else {
+        console.warn(`[Rhino3dm] Object ${i}: conversion returned null geometry`);
+        errorCount++;
+      }
+    } catch (objError) {
+      console.error(`[Rhino3dm] Error processing object ${i}:`, objError);
+      errorCount++;
     }
   }
   
-  console.log(`[Rhino3dm] Extracted ${objects.length} objects`);
+  console.log(`[Rhino3dm] Extracted ${objects.length} objects (skipped: ${skippedCount}, errors: ${errorCount})`);
+  
+  // Warn if no objects were extracted
+  if (objects.length === 0 && totalObjects > 0) {
+    console.warn('[Rhino3dm] WARNING: No meshable objects found in file. The file may contain only curves, points, or other non-mesh geometry.');
+  }
   
   // Get document metadata
   const settings = doc.settings();
