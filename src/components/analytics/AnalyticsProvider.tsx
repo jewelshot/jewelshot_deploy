@@ -9,7 +9,8 @@
 import { GoogleAnalytics } from './GoogleAnalytics';
 import { MetaPixel } from './MetaPixel';
 import { Hotjar } from './Hotjar';
-import { JivoChat } from './JivoChat';
+// JivoChat disabled - sürekli modal açıyor, rahatsız edici
+// import { JivoChat } from './JivoChat';
 
 export function AnalyticsProvider() {
   // Production'da mı kontrol et
@@ -23,7 +24,8 @@ export function AnalyticsProvider() {
       <GoogleAnalytics />
       <MetaPixel />
       <Hotjar />
-      <JivoChat />
+      {/* JivoChat disabled - rahatsız edici popup'lar */}
+      {/* <JivoChat /> */}
     </>
   );
 }
