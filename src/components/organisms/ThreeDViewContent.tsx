@@ -24,6 +24,7 @@ import {
   Box,
   RotateCcw,
   Camera,
+  Compass,
   Download,
   Layers,
   Eye,
@@ -356,50 +357,29 @@ function Model({
   );
 }
 
-// Layer Model component with advanced materials and selection support
+// Layer Model component with advanced materials
 function LayerModel({ 
   layer,
   material,
   wireframe = false,
-  onMeshRef,
 }: { 
   layer: ModelLayer;
   material: MaterialPreset;
   wireframe?: boolean;
-  onMeshRef?: (mesh: THREE.Mesh | null, layerId: string) => void;
 }) {
-  const meshRef = useRef<THREE.Mesh>(null);
-  
-  // Register mesh ref for picking
-  useEffect(() => {
-    if (meshRef.current) {
-      meshRef.current.userData.layerId = layer.id;
-      meshRef.current.userData.selectable = true;
-      onMeshRef?.(meshRef.current, layer.id);
-    }
-    return () => {
-      onMeshRef?.(null, layer.id);
-    };
-  }, [layer.id, onMeshRef]);
-  
   if (!layer.visible) return null;
   
   // Determine if this is a stone/gem material
   const isGem = layer.category === 'stone';
   
-  // NO emissive changes - keep original material colors
-  // Selection is handled by OutlinePass (orange edge line only)
-  
   return (
     <mesh 
-      ref={meshRef} 
       geometry={layer.geometry} 
       castShadow 
       receiveShadow
-      userData={{ layerId: layer.id, selectable: true }}
     >
       {isGem ? (
-        // Enhanced gem material with transparency and refraction
+        // Enhanced gem material with transparency and refraction (for diamonds, rubies, etc.)
         <meshPhysicalMaterial
           color={material.color}
           metalness={0}
@@ -413,7 +393,7 @@ function LayerModel({
           wireframe={wireframe}
         />
       ) : (
-        // Metal material - keeps original color
+        // Metal material (gold, silver, platinum, etc.)
         <meshStandardMaterial
           color={material.color}
           metalness={material.metalness}
@@ -501,129 +481,6 @@ function AdaptiveResolutionController({
   return null;
 }
 
-// Object Picker Controller - Click to select, orange outline on selected object only
-function ObjectSelectionController({
-  enabled = true,
-  selectedLayerId,
-  onSelect,
-  meshRegistry,
-}: {
-  enabled?: boolean;
-  selectedLayerId: string | null;
-  onSelect: (layerId: string | null) => void;
-  meshRegistry: Map<string, THREE.Mesh>;
-}) {
-  const { camera, gl } = useThree();
-  const raycaster = useRef(new THREE.Raycaster());
-  const mouse = useRef(new THREE.Vector2());
-  
-  // Mouse event handlers - ONLY click, no hover effect
-  useEffect(() => {
-    if (!enabled) return;
-    
-    const canvas = gl.domElement;
-    
-    // Only change cursor on hover, no visual effect
-    const handleMouseMove = (event: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      mouse.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      mouse.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-      
-      raycaster.current.setFromCamera(mouse.current, camera);
-      
-      const meshes = Array.from(meshRegistry.values());
-      const intersects = raycaster.current.intersectObjects(meshes, false);
-      
-      canvas.style.cursor = intersects.length > 0 ? 'pointer' : 'default';
-    };
-    
-    const handleClick = (event: MouseEvent) => {
-      if (event.button !== 0) return;
-      
-      const rect = canvas.getBoundingClientRect();
-      mouse.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      mouse.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-      
-      raycaster.current.setFromCamera(mouse.current, camera);
-      
-      const meshes = Array.from(meshRegistry.values());
-      const intersects = raycaster.current.intersectObjects(meshes, false);
-      
-      if (intersects.length > 0) {
-        const layerId = intersects[0].object.userData.layerId;
-        onSelect(layerId === selectedLayerId ? null : layerId);
-      } else {
-        onSelect(null);
-      }
-    };
-    
-    canvas.addEventListener('mousemove', handleMouseMove);
-    canvas.addEventListener('click', handleClick);
-    
-    return () => {
-      canvas.removeEventListener('mousemove', handleMouseMove);
-      canvas.removeEventListener('click', handleClick);
-      canvas.style.cursor = 'default';
-    };
-  }, [enabled, gl, camera, meshRegistry, selectedLayerId, onSelect]);
-  
-  return null;
-}
-
-// Simple Outline - Orange edge lines on selected object (no post-processing)
-// This approach doesn't affect other objects' rendering
-function SimpleSelectionOutline({
-  selectedLayerId,
-  meshRegistry,
-}: {
-  selectedLayerId: string | null;
-  meshRegistry: Map<string, THREE.Mesh>;
-}) {
-  const [outlineGeometry, setOutlineGeometry] = useState<THREE.BufferGeometry | null>(null);
-  const [outlinePosition, setOutlinePosition] = useState<THREE.Vector3>(new THREE.Vector3());
-  const [outlineScale, setOutlineScale] = useState<THREE.Vector3>(new THREE.Vector3(1, 1, 1));
-  
-  // Create edge geometry when selection changes
-  useEffect(() => {
-    if (!selectedLayerId) {
-      setOutlineGeometry(null);
-      return;
-    }
-    
-    const mesh = meshRegistry.get(selectedLayerId);
-    if (!mesh || !mesh.geometry) {
-      setOutlineGeometry(null);
-      return;
-    }
-    
-    // Create edges from the selected mesh's geometry
-    const edges = new THREE.EdgesGeometry(mesh.geometry, 15); // 15 degree threshold
-    setOutlineGeometry(edges);
-    
-    // Get world position and scale
-    mesh.getWorldPosition(outlinePosition);
-    mesh.getWorldScale(outlineScale);
-    setOutlinePosition(outlinePosition.clone());
-    setOutlineScale(outlineScale.clone());
-  }, [selectedLayerId, meshRegistry]);
-  
-  if (!outlineGeometry || !selectedLayerId) return null;
-  
-  const mesh = meshRegistry.get(selectedLayerId);
-  if (!mesh) return null;
-  
-  return (
-    <lineSegments geometry={outlineGeometry}>
-      <lineBasicMaterial 
-        color="#ff6600" 
-        linewidth={2}
-        transparent
-        opacity={0.9}
-      />
-    </lineSegments>
-  );
-}
-
 // Scene content component
 function SceneContent({
   geometry,
@@ -642,9 +499,7 @@ function SceneContent({
   lightIntensity,
   onControlsReady,
   onFitToView,
-  selectedLayerId,
-  onSelectLayer,
-  meshRegistry,
+  envRotation,
   adaptiveResolution,
   onResolutionChange,
 }: {
@@ -664,9 +519,7 @@ function SceneContent({
   lightIntensity: number;
   onControlsReady: (controls: any) => void;
   onFitToView: (fitFn: () => void) => void;
-  selectedLayerId: string | null;
-  onSelectLayer: (id: string | null) => void;
-  meshRegistry: Map<string, THREE.Mesh>;
+  envRotation: [number, number, number];
   adaptiveResolution: boolean;
   onResolutionChange?: (ratio: number, isRefining: boolean) => void;
 }) {
@@ -674,15 +527,6 @@ function SceneContent({
   const groupRef = useRef<THREE.Group>(null);
   const meshRef = useRef<THREE.Mesh>(null);
   const { camera } = useThree();
-  
-  // Mesh registry callback
-  const handleMeshRef = useCallback((mesh: THREE.Mesh | null, layerId: string) => {
-    if (mesh) {
-      meshRegistry.set(layerId, mesh);
-    } else {
-      meshRegistry.delete(layerId);
-    }
-  }, [meshRegistry]);
   const [modelTransform, setModelTransform] = useState<{
     position: THREE.Vector3;
     scale: number;
@@ -923,7 +767,6 @@ function SceneContent({
               layer={layer}
               material={layerMaterials[layer.id] || METAL_PRESETS[0]}
               wireframe={wireframe}
-              onMeshRef={handleMeshRef}
             />
           ))}
         </group>
@@ -945,11 +788,11 @@ function SceneContent({
         target={[0, 0, 0]}
       />
       
-      {/* Axis Gizmo in corner - hide during snapshot */}
+      {/* Axis Gizmo in corner - only show when grid is visible */}
       {showGrid && (
         <GizmoHelper alignment="bottom-right" margin={[60, 60]}>
           <GizmoViewport 
-            axisColors={['#cc6666', '#66aa66', '#6688bb']}  // Softer, muted colors
+            axisColors={['#cc6666', '#66aa66', '#6688bb']}
             labelColor="#888888"
             hideNegativeAxes
             font="12px Inter, system-ui, sans-serif"
@@ -962,24 +805,6 @@ function SceneContent({
         enabled={adaptiveResolution}
         onResolutionChange={onResolutionChange}
       />
-      
-      {/* Object Selection - Click to select */}
-      {layers.length > 0 && (
-        <ObjectSelectionController
-          enabled={true}
-          selectedLayerId={selectedLayerId}
-          onSelect={onSelectLayer}
-          meshRegistry={meshRegistry}
-        />
-      )}
-      
-      {/* Simple Orange Outline - No post-processing, won't affect other objects */}
-      {layers.length > 0 && selectedLayerId && (
-        <SimpleSelectionOutline
-          selectedLayerId={selectedLayerId}
-          meshRegistry={meshRegistry}
-        />
-      )}
     </>
   );
 }
@@ -1019,7 +844,7 @@ export default function ThreeDViewContent() {
   const [fileName, setFileName] = useState<string | null>(null);
   const [selectedMaterial, setSelectedMaterial] = useState<MaterialPreset>(METAL_PRESETS[0]);
   const [autoRotate, setAutoRotate] = useState(false);
-  const [showGrid, setShowGrid] = useState(true);
+  const [showGrid, setShowGrid] = useState(false); // Default OFF for cleaner view
   const [wireframe, setWireframe] = useState(false);
   const [materialType, setMaterialType] = useState<'metal' | 'stone' | 'matte'>('metal');
   const [snapshotPreview, setSnapshotPreview] = useState<string | null>(null);
@@ -1042,17 +867,22 @@ export default function ThreeDViewContent() {
   const [raw3DMBuffer, setRaw3DMBuffer] = useState<ArrayBuffer | null>(null); // Store raw file for re-tessellation
   const [raw3DMFileName, setRaw3DMFileName] = useState<string | null>(null);
   
-  // Layer state (for future 3DM support)
+  // Layer state (for 3DM support)
   const [layers, setLayers] = useState<ModelLayer[]>([]);
-  const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
   const [layerMaterials, setLayerMaterials] = useState<Record<string, MaterialPreset>>({});
+  const [layersAccordionOpen, setLayersAccordionOpen] = useState(true);
   
-  // Progressive rendering & selection state
+  // Progressive rendering state
   const [adaptiveResolution, setAdaptiveResolution] = useState(true);
   const [currentResolution, setCurrentResolution] = useState(1);
   const [isRefining, setIsRefining] = useState(false);
-  const [layersAccordionOpen, setLayersAccordionOpen] = useState(true);
   const meshRegistryRef = useRef<Map<string, THREE.Mesh>>(new Map());
+  
+  // Environment rotation (X, Y, Z in degrees)
+  const [envRotation, setEnvRotation] = useState<[number, number, number]>([0, 0, 0]);
+  
+  // Edge smoothing (0 = sharp, 1 = smooth)
+  const [edgeSmoothing, setEdgeSmoothing] = useState(0);
   
   // Resolution change callback
   const handleResolutionChange = useCallback((ratio: number, refining: boolean) => {
@@ -1404,6 +1234,19 @@ export default function ThreeDViewContent() {
   const handleRotateZ = useCallback(() => {
     setModelRotation(prev => [prev[0], prev[1], prev[2] + Math.PI / 2]);
   }, []);
+  
+  // Auto-orient model to correct X/Y/Z axis (detect Z-up and convert to Y-up)
+  const handleAutoOrient = useCallback(() => {
+    // For Rhino/CAD files, models are typically Z-up
+    // We need to rotate -90 degrees around X to convert to Y-up (Three.js convention)
+    // This is the most common case for jewelry 3D models
+    setModelRotation([-Math.PI / 2, 0, 0]);
+    
+    // Fit to view after orientation change
+    setTimeout(() => {
+      fitToViewFn?.();
+    }, 100);
+  }, [fitToViewFn]);
 
   // Take snapshot
   const handleSnapshot = useCallback(() => {
@@ -1527,7 +1370,6 @@ export default function ThreeDViewContent() {
     setFileName(null);
     setLayers([]);
     setLayerMaterials({});
-    setSelectedLayerId(null);
     setModelInfo(null);
   }, []);
 
@@ -1645,6 +1487,14 @@ export default function ThreeDViewContent() {
               title="Rotate Z (90°)"
             >
               <span className="text-[10px] font-medium">Z</span>
+            </button>
+            <button
+              onClick={handleAutoOrient}
+              disabled={!loadedGeometry && layers.length === 0}
+              className="flex h-7 items-center justify-center rounded px-2 text-white/60 hover:bg-white/10 disabled:opacity-30 border-l border-white/10"
+              title="Auto Orient (Z-up to Y-up)"
+            >
+              <Compass className="h-3.5 w-3.5" />
             </button>
           </div>
 
@@ -1791,9 +1641,7 @@ export default function ThreeDViewContent() {
                 lightIntensity={lightIntensity}
                 onControlsReady={(controls) => { controlsRef.current = controls; }}
                 onFitToView={(fn) => setFitToViewFn(() => fn)}
-                selectedLayerId={selectedLayerId}
-                onSelectLayer={setSelectedLayerId}
-                meshRegistry={meshRegistryRef.current}
+                envRotation={envRotation}
                 adaptiveResolution={adaptiveResolution}
                 onResolutionChange={handleResolutionChange}
               />
@@ -1807,9 +1655,6 @@ export default function ThreeDViewContent() {
               <span className="text-white/60">Left:</span> Rotate &nbsp;
               <span className="text-white/60">Right:</span> Pan &nbsp;
               <span className="text-white/60">Scroll:</span> Zoom
-              {layers.length > 0 && (
-                <> &nbsp;<span className="text-white/60">Click object:</span> Select</>
-              )}
             </div>
           )}
           
@@ -2112,6 +1957,46 @@ export default function ThreeDViewContent() {
                   </>
                 )}
                 
+                {/* Environment Rotation */}
+                <div className="mt-3 space-y-2">
+                  <p className="text-[10px] text-white/40">Environment Rotation</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="text-[9px] text-white/30">X</label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="360"
+                        value={envRotation[0] * (180 / Math.PI)}
+                        onChange={(e) => setEnvRotation([parseFloat(e.target.value) * (Math.PI / 180), envRotation[1], envRotation[2]])}
+                        className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-purple-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[9px] text-white/30">Y</label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="360"
+                        value={envRotation[1] * (180 / Math.PI)}
+                        onChange={(e) => setEnvRotation([envRotation[0], parseFloat(e.target.value) * (Math.PI / 180), envRotation[2]])}
+                        className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-purple-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[9px] text-white/30">Z</label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="360"
+                        value={envRotation[2] * (180 / Math.PI)}
+                        onChange={(e) => setEnvRotation([envRotation[0], envRotation[1], parseFloat(e.target.value) * (Math.PI / 180)])}
+                        className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-purple-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+                
                 </div>
 
               {/* Background */}
@@ -2242,6 +2127,26 @@ export default function ThreeDViewContent() {
                       />
                     </button>
                   </label>
+                  
+                  {/* Edge Smoothing */}
+                  <div className="pt-2 mt-2 border-t border-white/10">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-white/70">Edge Smoothing</span>
+                      <span className="text-[10px] text-white/50">{Math.round(edgeSmoothing * 100)}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.1"
+                      value={edgeSmoothing}
+                      onChange={(e) => setEdgeSmoothing(parseFloat(e.target.value))}
+                      className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer accent-purple-500"
+                    />
+                    <p className="text-[9px] text-white/30 mt-1">
+                      Chamfer effect for smoother edges
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -2321,33 +2226,17 @@ export default function ThreeDViewContent() {
                 title="Objects"
                 count={layers.length > 0 ? layers.length : undefined}
                 defaultOpen={layersAccordionOpen}
-                headerAction={
-                  layers.length > 0 && selectedLayerId ? (
-                    <button
-                      onClick={() => setSelectedLayerId(null)}
-                      className="text-[10px] text-orange-400 hover:text-orange-300 px-2"
-                    >
-                      Deselect
-                    </button>
-                  ) : null
-                }
               >
                 {layers.length > 0 ? (
                   <div className="space-y-1">
                     {layers.map((layer) => (
                       <div
                         key={layer.id}
-                        className={`rounded-lg border p-2 transition-all cursor-pointer ${
-                          selectedLayerId === layer.id
-                            ? 'border-orange-500/50 bg-orange-500/10 ring-1 ring-orange-500/30'
-                            : 'border-white/10 bg-white/5 hover:border-white/20'
-                        }`}
-                        onClick={() => setSelectedLayerId(selectedLayerId === layer.id ? null : layer.id)}
+                        className="rounded-lg border border-white/10 bg-white/5 p-2 transition-all hover:border-white/20"
                       >
                         <div className="flex items-center gap-2">
                           <button
-                            onClick={(e) => {
-                              e.stopPropagation();
+                            onClick={() => {
                               setLayers(prev => prev.map(l => 
                                 l.id === layer.id ? { ...l, visible: !l.visible } : l
                               ));
@@ -2365,12 +2254,7 @@ export default function ThreeDViewContent() {
                             style={{ backgroundColor: layerMaterials[layer.id]?.color || layer.color }}
                           />
                           <div className="flex-1 overflow-hidden">
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-xs text-white/70 truncate">{layer.name}</span>
-                              {selectedLayerId === layer.id && (
-                                <MousePointer2 className="h-3 w-3 text-orange-400 flex-shrink-0" />
-                              )}
-                            </div>
+                            <span className="text-xs text-white/70 truncate block">{layer.name}</span>
                             <div className="flex items-center gap-1.5 text-[10px] text-white/40">
                               <span className={`px-1 py-0.5 rounded text-[9px] ${
                                 layer.category === 'metal' || layer.category === 'setting'
@@ -2390,39 +2274,24 @@ export default function ThreeDViewContent() {
                               )}
                             </div>
                           </div>
+                          
+                          {/* Material quick selector */}
+                          <select
+                            value={layerMaterials[layer.id]?.id || (layer.category === 'stone' ? STONE_PRESETS[0].id : METAL_PRESETS[0].id)}
+                            onChange={(e) => {
+                              const presets = layer.category === 'stone' ? STONE_PRESETS : METAL_PRESETS;
+                              const preset = presets.find(p => p.id === e.target.value);
+                              if (preset) {
+                                setLayerMaterials(prev => ({ ...prev, [layer.id]: preset }));
+                              }
+                            }}
+                            className="h-6 bg-white/10 border border-white/10 rounded text-[10px] text-white/70 px-1 appearance-none cursor-pointer hover:bg-white/15"
+                          >
+                            {(layer.category === 'stone' ? STONE_PRESETS : METAL_PRESETS).map(p => (
+                              <option key={p.id} value={p.id} className="bg-black">{p.name}</option>
+                            ))}
+                          </select>
                         </div>
-                        
-                        {/* Layer Material Selection - Expand when selected */}
-                        {selectedLayerId === layer.id && (
-                          <div className="mt-2 border-t border-white/10 pt-2">
-                            <p className="mb-2 text-[10px] text-white/40">Assign Material:</p>
-                            <div className="grid grid-cols-5 gap-1">
-                              {(layer.category === 'stone' ? STONE_PRESETS : METAL_PRESETS).map((preset) => (
-                                <button
-                                  key={preset.id}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setLayerMaterials(prev => ({
-                                      ...prev,
-                                      [layer.id]: preset
-                                    }));
-                                  }}
-                                  className={`aspect-square rounded-md border transition-all ${
-                                    layerMaterials[layer.id]?.id === preset.id
-                                      ? 'border-purple-500 ring-1 ring-purple-500'
-                                      : 'border-white/10 hover:border-white/30'
-                                  }`}
-                                  style={{ 
-                                    background: layer.category === 'stone'
-                                      ? `radial-gradient(circle at 30% 30%, white 0%, ${preset.color} 50%)`
-                                      : `linear-gradient(135deg, ${preset.color} 0%, ${preset.color}88 100%)`
-                                  }}
-                                  title={preset.name}
-                                />
-                              ))}
-                            </div>
-                          </div>
-                        )}
                       </div>
                     ))}
                     

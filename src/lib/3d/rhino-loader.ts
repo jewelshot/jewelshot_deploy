@@ -680,7 +680,7 @@ export async function parse3DMFile(
           console.log(`[Rhino3dm] Object ${i}: Converting as Mesh`);
           bufferGeometry = rhinoMeshToBufferGeometry(geometry);
         }
-        // Approach 2: Check if it's a Brep (polysurface)
+        // Approach 2: Check if it's a Brep (polysurface) - common for jewelry settings and stones
         else if (geometryTypeName === 'Brep' || geometryType === rhino.ObjectType?.Brep) {
           console.log(`[Rhino3dm] Object ${i}: Converting Brep to Mesh`);
           bufferGeometry = rhinoBrepToMesh(geometry, rhino);
@@ -726,7 +726,42 @@ export async function parse3DMFile(
             console.warn(`[Rhino3dm] Object ${i}: Surface.toBrep failed:`, e);
           }
         }
-        // Approach 6: Try generic toMesh if available
+        // Approach 6: InstanceReference (Block) - common for Matrix stones
+        // Note: rhino3dm WASM doesn't fully support instance expansion, but log it for debugging
+        else if (geometryTypeName === 'InstanceReference' || geometryType === rhino.ObjectType?.InstanceReference) {
+          console.log(`[Rhino3dm] Object ${i}: InstanceReference (Block) detected - attempting to extract`);
+          // Try to get the block definition and create geometry
+          // Note: Full block support requires doc.instanceDefinitions() which may not be available in WASM
+          try {
+            if (typeof geometry.geometry === 'function') {
+              const blockGeom = geometry.geometry();
+              if (blockGeom) {
+                // Try mesh first
+                if (typeof blockGeom.toMesh === 'function') {
+                  const mesh = blockGeom.toMesh(rhino.MeshType?.Any || 0);
+                  if (mesh) {
+                    bufferGeometry = rhinoMeshToBufferGeometry(mesh);
+                  }
+                }
+                // Try brep conversion
+                if (!bufferGeometry && typeof blockGeom.toBrep === 'function') {
+                  const brep = blockGeom.toBrep();
+                  if (brep) {
+                    bufferGeometry = rhinoBrepToMesh(brep, rhino);
+                  }
+                }
+              }
+            }
+          } catch (e) {
+            console.warn(`[Rhino3dm] Object ${i}: InstanceReference extraction failed:`, e);
+          }
+          if (!bufferGeometry) {
+            console.log(`[Rhino3dm] Object ${i}: InstanceReference couldn't be converted - block geometry may need Rhino to expand`);
+            skippedCount++;
+            continue;
+          }
+        }
+        // Approach 7: Try generic toMesh if available
         else if (typeof geometry.toMesh === 'function') {
           console.log(`[Rhino3dm] Object ${i}: Trying generic toMesh()`);
           try {
@@ -738,7 +773,7 @@ export async function parse3DMFile(
             console.warn(`[Rhino3dm] Object ${i}: Generic toMesh failed:`, e);
           }
         }
-        // Approach 7: Try toBrep then to mesh
+        // Approach 8: Try toBrep then to mesh
         else if (typeof geometry.toBrep === 'function') {
           console.log(`[Rhino3dm] Object ${i}: Trying toBrep() then mesh`);
           try {
@@ -750,7 +785,7 @@ export async function parse3DMFile(
             console.warn(`[Rhino3dm] Object ${i}: toBrep failed:`, e);
           }
         }
-        // Skip non-meshable geometry types
+        // Skip non-meshable geometry types (curves, points, annotations, etc.)
         else {
           console.log(`[Rhino3dm] Object ${i}: Skipping non-meshable type: ${geometryTypeName} (${geometryType})`);
           skippedCount++;
