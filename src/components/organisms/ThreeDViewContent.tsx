@@ -7,14 +7,21 @@
  * - Layer management for 3DM files
  * - Material assignment (metals, stones)
  * - Snapshot export
+ * - Progressive resolution rendering (KeyShot-like)
+ * - Object picking with orange outline selection
  */
 
 'use client';
 
-import React, { useState, useRef, useCallback, Suspense, useEffect } from 'react';
-import { Canvas, useThree } from '@react-three/fiber';
+import React, { useState, useRef, useCallback, Suspense, useEffect, useMemo } from 'react';
+import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { OrbitControls, Center, Environment, Grid, GizmoHelper, GizmoViewport, Lightformer } from '@react-three/drei';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
+import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
 import * as THREE from 'three';
 import { LoopSubdivision } from 'three-subdivide';
 import {
@@ -28,6 +35,7 @@ import {
   EyeOff,
   ChevronRight,
   ChevronLeft,
+  ChevronDown,
   RefreshCw,
   Trash2,
   Grid3X3,
@@ -47,8 +55,10 @@ import {
   RotateCw,
   FlipHorizontal,
   FlipVertical,
+  MousePointer2,
 } from 'lucide-react';
 import { useSidebarStore } from '@/store/sidebarStore';
+import { Accordion } from '@/components/atoms/Accordion';
 
 // Rhino3dm - Will be loaded dynamically when needed
 // Note: 3DM support requires additional setup due to WASM complexity
@@ -351,25 +361,52 @@ function Model({
   );
 }
 
-// Layer Model component with advanced materials
+// Layer Model component with advanced materials and selection support
 function LayerModel({ 
   layer,
   material,
   wireframe = false,
+  isSelected = false,
+  isHovered = false,
+  onMeshRef,
 }: { 
   layer: ModelLayer;
   material: MaterialPreset;
   wireframe?: boolean;
+  isSelected?: boolean;
+  isHovered?: boolean;
+  onMeshRef?: (mesh: THREE.Mesh | null, layerId: string) => void;
 }) {
   const meshRef = useRef<THREE.Mesh>(null);
+  
+  // Register mesh ref for picking
+  useEffect(() => {
+    if (meshRef.current) {
+      meshRef.current.userData.layerId = layer.id;
+      meshRef.current.userData.selectable = true;
+      onMeshRef?.(meshRef.current, layer.id);
+    }
+    return () => {
+      onMeshRef?.(null, layer.id);
+    };
+  }, [layer.id, onMeshRef]);
   
   if (!layer.visible) return null;
   
   // Determine if this is a stone/gem material
   const isGem = layer.category === 'stone';
   
+  // Emissive boost when hovered
+  const emissiveIntensity = isHovered ? 0.1 : 0;
+  
   return (
-    <mesh ref={meshRef} geometry={layer.geometry} castShadow receiveShadow>
+    <mesh 
+      ref={meshRef} 
+      geometry={layer.geometry} 
+      castShadow 
+      receiveShadow
+      userData={{ layerId: layer.id, selectable: true }}
+    >
       {isGem ? (
         // Enhanced gem material with transparency and refraction
         <meshPhysicalMaterial
@@ -383,6 +420,8 @@ function LayerModel({
           clearcoat={1}
           clearcoatRoughness={0}
           wireframe={wireframe}
+          emissive={isHovered ? '#ff6600' : '#000000'}
+          emissiveIntensity={emissiveIntensity}
         />
       ) : (
         // Metal material
@@ -392,10 +431,227 @@ function LayerModel({
           roughness={material.roughness}
           envMapIntensity={material.envMapIntensity}
           wireframe={wireframe}
+          emissive={isHovered ? '#ff6600' : '#000000'}
+          emissiveIntensity={emissiveIntensity}
         />
       )}
     </mesh>
   );
+}
+
+// Adaptive Resolution Controller - Handles progressive rendering
+function AdaptiveResolutionController({ 
+  enabled = true,
+  onResolutionChange,
+}: { 
+  enabled?: boolean;
+  onResolutionChange?: (ratio: number, isRefining: boolean) => void;
+}) {
+  const { gl, camera } = useThree();
+  const prevCameraMatrix = useRef(new THREE.Matrix4());
+  const lastMovementTime = useRef(Date.now());
+  const refinementStartTime = useRef<number | null>(null);
+  const currentRatio = useRef(1);
+  
+  const minRatio = 0.3;
+  const maxRatio = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, 2) : 2;
+  const idleDelay = 80; // ms before starting refinement
+  const refinementDuration = 400; // ms for full refinement
+  
+  useFrame(() => {
+    if (!enabled) return;
+    
+    const now = Date.now();
+    const currentMatrix = camera.matrixWorld;
+    
+    // Check camera movement
+    let totalDiff = 0;
+    for (let i = 0; i < 16; i++) {
+      totalDiff += Math.abs(currentMatrix.elements[i] - prevCameraMatrix.current.elements[i]);
+    }
+    prevCameraMatrix.current.copy(currentMatrix);
+    
+    const isMoving = totalDiff > 0.005;
+    
+    if (isMoving) {
+      // Camera moving - drop resolution
+      lastMovementTime.current = now;
+      refinementStartTime.current = null;
+      
+      if (currentRatio.current !== minRatio) {
+        currentRatio.current = minRatio;
+        gl.setPixelRatio(minRatio);
+        onResolutionChange?.(minRatio, false);
+      }
+    } else {
+      const timeSinceMovement = now - lastMovementTime.current;
+      
+      if (timeSinceMovement > idleDelay) {
+        if (refinementStartTime.current === null) {
+          refinementStartTime.current = now;
+        }
+        
+        const progress = Math.min(1, (now - refinementStartTime.current) / refinementDuration);
+        const easedProgress = 1 - Math.pow(1 - progress, 3);
+        const newRatio = minRatio + (maxRatio - minRatio) * easedProgress;
+        
+        if (Math.abs(currentRatio.current - newRatio) > 0.02) {
+          currentRatio.current = newRatio;
+          gl.setPixelRatio(newRatio);
+          onResolutionChange?.(newRatio, progress < 1);
+        }
+      }
+    }
+  });
+  
+  useEffect(() => {
+    if (enabled) {
+      gl.setPixelRatio(maxRatio);
+      prevCameraMatrix.current.copy(camera.matrixWorld);
+    }
+  }, [enabled, gl, camera, maxRatio]);
+  
+  return null;
+}
+
+// Object Picker & Outline Controller
+function ObjectSelectionController({
+  enabled = true,
+  selectedLayerId,
+  hoveredLayerId,
+  onSelect,
+  onHover,
+  meshRegistry,
+}: {
+  enabled?: boolean;
+  selectedLayerId: string | null;
+  hoveredLayerId: string | null;
+  onSelect: (layerId: string | null) => void;
+  onHover: (layerId: string | null) => void;
+  meshRegistry: Map<string, THREE.Mesh>;
+}) {
+  const { camera, gl, scene, size } = useThree();
+  const raycaster = useRef(new THREE.Raycaster());
+  const mouse = useRef(new THREE.Vector2());
+  
+  // Outline effect
+  const composer = useRef<EffectComposer | null>(null);
+  const outlinePass = useRef<OutlinePass | null>(null);
+  
+  // Setup outline composer
+  useEffect(() => {
+    if (!enabled) return;
+    
+    const effectComposer = new EffectComposer(gl);
+    composer.current = effectComposer;
+    
+    const renderPass = new RenderPass(scene, camera);
+    effectComposer.addPass(renderPass);
+    
+    const outline = new OutlinePass(
+      new THREE.Vector2(size.width, size.height),
+      scene,
+      camera
+    );
+    outline.edgeStrength = 4;
+    outline.edgeGlow = 0.3;
+    outline.edgeThickness = 1.5;
+    outline.pulsePeriod = 0;
+    outline.visibleEdgeColor.set('#ff6600');
+    outline.hiddenEdgeColor.set('#ff660066');
+    outlinePass.current = outline;
+    effectComposer.addPass(outline);
+    
+    const fxaaPass = new ShaderPass(FXAAShader);
+    fxaaPass.uniforms['resolution'].value.set(1 / size.width, 1 / size.height);
+    effectComposer.addPass(fxaaPass);
+    
+    return () => {
+      effectComposer.dispose();
+    };
+  }, [enabled, gl, scene, camera, size]);
+  
+  // Update selected objects for outline
+  useEffect(() => {
+    if (outlinePass.current && selectedLayerId) {
+      const mesh = meshRegistry.get(selectedLayerId);
+      outlinePass.current.selectedObjects = mesh ? [mesh] : [];
+    } else if (outlinePass.current) {
+      outlinePass.current.selectedObjects = [];
+    }
+  }, [selectedLayerId, meshRegistry]);
+  
+  // Handle resize
+  useEffect(() => {
+    if (composer.current) {
+      composer.current.setSize(size.width, size.height);
+    }
+  }, [size]);
+  
+  // Render with outline
+  useFrame(() => {
+    if (enabled && composer.current && selectedLayerId) {
+      composer.current.render();
+    }
+  }, 1);
+  
+  // Mouse event handlers
+  useEffect(() => {
+    if (!enabled) return;
+    
+    const canvas = gl.domElement;
+    
+    const handleMouseMove = (event: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      
+      raycaster.current.setFromCamera(mouse.current, camera);
+      
+      const meshes = Array.from(meshRegistry.values());
+      const intersects = raycaster.current.intersectObjects(meshes, false);
+      
+      if (intersects.length > 0) {
+        const layerId = intersects[0].object.userData.layerId;
+        onHover(layerId);
+        canvas.style.cursor = 'pointer';
+      } else {
+        onHover(null);
+        canvas.style.cursor = 'default';
+      }
+    };
+    
+    const handleClick = (event: MouseEvent) => {
+      if (event.button !== 0) return;
+      
+      const rect = canvas.getBoundingClientRect();
+      mouse.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      
+      raycaster.current.setFromCamera(mouse.current, camera);
+      
+      const meshes = Array.from(meshRegistry.values());
+      const intersects = raycaster.current.intersectObjects(meshes, false);
+      
+      if (intersects.length > 0) {
+        const layerId = intersects[0].object.userData.layerId;
+        onSelect(layerId === selectedLayerId ? null : layerId);
+      } else {
+        onSelect(null);
+      }
+    };
+    
+    canvas.addEventListener('mousemove', handleMouseMove);
+    canvas.addEventListener('click', handleClick);
+    
+    return () => {
+      canvas.removeEventListener('mousemove', handleMouseMove);
+      canvas.removeEventListener('click', handleClick);
+      canvas.style.cursor = 'default';
+    };
+  }, [enabled, gl, camera, meshRegistry, selectedLayerId, onSelect, onHover]);
+  
+  return null;
 }
 
 // Scene content component
@@ -416,6 +672,13 @@ function SceneContent({
   lightIntensity,
   onControlsReady,
   onFitToView,
+  selectedLayerId,
+  hoveredLayerId,
+  onSelectLayer,
+  onHoverLayer,
+  meshRegistry,
+  adaptiveResolution,
+  onResolutionChange,
 }: {
   geometry: THREE.BufferGeometry | null;
   material: MaterialPreset;
@@ -433,11 +696,27 @@ function SceneContent({
   lightIntensity: number;
   onControlsReady: (controls: any) => void;
   onFitToView: (fitFn: () => void) => void;
+  selectedLayerId: string | null;
+  hoveredLayerId: string | null;
+  onSelectLayer: (id: string | null) => void;
+  onHoverLayer: (id: string | null) => void;
+  meshRegistry: Map<string, THREE.Mesh>;
+  adaptiveResolution: boolean;
+  onResolutionChange?: (ratio: number, isRefining: boolean) => void;
 }) {
   const controlsRef = useRef<any>(null);
   const groupRef = useRef<THREE.Group>(null);
   const meshRef = useRef<THREE.Mesh>(null);
   const { camera } = useThree();
+  
+  // Mesh registry callback
+  const handleMeshRef = useCallback((mesh: THREE.Mesh | null, layerId: string) => {
+    if (mesh) {
+      meshRegistry.set(layerId, mesh);
+    } else {
+      meshRegistry.delete(layerId);
+    }
+  }, [meshRegistry]);
   const [modelTransform, setModelTransform] = useState<{
     position: THREE.Vector3;
     scale: number;
@@ -678,6 +957,9 @@ function SceneContent({
               layer={layer}
               material={layerMaterials[layer.id] || METAL_PRESETS[0]}
               wireframe={wireframe}
+              isSelected={selectedLayerId === layer.id}
+              isHovered={hoveredLayerId === layer.id}
+              onMeshRef={handleMeshRef}
             />
           ))}
         </group>
@@ -709,6 +991,24 @@ function SceneContent({
             font="12px Inter, system-ui, sans-serif"
           />
         </GizmoHelper>
+      )}
+      
+      {/* Adaptive Resolution - Progressive rendering for smooth interaction */}
+      <AdaptiveResolutionController 
+        enabled={adaptiveResolution}
+        onResolutionChange={onResolutionChange}
+      />
+      
+      {/* Object Selection with Outline */}
+      {layers.length > 0 && (
+        <ObjectSelectionController
+          enabled={true}
+          selectedLayerId={selectedLayerId}
+          hoveredLayerId={hoveredLayerId}
+          onSelect={onSelectLayer}
+          onHover={onHoverLayer}
+          meshRegistry={meshRegistry}
+        />
       )}
     </>
   );
@@ -775,7 +1075,21 @@ export default function ThreeDViewContent() {
   // Layer state (for future 3DM support)
   const [layers, setLayers] = useState<ModelLayer[]>([]);
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
+  const [hoveredLayerId, setHoveredLayerId] = useState<string | null>(null);
   const [layerMaterials, setLayerMaterials] = useState<Record<string, MaterialPreset>>({});
+  
+  // Progressive rendering & selection state
+  const [adaptiveResolution, setAdaptiveResolution] = useState(true);
+  const [currentResolution, setCurrentResolution] = useState(1);
+  const [isRefining, setIsRefining] = useState(false);
+  const [layersAccordionOpen, setLayersAccordionOpen] = useState(true);
+  const meshRegistryRef = useRef<Map<string, THREE.Mesh>>(new Map());
+  
+  // Resolution change callback
+  const handleResolutionChange = useCallback((ratio: number, refining: boolean) => {
+    setCurrentResolution(ratio);
+    setIsRefining(refining);
+  }, []);
 
   // Apply subdivision when level changes
   useEffect(() => {
@@ -1508,6 +1822,13 @@ export default function ThreeDViewContent() {
                 lightIntensity={lightIntensity}
                 onControlsReady={(controls) => { controlsRef.current = controls; }}
                 onFitToView={(fn) => setFitToViewFn(() => fn)}
+                selectedLayerId={selectedLayerId}
+                hoveredLayerId={hoveredLayerId}
+                onSelectLayer={setSelectedLayerId}
+                onHoverLayer={setHoveredLayerId}
+                meshRegistry={meshRegistryRef.current}
+                adaptiveResolution={adaptiveResolution}
+                onResolutionChange={handleResolutionChange}
               />
               <SnapshotHelper onSnapshot={handleSnapshotResult} />
             </Suspense>
@@ -1518,7 +1839,25 @@ export default function ThreeDViewContent() {
             <div className="absolute bottom-4 left-4 rounded-lg bg-black/60 px-3 py-2 text-xs text-white/40 backdrop-blur-sm">
               <span className="text-white/60">Left click:</span> Rotate &nbsp;
               <span className="text-white/60">Right click:</span> Pan &nbsp;
-              <span className="text-white/60">Scroll:</span> Zoom
+              <span className="text-white/60">Scroll:</span> Zoom &nbsp;
+              {layers.length > 0 && (
+                <>
+                  <span className="text-white/60">Click:</span> Select
+                </>
+              )}
+            </div>
+          )}
+          
+          {/* Resolution indicator */}
+          {adaptiveResolution && (loadedGeometry || layers.length > 0) && (
+            <div className="absolute bottom-4 right-4 flex items-center gap-2 rounded-lg bg-black/60 px-3 py-2 backdrop-blur-sm">
+              <div className={`h-2 w-2 rounded-full ${isRefining ? 'bg-orange-400 animate-pulse' : 'bg-green-400'}`} />
+              <span className="text-[10px] text-white/50">
+                {isRefining ? 'Refining...' : 'HD'}
+              </span>
+              <span className="text-[10px] font-mono text-white/30">
+                {Math.round(currentResolution * 100)}%
+              </span>
             </div>
           )}
         </div>
@@ -2012,25 +2351,40 @@ export default function ThreeDViewContent() {
                 </div>
               </div>
 
-              {/* Layers (for 3DM files) */}
-              <div className="mb-6">
-                <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
-                  Layers {layers.length > 0 && `(${layers.length})`}
-                </h3>
+              {/* Layers Accordion (for 3DM files) */}
+              <Accordion
+                title="Objects"
+                count={layers.length > 0 ? layers.length : undefined}
+                defaultOpen={layersAccordionOpen}
+                headerAction={
+                  layers.length > 0 && selectedLayerId ? (
+                    <button
+                      onClick={() => setSelectedLayerId(null)}
+                      className="text-[10px] text-orange-400 hover:text-orange-300 px-2"
+                    >
+                      Deselect
+                    </button>
+                  ) : null
+                }
+              >
                 {layers.length > 0 ? (
-                  <div className="space-y-2">
+                  <div className="space-y-1">
                     {layers.map((layer) => (
                       <div
                         key={layer.id}
-                        className={`rounded-lg border p-2 transition-all ${
+                        className={`rounded-lg border p-2 transition-all cursor-pointer ${
                           selectedLayerId === layer.id
-                            ? 'border-purple-500/50 bg-purple-500/10'
-                            : 'border-white/10 bg-white/5'
+                            ? 'border-orange-500/50 bg-orange-500/10 ring-1 ring-orange-500/30'
+                            : hoveredLayerId === layer.id
+                            ? 'border-orange-500/30 bg-orange-500/5'
+                            : 'border-white/10 bg-white/5 hover:border-white/20'
                         }`}
+                        onClick={() => setSelectedLayerId(selectedLayerId === layer.id ? null : layer.id)}
                       >
                         <div className="flex items-center gap-2">
                           <button
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.stopPropagation();
                               setLayers(prev => prev.map(l => 
                                 l.id === layer.id ? { ...l, visible: !l.visible } : l
                               ));
@@ -2044,14 +2398,16 @@ export default function ThreeDViewContent() {
                             {layer.visible ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
                           </button>
                           <div
-                            className="h-3 w-3 rounded-full"
+                            className="h-3 w-3 rounded-full ring-1 ring-white/20"
                             style={{ backgroundColor: layerMaterials[layer.id]?.color || layer.color }}
                           />
-                          <button
-                            onClick={() => setSelectedLayerId(selectedLayerId === layer.id ? null : layer.id)}
-                            className="flex-1 text-left overflow-hidden"
-                          >
-                            <div className="text-xs text-white/70 truncate">{layer.name}</div>
+                          <div className="flex-1 overflow-hidden">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-xs text-white/70 truncate">{layer.name}</span>
+                              {selectedLayerId === layer.id && (
+                                <MousePointer2 className="h-3 w-3 text-orange-400 flex-shrink-0" />
+                              )}
+                            </div>
                             <div className="flex items-center gap-1.5 text-[10px] text-white/40">
                               <span className={`px-1 py-0.5 rounded text-[9px] ${
                                 layer.category === 'metal' || layer.category === 'setting'
@@ -2070,10 +2426,10 @@ export default function ThreeDViewContent() {
                                 </span>
                               )}
                             </div>
-                          </button>
+                          </div>
                         </div>
                         
-                        {/* Layer Material Selection */}
+                        {/* Layer Material Selection - Expand when selected */}
                         {selectedLayerId === layer.id && (
                           <div className="mt-2 border-t border-white/10 pt-2">
                             <p className="mb-2 text-[10px] text-white/40">Assign Material:</p>
@@ -2081,7 +2437,8 @@ export default function ThreeDViewContent() {
                               {(layer.category === 'stone' ? STONE_PRESETS : METAL_PRESETS).map((preset) => (
                                 <button
                                   key={preset.id}
-                                  onClick={() => {
+                                  onClick={(e) => {
+                                    e.stopPropagation();
                                     setLayerMaterials(prev => ({
                                       ...prev,
                                       [layer.id]: preset
@@ -2143,7 +2500,7 @@ export default function ThreeDViewContent() {
                     </p>
                   </div>
                 )}
-              </div>
+              </Accordion>
 
 
               {/* Quick Guide */}
