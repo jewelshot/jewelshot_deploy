@@ -108,6 +108,26 @@ const MATTE_PRESETS: MaterialPreset[] = [
   { id: 'wax-beige', name: 'Wax (Castable)', color: '#D4A574', metalness: 0, roughness: 0.85, envMapIntensity: 0.4 },
 ];
 
+// HDR Environment presets
+interface HDRPreset {
+  id: string;
+  name: string;
+  file: string; // Path to HDR file in public/environments
+  preview: string; // Preview color/gradient
+  description: string;
+}
+
+const HDR_PRESETS: HDRPreset[] = [
+  {
+    id: 'env-metal-1',
+    name: 'Metal Studio',
+    file: '/environments/env_metal_1.hdr',
+    preview: 'linear-gradient(135deg, #2a2a2a 0%, #4a4a4a 50%, #1a1a1a 100%)',
+    description: 'Optimized for metal reflections',
+  },
+  // Add more HDR presets here as files are added
+];
+
 // Studio environment presets - custom lightformer setups (no external HDR needed)
 interface StudioPreset {
   id: string;
@@ -384,6 +404,8 @@ function SceneContent({
   showGrid,
   wireframe,
   studioPreset,
+  hdrPreset,
+  useHDR,
   showEnvironmentBackground,
   modelRotation,
   lighting,
@@ -399,6 +421,8 @@ function SceneContent({
   showGrid: boolean;
   wireframe: boolean;
   studioPreset: StudioPreset;
+  hdrPreset: HDRPreset | null;
+  useHDR: boolean;
   showEnvironmentBackground: boolean;
   modelRotation: [number, number, number];
   lighting: LightingPreset;
@@ -569,25 +593,34 @@ function SceneContent({
       />
 
       {/* Custom Studio Environment with Lightformers - No external HDR needed */}
-      <Environment 
-        background={showEnvironmentBackground}
-        resolution={256}
-      >
-        {/* Studio Lightformers for reflections */}
-        {studioPreset.lights.map((light, index) => (
-          <Lightformer
-            key={index}
-            form="rect"
-            color={light.color}
-            intensity={light.intensity * lightIntensity}
-            position={light.position}
-            scale={light.scale}
-            rotation={light.rotation || [0, 0, 0]}
-          />
-        ))}
-        {/* Background color */}
-        <color attach="background" args={[studioPreset.backgroundColor]} />
-      </Environment>
+      {/* Environment: HDR or Lightformer based on selection */}
+      {useHDR && hdrPreset ? (
+        <Environment 
+          files={hdrPreset.file}
+          background={showEnvironmentBackground}
+          environmentIntensity={lightIntensity}
+        />
+      ) : (
+        <Environment 
+          background={showEnvironmentBackground}
+          resolution={256}
+        >
+          {/* Studio Lightformers for reflections */}
+          {studioPreset.lights.map((light, index) => (
+            <Lightformer
+              key={index}
+              form="rect"
+              color={light.color}
+              intensity={light.intensity * lightIntensity}
+              position={light.position}
+              scale={light.scale}
+              rotation={light.rotation || [0, 0, 0]}
+            />
+          ))}
+          {/* Background color */}
+          <color attach="background" args={[studioPreset.backgroundColor]} />
+        </Environment>
+      )}
       
       {/* Contact shadows removed per user request */}
 
@@ -717,6 +750,8 @@ export default function ThreeDViewContent() {
   const [materialType, setMaterialType] = useState<'metal' | 'stone' | 'matte'>('metal');
   const [snapshotPreview, setSnapshotPreview] = useState<string | null>(null);
   const [selectedStudio, setSelectedStudio] = useState<StudioPreset>(STUDIO_PRESETS[0]); // White Studio
+  const [selectedHDR, setSelectedHDR] = useState<HDRPreset | null>(null); // HDR environment
+  const [useHDR, setUseHDR] = useState(false); // Toggle between HDR and Lightformer
   const [backgroundColor, setBackgroundColor] = useState('#0a0a0a');
   const [snapshotScale, setSnapshotScale] = useState<1 | 2 | 4>(1);
   const [isDragging, setIsDragging] = useState(false);
@@ -1333,6 +1368,8 @@ export default function ThreeDViewContent() {
                 showGrid={showGrid && !isSnapshotMode}
                 wireframe={wireframe}
                 studioPreset={selectedStudio}
+                hdrPreset={selectedHDR}
+                useHDR={useHDR}
                 showEnvironmentBackground={showEnvBackground && !isSnapshotMode}
                 modelRotation={modelRotation}
                 lighting={selectedLighting}
@@ -1538,28 +1575,109 @@ export default function ThreeDViewContent() {
                 </div>
               </div>
 
-              {/* Studio Environment */}
+              {/* Environment */}
               <div className="mb-4">
                 <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
-                  Studio Environment
+                  Environment
                 </h3>
-                <div className="grid grid-cols-3 gap-1 mb-3">
-                  {STUDIO_PRESETS.map((preset) => (
-                    <button
-                      key={preset.id}
-                      onClick={() => setSelectedStudio(preset)}
-                      className={`rounded-md py-1.5 text-[10px] transition-all ${
-                        selectedStudio.id === preset.id
-                          ? 'bg-purple-500/30 text-purple-300 ring-1 ring-purple-500/50'
-                          : 'bg-white/5 text-white/50 hover:bg-white/10'
-                      }`}
-                    >
-                      {preset.name}
-                    </button>
-                  ))}
+                
+                {/* Environment Type Toggle */}
+                <div className="flex rounded-lg border border-white/10 bg-white/5 p-1 mb-3">
+                  <button
+                    onClick={() => setUseHDR(false)}
+                    className={`flex-1 rounded-md py-1.5 text-xs font-medium transition-all ${
+                      !useHDR
+                        ? 'bg-white/15 text-white'
+                        : 'text-white/50 hover:text-white/70'
+                    }`}
+                  >
+                    Studio
+                  </button>
+                  <button
+                    onClick={() => {
+                      setUseHDR(true);
+                      if (!selectedHDR && HDR_PRESETS.length > 0) {
+                        setSelectedHDR(HDR_PRESETS[0]);
+                      }
+                    }}
+                    className={`flex-1 rounded-md py-1.5 text-xs font-medium transition-all ${
+                      useHDR
+                        ? 'bg-white/15 text-white'
+                        : 'text-white/50 hover:text-white/70'
+                    }`}
+                  >
+                    HDR
+                  </button>
                 </div>
+                
+                {/* HDR Presets */}
+                {useHDR ? (
+                  <div className="space-y-2">
+                    {HDR_PRESETS.length > 0 ? (
+                      <>
+                        {HDR_PRESETS.map((preset) => (
+                          <button
+                            key={preset.id}
+                            onClick={() => setSelectedHDR(preset)}
+                            className={`w-full flex items-center gap-3 p-2 rounded-lg transition-all ${
+                              selectedHDR?.id === preset.id
+                                ? 'bg-purple-500/20 ring-1 ring-purple-500/50'
+                                : 'bg-white/5 hover:bg-white/10'
+                            }`}
+                          >
+                            {/* HDR Preview */}
+                            <div 
+                              className="w-10 h-10 rounded-md flex-shrink-0 ring-1 ring-white/10"
+                              style={{ background: preset.preview }}
+                            />
+                            <div className="text-left flex-1 min-w-0">
+                              <p className={`text-xs font-medium truncate ${
+                                selectedHDR?.id === preset.id ? 'text-purple-300' : 'text-white/80'
+                              }`}>
+                                {preset.name}
+                              </p>
+                              <p className="text-[10px] text-white/40 truncate">
+                                {preset.description}
+                              </p>
+                            </div>
+                          </button>
+                        ))}
+                      </>
+                    ) : (
+                      <p className="text-[10px] text-white/40 text-center py-4">
+                        No HDR files available. Add .hdr or .exr files to /public/environments/
+                      </p>
+                    )}
+                    <p className="text-[10px] text-white/30 mt-2">
+                      HDR environments provide realistic reflections.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    {/* Studio Presets */}
+                    <div className="grid grid-cols-3 gap-1 mb-3">
+                      {STUDIO_PRESETS.map((preset) => (
+                        <button
+                          key={preset.id}
+                          onClick={() => setSelectedStudio(preset)}
+                          className={`rounded-md py-1.5 text-[10px] transition-all ${
+                            selectedStudio.id === preset.id
+                              ? 'bg-purple-500/30 text-purple-300 ring-1 ring-purple-500/50'
+                              : 'bg-white/5 text-white/50 hover:bg-white/10'
+                          }`}
+                        >
+                          {preset.name}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="text-[10px] text-white/30">
+                      Built-in studio lighting - no external files needed.
+                    </p>
+                  </>
+                )}
+                
                 {/* Show Background Toggle */}
-                <label className="flex items-center justify-between cursor-pointer">
+                <label className="flex items-center justify-between cursor-pointer mt-3 pt-3 border-t border-white/10">
                   <span className="text-[10px] text-white/50">Show Background</span>
                   <button
                     onClick={() => setShowEnvBackground(!showEnvBackground)}
@@ -1574,9 +1692,6 @@ export default function ThreeDViewContent() {
                     />
                   </button>
                 </label>
-                <p className="mt-2 text-[10px] text-white/30">
-                  Custom studio lighting - no external files needed.
-                </p>
               </div>
 
               {/* Background */}
