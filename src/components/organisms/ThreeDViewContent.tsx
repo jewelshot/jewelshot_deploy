@@ -768,6 +768,9 @@ export default function ThreeDViewContent() {
   // HDR is used for reflections only, not as visible background
   const [subdivisionLevel, setSubdivisionLevel] = useState(0); // 0 = original, 1-3 = smoother
   const [originalGeometry, setOriginalGeometry] = useState<THREE.BufferGeometry | null>(null); // Store original for subdivision
+  const [tessellationQuality, setTessellationQuality] = useState(1.0); // 0.25 = low, 1.0 = medium, 5.0 = high
+  const [raw3DMBuffer, setRaw3DMBuffer] = useState<ArrayBuffer | null>(null); // Store raw file for re-tessellation
+  const [raw3DMFileName, setRaw3DMFileName] = useState<string | null>(null);
   
   // Layer state (for future 3DM support)
   const [layers, setLayers] = useState<ModelLayer[]>([]);
@@ -802,6 +805,86 @@ export default function ThreeDViewContent() {
       }
     }
   }, [subdivisionLevel, originalGeometry]);
+
+  // Re-tessellate 3DM when quality changes
+  const reTessellate = useCallback(async (newQuality: number) => {
+    if (!raw3DMBuffer || !raw3DMFileName) {
+      console.log('[Tessellation] No 3DM buffer to re-tessellate');
+      return;
+    }
+    
+    console.log(`[Tessellation] Re-tessellating with quality: ${newQuality}`);
+    setIsLoading(true);
+    setLoadingStatus(`Re-tessellating (quality: ${newQuality.toFixed(2)})...`);
+    setTessellationQuality(newQuality);
+    
+    try {
+      const rhinoLoader = await import('@/lib/3d/rhino-loader');
+      const { parse3DMFile, setTessellationQuality: setRhinoQuality } = rhinoLoader;
+      const { detectLayerType } = await import('@/lib/3d/layer-detector');
+      const { calculateMeshVolume, calculateWeight } = await import('@/lib/3d/weight-calculator');
+      const { getMaterialById } = await import('@/lib/3d/materials-database');
+      
+      // Set quality before parsing
+      setRhinoQuality(newQuality);
+      
+      const doc = await parse3DMFile(raw3DMBuffer, raw3DMFileName, newQuality);
+      
+      // Convert to layers
+      const processedLayers: ModelLayer[] = doc.objects.map((obj, index) => {
+        const layer = doc.layers.find(l => l.id === obj.layerId) || doc.layers[0];
+        const detection = detectLayerType(layer?.name || `Object ${index}`, layer?.color || '#808080');
+        
+        let volumeInfo = null;
+        if (detection.suggestedMaterialId) {
+          const volResult = calculateMeshVolume(obj.geometry);
+          const material = getMaterialById(detection.suggestedMaterialId);
+          if (material) {
+            const weightResult = calculateWeight(volResult.volumeMm3, material);
+            volumeInfo = {
+              volume: volResult.volumeMm3,
+              weight: weightResult.weightGrams,
+              carats: weightResult.weightCarats,
+            };
+          }
+        }
+        
+        return {
+          id: obj.id || `layer-${index}`,
+          name: layer?.name || `Object ${index + 1}`,
+          visible: layer?.visible ?? true,
+          geometry: obj.geometry,
+          materialId: detection.suggestedMaterialId || 'gold-18k',
+          color: obj.color || layer?.color || '#808080',
+          category: detection.category,
+          confidence: detection.confidence,
+          volumeInfo,
+        };
+      });
+      
+      setLayers(processedLayers);
+      
+      // Update model info
+      let totalVertices = 0;
+      let totalFaces = 0;
+      processedLayers.forEach(layer => {
+        const pos = layer.geometry.getAttribute('position');
+        if (pos) {
+          totalVertices += pos.count;
+          totalFaces += Math.floor(pos.count / 3);
+        }
+      });
+      setModelInfo({ vertices: totalVertices, faces: totalFaces });
+      
+      console.log(`[Tessellation] Re-tessellation complete: ${processedLayers.length} objects, ${totalVertices} vertices`);
+    } catch (error) {
+      console.error('[Tessellation] Re-tessellation error:', error);
+      alert('Re-tessellation failed. See console for details.');
+    } finally {
+      setIsLoading(false);
+      setLoadingStatus('');
+    }
+  }, [raw3DMBuffer, raw3DMFileName]);
 
   // Process file (shared between click and drag&drop)
   const processFile = useCallback((file: File) => {
@@ -863,6 +946,11 @@ export default function ThreeDViewContent() {
         const contents = event.target?.result;
         console.log('[3DM] File read complete, size:', contents ? (contents as ArrayBuffer).byteLength : 0);
         if (contents) {
+          // Store raw buffer for potential re-tessellation
+          const buffer = contents as ArrayBuffer;
+          setRaw3DMBuffer(buffer.slice(0)); // Clone the buffer
+          setRaw3DMFileName(file.name);
+          
           try {
             setLoadingStatus('Loading rhino3dm...');
             console.log('[3DM] Importing rhino-loader module...');
@@ -883,9 +971,9 @@ export default function ThreeDViewContent() {
             
             console.log('[3DM] All modules imported successfully');
             
-            setLoadingStatus('Parsing 3DM file...');
-            console.log('[3DM] Calling parse3DMFile...');
-            const doc = await parse3DMFile(contents as ArrayBuffer, file.name);
+            setLoadingStatus(`Parsing 3DM file (quality: ${tessellationQuality})...`);
+            console.log('[3DM] Calling parse3DMFile with quality:', tessellationQuality);
+            const doc = await parse3DMFile(buffer, file.name, tessellationQuality);
             console.log('[3DM] parse3DMFile returned:', doc ? `${doc.objects.length} objects, ${doc.layers.length} layers` : 'null');
             
             setLoadingStatus('Processing layers...');
@@ -1743,6 +1831,47 @@ export default function ThreeDViewContent() {
                   ))}
                 </div>
               </div>
+
+              {/* Tessellation Quality (only for 3DM files) */}
+              {raw3DMBuffer && (
+                <div className="mb-4">
+                  <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
+                    Mesh Quality
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-white/70">Quality</span>
+                      <span className="text-xs font-mono text-purple-400">{tessellationQuality.toFixed(2)}</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0.25"
+                      max="5"
+                      step="0.25"
+                      value={tessellationQuality}
+                      onChange={(e) => setTessellationQuality(parseFloat(e.target.value))}
+                      className="w-full h-2 bg-white/10 rounded-full appearance-none cursor-pointer accent-purple-500"
+                    />
+                    <div className="flex justify-between text-[10px] text-white/40">
+                      <span>Fast (Low)</span>
+                      <span>Balanced</span>
+                      <span>HD (High)</span>
+                    </div>
+                    <button
+                      onClick={() => reTessellate(tessellationQuality)}
+                      disabled={isLoading}
+                      className="w-full py-2 px-3 rounded-lg bg-purple-500/20 text-purple-300 text-xs font-medium hover:bg-purple-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isLoading ? 'Processing...' : 'Apply Quality'}
+                    </button>
+                    {modelInfo && (
+                      <p className="text-[10px] text-white/40 text-center">
+                        {modelInfo.vertices.toLocaleString()} vertices • {modelInfo.faces.toLocaleString()} faces
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Display Options */}
               <div className="mb-4">

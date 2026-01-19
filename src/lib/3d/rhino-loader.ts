@@ -337,25 +337,57 @@ function rhinoMeshToBufferGeometry(rhinoMesh: any): THREE.BufferGeometry {
 }
 
 /**
- * Convert Rhino Brep to mesh (tessellation)
+ * Tessellation quality levels
+ * 0.25 = Low quality (fast, fewer polygons)
+ * 1.0 = Medium quality (balanced)
+ * 5.0 = High quality (slow, more polygons)
  */
-function rhinoBrepToMesh(brep: any, rhino: any): THREE.BufferGeometry | null {
+export type TessellationQuality = number;
+
+// Current tessellation quality (can be changed dynamically)
+let currentTessellationQuality: TessellationQuality = 1.0;
+
+export function setTessellationQuality(quality: TessellationQuality): void {
+  currentTessellationQuality = Math.max(0.1, Math.min(10, quality));
+  console.log(`[Rhino3dm] Tessellation quality set to: ${currentTessellationQuality}`);
+}
+
+export function getTessellationQuality(): TessellationQuality {
+  return currentTessellationQuality;
+}
+
+/**
+ * Convert Rhino Brep to mesh (tessellation)
+ * @param brep - Rhino Brep geometry
+ * @param rhino - Rhino3dm module
+ * @param quality - Optional quality override (0.1 to 10, default uses global setting)
+ */
+function rhinoBrepToMesh(brep: any, rhino: any, quality?: number): THREE.BufferGeometry | null {
+  const tessQuality = quality ?? currentTessellationQuality;
+  
   try {
-    console.log('[Rhino3dm] rhinoBrepToMesh: Starting conversion...');
+    console.log(`[Rhino3dm] rhinoBrepToMesh: Starting conversion (quality: ${tessQuality})...`);
     
     // Try multiple meshing approaches
     let meshes: any = null;
     
-    // Approach 1: Use MeshingParameters with fine settings
+    // Calculate meshing parameters based on quality
+    // Higher quality = smaller edge lengths, more grid cells
+    const minEdge = 0.01 / tessQuality;  // At quality 5, minEdge = 0.002
+    const maxEdge = 10 / tessQuality;     // At quality 5, maxEdge = 2
+    const gridMin = Math.round(4 * tessQuality); // At quality 5, gridMin = 20
+    
+    console.log(`[Rhino3dm] Meshing params: minEdge=${minEdge}, maxEdge=${maxEdge}, gridMin=${gridMin}`);
+    
+    // Approach 1: Use MeshingParameters with quality-based settings
     try {
       if (rhino.MeshingParameters) {
         const meshParameters = new rhino.MeshingParameters();
-        // Fine quality settings
-        meshParameters.minEdgeLength = 0.001;
-        meshParameters.maxEdgeLength = 100;
+        meshParameters.minEdgeLength = minEdge;
+        meshParameters.maxEdgeLength = maxEdge;
         meshParameters.gridAspectRatio = 0;
-        meshParameters.gridMinCount = 16;
-        meshParameters.refine = true;
+        meshParameters.gridMinCount = gridMin;
+        meshParameters.refine = tessQuality >= 1.0; // Only refine at medium+ quality
         
         console.log('[Rhino3dm] rhinoBrepToMesh: Trying createFromBrep with MeshingParameters...');
         meshes = rhino.Mesh.createFromBrep(brep, meshParameters);
@@ -527,8 +559,23 @@ function mergeBufferGeometries(geometries: THREE.BufferGeometry[]): THREE.Buffer
 /**
  * Parse a 3DM file and extract layers, objects, and metadata
  */
-export async function parse3DMFile(buffer: ArrayBuffer, fileName: string = 'model.3dm'): Promise<Rhino3dmDocument> {
-  console.log(`[Rhino3dm] Starting to parse: ${fileName} (${(buffer.byteLength / 1024).toFixed(1)} KB)`);
+/**
+ * Parse a 3DM file with optional tessellation quality
+ * @param buffer - File buffer
+ * @param fileName - File name for logging
+ * @param quality - Tessellation quality (0.1-10, default 1.0)
+ */
+export async function parse3DMFile(
+  buffer: ArrayBuffer, 
+  fileName: string = 'model.3dm',
+  quality?: TessellationQuality
+): Promise<Rhino3dmDocument> {
+  // Set quality for this parse operation
+  if (quality !== undefined) {
+    setTessellationQuality(quality);
+  }
+  
+  console.log(`[Rhino3dm] Starting to parse: ${fileName} (${(buffer.byteLength / 1024).toFixed(1)} KB, quality: ${getTessellationQuality()})`);
   
   const rhino = await initRhino3dm();
   
