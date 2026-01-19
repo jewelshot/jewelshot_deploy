@@ -61,6 +61,13 @@ interface ModelLayer {
   geometry: THREE.BufferGeometry;
   materialId: string;
   color: string;
+  category?: 'metal' | 'stone' | 'setting' | 'unknown';
+  confidence?: number;
+  volumeInfo?: {
+    volume: number;
+    weight: number;
+    carats?: number;
+  } | null;
 }
 
 interface MaterialPreset {
@@ -775,9 +782,83 @@ export default function ThreeDViewContent() {
       };
       reader.readAsArrayBuffer(file);
     } else if (file.name.toLowerCase().endsWith('.3dm')) {
-      alert('3DM support coming soon! For now, please export your model as STL.');
-      setIsLoading(false);
-      setLoadingStatus('');
+      // 3DM File Support
+      reader.onload = async (event) => {
+        const contents = event.target?.result;
+        if (contents) {
+          try {
+            setLoadingStatus('Loading rhino3dm...');
+            
+            // Dynamic import of rhino3dm loader (separate from index to avoid SSR issues)
+            const { parse3DMFile } = await import('@/lib/3d/rhino-loader');
+            const { detectLayerType } = await import('@/lib/3d/layer-detector');
+            const { calculateMeshVolume, calculateWeight } = await import('@/lib/3d/weight-calculator');
+            const { getMaterialById } = await import('@/lib/3d/materials-database');
+            
+            setLoadingStatus('Parsing 3DM file...');
+            const doc = await parse3DMFile(contents as ArrayBuffer, file.name);
+            
+            setLoadingStatus('Processing layers...');
+            
+            // Convert to our layer format with auto-detection
+            const processedLayers: ModelLayer[] = doc.objects.map((obj, index) => {
+              const layer = doc.layers.find(l => l.id === obj.layerId) || doc.layers[0];
+              const detection = detectLayerType(layer?.name || `Object ${index}`, layer?.color || '#808080');
+              
+              // Calculate volume and weight if material detected
+              let volumeInfo = null;
+              if (detection.suggestedMaterialId) {
+                const volResult = calculateMeshVolume(obj.geometry);
+                const material = getMaterialById(detection.suggestedMaterialId);
+                if (material) {
+                  const weightResult = calculateWeight(volResult.volumeMm3, material);
+                  volumeInfo = {
+                    volume: volResult.volumeMm3,
+                    weight: weightResult.weightGrams,
+                    carats: weightResult.weightCarats,
+                  };
+                }
+              }
+              
+              return {
+                id: obj.id || `layer-${index}`,
+                name: layer?.name || `Object ${index + 1}`,
+                visible: layer?.visible ?? true,
+                geometry: obj.geometry,
+                materialId: detection.suggestedMaterialId || 'gold-18k',
+                color: obj.color || layer?.color || '#808080',
+                category: detection.category,
+                confidence: detection.confidence,
+                volumeInfo,
+              };
+            });
+            
+            setLayers(processedLayers);
+            setLoadedGeometry(null);
+            setOriginalGeometry(null);
+            
+            // Calculate model info
+            let totalVertices = 0;
+            let totalFaces = 0;
+            processedLayers.forEach(layer => {
+              const pos = layer.geometry.getAttribute('position');
+              if (pos) {
+                totalVertices += pos.count;
+                totalFaces += Math.floor(pos.count / 3);
+              }
+            });
+            setModelInfo({ vertices: totalVertices, faces: totalFaces });
+            
+            console.log(`[3DM] Loaded ${processedLayers.length} layers from ${file.name}`);
+          } catch (error) {
+            console.error('Error parsing 3DM:', error);
+            alert(`Error loading 3DM file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          }
+        }
+        setIsLoading(false);
+        setLoadingStatus('');
+      };
+      reader.readAsArrayBuffer(file);
     } else {
       alert('Unsupported file format. Please use STL files.');
       setIsLoading(false);

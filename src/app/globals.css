@@ -298,3 +298,16 @@ body.no-scroll {
 .phone-input-dark .PhoneInputCountrySelectArrow {
   border-color: rgba(255, 255, 255, 0.5);
 }
+
+/* ============================================
+   reCAPTCHA v3 Badge - Hidden
+   Note: As per Google guidelines, when hiding the badge,
+   you must include the following text in your Privacy Policy:
+   "This site is protected by reCAPTCHA and the Google
+   Privacy Policy and Terms of Service apply."
+   ============================================ */
+.grecaptcha-badge {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}

@@ -965,4 +965,32 @@ export const tr: TranslationKeys = {
     clearSelection: 'Seçimi Temizle',
   },
 
+  // 3D Viewer
+  viewer3d: {
+    title: '3D Görüntüleyici',
+    noLayers: 'Katman yüklenmedi',
+    uploadToSeeLayers: 'Katmanları görmek için 3DM dosyası yükleyin',
+    metalLayers: 'Metal',
+    stoneLayers: 'Taşlar',
+    otherLayers: 'Diğer',
+    selectMaterial: 'Materyal Seç',
+    searchMaterials: 'Materyal ara...',
+    metals: 'Metaller',
+    gemstones: 'Değerli Taşlar',
+    weightSummary: 'Ağırlık Özeti',
+    noWeightData: 'Ağırlık verisi yok',
+    assignMaterials: 'Ağırlık hesaplamak için materyal atayın',
+    materialBreakdown: 'Materyal Dağılımı',
+    uploadModel: '3D Model Yükle',
+    supportedFormats: 'Desteklenen formatlar: STL, 3DM',
+    layerCount: 'Katmanlar',
+    objectCount: 'Nesneler',
+    units: 'Birimler',
+    volume: 'Hacim',
+    dimensions: 'Boyutlar',
+    autoDetect: 'Otomatik Algıla',
+    manualAssign: 'Manuel Ata',
+    exportReport: 'Rapor İndir',
+  },
+
 };

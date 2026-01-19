@@ -14,6 +14,38 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: process.env.SKIP_TYPE_CHECK === 'true',
   },
 
+  // WASM Support for rhino3dm
+  webpack: (config, { isServer }) => {
+    // Enable WASM support
+    config.experiments = {
+      ...config.experiments,
+      asyncWebAssembly: true,
+    };
+
+    // Handle .wasm files
+    config.module.rules.push({
+      test: /\.wasm$/,
+      type: 'webassembly/async',
+    });
+
+    // Exclude rhino3dm from server-side bundling (client-only)
+    if (isServer) {
+      config.externals = [...(config.externals || []), 'rhino3dm'];
+    }
+
+    // Fallback for Node.js built-in modules that don't exist in browser
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        crypto: false,
+      };
+    }
+
+    return config;
+  },
+
   // 🔒 Security: Disable source maps in production
   productionBrowserSourceMaps: false,
 
@@ -117,7 +149,7 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://va.vercel-scripts.com https://vercel.live https://plausible.io https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://www.google.com https://www.gstatic.com https://*.contentsquare.net https://code.jivosite.com https://static.hotjar.com https://*.hotjar.com", // Analytics + reCAPTCHA + JivoChat + Hotjar + Contentsquare
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://va.vercel-scripts.com https://vercel.live https://plausible.io https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://www.google.com https://www.gstatic.com https://*.contentsquare.net https://code.jivosite.com https://static.hotjar.com https://*.hotjar.com blob:", // Analytics + reCAPTCHA + JivoChat + Hotjar + Contentsquare + rhino3dm WASM
               "style-src 'self' 'unsafe-inline' https://code.jivosite.com", // Tailwind + JivoChat CSS
               "img-src 'self' data: https: blob:", // Allow images from FAL.AI and Supabase
               "font-src 'self' data: https://vercel.live", // Added Vercel Live fonts

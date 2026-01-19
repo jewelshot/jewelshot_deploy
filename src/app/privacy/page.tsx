@@ -55,6 +55,10 @@ export default function PrivacyPage() {
           subtitle: 'Security & Fraud Prevention',
           text: 'We use your information to detect and prevent fraudulent activity, unauthorized access, and other security threats.',
         },
+        {
+          subtitle: 'reCAPTCHA Protection',
+          text: 'This site is protected by reCAPTCHA and the Google Privacy Policy and Terms of Service apply. reCAPTCHA helps us prevent automated abuse while ensuring legitimate users can access our services seamlessly.',
+        },
       ],
     },
     {

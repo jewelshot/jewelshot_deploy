@@ -965,4 +965,32 @@ export const en: TranslationKeys = {
     clearSelection: 'Clear Selection',
   },
 
+  // 3D Viewer
+  viewer3d: {
+    title: '3D Viewer',
+    noLayers: 'No layers loaded',
+    uploadToSeeLayers: 'Upload a 3DM file to see layers',
+    metalLayers: 'Metal',
+    stoneLayers: 'Gemstones',
+    otherLayers: 'Other',
+    selectMaterial: 'Select Material',
+    searchMaterials: 'Search materials...',
+    metals: 'Metals',
+    gemstones: 'Gemstones',
+    weightSummary: 'Weight Summary',
+    noWeightData: 'No weight data available',
+    assignMaterials: 'Assign materials to calculate weight',
+    materialBreakdown: 'Material Breakdown',
+    uploadModel: 'Upload 3D Model',
+    supportedFormats: 'Supported formats: STL, 3DM',
+    layerCount: 'Layers',
+    objectCount: 'Objects',
+    units: 'Units',
+    volume: 'Volume',
+    dimensions: 'Dimensions',
+    autoDetect: 'Auto Detect',
+    manualAssign: 'Manual Assign',
+    exportReport: 'Export Report',
+  },
+
 };

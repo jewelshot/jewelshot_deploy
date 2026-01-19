@@ -965,6 +965,34 @@ export interface TranslationKeys {
     clearSelection: string;
   };
 
+  // 3D Viewer
+  viewer3d: {
+    title: string;
+    noLayers: string;
+    uploadToSeeLayers: string;
+    metalLayers: string;
+    stoneLayers: string;
+    otherLayers: string;
+    selectMaterial: string;
+    searchMaterials: string;
+    metals: string;
+    gemstones: string;
+    weightSummary: string;
+    noWeightData: string;
+    assignMaterials: string;
+    materialBreakdown: string;
+    uploadModel: string;
+    supportedFormats: string;
+    layerCount: string;
+    objectCount: string;
+    units: string;
+    volume: string;
+    dimensions: string;
+    autoDetect: string;
+    manualAssign: string;
+    exportReport: string;
+  };
+
 }
 
 export type Translations = {
