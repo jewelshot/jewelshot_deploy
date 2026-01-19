@@ -506,120 +506,29 @@ function AdaptiveResolutionController({
   return null;
 }
 
-// Object Picker & Outline Controller
+// Object Picker Controller - Click to select, orange outline on selected object only
 function ObjectSelectionController({
   enabled = true,
   selectedLayerId,
-  hoveredLayerId,
   onSelect,
-  onHover,
   meshRegistry,
 }: {
   enabled?: boolean;
   selectedLayerId: string | null;
-  hoveredLayerId: string | null;
   onSelect: (layerId: string | null) => void;
-  onHover: (layerId: string | null) => void;
   meshRegistry: Map<string, THREE.Mesh>;
 }) {
-  const { camera, gl, scene, size } = useThree();
+  const { camera, gl } = useThree();
   const raycaster = useRef(new THREE.Raycaster());
   const mouse = useRef(new THREE.Vector2());
   
-  // Outline effect
-  const composer = useRef<EffectComposer | null>(null);
-  const outlinePass = useRef<OutlinePass | null>(null);
-  const isInitialized = useRef(false);
-  
-  // Setup outline composer - only once
-  useEffect(() => {
-    if (!enabled || isInitialized.current) return;
-    
-    const effectComposer = new EffectComposer(gl);
-    composer.current = effectComposer;
-    
-    const renderPass = new RenderPass(scene, camera);
-    effectComposer.addPass(renderPass);
-    
-    // Orange outline like iJewel3D
-    const outline = new OutlinePass(
-      new THREE.Vector2(size.width, size.height),
-      scene,
-      camera
-    );
-    // Strong, visible orange outline
-    outline.edgeStrength = 6;       // Stronger edge
-    outline.edgeGlow = 0.5;         // More glow
-    outline.edgeThickness = 2;      // Thicker line
-    outline.pulsePeriod = 0;        // No pulsing
-    outline.visibleEdgeColor.set('#ff6600');  // Orange
-    outline.hiddenEdgeColor.set('#ff660044'); // Faded orange for hidden parts
-    outlinePass.current = outline;
-    effectComposer.addPass(outline);
-    
-    const fxaaPass = new ShaderPass(FXAAShader);
-    fxaaPass.uniforms['resolution'].value.set(1 / size.width, 1 / size.height);
-    effectComposer.addPass(fxaaPass);
-    
-    isInitialized.current = true;
-    
-    return () => {
-      effectComposer.dispose();
-      isInitialized.current = false;
-    };
-  }, [enabled, gl, scene, camera, size]);
-  
-  // Update selected/hovered objects for outline
-  useEffect(() => {
-    if (!outlinePass.current) return;
-    
-    const selectedObjects: THREE.Object3D[] = [];
-    
-    // Add selected object with strong outline
-    if (selectedLayerId) {
-      const mesh = meshRegistry.get(selectedLayerId);
-      if (mesh) selectedObjects.push(mesh);
-    }
-    
-    // Optionally add hovered object if different from selected
-    if (hoveredLayerId && hoveredLayerId !== selectedLayerId) {
-      const mesh = meshRegistry.get(hoveredLayerId);
-      if (mesh) selectedObjects.push(mesh);
-    }
-    
-    outlinePass.current.selectedObjects = selectedObjects;
-  }, [selectedLayerId, hoveredLayerId, meshRegistry]);
-  
-  // Handle resize
-  useEffect(() => {
-    if (composer.current) {
-      composer.current.setSize(size.width, size.height);
-    }
-    if (outlinePass.current) {
-      outlinePass.current.resolution.set(size.width, size.height);
-    }
-  }, [size]);
-  
-  // ALWAYS render with composer when we have selection or hover
-  // This replaces the default R3F render
-  useFrame(({ gl: renderer }) => {
-    if (!enabled || !composer.current) return;
-    
-    const hasOutlineTargets = selectedLayerId || hoveredLayerId;
-    
-    if (hasOutlineTargets) {
-      // Render with outline effect
-      composer.current.render();
-    }
-    // When no selection, let R3F render normally (don't call composer)
-  }, 1);
-  
-  // Mouse event handlers
+  // Mouse event handlers - ONLY click, no hover effect
   useEffect(() => {
     if (!enabled) return;
     
     const canvas = gl.domElement;
     
+    // Only change cursor on hover, no visual effect
     const handleMouseMove = (event: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
       mouse.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -630,14 +539,7 @@ function ObjectSelectionController({
       const meshes = Array.from(meshRegistry.values());
       const intersects = raycaster.current.intersectObjects(meshes, false);
       
-      if (intersects.length > 0) {
-        const layerId = intersects[0].object.userData.layerId;
-        onHover(layerId);
-        canvas.style.cursor = 'pointer';
-      } else {
-        onHover(null);
-        canvas.style.cursor = 'default';
-      }
+      canvas.style.cursor = intersects.length > 0 ? 'pointer' : 'default';
     };
     
     const handleClick = (event: MouseEvent) => {
@@ -668,7 +570,74 @@ function ObjectSelectionController({
       canvas.removeEventListener('click', handleClick);
       canvas.style.cursor = 'default';
     };
-  }, [enabled, gl, camera, meshRegistry, selectedLayerId, onSelect, onHover]);
+  }, [enabled, gl, camera, meshRegistry, selectedLayerId, onSelect]);
+  
+  return null;
+}
+
+// Outline Effect - Renders orange outline around selected object
+function SelectionOutlineEffect({
+  selectedLayerId,
+  meshRegistry,
+}: {
+  selectedLayerId: string | null;
+  meshRegistry: Map<string, THREE.Mesh>;
+}) {
+  const { gl, scene, camera, size } = useThree();
+  const composer = useRef<EffectComposer | null>(null);
+  const outlinePass = useRef<OutlinePass | null>(null);
+  
+  // Setup composer once
+  useEffect(() => {
+    const effectComposer = new EffectComposer(gl);
+    
+    const renderPass = new RenderPass(scene, camera);
+    effectComposer.addPass(renderPass);
+    
+    const outline = new OutlinePass(
+      new THREE.Vector2(size.width, size.height),
+      scene,
+      camera
+    );
+    outline.edgeStrength = 5;
+    outline.edgeGlow = 0.3;
+    outline.edgeThickness = 1.5;
+    outline.pulsePeriod = 0;
+    outline.visibleEdgeColor.set('#ff6600');
+    outline.hiddenEdgeColor.set('#ff660033');
+    outlinePass.current = outline;
+    effectComposer.addPass(outline);
+    
+    composer.current = effectComposer;
+    
+    return () => {
+      effectComposer.dispose();
+    };
+  }, [gl, scene, camera, size]);
+  
+  // Update outline target when selection changes
+  useEffect(() => {
+    if (!outlinePass.current) return;
+    
+    if (selectedLayerId) {
+      const mesh = meshRegistry.get(selectedLayerId);
+      outlinePass.current.selectedObjects = mesh ? [mesh] : [];
+    } else {
+      outlinePass.current.selectedObjects = [];
+    }
+  }, [selectedLayerId, meshRegistry]);
+  
+  // Resize handler
+  useEffect(() => {
+    composer.current?.setSize(size.width, size.height);
+  }, [size]);
+  
+  // Only render with composer when there's a selection
+  useFrame(() => {
+    if (selectedLayerId && composer.current) {
+      composer.current.render();
+    }
+  }, 1);
   
   return null;
 }
@@ -692,9 +661,7 @@ function SceneContent({
   onControlsReady,
   onFitToView,
   selectedLayerId,
-  hoveredLayerId,
   onSelectLayer,
-  onHoverLayer,
   meshRegistry,
   adaptiveResolution,
   onResolutionChange,
@@ -716,9 +683,7 @@ function SceneContent({
   onControlsReady: (controls: any) => void;
   onFitToView: (fitFn: () => void) => void;
   selectedLayerId: string | null;
-  hoveredLayerId: string | null;
   onSelectLayer: (id: string | null) => void;
-  onHoverLayer: (id: string | null) => void;
   meshRegistry: Map<string, THREE.Mesh>;
   adaptiveResolution: boolean;
   onResolutionChange?: (ratio: number, isRefining: boolean) => void;
@@ -1016,14 +981,20 @@ function SceneContent({
         onResolutionChange={onResolutionChange}
       />
       
-      {/* Object Selection with Outline */}
+      {/* Object Selection - Click to select */}
       {layers.length > 0 && (
         <ObjectSelectionController
           enabled={true}
           selectedLayerId={selectedLayerId}
-          hoveredLayerId={hoveredLayerId}
           onSelect={onSelectLayer}
-          onHover={onHoverLayer}
+          meshRegistry={meshRegistry}
+        />
+      )}
+      
+      {/* Orange Outline Effect - Only on selected object */}
+      {layers.length > 0 && selectedLayerId && (
+        <SelectionOutlineEffect
+          selectedLayerId={selectedLayerId}
           meshRegistry={meshRegistry}
         />
       )}
@@ -1092,7 +1063,6 @@ export default function ThreeDViewContent() {
   // Layer state (for future 3DM support)
   const [layers, setLayers] = useState<ModelLayer[]>([]);
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
-  const [hoveredLayerId, setHoveredLayerId] = useState<string | null>(null);
   const [layerMaterials, setLayerMaterials] = useState<Record<string, MaterialPreset>>({});
   
   // Progressive rendering & selection state
@@ -1840,9 +1810,7 @@ export default function ThreeDViewContent() {
                 onControlsReady={(controls) => { controlsRef.current = controls; }}
                 onFitToView={(fn) => setFitToViewFn(() => fn)}
                 selectedLayerId={selectedLayerId}
-                hoveredLayerId={hoveredLayerId}
                 onSelectLayer={setSelectedLayerId}
-                onHoverLayer={setHoveredLayerId}
                 meshRegistry={meshRegistryRef.current}
                 adaptiveResolution={adaptiveResolution}
                 onResolutionChange={handleResolutionChange}
@@ -1854,13 +1822,11 @@ export default function ThreeDViewContent() {
           {/* Controls hint */}
           {(loadedGeometry || layers.length > 0) && (
             <div className="absolute bottom-4 left-4 rounded-lg bg-black/60 px-3 py-2 text-xs text-white/40 backdrop-blur-sm">
-              <span className="text-white/60">Left click:</span> Rotate &nbsp;
-              <span className="text-white/60">Right click:</span> Pan &nbsp;
-              <span className="text-white/60">Scroll:</span> Zoom &nbsp;
+              <span className="text-white/60">Left:</span> Rotate &nbsp;
+              <span className="text-white/60">Right:</span> Pan &nbsp;
+              <span className="text-white/60">Scroll:</span> Zoom
               {layers.length > 0 && (
-                <>
-                  <span className="text-white/60">Click:</span> Select
-                </>
+                <> &nbsp;<span className="text-white/60">Click object:</span> Select</>
               )}
             </div>
           )}
@@ -2392,8 +2358,6 @@ export default function ThreeDViewContent() {
                         className={`rounded-lg border p-2 transition-all cursor-pointer ${
                           selectedLayerId === layer.id
                             ? 'border-orange-500/50 bg-orange-500/10 ring-1 ring-orange-500/30'
-                            : hoveredLayerId === layer.id
-                            ? 'border-orange-500/30 bg-orange-500/5'
                             : 'border-white/10 bg-white/5 hover:border-white/20'
                         }`}
                         onClick={() => setSelectedLayerId(selectedLayerId === layer.id ? null : layer.id)}
