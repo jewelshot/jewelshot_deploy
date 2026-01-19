@@ -17,11 +17,6 @@ import React, { useState, useRef, useCallback, Suspense, useEffect, useMemo } fr
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { OrbitControls, Center, Environment, Grid, GizmoHelper, GizmoViewport, Lightformer } from '@react-three/drei';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
-import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
 import * as THREE from 'three';
 import { LoopSubdivision } from 'three-subdivide';
 import {
@@ -575,71 +570,58 @@ function ObjectSelectionController({
   return null;
 }
 
-// Outline Effect - Renders orange outline around selected object
-function SelectionOutlineEffect({
+// Simple Outline - Orange edge lines on selected object (no post-processing)
+// This approach doesn't affect other objects' rendering
+function SimpleSelectionOutline({
   selectedLayerId,
   meshRegistry,
 }: {
   selectedLayerId: string | null;
   meshRegistry: Map<string, THREE.Mesh>;
 }) {
-  const { gl, scene, camera, size } = useThree();
-  const composer = useRef<EffectComposer | null>(null);
-  const outlinePass = useRef<OutlinePass | null>(null);
+  const [outlineGeometry, setOutlineGeometry] = useState<THREE.BufferGeometry | null>(null);
+  const [outlinePosition, setOutlinePosition] = useState<THREE.Vector3>(new THREE.Vector3());
+  const [outlineScale, setOutlineScale] = useState<THREE.Vector3>(new THREE.Vector3(1, 1, 1));
   
-  // Setup composer once
+  // Create edge geometry when selection changes
   useEffect(() => {
-    const effectComposer = new EffectComposer(gl);
-    
-    const renderPass = new RenderPass(scene, camera);
-    effectComposer.addPass(renderPass);
-    
-    const outline = new OutlinePass(
-      new THREE.Vector2(size.width, size.height),
-      scene,
-      camera
-    );
-    outline.edgeStrength = 5;
-    outline.edgeGlow = 0.3;
-    outline.edgeThickness = 1.5;
-    outline.pulsePeriod = 0;
-    outline.visibleEdgeColor.set('#ff6600');
-    outline.hiddenEdgeColor.set('#ff660033');
-    outlinePass.current = outline;
-    effectComposer.addPass(outline);
-    
-    composer.current = effectComposer;
-    
-    return () => {
-      effectComposer.dispose();
-    };
-  }, [gl, scene, camera, size]);
-  
-  // Update outline target when selection changes
-  useEffect(() => {
-    if (!outlinePass.current) return;
-    
-    if (selectedLayerId) {
-      const mesh = meshRegistry.get(selectedLayerId);
-      outlinePass.current.selectedObjects = mesh ? [mesh] : [];
-    } else {
-      outlinePass.current.selectedObjects = [];
+    if (!selectedLayerId) {
+      setOutlineGeometry(null);
+      return;
     }
+    
+    const mesh = meshRegistry.get(selectedLayerId);
+    if (!mesh || !mesh.geometry) {
+      setOutlineGeometry(null);
+      return;
+    }
+    
+    // Create edges from the selected mesh's geometry
+    const edges = new THREE.EdgesGeometry(mesh.geometry, 15); // 15 degree threshold
+    setOutlineGeometry(edges);
+    
+    // Get world position and scale
+    mesh.getWorldPosition(outlinePosition);
+    mesh.getWorldScale(outlineScale);
+    setOutlinePosition(outlinePosition.clone());
+    setOutlineScale(outlineScale.clone());
   }, [selectedLayerId, meshRegistry]);
   
-  // Resize handler
-  useEffect(() => {
-    composer.current?.setSize(size.width, size.height);
-  }, [size]);
+  if (!outlineGeometry || !selectedLayerId) return null;
   
-  // Only render with composer when there's a selection
-  useFrame(() => {
-    if (selectedLayerId && composer.current) {
-      composer.current.render();
-    }
-  }, 1);
+  const mesh = meshRegistry.get(selectedLayerId);
+  if (!mesh) return null;
   
-  return null;
+  return (
+    <lineSegments geometry={outlineGeometry}>
+      <lineBasicMaterial 
+        color="#ff6600" 
+        linewidth={2}
+        transparent
+        opacity={0.9}
+      />
+    </lineSegments>
+  );
 }
 
 // Scene content component
@@ -991,9 +973,9 @@ function SceneContent({
         />
       )}
       
-      {/* Orange Outline Effect - Only on selected object */}
+      {/* Simple Orange Outline - No post-processing, won't affect other objects */}
       {layers.length > 0 && selectedLayerId && (
-        <SelectionOutlineEffect
+        <SimpleSelectionOutline
           selectedLayerId={selectedLayerId}
           meshRegistry={meshRegistry}
         />
