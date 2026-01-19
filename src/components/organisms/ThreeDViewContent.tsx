@@ -255,10 +255,14 @@ type StudioPresetId = typeof STUDIO_PRESETS[number]['id'];
 
 // Background presets
 const BACKGROUND_PRESETS = [
+  { id: 'black', name: 'Black', color: '#000000' },
   { id: 'dark', name: 'Dark', color: '#0a0a0a' },
-  { id: 'darker', name: 'Darker', color: '#000000' },
-  { id: 'gray', name: 'Gray', color: '#1a1a1a' },
-  { id: 'gradient', name: 'Gradient', color: 'linear-gradient(180deg, #1a1a2e 0%, #0a0a0a 100%)' },
+  { id: 'charcoal', name: 'Charcoal', color: '#1a1a1a' },
+  { id: 'slate', name: 'Slate', color: '#2d2d2d' },
+  { id: 'gray', name: 'Gray', color: '#4a4a4a' },
+  { id: 'light-gray', name: 'Light Gray', color: '#808080' },
+  { id: 'silver', name: 'Silver', color: '#c0c0c0' },
+  { id: 'white', name: 'White', color: '#ffffff' },
 ];
 
 // Lighting presets
@@ -406,7 +410,7 @@ function SceneContent({
   studioPreset,
   hdrPreset,
   useHDR,
-  showEnvironmentBackground,
+  backgroundColor,
   modelRotation,
   lighting,
   lightIntensity,
@@ -423,7 +427,7 @@ function SceneContent({
   studioPreset: StudioPreset;
   hdrPreset: HDRPreset | null;
   useHDR: boolean;
-  showEnvironmentBackground: boolean;
+  backgroundColor: string;
   modelRotation: [number, number, number];
   lighting: LightingPreset;
   lightIntensity: number;
@@ -592,17 +596,19 @@ function SceneContent({
         intensity={0.4 * intensityMultiplier}
       />
 
-      {/* Custom Studio Environment with Lightformers - No external HDR needed */}
-      {/* Environment: HDR or Lightformer based on selection */}
+      {/* Scene Background Color */}
+      <color attach="background" args={[backgroundColor]} />
+      
+      {/* Environment: HDR or Lightformer - ONLY for reflections, never as visible background */}
       {useHDR && hdrPreset ? (
         <Environment 
           files={hdrPreset.file}
-          background={showEnvironmentBackground}
+          background={false}
           environmentIntensity={lightIntensity}
         />
       ) : (
         <Environment 
-          background={showEnvironmentBackground}
+          background={false}
           resolution={256}
         >
           {/* Studio Lightformers for reflections */}
@@ -617,8 +623,6 @@ function SceneContent({
               rotation={light.rotation || [0, 0, 0]}
             />
           ))}
-          {/* Background color */}
-          <color attach="background" args={[studioPreset.backgroundColor]} />
         </Environment>
       )}
       
@@ -761,7 +765,7 @@ export default function ThreeDViewContent() {
   const [selectedLighting, setSelectedLighting] = useState<LightingPreset>(LIGHTING_PRESETS[0]); // Studio default
   const [lightIntensity, setLightIntensity] = useState(1.0); // Global intensity multiplier
   const [isSnapshotMode, setIsSnapshotMode] = useState(false); // Hide grid during snapshot
-  const [showEnvBackground, setShowEnvBackground] = useState(true); // Show HDR as background
+  // HDR is used for reflections only, not as visible background
   const [subdivisionLevel, setSubdivisionLevel] = useState(0); // 0 = original, 1-3 = smoother
   const [originalGeometry, setOriginalGeometry] = useState<THREE.BufferGeometry | null>(null); // Store original for subdivision
   
@@ -1370,7 +1374,7 @@ export default function ThreeDViewContent() {
                 studioPreset={selectedStudio}
                 hdrPreset={selectedHDR}
                 useHDR={useHDR}
-                showEnvironmentBackground={showEnvBackground && !isSnapshotMode}
+                backgroundColor={backgroundColor}
                 modelRotation={modelRotation}
                 lighting={selectedLighting}
                 lightIntensity={lightIntensity}
@@ -1676,23 +1680,7 @@ export default function ThreeDViewContent() {
                   </>
                 )}
                 
-                {/* Show Background Toggle */}
-                <label className="flex items-center justify-between cursor-pointer mt-3 pt-3 border-t border-white/10">
-                  <span className="text-[10px] text-white/50">Show Background</span>
-                  <button
-                    onClick={() => setShowEnvBackground(!showEnvBackground)}
-                    className={`relative w-9 h-5 rounded-full transition-colors ${
-                      showEnvBackground ? 'bg-purple-500' : 'bg-white/20'
-                    }`}
-                  >
-                    <span 
-                      className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform ${
-                        showEnvBackground ? 'translate-x-4' : 'translate-x-0'
-                      }`}
-                    />
-                  </button>
-                </label>
-              </div>
+                </div>
 
               {/* Background */}
               <div className="mb-4">
@@ -1704,15 +1692,83 @@ export default function ThreeDViewContent() {
                     <button
                       key={preset.id}
                       onClick={() => setBackgroundColor(preset.color)}
-                      className={`h-8 flex-1 rounded-md border-2 transition-all ${
+                      className={`h-6 w-6 rounded border-2 transition-all ${
                         backgroundColor === preset.color
-                          ? 'border-purple-500'
-                          : 'border-transparent hover:border-white/20'
+                          ? 'border-purple-500 ring-1 ring-purple-500/30'
+                          : 'border-transparent hover:border-white/30'
                       }`}
                       style={{ background: preset.color }}
                       title={preset.name}
                     />
                   ))}
+                </div>
+              </div>
+
+              {/* Display Options */}
+              <div className="mb-4">
+                <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
+                  Display Options
+                </h3>
+                <div className="space-y-2">
+                  {/* Grid Toggle */}
+                  <label className="flex items-center justify-between cursor-pointer py-1">
+                    <span className="flex items-center gap-2 text-xs text-white/70">
+                      <Grid3X3 className="h-4 w-4" />
+                      Show Grid
+                    </span>
+                    <button
+                      onClick={() => setShowGrid(!showGrid)}
+                      className={`relative w-9 h-5 rounded-full transition-colors ${
+                        showGrid ? 'bg-purple-500' : 'bg-white/20'
+                      }`}
+                    >
+                      <span 
+                        className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform ${
+                          showGrid ? 'translate-x-4' : 'translate-x-0'
+                        }`}
+                      />
+                    </button>
+                  </label>
+                  
+                  {/* Wireframe Toggle */}
+                  <label className="flex items-center justify-between cursor-pointer py-1">
+                    <span className="flex items-center gap-2 text-xs text-white/70">
+                      <Box className="h-4 w-4" />
+                      Wireframe Mode
+                    </span>
+                    <button
+                      onClick={() => setWireframe(!wireframe)}
+                      className={`relative w-9 h-5 rounded-full transition-colors ${
+                        wireframe ? 'bg-purple-500' : 'bg-white/20'
+                      }`}
+                    >
+                      <span 
+                        className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform ${
+                          wireframe ? 'translate-x-4' : 'translate-x-0'
+                        }`}
+                      />
+                    </button>
+                  </label>
+                  
+                  {/* Auto Rotate Toggle */}
+                  <label className="flex items-center justify-between cursor-pointer py-1">
+                    <span className="flex items-center gap-2 text-xs text-white/70">
+                      <RefreshCw className="h-4 w-4" />
+                      Auto Rotate
+                    </span>
+                    <button
+                      onClick={() => setAutoRotate(!autoRotate)}
+                      className={`relative w-9 h-5 rounded-full transition-colors ${
+                        autoRotate ? 'bg-purple-500' : 'bg-white/20'
+                      }`}
+                    >
+                      <span 
+                        className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform ${
+                          autoRotate ? 'translate-x-4' : 'translate-x-0'
+                        }`}
+                      />
+                    </button>
+                  </label>
                 </div>
               </div>
 
