@@ -7,7 +7,8 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useSidebarStore } from '@/store/sidebarStore';
 import { User, BarChart3, Settings, CreditCard, Gift } from 'lucide-react';
 import ProfileInfoSection from '@/components/molecules/ProfileInfoSection';
@@ -16,13 +17,39 @@ import SettingsSection from '@/components/molecules/SettingsSection';
 import BillingSection from '@/components/molecules/BillingSection';
 import { ReferralSection } from '@/components/molecules/ReferralSection';
 import { useLanguage } from '@/lib/i18n';
+import { trackEvent } from '@/components/analytics/FacebookPixel';
 
 type TabType = 'profile' | 'stats' | 'settings' | 'billing' | 'referral';
 
 export function ProfileContent() {
   const { leftOpen } = useSidebarStore();
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState<TabType>('profile');
+  const searchParams = useSearchParams();
+  const purchaseTracked = useRef(false);
+  
+  // Determine initial tab from URL params
+  const tabFromUrl = searchParams.get('tab') as TabType | null;
+  const isPaymentSuccess = searchParams.get('success') === 'true';
+  
+  const [activeTab, setActiveTab] = useState<TabType>(tabFromUrl || 'profile');
+
+  // Track Purchase event when redirected from successful payment
+  useEffect(() => {
+    if (isPaymentSuccess && !purchaseTracked.current) {
+      purchaseTracked.current = true;
+      
+      // Track purchase with Meta Pixel
+      // Note: Actual amount comes from webhook, this is for conversion tracking
+      trackEvent('Purchase', {
+        currency: 'USD',
+        value: 0, // Actual value tracked server-side via Conversions API
+        content_name: 'Subscription',
+        content_type: 'product',
+      });
+      
+      console.log('[Profile] Purchase event tracked');
+    }
+  }, [isPaymentSuccess]);
 
   const tabs = [
     { id: 'profile' as TabType, label: t.profile.title, icon: User },

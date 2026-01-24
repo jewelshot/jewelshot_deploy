@@ -60,15 +60,34 @@ declare global {
   }
 }
 
-// Helper functions for tracking events
-export function fbEvent(name: string, options?: Record<string, unknown>) {
+// ============================================
+// TRACKING HELPER FUNCTIONS
+// ============================================
+
+/**
+ * Track a standard Meta event
+ * @param eventName - Standard event name (e.g., 'Purchase', 'CompleteRegistration')
+ * @param data - Optional event parameters
+ */
+export function trackEvent(eventName: string, data?: Record<string, unknown>) {
   if (typeof window !== 'undefined' && window.fbq) {
-    window.fbq('track', name, options);
+    window.fbq('track', eventName, data);
+    console.log(`[Meta Pixel] Tracked: ${eventName}`, data);
   }
 }
 
-export function fbCustomEvent(name: string, options?: Record<string, unknown>) {
+/**
+ * Track a custom Meta event
+ * @param eventName - Custom event name
+ * @param data - Optional event parameters
+ */
+export function trackCustomEvent(eventName: string, data?: Record<string, unknown>) {
   if (typeof window !== 'undefined' && window.fbq) {
-    window.fbq('trackCustom', name, options);
+    window.fbq('trackCustom', eventName, data);
+    console.log(`[Meta Pixel] Tracked Custom: ${eventName}`, data);
   }
 }
+
+// Legacy aliases for backwards compatibility
+export const fbEvent = trackEvent;
+export const fbCustomEvent = trackCustomEvent;

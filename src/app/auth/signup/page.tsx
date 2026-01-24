@@ -12,6 +12,7 @@ import { AuroraBackground } from '@/components/atoms/AuroraBackground';
 import { useLanguage } from '@/lib/i18n';
 import { useDeviceFingerprint } from '@/hooks/useDeviceFingerprint';
 import { useRecaptcha } from '@/components/atoms/RecaptchaProvider';
+import { trackEvent } from '@/components/analytics/FacebookPixel';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -99,6 +100,12 @@ export default function SignupPage() {
 
       if (signUpError) throw signUpError;
 
+      // Track successful registration with Meta Pixel
+      trackEvent('CompleteRegistration', {
+        content_name: 'Email Signup',
+        status: 'success',
+      });
+
       setSuccess(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : t.errors.generic);
@@ -129,6 +136,12 @@ export default function SignupPage() {
       });
 
       if (signInError) throw signInError;
+
+      // Track Google signup initiation with Meta Pixel
+      trackEvent('CompleteRegistration', {
+        content_name: 'Google Signup',
+        status: 'initiated',
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : t.errors.generic);
     }
