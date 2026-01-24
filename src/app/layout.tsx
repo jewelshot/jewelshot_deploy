@@ -15,6 +15,7 @@ import { OrganizationSchema, SoftwareApplicationSchema, WebSiteSchema } from '@/
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { AILoadingModal } from '@/components/molecules/AILoadingModal';
 import { LanguageProvider } from '@/lib/i18n';
+import { FacebookPixel } from '@/components/analytics/FacebookPixel';
 import './globals.css';
 
 // Note: Environment validation is available in src/lib/env.ts
@@ -182,6 +183,7 @@ export default function RootLayout({
             <GalleryPrefetch />
             <PlausibleAnalytics />
             <AnalyticsProvider />
+            <FacebookPixel />
             <CookieConsent />
           </LanguageProvider>
         </ThemeProvider>
