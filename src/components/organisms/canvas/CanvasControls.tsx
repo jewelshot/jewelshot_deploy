@@ -195,23 +195,31 @@ export default function CanvasControls({
         </div>
       )}
 
-      {/* Top Right Controls - Zoom & Actions */}
+      {/* Top Right Controls - Zoom (hideable) & Actions (always visible) */}
       <div
         className="fixed z-20 flex items-center gap-2 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
         style={{
           top: topOpen ? '80px' : '16px',
           right: rightOpen ? '276px' : '16px',
-          opacity: controlsVisible ? 1 : 0,
-          transform: controlsVisible ? 'translateX(0)' : 'translateX(30px)',
-          pointerEvents: controlsVisible ? 'auto' : 'none',
         }}
       >
-        <ZoomControls
-          scale={displayScale}
-          onZoomIn={onZoomIn}
-          onZoomOut={onZoomOut}
-          onFitScreen={onFitScreen}
-        />
+        {/* Zoom Controls - Hideable */}
+        <div
+          className="transition-all duration-[400ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
+          style={{
+            opacity: controlsVisible ? 1 : 0,
+            transform: controlsVisible ? 'translateX(0)' : 'translateX(20px)',
+            pointerEvents: controlsVisible ? 'auto' : 'none',
+          }}
+        >
+          <ZoomControls
+            scale={displayScale}
+            onZoomIn={onZoomIn}
+            onZoomOut={onZoomOut}
+            onFitScreen={onFitScreen}
+          />
+        </div>
+        {/* Action Controls - ALWAYS visible (toggle bars, UI, fullscreen) */}
         <ActionControls
           allBarsOpen={allBarsOpen}
           onToggleAllBars={onToggleAllBars}

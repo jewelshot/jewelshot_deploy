@@ -73,7 +73,7 @@ interface UseCanvasHandlersProps {
   openRight: () => void;
   
   // Background control
-  setBackground: (bg: 'gray' | 'white' | 'black') => void;
+  setBackground: (bg: 'none' | 'black' | 'gray' | 'white' | 'alpha') => void;
 }
 
 export function useCanvasHandlers(props: UseCanvasHandlersProps) {
@@ -276,9 +276,9 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
       fileInputRef.current.value = '';
     }
     
-    // 🎯 Reset background to default (gray) when image is closed
-    setBackground('gray');
-    logger.info('🎨 Background reset to default');
+    // 🎯 Reset background to default (none = app original background) when image is closed
+    setBackground('none');
+    logger.info('🎨 Background reset to default (none)');
     
     // 🎯 Dispatch image closed event for thumbnail cleanup
     const closeEvent = new CustomEvent('jewelshot:imageClosed');
