@@ -1106,6 +1106,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
     setLeftImagePosition,
     setRightImagePosition,
     openRight,
+    setBackground,
   });
 
   // ===================================================================
