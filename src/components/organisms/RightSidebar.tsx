@@ -461,7 +461,6 @@ ${libraryPreset.negativePrompt}`;
           showFace={showFace}
           onShowFaceChange={(value) => setShowFace(value)}
           isRequired={isSettingsRequired}
-          imageUrl={thumbnailUrl}
         />
       </div>
     </aside>
