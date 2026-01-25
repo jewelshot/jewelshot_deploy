@@ -178,7 +178,7 @@ export function GenerationSettingsModal({
 
       {/* Modal */}
       <div
-        className="fixed left-1/2 top-1/2 z-[201] w-full max-w-2xl -translate-x-1/2 -translate-y-1/2 transform px-4"
+        className="fixed left-1/2 top-1/2 z-[201] w-full max-w-md -translate-x-1/2 -translate-y-1/2 transform px-4"
         role="dialog"
         aria-modal="true"
         aria-labelledby="settings-modal-title"
@@ -187,8 +187,29 @@ export function GenerationSettingsModal({
           {/* Glassmorphism inner glow */}
           <div className="pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-br from-white/[0.05] via-transparent to-transparent" />
           
+          {/* Image Thumbnail - Top Right with Fade */}
+          {imageUrl && (
+            <div className="pointer-events-none absolute -right-4 -top-4 z-0 h-[180px] w-[140px] overflow-hidden">
+              {/* Image with zoom effect */}
+              <div className="relative h-full w-full">
+                <img
+                  src={imageUrl}
+                  alt="Uploaded jewelry"
+                  className="h-full w-full scale-150 object-cover opacity-60"
+                  style={{ objectPosition: 'center' }}
+                />
+                {/* Left fade gradient */}
+                <div className="absolute inset-0 bg-gradient-to-r from-[rgba(10,10,10,1)] via-[rgba(10,10,10,0.8)] to-transparent" />
+                {/* Bottom fade gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[rgba(10,10,10,1)] via-transparent to-transparent" />
+                {/* Top fade gradient */}
+                <div className="absolute inset-0 bg-gradient-to-b from-[rgba(10,10,10,0.6)] via-transparent to-transparent" />
+              </div>
+            </div>
+          )}
+          
           {/* Header */}
-          <div className="relative mb-5 flex items-center justify-between">
+          <div className="relative z-10 mb-5 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-white/10 to-white/5 ring-1 ring-white/10">
                 <Settings className="h-5 w-5 text-white/80" />
@@ -205,35 +226,15 @@ export function GenerationSettingsModal({
             </div>
             <button
               onClick={onClose}
-              className="flex h-8 w-8 items-center justify-center rounded-xl text-white/50 transition-all hover:bg-white/10 hover:text-white"
+              className="relative z-10 flex h-8 w-8 items-center justify-center rounded-xl text-white/50 transition-all hover:bg-white/10 hover:text-white"
               aria-label="Close settings"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
 
-          {/* Main Content Grid - Image Preview + Settings */}
-          <div className="relative flex gap-6">
-            {/* Image Preview Section */}
-            {imageUrl && (
-              <div className="flex-shrink-0">
-                <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/40 p-1">
-                  <img
-                    src={imageUrl}
-                    alt="Uploaded jewelry"
-                    className="h-[280px] w-[200px] rounded-xl object-contain"
-                  />
-                  {/* Subtle overlay gradient */}
-                  <div className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-                </div>
-                <p className="mt-2 text-center text-[10px] font-medium uppercase tracking-wider text-white/30">
-                  Your Image
-                </p>
-              </div>
-            )}
-
-            {/* Settings Section */}
-            <div className="flex-1 space-y-4">
+          {/* Settings Content */}
+          <div className="relative z-10 space-y-4">
             {/* Gender Selection */}
             <div>
               <label className="mb-1.5 block text-xs font-medium text-white/70">
@@ -389,12 +390,11 @@ export function GenerationSettingsModal({
                 </div>
               </div>
             </div>
-            </div>
           </div>
 
           {/* Validation Error */}
           {showValidationError && (
-            <div className="relative mt-4 flex items-start gap-3 rounded-xl border border-red-500/20 bg-red-500/10 p-3 backdrop-blur-sm">
+            <div className="relative z-10 mt-4 flex items-start gap-3 rounded-xl border border-red-500/20 bg-red-500/10 p-3 backdrop-blur-sm">
               <AlertCircle className="h-5 w-5 flex-shrink-0 text-red-400" />
               <div className="flex-1">
                 <p className="text-sm font-medium text-red-400">
@@ -405,7 +405,7 @@ export function GenerationSettingsModal({
           )}
 
           {/* Apply to All Checkbox */}
-          <div className="relative mt-4">
+          <div className="relative z-10 mt-4">
             <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/5 bg-white/[0.02] p-3 transition-colors hover:bg-white/[0.04]">
               <input
                 type="checkbox"
@@ -420,7 +420,7 @@ export function GenerationSettingsModal({
           </div>
 
           {/* Footer */}
-          <div className="relative mt-5 flex justify-end gap-2">
+          <div className="relative z-10 mt-5 flex justify-end gap-2">
             {!isRequired && (
               <button
                 onClick={handleClose}
