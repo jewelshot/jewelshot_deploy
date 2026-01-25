@@ -1,25 +1,22 @@
 /**
  * Announcements API
  * 
- * GET - Fetch unread announcements for current user
+ * GET - Fetch all announcements with read status for current user
  */
 
 import { NextResponse } from 'next/server';
-import { getUnreadAnnouncements, getAllAnnouncements } from '@/lib/announcements/queries';
+import { getAllAnnouncements } from '@/lib/announcements/queries';
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url);
-    const all = searchParams.get('all') === 'true';
-
-    const announcements = all 
-      ? await getAllAnnouncements()
-      : await getUnreadAnnouncements();
+    // Always return all announcements with is_read flag
+    const announcements = await getAllAnnouncements();
 
     return NextResponse.json({
       success: true,
       announcements,
       count: announcements.length,
+      unreadCount: announcements.filter(a => !a.is_read).length,
     });
   } catch (error) {
     console.error('Error fetching announcements:', error);

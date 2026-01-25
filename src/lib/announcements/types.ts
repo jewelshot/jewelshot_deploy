@@ -60,6 +60,7 @@ export interface UserAnnouncement {
   action_label: string | null;
   image_url: string | null;
   created_at: string;
+  is_read?: boolean; // Whether the user has read this announcement
 }
 
 /**

@@ -212,6 +212,27 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // ============================================
+  // 🚫 BANNED USER CHECK
+  // ============================================
+  // Check if user is banned (Supabase sets banned_until when user is banned)
+  if (user) {
+    const bannedUntil = (user as unknown as { banned_until?: string }).banned_until;
+    if (bannedUntil) {
+      const banDate = new Date(bannedUntil);
+      if (banDate > new Date()) {
+        // User is still banned - redirect to banned page
+        if (pathname !== '/banned') {
+          const url = request.nextUrl.clone();
+          url.pathname = '/banned';
+          return NextResponse.redirect(url);
+        }
+        // Allow access to /banned page
+        return supabaseResponse;
+      }
+    }
+  }
+
   // 🔒 EMAIL VERIFICATION CHECK
   // If user is logged in but email not verified, redirect to verify page
   const isVerifyEmailPage = pathname === '/auth/verify-email';

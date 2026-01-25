@@ -4,6 +4,7 @@
  * Unified notification center with:
  * - Admin announcements (from database)
  * - Local notifications (in-app events)
+ * - Detail modal when clicking notifications
  * - Glassmorphism design
  */
 
@@ -25,6 +26,7 @@ import {
   Wrench,
   ExternalLink,
   Megaphone,
+  ChevronRight,
 } from 'lucide-react';
 import { useAnnouncements } from '@/hooks/useAnnouncements';
 import type { UserAnnouncement, AnnouncementType } from '@/lib/announcements/types';
@@ -159,12 +161,125 @@ const announcementColorMap: Record<AnnouncementType, string> = {
 };
 
 // ============================================
+// ANNOUNCEMENT DETAIL MODAL
+// ============================================
+
+interface AnnouncementDetailModalProps {
+  announcement: UserAnnouncement;
+  onClose: () => void;
+  onMarkAsRead: () => void;
+}
+
+function AnnouncementDetailModal({ announcement, onClose, onMarkAsRead }: AnnouncementDetailModalProps) {
+  const Icon = announcementIconMap[announcement.type] || Sparkles;
+  const colors = announcementColorMap[announcement.type] || announcementColorMap.update;
+
+  const handleAction = () => {
+    onMarkAsRead();
+    if (announcement.action_url) {
+      if (announcement.action_url.startsWith('http')) {
+        window.open(announcement.action_url, '_blank');
+      } else {
+        window.location.href = announcement.action_url;
+      }
+    }
+    onClose();
+  };
+
+  return createPortal(
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[10001] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.9, y: 20 }}
+          transition={{ type: 'spring', duration: 0.3 }}
+          className="w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 bg-[rgba(15,15,15,0.98)] shadow-[0_20px_60px_rgba(0,0,0,0.5)] backdrop-blur-xl"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header with Image */}
+          <div className="relative overflow-hidden">
+            {announcement.image_url && (
+              <div className="absolute inset-0">
+                <img
+                  src={announcement.image_url}
+                  alt=""
+                  className="h-full w-full object-cover opacity-30"
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[rgba(15,15,15,0.98)]" />
+              </div>
+            )}
+            <div className="relative p-6">
+              <div className="flex items-start justify-between">
+                <div className={`rounded-xl p-3 ${colors}`}>
+                  <Icon className="h-6 w-6" />
+                </div>
+                <button
+                  onClick={onClose}
+                  className="rounded-lg p-2 text-white/40 transition-colors hover:bg-white/10 hover:text-white"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <h2 className="mt-4 text-2xl font-bold text-white">{announcement.title}</h2>
+              <p className="mt-1 text-sm text-white/40">
+                {new Date(announcement.created_at).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </p>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="px-6 pb-6">
+            <div className="prose prose-invert max-w-none">
+              <p className="text-white/70 whitespace-pre-wrap leading-relaxed">
+                {announcement.message}
+              </p>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="flex items-center gap-3 border-t border-white/10 p-4">
+            <button
+              onClick={onClose}
+              className="flex-1 rounded-xl border border-white/20 bg-white/5 px-4 py-3 font-medium text-white transition-all hover:bg-white/10"
+            >
+              Close
+            </button>
+            {announcement.action_url && (
+              <button
+                onClick={handleAction}
+                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-purple-600 px-4 py-3 font-medium text-white transition-all hover:bg-purple-700"
+              >
+                {announcement.action_label || 'Learn More'}
+                <ExternalLink className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>,
+    document.body
+  );
+}
+
+// ============================================
 // NOTIFICATION CENTER COMPONENT
 // ============================================
 
 export function NotificationCenter() {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState<UserAnnouncement | null>(null);
   const localNotifs = useLocalNotifications();
   const { announcements, markAsRead } = useAnnouncements();
 
@@ -172,7 +287,10 @@ export function NotificationCenter() {
     setMounted(true);
   }, []);
 
-  const totalUnread = announcements.length + localNotifs.filter(n => !n.read).length;
+  // Count unread announcements
+  const unreadAnnouncements = announcements.filter(a => !a.is_read);
+  const unreadLocalNotifs = localNotifs.filter(n => !n.read);
+  const totalUnread = unreadAnnouncements.length + unreadLocalNotifs.length;
 
   const formatTime = (date: Date | string) => {
     const d = typeof date === 'string' ? new Date(date) : date;
@@ -189,14 +307,8 @@ export function NotificationCenter() {
   };
 
   const handleAnnouncementClick = (announcement: UserAnnouncement) => {
-    markAsRead(announcement.id);
-    if (announcement.action_url) {
-      if (announcement.action_url.startsWith('http')) {
-        window.open(announcement.action_url, '_blank');
-      } else {
-        window.location.href = announcement.action_url;
-      }
-    }
+    setSelectedAnnouncement(announcement);
+    setIsOpen(false);
   };
 
   const handleLocalClick = (notification: LocalNotification) => {
@@ -206,6 +318,22 @@ export function NotificationCenter() {
     } else if (notification.action?.href) {
       window.location.href = notification.action.href;
     }
+    setIsOpen(false);
+  };
+
+  const handleMarkAllAsRead = () => {
+    // Mark all announcements as read
+    announcements.forEach(a => {
+      if (!a.is_read) {
+        markAsRead(a.id);
+      }
+    });
+    // Clear local notifications
+    localNotifs.forEach(n => {
+      if (!n.read) {
+        markLocalAsRead(n.id);
+      }
+    });
   };
 
   // Dropdown content rendered via portal
@@ -233,7 +361,7 @@ export function NotificationCenter() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
               transition={{ duration: 0.15 }}
-              className="fixed right-4 top-16 z-[10000] w-[360px] overflow-hidden rounded-2xl border border-white/10 bg-[rgba(10,10,10,0.95)] shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-xl"
+              className="fixed right-4 top-16 z-[10000] w-[380px] overflow-hidden rounded-2xl border border-white/10 bg-[rgba(10,10,10,0.95)] shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-xl"
             >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-white/10 p-4">
@@ -257,7 +385,7 @@ export function NotificationCenter() {
         </div>
 
         {/* Content */}
-        <div className="max-h-[400px] overflow-y-auto">
+        <div className="max-h-[450px] overflow-y-auto">
           {/* Announcements Section */}
           {announcements.length > 0 && (
             <div className="border-b border-white/5">
@@ -268,36 +396,39 @@ export function NotificationCenter() {
               {announcements.map((announcement) => {
                 const Icon = announcementIconMap[announcement.type] || Sparkles;
                 const colors = announcementColorMap[announcement.type] || announcementColorMap.update;
+                const isRead = announcement.is_read;
                 return (
                   <div
                     key={announcement.id}
-                    className="cursor-pointer border-b border-white/5 p-4 transition-colors hover:bg-white/5"
+                    className={`cursor-pointer border-b border-white/5 p-4 transition-colors hover:bg-white/5 ${
+                      !isRead ? 'bg-white/[0.02]' : ''
+                    }`}
                     onClick={() => handleAnnouncementClick(announcement)}
                   >
                     <div className="flex gap-3">
-                      <div className={`shrink-0 rounded-lg p-2 ${colors}`}>
+                      <div className={`shrink-0 rounded-lg p-2 ${colors} ${isRead ? 'opacity-50' : ''}`}>
                         <Icon className="h-4 w-4" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-start justify-between gap-2">
-                          <p className="text-sm font-medium text-white">
+                          <p className={`text-sm font-medium ${isRead ? 'text-white/60' : 'text-white'}`}>
                             {announcement.title}
                           </p>
-                          <span className="shrink-0 h-2 w-2 rounded-full bg-purple-500" />
+                          {!isRead && (
+                            <span className="shrink-0 h-2 w-2 rounded-full bg-purple-500" />
+                          )}
                         </div>
-                        <p className="mt-1 line-clamp-2 text-sm text-white/50">
+                        <p className={`mt-1 line-clamp-2 text-sm ${isRead ? 'text-white/40' : 'text-white/50'}`}>
                           {announcement.message}
                         </p>
                         <div className="mt-2 flex items-center justify-between">
                           <span className="text-xs text-white/30">
                             {formatTime(announcement.created_at)}
                           </span>
-                          {announcement.action_url && (
-                            <span className="flex items-center gap-1 text-xs text-purple-400">
-                              {announcement.action_label || 'View'}
-                              <ExternalLink className="h-3 w-3" />
-                            </span>
-                          )}
+                          <span className="flex items-center gap-1 text-xs text-purple-400">
+                            View Details
+                            <ChevronRight className="h-3 w-3" />
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -328,19 +459,19 @@ export function NotificationCenter() {
                     onClick={() => handleLocalClick(notification)}
                   >
                     <div className="flex gap-3">
-                      <div className={`shrink-0 rounded-lg p-2 ${colors}`}>
+                      <div className={`shrink-0 rounded-lg p-2 ${colors} ${notification.read ? 'opacity-50' : ''}`}>
                         <Icon className="h-4 w-4" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-start justify-between gap-2">
-                          <p className={`text-sm font-medium ${notification.read ? 'text-white/70' : 'text-white'}`}>
+                          <p className={`text-sm font-medium ${notification.read ? 'text-white/60' : 'text-white'}`}>
                             {notification.title}
                           </p>
                           {!notification.read && (
                             <span className="shrink-0 h-2 w-2 rounded-full bg-purple-500" />
                           )}
                         </div>
-                        <p className="mt-1 line-clamp-2 text-sm text-white/50">
+                        <p className={`mt-1 line-clamp-2 text-sm ${notification.read ? 'text-white/40' : 'text-white/50'}`}>
                           {notification.message}
                         </p>
                         <span className="mt-2 block text-xs text-white/30">
@@ -369,13 +500,10 @@ export function NotificationCenter() {
         </div>
 
         {/* Footer */}
-        {(announcements.length > 0 || localNotifs.length > 0) && (
+        {(announcements.length > 0 || localNotifs.length > 0) && totalUnread > 0 && (
           <div className="border-t border-white/10 p-3">
             <button
-              onClick={() => {
-                clearLocalNotifications();
-                announcements.forEach(a => markAsRead(a.id));
-              }}
+              onClick={handleMarkAllAsRead}
               className="w-full rounded-lg py-2 text-center text-sm text-white/40 transition-colors hover:bg-white/5 hover:text-white/60"
             >
               Mark all as read
@@ -411,6 +539,15 @@ export function NotificationCenter() {
 
       {/* Dropdown Portal */}
       {renderDropdown()}
+
+      {/* Announcement Detail Modal */}
+      {selectedAnnouncement && (
+        <AnnouncementDetailModal
+          announcement={selectedAnnouncement}
+          onClose={() => setSelectedAnnouncement(null)}
+          onMarkAsRead={() => markAsRead(selectedAnnouncement.id)}
+        />
+      )}
     </>
   );
 }

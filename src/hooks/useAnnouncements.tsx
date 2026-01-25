@@ -59,8 +59,10 @@ export function useAnnouncements(): UseAnnouncementsReturn {
         throw new Error(data.error || 'Failed to mark as read');
       }
 
-      // Remove from local state
-      setAnnouncements(prev => prev.filter(a => a.id !== announcementId));
+      // Mark as read in local state (don't remove - keep in history)
+      setAnnouncements(prev => prev.map(a => 
+        a.id === announcementId ? { ...a, is_read: true } : a
+      ));
     } catch (err) {
       console.error('Error marking announcement read:', err);
     }

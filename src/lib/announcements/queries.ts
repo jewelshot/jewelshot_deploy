@@ -80,7 +80,7 @@ export async function markAnnouncementRead(
 }
 
 /**
- * Get all announcements (for notification history)
+ * Get all announcements with read status (for notification history)
  */
 export async function getAllAnnouncements(): Promise<UserAnnouncement[]> {
   const supabase = await createClient();
@@ -97,7 +97,9 @@ export async function getAllAnnouncements(): Promise<UserAnnouncement[]> {
 
   const userPlan = (profile as { subscription_plan?: string } | null)?.subscription_plan || 'free';
 
-  const { data, error } = await supabase
+  // Get all active announcements
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: announcements, error } = await (supabase as any)
     .from('announcements')
     .select('id, title, message, type, priority, action_url, action_label, image_url, created_at')
     .eq('is_active', true)
@@ -112,7 +114,30 @@ export async function getAllAnnouncements(): Promise<UserAnnouncement[]> {
     return [];
   }
 
-  return data || [];
+  const announcementList = announcements as UserAnnouncement[] | null;
+  if (!announcementList || announcementList.length === 0) {
+    return [];
+  }
+
+  // Get user's read status for these announcements
+  const announcementIds = announcementList.map(a => a.id);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: readRecords } = await (supabase as any)
+    .from('user_announcement_reads')
+    .select('announcement_id, read_at')
+    .eq('user_id', user.id)
+    .in('announcement_id', announcementIds);
+
+  // Create a set of read announcement IDs
+  const readSet = new Set(
+    (readRecords as { announcement_id: string }[] | null)?.map(r => r.announcement_id) || []
+  );
+
+  // Add is_read flag to each announcement
+  return announcementList.map(a => ({
+    ...a,
+    is_read: readSet.has(a.id),
+  }));
 }
 
 // ============================================
