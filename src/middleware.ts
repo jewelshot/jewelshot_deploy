@@ -7,7 +7,7 @@ import { Redis } from '@upstash/redis';
 // 🔒 MAINTENANCE MODE CONFIGURATION
 // ============================================
 const MAINTENANCE_MODE = false; // ✅ true = site kapalı, false = site açık
-const MAINTENANCE_PASSWORD = 'jewelshot2024'; // 🔑 Geliştirici bypass şifresi
+const MAINTENANCE_PASSWORD = process.env.MAINTENANCE_PASSWORD || 'change-me-in-env'; // 🔑 Geliştirici bypass şifresi (ENV'den al!)
 
 // ============================================
 // 🚦 IP-BASED RATE LIMITING (GLOBAL PROTECTION)
@@ -181,23 +181,40 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Protected routes
-  const protectedPaths = ['/studio', '/gallery'];
+  // ============================================
+  // 🔐 PROTECTED ROUTES - REQUIRE LOGIN
+  // ============================================
+  // ALL app pages require authentication (except public pages)
+  const protectedPaths = [
+    '/studio',      // Main app
+    '/gallery',     // User gallery
+    '/dashboard',   // Dashboard/Home
+    '/batch',       // Batch processing
+    '/library',     // User library
+    '/profile',     // User profile
+    '/editor',      // Image editor
+    '/3d-view',     // 3D viewer
+    '/motion-plus', // Video/Motion
+    '/brand-lab',   // Brand Lab
+    '/design-office', // Design Office
+    '/catalogue',   // Catalogue
+    '/admin',       // Admin pages (extra check in layout)
+  ];
   const isProtectedPath = protectedPaths.some((path) =>
-    request.nextUrl.pathname.startsWith(path)
+    pathname.startsWith(path)
   );
 
   // Redirect to login if accessing protected route without auth
   if (isProtectedPath && !user) {
     const url = request.nextUrl.clone();
     url.pathname = '/auth/login';
-    url.searchParams.set('redirectTo', request.nextUrl.pathname);
+    url.searchParams.set('redirectTo', pathname);
     return NextResponse.redirect(url);
   }
 
   // 🔒 EMAIL VERIFICATION CHECK
   // If user is logged in but email not verified, redirect to verify page
-  const isVerifyEmailPage = request.nextUrl.pathname === '/auth/verify-email';
+  const isVerifyEmailPage = pathname === '/auth/verify-email';
 
   if (user && isProtectedPath && !isVerifyEmailPage) {
     // Check if email is confirmed
@@ -213,19 +230,15 @@ export async function middleware(request: NextRequest) {
     if (!isEmailVerified && !isOAuthUser) {
       const url = request.nextUrl.clone();
       url.pathname = '/auth/verify-email';
-      url.searchParams.set('redirectTo', request.nextUrl.pathname);
+      url.searchParams.set('redirectTo', pathname);
       return NextResponse.redirect(url);
     }
   }
 
-  // Redirect to studio if accessing auth pages while logged in (except verify-email)
-  if (
-    request.nextUrl.pathname.startsWith('/auth') &&
-    user &&
-    !isVerifyEmailPage
-  ) {
+  // Redirect to dashboard if accessing auth pages while logged in (except verify-email)
+  if (pathname.startsWith('/auth') && user && !isVerifyEmailPage) {
     const url = request.nextUrl.clone();
-    url.pathname = '/studio';
+    url.pathname = '/dashboard';
     return NextResponse.redirect(url);
   }
 
