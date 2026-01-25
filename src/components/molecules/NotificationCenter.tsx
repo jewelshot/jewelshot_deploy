@@ -208,22 +208,33 @@ export function NotificationCenter() {
     }
   };
 
-  const dropdownContent = isOpen && mounted && (
-    <>
-      {/* Backdrop */}
-      <div 
-        className="fixed inset-0 z-[9999]" 
-        onClick={() => setIsOpen(false)}
-      />
-      
-      {/* Panel */}
-      <motion.div
-        initial={{ opacity: 0, y: -10, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: -10, scale: 0.95 }}
-        transition={{ duration: 0.15 }}
-        className="fixed right-4 top-16 z-[10000] w-[360px] overflow-hidden rounded-2xl border border-white/10 bg-[rgba(10,10,10,0.95)] shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-xl"
-      >
+  // Dropdown content rendered via portal
+  const renderDropdown = () => {
+    if (!mounted) return null;
+    
+    return createPortal(
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div 
+              key="notification-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[9999]" 
+              onClick={() => setIsOpen(false)}
+            />
+            
+            {/* Panel */}
+            <motion.div
+              key="notification-panel"
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              transition={{ duration: 0.15 }}
+              className="fixed right-4 top-16 z-[10000] w-[360px] overflow-hidden rounded-2xl border border-white/10 bg-[rgba(10,10,10,0.95)] shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-xl"
+            >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-white/10 p-4">
           <div className="flex items-center gap-2">
@@ -371,9 +382,13 @@ export function NotificationCenter() {
             </button>
           </div>
         )}
-      </motion.div>
-    </>
-  );
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>,
+      document.body
+    );
+  };
 
   return (
     <>
@@ -395,9 +410,7 @@ export function NotificationCenter() {
       </button>
 
       {/* Dropdown Portal */}
-      <AnimatePresence>
-        {mounted && createPortal(dropdownContent, document.body)}
-      </AnimatePresence>
+      {renderDropdown()}
     </>
   );
 }
