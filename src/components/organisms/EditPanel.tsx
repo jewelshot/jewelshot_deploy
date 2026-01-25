@@ -337,20 +337,22 @@ export function EditPanel({
               <div className="mx-1 h-4 w-px bg-white/20" />
             )}
 
-            {/* Reset Position Button */}
-            {userDragged && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleResetPosition();
-                }}
-                className="flex h-6 w-6 items-center justify-center rounded-md text-white/60 transition-all hover:bg-purple-500/20 hover:text-purple-300"
-                aria-label="Reset Position"
-                title="Reset to Default Position"
-              >
-                <Home className="h-3.5 w-3.5" />
-              </button>
-            )}
+            {/* Reset Position Button - Always visible */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleResetPosition();
+              }}
+              className={`flex h-6 w-6 items-center justify-center rounded-md transition-all ${
+                userDragged 
+                  ? 'text-purple-400 hover:bg-purple-500/20 hover:text-purple-300' 
+                  : 'text-white/40 hover:bg-white/10 hover:text-white/60'
+              }`}
+              aria-label="Reset Position"
+              title="Reset to Default Position"
+            >
+              <Home className="h-3.5 w-3.5" />
+            </button>
 
             {/* Bar Mode Toggle */}
             <button

@@ -31,6 +31,7 @@ interface ImageViewerProps {
     rotation: number;
     flipHorizontal: boolean;
     flipVertical: boolean;
+    imageScale?: number; // Image size scale (1 = 100%)
   };
   adjustFilters?: {
     brightness?: number;
@@ -72,7 +73,7 @@ export function ImageViewer({
   position,
   onScaleChange,
   onPositionChange,
-  transform = { rotation: 0, flipHorizontal: false, flipVertical: false },
+  transform = { rotation: 0, flipHorizontal: false, flipVertical: false, imageScale: 1 },
   adjustFilters = {},
   colorFilters = {},
   filterEffects = {},
@@ -86,9 +87,15 @@ export function ImageViewer({
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isZooming, setIsZooming] = useState(false);
+  const [hasImageError, setHasImageError] = useState(false);
   const isDraggingRef = useRef(false);
   const startPosRef = useRef({ x: 0, y: 0 });
   const zoomTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Reset error state when source changes
+  React.useEffect(() => {
+    setHasImageError(false);
+  }, [src]);
 
   // 🎯 CRITICAL: Clamp filter values to safe ranges (prevents canvas rendering failures)
   const safeAdjustFilters = useMemo(
@@ -704,19 +711,27 @@ export function ImageViewer({
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={finalProcessedSrc}
+        src={hasImageError ? src : finalProcessedSrc}
         alt={alt}
-        onLoad={onImageLoad}
-        onError={onImageError}
+        onLoad={() => {
+          setHasImageError(false);
+          onImageLoad?.();
+        }}
+        onError={() => {
+          // If processed image fails, fall back to original source
+          if (!hasImageError) {
+            setHasImageError(true);
+            logger.warn('⚠️ Processed image failed to load, falling back to original');
+          }
+          onImageError?.();
+        }}
         className="max-h-full max-w-full select-none object-contain shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
         style={{
-          transform: `translate(${position.x}px, ${position.y}px) scale(${scale}) rotate(${transform.rotation}deg) scaleX(${transform.flipHorizontal ? -1 : 1}) scaleY(${transform.flipVertical ? -1 : 1})`,
-          filter: filterString,
+          transform: `translate(${position.x}px, ${position.y}px) scale(${scale * (transform.imageScale || 1)}) rotate(${transform.rotation}deg) scaleX(${transform.flipHorizontal ? -1 : 1}) scaleY(${transform.flipVertical ? -1 : 1})`,
+          filter: hasImageError ? 'none' : filterString, // Disable filters if error
           animation: 'scaleIn 400ms ease-out',
-          transition:
-            isDragging || isZooming
-              ? 'none'
-              : 'transform 800ms cubic-bezier(0.4, 0.0, 0.2, 1)',
+          // No transition for immediate response during transform/filter changes
+          transition: 'none',
         }}
         draggable={false}
       />
