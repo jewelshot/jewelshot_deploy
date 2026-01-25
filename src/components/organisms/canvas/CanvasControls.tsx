@@ -155,9 +155,9 @@ export default function CanvasControls({
 
   return (
     <>
-      {/* Top Left Controls - File Info */}
+      {/* Top Left Controls - File Info (z-30 to be above ViewModeSelector) */}
       <div
-        className="fixed z-20 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
+        className="fixed z-30 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
         style={{
           top: topOpen ? '80px' : '16px',
           left: leftOpen ? '276px' : '16px',
@@ -177,21 +177,22 @@ export default function CanvasControls({
       {/* Top Center Controls - View Mode Selector */}
       {hasOriginalImage && (
         <div
-          className="fixed z-20 flex justify-center transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
+          className="pointer-events-none fixed z-20 flex justify-center transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
           style={{
             top: topOpen ? '80px' : '16px',
             left: leftOpen ? '130px' : '0px',
             right: rightOpen ? '130px' : '0px',
             opacity: controlsVisible ? 1 : 0,
             transform: controlsVisible ? 'translateY(0)' : 'translateY(-20px)',
-            pointerEvents: controlsVisible ? 'auto' : 'none',
           }}
         >
-          <ViewModeSelector
-            viewMode={viewMode}
-            onViewModeChange={onViewModeChange}
-            disabled={isAIEditing}
-          />
+          <div className="pointer-events-auto">
+            <ViewModeSelector
+              viewMode={viewMode}
+              onViewModeChange={onViewModeChange}
+              disabled={isAIEditing}
+            />
+          </div>
         </div>
       )}
 
