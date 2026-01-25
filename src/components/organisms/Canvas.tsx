@@ -1644,6 +1644,23 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
   };
 
   const handleCropApply = (croppedImage: string) => {
+    // Save current state to history before applying crop (allows undo)
+    if (uploadedImage) {
+      pushHistory({
+        uploadedImage,
+        scale,
+        position,
+        rotation: transform.rotation,
+        flipHorizontal: transform.flipHorizontal,
+        flipVertical: transform.flipVertical,
+        adjustFilters,
+        colorFilters,
+        filterEffects,
+        background,
+        timestamp: Date.now(),
+      });
+    }
+    
     setUploadedImage(croppedImage);
     resetCropState(); // Reset crop mode and ratio
     resetTransform(); // Reset scale, position, transform after crop

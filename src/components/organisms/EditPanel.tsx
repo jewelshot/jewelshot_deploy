@@ -10,6 +10,7 @@ import {
   Undo2,
   Redo2,
   RotateCcw,
+  Home,
 } from 'lucide-react';
 import TabList from '@/components/molecules/TabList';
 import CropPanel from '@/components/molecules/CropPanel';
@@ -148,14 +149,23 @@ export function EditPanel({
     e.preventDefault();
   };
 
+  // Calculate default position based on sidebar states
+  const getDefaultPosition = () => {
+    const x = leftOpen ? 276 : 16;
+    const y = topOpen ? 80 + 48 + 12 : 16 + 48 + 12;
+    return { x, y };
+  };
+
+  // Reset position to default
+  const handleResetPosition = () => {
+    setPosition(getDefaultPosition());
+    setUserDragged(false);
+  };
+
   // Reset position to file name bar alignment when panel opens
   useEffect(() => {
     if (isOpen) {
-      const x = leftOpen ? 276 : 16;
-      const y = topOpen ? 80 + 48 + 12 : 16 + 48 + 12;
-
-      setPosition({ x, y });
-
+      setPosition(getDefaultPosition());
       setUserDragged(false); // Reset drag state on open
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -325,6 +335,21 @@ export function EditPanel({
             {/* Divider */}
             {(onUndo || onRedo || onReset) && (
               <div className="mx-1 h-4 w-px bg-white/20" />
+            )}
+
+            {/* Reset Position Button */}
+            {userDragged && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleResetPosition();
+                }}
+                className="flex h-6 w-6 items-center justify-center rounded-md text-white/60 transition-all hover:bg-purple-500/20 hover:text-purple-300"
+                aria-label="Reset Position"
+                title="Reset to Default Position"
+              >
+                <Home className="h-3.5 w-3.5" />
+              </button>
             )}
 
             {/* Bar Mode Toggle */}
