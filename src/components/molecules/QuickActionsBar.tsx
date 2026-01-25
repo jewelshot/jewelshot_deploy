@@ -162,12 +162,12 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
 
   return (
     <div
-      className="fixed z-20 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
+      className="fixed z-20 transition-all duration-[400ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
       style={{
         top: '50%',
         transform: controlsVisible
-          ? 'translateY(-50%) translateX(0)'
-          : 'translateY(-50%) translateX(30px)',
+          ? 'translateY(-50%) translateX(0) scale(1)'
+          : 'translateY(-50%) translateX(20px) scale(0.95)',
         right: isRightSidebarOpen ? '276px' : '16px',
         opacity: controlsVisible ? 1 : 0,
         pointerEvents: controlsVisible ? 'auto' : 'none',
