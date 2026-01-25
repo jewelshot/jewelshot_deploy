@@ -9,7 +9,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { LogOut, ChevronDown } from 'lucide-react';
+import { LogOut, ChevronDown, User } from 'lucide-react';
 import Avatar from '@/components/atoms/Avatar';
 import OnlineIndicator from '@/components/atoms/OnlineIndicator';
 import UserInfo from '@/components/atoms/UserInfo';
@@ -165,6 +165,22 @@ export function UserProfile() {
               animation: 'slideInFromBottom 200ms cubic-bezier(0.4, 0, 0.2, 1)',
             }}
           >
+            {/* Profile Link */}
+            <button
+              onClick={() => {
+                setIsDropdownOpen(false);
+                router.push('/profile');
+              }}
+              className="flex w-full items-center gap-3 px-4 py-3 text-sm text-white/80 transition-colors hover:bg-white/5 hover:text-white"
+            >
+              <User className="h-4 w-4" />
+              <span>Profile</span>
+            </button>
+            
+            {/* Divider */}
+            <div className="mx-3 border-t border-white/10" />
+            
+            {/* Logout Button */}
             <button
               onClick={handleLogout}
               disabled={isLoggingOut}
