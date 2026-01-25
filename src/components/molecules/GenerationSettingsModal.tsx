@@ -187,50 +187,51 @@ export function GenerationSettingsModal({
           {/* Glassmorphism inner glow */}
           <div className="pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-br from-white/[0.05] via-transparent to-transparent" />
           
-          {/* Image Thumbnail - Top Right with Fade */}
-          {imageUrl && (
-            <div className="pointer-events-none absolute -right-4 -top-4 z-0 h-[180px] w-[140px] overflow-hidden">
-              {/* Image with zoom effect */}
-              <div className="relative h-full w-full">
-                <img
-                  src={imageUrl}
-                  alt="Uploaded jewelry"
-                  className="h-full w-full scale-150 object-cover opacity-60"
-                  style={{ objectPosition: 'center' }}
-                />
-                {/* Left fade gradient */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[rgba(10,10,10,1)] via-[rgba(10,10,10,0.8)] to-transparent" />
-                {/* Bottom fade gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[rgba(10,10,10,1)] via-transparent to-transparent" />
-                {/* Top fade gradient */}
-                <div className="absolute inset-0 bg-gradient-to-b from-[rgba(10,10,10,0.6)] via-transparent to-transparent" />
+          {/* Header with Image Background */}
+          <div className="relative mb-5 overflow-hidden rounded-t-2xl">
+            {/* Image Thumbnail - Header Background Only */}
+            {imageUrl && (
+              <div className="pointer-events-none absolute inset-0 z-0">
+                {/* Image positioned to the right */}
+                <div className="absolute right-0 top-0 h-full w-2/3">
+                  <img
+                    src={imageUrl}
+                    alt="Uploaded jewelry"
+                    className="h-full w-full scale-125 object-cover opacity-40"
+                    style={{ objectPosition: 'center' }}
+                  />
+                </div>
+                {/* Right to Left fade gradient */}
+                <div className="absolute inset-0 bg-gradient-to-r from-[rgba(15,15,15,1)] via-[rgba(15,15,15,0.95)] to-transparent" />
+                {/* Bottom hard edge */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[rgba(15,15,15,1)] via-[rgba(15,15,15,0.3)] to-transparent" />
               </div>
+            )}
+            
+            {/* Header Content */}
+            <div className="relative z-10 flex items-center justify-between py-1">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-white/10 to-white/5 ring-1 ring-white/10">
+                  <Settings className="h-5 w-5 text-white/80" />
+                </div>
+                <div>
+                  <h2
+                    id="settings-modal-title"
+                    className="text-lg font-semibold text-white"
+                  >
+                    {t.settingsModal.title}
+                  </h2>
+                  <p className="text-xs text-white/40">Configure your generation preferences</p>
+                </div>
+              </div>
+              <button
+                onClick={onClose}
+                className="flex h-8 w-8 items-center justify-center rounded-xl text-white/50 transition-all hover:bg-white/10 hover:text-white"
+                aria-label="Close settings"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
-          )}
-          
-          {/* Header */}
-          <div className="relative z-10 mb-5 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-white/10 to-white/5 ring-1 ring-white/10">
-                <Settings className="h-5 w-5 text-white/80" />
-              </div>
-              <div>
-                <h2
-                  id="settings-modal-title"
-                  className="text-lg font-semibold text-white"
-                >
-                  {t.settingsModal.title}
-                </h2>
-                <p className="text-xs text-white/40">Configure your generation preferences</p>
-              </div>
-            </div>
-            <button
-              onClick={onClose}
-              className="relative z-10 flex h-8 w-8 items-center justify-center rounded-xl text-white/50 transition-all hover:bg-white/10 hover:text-white"
-              aria-label="Close settings"
-            >
-              <X className="h-4 w-4" />
-            </button>
           </div>
 
           {/* Settings Content */}
