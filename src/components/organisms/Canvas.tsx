@@ -1582,6 +1582,10 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
   // - handleDownload (download with filters applied)
 
   const handleToggleEditPanel = () => {
+    // If opening edit panel while in compare mode, switch to normal view
+    if (!isEditPanelOpen && viewMode === 'side-by-side') {
+      setViewMode('normal');
+    }
     setIsEditPanelOpen((prev) => !prev);
   };
 

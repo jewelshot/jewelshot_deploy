@@ -77,41 +77,65 @@ export function CropModal({
     };
   }, [isOpen, imageSrc]);
 
-  const handleApply = () => {
-    if (!imageRef.current || !canvasRef.current) return;
+  const [isApplying, setIsApplying] = useState(false);
 
-    const img = imageRef.current;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+  const handleApply = async () => {
+    if (!imageRef.current || !canvasRef.current || isApplying) return;
 
-    // Crop uses normalized coordinates (0-1)
-    // Convert to actual image pixels
-    const srcX = cropArea.x * img.naturalWidth;
-    const srcY = cropArea.y * img.naturalHeight;
-    const srcWidth = cropArea.width * img.naturalWidth;
-    const srcHeight = cropArea.height * img.naturalHeight;
+    setIsApplying(true);
 
-    // Set canvas size to crop area
-    canvas.width = srcWidth;
-    canvas.height = srcHeight;
+    // Use requestAnimationFrame to ensure UI updates before heavy processing
+    requestAnimationFrame(() => {
+      const img = imageRef.current;
+      const canvas = canvasRef.current;
+      if (!img || !canvas) {
+        setIsApplying(false);
+        return;
+      }
 
-    // Draw cropped image
-    ctx.drawImage(
-      img,
-      srcX,
-      srcY,
-      srcWidth,
-      srcHeight,
-      0,
-      0,
-      srcWidth,
-      srcHeight
-    );
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        setIsApplying(false);
+        return;
+      }
 
-    // Get cropped image as base64
-    const croppedImage = canvas.toDataURL('image/png');
-    onApply(croppedImage);
+      // Crop uses normalized coordinates (0-1)
+      // Convert to actual image pixels
+      const srcX = Math.round(cropArea.x * img.naturalWidth);
+      const srcY = Math.round(cropArea.y * img.naturalHeight);
+      const srcWidth = Math.round(cropArea.width * img.naturalWidth);
+      const srcHeight = Math.round(cropArea.height * img.naturalHeight);
+
+      // Set canvas size to crop area
+      canvas.width = srcWidth;
+      canvas.height = srcHeight;
+
+      // Draw cropped image
+      ctx.drawImage(
+        img,
+        srcX,
+        srcY,
+        srcWidth,
+        srcHeight,
+        0,
+        0,
+        srcWidth,
+        srcHeight
+      );
+
+      // Use setTimeout to allow UI to update before the heavy toDataURL call
+      setTimeout(() => {
+        // Use JPEG for faster encoding (PNG is slow for large images)
+        // Check if image has transparency (PNG source) - if so keep PNG
+        const isPNG = imageSrc.includes('image/png') || imageSrc.endsWith('.png');
+        const croppedImage = isPNG 
+          ? canvas.toDataURL('image/png')
+          : canvas.toDataURL('image/jpeg', 0.92);
+        
+        setIsApplying(false);
+        onApply(croppedImage);
+      }, 10);
+    });
   };
 
   const handleReset = () => {
@@ -192,6 +216,7 @@ export function CropModal({
         onApply={handleApply}
         onCancel={onCancel}
         onReset={handleReset}
+        isApplying={isApplying}
       />
 
       {/* Info bar */}
