@@ -13,6 +13,7 @@ import { AnalyticsProvider } from '@/components/analytics/AnalyticsProvider';
 import { CookieConsent } from '@/components/molecules/CookieConsent';
 import { OrganizationSchema, SoftwareApplicationSchema, WebSiteSchema } from '@/components/seo/StructuredData';
 import { ThemeProvider } from '@/components/providers/ThemeProvider';
+import { AppProviders } from '@/components/providers/AppProviders';
 import { AILoadingModal } from '@/components/molecules/AILoadingModal';
 import { LanguageProvider } from '@/lib/i18n';
 import { FacebookPixel } from '@/components/analytics/FacebookPixel';
@@ -176,15 +177,17 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <LanguageProvider>
-            <ErrorBoundary>{children}</ErrorBoundary>
-            <GlobalSidebar />
-            <ToastContainer />
-            <AILoadingModal />
-            <GalleryPrefetch />
-            <PlausibleAnalytics />
-            <AnalyticsProvider />
-            <FacebookPixel />
-            <CookieConsent />
+            <AppProviders>
+              <ErrorBoundary>{children}</ErrorBoundary>
+              <GlobalSidebar />
+              <ToastContainer />
+              <AILoadingModal />
+              <GalleryPrefetch />
+              <PlausibleAnalytics />
+              <AnalyticsProvider />
+              <FacebookPixel />
+              <CookieConsent />
+            </AppProviders>
           </LanguageProvider>
         </ThemeProvider>
         <Analytics />
