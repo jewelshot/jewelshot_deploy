@@ -25,15 +25,13 @@ import {
   Loader2,
   TrendingUp,
   Sparkles,
-  Bell,
-  Check,
-  Trash2,
   HardDrive,
   CalendarClock,
 } from 'lucide-react';
 import { createScopedLogger } from '@/lib/logger';
 import Link from 'next/link';
 import { useLanguage } from '@/lib/i18n';
+import { NotificationCenter } from '@/components/molecules/NotificationCenter';
 
 const logger = createScopedLogger('Dashboard');
 
@@ -80,15 +78,6 @@ interface PlanInfo {
   creditsTotal: number;
   percentUsed: number;
   renewalDate: string | null;
-}
-
-interface NotificationItem {
-  id: string;
-  type: string;
-  title: string;
-  message: string;
-  read: boolean;
-  created_at: string;
 }
 
 interface StorageBreakdown {
@@ -161,11 +150,6 @@ export function DashboardContent() {
   const [recentBatches, setRecentBatches] = useState<BatchJob[]>([]);
   const [storageBreakdown, setStorageBreakdown] = useState<StorageBreakdown[]>([]);
 
-  // Notifications State
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [showNotifications, setShowNotifications] = useState(false);
-
   // UI State
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [lastUsedPreset, setLastUsedPreset] = useState<{ id: string; name: string } | null>(null);
@@ -224,7 +208,6 @@ export function DashboardContent() {
 
       const [
         profileResult,
-        notifsResult,
         // Count only (very fast, head: true)
         galleryCountResult,
         // Recent images for display (only 8, minimal fields)
@@ -244,14 +227,6 @@ export function DashboardContent() {
           .select('subscription_plan, subscription_renewal_date, credits')
           .eq('id', user.id)
           .single(),
-        // Notifications - limited
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (supabase as any)
-          .from('notifications')
-          .select('id, type, title, message, read, created_at')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(10),
         // Gallery count only (super fast)
         supabase
           .from('images')
@@ -310,13 +285,6 @@ export function DashboardContent() {
           percentUsed: percent,
           renewalDate: profile.subscription_renewal_date || null,
         });
-      }
-
-      // ========== PROCESS NOTIFICATIONS ==========
-      const notifs = notifsResult.data as NotificationItem[] | null;
-      if (notifs) {
-        setNotifications(notifs);
-        setUnreadCount(notifs.filter(n => !n.read).length);
       }
 
       // ========== PROCESS COUNTS ==========
@@ -510,49 +478,6 @@ export function DashboardContent() {
     router.push('/studio');
   };
 
-  const markNotificationRead = async (id: string) => {
-    const supabase = createClient();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any)
-      .from('notifications')
-      .update({ read: true })
-      .eq('id', id);
-    
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
-    setUnreadCount(prev => Math.max(0, prev - 1));
-  };
-
-  const markAllNotificationsRead = async () => {
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any)
-      .from('notifications')
-      .update({ read: true })
-      .eq('user_id', user.id)
-      .eq('read', false);
-    
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-    setUnreadCount(0);
-  };
-
-  const deleteNotification = async (id: string) => {
-    const supabase = createClient();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any)
-      .from('notifications')
-      .delete()
-      .eq('id', id);
-    
-    const notif = notifications.find(n => n.id === id);
-    setNotifications(prev => prev.filter(n => n.id !== id));
-    if (notif && !notif.read) {
-      setUnreadCount(prev => Math.max(0, prev - 1));
-    }
-  };
-
   // ============================================
   // LOADING STATE
   // ============================================
@@ -596,18 +521,8 @@ export function DashboardContent() {
 
           {/* Header Actions */}
           <div className="flex items-center gap-2">
-            {/* Notifications Button */}
-            <button
-              onClick={() => setShowNotifications(!showNotifications)}
-              className="relative flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/60 hover:bg-white/[0.06] transition-colors"
-            >
-              <Bell className="h-3.5 w-3.5" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">
-                  {unreadCount}
-                </span>
-              )}
-            </button>
+            {/* Notifications */}
+            <NotificationCenter />
 
             <button
               onClick={() => setShowShortcuts(true)}
@@ -1015,73 +930,6 @@ export function DashboardContent() {
           ))}
         </div>
       </div>
-
-      {/* ==================== NOTIFICATIONS PANEL ==================== */}
-      {showNotifications && (
-        <div className="fixed inset-0 z-50" onClick={() => setShowNotifications(false)}>
-          <div 
-            className="absolute right-6 top-16 w-80 rounded-xl border border-white/10 bg-[#0a0a0a] shadow-2xl"
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between p-4 border-b border-white/10">
-              <h3 className="text-sm font-semibold text-white">{t.dashboard.notifications}</h3>
-              {unreadCount > 0 && (
-                <button
-                  onClick={markAllNotificationsRead}
-                  className="text-[10px] text-purple-400 hover:text-purple-300"
-                >
-                  {t.dashboard.markAllRead}
-                </button>
-              )}
-            </div>
-
-            <div className="max-h-80 overflow-y-auto">
-              {notifications.length > 0 ? (
-                notifications.map(notif => (
-                  <div
-                    key={notif.id}
-                    className={`p-3 border-b border-white/5 hover:bg-white/[0.03] ${!notif.read ? 'bg-purple-500/5' : ''}`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className={`mt-1 h-2 w-2 rounded-full flex-shrink-0 ${!notif.read ? 'bg-purple-500' : 'bg-white/20'}`} />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-white">{notif.title}</p>
-                        <p className="text-[11px] text-white/60 mt-0.5">{notif.message}</p>
-                        <p className="text-[10px] text-white/30 mt-1">
-                          {formatTimeAgo(new Date(notif.created_at))}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        {!notif.read && (
-                          <button
-                            onClick={() => markNotificationRead(notif.id)}
-                            className="p-1 rounded hover:bg-white/10"
-                            title={t.dashboard.markAsRead}
-                          >
-                            <Check className="h-3 w-3 text-white/40" />
-                          </button>
-                        )}
-                        <button
-                          onClick={() => deleteNotification(notif.id)}
-                          className="p-1 rounded hover:bg-white/10"
-                          title={t.common.delete}
-                        >
-                          <Trash2 className="h-3 w-3 text-white/40" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="p-8 text-center">
-                  <Bell className="h-8 w-8 text-white/20 mx-auto mb-2" />
-                  <p className="text-xs text-white/40">{t.dashboard.noNotifications}</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ==================== KEYBOARD SHORTCUTS MODAL ==================== */}
       {showShortcuts && (
