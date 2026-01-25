@@ -153,7 +153,7 @@ export function NotificationCenter() {
   };
 
   return (
-    <div className="relative">
+    <>
       {/* Bell Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
@@ -167,23 +167,23 @@ export function NotificationCenter() {
         )}
       </button>
 
-      {/* Dropdown */}
+      {/* Dropdown - Fixed position for full-screen overlay */}
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Backdrop */}
+            {/* Backdrop - Full screen with high z-index */}
             <div 
-              className="fixed inset-0 z-40" 
+              className="fixed inset-0 z-[9999] bg-black/50 backdrop-blur-sm" 
               onClick={() => setIsOpen(false)}
             />
             
-            {/* Panel */}
+            {/* Panel - Centered modal on mobile, top-right on desktop */}
             <motion.div
               initial={{ opacity: 0, y: -10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
               transition={{ duration: 0.15 }}
-              className="absolute right-0 top-full mt-2 z-50 w-80 sm:w-96 rounded-xl border border-white/10 bg-[#0a0a0a] shadow-2xl overflow-hidden"
+              className="fixed right-4 top-16 z-[10000] w-80 sm:w-96 rounded-xl border border-white/10 bg-[#0a0a0a] shadow-2xl overflow-hidden"
             >
               {/* Header */}
               <div className="flex items-center justify-between border-b border-white/10 p-4">
@@ -275,7 +275,7 @@ export function NotificationCenter() {
           </>
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 }
 

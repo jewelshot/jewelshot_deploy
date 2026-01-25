@@ -8,7 +8,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Settings, Sparkles } from 'lucide-react';
+import { Settings } from 'lucide-react';
 import { useSidebarStore } from '@/store/sidebarStore';
 import { NotificationCenter } from '@/components/molecules/NotificationCenter';
 import { GenerationSettingsModal } from '@/components/molecules/GenerationSettingsModal';
@@ -304,15 +304,11 @@ ${libraryPreset.negativePrompt}`;
 
   return (
     <aside
-      className={`fixed bottom-0 right-0 top-0 z-[100] w-[260px] border-l border-[rgba(139,92,246,0.15)] bg-[rgba(10,10,10,0.7)] shadow-[-4px_0_24px_rgba(0,0,0,0.3)] backdrop-blur-[24px] backdrop-saturate-[200%] transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)] ${rightOpen ? 'translate-x-0' : 'translate-x-full'}`}
+      className={`fixed bottom-0 right-0 top-0 z-[100] w-[260px] border-l border-[rgba(139,92,246,0.15)] bg-[rgba(10,10,10,0.7)] shadow-[-4px_0_24px_rgba(0,0,0,0.3)] backdrop-blur-[24px] backdrop-saturate-[200%] transition-all duration-[400ms] ease-[cubic-bezier(0.4,0.0,0.2,1)] ${rightOpen ? 'translate-x-0' : 'translate-x-full'}`}
     >
       <div className="sidebar-scroll flex h-full flex-col overflow-y-auto px-4 py-3">
-        {/* Header with Title and Notification */}
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-purple-400" />
-            <h2 className="text-sm font-medium text-white">AI Studio</h2>
-          </div>
+        {/* Header with Notification Only */}
+        <div className="flex items-center justify-end mb-3">
           <NotificationCenter />
         </div>
 
