@@ -4,10 +4,8 @@ import React, { useState } from 'react';
 import AIPromptInput from '@/components/atoms/AIPromptInput';
 import AIGenerateButton from '@/components/atoms/AIGenerateButton';
 import AIToggleButton from '@/components/atoms/AIToggleButton';
-import QuickPromptButton from '@/components/atoms/QuickPromptButton';
 import { validatePrompt } from '@/lib/validators';
 import { toastManager } from '@/lib/toast-manager';
-import jewelryPrompts from '@/data/jewelryPrompts.json';
 
 interface AIEditControlProps {
   currentImageUrl: string;
@@ -61,20 +59,6 @@ export function AIEditControl({
     window.dispatchEvent(event);
   };
 
-  const handleQuickPrompt = (promptText: string) => {
-    if (isEditing) return;
-
-    // Directly trigger generation without showing prompt in textarea
-    const event = new CustomEvent('ai-edit-generate', {
-      detail: { 
-        prompt: promptText, 
-        imageUrl: currentImageUrl,
-        aspectRatio: aspectRatio || 'auto', // Include aspect ratio
-      },
-    });
-    window.dispatchEvent(event);
-  };
-
   if (!visible) return null;
 
   // Nano Banana supported aspect ratios (from official API guide)
@@ -92,25 +76,24 @@ export function AIEditControl({
 
   return (
     <div className="flex flex-col items-center gap-2">
-      {/* Expanded Prompt Area */}
+      {/* Expanded Prompt Area - Compact */}
       <div
-        className={`w-full max-w-xl origin-bottom transition-all duration-300 ease-out ${
+        className={`w-full max-w-md origin-bottom transition-all duration-300 ease-out ${
           shouldShowExpanded
             ? 'translate-y-0 scale-100 opacity-100'
             : 'pointer-events-none -translate-y-2 scale-95 opacity-0'
         }`}
       >
-        {/* Scrollable container with max-height and solid background */}
-        <div className="max-h-[400px] space-y-2 overflow-y-auto rounded-xl border border-white/10 bg-[#0f0f0f] p-3 shadow-xl">
-          {/* Aspect Ratio Selector */}
-          <div className="w-full">
-            <label className="mb-1 block text-xs text-white/60">
-              Aspect Ratio
+        <div className="space-y-2 rounded-lg border border-white/10 bg-[#0f0f0f] p-2 shadow-xl">
+          {/* Aspect Ratio Selector - Inline */}
+          <div className="flex items-center gap-2">
+            <label className="text-[10px] text-white/50 whitespace-nowrap">
+              Ratio
             </label>
             <select
               value={aspectRatio}
               onChange={(e) => setAspectRatio(e.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-[#1a1a1a] px-4 py-2 text-sm text-white focus:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
+              className="flex-1 rounded-md border border-white/10 bg-[#1a1a1a] px-2 py-1 text-xs text-white focus:border-purple-500/50 focus:outline-none"
               disabled={isEditing}
             >
               {aspectRatios.map((ratio) => (
@@ -128,29 +111,12 @@ export function AIEditControl({
             onSubmit={handleGenerate}
             disabled={isEditing}
           />
-
-          {/* Quick Prompt Buttons */}
-          <div className="no-scrollbar flex gap-2 overflow-x-auto">
-            {jewelryPrompts.map((item) => (
-              <QuickPromptButton
-                key={item.id}
-                label={item.label}
-                icon={item.icon as 'sparkles' | 'square' | 'zap' | 'gem'}
-                onClick={() => handleQuickPrompt(item.prompt)}
-                disabled={isEditing}
-              />
-            ))}
-          </div>
         </div>
       </div>
 
-      {/* Main Control Bar */}
+      {/* Main Control Bar - Compact */}
       <div className="group relative">
-        {/* Dark backdrop layer */}
-        <div className="pointer-events-none absolute inset-0 -z-10 rounded-lg bg-black/50 backdrop-blur-2xl" />
-
-        {/* Main container */}
-        <div className="relative flex items-center gap-1.5 rounded-lg border border-[rgba(139,92,246,0.3)] bg-[rgba(10,10,10,0.85)] px-2 py-1.5 backdrop-blur-2xl transition-all duration-200 hover:border-[rgba(139,92,246,0.4)] hover:bg-[rgba(10,10,10,0.95)]">
+        <div className="relative flex items-center gap-1 rounded-md border border-white/10 bg-[rgba(10,10,10,0.9)] px-1.5 py-1 backdrop-blur-xl">
           {/* Toggle Button */}
           <AIToggleButton
             isExpanded={isExpanded}
@@ -159,9 +125,7 @@ export function AIEditControl({
           />
 
           {/* Divider */}
-          <div className="h-5 w-px bg-[rgba(139,92,246,0.3)]" />
-
-          {/* Rate Limit Badge - Moved to Bottom Bar */}
+          <div className="h-4 w-px bg-white/10" />
 
           {/* Generate Button */}
           <AIGenerateButton

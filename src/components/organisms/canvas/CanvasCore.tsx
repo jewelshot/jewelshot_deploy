@@ -197,22 +197,15 @@ export default function CanvasCore({
               {/* Original Image (Left) */}
               {originalImage && (
                 <div
-                  className="relative flex h-full w-1/2 flex-col items-center justify-center transition-all duration-200"
+                  className="relative flex h-full w-1/2 flex-col items-center justify-center"
                   style={{
                     zIndex: activeImage === 'left' ? 10 : 5,
-                    opacity: activeImage === 'left' ? 1 : 0.85,
                   }}
                 >
                   <div
-                    className="relative h-full w-full cursor-pointer transition-all duration-200"
+                    className="relative h-full w-full cursor-pointer"
                     onClick={() => onActiveImageChange('left')}
-                    title="Click to bring to front"
-                    style={{
-                      filter:
-                        activeImage === 'left'
-                          ? 'drop-shadow(0 0 8px rgba(139, 92, 246, 0.4))'
-                          : 'none',
-                    }}
+                    title="Click to select"
                   >
                     <ImageViewer
                       src={originalImage}
@@ -235,8 +228,15 @@ export default function CanvasCore({
                       onImageError={onImageError}
                       controlsVisible={canvasControlsVisible}
                     />
-                    {/* Label */}
-                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-md bg-black/70 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                    {/* Label with selection indicator */}
+                    <div 
+                      className={`absolute bottom-2 left-1/2 -translate-x-1/2 rounded-md px-3 py-1 text-xs font-medium backdrop-blur-sm transition-all ${
+                        activeImage === 'left'
+                          ? 'border border-purple-500/60 bg-purple-500/20 text-purple-300'
+                          : 'border border-white/10 bg-black/60 text-white/70'
+                      }`}
+                    >
+                      {activeImage === 'left' && <span className="mr-1.5">●</span>}
                       Original
                     </div>
                   </div>
@@ -245,22 +245,15 @@ export default function CanvasCore({
 
               {/* Edited Image (Right) */}
               <div
-                className="relative flex h-full w-1/2 flex-col items-center justify-center transition-all duration-200"
+                className="relative flex h-full w-1/2 flex-col items-center justify-center"
                 style={{
                   zIndex: activeImage === 'right' ? 10 : 5,
-                  opacity: activeImage === 'right' ? 1 : 0.85,
                 }}
               >
                 <div
-                  className="relative h-full w-full cursor-pointer transition-all duration-200"
+                  className="relative h-full w-full cursor-pointer"
                   onClick={() => onActiveImageChange('right')}
-                  title="Click to bring to front"
-                  style={{
-                    filter:
-                      activeImage === 'right'
-                        ? 'drop-shadow(0 0 8px rgba(139, 92, 246, 0.4))'
-                        : 'none',
-                  }}
+                  title="Click to select"
                 >
                   <ImageViewer
                     src={uploadedImage}
@@ -279,8 +272,15 @@ export default function CanvasCore({
                     onImageError={onImageError}
                     controlsVisible={canvasControlsVisible}
                   />
-                  {/* Label */}
-                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-md bg-black/70 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                  {/* Label with selection indicator */}
+                  <div 
+                    className={`absolute bottom-2 left-1/2 -translate-x-1/2 rounded-md px-3 py-1 text-xs font-medium backdrop-blur-sm transition-all ${
+                      activeImage === 'right'
+                        ? 'border border-purple-500/60 bg-purple-500/20 text-purple-300'
+                        : 'border border-white/10 bg-black/60 text-white/70'
+                    }`}
+                  >
+                    {activeImage === 'right' && <span className="mr-1.5">●</span>}
                     Edited
                   </div>
                 </div>
