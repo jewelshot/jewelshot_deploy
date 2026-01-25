@@ -365,9 +365,6 @@ ${libraryPreset.negativePrompt}`;
             <div className="space-y-3">
               {/* Built-in Quick Presets */}
               <div>
-                <div className="mb-2 flex items-center justify-between">
-                  <h3 className="text-[10px] font-medium text-white/50">{t.presets.quick}</h3>
-                </div>
                 <QuickPresetsGrid 
                   onPresetSelect={handlePresetSelect}
                   disabled={!jewelryType}

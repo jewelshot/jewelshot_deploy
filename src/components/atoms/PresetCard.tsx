@@ -4,37 +4,56 @@ import Image from 'next/image';
 interface PresetCardProps {
   title: string;
   imagePath: string;
+  description?: string;
   onClick: () => void;
 }
 
 /**
  * PresetCard - Compact preset card with image preview
  * Used in Quick Mode for preset selection
+ * Style matches QuickPresetsGrid buttons
  */
-export function PresetCard({ title, imagePath, onClick }: PresetCardProps) {
+export function PresetCard({ title, imagePath, description, onClick }: PresetCardProps) {
   return (
     <button
       onClick={onClick}
-      className="group relative w-full overflow-hidden rounded-lg border border-white/10 bg-white/[0.02] transition-all duration-300 hover:border-purple-500/50 hover:bg-white/[0.08] hover:shadow-[0_0_30px_rgba(139,92,246,0.25)]"
+      className={`
+        group relative overflow-hidden rounded-lg aspect-[4/3]
+        border border-white/10 hover:border-purple-500/50
+        transition-all duration-300
+        cursor-pointer
+      `}
     >
-      {/* Image Preview */}
-      <div className="relative aspect-[5/7] w-full overflow-hidden">
-        <Image
-          src={imagePath}
-          alt={title}
-          fill
-          className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
-          sizes="200px"
-        />
-        {/* Overlay on hover */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-      </div>
-
-      {/* Title */}
-      <div className="px-2 py-1.5">
-        <span className="text-[10px] font-medium text-white/70 transition-colors duration-300 group-hover:text-purple-300">
+      {/* Background Image */}
+      <Image
+        src={imagePath}
+        alt={title}
+        fill
+        sizes="(max-width: 768px) 50vw, 150px"
+        className="object-cover transition-transform duration-300 group-hover:scale-110"
+      />
+      
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+      
+      {/* Content */}
+      <div className="absolute inset-0 flex flex-col justify-end p-2.5">
+        {/* Name */}
+        <span className="text-xs font-medium text-white drop-shadow-lg">
           {title}
         </span>
+        
+        {/* Description */}
+        {description && (
+          <span className="text-[10px] text-white/70 leading-tight mt-0.5 drop-shadow-md">
+            {description}
+          </span>
+        )}
+      </div>
+      
+      {/* Hover Border Glow */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+        <div className="absolute inset-0 rounded-lg ring-1 ring-purple-500/50 ring-inset" />
       </div>
     </button>
   );

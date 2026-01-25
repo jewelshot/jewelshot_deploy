@@ -30,7 +30,7 @@ export function QuickModeContent({ onPresetSelect, gender, jewelryType }: QuickM
   const { presetsByCategory, filteredCount, totalCount } = useMemo(() => {
     const grouped = new Map<
       string,
-      Array<{ id: string; title: string; imagePath: string }>
+      Array<{ id: string; title: string; imagePath: string; description?: string }>
     >();
     
     let filtered = 0;
@@ -62,6 +62,7 @@ export function QuickModeContent({ onPresetSelect, gender, jewelryType }: QuickM
           id: preset.id,
           title: preset.title,
           imagePath: preset.imagePath,
+          description: preset.description,
         });
       }
     });
@@ -185,6 +186,7 @@ export function QuickModeContent({ onPresetSelect, gender, jewelryType }: QuickM
                           key={preset.id}
                           title={preset.title}
                           imagePath={preset.imagePath}
+                          description={preset.description}
                           onClick={() => onPresetSelect(preset.id)}
                         />
                       ))}

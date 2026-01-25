@@ -100,9 +100,6 @@ export function QuickPresetsGrid({ onPresetSelect, disabled = false }: QuickPres
         <span className="text-xs text-white/50 font-medium uppercase tracking-wider">
           Quick Presets
         </span>
-        <span className="text-xs text-white/30">
-          10 most used
-        </span>
       </div>
 
       {/* Preset Grid - 2 columns */}
