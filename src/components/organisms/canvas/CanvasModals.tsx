@@ -144,6 +144,7 @@ export default function CanvasModals({
               rotation: transformData.rotation,
               flipHorizontal: transformData.flipHorizontal,
               flipVertical: transformData.flipVertical,
+              imageScale: transformData.imageScale,
             });
           }}
           onAdjustChange={(adjustData) => {

@@ -16,7 +16,7 @@ import type { BackgroundType } from '@/components/molecules/BackgroundSelector';
 const logger = createScopedLogger('CanvasState');
 
 const CANVAS_STATE_KEY = 'jewelshot_canvas_state';
-const STATE_VERSION = 1;
+const STATE_VERSION = 2; // Bumped for imageScale support
 
 export interface CanvasState {
   version: number;
@@ -31,6 +31,7 @@ export interface CanvasState {
   rotation: number;
   flipHorizontal: boolean;
   flipVertical: boolean;
+  imageScale?: number; // Image content scale (0.1 - 2.0)
   // Filters
   adjustFilters: AdjustFilters;
   colorFilters: ColorFilters;

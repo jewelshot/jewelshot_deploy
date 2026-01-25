@@ -5,9 +5,9 @@
  * Extreme values can cause canvas rendering failures ("image explosion").
  *
  * SAFETY LIMITS:
- * - Standard filters: -75 to +75 (instead of -100 to +100)
- * - Positive-only filters: 0 to 75 (instead of 0 to 100)
- * - Prevents extreme value combinations that break canvas rendering
+ * - Standard filters: -100 to +100 (full range with safe fallback)
+ * - Positive-only filters: 0 to 100 (full range with safe fallback)
+ * - Error fallback is handled in ImageViewer component
  */
 
 import type {
@@ -16,36 +16,36 @@ import type {
   FilterEffects,
 } from '@/hooks/useImageFilters';
 
-// 🎯 SAFE BOUNDARIES (prevents canvas rendering failures)
+// 🎯 SAFE BOUNDARIES (full range - error fallback in ImageViewer)
 const SAFE_LIMITS = {
-  // Adjust filters (standard range: -75 to +75)
+  // Adjust filters (standard range: -100 to +100)
   adjust: {
-    brightness: { min: -75, max: 75 },
-    contrast: { min: -75, max: 75 },
-    exposure: { min: -75, max: 75 },
-    highlights: { min: -75, max: 75 },
-    shadows: { min: -75, max: 75 },
-    whites: { min: -75, max: 75 },
-    blacks: { min: -75, max: 75 },
-    clarity: { min: -75, max: 75 },
-    sharpness: { min: 0, max: 75 }, // Positive only
-    dehaze: { min: -75, max: 75 },
+    brightness: { min: -100, max: 100 },
+    contrast: { min: -100, max: 100 },
+    exposure: { min: -100, max: 100 },
+    highlights: { min: -100, max: 100 },
+    shadows: { min: -100, max: 100 },
+    whites: { min: -100, max: 100 },
+    blacks: { min: -100, max: 100 },
+    clarity: { min: -100, max: 100 },
+    sharpness: { min: 0, max: 100 }, // Positive only
+    dehaze: { min: -100, max: 100 },
   },
-  // Color filters (standard range: -75 to +75)
+  // Color filters (standard range: -100 to +100)
   color: {
-    temperature: { min: -75, max: 75 },
-    tint: { min: -75, max: 75 },
-    saturation: { min: -75, max: 75 },
-    vibrance: { min: -75, max: 75 },
+    temperature: { min: -100, max: 100 },
+    tint: { min: -100, max: 100 },
+    saturation: { min: -100, max: 100 },
+    vibrance: { min: -100, max: 100 },
   },
-  // Filter effects (positive only: 0 to 75)
+  // Filter effects (positive only: 0 to 100)
   effects: {
-    vignetteAmount: { min: 0, max: 75 },
-    vignetteSize: { min: 25, max: 75 }, // Narrower range
-    vignetteFeather: { min: 25, max: 75 }, // Narrower range
-    grainAmount: { min: 0, max: 75 },
-    grainSize: { min: 25, max: 75 }, // Narrower range
-    fadeAmount: { min: 0, max: 75 },
+    vignetteAmount: { min: 0, max: 100 },
+    vignetteSize: { min: 0, max: 100 },
+    vignetteFeather: { min: 0, max: 100 },
+    grainAmount: { min: 0, max: 100 },
+    grainSize: { min: 0, max: 100 },
+    fadeAmount: { min: 0, max: 100 },
   },
 };
 
@@ -189,9 +189,9 @@ export function detectExtremeFilters(
   colorFilters: ColorFilters,
   filterEffects: FilterEffects
 ): string | null {
-  // Count how many filters are at extreme values (>50 or <-50)
+  // Count how many filters are at extreme values (>80 or <-80)
   let extremeCount = 0;
-  const EXTREME_THRESHOLD = 50;
+  const EXTREME_THRESHOLD = 80;
 
   // Check adjust filters
   Object.values(adjustFilters).forEach((value) => {

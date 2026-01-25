@@ -31,6 +31,7 @@ export interface Transform {
   rotation: number;
   flipHorizontal: boolean;
   flipVertical: boolean;
+  imageScale: number; // Image content scale (0.1 to 2.0)
 }
 
 interface ImageTransformState {
@@ -66,6 +67,7 @@ const DEFAULT_TRANSFORM: Transform = {
   rotation: 0,
   flipHorizontal: false,
   flipVertical: false,
+  imageScale: 1,
 };
 
 export function useImageTransform(): ImageTransformState {

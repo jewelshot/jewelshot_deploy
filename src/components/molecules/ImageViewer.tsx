@@ -91,10 +91,12 @@ export function ImageViewer({
   const isDraggingRef = useRef(false);
   const startPosRef = useRef({ x: 0, y: 0 });
   const zoomTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastGoodSrcRef = useRef<string>(src); // Track last known good source
 
-  // Reset error state when source changes
+  // Reset error state when original source changes
   React.useEffect(() => {
     setHasImageError(false);
+    lastGoodSrcRef.current = src;
   }, [src]);
 
   // 🎯 CRITICAL: Clamp filter values to safe ranges (prevents canvas rendering failures)
@@ -701,6 +703,20 @@ export function ImageViewer({
     };
   }, [onScaleChange]);
 
+  // Determine the source to use with fallback chain
+  const displaySrc = useMemo(() => {
+    if (hasImageError) {
+      return src; // Fallback to original unprocessed source
+    }
+    // Check if processed source is valid (not empty, not broken)
+    if (finalProcessedSrc && finalProcessedSrc !== '' && finalProcessedSrc.startsWith('data:') || finalProcessedSrc.startsWith('http') || finalProcessedSrc.startsWith('blob:')) {
+      lastGoodSrcRef.current = finalProcessedSrc;
+      return finalProcessedSrc;
+    }
+    // If processed source seems invalid, use original
+    return src;
+  }, [hasImageError, finalProcessedSrc, src]);
+
   return (
     <div
       ref={containerRef}
@@ -711,17 +727,21 @@ export function ImageViewer({
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={hasImageError ? src : finalProcessedSrc}
+        src={displaySrc}
         alt={alt}
         onLoad={() => {
-          setHasImageError(false);
+          // Successfully loaded - clear error state
+          if (hasImageError) {
+            setHasImageError(false);
+          }
+          lastGoodSrcRef.current = displaySrc;
           onImageLoad?.();
         }}
         onError={() => {
           // If processed image fails, fall back to original source
           if (!hasImageError) {
             setHasImageError(true);
-            logger.warn('⚠️ Processed image failed to load, falling back to original');
+            logger.warn('⚠️ Image failed to load, falling back to original source');
           }
           onImageError?.();
         }}

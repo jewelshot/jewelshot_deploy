@@ -53,6 +53,7 @@ interface EditPanelProps {
     rotation: number;
     flipHorizontal: boolean;
     flipVertical: boolean;
+    imageScale: number;
   }) => void;
   /**
    * Adjust change handler

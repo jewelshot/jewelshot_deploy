@@ -1159,6 +1159,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
         rotation: previousState.rotation,
         flipHorizontal: previousState.flipHorizontal,
         flipVertical: previousState.flipVertical,
+        imageScale: previousState.imageScale || 1,
       });
     }
     if (previousState.adjustFilters) {
@@ -1218,6 +1219,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
         rotation: nextState.rotation,
         flipHorizontal: nextState.flipHorizontal,
         flipVertical: nextState.flipVertical,
+        imageScale: nextState.imageScale || 1,
       });
     }
     if (nextState.adjustFilters) {
@@ -1290,6 +1292,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
         rotation: transform.rotation,
         flipHorizontal: transform.flipHorizontal,
         flipVertical: transform.flipVertical,
+        imageScale: transform.imageScale,
         adjustFilters,
         colorFilters,
         filterEffects,
@@ -1518,6 +1521,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
       rotation: savedState.rotation,
       flipHorizontal: savedState.flipHorizontal,
       flipVertical: savedState.flipVertical,
+      imageScale: savedState.imageScale || 1,
     });
 
     // Restore filters
@@ -1548,6 +1552,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
         rotation: transform.rotation,
         flipHorizontal: transform.flipHorizontal,
         flipVertical: transform.flipVertical,
+        imageScale: transform.imageScale,
         adjustFilters,
         colorFilters,
         filterEffects,
@@ -1653,6 +1658,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
         rotation: transform.rotation,
         flipHorizontal: transform.flipHorizontal,
         flipVertical: transform.flipVertical,
+        imageScale: transform.imageScale,
         adjustFilters,
         colorFilters,
         filterEffects,
@@ -2073,6 +2079,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
             rotation: transformData.rotation,
             flipHorizontal: transformData.flipHorizontal,
             flipVertical: transformData.flipVertical,
+            imageScale: transformData.imageScale,
           });
         }}
         adjustFilters={adjustFilters}

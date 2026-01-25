@@ -25,6 +25,7 @@ export interface CanvasHistoryState {
   rotation: number;
   flipHorizontal: boolean;
   flipVertical: boolean;
+  imageScale?: number; // Image content scale (0.1 - 2.0)
   // Filters
   adjustFilters: AdjustFilters;
   colorFilters: ColorFilters;
