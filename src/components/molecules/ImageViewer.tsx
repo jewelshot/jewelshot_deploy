@@ -676,8 +676,12 @@ export function ImageViewer({
         setIsZooming(false);
       }, 150);
 
-      const delta = -e.deltaY * 0.01;
-      onScaleChange((prev) => Math.max(0.1, Math.min(3.0, prev + delta)));
+      // Use same limits as button handlers: MIN 0.1 (10%), MAX 8.0 (800%)
+      const delta = -e.deltaY * 0.005; // Slower zoom for better control
+      onScaleChange((prev) => {
+        const newScale = prev + delta;
+        return Math.max(0.1, Math.min(8.0, newScale));
+      });
     };
 
     container.addEventListener('wheel', handleWheel, { passive: false });

@@ -488,16 +488,16 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
     // filterEffects not used in download
   ]);
 
-  const handleDelete = useCallback(() => {
-    if (
-      window.confirm(
-        'Are you sure you want to delete this image? This action cannot be undone.'
-      )
-    ) {
-      handleCloseImage();
-      toastManager.info('Image deleted');
-    }
+  // Delete without confirmation (called after modal confirmation)
+  const performDelete = useCallback(() => {
+    handleCloseImage();
+    toastManager.info('Image deleted');
   }, [handleCloseImage]);
+
+  // Request delete - triggers confirmation modal via callback
+  const handleDeleteRequest = useCallback((showConfirmation: () => void) => {
+    showConfirmation();
+  }, []);
 
   // ============================================================================
   // UI CONTROLS
@@ -532,7 +532,8 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
     // Actions
     handleSave,
     handleDownload,
-    handleDelete,
+    performDelete,
+    handleDeleteRequest,
 
     // UI controls
     toggleFullscreen,

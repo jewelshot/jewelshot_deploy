@@ -36,8 +36,49 @@ import {
 } from 'lucide-react';
 import { Tooltip } from '@/components/atoms/Tooltip';
 import { MetalColorPicker } from './MetalColorPicker';
+import { ConfirmationModal } from './ConfirmationModal';
 import { MetalType } from '@/hooks/useMetalRecolor';
 import { useLanguage } from '@/lib/i18n';
+
+// Action descriptions for confirmation modal
+const ACTION_DESCRIPTIONS: Record<string, { title: string; description: string }> = {
+  upscale: {
+    title: 'Upscale Image (2×)',
+    description: 'Increase image resolution by 2x using AI enhancement. This will use 1 credit.',
+  },
+  removeBackground: {
+    title: 'Remove Background',
+    description: 'Remove the background from the image, leaving only the jewelry on a transparent background. This will use 1 credit.',
+  },
+  rotateLeft: {
+    title: 'Rotate Left (30°)',
+    description: 'Rotate the jewelry image 30 degrees to the left using AI perspective transformation. This will use 1 credit.',
+  },
+  rotateRight: {
+    title: 'Rotate Right (30°)',
+    description: 'Rotate the jewelry image 30 degrees to the right using AI perspective transformation. This will use 1 credit.',
+  },
+  closeUp: {
+    title: 'Close-Up Shot',
+    description: 'Generate a detailed close-up view of the jewelry, focusing on intricate details. This will use 1 credit.',
+  },
+  gemstoneEnhance: {
+    title: 'Enhance Gemstones',
+    description: 'Enhance the clarity, sparkle, and brilliance of gemstones in the image. This will use 1 credit.',
+  },
+  metalPolish: {
+    title: 'Polish Metal',
+    description: 'Apply a mirror-like polish effect to the metal surfaces in the image. This will use 1 credit.',
+  },
+  naturalLight: {
+    title: 'Natural Light',
+    description: 'Add realistic natural light reflections and highlights to the jewelry. This will use 1 credit.',
+  },
+  turntableVideo: {
+    title: '360° Turntable Video',
+    description: 'Generate a rotating turntable video of the jewelry from the image. This will use 5 credits.',
+  },
+};
 
 interface QuickActionsBarProps {
   /** Callback when upscale button is clicked */
@@ -119,12 +160,57 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
   const { t } = useLanguage();
   // State for metal color picker
   const [isMetalPickerOpen, setIsMetalPickerOpen] = useState(false);
+  // State for confirmation modal
+  const [confirmAction, setConfirmAction] = useState<string | null>(null);
 
   // Handle metal color selection
   const handleMetalSelect = (metalType: MetalType) => {
     onMetalRecolor(metalType);
-    setIsMetalPickerOpen(false); // Close picker after selection
+    setIsMetalPickerOpen(false);
   };
+
+  // Handler for action buttons - shows confirmation modal
+  const handleActionClick = (actionKey: string) => {
+    setConfirmAction(actionKey);
+  };
+
+  // Execute the confirmed action
+  const handleConfirmAction = () => {
+    if (!confirmAction) return;
+
+    switch (confirmAction) {
+      case 'upscale':
+        onUpscale();
+        break;
+      case 'removeBackground':
+        onRemoveBackground();
+        break;
+      case 'rotateLeft':
+        onRotateLeft();
+        break;
+      case 'rotateRight':
+        onRotateRight();
+        break;
+      case 'closeUp':
+        onCloseUp();
+        break;
+      case 'gemstoneEnhance':
+        onGemstoneEnhance();
+        break;
+      case 'metalPolish':
+        onMetalPolish();
+        break;
+      case 'naturalLight':
+        onNaturalLight();
+        break;
+      case 'turntableVideo':
+        onTurntableVideo();
+        break;
+    }
+    setConfirmAction(null);
+  };
+
+  const currentActionInfo = confirmAction ? ACTION_DESCRIPTIONS[confirmAction] : null;
   // Button base classes matching Canvas UI
   const buttonBaseClass =
     'relative flex h-7 w-7 items-center justify-center rounded-md transition-all';
@@ -181,7 +267,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
           side="left"
         >
           <button
-            onClick={onUpscale}
+            onClick={() => handleActionClick('upscale')}
             disabled={!hasActiveImage || isUpscaling}
             className={getButtonClass(hasActiveImage, isUpscaling, colors.purple)}
           >
@@ -206,7 +292,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
           side="left"
         >
           <button
-            onClick={onRemoveBackground}
+            onClick={() => handleActionClick('removeBackground')}
             disabled={!hasActiveImage || isRemovingBackground}
             className={getButtonClass(
               hasActiveImage,
@@ -231,7 +317,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
           side="left"
         >
           <button
-            onClick={onRotateLeft}
+            onClick={() => handleActionClick('rotateLeft')}
             disabled={!hasActiveImage || isRotatingLeft}
             className={getButtonClass(
               hasActiveImage,
@@ -253,7 +339,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
           side="left"
         >
           <button
-            onClick={onRotateRight}
+            onClick={() => handleActionClick('rotateRight')}
             disabled={!hasActiveImage || isRotatingRight}
             className={getButtonClass(
               hasActiveImage,
@@ -272,7 +358,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
         {/* Close-Up Button */}
         <Tooltip content={isClosingUp ? t.tooltips.creating : t.tooltips.closeUp} side="left">
           <button
-            onClick={onCloseUp}
+            onClick={() => handleActionClick('closeUp')}
             disabled={!hasActiveImage || isClosingUp}
             className={getButtonClass(
               hasActiveImage,
@@ -297,7 +383,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
           side="left"
         >
           <button
-            onClick={onGemstoneEnhance}
+            onClick={() => handleActionClick('gemstoneEnhance')}
             disabled={!hasActiveImage || isEnhancingGemstones}
             className={getButtonClass(
               hasActiveImage,
@@ -341,7 +427,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
           side="left"
         >
           <button
-            onClick={onMetalPolish}
+            onClick={() => handleActionClick('metalPolish')}
             disabled={!hasActiveImage || isPolishingMetal}
             className={getButtonClass(
               hasActiveImage,
@@ -366,7 +452,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
           side="left"
         >
           <button
-            onClick={onNaturalLight}
+            onClick={() => handleActionClick('naturalLight')}
             disabled={!hasActiveImage || isEnhancingLight}
             className={getButtonClass(
               hasActiveImage,
@@ -388,7 +474,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
           side="left"
         >
           <button
-            onClick={onTurntableVideo}
+            onClick={() => handleActionClick('turntableVideo')}
             disabled={!hasActiveImage || isGeneratingTurntable}
             className={getButtonClass(
               hasActiveImage,
@@ -410,6 +496,18 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
         isOpen={isMetalPickerOpen && hasActiveImage && !isRecoloringMetal}
         onSelect={handleMetalSelect}
         disabled={isRecoloringMetal}
+      />
+
+      {/* Confirmation Modal for Quick Actions */}
+      <ConfirmationModal
+        isOpen={confirmAction !== null}
+        onClose={() => setConfirmAction(null)}
+        onConfirm={handleConfirmAction}
+        title={currentActionInfo?.title || 'Confirm Action'}
+        description={currentActionInfo?.description || 'Are you sure you want to proceed?'}
+        confirmText="Proceed"
+        cancelText="Cancel"
+        variant="ai"
       />
     </div>
   );

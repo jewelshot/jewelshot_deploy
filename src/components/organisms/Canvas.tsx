@@ -27,6 +27,7 @@ import { useCreditStore } from '@/store/creditStore';
 import { VideoPlayerModal } from '@/components/molecules/VideoPlayerModal';
 import { VideoGeneratingModal } from '@/components/molecules/VideoGeneratingModal';
 import { QuickActionsBar } from '@/components/molecules/QuickActionsBar';
+import { ConfirmationModal } from '@/components/molecules/ConfirmationModal';
 import { saveCanvasState, loadCanvasState } from '@/lib/canvas-state-storage';
 import { FEATURE_FLAGS } from '@/lib/feature-flags';
 import { CanvasNew } from './CanvasNew';
@@ -1060,6 +1061,9 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
     };
   }, [onPresetPrompt, handlePresetGeneration]);
 
+  // Delete confirmation modal state
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
   // Canvas handlers (extracted to hook for better organization)
   const {
     handleUploadClick,
@@ -1070,7 +1074,7 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
     handleFitScreen,
     handleSave,
     handleDownload,
-    handleDelete,
+    performDelete,
     toggleFullscreen,
   } = useCanvasHandlers({
     fileInputRef,
@@ -1108,6 +1112,17 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
     openRight,
     setBackground,
   });
+
+  // Delete handler - shows confirmation modal
+  const handleDelete = useCallback(() => {
+    setShowDeleteConfirm(true);
+  }, []);
+
+  // Confirm delete - actually performs the delete
+  const handleConfirmDelete = useCallback(() => {
+    setShowDeleteConfirm(false);
+    performDelete();
+  }, [performDelete]);
 
   // ===================================================================
   // CANVAS HISTORY - Undo/Redo/Reset Handlers
@@ -1968,8 +1983,6 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
           onAIError={(error) => toastManager.error(error.message)}
           onPromptExpandedChange={setIsPromptExpanded}
           currentImageUrl={uploadedImage || ''}
-          onGenerateVideo={handleGenerateVideo}
-          isGeneratingVideo={isGeneratingVideo}
         />
       )}
 
@@ -2098,6 +2111,18 @@ function CanvasLegacy({ onPresetPrompt }: CanvasProps = {}) {
           }}
         />
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Image"
+        description="Are you sure you want to delete this image? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+      />
 
       {/* Toast Notifications - Now displayed in BottomBar */}
     </>

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import AIPromptInput from '@/components/atoms/AIPromptInput';
 import AIGenerateButton from '@/components/atoms/AIGenerateButton';
 import AIToggleButton from '@/components/atoms/AIToggleButton';
+import { ConfirmationModal } from './ConfirmationModal';
 import { validatePrompt } from '@/lib/validators';
 import { toastManager } from '@/lib/toast-manager';
 
@@ -25,7 +26,8 @@ export function AIEditControl({
 }: AIEditControlProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [prompt, setPrompt] = useState('');
-  const [aspectRatio, setAspectRatio] = useState('auto'); // Default to 'auto' (Nano Banana recommended)
+  const [aspectRatio, setAspectRatio] = useState('auto');
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   // Auto-collapse expanded area when AI starts processing
   const shouldShowExpanded = isExpanded && !isEditing;
@@ -35,7 +37,7 @@ export function AIEditControl({
     onExpandedChange?.(shouldShowExpanded);
   }, [shouldShowExpanded, onExpandedChange]);
 
-  const handleGenerate = () => {
+  const handleGenerateClick = () => {
     if (isEditing) return;
 
     const trimmedPrompt = prompt.trim();
@@ -49,11 +51,18 @@ export function AIEditControl({
       }
     }
 
+    // Show confirmation modal
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmGenerate = () => {
+    setShowConfirmModal(false);
+    
     const event = new CustomEvent('ai-edit-generate', {
       detail: { 
-        prompt: trimmedPrompt || '', 
+        prompt: prompt.trim() || '', 
         imageUrl: currentImageUrl,
-        aspectRatio: aspectRatio || 'auto', // Include aspect ratio
+        aspectRatio: aspectRatio || 'auto',
       },
     });
     window.dispatchEvent(event);
@@ -108,7 +117,7 @@ export function AIEditControl({
           <AIPromptInput
             value={prompt}
             onChange={setPrompt}
-            onSubmit={handleGenerate}
+            onSubmit={handleGenerateClick}
             disabled={isEditing}
           />
         </div>
@@ -129,12 +138,28 @@ export function AIEditControl({
 
           {/* Generate Button */}
           <AIGenerateButton
-            onClick={handleGenerate}
+            onClick={handleGenerateClick}
             disabled={isEditing}
             loading={isEditing}
           />
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={handleConfirmGenerate}
+        title="Generate AI Image"
+        description="This will use 1 credit to generate a new image with AI."
+        details={[
+          { label: 'Prompt', value: prompt.trim() || '(No prompt - default enhancement)' },
+          { label: 'Aspect Ratio', value: aspectRatios.find(r => r.value === aspectRatio)?.label || aspectRatio },
+        ]}
+        confirmText="Generate"
+        cancelText="Cancel"
+        variant="ai"
+      />
 
       {/* Keyframes */}
       <style jsx>{`

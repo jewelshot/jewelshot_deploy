@@ -91,10 +91,6 @@ export interface CanvasControlsProps {
 
   // Current image URL (for AI Edit)
   currentImageUrl: string;
-
-  // Video generation
-  onGenerateVideo?: () => void;
-  isGeneratingVideo?: boolean;
 }
 
 /**
@@ -138,8 +134,6 @@ export default function CanvasControls({
   onAIError,
   onPromptExpandedChange,
   currentImageUrl,
-  onGenerateVideo,
-  isGeneratingVideo,
 }: CanvasControlsProps) {
   // Don't render controls if no image
   if (!hasImage) return null;
@@ -289,8 +283,6 @@ export default function CanvasControls({
           onDelete={onDelete}
           onSave={onSave}
           onDownload={onDownload}
-          onGenerateVideo={onGenerateVideo}
-          isGeneratingVideo={isGeneratingVideo}
         />
       </div>
     </>
