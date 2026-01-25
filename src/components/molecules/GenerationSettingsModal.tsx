@@ -39,6 +39,9 @@ interface GenerationSettingsModalProps {
   
   // Required validation
   isRequired?: boolean;
+  
+  // Image preview from canvas
+  imageUrl?: string | null;
 }
 
 const genderOptions = [
@@ -87,6 +90,7 @@ export function GenerationSettingsModal({
   showFace,
   onShowFaceChange,
   isRequired = false,
+  imageUrl,
 }: GenerationSettingsModalProps) {
   const { t } = useLanguage();
   const [mounted, setMounted] = useState(false);
@@ -174,36 +178,62 @@ export function GenerationSettingsModal({
 
       {/* Modal */}
       <div
-        className="fixed left-1/2 top-1/2 z-[201] w-full max-w-md -translate-x-1/2 -translate-y-1/2 transform px-4"
+        className="fixed left-1/2 top-1/2 z-[201] w-full max-w-2xl -translate-x-1/2 -translate-y-1/2 transform px-4"
         role="dialog"
         aria-modal="true"
         aria-labelledby="settings-modal-title"
       >
-        <div className="relative rounded-2xl border border-white/10 bg-[rgba(10,10,10,0.95)] p-5 shadow-2xl backdrop-blur-2xl">
+        <div className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-gradient-to-br from-white/[0.08] to-white/[0.02] p-6 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.75)] backdrop-blur-xl">
+          {/* Glassmorphism inner glow */}
+          <div className="pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-br from-white/[0.05] via-transparent to-transparent" />
+          
           {/* Header */}
-          <div className="mb-4 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/5">
-                <Settings className="h-4 w-4 text-white/70" />
+          <div className="relative mb-5 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-white/10 to-white/5 ring-1 ring-white/10">
+                <Settings className="h-5 w-5 text-white/80" />
               </div>
-              <h2
-                id="settings-modal-title"
-                className="text-base font-semibold text-white"
-              >
-                {t.settingsModal.title}
-              </h2>
+              <div>
+                <h2
+                  id="settings-modal-title"
+                  className="text-lg font-semibold text-white"
+                >
+                  {t.settingsModal.title}
+                </h2>
+                <p className="text-xs text-white/40">Configure your generation preferences</p>
+              </div>
             </div>
             <button
               onClick={onClose}
-              className="flex h-7 w-7 items-center justify-center rounded-lg text-white/60 transition-colors hover:bg-white/5 hover:text-white"
+              className="flex h-8 w-8 items-center justify-center rounded-xl text-white/50 transition-all hover:bg-white/10 hover:text-white"
               aria-label="Close settings"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
 
-          {/* Content */}
-          <div className="space-y-4">
+          {/* Main Content Grid - Image Preview + Settings */}
+          <div className="relative flex gap-6">
+            {/* Image Preview Section */}
+            {imageUrl && (
+              <div className="flex-shrink-0">
+                <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/40 p-1">
+                  <img
+                    src={imageUrl}
+                    alt="Uploaded jewelry"
+                    className="h-[280px] w-[200px] rounded-xl object-contain"
+                  />
+                  {/* Subtle overlay gradient */}
+                  <div className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-t from-black/20 via-transparent to-transparent" />
+                </div>
+                <p className="mt-2 text-center text-[10px] font-medium uppercase tracking-wider text-white/30">
+                  Your Image
+                </p>
+              </div>
+            )}
+
+            {/* Settings Section */}
+            <div className="flex-1 space-y-4">
             {/* Gender Selection */}
             <div>
               <label className="mb-1.5 block text-xs font-medium text-white/70">
@@ -359,14 +389,15 @@ export function GenerationSettingsModal({
                 </div>
               </div>
             </div>
+            </div>
           </div>
 
           {/* Validation Error */}
           {showValidationError && (
-            <div className="mt-3 flex items-start gap-2 rounded-md border border-red-500/20 bg-red-500/10 p-2.5">
-              <AlertCircle className="h-4 w-4 flex-shrink-0 text-red-400" />
+            <div className="relative mt-4 flex items-start gap-3 rounded-xl border border-red-500/20 bg-red-500/10 p-3 backdrop-blur-sm">
+              <AlertCircle className="h-5 w-5 flex-shrink-0 text-red-400" />
               <div className="flex-1">
-                <p className="text-xs font-medium text-red-400">
+                <p className="text-sm font-medium text-red-400">
                   {t.settingsModal.requiredWarning}
                 </p>
               </div>
@@ -374,35 +405,33 @@ export function GenerationSettingsModal({
           )}
 
           {/* Apply to All Checkbox */}
-          <div className="mt-3">
-            <label className="flex items-start gap-2.5 cursor-pointer group">
+          <div className="relative mt-4">
+            <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/5 bg-white/[0.02] p-3 transition-colors hover:bg-white/[0.04]">
               <input
                 type="checkbox"
                 checked={applyToAll}
                 onChange={(e) => setApplyToAll(e.target.checked)}
-                className="mt-0.5 h-3.5 w-3.5 rounded border-white/20 bg-white/5 text-white/80 focus:ring-2 focus:ring-white/30 focus:ring-offset-0"
+                className="h-4 w-4 rounded border-white/20 bg-white/5 text-white/80 focus:ring-2 focus:ring-white/20 focus:ring-offset-0"
               />
-              <div className="flex-1">
-                <span className="text-xs font-medium text-white group-hover:text-white/80 transition-colors">
-                  {t.settingsModal.applyToAll}
-                </span>
-              </div>
+              <span className="text-sm font-medium text-white/70">
+                {t.settingsModal.applyToAll}
+              </span>
             </label>
           </div>
 
           {/* Footer */}
-          <div className="mt-4 flex justify-end gap-1.5">
+          <div className="relative mt-5 flex justify-end gap-2">
             {!isRequired && (
               <button
                 onClick={handleClose}
-                className="rounded-md border border-white/10 px-4 py-1.5 text-xs font-medium text-white/80 transition-colors hover:bg-white/5"
+                className="rounded-xl border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-white/70 transition-all hover:bg-white/10 hover:text-white"
               >
                 {t.common.cancel}
               </button>
             )}
             <button
               onClick={handleDone}
-              className="rounded-md bg-white/10 border border-white/20 px-4 py-1.5 text-xs font-medium text-white transition-colors hover:bg-white/15"
+              className="rounded-xl bg-gradient-to-r from-white/20 to-white/10 px-6 py-2 text-sm font-semibold text-white shadow-lg ring-1 ring-white/20 transition-all hover:from-white/25 hover:to-white/15 hover:shadow-xl"
             >
               {t.settingsModal.saveSettings}
             </button>
