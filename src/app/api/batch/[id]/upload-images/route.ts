@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { createScopedLogger } from '@/lib/logger';
+import { validateImageFile, getSafeContentType, getExtensionFromMime, MAX_FILE_SIZES } from '@/lib/security/file-validator';
 
 const logger = createScopedLogger('API:Batch:UploadImages');
 
@@ -85,16 +86,32 @@ export async function POST(
         const base64Data = dataUri.split(',')[1];
         const buffer = Buffer.from(base64Data, 'base64');
 
-        // Generate unique filename
+        // 🔒 SECURITY: Validate file (size, type, magic bytes)
+        const validation = validateImageFile(buffer, undefined, MAX_FILE_SIZES.batch);
+        if (!validation.valid) {
+          uploadResults.push({
+            filename,
+            success: false,
+            error: validation.error,
+          });
+          continue;
+        }
+
+        // 🔒 SECURITY: Use detected content type (not client-provided)
+        const contentType = getSafeContentType(buffer);
+        const ext = getExtensionFromMime(contentType);
+
+        // Generate unique filename with crypto
         const timestamp = Date.now();
-        const ext = filename.split('.').pop() || 'jpg';
-        const uniqueFilename = `${user.id}/${batchProjectId}/${timestamp}-${filename}`;
+        const randomId = crypto.randomUUID().split('-')[0];
+        const safeFilename = filename.replace(/[^a-zA-Z0-9.-]/g, '_');
+        const uniqueFilename = `${user.id}/${batchProjectId}/${timestamp}_${randomId}_${safeFilename}.${ext}`;
 
         // Upload to Supabase Storage (batch-originals bucket)
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('batch-originals')
           .upload(uniqueFilename, buffer, {
-            contentType: dataUri.split(';')[0].split(':')[1] || 'image/jpeg',
+            contentType,
             upsert: false,
           });
 

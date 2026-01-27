@@ -7,7 +7,8 @@ import { Redis } from '@upstash/redis';
 // 🔒 MAINTENANCE MODE CONFIGURATION
 // ============================================
 const MAINTENANCE_MODE = false; // ✅ true = site kapalı, false = site açık
-const MAINTENANCE_PASSWORD = process.env.MAINTENANCE_PASSWORD || 'change-me-in-env'; // 🔑 Geliştirici bypass şifresi (ENV'den al!)
+// 🔒 SECURITY: No fallback - MAINTENANCE_PASSWORD must be set in env
+const MAINTENANCE_PASSWORD = process.env.MAINTENANCE_PASSWORD;
 
 // ============================================
 // 🚦 IP-BASED RATE LIMITING (GLOBAL PROTECTION)
@@ -124,7 +125,8 @@ export async function middleware(request: NextRequest) {
     // Bypass API endpoint
     if (pathname === '/api/maintenance-bypass') {
       const password = request.nextUrl.searchParams.get('password');
-      if (password === MAINTENANCE_PASSWORD) {
+      // 🔒 SECURITY: Only allow bypass if password is configured AND matches
+      if (MAINTENANCE_PASSWORD && password === MAINTENANCE_PASSWORD) {
         const response = NextResponse.redirect(new URL('/', request.url));
         response.cookies.set('maintenance_bypass', 'true', {
           maxAge: 60 * 60 * 24 * 7, // 7 days

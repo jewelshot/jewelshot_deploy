@@ -81,7 +81,7 @@ export const GET = withAdminAuth(
   } catch (error: any) {
     console.error('Audit logs API error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch audit logs', details: error.message },
+      { error: 'Failed to fetch audit logs' },
       { status: 500 }
     );
   }

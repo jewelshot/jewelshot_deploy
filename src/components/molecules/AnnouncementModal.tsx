@@ -1,8 +1,8 @@
 /**
  * Announcement Modal
  * 
- * Full-screen modal for important announcements
- * Shows when user logs in if there are important/critical announcements
+ * Elegant glassmorphism modal for important announcements
+ * No icons - clean minimal design
  */
 
 'use client';
@@ -10,64 +10,23 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createPortal } from 'react-dom';
-import { 
-  X, 
-  Sparkles, 
-  Gift, 
-  AlertCircle, 
-  Zap, 
-  Wrench,
-  ExternalLink,
-  ChevronRight,
-} from 'lucide-react';
 import type { UserAnnouncement, AnnouncementType } from '@/lib/announcements/types';
 
-// Icon mapping
-const ICON_MAP: Record<AnnouncementType, typeof Sparkles> = {
-  update: Sparkles,
-  offer: Gift,
-  alert: AlertCircle,
-  feature: Zap,
-  maintenance: Wrench,
+// Color accent mapping (subtle)
+const ACCENT_MAP: Record<AnnouncementType, string> = {
+  update: 'from-blue-500/20 to-transparent',
+  offer: 'from-purple-500/20 to-transparent',
+  alert: 'from-amber-500/20 to-transparent',
+  feature: 'from-emerald-500/20 to-transparent',
+  maintenance: 'from-rose-500/20 to-transparent',
 };
 
-// Color mapping
-const COLOR_MAP: Record<AnnouncementType, {
-  icon: string;
-  bg: string;
-  border: string;
-  glow: string;
-}> = {
-  update: {
-    icon: 'text-blue-400',
-    bg: 'bg-blue-500/10',
-    border: 'border-blue-500/30',
-    glow: 'shadow-[0_0_60px_rgba(59,130,246,0.3)]',
-  },
-  offer: {
-    icon: 'text-purple-400',
-    bg: 'bg-purple-500/10',
-    border: 'border-purple-500/30',
-    glow: 'shadow-[0_0_60px_rgba(139,92,246,0.3)]',
-  },
-  alert: {
-    icon: 'text-yellow-400',
-    bg: 'bg-yellow-500/10',
-    border: 'border-yellow-500/30',
-    glow: 'shadow-[0_0_60px_rgba(234,179,8,0.3)]',
-  },
-  feature: {
-    icon: 'text-green-400',
-    bg: 'bg-green-500/10',
-    border: 'border-green-500/30',
-    glow: 'shadow-[0_0_60px_rgba(34,197,94,0.3)]',
-  },
-  maintenance: {
-    icon: 'text-red-400',
-    bg: 'bg-red-500/10',
-    border: 'border-red-500/30',
-    glow: 'shadow-[0_0_60px_rgba(239,68,68,0.3)]',
-  },
+const LABEL_MAP: Record<AnnouncementType, string> = {
+  update: 'Update',
+  offer: 'Offer',
+  alert: 'Alert',
+  feature: 'New',
+  maintenance: 'Notice',
 };
 
 interface AnnouncementModalProps {
@@ -85,7 +44,6 @@ export function AnnouncementModal({
 
   useEffect(() => {
     setMounted(true);
-    // Prevent body scroll
     document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.overflow = '';
@@ -94,8 +52,8 @@ export function AnnouncementModal({
 
   if (!mounted) return null;
 
-  const Icon = ICON_MAP[announcement.type] || Sparkles;
-  const colors = COLOR_MAP[announcement.type] || COLOR_MAP.update;
+  const accent = ACCENT_MAP[announcement.type] || ACCENT_MAP.update;
+  const label = LABEL_MAP[announcement.type] || 'Update';
 
   const modalContent = (
     <AnimatePresence>
@@ -110,101 +68,70 @@ export function AnnouncementModal({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="absolute inset-0 bg-black/80 backdrop-blur-md"
+          className="absolute inset-0 bg-black/70 backdrop-blur-sm"
           onClick={isCritical ? undefined : onDismiss}
         />
 
         {/* Modal */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          initial={{ opacity: 0, scale: 0.95, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className={`
-            relative z-10 w-full max-w-lg overflow-hidden rounded-2xl
-            border ${colors.border} ${colors.bg}
-            bg-[rgba(10,10,10,0.95)] backdrop-blur-xl
-            ${colors.glow}
-          `}
+          exit={{ opacity: 0, scale: 0.95, y: 10 }}
+          transition={{ type: 'spring', damping: 30, stiffness: 400 }}
+          className="relative z-10 w-full max-w-sm overflow-hidden rounded-xl border border-white/10 bg-black/60 backdrop-blur-xl"
         >
-          {/* Close button (not for critical) */}
-          {!isCritical && (
-            <button
-              onClick={onDismiss}
-              className="absolute right-4 top-4 z-10 rounded-lg p-2 text-white/50 transition-colors hover:bg-white/10 hover:text-white"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          )}
-
-          {/* Image header (if available) */}
-          {announcement.image_url && (
-            <div className="relative h-48 w-full overflow-hidden">
-              <img
-                src={announcement.image_url}
-                alt=""
-                className="h-full w-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[rgba(10,10,10,0.95)] to-transparent" />
-            </div>
-          )}
+          {/* Gradient accent */}
+          <div className={`absolute inset-x-0 top-0 h-20 bg-gradient-to-b ${accent}`} />
 
           {/* Content */}
-          <div className="p-6">
-            {/* Icon & Type Badge */}
-            <div className="mb-4 flex items-center gap-3">
-              <div className={`rounded-xl p-3 ${colors.bg} ${colors.border} border`}>
-                <Icon className={`h-6 w-6 ${colors.icon}`} />
-              </div>
-              <span className={`text-xs font-medium uppercase tracking-wider ${colors.icon}`}>
-                {announcement.type === 'offer' ? 'Special Offer' : 
-                 announcement.type === 'feature' ? 'New Feature' :
-                 announcement.type === 'maintenance' ? 'Maintenance' :
-                 announcement.type === 'alert' ? 'Important Alert' : 'Update'}
-              </span>
-            </div>
+          <div className="relative p-5">
+            {/* Type label */}
+            <span className="mb-3 inline-block text-[10px] font-medium uppercase tracking-widest text-white/40">
+              {label}
+            </span>
 
             {/* Title */}
-            <h2 className="mb-3 text-2xl font-bold text-white">
+            <h2 className="mb-2 text-base font-semibold text-white">
               {announcement.title}
             </h2>
 
             {/* Message */}
-            <p className="mb-6 text-base leading-relaxed text-white/70">
+            <p className="mb-5 text-sm leading-relaxed text-white/60">
               {announcement.message}
             </p>
 
+            {/* Image (optional, small) */}
+            {announcement.image_url && (
+              <div className="mb-5 overflow-hidden rounded-lg">
+                <img
+                  src={announcement.image_url}
+                  alt=""
+                  className="h-28 w-full object-cover"
+                />
+              </div>
+            )}
+
             {/* Actions */}
-            <div className="flex items-center gap-3">
+            <div className="flex gap-2">
               {announcement.action_url && (
                 <a
                   href={announcement.action_url}
                   target={announcement.action_url.startsWith('http') ? '_blank' : undefined}
                   rel={announcement.action_url.startsWith('http') ? 'noopener noreferrer' : undefined}
-                  className={`
-                    flex items-center gap-2 rounded-xl px-5 py-3
-                    font-medium text-white transition-all
-                    ${colors.bg} ${colors.border} border
-                    hover:brightness-125
-                  `}
+                  className="flex-1 rounded-lg bg-white/10 px-4 py-2.5 text-center text-xs font-medium text-white transition-colors hover:bg-white/20"
                   onClick={onDismiss}
                 >
                   {announcement.action_label || 'Learn More'}
-                  {announcement.action_url.startsWith('http') ? (
-                    <ExternalLink className="h-4 w-4" />
-                  ) : (
-                    <ChevronRight className="h-4 w-4" />
-                  )}
                 </a>
               )}
 
               <button
                 onClick={onDismiss}
                 className={`
-                  flex-1 rounded-xl px-5 py-3 font-medium transition-all
-                  ${isCritical 
-                    ? `${colors.bg} ${colors.border} border text-white hover:brightness-125` 
-                    : 'text-white/50 hover:bg-white/5 hover:text-white'
+                  rounded-lg px-4 py-2.5 text-xs font-medium transition-colors
+                  ${announcement.action_url 
+                    ? 'text-white/40 hover:bg-white/5 hover:text-white/60' 
+                    : 'flex-1 bg-white/10 text-white hover:bg-white/20'
                   }
                 `}
               >
@@ -213,11 +140,11 @@ export function AnnouncementModal({
             </div>
           </div>
 
-          {/* Critical badge */}
+          {/* Critical notice */}
           {isCritical && (
-            <div className="border-t border-white/10 bg-red-500/10 px-6 py-3">
-              <p className="text-center text-xs text-red-400">
-                ⚠️ This is a critical announcement. Please read carefully.
+            <div className="border-t border-white/5 bg-rose-500/10 px-5 py-2.5">
+              <p className="text-center text-[10px] text-rose-400/80">
+                This is a critical announcement
               </p>
             </div>
           )}

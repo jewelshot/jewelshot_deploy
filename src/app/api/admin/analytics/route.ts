@@ -150,7 +150,7 @@ export const GET = withAdminAuth(
   } catch (error: any) {
     console.error('Analytics API error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch analytics', details: error.message },
+      { error: 'Failed to fetch analytics' },
       { status: 500 }
     );
   }

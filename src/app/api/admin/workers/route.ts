@@ -73,7 +73,7 @@ export const GET = withAdminAuth(
     } catch (error: any) {
       console.error('Workers API error:', error);
       return NextResponse.json(
-        { error: 'Failed to fetch worker metrics', details: error.message },
+        { error: 'Failed to fetch worker metrics' },
         { status: 500 }
       );
     }

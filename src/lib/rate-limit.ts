@@ -331,3 +331,45 @@ export async function checkRateLimitEnhanced(
     return { success: true, type, identifier };
   }
 }
+
+/**
+ * Simple IP-based rate limit check for specific endpoints
+ * 🔒 SECURITY: Prevents spam on public endpoints
+ * 
+ * @param ip - Client IP address
+ * @param prefix - Unique prefix for this endpoint
+ * @param config - Rate limit configuration
+ * @returns Rate limit result
+ */
+export async function checkRateLimitByIP(
+  ip: string,
+  prefix: string,
+  config: { requests: number; window: string }
+): Promise<{ success: boolean; limit?: number; remaining?: number; reset?: number }> {
+  if (!redis) {
+    // If Redis is not configured, allow all requests (dev mode)
+    return { success: true };
+  }
+
+  try {
+    const limiter = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(config.requests, config.window as Parameters<typeof Ratelimit.slidingWindow>[1]),
+      analytics: false,
+      prefix: `ratelimit:${prefix}`,
+    });
+
+    const { success, limit, remaining, reset } = await limiter.limit(`ip:${ip}`);
+
+    return {
+      success,
+      limit,
+      remaining,
+      reset,
+    };
+  } catch (error) {
+    // If Redis fails, allow request to proceed
+    console.warn(`[RateLimit:${prefix}] Redis error:`, error instanceof Error ? error.message : 'Unknown error');
+    return { success: true };
+  }
+}

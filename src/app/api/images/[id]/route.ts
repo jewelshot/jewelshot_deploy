@@ -32,6 +32,13 @@ export async function GET(
     // Get Supabase client
     const supabase = await createClient();
 
+    // 🔒 SECURITY: Verify user is authenticated
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     // Fetch image metadata from database
     const { data: imageData, error: dbError } = await supabase
       .from('generated_images')
@@ -49,6 +56,16 @@ export async function GET(
       storage_path: string;
       user_id: string;
     };
+
+    // 🔒 SECURITY: Verify user owns this image (IDOR protection)
+    if (typedImageData.user_id !== user.id) {
+      logger.warn('Unauthorized image access attempt', { 
+        requestedBy: user.id, 
+        imageOwner: typedImageData.user_id,
+        imageId: id 
+      });
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
     // Fetch image from Supabase Storage
     const { data: fileData, error: storageError } = await supabase.storage

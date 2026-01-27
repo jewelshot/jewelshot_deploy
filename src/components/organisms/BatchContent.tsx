@@ -1,13 +1,18 @@
 'use client';
 
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useState, useMemo } from 'react';
 import { useSidebarStore } from '@/store/sidebarStore';
 import { useLanguage } from '@/lib/i18n';
 import { BatchImageGrid } from '@/components/molecules/BatchImageGrid';
 import type { BatchImage } from '@/components/molecules/BatchImageGrid';
 import type { SelectedBatchPreset } from '@/components/templates/BatchPage';
+import { BatchActionModal, type BatchActionType } from '@/components/molecules/BatchActionModal';
+import { FileNamingFormat, defaultFileNamingConfig, type FileNamingConfig } from '@/components/molecules/FileNamingFormat';
 import Image from 'next/image';
-import { Upload, X, Plus, AlertCircle } from 'lucide-react';
+import { Upload, X, Plus, AlertCircle, Pause, Play, Trash2, Square } from 'lucide-react';
+
+// Batch processing state type
+type BatchProcessingState = 'idle' | 'processing' | 'paused' | 'completed' | 'cancelled';
 
 interface BatchContentProps {
   images: BatchImage[];
@@ -29,6 +34,14 @@ interface BatchContentProps {
   onClearPresets?: () => void;
   onStartMatrixBatch?: () => void;
   currentProgress?: { current: number; total: number; currentImage: string; currentPreset: string };
+  // New: Pause/Resume/Cancel
+  batchState?: BatchProcessingState;
+  onPause?: () => void;
+  onResume?: () => void;
+  onCancel?: () => void;
+  // New: File naming
+  fileNamingConfig?: FileNamingConfig;
+  onFileNamingConfigChange?: (config: FileNamingConfig) => void;
 }
 
 /**
@@ -53,10 +66,31 @@ export function BatchContent({
   onClearPresets,
   onStartMatrixBatch,
   currentProgress,
+  batchState = 'idle',
+  onPause,
+  onResume,
+  onCancel,
+  fileNamingConfig = defaultFileNamingConfig,
+  onFileNamingConfigChange,
 }: BatchContentProps) {
   const { leftOpen, rightOpen, topOpen, bottomOpen } = useSidebarStore();
   const { t } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Modal state for confirmations
+  const [actionModal, setActionModal] = useState<{ isOpen: boolean; type: BatchActionType }>({
+    isOpen: false,
+    type: 'pause',
+  });
+
+  // Generate default batch name
+  const defaultBatchName = useMemo(() => {
+    const now = new Date();
+    return `Batch_${now.toLocaleDateString('en-GB').replace(/\//g, '-')}_${now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }).replace(':', '')}`;
+  }, []);
+
+  // Use default name if empty
+  const effectiveBatchName = batchName.trim() || defaultBatchName;
 
   // Nano Banana supported aspect ratios
   const aspectRatios = [
@@ -72,12 +106,41 @@ export function BatchContent({
     { value: '2:3', label: 'Portrait Classic (2:3)' },
   ];
 
-  // Validation
-  const isBatchNameValid = batchName.trim().length > 0;
+  // Validation - batch name is now optional (has default)
   const isAspectRatioValid = aspectRatio.length > 0;
   const hasPresets = selectedPresets.length > 0;
   const hasImages = images.length > 0;
-  const canStart = isBatchNameValid && isAspectRatioValid && hasPresets && hasImages && !isProcessing;
+  const canStart = isAspectRatioValid && hasPresets && hasImages && !isProcessing;
+
+  // Handle action modal
+  const openActionModal = (type: BatchActionType) => {
+    setActionModal({ isOpen: true, type });
+  };
+
+  const closeActionModal = () => {
+    setActionModal({ isOpen: false, type: actionModal.type });
+  };
+
+  const handleActionConfirm = () => {
+    closeActionModal();
+    switch (actionModal.type) {
+      case 'pause':
+        onPause?.();
+        break;
+      case 'resume':
+        onResume?.();
+        break;
+      case 'cancel':
+        onCancel?.();
+        break;
+      case 'clear':
+        onClearAll?.();
+        break;
+      case 'start':
+        onStartMatrixBatch?.();
+        break;
+    }
+  };
 
   // File handling
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -103,8 +166,52 @@ export function BatchContent({
     e.preventDefault();
   }, []);
 
+  // Generate file naming preview
+  const fileNamingPreview = useMemo(() => {
+    const sep = fileNamingConfig.separator;
+    const baseName = images[0]?.file?.name?.split('.')[0] || 'image';
+    switch (fileNamingConfig.pattern) {
+      case 'original_number': return `${baseName}${sep}1, ${baseName}${sep}2, ...`;
+      case 'number_original': return `1${sep}${baseName}, 2${sep}${baseName}, ...`;
+      case 'batch_number': return `batch${sep}1, batch${sep}2, ...`;
+      case 'custom': 
+        const prefix = fileNamingConfig.prefix || baseName;
+        const suffix = fileNamingConfig.suffix ? `${sep}${fileNamingConfig.suffix}` : '';
+        return `${prefix}${sep}1${suffix}, ${prefix}${sep}2${suffix}, ...`;
+      default: return `${baseName}${sep}1, ...`;
+    }
+  }, [fileNamingConfig, images]);
+
+  // Batch info for start modal
+  const batchInfoForModal = useMemo(() => ({
+    name: effectiveBatchName,
+    imageCount: images.length,
+    presetCount: selectedPresets.length,
+    presetNames: selectedPresets.map(p => p.name),
+    aspectRatio: aspectRatios.find(r => r.value === aspectRatio)?.label || aspectRatio || 'Not selected',
+    totalCredits: images.length * selectedPresets.length,
+    fileNamingFormat: fileNamingPreview,
+  }), [effectiveBatchName, images.length, selectedPresets, aspectRatio, fileNamingPreview]);
+
+  // Progress info for pause/resume/cancel modals
+  const progressInfoForModal = useMemo(() => ({
+    completed: currentProgress?.current || 0,
+    total: currentProgress?.total || images.length,
+    processing: images.filter(i => i.status === 'processing').length,
+  }), [currentProgress, images]);
+
   return (
     <>
+      {/* Action Confirmation Modals */}
+      <BatchActionModal
+        isOpen={actionModal.isOpen}
+        actionType={actionModal.type}
+        onConfirm={handleActionConfirm}
+        onCancel={closeActionModal}
+        batchInfo={actionModal.type === 'start' ? batchInfoForModal : undefined}
+        progressInfo={['pause', 'resume', 'cancel'].includes(actionModal.type) ? progressInfoForModal : undefined}
+      />
+
       <main
         className="fixed transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
         style={{
@@ -128,22 +235,18 @@ export function BatchContent({
             </div>
 
             <div className="flex items-end gap-3">
-              {/* Batch Name - Required */}
+              {/* Batch Name - Optional with default */}
               <div className="flex flex-col gap-1">
                 <label className="flex items-center gap-1 text-xs text-white/60">
                   Batch Name
-                  <span className="text-red-400">*</span>
+                  <span className="text-white/30">(optional)</span>
                 </label>
                 <input
                   type="text"
                   value={batchName}
                   onChange={(e) => onBatchNameChange?.(e.target.value)}
-                  placeholder={t.placeholders.enterName}
-                  className={`w-48 rounded-lg border px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-1 ${
-                    batchName.trim() 
-                      ? 'border-green-500/50 bg-green-500/5 focus:ring-green-500/50' 
-                      : 'border-red-500/30 bg-red-500/5 focus:ring-red-500/50'
-                  }`}
+                  placeholder={defaultBatchName}
+                  className="w-48 rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-purple-500/50 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
                   disabled={disabled}
                 />
               </div>
@@ -173,6 +276,14 @@ export function BatchContent({
               </div>
             </div>
           </div>
+
+          {/* File Naming Format - Optional */}
+          <FileNamingFormat
+            config={fileNamingConfig}
+            onChange={(config) => onFileNamingConfigChange?.(config)}
+            sampleFilename={images[0]?.file?.name || 'image.jpg'}
+            disabled={disabled}
+          />
 
           {/* ═══════════════════════════════════════════════════════════════
               SECTION 1: SELECTED PRESETS (with thumbnails)
@@ -340,37 +451,88 @@ export function BatchContent({
           </div>
 
           {/* ═══════════════════════════════════════════════════════════════
-              SECTION 3: PROGRESS BAR (when processing)
+              SECTION 3: PROGRESS BAR (when processing or paused)
           ═══════════════════════════════════════════════════════════════ */}
-          {isProcessing && currentProgress && currentProgress.total > 0 && (
-            <div className="rounded-xl border border-purple-500/30 bg-gradient-to-r from-purple-500/10 to-blue-500/10 p-5">
+          {(isProcessing || batchState === 'paused') && currentProgress && currentProgress.total > 0 && (
+            <div className={`rounded-xl border p-5 ${
+              batchState === 'paused' 
+                ? 'border-amber-500/30 bg-gradient-to-r from-amber-500/10 to-orange-500/10' 
+                : 'border-purple-500/30 bg-gradient-to-r from-purple-500/10 to-blue-500/10'
+            }`}>
               <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-500/20">
-                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-purple-400 border-t-transparent" />
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-full ${
+                    batchState === 'paused' ? 'bg-amber-500/20' : 'bg-purple-500/20'
+                  }`}>
+                    {batchState === 'paused' ? (
+                      <Pause className="h-5 w-5 text-amber-400" />
+                    ) : (
+                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-purple-400 border-t-transparent" />
+                    )}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-white">Processing Batch</h3>
+                    <h3 className="font-semibold text-white">
+                      {batchState === 'paused' ? 'Batch Duraklatıldı' : 'İşleniyor...'}
+                    </h3>
                     <p className="text-sm text-white/60">
-                      {currentProgress.currentImage 
-                        ? `${currentProgress.currentImage} → ${currentProgress.currentPreset}`
-                        : 'Preparing...'}
+                      {batchState === 'paused' 
+                        ? 'Devam etmek için Resume butonuna tıklayın'
+                        : currentProgress.currentImage 
+                          ? `${currentProgress.currentImage} → ${currentProgress.currentPreset}`
+                          : 'Preparing...'}
                     </p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-white">
-                    {currentProgress.current}<span className="text-white/40">/{currentProgress.total}</span>
-                  </div>
-                  <div className="text-sm text-white/60">
-                    {Math.round((currentProgress.current / currentProgress.total) * 100)}%
-                  </div>
+                
+                {/* Control Buttons */}
+                <div className="flex items-center gap-2">
+                  {batchState === 'paused' ? (
+                    <button
+                      onClick={() => openActionModal('resume')}
+                      className="flex items-center gap-2 rounded-lg bg-green-500/20 px-4 py-2 text-sm font-medium text-green-400 transition-colors hover:bg-green-500/30"
+                    >
+                      <Play className="h-4 w-4" />
+                      Devam Et
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => openActionModal('pause')}
+                      className="flex items-center gap-2 rounded-lg bg-amber-500/20 px-4 py-2 text-sm font-medium text-amber-400 transition-colors hover:bg-amber-500/30"
+                    >
+                      <Pause className="h-4 w-4" />
+                      Duraklat
+                    </button>
+                  )}
+                  <button
+                    onClick={() => openActionModal('cancel')}
+                    className="flex items-center gap-2 rounded-lg bg-red-500/20 px-3 py-2 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/30"
+                  >
+                    <Square className="h-4 w-4" />
+                    İptal
+                  </button>
+                </div>
+              </div>
+              
+              {/* Progress Stats */}
+              <div className="mb-3 flex items-center justify-between text-sm">
+                <div className="flex items-center gap-4">
+                  <span className="text-green-400">{currentProgress.current} tamamlandı</span>
+                  {currentProgress.total - currentProgress.current > 0 && (
+                    <span className="text-white/40">{currentProgress.total - currentProgress.current} bekliyor</span>
+                  )}
+                </div>
+                <div className="text-lg font-bold text-white">
+                  {Math.round((currentProgress.current / currentProgress.total) * 100)}%
                 </div>
               </div>
               
               <div className="relative h-3 overflow-hidden rounded-full bg-white/10">
                 <div 
-                  className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-500"
+                  className={`absolute inset-y-0 left-0 rounded-full transition-all duration-500 ${
+                    batchState === 'paused'
+                      ? 'bg-gradient-to-r from-amber-500 to-orange-500'
+                      : 'bg-gradient-to-r from-purple-500 to-blue-500'
+                  }`}
                   style={{ width: `${(currentProgress.current / currentProgress.total) * 100}%` }}
                 />
               </div>
@@ -399,21 +561,17 @@ export function BatchContent({
                 )}
                 
                 {/* Validation Warnings */}
-                {(!isBatchNameValid || !isAspectRatioValid) && (hasPresets || hasImages) && (
+                {!isAspectRatioValid && (hasPresets || hasImages) && (
                   <div className="mt-2 flex items-center gap-2 text-xs text-amber-400">
                     <AlertCircle className="h-3.5 w-3.5" />
-                    <span>
-                      {!isBatchNameValid && !isAspectRatioValid && 'Enter batch name and select aspect ratio'}
-                      {!isBatchNameValid && isAspectRatioValid && 'Enter batch name'}
-                      {isBatchNameValid && !isAspectRatioValid && 'Select aspect ratio'}
-                    </span>
+                    <span>Lütfen aspect ratio seçin (zorunlu)</span>
                   </div>
                 )}
               </div>
 
               {/* Start Button */}
               <button
-                onClick={onStartMatrixBatch}
+                onClick={() => openActionModal('start')}
                 disabled={!canStart}
                 className="rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/25 transition-all hover:from-purple-500 hover:to-blue-500 hover:shadow-purple-500/40 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
               >
@@ -423,9 +581,9 @@ export function BatchContent({
                     Processing...
                   </span>
                 ) : canStart ? (
-                  `Start Batch (${images.length * selectedPresets.length} credits)`
+                  `Batch Başlat (${images.length * selectedPresets.length} kredi)`
                 ) : (
-                  'Complete Setup Above'
+                  'Ayarları Tamamlayın'
                 )}
               </button>
             </div>

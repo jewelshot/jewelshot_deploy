@@ -61,7 +61,7 @@ export const GET = withAdminAuth(
   } catch (error: any) {
     console.error('Suspicious activities API error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch suspicious activities', details: error.message },
+      { error: 'Failed to fetch suspicious activities' },
       { status: 500 }
     );
   }
@@ -90,7 +90,7 @@ export const POST = withAdminAuth(
 
   } catch (error: any) {
     return NextResponse.json(
-      { error: 'Failed to update activity', details: error.message },
+      { error: 'Failed to update activity' },
       { status: 500 }
     );
   }

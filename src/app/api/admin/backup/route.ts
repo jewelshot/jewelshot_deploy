@@ -36,7 +36,7 @@ export const GET = withAdminAuth(
     } catch (error: any) {
       console.error('Backup API error:', error);
       return NextResponse.json(
-        { error: 'Failed to fetch backup history', details: error.message },
+        { error: 'Failed to fetch backup history' },
         { status: 500 }
       );
     }
@@ -67,7 +67,7 @@ export const POST = withAdminAuth(
     } catch (error: any) {
       console.error('Backup trigger error:', error);
       return NextResponse.json(
-        { error: 'Failed to trigger backup', details: error.message },
+        { error: 'Failed to trigger backup' },
         { status: 500 }
       );
     }

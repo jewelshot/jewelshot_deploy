@@ -184,7 +184,8 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     // ============================================
     
     const useQueue = isQueueAvailable() && !sync;
-    const jobId = `job-${user.id.slice(0, 8)}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    // 🔒 SECURITY: Use crypto for secure random ID
+    const jobId = `job-${user.id.slice(0, 8)}-${Date.now()}-${crypto.randomUUID().slice(0, 7)}`;
 
     console.log(`[API/submit] Processing mode: ${useQueue ? 'QUEUE' : 'SYNC'}, JobID: ${jobId}`);
 

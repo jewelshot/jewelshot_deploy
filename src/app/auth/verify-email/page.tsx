@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Mail, ArrowLeft, RefreshCw, CheckCircle2, Shield, Inbox, Sparkles } from 'lucide-react';
 import { PrimaryButton } from '@/components/atoms/PrimaryButton';
 import { AuroraBackground } from '@/components/atoms/AuroraBackground';
+import { validateRedirectUrl } from '@/lib/security/redirect-validator';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -14,7 +15,8 @@ export const dynamic = 'force-dynamic';
 function VerifyEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams?.get('redirectTo') || '/studio';
+  // 🔒 SECURITY: Validate redirect URL to prevent Open Redirect attacks
+  const redirectTo = validateRedirectUrl(searchParams?.get('redirectTo'));
   
   const [email, setEmail] = useState<string>('');
   const [resending, setResending] = useState(false);

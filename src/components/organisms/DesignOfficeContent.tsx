@@ -1,670 +1,1250 @@
 /**
- * DesignOfficeContent - Product Variation & Collection Generator
+ * DesignOfficeContent - Comprehensive Jewelry Design System
  * 
  * Features:
- * - Upload reference product
- * - Generate matching set pieces (ring, earring, necklace, bracelet)
- * - Create variations (with/without stones, different gems)
- * - Sketch to realistic product conversion
- * - Collection builder
+ * - Create from scratch with full parameter control
+ * - Upload reference and generate variations
+ * - Create matching sets (parure)
+ * - All jewelry parameters: stones, metals, styles, profiles
+ * - Shuffle and random generation
  */
 
 'use client';
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Upload,
   Sparkles,
-  Briefcase,
   Plus,
   X,
   ChevronRight,
   ChevronLeft,
-  Diamond,
-  Gem,
-  CircleDot,
-  Circle,
+  ChevronDown,
   Loader2,
   Download,
   RefreshCw,
   Trash2,
   Eye,
-  Check,
+  Shuffle,
+  Dice5,
+  Settings2,
   Palette,
-  Pencil,
-  Image as ImageIcon,
-  Copy,
-  Settings,
+  Gem,
+  Circle,
+  Square,
+  Heart,
+  Star,
   Wand2,
   Layers,
-  Grid3X3,
+  Check,
+  Copy,
+  Save,
 } from 'lucide-react';
 import { useSidebarStore } from '@/store/sidebarStore';
+import {
+  type DesignConfig,
+  type DesignMode,
+  type JewelryType,
+  type StoneConfig,
+  type MetalConfig,
+  type StyleConfig,
+  type RingConfig,
+  type ChainConfig,
+  type EarringConfig,
+  type DetailConfig,
+  type TargetConfig,
+  type GeneratedDesign,
+  type ParameterOption,
+} from '@/lib/design-office/types';
+import * as params from '@/lib/design-office/jewelry-parameters';
+import { buildPrompt, generateRandomConfig, shuffleParameter } from '@/lib/design-office/prompt-builder';
 
-// Types
-type JewelryType = 'ring' | 'earring' | 'necklace' | 'bracelet' | 'pendant' | 'brooch';
-type VariationType = 'set-piece' | 'stone-variant' | 'material-variant' | 'sketch-to-real';
-
-interface GeneratedVariation {
-  id: string;
-  type: VariationType;
-  jewelryType?: JewelryType;
-  label: string;
-  imageUrl: string;
-  prompt: string;
-  selected: boolean;
+// ============================================
+// PARAMETER SECTION COMPONENT
+// ============================================
+interface ParamSectionProps {
+  title: string;
+  titleTr: string;
+  isOpen: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+  badge?: string;
 }
 
-interface StoneOption {
-  id: string;
-  name: string;
-  color: string;
-  icon: React.ReactNode;
+function ParamSection({ title, titleTr, isOpen, onToggle, children, badge }: ParamSectionProps) {
+  return (
+    <div className="border-b border-white/10">
+      <button
+        onClick={onToggle}
+        className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-white/5"
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-white/80">{titleTr}</span>
+          {badge && (
+            <span className="rounded-full bg-purple-500/20 px-2 py-0.5 text-[10px] text-purple-300">
+              {badge}
+            </span>
+          )}
+        </div>
+        <ChevronDown className={`h-4 w-4 text-white/40 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="px-4 pb-4">{children}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
 }
 
-interface MaterialOption {
-  id: string;
-  name: string;
-  color: string;
+// ============================================
+// OPTION GRID COMPONENT
+// ============================================
+interface OptionGridProps {
+  options: ParameterOption[];
+  selected?: string;
+  onSelect: (value: string) => void;
+  columns?: 1 | 2 | 3 | 4;
+  showIcon?: boolean;
+  allowDeselect?: boolean;
 }
 
-// Stone options
-const STONE_OPTIONS: StoneOption[] = [
-  { id: 'none', name: 'No Stone', color: '#6B7280', icon: <CircleDot className="h-4 w-4" /> },
-  { id: 'diamond', name: 'Diamond', color: '#E5E7EB', icon: <Diamond className="h-4 w-4" /> },
-  { id: 'ruby', name: 'Ruby', color: '#DC2626', icon: <Gem className="h-4 w-4" /> },
-  { id: 'sapphire', name: 'Sapphire', color: '#2563EB', icon: <Gem className="h-4 w-4" /> },
-  { id: 'emerald', name: 'Emerald', color: '#059669', icon: <Gem className="h-4 w-4" /> },
-  { id: 'amethyst', name: 'Amethyst', color: '#7C3AED', icon: <Gem className="h-4 w-4" /> },
-  { id: 'topaz', name: 'Topaz', color: '#F59E0B', icon: <Gem className="h-4 w-4" /> },
-  { id: 'pearl', name: 'Pearl', color: '#FDF4E7', icon: <Circle className="h-4 w-4" /> },
-];
+function OptionGrid({ options, selected, onSelect, columns = 3, showIcon = false, allowDeselect = true }: OptionGridProps) {
+  return (
+    <div className={`grid gap-2 grid-cols-${columns}`} style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
+      {options.map((opt) => (
+        <button
+          key={opt.value}
+          onClick={() => {
+            if (allowDeselect && selected === opt.value) {
+              onSelect('');
+            } else {
+              onSelect(opt.value);
+            }
+          }}
+          className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-xs transition-all ${
+            selected === opt.value
+              ? 'border-purple-500/50 bg-purple-500/20 text-white'
+              : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20 hover:bg-white/10'
+          }`}
+        >
+          {showIcon && opt.icon && <span className="text-sm">{opt.icon}</span>}
+          <span className="truncate">{opt.labelTr || opt.label}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
 
-// Material options
-const MATERIAL_OPTIONS: MaterialOption[] = [
-  { id: 'yellow-gold', name: 'Yellow Gold', color: '#D4AF37' },
-  { id: 'white-gold', name: 'White Gold', color: '#E5E4E2' },
-  { id: 'rose-gold', name: 'Rose Gold', color: '#B76E79' },
-  { id: 'platinum', name: 'Platinum', color: '#E5E4E2' },
-  { id: 'silver', name: 'Silver', color: '#C0C0C0' },
-];
-
-// Jewelry type icons
-const JEWELRY_TYPES: { type: JewelryType; label: string; description: string }[] = [
-  { type: 'ring', label: 'Ring', description: 'Finger ring variations' },
-  { type: 'earring', label: 'Earrings', description: 'Matching earrings pair' },
-  { type: 'necklace', label: 'Necklace', description: 'Necklace or chain' },
-  { type: 'bracelet', label: 'Bracelet', description: 'Wrist bracelet' },
-  { type: 'pendant', label: 'Pendant', description: 'Hanging pendant' },
-  { type: 'brooch', label: 'Brooch', description: 'Decorative brooch' },
-];
-
-type ActiveMode = 'set-pieces' | 'variations' | 'sketch' | 'collection';
-
+// ============================================
+// MAIN COMPONENT
+// ============================================
 export default function DesignOfficeContent() {
-  // Layout state
   const { leftOpen } = useSidebarStore();
-  
-  // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // State
-  const [activeMode, setActiveMode] = useState<ActiveMode>('set-pieces');
-  const [isPanelOpen, setIsPanelOpen] = useState(true);
+  // ========== STATE ==========
+  // Mode & Base
+  const [mode, setMode] = useState<DesignMode>('create');
   const [sourceImage, setSourceImage] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const [sourceImageName, setSourceImageName] = useState<string>('');
+  
+  // Jewelry Type Modal (after upload)
+  const [showTypeModal, setShowTypeModal] = useState(false);
+  const [uploadedImageTemp, setUploadedImageTemp] = useState<string | null>(null);
+  
+  // Design Config
+  const [config, setConfig] = useState<Partial<DesignConfig>>({
+    mode: 'create',
+  });
+  
+  // UI State
+  const [openSections, setOpenSections] = useState<Set<string>>(new Set(['type', 'stone', 'metal']));
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedVariations, setGeneratedVariations] = useState<GeneratedVariation[]>([]);
+  const [generatedDesigns, setGeneratedDesigns] = useState<GeneratedDesign[]>([]);
+  const [selectedDesign, setSelectedDesign] = useState<GeneratedDesign | null>(null);
+  const [variationCount, setVariationCount] = useState(4);
   
-  // Set Pieces mode state
-  const [selectedJewelryTypes, setSelectedJewelryTypes] = useState<JewelryType[]>([]);
+  // ========== HANDLERS ==========
+  const toggleSection = (section: string) => {
+    setOpenSections(prev => {
+      const next = new Set(prev);
+      if (next.has(section)) {
+        next.delete(section);
+      } else {
+        next.add(section);
+      }
+      return next;
+    });
+  };
   
-  // Variations mode state
-  const [selectedStones, setSelectedStones] = useState<string[]>([]);
-  const [selectedMaterials, setSelectedMaterials] = useState<string[]>([]);
+  const updateConfig = useCallback(<K extends keyof DesignConfig>(key: K, value: DesignConfig[K]) => {
+    setConfig(prev => ({ ...prev, [key]: value }));
+  }, []);
   
-  // Sketch mode state
-  const [sketchStyle, setSketchStyle] = useState<'realistic' | 'studio' | 'lifestyle'>('realistic');
-
-  // Mode config
-  const modes = [
-    { id: 'set-pieces' as const, label: 'Set Pieces', icon: Layers, description: 'Generate matching jewelry set' },
-    { id: 'variations' as const, label: 'Variations', icon: Grid3X3, description: 'Stone & material variants' },
-    { id: 'sketch' as const, label: 'Sketch to Real', icon: Pencil, description: 'Convert sketches to photos' },
-    { id: 'collection' as const, label: 'Collection', icon: Briefcase, description: 'Build full collection' },
-  ];
-
+  const updateStoneConfig = useCallback(<K extends keyof StoneConfig>(key: K, value: StoneConfig[K]) => {
+    setConfig(prev => ({
+      ...prev,
+      stone: { ...prev.stone, [key]: value } as StoneConfig,
+    }));
+  }, []);
+  
+  const updateMetalConfig = useCallback(<K extends keyof MetalConfig>(key: K, value: MetalConfig[K]) => {
+    setConfig(prev => ({
+      ...prev,
+      metal: { ...prev.metal, [key]: value } as MetalConfig,
+    }));
+  }, []);
+  
+  const updateStyleConfig = useCallback(<K extends keyof StyleConfig>(key: K, value: StyleConfig[K]) => {
+    setConfig(prev => ({
+      ...prev,
+      style: { ...prev.style, [key]: value } as StyleConfig,
+    }));
+  }, []);
+  
+  const updateRingConfig = useCallback(<K extends keyof RingConfig>(key: K, value: RingConfig[K]) => {
+    setConfig(prev => ({
+      ...prev,
+      ring: { ...prev.ring, [key]: value } as RingConfig,
+    }));
+  }, []);
+  
+  const updateChainConfig = useCallback(<K extends keyof ChainConfig>(key: K, value: ChainConfig[K]) => {
+    setConfig(prev => ({
+      ...prev,
+      chain: { ...prev.chain, [key]: value } as ChainConfig,
+    }));
+  }, []);
+  
+  const updateEarringConfig = useCallback(<K extends keyof EarringConfig>(key: K, value: EarringConfig[K]) => {
+    setConfig(prev => ({
+      ...prev,
+      earring: { ...prev.earring, [key]: value } as EarringConfig,
+    }));
+  }, []);
+  
+  const updateDetailConfig = useCallback(<K extends keyof DetailConfig>(key: K, value: DetailConfig[K]) => {
+    setConfig(prev => ({
+      ...prev,
+      detail: { ...prev.detail, [key]: value } as DetailConfig,
+    }));
+  }, []);
+  
+  const updateTargetConfig = useCallback(<K extends keyof TargetConfig>(key: K, value: TargetConfig[K]) => {
+    setConfig(prev => ({
+      ...prev,
+      target: { ...prev.target, [key]: value } as TargetConfig,
+    }));
+  }, []);
+  
   // Handle image upload
   const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    setIsUploading(true);
+    
     const reader = new FileReader();
     reader.onload = (event) => {
-      setSourceImage(event.target?.result as string);
-      setIsUploading(false);
-      setGeneratedVariations([]);
+      const imageUrl = event.target?.result as string;
+      setUploadedImageTemp(imageUrl);
+      setSourceImageName(file.name);
+      setShowTypeModal(true);
     };
     reader.readAsDataURL(file);
     e.target.value = '';
   }, []);
-
-  // Toggle jewelry type selection
-  const toggleJewelryType = useCallback((type: JewelryType) => {
-    setSelectedJewelryTypes(prev => 
-      prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
-    );
-  }, []);
-
-  // Toggle stone selection
-  const toggleStone = useCallback((stoneId: string) => {
-    setSelectedStones(prev =>
-      prev.includes(stoneId) ? prev.filter(s => s !== stoneId) : [...prev, stoneId]
-    );
-  }, []);
-
-  // Toggle material selection
-  const toggleMaterial = useCallback((materialId: string) => {
-    setSelectedMaterials(prev =>
-      prev.includes(materialId) ? prev.filter(m => m !== materialId) : [...prev, materialId]
-    );
-  }, []);
-
-  // Generate variations
+  
+  // Confirm jewelry type after upload
+  const handleConfirmType = useCallback((jewelryType: JewelryType, hasStones: boolean, stoneType?: string) => {
+    setSourceImage(uploadedImageTemp);
+    setConfig(prev => ({
+      ...prev,
+      mode: 'variation',
+      jewelryType,
+      stone: {
+        hasStones,
+        stoneType: stoneType as any,
+      },
+    }));
+    setMode('variation');
+    setShowTypeModal(false);
+    setUploadedImageTemp(null);
+  }, [uploadedImageTemp]);
+  
+  // Shuffle all parameters
+  const handleShuffle = useCallback(() => {
+    const randomConfig = generateRandomConfig(config.jewelryType);
+    setConfig(prev => ({
+      ...prev,
+      ...randomConfig,
+      mode: prev.mode,
+      jewelryType: prev.jewelryType || randomConfig.jewelryType,
+    }));
+  }, [config.jewelryType]);
+  
+  // Generate designs
   const handleGenerate = useCallback(async () => {
-    if (!sourceImage) return;
-    
     setIsGenerating(true);
     
-    // Simulate generation - replace with actual API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    const mockVariations: GeneratedVariation[] = [];
-    
-    if (activeMode === 'set-pieces') {
-      selectedJewelryTypes.forEach((type, index) => {
-        mockVariations.push({
-          id: `set-${type}-${index}`,
-          type: 'set-piece',
-          jewelryType: type,
-          label: JEWELRY_TYPES.find(j => j.type === type)?.label || type,
-          imageUrl: sourceImage, // In real app, this would be generated image
-          prompt: `Matching ${type} in the same style`,
-          selected: false,
-        });
-      });
-    } else if (activeMode === 'variations') {
-      selectedStones.forEach((stoneId, index) => {
-        const stone = STONE_OPTIONS.find(s => s.id === stoneId);
-        mockVariations.push({
-          id: `stone-${stoneId}-${index}`,
-          type: 'stone-variant',
-          label: stone?.name || stoneId,
-          imageUrl: sourceImage,
-          prompt: `Same design with ${stone?.name}`,
-          selected: false,
-        });
-      });
-      selectedMaterials.forEach((materialId, index) => {
-        const material = MATERIAL_OPTIONS.find(m => m.id === materialId);
-        mockVariations.push({
-          id: `material-${materialId}-${index}`,
-          type: 'material-variant',
-          label: material?.name || materialId,
-          imageUrl: sourceImage,
-          prompt: `Same design in ${material?.name}`,
-          selected: false,
-        });
-      });
-    } else if (activeMode === 'sketch') {
-      mockVariations.push({
-        id: 'sketch-real-1',
-        type: 'sketch-to-real',
-        label: `${sketchStyle.charAt(0).toUpperCase() + sketchStyle.slice(1)} Photo`,
-        imageUrl: sourceImage,
-        prompt: `Realistic ${sketchStyle} jewelry photo from sketch`,
-        selected: false,
-      });
+    try {
+      const prompt = buildPrompt(config);
+      console.log('Generated Prompt:', prompt);
+      
+      // Simulate API call - replace with actual AI generation
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Mock generated designs
+      const mockDesigns: GeneratedDesign[] = Array.from({ length: variationCount }, (_, i) => ({
+        id: `design-${Date.now()}-${i}`,
+        imageUrl: `https://picsum.photos/seed/${Date.now() + i}/400/400`,
+        prompt,
+        config: config as DesignConfig,
+        createdAt: new Date(),
+      }));
+      
+      setGeneratedDesigns(prev => [...mockDesigns, ...prev]);
+    } catch (error) {
+      console.error('Generation failed:', error);
+    } finally {
+      setIsGenerating(false);
     }
-    
-    setGeneratedVariations(mockVariations);
-    setIsGenerating(false);
-  }, [sourceImage, activeMode, selectedJewelryTypes, selectedStones, selectedMaterials, sketchStyle]);
-
-  // Toggle variation selection
-  const toggleVariationSelection = useCallback((id: string) => {
-    setGeneratedVariations(prev =>
-      prev.map(v => v.id === id ? { ...v, selected: !v.selected } : v)
-    );
-  }, []);
-
-  // Clear source
-  const clearSource = useCallback(() => {
+  }, [config, variationCount]);
+  
+  // Clear source image
+  const handleClearSource = useCallback(() => {
     setSourceImage(null);
-    setGeneratedVariations([]);
-    setSelectedJewelryTypes([]);
-    setSelectedStones([]);
-    setSelectedMaterials([]);
+    setSourceImageName('');
+    setMode('create');
+    setConfig(prev => ({ ...prev, mode: 'create' }));
   }, []);
-
-  // Get selected count
-  const selectedCount = generatedVariations.filter(v => v.selected).length;
-
+  
+  // Get current prompt preview
+  const promptPreview = useMemo(() => {
+    return buildPrompt(config);
+  }, [config]);
+  
+  // Get subtype options based on jewelry type
+  const subtypeOptions = useMemo(() => {
+    if (!config.jewelryType) return [];
+    return params.getSubtypeOptions(config.jewelryType);
+  }, [config.jewelryType]);
+  
+  // Get specific motif options based on theme
+  const specificMotifOptions = useMemo(() => {
+    if (!config.style?.thematicMotif) return [];
+    return params.getSpecificMotifs(config.style.thematicMotif);
+  }, [config.style?.thematicMotif]);
+  
   return (
     <div 
-      className="fixed inset-0 flex flex-col"
+      className="fixed inset-0 flex"
       style={{
         left: leftOpen ? '256px' : '0',
         transition: 'left 500ms ease-in-out',
       }}
     >
-      {/* Top Bar */}
-      <div className="flex h-12 items-center justify-between border-b border-white/10 bg-black/40 px-4 backdrop-blur-sm">
-        <div className="flex items-center gap-3">
-          <Briefcase className="h-5 w-5 text-white/60" />
-          <h1 className="text-sm font-medium text-white/80">Design Office</h1>
-        </div>
-
-        {/* Mode Tabs */}
-        <div className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 p-1">
-          {modes.map(({ id, label, icon: Icon }) => (
+      {/* ========== LEFT PANEL - PARAMETERS ========== */}
+      <div className="flex w-80 flex-col border-r border-white/10 bg-black/40 backdrop-blur-sm">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+          <div className="flex items-center gap-2">
+            <Wand2 className="h-5 w-5 text-purple-400" />
+            <h1 className="text-sm font-medium text-white/90">Design Office</h1>
+          </div>
+          <div className="flex items-center gap-1">
             <button
-              key={id}
-              onClick={() => setActiveMode(id)}
-              className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-xs transition-all ${
-                activeMode === id
-                  ? 'bg-white/15 text-white'
-                  : 'text-white/50 hover:text-white/70'
+              onClick={handleShuffle}
+              className="rounded-lg p-2 text-white/40 hover:bg-white/10 hover:text-white"
+              title="Rastgele Parametreler"
+            >
+              <Shuffle className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => setConfig({ mode: 'create' })}
+              className="rounded-lg p-2 text-white/40 hover:bg-white/10 hover:text-white"
+              title="Temizle"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+        
+        {/* Mode Selector */}
+        <div className="border-b border-white/10 p-4">
+          <div className="mb-3 text-xs text-white/50">Mod</div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setMode('create')}
+              className={`flex-1 rounded-lg border px-3 py-2 text-xs font-medium transition-all ${
+                mode === 'create'
+                  ? 'border-purple-500/50 bg-purple-500/20 text-white'
+                  : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20'
               }`}
             >
-              <Icon className="h-3.5 w-3.5" />
-              {label}
+              Sıfırdan Oluştur
             </button>
-          ))}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className={`flex-1 rounded-lg border px-3 py-2 text-xs font-medium transition-all ${
+                mode === 'variation' || mode === 'set'
+                  ? 'border-purple-500/50 bg-purple-500/20 text-white'
+                  : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20'
+              }`}
+            >
+              Görsel Yükle
+            </button>
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="hidden"
+          />
         </div>
-
-        {/* Actions */}
-        <div className="flex items-center gap-2">
-          {selectedCount > 0 && (
-            <span className="rounded-full bg-purple-500/20 px-2 py-1 text-xs text-purple-300">
-              {selectedCount} selected
-            </span>
-          )}
-          <button 
-            className="flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/60 hover:bg-white/10"
-            disabled={selectedCount === 0}
+        
+        {/* Source Image Preview */}
+        {sourceImage && (
+          <div className="border-b border-white/10 p-4">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-xs text-white/50">Kaynak Görsel</span>
+              <button
+                onClick={handleClearSource}
+                className="rounded p-1 text-white/40 hover:bg-white/10 hover:text-red-400"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+            <div className="relative aspect-square overflow-hidden rounded-lg border border-white/10">
+              <img src={sourceImage} alt="Source" className="h-full w-full object-cover" />
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
+                <p className="truncate text-[10px] text-white/60">{sourceImageName}</p>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Parameter Sections - Scrollable */}
+        <div className="flex-1 overflow-y-auto">
+          {/* Jewelry Type */}
+          <ParamSection
+            title="Jewelry Type"
+            titleTr="Takı Türü"
+            isOpen={openSections.has('type')}
+            onToggle={() => toggleSection('type')}
+            badge={config.jewelryType ? params.JEWELRY_TYPES.find(t => t.value === config.jewelryType)?.labelTr : undefined}
           >
-            <Download className="h-3 w-3" />
-            Export
+            <OptionGrid
+              options={params.JEWELRY_TYPES}
+              selected={config.jewelryType}
+              onSelect={(v) => updateConfig('jewelryType', v as JewelryType)}
+              columns={3}
+              showIcon
+            />
+            
+            {/* Subtype */}
+            {subtypeOptions.length > 0 && (
+              <div className="mt-3">
+                <div className="mb-2 text-[10px] text-white/40">Alt Tür</div>
+                <OptionGrid
+                  options={subtypeOptions}
+                  selected={config.subType}
+                  onSelect={(v) => updateConfig('subType', v)}
+                  columns={2}
+                />
+              </div>
+            )}
+          </ParamSection>
+          
+          {/* Stone Parameters */}
+          <ParamSection
+            title="Stones"
+            titleTr="Taş Ayarları"
+            isOpen={openSections.has('stone')}
+            onToggle={() => toggleSection('stone')}
+            badge={config.stone?.hasStones ? (config.stone.stoneType ? params.STONE_TYPES.find(s => s.value === config.stone?.stoneType)?.labelTr : 'Taşlı') : 'Taşsız'}
+          >
+            {/* Has Stones Toggle */}
+            <div className="mb-4 flex gap-2">
+              <button
+                onClick={() => updateStoneConfig('hasStones', true)}
+                className={`flex-1 rounded-lg border px-3 py-2 text-xs font-medium ${
+                  config.stone?.hasStones
+                    ? 'border-green-500/50 bg-green-500/20 text-green-300'
+                    : 'border-white/10 bg-white/5 text-white/60'
+                }`}
+              >
+                Taşlı
+              </button>
+              <button
+                onClick={() => updateStoneConfig('hasStones', false)}
+                className={`flex-1 rounded-lg border px-3 py-2 text-xs font-medium ${
+                  config.stone?.hasStones === false
+                    ? 'border-amber-500/50 bg-amber-500/20 text-amber-300'
+                    : 'border-white/10 bg-white/5 text-white/60'
+                }`}
+              >
+                Taşsız
+              </button>
+            </div>
+            
+            {config.stone?.hasStones !== false && (
+              <>
+                {/* Stone Type */}
+                <div className="mb-3">
+                  <div className="mb-2 text-[10px] text-white/40">Taş Türü</div>
+                  <OptionGrid
+                    options={params.STONE_TYPES}
+                    selected={config.stone?.stoneType}
+                    onSelect={(v) => updateStoneConfig('stoneType', v as any)}
+                    columns={3}
+                    showIcon
+                  />
+                </div>
+                
+                {/* Diamond Cut */}
+                {(config.stone?.stoneType === 'diamond' || config.stone?.stoneType === 'zircon') && (
+                  <div className="mb-3">
+                    <div className="mb-2 text-[10px] text-white/40">Kesim</div>
+                    <OptionGrid
+                      options={params.DIAMOND_CUTS}
+                      selected={config.stone?.cut}
+                      onSelect={(v) => updateStoneConfig('cut', v as any)}
+                      columns={3}
+                    />
+                  </div>
+                )}
+                
+                {/* Setting Type */}
+                <div className="mb-3">
+                  <div className="mb-2 text-[10px] text-white/40">Mıhlama Tipi</div>
+                  <OptionGrid
+                    options={params.SETTING_TYPES}
+                    selected={config.stone?.setting}
+                    onSelect={(v) => updateStoneConfig('setting', v as any)}
+                    columns={2}
+                  />
+                </div>
+                
+                {/* Arrangement */}
+                <div className="mb-3">
+                  <div className="mb-2 text-[10px] text-white/40">Taş Düzeni</div>
+                  <OptionGrid
+                    options={params.STONE_ARRANGEMENTS}
+                    selected={config.stone?.arrangement}
+                    onSelect={(v) => updateStoneConfig('arrangement', v as any)}
+                    columns={2}
+                  />
+                </div>
+                
+                {/* Stone Count & Size */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <div className="mb-2 text-[10px] text-white/40">Taş Sayısı</div>
+                    <OptionGrid
+                      options={params.STONE_COUNTS}
+                      selected={config.stone?.stoneCount as string}
+                      onSelect={(v) => updateStoneConfig('stoneCount', v as any)}
+                      columns={1}
+                    />
+                  </div>
+                  <div>
+                    <div className="mb-2 text-[10px] text-white/40">Taş Boyutu</div>
+                    <OptionGrid
+                      options={params.STONE_SIZES}
+                      selected={config.stone?.stoneSize}
+                      onSelect={(v) => updateStoneConfig('stoneSize', v as any)}
+                      columns={1}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+          </ParamSection>
+          
+          {/* Metal Parameters */}
+          <ParamSection
+            title="Metal"
+            titleTr="Metal Ayarları"
+            isOpen={openSections.has('metal')}
+            onToggle={() => toggleSection('metal')}
+            badge={config.metal?.primaryMetal ? params.METAL_TYPES.find(m => m.value === config.metal?.primaryMetal)?.labelTr : undefined}
+          >
+            {/* Primary Metal */}
+            <div className="mb-3">
+              <div className="mb-2 text-[10px] text-white/40">Ana Metal</div>
+              <OptionGrid
+                options={params.METAL_TYPES}
+                selected={config.metal?.primaryMetal}
+                onSelect={(v) => updateMetalConfig('primaryMetal', v as any)}
+                columns={2}
+                showIcon
+              />
+            </div>
+            
+            {/* Purity */}
+            <div className="mb-3">
+              <div className="mb-2 text-[10px] text-white/40">Ayar</div>
+              <OptionGrid
+                options={params.METAL_PURITIES}
+                selected={config.metal?.primaryPurity}
+                onSelect={(v) => updateMetalConfig('primaryPurity', v as any)}
+                columns={3}
+              />
+            </div>
+            
+            {/* Finish */}
+            <div className="mb-3">
+              <div className="mb-2 text-[10px] text-white/40">Yüzey İşlemi</div>
+              <OptionGrid
+                options={params.METAL_FINISHES}
+                selected={config.metal?.primaryFinish}
+                onSelect={(v) => updateMetalConfig('primaryFinish', v as any)}
+                columns={2}
+              />
+            </div>
+            
+            {/* Two-Tone Toggle */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => updateMetalConfig('twoTone', !config.metal?.twoTone)}
+                className={`flex-1 rounded-lg border px-3 py-2 text-xs ${
+                  config.metal?.twoTone
+                    ? 'border-purple-500/50 bg-purple-500/20 text-white'
+                    : 'border-white/10 bg-white/5 text-white/60'
+                }`}
+              >
+                İki Renk
+              </button>
+              <button
+                onClick={() => updateMetalConfig('triColor', !config.metal?.triColor)}
+                className={`flex-1 rounded-lg border px-3 py-2 text-xs ${
+                  config.metal?.triColor
+                    ? 'border-purple-500/50 bg-purple-500/20 text-white'
+                    : 'border-white/10 bg-white/5 text-white/60'
+                }`}
+              >
+                Üç Renk
+              </button>
+            </div>
+          </ParamSection>
+          
+          {/* Ring Specific */}
+          {config.jewelryType === 'ring' && (
+            <ParamSection
+              title="Ring Details"
+              titleTr="Yüzük Detayları"
+              isOpen={openSections.has('ring')}
+              onToggle={() => toggleSection('ring')}
+            >
+              {/* Profile */}
+              <div className="mb-3">
+                <div className="mb-2 text-[10px] text-white/40">Kol Profili</div>
+                <OptionGrid
+                  options={params.RING_PROFILES}
+                  selected={config.ring?.profile}
+                  onSelect={(v) => updateRingConfig('profile', v as any)}
+                  columns={2}
+                />
+              </div>
+              
+              {/* Width */}
+              <div className="mb-3">
+                <div className="mb-2 text-[10px] text-white/40">Kol Genişliği</div>
+                <OptionGrid
+                  options={params.RING_WIDTHS}
+                  selected={config.ring?.width}
+                  onSelect={(v) => updateRingConfig('width', v as any)}
+                  columns={2}
+                />
+              </div>
+              
+              {/* Shank Stones */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => updateRingConfig('shankStones', !config.ring?.shankStones)}
+                  className={`flex-1 rounded-lg border px-3 py-2 text-xs ${
+                    config.ring?.shankStones
+                      ? 'border-purple-500/50 bg-purple-500/20 text-white'
+                      : 'border-white/10 bg-white/5 text-white/60'
+                  }`}
+                >
+                  Kol Taşlı
+                </button>
+                <button
+                  onClick={() => updateRingConfig('comfortFit', !config.ring?.comfortFit)}
+                  className={`flex-1 rounded-lg border px-3 py-2 text-xs ${
+                    config.ring?.comfortFit
+                      ? 'border-purple-500/50 bg-purple-500/20 text-white'
+                      : 'border-white/10 bg-white/5 text-white/60'
+                  }`}
+                >
+                  Konfor İçi
+                </button>
+              </div>
+            </ParamSection>
+          )}
+          
+          {/* Chain/Necklace Specific */}
+          {(config.jewelryType === 'necklace' || config.jewelryType === 'bracelet') && (
+            <ParamSection
+              title="Chain Details"
+              titleTr="Zincir Detayları"
+              isOpen={openSections.has('chain')}
+              onToggle={() => toggleSection('chain')}
+            >
+              <div className="mb-3">
+                <div className="mb-2 text-[10px] text-white/40">Zincir Tipi</div>
+                <OptionGrid
+                  options={params.CHAIN_TYPES}
+                  selected={config.chain?.chainType}
+                  onSelect={(v) => updateChainConfig('chainType', v as any)}
+                  columns={2}
+                />
+              </div>
+              
+              {config.jewelryType === 'necklace' && (
+                <div className="mb-3">
+                  <div className="mb-2 text-[10px] text-white/40">Uzunluk</div>
+                  <OptionGrid
+                    options={params.NECKLACE_LENGTHS}
+                    selected={config.chain?.length}
+                    onSelect={(v) => updateChainConfig('length', v as any)}
+                    columns={2}
+                  />
+                </div>
+              )}
+              
+              <div className="mb-3">
+                <div className="mb-2 text-[10px] text-white/40">Kilit Tipi</div>
+                <OptionGrid
+                  options={params.CLASP_TYPES}
+                  selected={config.chain?.clasp}
+                  onSelect={(v) => updateChainConfig('clasp', v as any)}
+                  columns={2}
+                />
+              </div>
+            </ParamSection>
+          )}
+          
+          {/* Earring Specific */}
+          {config.jewelryType === 'earring' && (
+            <ParamSection
+              title="Earring Details"
+              titleTr="Küpe Detayları"
+              isOpen={openSections.has('earring')}
+              onToggle={() => toggleSection('earring')}
+            >
+              <div className="mb-3">
+                <div className="mb-2 text-[10px] text-white/40">Arka Tip</div>
+                <OptionGrid
+                  options={params.EARRING_BACKS}
+                  selected={config.earring?.backType}
+                  onSelect={(v) => updateEarringConfig('backType', v as any)}
+                  columns={2}
+                />
+              </div>
+            </ParamSection>
+          )}
+          
+          {/* Style */}
+          <ParamSection
+            title="Style"
+            titleTr="Tasarım Stili"
+            isOpen={openSections.has('style')}
+            onToggle={() => toggleSection('style')}
+          >
+            {/* Design Style */}
+            <div className="mb-3">
+              <div className="mb-2 text-[10px] text-white/40">Stil</div>
+              <OptionGrid
+                options={params.DESIGN_STYLES}
+                selected={config.style?.designStyle}
+                onSelect={(v) => updateStyleConfig('designStyle', v as any)}
+                columns={2}
+              />
+            </div>
+            
+            {/* Cultural Style */}
+            <div className="mb-3">
+              <div className="mb-2 text-[10px] text-white/40">Kültürel Stil</div>
+              <OptionGrid
+                options={params.CULTURAL_STYLES}
+                selected={config.style?.culturalStyle}
+                onSelect={(v) => updateStyleConfig('culturalStyle', v as any)}
+                columns={2}
+              />
+            </div>
+            
+            {/* Motif */}
+            <div className="mb-3">
+              <div className="mb-2 text-[10px] text-white/40">Motif Teması</div>
+              <OptionGrid
+                options={params.THEMATIC_MOTIFS}
+                selected={config.style?.thematicMotif}
+                onSelect={(v) => updateStyleConfig('thematicMotif', v as any)}
+                columns={2}
+                showIcon
+              />
+            </div>
+            
+            {/* Specific Motif */}
+            {specificMotifOptions.length > 0 && (
+              <div className="mb-3">
+                <div className="mb-2 text-[10px] text-white/40">Spesifik Motif</div>
+                <OptionGrid
+                  options={specificMotifOptions}
+                  selected={config.style?.specificMotif}
+                  onSelect={(v) => updateStyleConfig('specificMotif', v as any)}
+                  columns={2}
+                />
+              </div>
+            )}
+            
+            {/* Realism */}
+            <div className="mb-3">
+              <div className="mb-2 text-[10px] text-white/40">Gerçekçilik</div>
+              <OptionGrid
+                options={params.MOTIF_REALISM}
+                selected={config.style?.motifRealism}
+                onSelect={(v) => updateStyleConfig('motifRealism', v as any)}
+                columns={2}
+              />
+            </div>
+          </ParamSection>
+          
+          {/* Details */}
+          <ParamSection
+            title="Details"
+            titleTr="Detaylar"
+            isOpen={openSections.has('detail')}
+            onToggle={() => toggleSection('detail')}
+          >
+            {/* Edge Detail */}
+            <div className="mb-3">
+              <div className="mb-2 text-[10px] text-white/40">Kenar Detayı</div>
+              <OptionGrid
+                options={params.EDGE_DETAILS}
+                selected={config.detail?.edgeDetail}
+                onSelect={(v) => updateDetailConfig('edgeDetail', v as any)}
+                columns={2}
+              />
+            </div>
+            
+            {/* Toggles */}
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => updateDetailConfig('filigree', !config.detail?.filigree)}
+                className={`rounded-lg border px-3 py-2 text-xs ${
+                  config.detail?.filigree
+                    ? 'border-purple-500/50 bg-purple-500/20 text-white'
+                    : 'border-white/10 bg-white/5 text-white/60'
+                }`}
+              >
+                Telkari
+              </button>
+              <button
+                onClick={() => updateDetailConfig('openwork', !config.detail?.openwork)}
+                className={`rounded-lg border px-3 py-2 text-xs ${
+                  config.detail?.openwork
+                    ? 'border-purple-500/50 bg-purple-500/20 text-white'
+                    : 'border-white/10 bg-white/5 text-white/60'
+                }`}
+              >
+                Ajur
+              </button>
+              <button
+                onClick={() => updateDetailConfig('engraving', !config.detail?.engraving)}
+                className={`rounded-lg border px-3 py-2 text-xs ${
+                  config.detail?.engraving
+                    ? 'border-purple-500/50 bg-purple-500/20 text-white'
+                    : 'border-white/10 bg-white/5 text-white/60'
+                }`}
+              >
+                Kazıma
+              </button>
+            </div>
+          </ParamSection>
+          
+          {/* Target */}
+          <ParamSection
+            title="Target"
+            titleTr="Hedef Kitle"
+            isOpen={openSections.has('target')}
+            onToggle={() => toggleSection('target')}
+          >
+            <div className="mb-3">
+              <div className="mb-2 text-[10px] text-white/40">Kullanım</div>
+              <OptionGrid
+                options={params.OCCASIONS}
+                selected={config.target?.occasion}
+                onSelect={(v) => updateTargetConfig('occasion', v as any)}
+                columns={2}
+              />
+            </div>
+            
+            <div className="mb-3">
+              <div className="mb-2 text-[10px] text-white/40">Cinsiyet</div>
+              <OptionGrid
+                options={params.GENDERS}
+                selected={config.target?.gender}
+                onSelect={(v) => updateTargetConfig('gender', v as any)}
+                columns={3}
+              />
+            </div>
+            
+            <div className="mb-3">
+              <div className="mb-2 text-[10px] text-white/40">Fiyat Segmenti</div>
+              <OptionGrid
+                options={params.PRICE_POINTS}
+                selected={config.target?.pricePoint}
+                onSelect={(v) => updateTargetConfig('pricePoint', v as any)}
+                columns={2}
+              />
+            </div>
+          </ParamSection>
+          
+          {/* Variation/Set Types (when in variation mode) */}
+          {mode === 'variation' && (
+            <ParamSection
+              title="Variation"
+              titleTr="Varyasyon Tipi"
+              isOpen={openSections.has('variation')}
+              onToggle={() => toggleSection('variation')}
+            >
+              <OptionGrid
+                options={params.VARIATION_TYPES}
+                selected={config.variationType}
+                onSelect={(v) => updateConfig('variationType', v as any)}
+                columns={1}
+              />
+            </ParamSection>
+          )}
+          
+          {/* Set Types */}
+          {mode === 'set' && (
+            <ParamSection
+              title="Set Type"
+              titleTr="Set Türü"
+              isOpen={openSections.has('set')}
+              onToggle={() => toggleSection('set')}
+            >
+              <OptionGrid
+                options={params.SET_TYPES}
+                selected={config.setType}
+                onSelect={(v) => updateConfig('setType', v as any)}
+                columns={1}
+              />
+            </ParamSection>
+          )}
+        </div>
+        
+        {/* Generate Button */}
+        <div className="border-t border-white/10 p-4">
+          {/* Variation Count */}
+          <div className="mb-3 flex items-center justify-between">
+            <span className="text-xs text-white/50">Varyasyon Sayısı</span>
+            <div className="flex items-center gap-2">
+              {[1, 2, 4, 8].map(n => (
+                <button
+                  key={n}
+                  onClick={() => setVariationCount(n)}
+                  className={`h-7 w-7 rounded text-xs font-medium ${
+                    variationCount === n
+                      ? 'bg-purple-500 text-white'
+                      : 'bg-white/10 text-white/60 hover:bg-white/20'
+                  }`}
+                >
+                  {n}
+                </button>
+              ))}
+            </div>
+          </div>
+          
+          <button
+            onClick={handleGenerate}
+            disabled={isGenerating || !config.jewelryType}
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 py-3 text-sm font-medium text-white shadow-lg shadow-purple-500/25 transition-all hover:from-purple-500 hover:to-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Üretiliyor...
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-4 w-4" />
+                Tasarım Üret ({variationCount})
+              </>
+            )}
           </button>
         </div>
       </div>
-
-      {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Main Canvas Area - Source + Generated Results */}
-        <div className="flex flex-1 overflow-hidden">
-          {/* Source Image Section */}
-          <div className="flex w-64 flex-shrink-0 flex-col border-r border-white/10 p-4">
-            <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
-              Reference Product
-            </h3>
-            {sourceImage ? (
-              <div className="group relative overflow-hidden rounded-xl border border-white/10">
-                <img 
-                  src={sourceImage} 
-                  alt="Source" 
-                  className="aspect-square w-full object-cover"
-                />
-                <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/60 opacity-0 transition-opacity group-hover:opacity-100">
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    className="rounded-lg bg-white/10 p-2 text-white/70 hover:bg-white/20"
-                  >
-                    <RefreshCw className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={clearSource}
-                    className="rounded-lg bg-white/10 p-2 text-white/70 hover:bg-white/20 hover:text-red-400"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isUploading}
-                className="flex aspect-square w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-white/20 bg-white/5 transition-colors hover:border-white/30 hover:bg-white/10"
-              >
-                {isUploading ? (
-                  <Loader2 className="h-8 w-8 animate-spin text-white/40" />
-                ) : (
-                  <>
-                    <Upload className="h-8 w-8 text-white/30" />
-                    <span className="mt-2 text-sm text-white/40">Upload Image</span>
-                    <span className="mt-1 text-xs text-white/30">or sketch</span>
-                  </>
-                )}
-              </button>
-            )}
-
-            {/* Generate Button */}
-            {sourceImage && (
-              <button
-                onClick={handleGenerate}
-                disabled={isGenerating || (
-                  activeMode === 'set-pieces' && selectedJewelryTypes.length === 0
-                ) || (
-                  activeMode === 'variations' && selectedStones.length === 0 && selectedMaterials.length === 0
-                )}
-                className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 py-2.5 text-sm font-medium text-white hover:from-purple-600 hover:to-pink-600 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="h-4 w-4" />
-                    Generate
-                  </>
-                )}
-              </button>
-            )}
-          </div>
-
-          {/* Generated Results Grid */}
-          <div className="flex-1 overflow-y-auto p-6">
-            {generatedVariations.length > 0 ? (
-              <>
-                <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-sm font-medium text-white/80">
-                    Generated {activeMode === 'set-pieces' ? 'Set Pieces' : 
-                              activeMode === 'variations' ? 'Variations' :
-                              activeMode === 'sketch' ? 'Photos' : 'Collection'} 
-                    <span className="ml-2 text-white/40">({generatedVariations.length})</span>
-                  </h2>
-                  <button
-                    onClick={() => setGeneratedVariations([])}
-                    className="text-xs text-white/40 hover:text-white/60"
-                  >
-                    Clear All
-                  </button>
-                </div>
-                <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                  {generatedVariations.map((variation) => (
-                    <div
-                      key={variation.id}
-                      onClick={() => toggleVariationSelection(variation.id)}
-                      className={`group cursor-pointer overflow-hidden rounded-xl border transition-all ${
-                        variation.selected
-                          ? 'border-purple-500/50 bg-purple-500/10 ring-2 ring-purple-500/30'
-                          : 'border-white/10 bg-white/5 hover:border-white/20'
-                      }`}
-                    >
-                      <div className="relative aspect-square overflow-hidden">
-                        <img 
-                          src={variation.imageUrl} 
-                          alt={variation.label}
-                          className="h-full w-full object-cover"
-                        />
-                        {variation.selected && (
-                          <div className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-purple-500 text-white">
-                            <Check className="h-4 w-4" />
-                          </div>
-                        )}
-                        <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/60 opacity-0 transition-opacity group-hover:opacity-100">
-                          <button className="rounded-lg bg-white/10 p-2 text-white/70 hover:bg-white/20">
-                            <Eye className="h-4 w-4" />
-                          </button>
-                          <button className="rounded-lg bg-white/10 p-2 text-white/70 hover:bg-white/20">
-                            <Download className="h-4 w-4" />
-                          </button>
-                          <button className="rounded-lg bg-white/10 p-2 text-white/70 hover:bg-white/20">
-                            <RefreshCw className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </div>
-                      <div className="p-3">
-                        <div className="flex items-center gap-2">
-                          <span className={`rounded px-1.5 py-0.5 text-[10px] ${
-                            variation.type === 'set-piece' ? 'bg-blue-500/20 text-blue-300' :
-                            variation.type === 'stone-variant' ? 'bg-pink-500/20 text-pink-300' :
-                            variation.type === 'material-variant' ? 'bg-amber-500/20 text-amber-300' :
-                            'bg-green-500/20 text-green-300'
-                          }`}>
-                            {variation.type === 'set-piece' ? 'Set' :
-                             variation.type === 'stone-variant' ? 'Stone' :
-                             variation.type === 'material-variant' ? 'Material' : 'Photo'}
-                          </span>
-                          <span className="text-sm font-medium text-white/80">{variation.label}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <div className="flex h-full flex-col items-center justify-center">
-                <div className="mb-4 rounded-full bg-white/5 p-6">
-                  <Wand2 className="h-12 w-12 text-white/20" />
-                </div>
-                <h2 className="text-lg font-medium text-white/60">No Generations Yet</h2>
-                <p className="mt-2 max-w-md text-center text-sm text-white/40">
-                  {!sourceImage 
-                    ? 'Upload a reference product image to get started'
-                    : activeMode === 'set-pieces'
-                      ? 'Select jewelry types from the right panel and click Generate'
-                      : activeMode === 'variations'
-                        ? 'Select stones or materials from the right panel and click Generate'
-                        : activeMode === 'sketch'
-                          ? 'Choose an output style and click Generate to convert your sketch'
-                          : 'Configure your collection options and click Generate'}
-                </p>
-              </div>
-            )}
+      
+      {/* ========== MAIN AREA - RESULTS ========== */}
+      <div className="flex flex-1 flex-col overflow-hidden">
+        {/* Prompt Preview */}
+        <div className="border-b border-white/10 bg-black/20 px-4 py-2">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-white/30">Prompt:</span>
+            <p className="flex-1 truncate text-xs text-white/50">{promptPreview}</p>
+            <button
+              onClick={() => navigator.clipboard.writeText(promptPreview)}
+              className="rounded p-1 text-white/30 hover:bg-white/10 hover:text-white"
+            >
+              <Copy className="h-3 w-3" />
+            </button>
           </div>
         </div>
-
-        {/* Right Panel - Settings */}
-        <div 
-          className={`relative flex flex-col border-l border-white/10 bg-black/40 backdrop-blur-sm transition-all duration-300 ${
-            isPanelOpen ? 'w-80' : 'w-0'
-          }`}
-        >
-          <button
-            onClick={() => setIsPanelOpen(!isPanelOpen)}
-            className="absolute -left-3 top-1/2 z-10 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-black/80 text-white/60 hover:text-white"
-          >
-            {isPanelOpen ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
-          </button>
-
-          {isPanelOpen && (
-            <div className="flex flex-1 flex-col overflow-y-auto p-4">
-              {/* Mode-specific Settings */}
-              {/* Set Pieces Mode */}
-              {activeMode === 'set-pieces' && (
-                <div className="mb-6">
-                  <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
-                    Generate Set Pieces
-                  </h3>
-                  <p className="mb-3 text-xs text-white/40">
-                    Select jewelry types to generate matching pieces
-                  </p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {JEWELRY_TYPES.map(({ type, label, description }) => (
-                      <button
-                        key={type}
-                        onClick={() => toggleJewelryType(type)}
-                        className={`rounded-lg border p-3 text-left transition-all ${
-                          selectedJewelryTypes.includes(type)
-                            ? 'border-purple-500/50 bg-purple-500/10'
-                            : 'border-white/10 bg-white/5 hover:border-white/20'
-                        }`}
-                      >
-                        <span className="text-sm font-medium text-white/80">{label}</span>
-                        <p className="mt-0.5 text-[10px] text-white/40">{description}</p>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Variations Mode */}
-              {activeMode === 'variations' && (
-                <>
-                  <div className="mb-6">
-                    <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
-                      Stone Variants
-                    </h3>
-                    <div className="grid grid-cols-4 gap-2">
-                      {STONE_OPTIONS.map((stone) => (
-                        <button
-                          key={stone.id}
-                          onClick={() => toggleStone(stone.id)}
-                          className={`flex flex-col items-center rounded-lg border p-2 transition-all ${
-                            selectedStones.includes(stone.id)
-                              ? 'border-purple-500/50 bg-purple-500/10'
-                              : 'border-white/10 bg-white/5 hover:border-white/20'
-                          }`}
-                          title={stone.name}
-                        >
-                          <div 
-                            className="mb-1 flex h-6 w-6 items-center justify-center rounded-full"
-                            style={{ backgroundColor: stone.color + '30', color: stone.color }}
-                          >
-                            {stone.icon}
-                          </div>
-                          <span className="text-[9px] text-white/60 truncate w-full text-center">{stone.name}</span>
+        
+        {/* Results Grid */}
+        <div className="flex-1 overflow-y-auto p-6">
+          {generatedDesigns.length === 0 ? (
+            <div className="flex h-full flex-col items-center justify-center">
+              <Wand2 className="h-16 w-16 text-white/10" />
+              <h3 className="mt-4 text-lg font-medium text-white/50">Tasarım Üretin</h3>
+              <p className="mt-2 text-sm text-white/30">
+                Sol panelden parametreleri seçin ve tasarım üretin
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+              {generatedDesigns.map((design) => (
+                <div
+                  key={design.id}
+                  onClick={() => setSelectedDesign(design)}
+                  className={`group cursor-pointer overflow-hidden rounded-xl border transition-all ${
+                    selectedDesign?.id === design.id
+                      ? 'border-purple-500/50 ring-2 ring-purple-500/30'
+                      : 'border-white/10 hover:border-white/20'
+                  }`}
+                >
+                  <div className="relative aspect-square">
+                    <img
+                      src={design.imageUrl}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity group-hover:opacity-100">
+                      <div className="absolute bottom-2 left-2 right-2 flex gap-1">
+                        <button className="flex-1 rounded bg-white/20 py-1 text-[10px] text-white backdrop-blur-sm hover:bg-white/30">
+                          <Download className="mx-auto h-3 w-3" />
                         </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="mb-6">
-                    <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
-                      Material Variants
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {MATERIAL_OPTIONS.map((material) => (
-                        <button
-                          key={material.id}
-                          onClick={() => toggleMaterial(material.id)}
-                          className={`flex items-center gap-2 rounded-lg border px-3 py-2 transition-all ${
-                            selectedMaterials.includes(material.id)
-                              ? 'border-purple-500/50 bg-purple-500/10'
-                              : 'border-white/10 bg-white/5 hover:border-white/20'
-                          }`}
-                        >
-                          <div 
-                            className="h-3 w-3 rounded-full"
-                            style={{ backgroundColor: material.color }}
-                          />
-                          <span className="text-xs text-white/70">{material.name}</span>
+                        <button className="flex-1 rounded bg-white/20 py-1 text-[10px] text-white backdrop-blur-sm hover:bg-white/30">
+                          <Heart className="mx-auto h-3 w-3" />
                         </button>
-                      ))}
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {/* Sketch Mode */}
-              {activeMode === 'sketch' && (
-                <div className="mb-6">
-                  <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
-                    Output Style
-                  </h3>
-                  <div className="space-y-2">
-                    {[
-                      { id: 'realistic', label: 'Realistic Photo', description: 'High-fidelity product shot' },
-                      { id: 'studio', label: 'Studio Shot', description: 'Professional white background' },
-                      { id: 'lifestyle', label: 'Lifestyle', description: 'On model or in context' },
-                    ].map((style) => (
-                      <button
-                        key={style.id}
-                        onClick={() => setSketchStyle(style.id as typeof sketchStyle)}
-                        className={`w-full rounded-lg border p-3 text-left transition-all ${
-                          sketchStyle === style.id
-                            ? 'border-purple-500/50 bg-purple-500/10'
-                            : 'border-white/10 bg-white/5 hover:border-white/20'
-                        }`}
-                      >
-                        <span className="text-sm font-medium text-white/80">{style.label}</span>
-                        <p className="mt-0.5 text-xs text-white/40">{style.description}</p>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Collection Mode */}
-              {activeMode === 'collection' && (
-                <div className="mb-6">
-                  <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
-                    Build Collection
-                  </h3>
-                  <p className="mb-3 text-xs text-white/40">
-                    Generate a complete jewelry collection from your reference piece
-                  </p>
-                  <div className="space-y-2">
-                    <label className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 p-3">
-                      <span className="text-sm text-white/70">Include all set pieces</span>
-                      <input type="checkbox" className="accent-purple-500" defaultChecked />
-                    </label>
-                    <label className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 p-3">
-                      <span className="text-sm text-white/70">Stone variations</span>
-                      <input type="checkbox" className="accent-purple-500" defaultChecked />
-                    </label>
-                    <label className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 p-3">
-                      <span className="text-sm text-white/70">Material variations</span>
-                      <input type="checkbox" className="accent-purple-500" />
-                    </label>
-                  </div>
-                </div>
-              )}
-
-              {/* Quick Guide */}
-              <div className="mt-auto">
-                <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
-                  Quick Guide
-                </h3>
-                <div className="space-y-2">
-                  <div className="rounded-lg border border-white/10 bg-white/5 p-2">
-                    <div className="flex items-center gap-2">
-                      <Layers className="h-3 w-3 text-blue-400" />
-                      <span className="text-xs text-white/60">Set Pieces - Generate matching jewelry</span>
-                    </div>
-                  </div>
-                  <div className="rounded-lg border border-white/10 bg-white/5 p-2">
-                    <div className="flex items-center gap-2">
-                      <Grid3X3 className="h-3 w-3 text-pink-400" />
-                      <span className="text-xs text-white/60">Variations - Stone & material changes</span>
-                    </div>
-                  </div>
-                  <div className="rounded-lg border border-white/10 bg-white/5 p-2">
-                    <div className="flex items-center gap-2">
-                      <Pencil className="h-3 w-3 text-green-400" />
-                      <span className="text-xs text-white/60">Sketch to Real - Convert drawings</span>
+                        <button className="flex-1 rounded bg-white/20 py-1 text-[10px] text-white backdrop-blur-sm hover:bg-white/30">
+                          <RefreshCw className="mx-auto h-3 w-3" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              ))}
             </div>
           )}
         </div>
       </div>
-
-      {/* Hidden file input */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        onChange={handleImageUpload}
-        className="hidden"
-      />
+      
+      {/* ========== JEWELRY TYPE MODAL ========== */}
+      <AnimatePresence>
+        {showTypeModal && uploadedImageTemp && (
+          <JewelryTypeModal
+            imageUrl={uploadedImageTemp}
+            onConfirm={handleConfirmType}
+            onCancel={() => {
+              setShowTypeModal(false);
+              setUploadedImageTemp(null);
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
+  );
+}
+
+// ============================================
+// JEWELRY TYPE SELECTION MODAL
+// ============================================
+interface JewelryTypeModalProps {
+  imageUrl: string;
+  onConfirm: (type: JewelryType, hasStones: boolean, stoneType?: string) => void;
+  onCancel: () => void;
+}
+
+function JewelryTypeModal({ imageUrl, onConfirm, onCancel }: JewelryTypeModalProps) {
+  const [step, setStep] = useState<'type' | 'stones' | 'stoneType'>('type');
+  const [selectedType, setSelectedType] = useState<JewelryType | null>(null);
+  const [hasStones, setHasStones] = useState<boolean | null>(null);
+  const [stoneType, setStoneType] = useState<string>('');
+  
+  const handleNext = () => {
+    if (step === 'type' && selectedType) {
+      setStep('stones');
+    } else if (step === 'stones' && hasStones !== null) {
+      if (hasStones) {
+        setStep('stoneType');
+      } else {
+        onConfirm(selectedType!, false);
+      }
+    } else if (step === 'stoneType') {
+      onConfirm(selectedType!, true, stoneType || 'diamond');
+    }
+  };
+  
+  const handleBack = () => {
+    if (step === 'stones') {
+      setStep('type');
+    } else if (step === 'stoneType') {
+      setStep('stones');
+    }
+  };
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+      onClick={onCancel}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        onClick={(e) => e.stopPropagation()}
+        className="mx-4 w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 bg-[#1a1a1a]/95 shadow-2xl backdrop-blur-xl"
+      >
+        {/* Header with Image */}
+        <div className="relative h-32 overflow-hidden">
+          <img src={imageUrl} alt="" className="h-full w-full object-cover opacity-50" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] to-transparent" />
+          <div className="absolute bottom-4 left-4">
+            <h2 className="text-lg font-medium text-white">Ürün Bilgisi</h2>
+            <p className="text-sm text-white/60">
+              {step === 'type' && 'Yüklediğiniz ürünün türünü seçin'}
+              {step === 'stones' && 'Ürün taşlı mı?'}
+              {step === 'stoneType' && 'Taş türünü seçin'}
+            </p>
+          </div>
+          <button
+            onClick={onCancel}
+            className="absolute right-4 top-4 rounded-full bg-black/40 p-2 text-white/60 hover:text-white"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        
+        {/* Content */}
+        <div className="p-6">
+          {/* Step 1: Jewelry Type */}
+          {step === 'type' && (
+            <div className="grid grid-cols-3 gap-3">
+              {params.JEWELRY_TYPES.map((type) => (
+                <button
+                  key={type.value}
+                  onClick={() => setSelectedType(type.value as JewelryType)}
+                  className={`flex flex-col items-center gap-2 rounded-xl border p-4 transition-all ${
+                    selectedType === type.value
+                      ? 'border-purple-500/50 bg-purple-500/20'
+                      : 'border-white/10 bg-white/5 hover:border-white/20'
+                  }`}
+                >
+                  <span className="text-2xl">{type.icon}</span>
+                  <span className="text-sm text-white/80">{type.labelTr}</span>
+                </button>
+              ))}
+            </div>
+          )}
+          
+          {/* Step 2: Has Stones */}
+          {step === 'stones' && (
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                onClick={() => setHasStones(true)}
+                className={`flex flex-col items-center gap-3 rounded-xl border p-6 transition-all ${
+                  hasStones === true
+                    ? 'border-green-500/50 bg-green-500/20'
+                    : 'border-white/10 bg-white/5 hover:border-white/20'
+                }`}
+              >
+                <Gem className="h-8 w-8 text-green-400" />
+                <span className="text-sm font-medium text-white">Taşlı</span>
+                <span className="text-xs text-white/40">Pırlanta, Zirkon vb.</span>
+              </button>
+              <button
+                onClick={() => setHasStones(false)}
+                className={`flex flex-col items-center gap-3 rounded-xl border p-6 transition-all ${
+                  hasStones === false
+                    ? 'border-amber-500/50 bg-amber-500/20'
+                    : 'border-white/10 bg-white/5 hover:border-white/20'
+                }`}
+              >
+                <Circle className="h-8 w-8 text-amber-400" />
+                <span className="text-sm font-medium text-white">Taşsız</span>
+                <span className="text-xs text-white/40">Sadece metal</span>
+              </button>
+            </div>
+          )}
+          
+          {/* Step 3: Stone Type */}
+          {step === 'stoneType' && (
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                { value: 'diamond', label: 'Pırlanta', icon: '💎' },
+                { value: 'zircon', label: 'Zirkon', icon: '✨' },
+                { value: 'ruby', label: 'Yakut', icon: '❤️' },
+                { value: 'sapphire', label: 'Safir', icon: '💙' },
+                { value: 'emerald', label: 'Zümrüt', icon: '💚' },
+                { value: 'other', label: 'Diğer', icon: '💠' },
+              ].map((stone) => (
+                <button
+                  key={stone.value}
+                  onClick={() => setStoneType(stone.value)}
+                  className={`flex flex-col items-center gap-2 rounded-xl border p-4 transition-all ${
+                    stoneType === stone.value
+                      ? 'border-purple-500/50 bg-purple-500/20'
+                      : 'border-white/10 bg-white/5 hover:border-white/20'
+                  }`}
+                >
+                  <span className="text-2xl">{stone.icon}</span>
+                  <span className="text-sm text-white/80">{stone.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        
+        {/* Footer */}
+        <div className="flex gap-3 border-t border-white/10 p-4">
+          {step !== 'type' && (
+            <button
+              onClick={handleBack}
+              className="flex-1 rounded-lg border border-white/20 bg-white/5 py-2.5 text-sm font-medium text-white/80 hover:bg-white/10"
+            >
+              Geri
+            </button>
+          )}
+          <button
+            onClick={handleNext}
+            disabled={
+              (step === 'type' && !selectedType) ||
+              (step === 'stones' && hasStones === null)
+            }
+            className="flex-1 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 py-2.5 text-sm font-medium text-white hover:from-purple-500 hover:to-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {step === 'stoneType' ? 'Tamamla' : 'Devam'}
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
   );
 }

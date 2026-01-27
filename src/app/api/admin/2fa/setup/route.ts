@@ -33,7 +33,7 @@ export const POST = withAdminAuth(
     } catch (error: any) {
       console.error('2FA setup error:', error);
       return NextResponse.json(
-        { error: 'Failed to setup 2FA', details: error.message },
+        { error: 'Failed to setup 2FA' },
         { status: 500 }
       );
     }

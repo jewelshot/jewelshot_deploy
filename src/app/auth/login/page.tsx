@@ -10,11 +10,13 @@ import { SocialButton } from '@/components/atoms/SocialButton';
 import { createClient } from '@/lib/supabase/client';
 import { AuroraBackground } from '@/components/atoms/AuroraBackground';
 import { useLanguage } from '@/lib/i18n';
+import { validateRedirectUrl, validateOAuthRedirect } from '@/lib/security/redirect-validator';
 
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirectTo') || '/studio';
+  // 🔒 SECURITY: Validate redirect URL to prevent Open Redirect attacks
+  const redirectTo = validateRedirectUrl(searchParams.get('redirectTo'));
   const { t } = useLanguage();
   
   const [email, setEmail] = useState('');
@@ -54,7 +56,8 @@ function LoginContent() {
       const { error: signInError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${siteUrl}/auth/callback?redirectTo=${encodeURIComponent(redirectTo)}`,
+          // 🔒 SECURITY: Use validated OAuth redirect
+          redirectTo: validateOAuthRedirect(redirectTo, siteUrl),
         },
       });
 

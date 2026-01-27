@@ -101,7 +101,7 @@ export async function POST(
     return NextResponse.json(
       {
         error: 'Failed to cancel job',
-        details: error.message,
+        // 🔒 SECURITY: Error details hidden
       },
       { status: 500 }
     );

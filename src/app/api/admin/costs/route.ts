@@ -98,7 +98,7 @@ export const GET = withAdminAuth(
     } catch (error: any) {
       console.error('Costs API error:', error);
       return NextResponse.json(
-        { error: 'Failed to fetch cost analytics', details: error.message },
+        { error: 'Failed to fetch cost analytics' },
         { status: 500 }
       );
     }

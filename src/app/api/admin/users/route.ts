@@ -102,7 +102,7 @@ export const GET = withAdminAuth(
   } catch (error: any) {
     console.error('Users API error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch users', details: error.message },
+      { error: 'Failed to fetch users' },
       { status: 500 }
     );
   }

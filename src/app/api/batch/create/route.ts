@@ -78,11 +78,16 @@ export const POST = withErrorHandling(async (request: Request) => {
 
   // Parse request body
   const body = await request.json();
-  const { name, totalImages, prompt, aspectRatio } = body;
+  const { name, totalImages, prompt, aspectRatio, fileNamingConfig } = body;
+
+  // Generate default batch name if not provided
+  const now = new Date();
+  const defaultName = `Batch_${now.toLocaleDateString('en-GB').replace(/\//g, '-')}_${now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }).replace(':', '')}`;
+  const batchName = name?.trim() || defaultName;
 
   // Validate inputs
   try {
-    validateString(name, 'name', { required: true, minLength: 1, maxLength: 100 });
+    validateString(batchName, 'name', { required: true, minLength: 1, maxLength: 100 });
     validateNumber(totalImages, 'totalImages', { required: true, min: 1, max: 100, integer: true });
     if (prompt) {
       validateString(prompt, 'prompt', { minLength: 3, maxLength: 1000 });
@@ -100,11 +105,12 @@ export const POST = withErrorHandling(async (request: Request) => {
       .from('batch_projects')
       .insert({
         user_id: user.id,
-        name,
+        name: batchName,
         total_images: totalImages,
         prompt: prompt || 'enhance the image quality and details',
         aspect_ratio: aspectRatio || 'auto',
         status: 'processing',
+        file_naming_config: fileNamingConfig || null,
       })
       .select()
       .single();
@@ -123,7 +129,7 @@ export const POST = withErrorHandling(async (request: Request) => {
     logger.info('Batch project created', {
       userId: user.id,
       projectId: project.id,
-      name,
+      name: batchName,
       totalImages,
     });
 

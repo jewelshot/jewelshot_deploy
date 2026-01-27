@@ -44,6 +44,17 @@ function normalizePlanName(productName: string): string {
   return 'basic'; // Default to basic for unknown plans
 }
 
+// 🔒 SECURITY: Mask email for logging (GDPR compliance)
+function maskEmail(email: string | undefined): string {
+  if (!email) return '[no-email]';
+  const [local, domain] = email.split('@');
+  if (!domain) return '[invalid]';
+  const masked = local.length > 2 
+    ? `${local[0]}***${local[local.length - 1]}` 
+    : '***';
+  return `${masked}@${domain}`;
+}
+
 /**
  * Grant subscription credits using unified RPC function
  * This updates BOTH user_credits and profiles tables atomically
@@ -54,7 +65,8 @@ async function grantSubscriptionCredits(
   productName: string,
   renewalDate?: string | null
 ) {
-  console.log(`[Creem Webhook] Granting subscription credits to user ${userId} (${email}) for ${productName}`);
+  // 🔒 SECURITY: Log with masked email (GDPR)
+  console.log(`[Creem Webhook] Granting credits to user ${userId.slice(0, 8)}... for ${productName}`);
   
   try {
     // Determine plan from product name using helper
@@ -115,7 +127,7 @@ async function grantSubscriptionCredits(
         metadata: { plan: planName, credits, renewal_date: nextRenewal },
       });
     
-    console.log(`[Creem Webhook] Completed credit grant flow for ${email}`);
+    console.log(`[Creem Webhook] Completed credit grant flow for user ${userId.slice(0, 8)}...`);
     
   } catch (error) {
     console.error('[Creem Webhook] Error granting subscription credits:', error);
@@ -132,7 +144,8 @@ async function revokeSubscriptionCredits(
   email: string, 
   reason: 'canceled' | 'expired' = 'canceled'
 ) {
-  console.log(`[Creem Webhook] Revoking subscription for user ${userId} (${email}) - ${reason}`);
+  // 🔒 SECURITY: Log with masked data (GDPR)
+  console.log(`[Creem Webhook] Revoking subscription for user ${userId.slice(0, 8)}... - ${reason}`);
   
   try {
     // Call unified RPC function
@@ -153,7 +166,7 @@ async function revokeSubscriptionCredits(
       throw new Error(result?.message || 'Failed to revoke credits');
     }
     
-    console.log(`[Creem Webhook] Successfully revoked subscription for ${email}`);
+    console.log(`[Creem Webhook] Successfully revoked subscription for user ${userId.slice(0, 8)}...`);
     
     // Log the transaction
     await supabaseAdmin
@@ -196,7 +209,8 @@ export const POST = Webhook({
   // CHECKOUT COMPLETED (First payment)
   // ============================================
   onCheckoutCompleted: async ({ customer, product, metadata, subscription }) => {
-    console.log(`[Creem Webhook] Checkout completed: ${customer?.email} purchased ${product?.name}`);
+    // 🔒 SECURITY: No PII in logs (GDPR)
+    console.log(`[Creem Webhook] Checkout completed for product: ${product?.name}`);
     
     const userId = metadata?.referenceId as string;
     
@@ -231,7 +245,8 @@ export const POST = Webhook({
     const { customer, product, metadata } = payload;
     const subscription = (payload as any).subscription;
     
-    console.log(`[Creem Webhook] Subscription paid: ${customer?.email}`);
+    // 🔒 SECURITY: No PII in logs (GDPR)
+    console.log(`[Creem Webhook] Subscription paid for product: ${product?.name}`);
     
     const userId = metadata?.referenceId as string;
     
@@ -255,7 +270,8 @@ export const POST = Webhook({
     const { customer, metadata, product } = payload;
     const subscription = (payload as any).subscription;
     
-    console.log(`[Creem Webhook] Grant access: ${customer?.email}`);
+    // 🔒 SECURITY: No PII in logs (GDPR)
+    console.log(`[Creem Webhook] Grant access event received`);
     
     const userId = metadata?.referenceId as string;
     
@@ -275,7 +291,8 @@ export const POST = Webhook({
   // REVOKE ACCESS (Generic access revoke)
   // ============================================
   onRevokeAccess: async ({ customer, metadata }) => {
-    console.log(`[Creem Webhook] Revoke access: ${customer?.email}`);
+    // 🔒 SECURITY: No PII in logs (GDPR)
+    console.log(`[Creem Webhook] Revoke access event received`);
     
     const userId = metadata?.referenceId as string;
     
@@ -291,7 +308,8 @@ export const POST = Webhook({
   // SUBSCRIPTION CANCELED
   // ============================================
   onSubscriptionCanceled: async ({ customer, metadata }) => {
-    console.log(`[Creem Webhook] Subscription canceled: ${customer?.email}`);
+    // 🔒 SECURITY: No PII in logs (GDPR)
+    console.log(`[Creem Webhook] Subscription canceled event received`);
     
     const userId = metadata?.referenceId as string;
     
@@ -307,7 +325,8 @@ export const POST = Webhook({
   // SUBSCRIPTION EXPIRED (Payment failed)
   // ============================================
   onSubscriptionExpired: async ({ customer, metadata }) => {
-    console.log(`[Creem Webhook] Subscription expired: ${customer?.email}`);
+    // 🔒 SECURITY: No PII in logs (GDPR)
+    console.log(`[Creem Webhook] Subscription expired event received`);
     
     const userId = metadata?.referenceId as string;
     

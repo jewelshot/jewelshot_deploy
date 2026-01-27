@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createScopedLogger } from '@/lib/logger';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
+import { validateImageFile, getSafeContentType, getExtensionFromMime, MAX_FILE_SIZES } from '@/lib/security/file-validator';
 
 const logger = createScopedLogger('BatchUploadOriginal');
 
@@ -101,14 +102,30 @@ export async function POST(request: NextRequest) {
     }
 
     const buffer = Buffer.from(base64Data, 'base64');
-    const contentType = imageDataUri.split(';')[0].split(':')[1] || 'image/jpeg';
 
-    // Generate unique filename
+    // 🔒 SECURITY: Validate file (size, type, magic bytes)
+    const validation = validateImageFile(buffer, undefined, MAX_FILE_SIZES.batch);
+    if (!validation.valid) {
+      logger.warn('Invalid file upload attempt', { 
+        userId: user.id, 
+        error: validation.error,
+        size: buffer.length,
+      });
+      return NextResponse.json(
+        { error: validation.error },
+        { status: 400 }
+      );
+    }
+
+    // 🔒 SECURITY: Use detected content type (not client-provided)
+    const contentType = getSafeContentType(buffer);
+    const extension = getExtensionFromMime(contentType);
+
+    // 🔒 SECURITY: Use crypto for secure random ID
     const timestamp = Date.now();
-    const randomId = Math.random().toString(36).substring(2, 9);
-    const extension = contentType.split('/')[1] || 'jpg';
+    const randomId = crypto.randomUUID().split('-')[0];
     const safeFilename = filename.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const storagePath = `${user.id}/batch-originals/${timestamp}_${randomId}_${safeFilename}`;
+    const storagePath = `${user.id}/batch-originals/${timestamp}_${randomId}_${safeFilename}.${extension}`;
 
     // Upload to Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase.storage

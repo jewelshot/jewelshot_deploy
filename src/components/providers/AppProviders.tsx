@@ -10,6 +10,7 @@ import { type ReactNode } from 'react';
 import { AnnouncementProvider, useAnnouncementContext } from '@/hooks/useAnnouncements';
 import { PermissionProvider } from '@/hooks/usePermissions';
 import { AnnouncementModal } from '@/components/molecules/AnnouncementModal';
+import { BatchPollingProvider } from '@/components/providers/BatchPollingProvider';
 
 interface AppProvidersProps {
   children: ReactNode;
@@ -46,8 +47,10 @@ export function AppProviders({ children }: AppProvidersProps) {
   return (
     <PermissionProvider>
       <AnnouncementProvider>
-        {children}
-        <AnnouncementModalController />
+        <BatchPollingProvider>
+          {children}
+          <AnnouncementModalController />
+        </BatchPollingProvider>
       </AnnouncementProvider>
     </PermissionProvider>
   );

@@ -18,12 +18,17 @@ const supabaseAdmin = createClient(
 
 export async function GET(request: NextRequest) {
   try {
-    // Verify cron secret for security
+    // 🔒 SECURITY: CRON_SECRET is REQUIRED - no bypass allowed
     const authHeader = request.headers.get('authorization');
     const cronSecret = process.env.CRON_SECRET;
     
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      console.log('[Cron/cleanup-credits] Unauthorized request');
+    if (!cronSecret) {
+      console.error('[Cron/cleanup-credits] CRON_SECRET not configured - denying request');
+      return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 });
+    }
+    
+    if (authHeader !== `Bearer ${cronSecret}`) {
+      console.warn('[Cron/cleanup-credits] Unauthorized request');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -35,7 +40,7 @@ export async function GET(request: NextRequest) {
     if (error) {
       console.error('[Cron/cleanup-credits] Cleanup failed:', error);
       return NextResponse.json(
-        { error: 'Cleanup failed', details: error.message },
+        { error: 'Cleanup failed' },
         { status: 500 }
       );
     }
@@ -53,7 +58,7 @@ export async function GET(request: NextRequest) {
   } catch (error: any) {
     console.error('[Cron/cleanup-credits] Unexpected error:', error);
     return NextResponse.json(
-      { error: 'Unexpected error', details: error.message },
+      { error: 'Unexpected error' },
       { status: 500 }
     );
   }

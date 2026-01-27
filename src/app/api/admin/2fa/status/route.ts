@@ -25,7 +25,7 @@ export const GET = withAdminAuth(
     } catch (error: any) {
       console.error('2FA status error:', error);
       return NextResponse.json(
-        { error: 'Failed to check 2FA status', details: error.message },
+        { error: 'Failed to check 2FA status' },
         { status: 500 }
       );
     }

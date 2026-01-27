@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import AuroraBackground from '@/components/atoms/AuroraBackground';
@@ -9,6 +9,8 @@ import { BatchConfirmModal } from '@/components/molecules/BatchConfirmModal';
 import type { BatchImage } from '@/components/molecules/BatchImageGrid';
 import { useSidebarStore } from '@/store/sidebarStore';
 import { useCreditStore } from '@/store/creditStore';
+import { useBatchStore, type BatchImageItem } from '@/store/batchStore';
+import { useBatchPolling } from '@/hooks/useBatchPolling';
 import { toast } from 'sonner';
 import { createScopedLogger } from '@/lib/logger';
 import {
@@ -18,6 +20,7 @@ import {
   type BatchImageState,
 } from '@/lib/batch-state-storage';
 import { getPresetById } from '@/data/presets';
+import { type FileNamingConfig, defaultFileNamingConfig } from '@/components/molecules/FileNamingFormat';
 
 const logger = createScopedLogger('BatchPage');
 
@@ -73,6 +76,105 @@ export function BatchPage() {
   // Multi-preset selection for matrix processing
   const [selectedPresets, setSelectedPresets] = useState<SelectedBatchPreset[]>([]);
   const [currentProgress, setCurrentProgress] = useState({ current: 0, total: 0, currentImage: '', currentPreset: '' });
+  
+  // File naming configuration
+  const [fileNamingConfig, setFileNamingConfig] = useState<FileNamingConfig>(defaultFileNamingConfig);
+
+  // 🆕 Global batch store for background processing
+  const { 
+    activeBatches, 
+    currentBatchId,
+    addBatch, 
+    updateBatch,
+    updateBatchImages,
+    setCurrentBatch,
+    getBatch,
+    hasProcessingBatches,
+    pauseBatch,
+    resumeBatch,
+    cancelBatch,
+    clearAllBatches,
+  } = useBatchStore();
+
+  // Get current batch state
+  const currentBatch = currentBatchId ? getBatch(currentBatchId) : null;
+  const batchState = currentBatch?.state || 'idle';
+
+  // 🆕 Background polling hook
+  const { startPolling, isPolling } = useBatchPolling({
+    onComplete: (projectId, completed, failed) => {
+      logger.debug('Batch completed via polling:', { projectId, completed, failed });
+      setIsProcessing(false);
+      fetchCredits();
+    },
+    onImageComplete: (projectId, image) => {
+      // Update local images state when an image completes
+      setImages(prev => prev.map(img => 
+        img.id === image.localId || img.file?.name === image.filename
+          ? { 
+              ...img, 
+              status: 'completed' as const, 
+              result: image.resultUrl || undefined,
+              progress: 100 
+            }
+          : img
+      ));
+    },
+    showToasts: true,
+  });
+
+  // 🆕 Sync local state with global store (for when returning to page)
+  useEffect(() => {
+    if (currentBatchId) {
+      const activeBatch = getBatch(currentBatchId);
+      if (activeBatch) {
+        // Check if we're still processing
+        const stillProcessing = activeBatch.completedImages + activeBatch.failedImages < activeBatch.totalImages;
+        setIsProcessing(stillProcessing);
+        
+        // Update progress
+        setCurrentProgress({
+          current: activeBatch.completedImages + activeBatch.failedImages,
+          total: activeBatch.totalImages,
+          currentImage: '',
+          currentPreset: activeBatch.presetName || '',
+        });
+
+        // Sync images from global store to local state
+        if (activeBatch.images.length > 0 && images.length === 0) {
+          const restoredImages: BatchImage[] = activeBatch.images.map(img => ({
+            id: img.localId,
+            file: { name: img.filename, size: 0 } as File,
+            preview: img.originalUrl || img.thumbnailUrl || '',
+            status: img.status,
+            progress: img.progress,
+            result: img.resultUrl || undefined,
+            error: img.error,
+          }));
+          setImages(restoredImages);
+          toast.info(`Restored ${restoredImages.length} images from active batch`);
+        }
+      }
+    }
+  }, [currentBatchId, getBatch]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 🆕 Keep global store synced with local changes
+  useEffect(() => {
+    if (currentBatchId && images.length > 0) {
+      const batchImages: BatchImageItem[] = images.map(img => ({
+        id: img.id,
+        localId: img.id,
+        filename: img.file?.name || 'unknown',
+        originalUrl: img.preview,
+        resultUrl: img.result || null,
+        thumbnailUrl: img.result || img.preview,
+        status: img.status,
+        error: img.error,
+        progress: img.progress || 0,
+      }));
+      updateBatchImages(currentBatchId, batchImages);
+    }
+  }, [images, currentBatchId, updateBatchImages]);
 
   // Fetch credits on mount
   useEffect(() => {
@@ -333,16 +435,18 @@ export function BatchPage() {
 
     // 🚀 STEP 1: Create batch project in Supabase (with matrix info)
     let batchProjectId: string | null = null;
+    const currentBatchName = batchName || `Batch ${new Date().toLocaleString()}`;
     try {
       const response = await fetch('/api/batch/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: batchName || `Batch ${new Date().toLocaleString()}`,
+          name: currentBatchName,
           totalImages: images.length,
           totalOperations, // New: total matrix operations
           presets: presetsToProcess, // New: all presets to apply
           aspectRatio: currentAspectRatio,
+          fileNamingConfig, // File naming format
         }),
       });
 
@@ -366,7 +470,34 @@ export function BatchPage() {
       }
 
       const data = await response.json();
-      batchProjectId = data.project.id;
+      batchProjectId = data.project.id as string;
+
+      if (!batchProjectId) {
+        throw new Error('No project ID returned');
+      }
+
+      // 🆕 Add to global batch store for background tracking
+      const batchImages: BatchImageItem[] = images.map(img => ({
+        id: img.id,
+        localId: img.id,
+        filename: img.file?.name || 'unknown',
+        originalUrl: img.preview,
+        resultUrl: null,
+        thumbnailUrl: img.preview,
+        status: 'pending' as const,
+        progress: 0,
+      }));
+
+      addBatch({
+        projectId: batchProjectId,
+        name: currentBatchName,
+        totalImages: images.length,
+        images: batchImages,
+        startedAt: Date.now(),
+        aspectRatio: currentAspectRatio,
+        presetName: presetsToProcess.map(p => p.name).join(', '),
+      });
+      setCurrentBatch(batchProjectId);
       
       toast.success('Batch project created! Uploading images...');
       logger.debug('Batch: Project created:', batchProjectId);
@@ -419,9 +550,10 @@ export function BatchPage() {
       logger.debug('Batch: Images uploaded:', uploadData);
       toast.success(`${uploadData.uploaded} images uploaded! Starting AI processing...`);
       
-      // 🚀 STEP 3: Start background polling loop
+      // 🚀 STEP 3: Start global background polling (continues across pages)
       if (batchProjectId) {
-        startBackgroundProcessing(batchProjectId);
+        startPolling();
+        logger.debug('Batch: Global background polling started');
       }
     } catch (error) {
       logger.error('Batch: Failed to upload images:', error);
@@ -429,126 +561,54 @@ export function BatchPage() {
       setIsProcessing(false);
       return;
     }
-  }, [images, batchPrompt, batchName, aspectRatio]);
+  }, [images, batchPrompt, batchName, aspectRatio, addBatch, setCurrentBatch, startPolling]);
 
-  // 🔄 Background Processing Poll Loop
-  const startBackgroundProcessing = useCallback((projectId: string) => {
-    logger.debug('Batch: Starting background processing loop for:', projectId);
-    
-    // Get current preset info for tracking
-    const currentPreset = selectedPresets[0] || null;
+  // 🆕 Background polling is now handled globally by useBatchPolling hook
+  // This allows processing to continue even when navigating away from batch page
 
-    const pollInterval = setInterval(async () => {
-      try {
-        // Call process-next API with preset info
-        const response = await fetch(`/api/batch/${projectId}/process-next`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            presetId: currentPreset?.id || null,
-            presetName: currentPreset?.name || presetName || null,
-          }),
-        });
+  // Handle pause batch
+  const handlePauseBatch = useCallback(() => {
+    if (currentBatchId) {
+      pauseBatch(currentBatchId);
+      setIsProcessing(false);
+      toast.info('Batch işlemi duraklatıldı');
+      logger.debug('Batch: Paused', { projectId: currentBatchId });
+    }
+  }, [currentBatchId, pauseBatch]);
 
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          logger.error('Batch: Process-next failed:', errorData);
-          
-          // Don't stop on errors, retry will handle it
-          return;
-        }
+  // Handle resume batch
+  const handleResumeBatch = useCallback(() => {
+    if (currentBatchId) {
+      resumeBatch(currentBatchId);
+      setIsProcessing(true);
+      startPolling();
+      toast.success('Batch işlemi devam ediyor');
+      logger.debug('Batch: Resumed', { projectId: currentBatchId });
+    }
+  }, [currentBatchId, resumeBatch, startPolling]);
 
-        const data = await response.json();
-        logger.debug('Batch: Poll result:', data);
+  // Handle cancel batch
+  const handleCancelBatch = useCallback(() => {
+    if (currentBatchId) {
+      cancelBatch(currentBatchId);
+      setIsProcessing(false);
+      toast.warning('Batch işlemi iptal edildi');
+      logger.debug('Batch: Cancelled', { projectId: currentBatchId });
+    }
+  }, [currentBatchId, cancelBatch]);
 
-        // Update progress from API response
-        if (data.progress) {
-          const { total, completed, failed, processing } = data.progress;
-          const current = completed + failed;
-          setCurrentProgress({
-            current,
-            total,
-            currentImage: data.currentImage?.filename || '',
-            currentPreset: presetName || selectedPresets[0]?.name || '',
-          });
-        }
-
-        // Update images status from API response
-        if (data.images && Array.isArray(data.images)) {
-          setImages(prevImages => {
-            return prevImages.map(img => {
-              // Find matching image from API by original filename
-              const apiImage = data.images.find((apiImg: { id: string; filename: string }) => 
-                img.file?.name === apiImg.filename || img.id === apiImg.id
-              );
-              
-              if (apiImage) {
-                return {
-                  ...img,
-                  status: apiImage.status as 'pending' | 'processing' | 'completed' | 'failed',
-                  result: apiImage.resultUrl || img.result,
-                  error: apiImage.error || img.error,
-                  progress: apiImage.status === 'processing' ? 50 : 
-                           apiImage.status === 'completed' ? 100 : 
-                           img.progress || 0,
-                };
-              }
-              return img;
-            });
-          });
-        }
-
-        // Check if batch is done
-        if (data.done) {
-          clearInterval(pollInterval);
-          setIsProcessing(false);
-          
-          const completedCount = data.progress?.completed || 0;
-          const failedCount = data.progress?.failed || 0;
-          
-          if (failedCount > 0) {
-            toast.success(`Batch completed! ${completedCount} successful, ${failedCount} failed`);
-          } else {
-            toast.success(`Batch processing completed! All ${completedCount} images processed`);
-          }
-          logger.debug('Batch: All images processed!');
-          
-          // Clear batch state
-          clearBatchState();
-          
-          // Refresh credits
-          fetchCredits();
-          
-          return;
-        }
-
-        // Update progress message
-        if (data.remaining !== undefined) {
-          logger.debug('Batch: Progress:', {
-            processed: data.processed,
-            remaining: data.remaining,
-          });
-        }
-      } catch (error) {
-        logger.error('Batch: Polling error:', error);
-        // Don't stop polling on errors
-      }
-    }, 3000); // Poll every 3 seconds
-
-    // Save interval ID for cleanup
-    (window as any).__batchPollInterval = pollInterval;
-  }, [presetName, selectedPresets, fetchCredits]);
-
-  // Cleanup polling on unmount
-  useEffect(() => {
-    return () => {
-      const pollInterval = (window as any).__batchPollInterval;
-      if (pollInterval) {
-        clearInterval(pollInterval);
-        logger.debug('Batch: Polling stopped (component unmounted)');
-      }
-    };
-  }, []);
+  // Handle clear all (with confirmation in BatchContent)
+  const handleClearAllBatches = useCallback(() => {
+    clearAllBatches();
+    setImages([]);
+    setBatchPrompt('');
+    setBatchName('');
+    setPresetName('');
+    setSelectedPresets([]);
+    setIsProcessing(false);
+    clearBatchState();
+    toast.success('Tüm batch verileri temizlendi');
+  }, [clearAllBatches]);
 
   // OLD CLIENT-SIDE PROCESSING LOOP REMOVED
   // Now using server-side background processing with polling ✅
@@ -579,8 +639,8 @@ export function BatchPage() {
         images={images}
         onFilesSelected={handleFilesSelected}
         onRemoveImage={handleRemoveImage}
-        onClearAll={handleClearAll}
-        disabled={isProcessing}
+        onClearAll={handleClearAllBatches}
+        disabled={isProcessing && batchState !== 'paused'}
         batchName={batchName}
         onBatchNameChange={setBatchName}
         onImageClick={handleImageClick}
@@ -593,6 +653,12 @@ export function BatchPage() {
         onClearPresets={handleClearPresets}
         onStartMatrixBatch={handleStartMatrixBatch}
         currentProgress={currentProgress}
+        batchState={batchState}
+        onPause={handlePauseBatch}
+        onResume={handleResumeBatch}
+        onCancel={handleCancelBatch}
+        fileNamingConfig={fileNamingConfig}
+        onFileNamingConfigChange={setFileNamingConfig}
       />
 
       {/* Batch Confirm Modal */}

@@ -104,11 +104,9 @@ export async function GET() {
   } catch (error: any) {
     console.error('[API/credits] Error fetching credits:', error);
     
+    // 🔒 SECURITY: Don't expose error details
     return NextResponse.json(
-      {
-        error: 'Failed to fetch credits',
-        details: error.message,
-      },
+      { error: 'Failed to fetch credits' },
       { status: 500 }
     );
   }

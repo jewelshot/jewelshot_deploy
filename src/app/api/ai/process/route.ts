@@ -42,11 +42,16 @@ export async function GET() {
 // ============================================
 
 export async function POST(request: NextRequest) {
-  // Verify cron secret (optional - for Vercel Cron)
+  // 🔒 SECURITY: CRON_SECRET is REQUIRED - no bypass allowed
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
   
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+  if (!cronSecret) {
+    logger.error('CRON_SECRET not configured - denying request');
+    return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 });
+  }
+  
+  if (authHeader !== `Bearer ${cronSecret}`) {
     logger.warn('Unauthorized process request');
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }

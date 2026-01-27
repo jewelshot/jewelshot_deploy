@@ -2,15 +2,16 @@
  * BrandLabContent - Brand Identity Management
  * 
  * Features:
- * - Brand Colors palette management
+ * - Brand Colors palette management with color extraction
+ * - Style library with reference images
  * - Logo upload and variants
- * - Style guide builder
- * - Asset library
+ * - Color theory-based palette generation
  */
 
 'use client';
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Palette,
   Upload,
@@ -26,19 +27,26 @@ import {
   Sparkles,
   ChevronRight,
   ChevronLeft,
-  Eye,
-  EyeOff,
   X,
   Edit3,
   Save,
   FlaskConical,
   Wand2,
-  FolderOpen,
-  Tag,
-  Star,
-  Grid3X3,
+  Loader2,
+  Eye,
 } from 'lucide-react';
 import { useSidebarStore } from '@/store/sidebarStore';
+import { ColorPicker } from '@/components/molecules/ColorPicker';
+import {
+  extractColorsFromImages,
+  generateComplementary,
+  generateAnalogous,
+  generateTriadic,
+  generateSplitComplementary,
+  getColorName,
+  type ExtractedColor,
+  type ColorPalette,
+} from '@/lib/color-extractor';
 
 // Types
 interface BrandColor {
@@ -70,6 +78,7 @@ interface StylePreset {
   images: string[]; // Reference image URLs
   createdAt: Date;
   tags: string[];
+  colorPalette?: ExtractedColor[]; // Extracted colors from images
 }
 
 type ActiveTab = 'styles' | 'colors' | 'logos' | 'typography' | 'assets';
@@ -91,7 +100,18 @@ export default function BrandLabContent() {
   const [newStyleTags, setNewStyleTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
   const [selectedStyle, setSelectedStyle] = useState<StylePreset | null>(null);
+  const [isStyleDetailOpen, setIsStyleDetailOpen] = useState(false);
+  const [isEditingStyle, setIsEditingStyle] = useState(false);
+  const [editStyleName, setEditStyleName] = useState('');
+  const [editStyleDescription, setEditStyleDescription] = useState('');
   const styleImageInputRef = useRef<HTMLInputElement>(null);
+  const editImageInputRef = useRef<HTMLInputElement>(null);
+  
+  // Color extraction state
+  const [isExtractingColors, setIsExtractingColors] = useState(false);
+  const [extractedColors, setExtractedColors] = useState<ExtractedColor[]>([]);
+  const [colorPalettes, setColorPalettes] = useState<ColorPalette[]>([]);
+  const [selectedPaletteType, setSelectedPaletteType] = useState<'extracted' | 'complementary' | 'analogous' | 'triadic' | 'split-complementary'>('extracted');
   
   // Brand Colors state
   const [brandColors, setBrandColors] = useState<BrandColor[]>([
@@ -197,27 +217,198 @@ export default function BrandLabContent() {
     setNewStyleTags(prev => prev.filter(t => t !== tag));
   }, []);
 
-  const saveStylePreset = useCallback(() => {
+  const saveStylePreset = useCallback(async () => {
     if (!newStyleName.trim() || newStyleImages.length === 0) return;
 
-    const newPreset: StylePreset = {
-      id: `style-${Date.now()}`,
-      name: newStyleName,
-      description: newStyleDescription,
-      images: newStyleImages,
-      createdAt: new Date(),
-      tags: newStyleTags,
-    };
+    setIsExtractingColors(true);
 
-    setStylePresets(prev => [...prev, newPreset]);
-    
-    // Reset form
-    setNewStyleName('');
-    setNewStyleDescription('');
-    setNewStyleImages([]);
-    setNewStyleTags([]);
-    setIsCreatingStyle(false);
+    try {
+      // Extract colors from uploaded images
+      const colors = await extractColorsFromImages(newStyleImages, 5);
+
+      const newPreset: StylePreset = {
+        id: `style-${Date.now()}`,
+        name: newStyleName,
+        description: newStyleDescription,
+        images: newStyleImages,
+        createdAt: new Date(),
+        tags: newStyleTags,
+        colorPalette: colors,
+      };
+
+      setStylePresets(prev => [...prev, newPreset]);
+      
+      // Also add extracted palette to color palettes
+      if (colors.length > 0) {
+        const newPalette: ColorPalette = {
+          id: `palette-${Date.now()}`,
+          name: `${newStyleName} Colors`,
+          colors: colors,
+          type: 'extracted',
+          sourceStyleId: newPreset.id,
+        };
+        setColorPalettes(prev => [...prev, newPalette]);
+      }
+      
+      // Reset form
+      setNewStyleName('');
+      setNewStyleDescription('');
+      setNewStyleImages([]);
+      setNewStyleTags([]);
+      setIsCreatingStyle(false);
+    } catch (error) {
+      console.error('Failed to extract colors:', error);
+    } finally {
+      setIsExtractingColors(false);
+    }
   }, [newStyleName, newStyleDescription, newStyleImages, newStyleTags]);
+
+  // Open style detail modal
+  const openStyleDetail = useCallback((style: StylePreset) => {
+    setSelectedStyle(style);
+    setEditStyleName(style.name);
+    setEditStyleDescription(style.description);
+    setIsStyleDetailOpen(true);
+    setIsEditingStyle(false);
+  }, []);
+
+  // Add image to existing style
+  const handleEditImageUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!selectedStyle) return;
+    const files = e.target.files;
+    if (!files) return;
+
+    const newImages: string[] = [];
+    
+    for (const file of Array.from(files)) {
+      const reader = new FileReader();
+      await new Promise<void>((resolve) => {
+        reader.onload = (event) => {
+          newImages.push(event.target?.result as string);
+          resolve();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Update style with new images
+    const updatedImages = [...selectedStyle.images, ...newImages].slice(0, 10);
+    
+    // Re-extract colors
+    setIsExtractingColors(true);
+    try {
+      const colors = await extractColorsFromImages(updatedImages, 5);
+      
+      setStylePresets(prev => prev.map(s => 
+        s.id === selectedStyle.id 
+          ? { ...s, images: updatedImages, colorPalette: colors }
+          : s
+      ));
+      
+      setSelectedStyle(prev => prev ? { ...prev, images: updatedImages, colorPalette: colors } : null);
+      
+      // Update corresponding palette
+      setColorPalettes(prev => prev.map(p =>
+        p.sourceStyleId === selectedStyle.id
+          ? { ...p, colors }
+          : p
+      ));
+    } catch (error) {
+      console.error('Failed to re-extract colors:', error);
+    } finally {
+      setIsExtractingColors(false);
+    }
+
+    e.target.value = '';
+  }, [selectedStyle]);
+
+  // Remove image from style
+  const removeImageFromStyle = useCallback(async (index: number) => {
+    if (!selectedStyle) return;
+    
+    const updatedImages = selectedStyle.images.filter((_, i) => i !== index);
+    
+    if (updatedImages.length < 1) return; // Keep at least 1 image
+    
+    // Re-extract colors
+    setIsExtractingColors(true);
+    try {
+      const colors = await extractColorsFromImages(updatedImages, 5);
+      
+      setStylePresets(prev => prev.map(s => 
+        s.id === selectedStyle.id 
+          ? { ...s, images: updatedImages, colorPalette: colors }
+          : s
+      ));
+      
+      setSelectedStyle(prev => prev ? { ...prev, images: updatedImages, colorPalette: colors } : null);
+      
+      // Update corresponding palette
+      setColorPalettes(prev => prev.map(p =>
+        p.sourceStyleId === selectedStyle.id
+          ? { ...p, colors }
+          : p
+      ));
+    } catch (error) {
+      console.error('Failed to re-extract colors:', error);
+    } finally {
+      setIsExtractingColors(false);
+    }
+  }, [selectedStyle]);
+
+  // Save style edits
+  const saveStyleEdits = useCallback(() => {
+    if (!selectedStyle) return;
+    
+    setStylePresets(prev => prev.map(s => 
+      s.id === selectedStyle.id 
+        ? { ...s, name: editStyleName, description: editStyleDescription }
+        : s
+    ));
+    
+    // Update palette name too
+    setColorPalettes(prev => prev.map(p =>
+      p.sourceStyleId === selectedStyle.id
+        ? { ...p, name: `${editStyleName} Colors` }
+        : p
+    ));
+    
+    setSelectedStyle(prev => prev ? { ...prev, name: editStyleName, description: editStyleDescription } : null);
+    setIsEditingStyle(false);
+  }, [selectedStyle, editStyleName, editStyleDescription]);
+
+  // Generate color schemes from selected style
+  const generateColorScheme = useCallback((type: 'complementary' | 'analogous' | 'triadic' | 'split-complementary') => {
+    if (!selectedStyle?.colorPalette?.length) return;
+    
+    const baseColor = selectedStyle.colorPalette[0];
+    let colors: ExtractedColor[];
+    
+    switch (type) {
+      case 'complementary':
+        colors = generateComplementary(baseColor);
+        break;
+      case 'analogous':
+        colors = generateAnalogous(baseColor);
+        break;
+      case 'triadic':
+        colors = generateTriadic(baseColor);
+        break;
+      case 'split-complementary':
+        colors = generateSplitComplementary(baseColor);
+        break;
+    }
+    
+    const newPalette: ColorPalette = {
+      id: `palette-${Date.now()}`,
+      name: `${selectedStyle.name} - ${type.charAt(0).toUpperCase() + type.slice(1)}`,
+      colors,
+      type,
+      sourceStyleId: selectedStyle.id,
+    };
+    
+    setColorPalettes(prev => [...prev, newPalette]);
+  }, [selectedStyle]);
 
   const deleteStylePreset = useCallback((id: string) => {
     setStylePresets(prev => prev.filter(s => s.id !== id));
@@ -425,16 +616,16 @@ export default function BrandLabContent() {
               {stylePresets.length === 0 && !isCreatingStyle ? (
                 <div className="flex flex-col items-center justify-center rounded-xl border border-white/10 bg-white/5 py-16">
                   <Wand2 className="h-12 w-12 text-white/20" />
-                  <h3 className="mt-4 text-lg font-medium text-white/60">No Styles Yet</h3>
+                  <h3 className="mt-4 text-lg font-medium text-white/60">Henüz Stil Yok</h3>
                   <p className="mt-2 text-sm text-white/40">
-                    Create your first style by uploading reference images
+                    Referans görseller yükleyerek ilk stilinizi oluşturun
                   </p>
                   <button
                     onClick={() => setIsCreatingStyle(true)}
                     className="mt-4 flex items-center gap-2 rounded-lg bg-purple-500/20 px-4 py-2 text-sm text-purple-300 hover:bg-purple-500/30"
                   >
                     <Plus className="h-4 w-4" />
-                    Create Your First Style
+                    İlk Stilinizi Oluşturun
                   </button>
                 </div>
               ) : (
@@ -442,7 +633,7 @@ export default function BrandLabContent() {
                   {stylePresets.map((style) => (
                     <div
                       key={style.id}
-                      onClick={() => setSelectedStyle(style)}
+                      onClick={() => openStyleDetail(style)}
                       className={`group cursor-pointer overflow-hidden rounded-xl border transition-all ${
                         selectedStyle?.id === style.id
                           ? 'border-purple-500/50 bg-purple-500/10'
@@ -457,18 +648,46 @@ export default function BrandLabContent() {
                           </div>
                         ))}
                       </div>
+                      
+                      {/* Color Palette under style */}
+                      {style.colorPalette && style.colorPalette.length > 0 && (
+                        <div className="flex gap-0.5 px-0.5">
+                          {style.colorPalette.slice(0, 5).map((color, i) => (
+                            <div
+                              key={i}
+                              className="h-4 flex-1"
+                              style={{ backgroundColor: color.hex }}
+                              title={`${getColorName(color.hex)} - ${color.hex}`}
+                            />
+                          ))}
+                        </div>
+                      )}
+                      
                       <div className="p-3">
                         <div className="flex items-center justify-between">
                           <h3 className="text-sm font-medium text-white/80">{style.name}</h3>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deleteStylePreset(style.id);
-                            }}
-                            className="rounded p-1 text-white/30 opacity-0 hover:bg-white/10 hover:text-red-400 group-hover:opacity-100"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </button>
+                          <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openStyleDetail(style);
+                              }}
+                              className="rounded p-1 text-white/30 hover:bg-white/10 hover:text-white"
+                              title="Detayları Gör"
+                            >
+                              <Eye className="h-3 w-3" />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteStylePreset(style.id);
+                              }}
+                              className="rounded p-1 text-white/30 hover:bg-white/10 hover:text-red-400"
+                              title="Sil"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </button>
+                          </div>
                         </div>
                         {style.description && (
                           <p className="mt-1 text-xs text-white/40 line-clamp-2">{style.description}</p>
@@ -484,7 +703,7 @@ export default function BrandLabContent() {
                           )}
                         </div>
                         <p className="mt-2 text-[10px] text-white/30">
-                          {style.images.length} images
+                          {style.images.length} görsel • {style.colorPalette?.length || 0} renk
                         </p>
                       </div>
                     </div>
@@ -492,7 +711,7 @@ export default function BrandLabContent() {
                 </div>
               )}
 
-              {/* Hidden file input */}
+              {/* Hidden file inputs */}
               <input
                 ref={styleImageInputRef}
                 type="file"
@@ -501,6 +720,206 @@ export default function BrandLabContent() {
                 onChange={handleStyleImageUpload}
                 className="hidden"
               />
+              <input
+                ref={editImageInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleEditImageUpload}
+                className="hidden"
+              />
+
+              {/* Style Detail Modal */}
+              <AnimatePresence>
+                {isStyleDetailOpen && selectedStyle && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+                    onClick={() => setIsStyleDetailOpen(false)}
+                  >
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                      onClick={(e) => e.stopPropagation()}
+                      className="mx-4 max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-white/10 bg-[#1a1a1a]/95 shadow-2xl backdrop-blur-xl"
+                    >
+                      {/* Modal Header */}
+                      <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/10 bg-[#1a1a1a]/95 p-4 backdrop-blur-xl">
+                        <div className="flex-1">
+                          {isEditingStyle ? (
+                            <input
+                              type="text"
+                              value={editStyleName}
+                              onChange={(e) => setEditStyleName(e.target.value)}
+                              className="w-full rounded-lg border border-white/20 bg-white/5 px-3 py-1.5 text-lg font-medium text-white focus:border-purple-500/50 focus:outline-none"
+                            />
+                          ) : (
+                            <h2 className="text-lg font-medium text-white">{selectedStyle.name}</h2>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {isEditingStyle ? (
+                            <>
+                              <button
+                                onClick={() => setIsEditingStyle(false)}
+                                className="rounded-lg px-3 py-1.5 text-sm text-white/60 hover:bg-white/10"
+                              >
+                                İptal
+                              </button>
+                              <button
+                                onClick={saveStyleEdits}
+                                className="flex items-center gap-1 rounded-lg bg-purple-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-purple-600"
+                              >
+                                <Save className="h-3.5 w-3.5" />
+                                Kaydet
+                              </button>
+                            </>
+                          ) : (
+                            <button
+                              onClick={() => setIsEditingStyle(true)}
+                              className="flex items-center gap-1 rounded-lg bg-white/10 px-3 py-1.5 text-sm text-white/70 hover:bg-white/20"
+                            >
+                              <Edit3 className="h-3.5 w-3.5" />
+                              Düzenle
+                            </button>
+                          )}
+                          <button
+                            onClick={() => setIsStyleDetailOpen(false)}
+                            className="rounded-lg p-1.5 text-white/40 hover:bg-white/10 hover:text-white"
+                          >
+                            <X className="h-5 w-5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="p-6">
+                        {/* Description */}
+                        {isEditingStyle ? (
+                          <textarea
+                            value={editStyleDescription}
+                            onChange={(e) => setEditStyleDescription(e.target.value)}
+                            placeholder="Stil açıklaması..."
+                            className="mb-6 h-20 w-full resize-none rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-purple-500/50 focus:outline-none"
+                          />
+                        ) : (
+                          selectedStyle.description && (
+                            <p className="mb-6 text-sm text-white/60">{selectedStyle.description}</p>
+                          )
+                        )}
+
+                        {/* Images Section */}
+                        <div className="mb-6">
+                          <div className="mb-3 flex items-center justify-between">
+                            <h3 className="text-sm font-medium text-white/80">Referans Görseller</h3>
+                            <button
+                              onClick={() => editImageInputRef.current?.click()}
+                              disabled={selectedStyle.images.length >= 10}
+                              className="flex items-center gap-1 rounded-lg bg-white/10 px-3 py-1.5 text-xs text-white/60 hover:bg-white/20 disabled:opacity-50"
+                            >
+                              <Plus className="h-3.5 w-3.5" />
+                              Görsel Ekle
+                            </button>
+                          </div>
+                          <div className="grid grid-cols-4 gap-3 sm:grid-cols-5">
+                            {selectedStyle.images.map((img, i) => (
+                              <div key={i} className="group relative aspect-square overflow-hidden rounded-lg border border-white/10">
+                                <img src={img} alt="" className="h-full w-full object-cover" />
+                                <button
+                                  onClick={() => removeImageFromStyle(i)}
+                                  disabled={selectedStyle.images.length <= 1}
+                                  className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white/60 opacity-0 transition-opacity hover:text-red-400 group-hover:opacity-100 disabled:hidden"
+                                >
+                                  <X className="h-3.5 w-3.5" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                          <p className="mt-2 text-xs text-white/30">{selectedStyle.images.length}/10 görsel</p>
+                        </div>
+
+                        {/* Extracted Color Palette */}
+                        <div className="mb-6">
+                          <h3 className="mb-3 text-sm font-medium text-white/80">Çıkarılan Renkler</h3>
+                          {isExtractingColors ? (
+                            <div className="flex items-center gap-2 py-4">
+                              <Loader2 className="h-4 w-4 animate-spin text-purple-400" />
+                              <span className="text-sm text-white/50">Renkler çıkarılıyor...</span>
+                            </div>
+                          ) : selectedStyle.colorPalette && selectedStyle.colorPalette.length > 0 ? (
+                            <div className="grid grid-cols-5 gap-3">
+                              {selectedStyle.colorPalette.map((color, i) => (
+                                <div key={i} className="overflow-hidden rounded-lg border border-white/10">
+                                  <div className="h-16" style={{ backgroundColor: color.hex }} />
+                                  <div className="bg-white/5 p-2">
+                                    <p className="text-xs font-medium text-white/80">{getColorName(color.hex)}</p>
+                                    <p className="font-mono text-[10px] text-white/40">{color.hex}</p>
+                                    <p className="text-[10px] text-white/30">{color.percentage.toFixed(1)}%</p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="py-4 text-sm text-white/40">Renk bulunamadı</p>
+                          )}
+                        </div>
+
+                        {/* Color Scheme Generator */}
+                        <div className="mb-6">
+                          <h3 className="mb-3 text-sm font-medium text-white/80">Renk Şeması Oluştur</h3>
+                          <div className="flex flex-wrap gap-2">
+                            <button
+                              onClick={() => generateColorScheme('complementary')}
+                              disabled={!selectedStyle.colorPalette?.length}
+                              className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/60 hover:bg-white/10 disabled:opacity-50"
+                            >
+                              Tamamlayıcı
+                            </button>
+                            <button
+                              onClick={() => generateColorScheme('analogous')}
+                              disabled={!selectedStyle.colorPalette?.length}
+                              className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/60 hover:bg-white/10 disabled:opacity-50"
+                            >
+                              Analog
+                            </button>
+                            <button
+                              onClick={() => generateColorScheme('triadic')}
+                              disabled={!selectedStyle.colorPalette?.length}
+                              className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/60 hover:bg-white/10 disabled:opacity-50"
+                            >
+                              Triadik
+                            </button>
+                            <button
+                              onClick={() => generateColorScheme('split-complementary')}
+                              disabled={!selectedStyle.colorPalette?.length}
+                              className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/60 hover:bg-white/10 disabled:opacity-50"
+                            >
+                              Bölünmüş Tamamlayıcı
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Tags */}
+                        <div>
+                          <h3 className="mb-3 text-sm font-medium text-white/80">Etiketler</h3>
+                          <div className="flex flex-wrap gap-2">
+                            {selectedStyle.tags.map((tag) => (
+                              <span key={tag} className="rounded-full bg-white/10 px-3 py-1 text-xs text-white/60">
+                                {tag}
+                              </span>
+                            ))}
+                            {selectedStyle.tags.length === 0 && (
+                              <span className="text-xs text-white/40">Etiket yok</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* How it works */}
               <div className="mt-8 rounded-xl border border-white/10 bg-white/5 p-6">
@@ -540,105 +959,176 @@ export default function BrandLabContent() {
 
           {/* Colors Tab */}
           {activeTab === 'colors' && (
-            <div className="mx-auto max-w-4xl">
+            <div className="mx-auto max-w-5xl">
               <div className="mb-6">
-                <h2 className="text-lg font-medium text-white/90">Brand Colors</h2>
+                <h2 className="text-lg font-medium text-white/90">Marka Renkleri</h2>
                 <p className="mt-1 text-sm text-white/50">
-                  Define your brand&apos;s color palette for consistent visual identity
+                  Stillerinizden çıkarılan ve manuel eklenen renk paletleri
                 </p>
               </div>
 
-              {/* Color Grid */}
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                {brandColors.map((color) => (
-                  <div
-                    key={color.id}
-                    className="group overflow-hidden rounded-xl border border-white/10 bg-white/5"
-                  >
-                    <div
-                      className="h-24 w-full"
-                      style={{ backgroundColor: color.hex }}
-                    />
-                    <div className="p-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-white/80">{color.name}</span>
-                        <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+              {/* Palettes from Styles */}
+              {colorPalettes.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="mb-4 text-sm font-medium text-white/70">Stil Paletleri</h3>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {colorPalettes.map((palette) => (
+                      <div key={palette.id} className="overflow-hidden rounded-xl border border-white/10 bg-white/5">
+                        <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+                          <div>
+                            <h4 className="text-sm font-medium text-white/80">{palette.name}</h4>
+                            <span className="rounded bg-white/10 px-1.5 py-0.5 text-[10px] text-white/50">
+                              {palette.type}
+                            </span>
+                          </div>
                           <button
-                            onClick={() => copyColor(color.hex)}
-                            className="rounded p-1 text-white/40 hover:bg-white/10 hover:text-white"
-                            title="Copy hex"
+                            onClick={() => setColorPalettes(prev => prev.filter(p => p.id !== palette.id))}
+                            className="rounded p-1 text-white/30 hover:bg-white/10 hover:text-red-400"
                           >
-                            {copiedColor === color.hex ? (
-                              <Check className="h-3 w-3 text-green-400" />
-                            ) : (
-                              <Copy className="h-3 w-3" />
-                            )}
-                          </button>
-                          <button
-                            onClick={() => removeColor(color.id)}
-                            className="rounded p-1 text-white/40 hover:bg-white/10 hover:text-red-400"
-                            title="Remove"
-                          >
-                            <Trash2 className="h-3 w-3" />
+                            <Trash2 className="h-3.5 w-3.5" />
                           </button>
                         </div>
+                        <div className="flex">
+                          {palette.colors.map((color, i) => (
+                            <div
+                              key={i}
+                              className="group relative h-20 flex-1 cursor-pointer transition-all hover:flex-[1.5]"
+                              style={{ backgroundColor: color.hex }}
+                              onClick={() => copyColor(color.hex)}
+                              title={`${getColorName(color.hex)} - ${color.hex}`}
+                            >
+                              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-2 opacity-0 transition-opacity group-hover:opacity-100">
+                                <p className="text-center font-mono text-[10px] text-white">{color.hex}</p>
+                              </div>
+                              {copiedColor === color.hex && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                                  <Check className="h-5 w-5 text-green-400" />
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                        <div className="flex gap-1 p-2">
+                          {palette.colors.map((color, i) => (
+                            <div key={i} className="flex-1 text-center">
+                              <p className="text-[9px] text-white/50">{getColorName(color.hex)}</p>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                      <p className="mt-1 font-mono text-xs text-white/50">{color.hex}</p>
-                      <p className="mt-1 text-xs text-white/40">{color.usage}</p>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Manual Colors */}
+              <div className="mb-6">
+                <h3 className="mb-4 text-sm font-medium text-white/70">Manuel Renkler</h3>
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+                  {brandColors.map((color) => (
+                    <div
+                      key={color.id}
+                      className="group overflow-hidden rounded-xl border border-white/10 bg-white/5"
+                    >
+                      <div
+                        className="h-20 w-full"
+                        style={{ backgroundColor: color.hex }}
+                      />
+                      <div className="p-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="truncate text-sm font-medium text-white/80">{color.name}</span>
+                          <div className="flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                            <ColorPicker
+                              color={color.hex}
+                              onChange={(hex) => {
+                                setBrandColors(prev => prev.map(c => 
+                                  c.id === color.id ? { ...c, hex } : c
+                                ));
+                              }}
+                              size="sm"
+                            />
+                            <button
+                              onClick={() => copyColor(color.hex)}
+                              className="rounded p-1 text-white/40 hover:bg-white/10 hover:text-white"
+                              title="Kopyala"
+                            >
+                              {copiedColor === color.hex ? (
+                                <Check className="h-3 w-3 text-green-400" />
+                              ) : (
+                                <Copy className="h-3 w-3" />
+                              )}
+                            </button>
+                            <button
+                              onClick={() => removeColor(color.id)}
+                              className="rounded p-1 text-white/40 hover:bg-white/10 hover:text-red-400"
+                              title="Kaldır"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </button>
+                          </div>
+                        </div>
+                        <p className="mt-1 font-mono text-xs text-white/50">{color.hex}</p>
+                        {color.usage && <p className="mt-1 text-xs text-white/40">{color.usage}</p>}
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Add New Color Card */}
+                  <div className="flex flex-col overflow-hidden rounded-xl border border-dashed border-white/20 bg-white/5">
+                    <div
+                      className="relative h-20 w-full cursor-pointer"
+                      style={{ backgroundColor: newColorHex }}
+                    >
+                      <div className="absolute right-2 top-2">
+                        <ColorPicker
+                          color={newColorHex}
+                          onChange={setNewColorHex}
+                          size="sm"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-2 p-3">
+                      <input
+                        type="text"
+                        placeholder="Renk adı"
+                        value={newColorName}
+                        onChange={(e) => setNewColorName(e.target.value)}
+                        className="rounded border border-white/10 bg-white/5 px-2 py-1.5 text-xs text-white placeholder-white/30"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Kullanım (opsiyonel)"
+                        value={newColorUsage}
+                        onChange={(e) => setNewColorUsage(e.target.value)}
+                        className="rounded border border-white/10 bg-white/5 px-2 py-1.5 text-xs text-white placeholder-white/30"
+                      />
+                      <button
+                        onClick={addColor}
+                        disabled={!newColorName.trim()}
+                        className="flex items-center justify-center gap-1 rounded bg-purple-500/20 py-1.5 text-xs text-purple-300 hover:bg-purple-500/30 disabled:opacity-50"
+                      >
+                        <Plus className="h-3 w-3" />
+                        Renk Ekle
+                      </button>
                     </div>
                   </div>
-                ))}
-
-                {/* Add New Color Card */}
-                <div className="flex flex-col overflow-hidden rounded-xl border border-dashed border-white/20 bg-white/5">
-                  <div
-                    className="h-24 w-full cursor-pointer"
-                    style={{ backgroundColor: newColorHex }}
-                  >
-                    <input
-                      type="color"
-                      value={newColorHex}
-                      onChange={(e) => setNewColorHex(e.target.value)}
-                      className="h-full w-full cursor-pointer opacity-0"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2 p-3">
-                    <input
-                      type="text"
-                      placeholder="Color name"
-                      value={newColorName}
-                      onChange={(e) => setNewColorName(e.target.value)}
-                      className="rounded border border-white/10 bg-white/5 px-2 py-1 text-xs text-white placeholder-white/30"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Usage (optional)"
-                      value={newColorUsage}
-                      onChange={(e) => setNewColorUsage(e.target.value)}
-                      className="rounded border border-white/10 bg-white/5 px-2 py-1 text-xs text-white placeholder-white/30"
-                    />
-                    <button
-                      onClick={addColor}
-                      disabled={!newColorName.trim()}
-                      className="flex items-center justify-center gap-1 rounded bg-purple-500/20 py-1.5 text-xs text-purple-300 hover:bg-purple-500/30 disabled:opacity-50"
-                    >
-                      <Plus className="h-3 w-3" />
-                      Add Color
-                    </button>
-                  </div>
                 </div>
               </div>
 
-              {/* AI Color Suggestions */}
-              <div className="mt-8 rounded-xl border border-white/10 bg-white/5 p-6">
-                <div className="flex items-center gap-3">
-                  <Sparkles className="h-5 w-5 text-purple-400" />
-                  <div>
-                    <h3 className="text-sm font-medium text-white/80">AI Color Suggestions</h3>
-                    <p className="text-xs text-white/40">Coming Soon - Generate complementary colors with AI</p>
+              {/* Empty state for palettes */}
+              {colorPalettes.length === 0 && brandColors.length <= 5 && (
+                <div className="mt-8 rounded-xl border border-white/10 bg-white/5 p-6">
+                  <div className="flex items-center gap-3">
+                    <Palette className="h-5 w-5 text-purple-400" />
+                    <div>
+                      <h3 className="text-sm font-medium text-white/80">Renk Paleti Oluşturun</h3>
+                      <p className="text-xs text-white/40">
+                        Styles sekmesinden yeni bir stil oluşturun. Yüklediğiniz görsellerden renkler otomatik çıkarılır.
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           )}
 

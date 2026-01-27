@@ -49,7 +49,7 @@ export const GET = withAdminAuth(
 
   } catch (error: any) {
     return NextResponse.json(
-      { error: 'Failed to fetch user', details: error.message },
+      { error: 'Failed to fetch user' },
       { status: 500 }
     );
   }
@@ -143,7 +143,7 @@ export const PATCH = withAdminAuth(
   } catch (error: any) {
     console.error('User management error:', error);
     return NextResponse.json(
-      { error: 'Failed to perform action', details: error.message },
+      { error: 'Failed to perform action' },
       { status: 500 }
     );
   }
@@ -174,7 +174,7 @@ export const DELETE = withAdminAuth(
   } catch (error: any) {
     console.error('User deletion error:', error);
     return NextResponse.json(
-      { error: 'Failed to delete user', details: error.message },
+      { error: 'Failed to delete user' },
       { status: 500 }
     );
   }

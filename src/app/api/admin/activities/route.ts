@@ -75,7 +75,7 @@ export const GET = withAdminAuth(
   } catch (error: any) {
     console.error('Activities API error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch activities', details: error.message },
+      { error: 'Failed to fetch activities' },
       { status: 500 }
     );
   }

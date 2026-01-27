@@ -93,7 +93,7 @@ export const GET = withAdminAuth(
     } catch (error: any) {
       console.error('Images API error:', error);
       return NextResponse.json(
-        { error: 'Failed to fetch images', details: error.message },
+        { error: 'Failed to fetch images' },
         { status: 500 }
       );
     }

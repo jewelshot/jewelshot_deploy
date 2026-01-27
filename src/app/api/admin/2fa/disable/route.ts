@@ -41,7 +41,7 @@ export const POST = withAdminAuth(
     } catch (error: any) {
       console.error('2FA disable error:', error);
       return NextResponse.json(
-        { error: 'Failed to disable 2FA', details: error.message },
+        { error: 'Failed to disable 2FA' },
         { status: 500 }
       );
     }
