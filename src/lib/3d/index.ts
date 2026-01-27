@@ -8,6 +8,9 @@
  * - Weight calculation (metals in grams, stones in carats)
  * - Material database and creators
  * - 3D viewer types and constants
+ * - HDR Environment presets
+ * - Diamond/Stone effects
+ * - Post-processing effects
  */
 
 // ============================================
@@ -216,6 +219,56 @@ export function createMaterialById(materialId: string): THREE.Material | null {
     });
   }
 }
+
+// ============================================
+// HDR ENVIRONMENT PRESETS
+// ============================================
+export {
+  BUILTIN_HDR_PRESETS,
+  STUDIO_PRESETS,
+  getHDRPresetById,
+  getStudioPresetById,
+  getPresetsForCategory,
+  type HDRPreset,
+  type BuiltInPreset,
+  type StudioPreset as HDRStudioPreset,
+  type StudioLightConfig,
+} from './hdr-presets';
+
+// ============================================
+// DIAMOND/STONE EFFECTS
+// ============================================
+export {
+  DEFAULT_DIAMOND_EFFECTS,
+  STONE_CUT_PRESETS,
+  GEMSTONE_TYPES,
+  CUT_QUALITY_MULTIPLIERS,
+  generateDiamondUniforms,
+  getGemstoneById,
+  getCutPresetById,
+  calculateEffectiveEffects,
+  type DiamondEffectConfig,
+  type StoneCutPreset,
+  type GemstoneTypeConfig,
+} from './diamond-effects';
+
+// ============================================
+// POST-PROCESSING
+// ============================================
+export {
+  DEFAULT_POST_PROCESSING,
+  POST_PROCESSING_PRESETS,
+  TONE_MAPPING_OPTIONS,
+  getPresetById as getPostProcessingPresetById,
+  applyPreset as applyPostProcessingPreset,
+  type PostProcessingConfig,
+  type BloomConfig,
+  type SSAOConfig,
+  type DepthOfFieldConfig,
+  type VignetteConfig,
+  type ToneMappingConfig,
+  type PostProcessingPreset,
+} from './post-processing';
 
 // ============================================
 // DEFAULT EXPORT

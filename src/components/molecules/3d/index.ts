@@ -11,8 +11,9 @@ export { TransformControls } from './TransformControls';
 export { LayerPanel } from './LayerPanel';
 export { LayerGroupPanel, type LayerItem, type LayerCategory } from './LayerGroupPanel';
 
-// Material Picker
+// Material Picker & Editor
 export { MaterialPicker } from './MaterialPicker';
+export { MaterialEditor, type MaterialProperties } from './MaterialEditor';
 
 // Weight Summary
 export { WeightSummaryCard } from './WeightSummaryCard';
@@ -22,3 +23,12 @@ export { ViewerSettingsPanel } from './ViewerSettingsPanel';
 
 // Orientation Modal
 export { OrientationModal, type OrientationConfig } from './OrientationModal';
+
+// Environment
+export { EnvironmentPicker, type SelectedEnvironment, type EnvironmentType } from './EnvironmentPicker';
+
+// Diamond Effects
+export { DiamondEffectsPanel } from './DiamondEffectsPanel';
+
+// Post-Processing
+export { PostProcessingPanel } from './PostProcessingPanel';
