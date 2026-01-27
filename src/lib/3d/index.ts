@@ -2,11 +2,63 @@
  * 3D Library Index
  * 
  * Central export for all 3D-related utilities:
+ * - Unified model loader (GLTF, FBX, OBJ, STL, 3DM)
  * - Rhino3dm loader for 3DM files
  * - Layer detection and categorization
  * - Weight calculation (metals in grams, stones in carats)
  * - Material database and creators
+ * - 3D viewer types and constants
  */
+
+// ============================================
+// UNIFIED MODEL LOADER
+// ============================================
+export {
+  loadModel,
+  loadModelFromURL,
+  detectFormat,
+  getSupportedExtensions as getModelExtensions,
+  getAcceptString,
+  isSupported,
+  type SupportedFormat,
+  type LoadedModel,
+  type LoadProgress,
+  type ProgressCallback,
+} from './model-loader';
+
+// ============================================
+// 3D VIEWER TYPES
+// ============================================
+export {
+  type Vector3Values,
+  type TransformState,
+  type FlipState,
+  type ModelLayer as ViewerModelLayer,
+  type LayerGroup,
+  type LayerCategory as ViewerLayerCategory,
+  type MaterialPreset,
+  type MaterialCategory,
+  type LightConfig,
+  type StudioPreset,
+  type GroundPlaneConfig,
+  type BackgroundType,
+  type BackgroundConfig,
+  type CameraPreset,
+  type CameraConfig,
+  type QualityLevel,
+  type QualityConfig,
+  type AutoRotateConfig,
+  type ViewerState,
+  DEFAULT_TRANSFORM,
+  DEFAULT_FLIP,
+  DEFAULT_GROUND_PLANE,
+  DEFAULT_BACKGROUND,
+  DEFAULT_QUALITY,
+  DEFAULT_AUTO_ROTATE,
+  DEFAULT_CAMERA,
+  BACKGROUND_PRESET_COLORS,
+  GROUND_PRESET_COLORS,
+} from './types';
 
 // ============================================
 // RHINO3DM LOADER (Types only - actual loader is dynamically imported)
