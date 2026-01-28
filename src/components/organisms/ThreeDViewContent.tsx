@@ -550,6 +550,7 @@ function SceneContent({
   hdrPreset,
   useHDR,
   backgroundColor,
+  backgroundType,
   modelRotation,
   lighting,
   lightIntensity,
@@ -578,6 +579,7 @@ function SceneContent({
   hdrPreset: HDRPreset | null;
   useHDR: boolean;
   backgroundColor: string;
+  backgroundType: 'solid' | 'gradient' | 'transparent';
   modelRotation: [number, number, number];
   lighting: LightingPreset;
   lightIntensity: number;
@@ -788,8 +790,10 @@ function SceneContent({
         intensity={0.4 * intensityMultiplier}
       />
 
-      {/* Scene Background Color */}
-      <color attach="background" args={[backgroundColor]} />
+      {/* Scene Background Color - Only for solid backgrounds, transparent uses CSS */}
+      {backgroundType !== 'transparent' && (
+        <color attach="background" args={[backgroundColor]} />
+      )}
       
       {/* Environment: HDR or Lightformer - ONLY for reflections, never as visible background */}
       {useHDR && hdrPreset ? (
@@ -1066,7 +1070,55 @@ export default function ThreeDViewContent() {
   useEffect(() => {
     if (backgroundConfig.type === 'solid' && backgroundConfig.solidColor) {
       setBackgroundColor(backgroundConfig.solidColor);
+    } else if (backgroundConfig.type === 'transparent') {
+      // For transparent, use a dark color for WebGL but CSS will handle actual transparency
+      setBackgroundColor('#000000');
+    } else if (backgroundConfig.type === 'gradient') {
+      // For gradient, use the first gradient color for WebGL (CSS will overlay the gradient)
+      setBackgroundColor(backgroundConfig.gradientColors[0]);
     }
+  }, [backgroundConfig]);
+  
+  // Compute CSS background style based on backgroundConfig
+  const canvasBackgroundStyle = useMemo(() => {
+    if (backgroundConfig.type === 'transparent') {
+      // Transparent - checkerboard pattern for preview
+      return {
+        background: `
+          repeating-conic-gradient(
+            #808080 0% 25%,
+            #404040 0% 50%
+          ) 50% / 20px 20px
+        `,
+        opacity: backgroundConfig.opacity,
+      };
+    } else if (backgroundConfig.type === 'gradient') {
+      // Generate CSS gradient
+      const colors = backgroundConfig.gradientColors;
+      const dir = backgroundConfig.gradientDirection;
+      let gradientCSS = '';
+      
+      switch (dir) {
+        case 'vertical':
+          gradientCSS = `linear-gradient(to bottom, ${colors[0]}, ${colors[1]})`;
+          break;
+        case 'horizontal':
+          gradientCSS = `linear-gradient(to right, ${colors[0]}, ${colors[1]})`;
+          break;
+        case 'diagonal':
+          gradientCSS = `linear-gradient(135deg, ${colors[0]}, ${colors[1]})`;
+          break;
+        case 'radial':
+          gradientCSS = `radial-gradient(circle, ${colors[0]}, ${colors[1]})`;
+          break;
+        default:
+          gradientCSS = `linear-gradient(to bottom, ${colors[0]}, ${colors[1]})`;
+      }
+      
+      return { background: gradientCSS };
+    }
+    // Solid color
+    return { background: backgroundConfig.solidColor };
   }, [backgroundConfig]);
   
   // Sync hdrConfig with useHDR and environment settings
@@ -2083,11 +2135,16 @@ export default function ThreeDViewContent() {
               antialias: true,
               failIfMajorPerformanceCaveat: false,
               powerPreference: 'default',
+              alpha: true, // Enable alpha channel for transparent backgrounds
             }}
-            style={{ background: backgroundColor }}
+            style={canvasBackgroundStyle}
             onCreated={(state) => {
-              // Ensure WebGL context is properly initialized
-              state.gl.setClearColor(backgroundColor);
+              // Handle transparent background
+              if (backgroundConfig.type === 'transparent') {
+                state.gl.setClearColor(0x000000, 0); // Fully transparent
+              } else {
+                state.gl.setClearColor(backgroundColor, 1);
+              }
             }}
           >
             <Suspense fallback={null}>
@@ -2103,6 +2160,7 @@ export default function ThreeDViewContent() {
                 hdrPreset={selectedHDR}
                 useHDR={useHDR}
                 backgroundColor={backgroundColor}
+                backgroundType={backgroundConfig.type}
                 modelRotation={modelRotation}
                 lighting={selectedLighting}
                 lightIntensity={lightIntensity}
