@@ -10,6 +10,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import * as THREE from 'three';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Box,
@@ -63,6 +64,9 @@ import { MaterialPicker } from '@/components/molecules/3d/MaterialPicker';
 import { WeightSummaryCard } from '@/components/molecules/3d/WeightSummaryCard';
 import { EnvironmentPicker, type SelectedEnvironment } from '@/components/molecules/3d/EnvironmentPicker';
 import { ExportPanel } from '@/components/molecules/3d/ExportPanel';
+import { DiamondEffectsPanel } from '@/components/molecules/3d/DiamondEffectsPanel';
+import { OrientationModal, type OrientationConfig } from '@/components/molecules/3d/OrientationModal';
+import { DEFAULT_DIAMOND_EFFECTS, type DiamondEffectConfig } from '@/lib/3d/diamond-effects';
 import { type ScreenshotConfig, type VideoConfig, type MultiAngleConfig } from '@/lib/3d/export-utils';
 
 // ============================================
@@ -300,6 +304,21 @@ interface ThreeDRightPanelProps {
   onScreenshot: (config: ScreenshotConfig) => Promise<void>;
   onVideoExport?: (config: VideoConfig) => Promise<void>;
   onMultiAngleExport?: (config: MultiAngleConfig) => Promise<void>;
+  
+  // NEW: Diamond Effects (Legacy with gemstone/cut selection)
+  diamondEffects: DiamondEffectConfig;
+  onDiamondEffectsChange: (effects: DiamondEffectConfig) => void;
+  selectedGemstone: string;
+  onGemstoneChange: (id: string) => void;
+  selectedCut: string;
+  onCutChange: (id: string) => void;
+  
+  // NEW: Orientation Modal
+  orientationModalOpen: boolean;
+  onOrientationModalClose: () => void;
+  onOrientationConfirm: (config: OrientationConfig) => void;
+  orientationGeometry?: THREE.BufferGeometry;
+  orientationScene?: THREE.Group;
 }
 
 // ============================================
@@ -413,6 +432,19 @@ export function ThreeDRightPanel({
   onScreenshot,
   onVideoExport,
   onMultiAngleExport,
+  // Diamond Effects
+  diamondEffects,
+  onDiamondEffectsChange,
+  selectedGemstone,
+  onGemstoneChange,
+  selectedCut,
+  onCutChange,
+  // Orientation Modal
+  orientationModalOpen,
+  onOrientationModalClose,
+  onOrientationConfirm,
+  orientationGeometry,
+  orientationScene,
 }: ThreeDRightPanelProps) {
   const [activeTab, setActiveTab] = useState<TabId>('model');
 
@@ -622,6 +654,19 @@ export function ThreeDRightPanel({
                 onChange={onDiamondChange}
               />
             </Section>
+
+            {/* Legacy Diamond Effects with Gemstone/Cut Selection */}
+            <Section title="Taş Kesimi & Türü" icon={<Sparkles className="h-4 w-4" />}>
+              <DiamondEffectsPanel
+                effects={diamondEffects}
+                onChange={onDiamondEffectsChange}
+                selectedGemstone={selectedGemstone}
+                onGemstoneChange={onGemstoneChange}
+                selectedCut={selectedCut}
+                onCutChange={onCutChange}
+                compact
+              />
+            </Section>
           </div>
         )}
 
@@ -811,6 +856,16 @@ export function ThreeDRightPanel({
         currentMaterialId={materialPickerLayerId}
         layerCategory={materialPickerCategory}
         onSelectMaterial={onMaterialSelect}
+      />
+
+      {/* Orientation Modal */}
+      <OrientationModal
+        isOpen={orientationModalOpen}
+        onClose={onOrientationModalClose}
+        onConfirm={onOrientationConfirm}
+        geometry={orientationGeometry}
+        scene={orientationScene}
+        fileName={fileName || '3D Model'}
       />
     </div>
   );

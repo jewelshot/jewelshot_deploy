@@ -91,6 +91,8 @@ import { DEFAULT_TRANSFORM, DEFAULT_FLIP, type TransformState, type FlipState } 
 import { DEFAULT_CAMERA_SETTINGS, type CameraSettings, type CameraViewPreset, CAMERA_VIEW_PRESETS } from '@/lib/3d/camera-presets';
 import { type LayerItem, type LayerCategory } from '@/components/molecules/3d/LayerGroupPanel';
 import { type SelectedEnvironment } from '@/components/molecules/3d/EnvironmentPicker';
+import { type OrientationConfig } from '@/components/molecules/3d/OrientationModal';
+import { DEFAULT_DIAMOND_EFFECTS, type DiamondEffectConfig } from '@/lib/3d/diamond-effects';
 
 // Rhino3dm - Will be loaded dynamically when needed
 // Note: 3DM support requires additional setup due to WASM complexity
@@ -1181,6 +1183,14 @@ export default function ThreeDViewContent() {
     rotation: 0,
     backgroundVisible: true,
   });
+  
+  // Diamond Effects (Legacy)
+  const [diamondEffects, setDiamondEffects] = useState<DiamondEffectConfig>(DEFAULT_DIAMOND_EFFECTS);
+  const [selectedGemstone, setSelectedGemstone] = useState('diamond');
+  const [selectedCut, setSelectedCut] = useState('round-brilliant');
+  
+  // Orientation Modal
+  const [orientationModalOpen, setOrientationModalOpen] = useState(false);
   
   // Model dimensions for measurement
   const [modelDimensions, setModelDimensions] = useState<Dimensions3D | null>(null);
@@ -2747,6 +2757,26 @@ export default function ThreeDViewContent() {
               onMultiAngleExport={async (config) => {
                 // Use existing batch export
               }}
+              // Diamond Effects
+              diamondEffects={diamondEffects}
+              onDiamondEffectsChange={setDiamondEffects}
+              selectedGemstone={selectedGemstone}
+              onGemstoneChange={setSelectedGemstone}
+              selectedCut={selectedCut}
+              onCutChange={setSelectedCut}
+              // Orientation Modal
+              orientationModalOpen={orientationModalOpen}
+              onOrientationModalClose={() => setOrientationModalOpen(false)}
+              onOrientationConfirm={(config) => {
+                // Apply orientation to model
+                const rotX = THREE.MathUtils.degToRad(config.rotationX);
+                const rotY = THREE.MathUtils.degToRad(config.rotationY);
+                const rotZ = THREE.MathUtils.degToRad(config.rotationZ);
+                setModelRotation([rotX - Math.PI / 2, rotY, rotZ]);
+                setOrientationModalOpen(false);
+              }}
+              orientationGeometry={loadedGeometry || undefined}
+              orientationScene={undefined}
             />
           )}
         </div>
