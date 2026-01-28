@@ -1,0 +1,599 @@
+/**
+ * ThreeDRightPanel - Organized right panel for 3D viewer with tabs
+ * 
+ * Features:
+ * - Tab-based navigation (Model, Materials, Lighting, Effects, Export)
+ * - All 3D viewer controls in one organized place
+ * - Collapsible sections within each tab
+ */
+
+'use client';
+
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Box,
+  Palette,
+  Sun,
+  Sparkles,
+  Download,
+  Layers,
+  RotateCw,
+  Settings,
+  Eye,
+  EyeOff,
+  ChevronDown,
+  ChevronRight,
+  Grid3X3,
+  Image as ImageIcon,
+  Diamond,
+  Video,
+  Camera,
+  RefreshCw,
+  X,
+  Check,
+} from 'lucide-react';
+
+// Panels
+import { GroundPlaneControls, DEFAULT_GROUND_CONFIG, type GroundPlaneConfig } from '@/components/molecules/3d/GroundPlane';
+import { LightingPanel, DEFAULT_LIGHTING_CONFIG, type LightingConfig } from '@/components/molecules/3d/LightingPanel';
+import { BackgroundPanel, DEFAULT_BACKGROUND_CONFIG, type BackgroundConfig } from '@/components/molecules/3d/BackgroundPanel';
+import { EdgeSmoothingPanel, DEFAULT_EDGE_SMOOTHING_CONFIG, type EdgeSmoothingConfig } from '@/components/molecules/3d/EdgeSmoothingPanel';
+import { HDRPanel, DEFAULT_HDR_CONFIG, type HDRConfig } from '@/components/molecules/3d/HDRPanel';
+import { DiamondPanel, DEFAULT_DIAMOND_CONFIG, type DiamondConfig } from '@/components/molecules/3d/DiamondPanel';
+import { PostProcessingPanelNew, DEFAULT_POST_PROCESSING_CONFIG, type PostProcessingConfig } from '@/components/molecules/3d';
+import { MaterialEditor, METAL_PRESETS, type MaterialConfig } from '@/components/molecules/3d/MaterialEditor';
+import { VideoExportPanel, DEFAULT_VIDEO_CONFIG, type VideoExportConfig, type RecordingState } from '@/components/molecules/3d/VideoExportPanel';
+import { TurntableControls, DEFAULT_TURNTABLE_CONFIG, type TurntableConfig } from '@/components/molecules/3d/TurntableController';
+import { BatchExportPanel, DEFAULT_BATCH_CONFIG, type BatchExportConfig, type BatchExportProgress } from '@/components/molecules/3d/BatchExportPanel';
+
+// ============================================
+// TYPES
+// ============================================
+
+type TabId = 'model' | 'materials' | 'lighting' | 'effects' | 'export';
+
+interface TabConfig {
+  id: TabId;
+  label: string;
+  icon: React.ReactNode;
+}
+
+const TABS: TabConfig[] = [
+  { id: 'model', label: 'Model', icon: <Box className="h-4 w-4" /> },
+  { id: 'materials', label: 'Malzeme', icon: <Palette className="h-4 w-4" /> },
+  { id: 'lighting', label: 'Işık', icon: <Sun className="h-4 w-4" /> },
+  { id: 'effects', label: 'Efekt', icon: <Sparkles className="h-4 w-4" /> },
+  { id: 'export', label: 'Export', icon: <Download className="h-4 w-4" /> },
+];
+
+// ============================================
+// SECTION COMPONENT
+// ============================================
+
+interface SectionProps {
+  title: string;
+  icon?: React.ReactNode;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}
+
+function Section({ title, icon, defaultOpen = false, children }: SectionProps) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  return (
+    <div className="border-b border-white/5 last:border-b-0">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-white/5"
+      >
+        <div className="flex items-center gap-2">
+          {icon && <span className={isOpen ? 'text-purple-400' : 'text-white/40'}>{icon}</span>}
+          <span className={`text-xs font-medium ${isOpen ? 'text-white' : 'text-white/60'}`}>
+            {title}
+          </span>
+        </div>
+        {isOpen ? (
+          <ChevronDown className="h-3.5 w-3.5 text-white/40" />
+        ) : (
+          <ChevronRight className="h-3.5 w-3.5 text-white/40" />
+        )}
+      </button>
+      
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div className="px-4 pb-4">{children}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ============================================
+// MAIN COMPONENT PROPS
+// ============================================
+
+interface ThreeDRightPanelProps {
+  isOpen: boolean;
+  onToggle: () => void;
+  
+  // Model info
+  fileName?: string | null;
+  modelInfo?: { vertices: number; faces: number } | null;
+  has3DMFile?: boolean;
+  
+  // Layers
+  layers?: Array<{
+    id: string;
+    name: string;
+    visible: boolean;
+    color: string;
+    category?: 'metal' | 'stone' | 'other';
+  }>;
+  onLayerVisibilityChange?: (id: string, visible: boolean) => void;
+  onLayerMaterialChange?: (id: string, materialId: string) => void;
+  
+  // View options
+  showGrid: boolean;
+  onShowGridChange: (show: boolean) => void;
+  wireframe: boolean;
+  onWireframeChange: (show: boolean) => void;
+  autoRotate: boolean;
+  onAutoRotateChange: (auto: boolean) => void;
+  
+  // Material
+  selectedMaterial: MaterialConfig;
+  onMaterialChange: (material: Partial<MaterialConfig>) => void;
+  
+  // Lighting
+  lightingConfig: LightingConfig;
+  onLightingChange: (config: Partial<LightingConfig>) => void;
+  
+  // HDR
+  hdrConfig: HDRConfig;
+  onHDRChange: (config: Partial<HDRConfig>) => void;
+  
+  // Background
+  backgroundConfig: BackgroundConfig;
+  onBackgroundChange: (config: Partial<BackgroundConfig>) => void;
+  
+  // Ground
+  groundConfig: GroundPlaneConfig;
+  onGroundChange: (config: Partial<GroundPlaneConfig>) => void;
+  
+  // Diamond
+  diamondConfig: DiamondConfig;
+  onDiamondChange: (config: Partial<DiamondConfig>) => void;
+  
+  // Post-processing
+  postProcessingConfig: PostProcessingConfig;
+  onPostProcessingChange: (config: Partial<PostProcessingConfig>) => void;
+  
+  // Edge smoothing
+  edgeSmoothingConfig: EdgeSmoothingConfig;
+  onEdgeSmoothingChange: (config: Partial<EdgeSmoothingConfig>) => void;
+  onApplyEdgeSmoothing?: () => void;
+  isProcessingEdges?: boolean;
+  
+  // Turntable
+  turntableConfig: TurntableConfig;
+  onTurntableChange: (config: Partial<TurntableConfig>) => void;
+  isTurntablePlaying: boolean;
+  onTurntableToggle: () => void;
+  onTurntableReset: () => void;
+  
+  // Video export
+  videoConfig: VideoExportConfig;
+  onVideoConfigChange: (config: Partial<VideoExportConfig>) => void;
+  recordingState: RecordingState;
+  onStartRecording: () => void;
+  onStopRecording: () => void;
+  onPauseRecording: () => void;
+  onTakeScreenshot: () => void;
+  
+  // Batch export
+  batchConfig: BatchExportConfig;
+  onBatchConfigChange: (config: Partial<BatchExportConfig>) => void;
+  batchProgress: BatchExportProgress;
+  onStartBatchExport: () => void;
+  onCancelBatchExport: () => void;
+  
+  // Snapshot
+  snapshotPreview?: string | null;
+  onDownloadSnapshot?: () => void;
+  onSaveToGallery?: () => void;
+  onOpenInStudio?: () => void;
+  onClearSnapshot?: () => void;
+  
+  // File actions
+  onFileUpload?: () => void;
+  onClearModel?: () => void;
+}
+
+// ============================================
+// MAIN COMPONENT
+// ============================================
+
+export function ThreeDRightPanel({
+  isOpen,
+  onToggle,
+  fileName,
+  modelInfo,
+  has3DMFile = false,
+  layers = [],
+  onLayerVisibilityChange,
+  onLayerMaterialChange,
+  showGrid,
+  onShowGridChange,
+  wireframe,
+  onWireframeChange,
+  autoRotate,
+  onAutoRotateChange,
+  selectedMaterial,
+  onMaterialChange,
+  lightingConfig,
+  onLightingChange,
+  hdrConfig,
+  onHDRChange,
+  backgroundConfig,
+  onBackgroundChange,
+  groundConfig,
+  onGroundChange,
+  diamondConfig,
+  onDiamondChange,
+  postProcessingConfig,
+  onPostProcessingChange,
+  edgeSmoothingConfig,
+  onEdgeSmoothingChange,
+  onApplyEdgeSmoothing,
+  isProcessingEdges,
+  turntableConfig,
+  onTurntableChange,
+  isTurntablePlaying,
+  onTurntableToggle,
+  onTurntableReset,
+  videoConfig,
+  onVideoConfigChange,
+  recordingState,
+  onStartRecording,
+  onStopRecording,
+  onPauseRecording,
+  onTakeScreenshot,
+  batchConfig,
+  onBatchConfigChange,
+  batchProgress,
+  onStartBatchExport,
+  onCancelBatchExport,
+  snapshotPreview,
+  onDownloadSnapshot,
+  onSaveToGallery,
+  onOpenInStudio,
+  onClearSnapshot,
+  onFileUpload,
+  onClearModel,
+}: ThreeDRightPanelProps) {
+  const [activeTab, setActiveTab] = useState<TabId>('model');
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="flex h-full flex-col bg-[#0a0a0a]">
+      {/* Header with Tabs */}
+      <div className="border-b border-white/10">
+        {/* Title */}
+        <div className="flex items-center justify-between px-4 py-3">
+          <span className="text-sm font-medium text-white">3D Viewer</span>
+          <button
+            onClick={onToggle}
+            className="rounded p-1 text-white/40 hover:bg-white/10 hover:text-white"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        
+        {/* Tab Navigation */}
+        <div className="flex border-t border-white/5">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex flex-1 flex-col items-center gap-1 py-2.5 transition-colors ${
+                activeTab === tab.id
+                  ? 'bg-purple-500/10 text-purple-400 border-b-2 border-purple-500'
+                  : 'text-white/40 hover:text-white/60 hover:bg-white/5 border-b-2 border-transparent'
+              }`}
+            >
+              {tab.icon}
+              <span className="text-[9px] font-medium">{tab.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Tab Content */}
+      <div className="flex-1 overflow-y-auto">
+        {/* ========== MODEL TAB ========== */}
+        {activeTab === 'model' && (
+          <div>
+            {/* Model Info */}
+            {fileName && (
+              <Section title="Model Bilgisi" icon={<Box className="h-4 w-4" />} defaultOpen>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between rounded-lg bg-white/5 p-3">
+                    <div>
+                      <p className="text-xs text-white/70 truncate max-w-[160px]">{fileName}</p>
+                      {modelInfo && (
+                        <p className="text-[10px] text-white/40 mt-1">
+                          {modelInfo.vertices.toLocaleString()} vertices • {modelInfo.faces.toLocaleString()} faces
+                        </p>
+                      )}
+                    </div>
+                    <button
+                      onClick={onClearModel}
+                      className="rounded p-1.5 text-white/40 hover:bg-red-500/20 hover:text-red-400"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              </Section>
+            )}
+
+            {/* Layers */}
+            {layers.length > 0 && (
+              <Section title={`Katmanlar (${layers.length})`} icon={<Layers className="h-4 w-4" />} defaultOpen>
+                <div className="space-y-1 max-h-48 overflow-y-auto">
+                  {layers.map((layer) => (
+                    <div
+                      key={layer.id}
+                      className="flex items-center gap-2 rounded-lg bg-white/5 p-2"
+                    >
+                      <button
+                        onClick={() => onLayerVisibilityChange?.(layer.id, !layer.visible)}
+                        className={`rounded p-1 ${layer.visible ? 'text-white/70' : 'text-white/30'}`}
+                      >
+                        {layer.visible ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+                      </button>
+                      <div
+                        className="h-3 w-3 rounded-full ring-1 ring-white/20"
+                        style={{ backgroundColor: layer.color }}
+                      />
+                      <span className="flex-1 text-xs text-white/60 truncate">{layer.name}</span>
+                      {layer.category && (
+                        <span className={`text-[9px] px-1.5 py-0.5 rounded ${
+                          layer.category === 'metal' ? 'bg-yellow-500/20 text-yellow-400' :
+                          layer.category === 'stone' ? 'bg-cyan-500/20 text-cyan-400' :
+                          'bg-white/10 text-white/40'
+                        }`}>
+                          {layer.category}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </Section>
+            )}
+
+            {/* Display Options */}
+            <Section title="Görüntü Ayarları" icon={<Settings className="h-4 w-4" />} defaultOpen>
+              <div className="space-y-3">
+                <label className="flex items-center justify-between cursor-pointer">
+                  <span className="flex items-center gap-2 text-xs text-white/70">
+                    <Grid3X3 className="h-4 w-4" />
+                    Grid
+                  </span>
+                  <button
+                    onClick={() => onShowGridChange(!showGrid)}
+                    className={`relative w-9 h-5 rounded-full transition-colors ${
+                      showGrid ? 'bg-purple-500' : 'bg-white/20'
+                    }`}
+                  >
+                    <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform ${
+                      showGrid ? 'translate-x-4' : 'translate-x-0'
+                    }`} />
+                  </button>
+                </label>
+
+                <label className="flex items-center justify-between cursor-pointer">
+                  <span className="flex items-center gap-2 text-xs text-white/70">
+                    <Box className="h-4 w-4" />
+                    Wireframe
+                  </span>
+                  <button
+                    onClick={() => onWireframeChange(!wireframe)}
+                    className={`relative w-9 h-5 rounded-full transition-colors ${
+                      wireframe ? 'bg-purple-500' : 'bg-white/20'
+                    }`}
+                  >
+                    <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform ${
+                      wireframe ? 'translate-x-4' : 'translate-x-0'
+                    }`} />
+                  </button>
+                </label>
+
+                <label className="flex items-center justify-between cursor-pointer">
+                  <span className="flex items-center gap-2 text-xs text-white/70">
+                    <RefreshCw className="h-4 w-4" />
+                    Otomatik Döndür
+                  </span>
+                  <button
+                    onClick={() => onAutoRotateChange(!autoRotate)}
+                    className={`relative w-9 h-5 rounded-full transition-colors ${
+                      autoRotate ? 'bg-purple-500' : 'bg-white/20'
+                    }`}
+                  >
+                    <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform ${
+                      autoRotate ? 'translate-x-4' : 'translate-x-0'
+                    }`} />
+                  </button>
+                </label>
+              </div>
+            </Section>
+
+            {/* Turntable */}
+            <Section title="Turntable Animasyon" icon={<RotateCw className="h-4 w-4" />}>
+              <TurntableControls
+                config={turntableConfig}
+                onChange={onTurntableChange}
+                isPlaying={isTurntablePlaying}
+                onTogglePlay={onTurntableToggle}
+                onReset={onTurntableReset}
+              />
+            </Section>
+
+            {/* Edge Smoothing */}
+            <Section title="Mesh Kalitesi" icon={<Settings className="h-4 w-4" />}>
+              <EdgeSmoothingPanel
+                config={edgeSmoothingConfig}
+                onChange={onEdgeSmoothingChange}
+                onApply={onApplyEdgeSmoothing}
+                isProcessing={isProcessingEdges}
+                modelInfo={modelInfo}
+                has3DMFile={has3DMFile}
+              />
+            </Section>
+          </div>
+        )}
+
+        {/* ========== MATERIALS TAB ========== */}
+        {activeTab === 'materials' && (
+          <div>
+            <Section title="Malzeme Editörü" icon={<Palette className="h-4 w-4" />} defaultOpen>
+              <MaterialEditor
+                material={selectedMaterial}
+                onChange={onMaterialChange}
+              />
+            </Section>
+
+            <Section title="Taş Efektleri" icon={<Diamond className="h-4 w-4" />}>
+              <DiamondPanel
+                config={diamondConfig}
+                onChange={onDiamondChange}
+              />
+            </Section>
+          </div>
+        )}
+
+        {/* ========== LIGHTING TAB ========== */}
+        {activeTab === 'lighting' && (
+          <div>
+            <Section title="Ortam (HDR)" icon={<ImageIcon className="h-4 w-4" />} defaultOpen>
+              <HDRPanel
+                config={hdrConfig}
+                onChange={onHDRChange}
+              />
+            </Section>
+
+            <Section title="Işık Kaynakları" icon={<Sun className="h-4 w-4" />}>
+              <LightingPanel
+                config={lightingConfig}
+                onChange={onLightingChange}
+              />
+            </Section>
+
+            <Section title="Arka Plan" icon={<Layers className="h-4 w-4" />}>
+              <BackgroundPanel
+                config={backgroundConfig}
+                onChange={onBackgroundChange}
+              />
+            </Section>
+
+            <Section title="Zemin Düzlemi" icon={<Box className="h-4 w-4" />}>
+              <GroundPlaneControls
+                config={groundConfig}
+                onChange={onGroundChange}
+              />
+            </Section>
+          </div>
+        )}
+
+        {/* ========== EFFECTS TAB ========== */}
+        {activeTab === 'effects' && (
+          <div>
+            <Section title="Post-Processing" icon={<Sparkles className="h-4 w-4" />} defaultOpen>
+              <PostProcessingPanelNew
+                config={postProcessingConfig}
+                onChange={onPostProcessingChange}
+              />
+            </Section>
+          </div>
+        )}
+
+        {/* ========== EXPORT TAB ========== */}
+        {activeTab === 'export' && (
+          <div>
+            {/* Snapshot Preview */}
+            {snapshotPreview && (
+              <Section title="Önizleme" icon={<Camera className="h-4 w-4" />} defaultOpen>
+                <div className="space-y-2">
+                  <div className="relative overflow-hidden rounded-lg border border-white/10">
+                    <img src={snapshotPreview} alt="Snapshot" className="w-full" />
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={onDownloadSnapshot}
+                      className="flex-1 flex items-center justify-center gap-1 rounded-lg bg-purple-500 py-2 text-xs font-medium text-white hover:bg-purple-600"
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                      İndir
+                    </button>
+                    <button
+                      onClick={onSaveToGallery}
+                      className="flex-1 flex items-center justify-center gap-1 rounded-lg bg-white/10 py-2 text-xs font-medium text-white hover:bg-white/20"
+                    >
+                      <ImageIcon className="h-3.5 w-3.5" />
+                      Galeri
+                    </button>
+                  </div>
+                  <button
+                    onClick={onClearSnapshot}
+                    className="w-full text-center text-[10px] text-white/40 hover:text-white/60"
+                  >
+                    Temizle
+                  </button>
+                </div>
+              </Section>
+            )}
+
+            <Section title="Video / GIF / Görsel" icon={<Video className="h-4 w-4" />} defaultOpen>
+              <VideoExportPanel
+                config={videoConfig}
+                onChange={onVideoConfigChange}
+                recordingState={recordingState}
+                onStartRecording={onStartRecording}
+                onStopRecording={onStopRecording}
+                onPauseRecording={onPauseRecording}
+                onTakeScreenshot={onTakeScreenshot}
+              />
+            </Section>
+
+            <Section title="Toplu Export (Çoklu Açı)" icon={<Layers className="h-4 w-4" />}>
+              <BatchExportPanel
+                config={batchConfig}
+                onChange={onBatchConfigChange}
+                progress={batchProgress}
+                onStartExport={onStartBatchExport}
+                onCancelExport={onCancelBatchExport}
+              />
+            </Section>
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="border-t border-white/10 px-4 py-2 text-center">
+        <p className="text-[9px] text-white/30">JewelShot 3D Viewer v2.0</p>
+      </div>
+    </div>
+  );
+}
+
+export default ThreeDRightPanel;

@@ -68,6 +68,20 @@ import {
   type FrameCaptureProgress,
 } from '@/lib/3d/video-export';
 
+// New organized right panel
+import { ThreeDRightPanel } from '@/components/organisms/ThreeDRightPanel';
+import { DEFAULT_GROUND_CONFIG, type GroundPlaneConfig } from '@/components/molecules/3d/GroundPlane';
+import { DEFAULT_LIGHTING_CONFIG, type LightingConfig } from '@/components/molecules/3d/LightingPanel';
+import { DEFAULT_BACKGROUND_CONFIG, type BackgroundConfig } from '@/components/molecules/3d/BackgroundPanel';
+import { DEFAULT_EDGE_SMOOTHING_CONFIG, type EdgeSmoothingConfig } from '@/components/molecules/3d/EdgeSmoothingPanel';
+import { DEFAULT_HDR_CONFIG, type HDRConfig } from '@/components/molecules/3d/HDRPanel';
+import { DEFAULT_DIAMOND_CONFIG, type DiamondConfig } from '@/components/molecules/3d/DiamondPanel';
+import { DEFAULT_POST_PROCESSING_CONFIG, type PostProcessingConfig } from '@/components/molecules/3d';
+import { METAL_PRESETS as MATERIAL_METAL_PRESETS, type MaterialConfig } from '@/components/molecules/3d/MaterialEditor';
+import { DEFAULT_VIDEO_CONFIG, type VideoExportConfig, type RecordingState } from '@/components/molecules/3d/VideoExportPanel';
+import { DEFAULT_TURNTABLE_CONFIG, type TurntableConfig } from '@/components/molecules/3d/TurntableController';
+import { DEFAULT_BATCH_CONFIG, type BatchExportConfig, type BatchExportProgress } from '@/components/molecules/3d/BatchExportPanel';
+
 // Rhino3dm - Will be loaded dynamically when needed
 // Note: 3DM support requires additional setup due to WASM complexity
 
@@ -916,6 +930,58 @@ export default function ThreeDViewContent() {
   const [exportProgress, setExportProgress] = useState<FrameCaptureProgress | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const initialRotation = useRef<[number, number, number]>(modelRotation);
+  
+  // ===== NEW PANEL STATES =====
+  // Ground config
+  const [groundConfig, setGroundConfig] = useState<GroundPlaneConfig>(DEFAULT_GROUND_CONFIG);
+  
+  // Lighting config (uses new system)
+  const [lightingConfig, setLightingConfig] = useState<LightingConfig>(DEFAULT_LIGHTING_CONFIG);
+  
+  // Background config
+  const [backgroundConfig, setBackgroundConfig] = useState<BackgroundConfig>(DEFAULT_BACKGROUND_CONFIG);
+  
+  // Edge smoothing config
+  const [edgeSmoothingConfig, setEdgeSmoothingConfig] = useState<EdgeSmoothingConfig>(DEFAULT_EDGE_SMOOTHING_CONFIG);
+  const [isProcessingEdges, setIsProcessingEdges] = useState(false);
+  
+  // HDR config
+  const [hdrConfig, setHDRConfig] = useState<HDRConfig>(DEFAULT_HDR_CONFIG);
+  
+  // Diamond config
+  const [diamondConfig, setDiamondConfig] = useState<DiamondConfig>(DEFAULT_DIAMOND_CONFIG);
+  
+  // Post-processing config
+  const [postProcessingConfig, setPostProcessingConfig] = useState<PostProcessingConfig>(DEFAULT_POST_PROCESSING_CONFIG);
+  
+  // Material config (new format)
+  const [materialConfig, setMaterialConfig] = useState<MaterialConfig>(MATERIAL_METAL_PRESETS[0]);
+  
+  // Video export config
+  const [videoConfig, setVideoConfig] = useState<VideoExportConfig>(DEFAULT_VIDEO_CONFIG);
+  const [recordingState, setRecordingState] = useState<RecordingState>({ 
+    isRecording: false, 
+    isPaused: false, 
+    progress: 0,
+    currentFrame: 0,
+    totalFrames: 0,
+    elapsedTime: 0,
+    estimatedTimeRemaining: 0
+  });
+  
+  // Turntable config
+  const [turntableConfig, setTurntableConfig] = useState<TurntableConfig>(DEFAULT_TURNTABLE_CONFIG);
+  const [isTurntablePlaying, setIsTurntablePlaying] = useState(false);
+  
+  // Batch export config
+  const [batchConfig, setBatchConfig] = useState<BatchExportConfig>(DEFAULT_BATCH_CONFIG);
+  const [batchProgress, setBatchProgress] = useState<BatchExportProgress>({ 
+    isExporting: false, 
+    currentAngle: 0, 
+    totalAngles: 0, 
+    completedImages: [],
+    currentAngleName: ''
+  });
   
   // Resolution change callback
   const handleResolutionChange = useCallback((ratio: number, refining: boolean) => {
@@ -1949,700 +2015,118 @@ export default function ThreeDViewContent() {
           )}
         </div>
 
-        {/* Right Panel Toggle Button (matching Studio style) */}
+        {/* Right Panel Toggle Button */}
         <button
           onClick={() => setRightOpen(!rightOpen)}
           className="fixed right-0 top-1/2 z-50 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-l-md border border-r-0 border-white/10 bg-[#0a0a0a] text-white/50 transition-all hover:text-white"
           style={{
-            right: rightOpen ? '280px' : '0',
-            transition: 'right 800ms cubic-bezier(0.4, 0.0, 0.2, 1)',
+            right: rightOpen ? '320px' : '0',
+            transition: 'right 500ms cubic-bezier(0.4, 0.0, 0.2, 1)',
           }}
         >
           {rightOpen ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
         </button>
 
-        {/* Right Panel */}
+        {/* Right Panel - NEW ORGANIZED VERSION */}
         <div 
           className="fixed right-0 top-0 bottom-0 z-40 flex flex-col border-l border-white/5 bg-[#0a0a0a]"
           style={{
-            width: rightOpen ? '280px' : '0',
+            width: rightOpen ? '320px' : '0',
             opacity: rightOpen ? 1 : 0,
-            transition: 'width 800ms cubic-bezier(0.4, 0.0, 0.2, 1), opacity 400ms ease',
+            transition: 'width 500ms cubic-bezier(0.4, 0.0, 0.2, 1), opacity 300ms ease',
           }}
         >
           {rightOpen && (
-            <div className="flex flex-1 flex-col overflow-y-auto p-4">
-              {/* Snapshot Preview - ALWAYS AT TOP */}
-              {snapshotPreview && (
-                <div className="mb-6">
-                  <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
-                    Snapshot Preview
-                  </h3>
-                  <div className="relative overflow-hidden rounded-lg border border-white/10">
-                    <img 
-                      src={snapshotPreview} 
-                      alt="Snapshot" 
-                      className="w-full"
-                    />
-                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/70 opacity-0 transition-opacity hover:opacity-100">
-                      <div className="flex flex-wrap justify-center gap-2">
-                        <button
-                          onClick={handleDownloadSnapshot}
-                          className="flex items-center gap-1 rounded-lg bg-purple-500 px-3 py-2 text-xs font-medium text-white hover:bg-purple-600"
-                        >
-                          <Download className="h-3.5 w-3.5" />
-                          Download
-                        </button>
-                        <button
-                          onClick={handleSaveToGallery}
-                          className="flex items-center gap-1 rounded-lg bg-white/15 px-3 py-2 text-xs font-medium text-white hover:bg-white/25"
-                        >
-                          <Image className="h-3.5 w-3.5" />
-                          Gallery
-                        </button>
-                        <button
-                          onClick={() => handleOpenInStudio(snapshotPreview)}
-                          className="flex items-center gap-1 rounded-lg bg-gradient-to-r from-rose-500 to-orange-500 px-3 py-2 text-xs font-medium text-white hover:from-rose-600 hover:to-orange-600"
-                        >
-                          <Palette className="h-3.5 w-3.5" />
-                          Studio
-                        </button>
-                      </div>
-                      <button
-                        onClick={() => setSnapshotPreview(null)}
-                        className="mt-1 text-[10px] text-white/50 hover:text-white/70"
-                      >
-                        Clear
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-              
-              {/* Export Panel */}
-              {(loadedGeometry || layers.length > 0) && (
-                <div className="mb-6">
-                  <Accordion title="Export" defaultOpen={true}>
-                    <ExportPanel
-                      onScreenshot={handleExportScreenshot}
-                      onVideo={handleExportVideo}
-                      onMultiAngle={handleExportMultiAngle}
-                      isExporting={isExporting}
-                    />
-                  </Accordion>
-                </div>
-              )}
-
-              {/* File Upload */}
-              <div className="mb-6">
-                <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
-                  Model
-                </h3>
-                {loadedGeometry ? (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 p-3">
-                      <div className="flex items-center gap-2">
-                        <Box className="h-4 w-4 text-purple-400" />
-                        <span className="text-sm text-white/70 truncate max-w-[120px]">
-                          {fileName}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => fileInputRef.current?.click()}
-                          className="rounded p-1 text-white/40 hover:bg-white/10 hover:text-white"
-                          title="Replace"
-                        >
-                          <RefreshCw className="h-3.5 w-3.5" />
-                        </button>
-                        <button
-                          onClick={handleClearModel}
-                          className="rounded p-1 text-white/40 hover:bg-white/10 hover:text-red-400"
-                          title="Remove"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                    {/* Model Info */}
-                    {modelInfo && (
-                      <div className="flex items-center gap-3 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2 text-[10px] text-white/40">
-                        <Info className="h-3 w-3 text-white/30" />
-                        <span>{modelInfo.vertices.toLocaleString()} vertices</span>
-                        <span>{modelInfo.faces.toLocaleString()} faces</span>
-                      </div>
-                    )}
-                    
-                    {/* Subdivision Control */}
-                    {originalGeometry && (
-                      <div className="mt-3 space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] text-white/40">Subdivision</span>
-                          <span className="text-[10px] text-white/60">{subdivisionLevel}x</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="range"
-                            min="0"
-                            max="3"
-                            step="1"
-                            value={subdivisionLevel}
-                            onChange={(e) => setSubdivisionLevel(parseInt(e.target.value))}
-                            className="flex-1 h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-purple-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer"
-                          />
-                        </div>
-                        <p className="text-[9px] text-white/30">
-                          Higher = smoother (slower)
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-white/20 bg-white/5 py-4 text-sm text-white/50 hover:border-white/30 hover:bg-white/10"
-                  >
-                    <Upload className="h-4 w-4" />
-                    Upload STL File
-                  </button>
-                )}
-              </div>
-
-              {/* Lighting */}
-              <div className="mb-4">
-                <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
-                  Lighting
-                </h3>
-                {/* Lighting Presets */}
-                <div className="grid grid-cols-3 gap-1 mb-3">
-                  {LIGHTING_PRESETS.map((preset) => (
-                    <button
-                      key={preset.id}
-                      onClick={() => setSelectedLighting(preset)}
-                      className={`rounded-md py-2 text-xs transition-all ${
-                        selectedLighting.id === preset.id
-                          ? 'bg-purple-500/30 text-purple-300 ring-1 ring-purple-500/50'
-                          : 'bg-white/5 text-white/50 hover:bg-white/10'
-                      }`}
-                    >
-                      {preset.name}
-                    </button>
-                  ))}
-                </div>
-                {/* Intensity Slider */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-white/40">Intensity</span>
-                    <span className="text-[10px] text-white/60">{Math.round(lightIntensity * 100)}%</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="0.1"
-                    max="3"
-                    step="0.1"
-                    value={lightIntensity}
-                    onChange={(e) => setLightIntensity(parseFloat(e.target.value))}
-                    className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-purple-500 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer"
-                  />
-                </div>
-              </div>
-
-              {/* Environment */}
-              <div className="mb-4">
-                <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
-                  Environment
-                </h3>
-                
-                {/* Environment Type Toggle */}
-                <div className="flex rounded-lg border border-white/10 bg-white/5 p-1 mb-3">
-                  <button
-                    onClick={() => setUseHDR(false)}
-                    className={`flex-1 rounded-md py-1.5 text-xs font-medium transition-all ${
-                      !useHDR
-                        ? 'bg-white/15 text-white'
-                        : 'text-white/50 hover:text-white/70'
-                    }`}
-                  >
-                    Studio
-                  </button>
-                  <button
-                    onClick={() => {
-                      setUseHDR(true);
-                      if (!selectedHDR && HDR_PRESETS.length > 0) {
-                        setSelectedHDR(HDR_PRESETS[0]);
-                      }
-                    }}
-                    className={`flex-1 rounded-md py-1.5 text-xs font-medium transition-all ${
-                      useHDR
-                        ? 'bg-white/15 text-white'
-                        : 'text-white/50 hover:text-white/70'
-                    }`}
-                  >
-                    HDR
-                  </button>
-                </div>
-                
-                {/* HDR Presets */}
-                {useHDR ? (
-                  <div className="space-y-2">
-                    {HDR_PRESETS.length > 0 ? (
-                      <>
-                        {HDR_PRESETS.map((preset) => (
-                          <button
-                            key={preset.id}
-                            onClick={() => setSelectedHDR(preset)}
-                            className={`w-full flex items-center gap-3 p-2 rounded-lg transition-all ${
-                              selectedHDR?.id === preset.id
-                                ? 'bg-purple-500/20 ring-1 ring-purple-500/50'
-                                : 'bg-white/5 hover:bg-white/10'
-                            }`}
-                          >
-                            {/* HDR Preview */}
-                            <div 
-                              className="w-10 h-10 rounded-md flex-shrink-0 ring-1 ring-white/10"
-                              style={{ background: preset.preview }}
-                            />
-                            <div className="text-left flex-1 min-w-0">
-                              <p className={`text-xs font-medium truncate ${
-                                selectedHDR?.id === preset.id ? 'text-purple-300' : 'text-white/80'
-                              }`}>
-                                {preset.name}
-                              </p>
-                              <p className="text-[10px] text-white/40 truncate">
-                                {preset.description}
-                              </p>
-                            </div>
-                          </button>
-                        ))}
-                      </>
-                    ) : (
-                      <p className="text-[10px] text-white/40 text-center py-4">
-                        No HDR files available. Add .hdr or .exr files to /public/environments/
-                      </p>
-                    )}
-                    <p className="text-[10px] text-white/30 mt-2">
-                      HDR environments provide realistic reflections.
-                    </p>
-                  </div>
-                ) : (
-                  <>
-                    {/* Studio Presets */}
-                    <div className="grid grid-cols-3 gap-1 mb-3">
-                      {STUDIO_PRESETS.map((preset) => (
-                        <button
-                          key={preset.id}
-                          onClick={() => setSelectedStudio(preset)}
-                          className={`rounded-md py-1.5 text-[10px] transition-all ${
-                            selectedStudio.id === preset.id
-                              ? 'bg-purple-500/30 text-purple-300 ring-1 ring-purple-500/50'
-                              : 'bg-white/5 text-white/50 hover:bg-white/10'
-                          }`}
-                        >
-                          {preset.name}
-                        </button>
-                      ))}
-                    </div>
-                    <p className="text-[10px] text-white/30">
-                      Built-in studio lighting - no external files needed.
-                    </p>
-                  </>
-                )}
-                
-                {/* Environment Rotation */}
-                <div className="mt-3 space-y-2">
-                  <p className="text-[10px] text-white/40">Environment Rotation</p>
-                  <div className="grid grid-cols-3 gap-2">
-                    <div>
-                      <label className="text-[9px] text-white/30">X</label>
-                      <input
-                        type="range"
-                        min="0"
-                        max="360"
-                        value={envRotation[0] * (180 / Math.PI)}
-                        onChange={(e) => setEnvRotation([parseFloat(e.target.value) * (Math.PI / 180), envRotation[1], envRotation[2]])}
-                        className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-purple-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[9px] text-white/30">Y</label>
-                      <input
-                        type="range"
-                        min="0"
-                        max="360"
-                        value={envRotation[1] * (180 / Math.PI)}
-                        onChange={(e) => setEnvRotation([envRotation[0], parseFloat(e.target.value) * (Math.PI / 180), envRotation[2]])}
-                        className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-purple-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[9px] text-white/30">Z</label>
-                      <input
-                        type="range"
-                        min="0"
-                        max="360"
-                        value={envRotation[2] * (180 / Math.PI)}
-                        onChange={(e) => setEnvRotation([envRotation[0], envRotation[1], parseFloat(e.target.value) * (Math.PI / 180)])}
-                        className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-purple-500"
-                      />
-                    </div>
-                  </div>
-                </div>
-                
-                </div>
-
-              {/* Background */}
-              <div className="mb-4">
-                <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
-                  Background
-                </h3>
-                <div className="flex gap-2">
-                  {BACKGROUND_PRESETS.map((preset) => (
-                    <button
-                      key={preset.id}
-                      onClick={() => setBackgroundColor(preset.color)}
-                      className={`h-6 w-6 rounded border-2 transition-all ${
-                        backgroundColor === preset.color
-                          ? 'border-purple-500 ring-1 ring-purple-500/30'
-                          : 'border-transparent hover:border-white/30'
-                      }`}
-                      style={{ background: preset.color }}
-                      title={preset.name}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Tessellation Quality (only for 3DM files) */}
-              {raw3DMBuffer && (
-                <div className="mb-4">
-                  <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
-                    Mesh Quality
-                  </h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-white/70">Quality</span>
-                      <span className="text-xs font-mono text-purple-400">{tessellationQuality.toFixed(2)}</span>
-                    </div>
-                    <input
-                      type="range"
-                      min="0.25"
-                      max="5"
-                      step="0.25"
-                      value={tessellationQuality}
-                      onChange={(e) => setTessellationQuality(parseFloat(e.target.value))}
-                      className="w-full h-2 bg-white/10 rounded-full appearance-none cursor-pointer accent-purple-500"
-                    />
-                    <div className="flex justify-between text-[10px] text-white/40">
-                      <span>Fast (Low)</span>
-                      <span>Balanced</span>
-                      <span>HD (High)</span>
-                    </div>
-                    <button
-                      onClick={() => reTessellate(tessellationQuality)}
-                      disabled={isLoading}
-                      className="w-full py-2 px-3 rounded-lg bg-purple-500/20 text-purple-300 text-xs font-medium hover:bg-purple-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {isLoading ? 'Processing...' : 'Apply Quality'}
-                    </button>
-                    {modelInfo && (
-                      <p className="text-[10px] text-white/40 text-center">
-                        {modelInfo.vertices.toLocaleString()} vertices • {modelInfo.faces.toLocaleString()} faces
-                      </p>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Display Options */}
-              <div className="mb-4">
-                <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
-                  Display Options
-                </h3>
-                <div className="space-y-2">
-                  {/* Grid Toggle */}
-                  <label className="flex items-center justify-between cursor-pointer py-1">
-                    <span className="flex items-center gap-2 text-xs text-white/70">
-                      <Grid3X3 className="h-4 w-4" />
-                      Show Grid
-                    </span>
-                    <button
-                      onClick={() => setShowGrid(!showGrid)}
-                      className={`relative w-9 h-5 rounded-full transition-colors ${
-                        showGrid ? 'bg-purple-500' : 'bg-white/20'
-                      }`}
-                    >
-                      <span 
-                        className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform ${
-                          showGrid ? 'translate-x-4' : 'translate-x-0'
-                        }`}
-                      />
-                    </button>
-                  </label>
-                  
-                  {/* Wireframe Toggle */}
-                  <label className="flex items-center justify-between cursor-pointer py-1">
-                    <span className="flex items-center gap-2 text-xs text-white/70">
-                      <Box className="h-4 w-4" />
-                      Wireframe Mode
-                    </span>
-                    <button
-                      onClick={() => setWireframe(!wireframe)}
-                      className={`relative w-9 h-5 rounded-full transition-colors ${
-                        wireframe ? 'bg-purple-500' : 'bg-white/20'
-                      }`}
-                    >
-                      <span 
-                        className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform ${
-                          wireframe ? 'translate-x-4' : 'translate-x-0'
-                        }`}
-                      />
-                    </button>
-                  </label>
-                  
-                  {/* Auto Rotate Toggle */}
-                  <label className="flex items-center justify-between cursor-pointer py-1">
-                    <span className="flex items-center gap-2 text-xs text-white/70">
-                      <RefreshCw className="h-4 w-4" />
-                      Auto Rotate
-                    </span>
-                    <button
-                      onClick={() => setAutoRotate(!autoRotate)}
-                      className={`relative w-9 h-5 rounded-full transition-colors ${
-                        autoRotate ? 'bg-purple-500' : 'bg-white/20'
-                      }`}
-                    >
-                      <span 
-                        className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform ${
-                          autoRotate ? 'translate-x-4' : 'translate-x-0'
-                        }`}
-                      />
-                    </button>
-                  </label>
-                  
-                  {/* Edge Smoothing */}
-                  <div className="pt-2 mt-2 border-t border-white/10">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs text-white/70">Edge Smoothing</span>
-                      <span className="text-[10px] text-white/50">{Math.round(edgeSmoothing * 100)}%</span>
-                    </div>
-                    <input
-                      type="range"
-                      min="0"
-                      max="1"
-                      step="0.1"
-                      value={edgeSmoothing}
-                      onChange={(e) => setEdgeSmoothing(parseFloat(e.target.value))}
-                      className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer accent-purple-500"
-                    />
-                    <p className="text-[9px] text-white/30 mt-1">
-                      Chamfer effect for smoother edges
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Material Type Toggle */}
-              <div className="mb-4">
-                <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
-                  Material Type
-                </h3>
-                <div className="flex rounded-lg border border-white/10 bg-white/5 p-1">
-                  <button
-                    onClick={() => setMaterialType('metal')}
-                    className={`flex-1 rounded-md py-1.5 text-xs font-medium transition-all ${
-                      materialType === 'metal'
-                        ? 'bg-white/15 text-white'
-                        : 'text-white/50 hover:text-white/70'
-                    }`}
-                  >
-                    Metal
-                  </button>
-                  <button
-                    onClick={() => setMaterialType('stone')}
-                    className={`flex-1 rounded-md py-1.5 text-xs font-medium transition-all ${
-                      materialType === 'stone'
-                        ? 'bg-white/15 text-white'
-                        : 'text-white/50 hover:text-white/70'
-                    }`}
-                  >
-                    Stone
-                  </button>
-                  <button
-                    onClick={() => setMaterialType('matte')}
-                    className={`flex-1 rounded-md py-1.5 text-xs font-medium transition-all ${
-                      materialType === 'matte'
-                        ? 'bg-white/15 text-white'
-                        : 'text-white/50 hover:text-white/70'
-                    }`}
-                  >
-                    Matte
-                  </button>
-                </div>
-              </div>
-
-              {/* Material Presets */}
-              <div className="mb-6">
-                <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
-                  {materialType === 'metal' ? 'Metal' : materialType === 'stone' ? 'Stone' : 'Matte / Resin'} Presets
-                </h3>
-                <div className="space-y-2">
-                  {currentPresets.map((preset) => (
-                    <button
-                      key={preset.id}
-                      onClick={() => setSelectedMaterial(preset)}
-                      className={`flex w-full items-center gap-3 rounded-lg border p-3 transition-all ${
-                        selectedMaterial.id === preset.id
-                          ? 'border-purple-500/50 bg-purple-500/10'
-                          : 'border-white/10 bg-white/5 hover:border-white/20'
-                      }`}
-                    >
-                      <div 
-                        className="h-6 w-6 rounded-full shadow-inner"
-                        style={{ 
-                          background: `linear-gradient(135deg, ${preset.color} 0%, ${preset.color}88 100%)`,
-                          boxShadow: `inset 0 2px 4px rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.3)`
-                        }}
-                      />
-                      <span className="text-sm text-white/70">{preset.name}</span>
-                      {selectedMaterial.id === preset.id && (
-                        <Check className="ml-auto h-4 w-4 text-purple-400" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Layers Accordion (for 3DM files) */}
-              <Accordion
-                title="Objects"
-                count={layers.length > 0 ? layers.length : undefined}
-                defaultOpen={layersAccordionOpen}
-              >
-                {layers.length > 0 ? (
-                  <div className="space-y-1">
-                    {layers.map((layer) => (
-                      <div
-                        key={layer.id}
-                        className="rounded-lg border border-white/10 bg-white/5 p-2 transition-all hover:border-white/20"
-                      >
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => {
-                              setLayers(prev => prev.map(l => 
-                                l.id === layer.id ? { ...l, visible: !l.visible } : l
-                              ));
-                            }}
-                            className={`rounded p-1 transition-colors ${
-                              layer.visible 
-                                ? 'text-white/70 hover:bg-white/10' 
-                                : 'text-white/30 hover:bg-white/10'
-                            }`}
-                          >
-                            {layer.visible ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
-                          </button>
-                          <div
-                            className="h-3 w-3 rounded-full ring-1 ring-white/20"
-                            style={{ backgroundColor: layerMaterials[layer.id]?.color || layer.color }}
-                          />
-                          <div className="flex-1 overflow-hidden">
-                            <span className="text-xs text-white/70 truncate block">{layer.name}</span>
-                            <div className="flex items-center gap-1.5 text-[10px] text-white/40">
-                              <span className={`px-1 py-0.5 rounded text-[9px] ${
-                                layer.category === 'metal' || layer.category === 'setting'
-                                  ? 'bg-yellow-500/20 text-yellow-400'
-                                  : layer.category === 'stone'
-                                  ? 'bg-cyan-500/20 text-cyan-400'
-                                  : 'bg-white/10 text-white/40'
-                              }`}>
-                                {layer.category || 'unknown'}
-                              </span>
-                              {layer.volumeInfo && (
-                                <span>
-                                  {layer.category === 'stone'
-                                    ? `${layer.volumeInfo.carats?.toFixed(2) || '0.00'} ct`
-                                    : `${layer.volumeInfo.weight?.toFixed(2) || '0.00'} g`}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                          
-                          {/* Material quick selector */}
-                          <select
-                            value={layerMaterials[layer.id]?.id || (layer.category === 'stone' ? STONE_PRESETS[0].id : METAL_PRESETS[0].id)}
-                            onChange={(e) => {
-                              const presets = layer.category === 'stone' ? STONE_PRESETS : METAL_PRESETS;
-                              const preset = presets.find(p => p.id === e.target.value);
-                              if (preset) {
-                                setLayerMaterials(prev => ({ ...prev, [layer.id]: preset }));
-                              }
-                            }}
-                            className="h-6 bg-white/10 border border-white/10 rounded text-[10px] text-white/70 px-1 appearance-none cursor-pointer hover:bg-white/15"
-                          >
-                            {(layer.category === 'stone' ? STONE_PRESETS : METAL_PRESETS).map(p => (
-                              <option key={p.id} value={p.id} className="bg-black">{p.name}</option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-                    ))}
-                    
-                    {/* Weight Summary for 3DM */}
-                    {layers.some(l => l.volumeInfo) && (
-                      <div className="mt-3 rounded-lg border border-white/10 bg-white/5 p-3">
-                        <h4 className="text-[10px] font-medium uppercase tracking-wider text-white/50 mb-2">Weight Summary</h4>
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="rounded bg-yellow-500/10 border border-yellow-500/20 p-2">
-                            <div className="text-[10px] text-yellow-400/70">Metal</div>
-                            <div className="text-sm font-semibold text-yellow-300">
-                              {layers
-                                .filter(l => l.category !== 'stone' && l.volumeInfo)
-                                .reduce((acc, l) => acc + (l.volumeInfo?.weight || 0), 0)
-                                .toFixed(2)} g
-                            </div>
-                          </div>
-                          <div className="rounded bg-cyan-500/10 border border-cyan-500/20 p-2">
-                            <div className="text-[10px] text-cyan-400/70">Gemstones</div>
-                            <div className="text-sm font-semibold text-cyan-300">
-                              {layers
-                                .filter(l => l.category === 'stone' && l.volumeInfo)
-                                .reduce((acc, l) => acc + (l.volumeInfo?.carats || 0), 0)
-                                .toFixed(2)} ct
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="rounded-lg border border-white/10 bg-white/5 p-4 text-center">
-                    <Layers className="mx-auto h-6 w-6 text-white/20" />
-                    <p className="mt-2 text-xs text-white/40">
-                      {loadedGeometry 
-                        ? 'STL files have a single layer'
-                        : 'Load a 3DM file to see layers'}
-                    </p>
-                  </div>
-                )}
-              </Accordion>
-
-
-              {/* Quick Guide */}
-              <div className="mt-auto">
-                <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">
-                  Supported Formats
-                </h3>
-                <div className="space-y-2 text-xs text-white/40">
-                  <div className="flex items-center gap-2">
-                    <Check className="h-3 w-3 text-green-400" />
-                    <span>STL - Single mesh models</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Check className="h-3 w-3 text-green-400" />
-                    <span>3DM - Rhino with layers</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <ThreeDRightPanel
+              isOpen={rightOpen}
+              onToggle={() => setRightOpen(false)}
+              fileName={fileName}
+              modelInfo={modelInfo}
+              has3DMFile={!!raw3DMBuffer}
+              layers={layers.map(l => ({
+                id: l.id,
+                name: l.name,
+                visible: l.visible,
+                color: l.color,
+                category: l.category === 'setting' ? 'metal' as const : 
+                         l.category === 'unknown' ? 'other' as const : 
+                         l.category as 'metal' | 'stone' | 'other' | undefined,
+              }))}
+              onLayerVisibilityChange={(id, visible) => {
+                setLayers(prev => prev.map(l => l.id === id ? { ...l, visible } : l));
+              }}
+              onLayerMaterialChange={(id, materialId) => {
+                const preset = METAL_PRESETS.find(p => p.id === materialId) || STONE_PRESETS.find(p => p.id === materialId);
+                if (preset) {
+                  setLayerMaterials(prev => ({ ...prev, [id]: preset }));
+                }
+              }}
+              showGrid={showGrid}
+              onShowGridChange={setShowGrid}
+              wireframe={wireframe}
+              onWireframeChange={setWireframe}
+              autoRotate={autoRotate}
+              onAutoRotateChange={setAutoRotate}
+              selectedMaterial={materialConfig}
+              onMaterialChange={(updates) => setMaterialConfig(prev => ({ ...prev, ...updates }))}
+              lightingConfig={lightingConfig}
+              onLightingChange={(updates) => setLightingConfig(prev => ({ ...prev, ...updates }))}
+              hdrConfig={hdrConfig}
+              onHDRChange={(updates) => setHDRConfig(prev => ({ ...prev, ...updates }))}
+              backgroundConfig={backgroundConfig}
+              onBackgroundChange={(updates) => setBackgroundConfig(prev => ({ ...prev, ...updates }))}
+              groundConfig={groundConfig}
+              onGroundChange={(updates) => setGroundConfig(prev => ({ ...prev, ...updates }))}
+              diamondConfig={diamondConfig}
+              onDiamondChange={(updates) => setDiamondConfig(prev => ({ ...prev, ...updates }))}
+              postProcessingConfig={postProcessingConfig}
+              onPostProcessingChange={(updates) => setPostProcessingConfig(prev => ({ ...prev, ...updates }))}
+              edgeSmoothingConfig={edgeSmoothingConfig}
+              onEdgeSmoothingChange={(updates) => setEdgeSmoothingConfig(prev => ({ ...prev, ...updates }))}
+              onApplyEdgeSmoothing={() => {
+                // Apply subdivision
+                if (!originalGeometry) return;
+                setIsProcessingEdges(true);
+                try {
+                  const params = { split: true, uvSmooth: false, preserveEdges: false, flatOnly: false };
+                  const subdivided = LoopSubdivision.modify(originalGeometry, edgeSmoothingConfig.subdivisionLevel, params);
+                  setLoadedGeometry(subdivided);
+                  const positionAttribute = subdivided.getAttribute('position');
+                  const vertices = positionAttribute ? positionAttribute.count : 0;
+                  const faces = Math.floor(vertices / 3);
+                  setModelInfo({ vertices, faces });
+                } catch (e) {
+                  console.error('Edge smoothing error:', e);
+                } finally {
+                  setIsProcessingEdges(false);
+                }
+              }}
+              isProcessingEdges={isProcessingEdges}
+              turntableConfig={turntableConfig}
+              onTurntableChange={(updates) => setTurntableConfig(prev => ({ ...prev, ...updates }))}
+              isTurntablePlaying={isTurntablePlaying}
+              onTurntableToggle={() => setIsTurntablePlaying(!isTurntablePlaying)}
+              onTurntableReset={() => setModelRotation([-Math.PI / 2, 0, 0])}
+              videoConfig={videoConfig}
+              onVideoConfigChange={(updates) => setVideoConfig(prev => ({ ...prev, ...updates }))}
+              recordingState={recordingState}
+              onStartRecording={() => console.log('Start recording')}
+              onStopRecording={() => console.log('Stop recording')}
+              onPauseRecording={() => console.log('Pause recording')}
+              onTakeScreenshot={handleSnapshot}
+              batchConfig={batchConfig}
+              onBatchConfigChange={(updates) => setBatchConfig(prev => ({ ...prev, ...updates }))}
+              batchProgress={batchProgress}
+              onStartBatchExport={() => console.log('Start batch export')}
+              onCancelBatchExport={() => console.log('Cancel batch export')}
+              snapshotPreview={snapshotPreview}
+              onDownloadSnapshot={handleDownloadSnapshot}
+              onSaveToGallery={handleSaveToGallery}
+              onOpenInStudio={() => snapshotPreview && handleOpenInStudio(snapshotPreview)}
+              onClearSnapshot={() => setSnapshotPreview(null)}
+              onFileUpload={() => fileInputRef.current?.click()}
+              onClearModel={handleClearModel}
+            />
           )}
         </div>
       </div>
