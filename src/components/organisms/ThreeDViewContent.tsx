@@ -15,7 +15,7 @@
 
 import React, { useState, useRef, useCallback, Suspense, useEffect, useMemo } from 'react';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
-import { OrbitControls, Center, Environment, Grid, GizmoHelper, GizmoViewport, Lightformer } from '@react-three/drei';
+import { OrbitControls, Center, Environment, Grid, GizmoHelper, GizmoViewport, Lightformer, TransformControls } from '@react-three/drei';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 import * as THREE from 'three';
 import { LoopSubdivision } from 'three-subdivide';
@@ -989,17 +989,15 @@ function SceneContent({
         target={[0, 0, 0]}
       />
       
-      {/* Axis Gizmo in corner - only show when grid is visible */}
-      {showGrid && (
-        <GizmoHelper alignment="bottom-right" margin={[60, 60]}>
-          <GizmoViewport 
-            axisColors={['#cc6666', '#66aa66', '#6688bb']}
-            labelColor="#888888"
-            hideNegativeAxes
-            font="12px Inter, system-ui, sans-serif"
-          />
-        </GizmoHelper>
-      )}
+      {/* Axis Gizmo in corner - always visible for orientation reference */}
+      <GizmoHelper alignment="bottom-right" margin={[60, 60]}>
+        <GizmoViewport 
+          axisColors={['#ff4444', '#44ff44', '#4488ff']}
+          labelColor="#ffffff"
+          hideNegativeAxes={false}
+          font="bold 12px Inter, system-ui, sans-serif"
+        />
+      </GizmoHelper>
       
       {/* Adaptive Resolution - Progressive rendering for smooth interaction */}
       {/* Disabled during auto-rotate to maintain full quality */}
