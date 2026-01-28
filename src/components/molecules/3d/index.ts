@@ -63,3 +63,6 @@ export { BatchExportPanel, type BatchExportConfig, type BatchExportProgress, typ
 
 // Measurement Panel (NEW Phase 9)
 export { MeasurementPanel, type MeasurementConfig, type Dimensions3D, DEFAULT_MEASUREMENT_CONFIG } from './MeasurementPanel';
+
+// View Panel (NEW Phase 10)
+export { ViewPanel, type ViewConfig, type ViewMode, type DebugView, type CameraType, type CameraPreset, DEFAULT_VIEW_CONFIG, CAMERA_PRESETS, VIEW_ANGLE_PRESETS, DEBUG_VIEWS } from './ViewPanel';
