@@ -1591,7 +1591,7 @@ export default function ThreeDViewContent() {
   }, [raw3DMBuffer, raw3DMFileName]);
 
   // Process file (shared between click and drag&drop)
-  const processFile = useCallback((file: File) => {
+  const processFile = useCallback(async (file: File) => {
     console.log('[ProcessFile] ========================================');
     console.log('[ProcessFile] File received:', file.name);
     console.log('[ProcessFile] File type:', file.type);
@@ -1601,9 +1601,11 @@ export default function ThreeDViewContent() {
     const fileName = file.name.toLowerCase();
     const isSTL = fileName.endsWith('.stl');
     const is3DM = fileName.endsWith('.3dm');
+    const isGLTF = fileName.endsWith('.gltf') || fileName.endsWith('.glb');
+    const isFBX = fileName.endsWith('.fbx');
+    const isOBJ = fileName.endsWith('.obj');
     
-    console.log('[ProcessFile] Is STL?', isSTL);
-    console.log('[ProcessFile] Is 3DM?', is3DM);
+    console.log('[ProcessFile] Format detection:', { isSTL, is3DM, isGLTF, isFBX, isOBJ });
     console.log('[ProcessFile] ========================================');
     
     setIsLoading(true);
@@ -1614,6 +1616,67 @@ export default function ThreeDViewContent() {
     setOriginalGeometry(null);
     setSubdivisionLevel(0);
     setModelInfo(null);
+
+    // Handle GLTF/GLB/FBX/OBJ using unified model loader
+    if (isGLTF || isFBX || isOBJ) {
+      try {
+        setLoadingStatus(`Loading ${isGLTF ? 'GLTF/GLB' : isFBX ? 'FBX' : 'OBJ'} file...`);
+        const modelLoader = await import('@/lib/3d/model-loader');
+        const { loadModel } = modelLoader;
+        
+        const result = await loadModel(file, (progress) => {
+          setLoadingStatus(progress.status || `Loading... ${progress.percentage}%`);
+        });
+        
+        if (result.scene) {
+          // Extract geometries from the scene
+          const geometries: THREE.BufferGeometry[] = [];
+          result.scene.traverse((child) => {
+            if (child instanceof THREE.Mesh && child.geometry) {
+              // Clone and apply world matrix
+              const geo = child.geometry.clone();
+              geo.applyMatrix4(child.matrixWorld);
+              geometries.push(geo);
+            }
+          });
+          
+          if (geometries.length > 0) {
+            // Merge all geometries into one
+            const { mergeGeometries } = await import('three/examples/jsm/utils/BufferGeometryUtils.js');
+            const mergedGeometry = mergeGeometries(geometries, false) || geometries[0];
+            
+            setOriginalGeometry(mergedGeometry.clone());
+            setLoadedGeometry(mergedGeometry);
+            setLayers([]);
+            
+            // Calculate model info
+            const positionAttribute = mergedGeometry.getAttribute('position');
+            const vertices = positionAttribute ? positionAttribute.count : 0;
+            const faces = Math.floor(vertices / 3);
+            setModelInfo({ vertices, faces });
+            
+            console.log(`[${isGLTF ? 'GLTF' : isFBX ? 'FBX' : 'OBJ'}] Loaded ${geometries.length} meshes, ${vertices} vertices`);
+          } else {
+            alert('No meshes found in the model file.');
+          }
+        } else if (result.geometry) {
+          setOriginalGeometry(result.geometry.clone());
+          setLoadedGeometry(result.geometry);
+          setLayers([]);
+          
+          const positionAttribute = result.geometry.getAttribute('position');
+          const vertices = positionAttribute ? positionAttribute.count : 0;
+          const faces = Math.floor(vertices / 3);
+          setModelInfo({ vertices, faces });
+        }
+      } catch (error) {
+        console.error('Error loading model:', error);
+        alert(`Error loading file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+      setIsLoading(false);
+      setLoadingStatus('');
+      return;
+    }
 
     const reader = new FileReader();
     
@@ -1747,11 +1810,11 @@ export default function ThreeDViewContent() {
       };
       reader.readAsArrayBuffer(file);
     } else {
-      alert('Unsupported file format. Please use STL or 3DM files.');
+      alert('Unsupported file format. Supported formats: STL, 3DM, GLTF, GLB, FBX, OBJ');
       setIsLoading(false);
       setLoadingStatus('');
     }
-  }, []);
+  }, [tessellationQuality]);
 
   // Handle file input change
   const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -2932,7 +2995,7 @@ export default function ThreeDViewContent() {
       <input
         ref={fileInputRef}
         type="file"
-        accept=".stl,.3dm"
+        accept=".stl,.3dm,.gltf,.glb,.fbx,.obj"
         onChange={handleFileUpload}
         className="hidden"
       />
