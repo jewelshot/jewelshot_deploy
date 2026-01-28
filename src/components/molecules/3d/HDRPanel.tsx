@@ -13,7 +13,8 @@
 
 import React, { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, X, Check, RotateCw, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Upload, X, Check, RotateCw, Eye, EyeOff, Loader2, FolderOpen, RefreshCw } from 'lucide-react';
+import { useEnvironments, type EnvironmentFile } from '@/hooks/useEnvironments';
 
 // ============================================
 // TYPES
@@ -267,10 +268,13 @@ interface HDRPanelProps {
 }
 
 export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProps) {
-  const [activeTab, setActiveTab] = useState<'lightformer' | 'hdr'>('lightformer');
+  const [activeTab, setActiveTab] = useState<'lightformer' | 'hdr' | 'custom'>('lightformer');
   const [uploadingHDR, setUploadingHDR] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Fetch custom environments from public/environments folder
+  const { environments: customEnvironments, isLoading: customLoading, refresh: refreshCustom } = useEnvironments();
 
   // Handle HDR file upload
   const handleHDRUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -354,6 +358,22 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
               }`}
             >
               HDR
+            </button>
+            <button
+              onClick={() => setActiveTab('custom')}
+              className={`flex-1 rounded-md py-1.5 text-xs font-medium transition-all flex items-center justify-center gap-1 ${
+                activeTab === 'custom'
+                  ? 'bg-white/15 text-white'
+                  : 'text-white/50 hover:text-white/70'
+              }`}
+            >
+              <FolderOpen className="h-3 w-3" />
+              Özel
+              {customEnvironments.length > 0 && (
+                <span className="rounded-full bg-purple-500/40 px-1 text-[9px]">
+                  {customEnvironments.length}
+                </span>
+              )}
             </button>
           </div>
 
@@ -464,6 +484,81 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                   </button>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* Custom Environments from public/environments folder */}
+          {activeTab === 'custom' && (
+            <div className="space-y-3">
+              {/* Header with refresh button */}
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-white/50">public/environments/</span>
+                <button
+                  onClick={refreshCustom}
+                  disabled={customLoading}
+                  className="flex items-center gap-1 rounded-md bg-white/5 px-2 py-1 text-[10px] text-white/60 transition-colors hover:bg-white/10 disabled:opacity-50"
+                >
+                  <RefreshCw className={`h-3 w-3 ${customLoading ? 'animate-spin' : ''}`} />
+                  Yenile
+                </button>
+              </div>
+
+              {/* Loading state */}
+              {customLoading && (
+                <div className="flex items-center justify-center py-6">
+                  <RefreshCw className="h-5 w-5 animate-spin text-purple-400" />
+                </div>
+              )}
+
+              {/* Empty state */}
+              {!customLoading && customEnvironments.length === 0 && (
+                <div className="rounded-lg border border-dashed border-white/20 bg-white/5 p-4 text-center">
+                  <FolderOpen className="mx-auto mb-2 h-8 w-8 text-white/30" />
+                  <p className="text-xs text-white/60">Henüz ortam dosyası yok</p>
+                  <p className="mt-1 text-[10px] text-white/40">
+                    HDR veya EXR dosyalarını public/environments/ klasörüne ekleyin
+                  </p>
+                </div>
+              )}
+
+              {/* Custom environments grid */}
+              {!customLoading && customEnvironments.length > 0 && (
+                <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
+                  {customEnvironments.map((env) => {
+                    const isSelected = config.customHDR === env.path;
+                    return (
+                      <button
+                        key={env.id}
+                        onClick={() => onChange({ customHDR: env.path, preset: null })}
+                        className={`flex flex-col items-start gap-1 rounded-lg border p-2 text-left transition-all ${
+                          isSelected
+                            ? 'border-purple-500/50 bg-purple-500/10 ring-1 ring-purple-500/30'
+                            : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
+                        }`}
+                      >
+                        <div className="flex w-full items-center justify-between">
+                          <span className="text-[10px] font-medium text-white/80 line-clamp-1">
+                            {env.name}
+                          </span>
+                          {isSelected && (
+                            <Check className="h-3 w-3 text-purple-400" />
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <span className="rounded bg-white/10 px-1 py-0.5 text-[8px] font-medium uppercase text-white/60">
+                            {env.format}
+                          </span>
+                          <span className="text-[9px] text-white/40">{env.sizeFormatted}</span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              <p className="text-[9px] text-white/30 text-center">
+                Klasöre yeni dosya ekledikten sonra "Yenile" butonuna tıklayın
+              </p>
             </div>
           )}
 
