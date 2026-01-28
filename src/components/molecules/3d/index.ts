@@ -72,3 +72,6 @@ export { FocusPanel, type FocusConfig, type DOFConfig, type BokehConfig, type Ti
 
 // Annotation Panel (NEW Phase 12)
 export { AnnotationPanel, type AnnotationConfig, type Annotation, type AnnotationType, type LabelStyle, DEFAULT_ANNOTATION_CONFIG, LABEL_STYLE_PRESETS } from './AnnotationPanel';
+
+// Transform Panel Advanced (NEW Phase 13)
+export { TransformPanelAdvanced, type TransformAdvancedConfig, type SnapConfig, type ArrayConfig, DEFAULT_TRANSFORM_ADVANCED_CONFIG } from './TransformPanelAdvanced';
