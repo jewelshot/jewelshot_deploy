@@ -38,6 +38,20 @@ export interface HDRConfig {
   rotation: { x: number; y: number; z: number };
   showBackground: boolean;
   blur: number;
+  // NEW: Separate controls for background vs reflection
+  backgroundIntensity: number; // 0-3, separate from reflection
+  reflectionIntensity: number; // 0-3, controls reflections on objects
+  // Environment tint
+  tintColor: string;
+  tintStrength: number; // 0-1
+  // Ground projection
+  groundProjection: boolean;
+  groundHeight: number;
+  groundRadius: number;
+  // Resolution
+  resolution: 256 | 512 | 1024 | 2048;
+  // Contrast
+  contrast: number; // 0-2, default 1
 }
 
 export const DEFAULT_HDR_CONFIG: HDRConfig = {
@@ -48,6 +62,15 @@ export const DEFAULT_HDR_CONFIG: HDRConfig = {
   rotation: { x: 0, y: 0, z: 0 },
   showBackground: false,
   blur: 0,
+  backgroundIntensity: 1.0,
+  reflectionIntensity: 1.0,
+  tintColor: '#ffffff',
+  tintStrength: 0,
+  groundProjection: false,
+  groundHeight: -0.5,
+  groundRadius: 50,
+  resolution: 1024,
+  contrast: 1.0,
 };
 
 // ============================================
@@ -444,10 +467,10 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
             </div>
           )}
 
-          {/* Intensity */}
+          {/* Overall Intensity */}
           <div className="space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] text-white/50">Yoğunluk</span>
+              <span className="text-[10px] text-white/50">Genel Yoğunluk</span>
               <span className="text-[10px] font-mono text-white/60">
                 {config.intensity.toFixed(1)}
               </span>
@@ -461,6 +484,97 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
               onChange={(e) => onChange({ intensity: parseFloat(e.target.value) })}
               className="w-full accent-purple-500"
             />
+          </div>
+
+          {/* Reflection Intensity (separate control) */}
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] text-white/50">Yansıma Yoğunluğu</span>
+              <span className="text-[10px] font-mono text-white/60">
+                {(config.reflectionIntensity || 1).toFixed(1)}
+              </span>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={3}
+              step={0.1}
+              value={config.reflectionIntensity || 1}
+              onChange={(e) => onChange({ reflectionIntensity: parseFloat(e.target.value) })}
+              className="w-full accent-cyan-500"
+            />
+            <p className="text-[9px] text-white/30">Metal ve taş yansımaları</p>
+          </div>
+
+          {/* Contrast */}
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] text-white/50">Kontrast</span>
+              <span className="text-[10px] font-mono text-white/60">
+                {(config.contrast || 1).toFixed(1)}
+              </span>
+            </div>
+            <input
+              type="range"
+              min={0.5}
+              max={2}
+              step={0.1}
+              value={config.contrast || 1}
+              onChange={(e) => onChange({ contrast: parseFloat(e.target.value) })}
+              className="w-full accent-purple-500"
+            />
+          </div>
+
+          {/* Tint Color */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] text-white/50">Renk Tonu</span>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={config.tintColor || '#ffffff'}
+                  onChange={(e) => onChange({ tintColor: e.target.value })}
+                  className="h-5 w-8 cursor-pointer rounded border border-white/10 bg-transparent"
+                />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-white/40">Ton Gücü</span>
+                <span className="text-[10px] font-mono text-white/40">
+                  {Math.round((config.tintStrength || 0) * 100)}%
+                </span>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.05}
+                value={config.tintStrength || 0}
+                onChange={(e) => onChange({ tintStrength: parseFloat(e.target.value) })}
+                className="w-full accent-purple-500"
+              />
+            </div>
+          </div>
+
+          {/* Resolution */}
+          <div className="space-y-1">
+            <span className="text-[10px] text-white/50">HDR Çözünürlük</span>
+            <div className="grid grid-cols-4 gap-1">
+              {([256, 512, 1024, 2048] as const).map((res) => (
+                <button
+                  key={res}
+                  onClick={() => onChange({ resolution: res })}
+                  className={`rounded-md py-1 text-[9px] transition-all ${
+                    config.resolution === res
+                      ? 'bg-purple-500/20 text-purple-300'
+                      : 'bg-white/5 text-white/50 hover:bg-white/10'
+                  }`}
+                >
+                  {res}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Rotation */}
@@ -541,24 +655,110 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
             </button>
           </label>
 
-          {/* Blur (for background) */}
+          {/* Background specific controls */}
           {config.showBackground && (
-            <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] text-white/50">Arka Plan Bulanıklığı</span>
-                <span className="text-[10px] font-mono text-white/60">{config.blur}</span>
+            <div className="space-y-3 rounded-lg border border-white/10 bg-white/5 p-3">
+              <span className="text-[10px] font-medium text-white/60">Arka Plan Ayarları</span>
+              
+              {/* Background Blur */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-white/50">Bulanıklık</span>
+                  <span className="text-[10px] font-mono text-white/60">{config.blur}</span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.1}
+                  value={config.blur}
+                  onChange={(e) => onChange({ blur: parseFloat(e.target.value) })}
+                  className="w-full accent-purple-500"
+                />
               </div>
-              <input
-                type="range"
-                min={0}
-                max={1}
-                step={0.1}
-                value={config.blur}
-                onChange={(e) => onChange({ blur: parseFloat(e.target.value) })}
-                className="w-full accent-purple-500"
-              />
+
+              {/* Background Intensity */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-white/50">Arka Plan Yoğunluğu</span>
+                  <span className="text-[10px] font-mono text-white/60">
+                    {(config.backgroundIntensity || 1).toFixed(1)}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={3}
+                  step={0.1}
+                  value={config.backgroundIntensity || 1}
+                  onChange={(e) => onChange({ backgroundIntensity: parseFloat(e.target.value) })}
+                  className="w-full accent-purple-500"
+                />
+              </div>
             </div>
           )}
+
+          {/* Ground Projection */}
+          <div className="space-y-2 rounded-lg border border-white/10 bg-white/5 p-3">
+            <label className="flex cursor-pointer items-center justify-between">
+              <span className="text-[10px] text-white/60">Zemin Projeksiyonu</span>
+              <button
+                onClick={() => onChange({ groundProjection: !config.groundProjection })}
+                className={`relative h-4 w-7 rounded-full transition-colors ${
+                  config.groundProjection ? 'bg-purple-500' : 'bg-white/20'
+                }`}
+              >
+                <span
+                  className={`absolute left-0.5 top-0.5 h-3 w-3 rounded-full bg-white transition-transform ${
+                    config.groundProjection ? 'translate-x-3' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </label>
+            <p className="text-[9px] text-white/30">HDR'ı zemine yansıt</p>
+
+            {config.groundProjection && (
+              <div className="space-y-2 pt-2">
+                {/* Ground Height */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-white/50">Zemin Yüksekliği</span>
+                    <span className="text-[10px] font-mono text-white/60">
+                      {(config.groundHeight || -0.5).toFixed(1)}
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min={-5}
+                    max={0}
+                    step={0.1}
+                    value={config.groundHeight || -0.5}
+                    onChange={(e) => onChange({ groundHeight: parseFloat(e.target.value) })}
+                    className="w-full accent-purple-500"
+                  />
+                </div>
+
+                {/* Ground Radius */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-white/50">Zemin Yarıçapı</span>
+                    <span className="text-[10px] font-mono text-white/60">
+                      {config.groundRadius || 50}
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min={10}
+                    max={200}
+                    step={5}
+                    value={config.groundRadius || 50}
+                    onChange={(e) => onChange({ groundRadius: parseFloat(e.target.value) })}
+                    className="w-full accent-purple-500"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </>
       )}
     </div>
