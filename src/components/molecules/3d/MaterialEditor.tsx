@@ -25,13 +25,30 @@ export interface MaterialConfig {
   metalness: number;
   roughness: number;
   envMapIntensity: number;
+  // Clearcoat (lacquer layer)
   clearcoat?: number;
   clearcoatRoughness?: number;
+  // Sheen (fabric-like sheen)
   sheen?: number;
   sheenRoughness?: number;
   sheenColor?: string;
+  // Iridescence (rainbow effect)
   iridescence?: number;
   iridescenceIOR?: number;
+  iridescenceThicknessMin?: number;
+  iridescenceThicknessMax?: number;
+  // Anisotropy (brushed metal direction)
+  anisotropy?: number;
+  anisotropyRotation?: number;
+  // Transmission (glass/transparent)
+  transmission?: number;
+  thickness?: number;
+  attenuationColor?: string;
+  attenuationDistance?: number;
+  ior?: number;
+  // Specular
+  specularIntensity?: number;
+  specularColor?: string;
 }
 
 // ============================================
@@ -523,6 +540,176 @@ export function MaterialEditor({ material, onChange, onPresetSelect }: MaterialE
                 onChange={(e) => onChange({ iridescence: parseFloat(e.target.value) })}
                 className="w-full accent-purple-500"
               />
+            </div>
+
+            {/* Anisotropy Section */}
+            <div className="pt-2 border-t border-white/10">
+              <p className="text-[10px] font-medium text-white/70 mb-2">Anisotropy (Fırçalanmış Metal)</p>
+              
+              {/* Anisotropy Intensity */}
+              <div className="space-y-1 mb-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-white/50">Yoğunluk</span>
+                  <span className="text-[10px] font-mono text-white/60">
+                    {(material.anisotropy || 0).toFixed(2)}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={-1}
+                  max={1}
+                  step={0.05}
+                  value={material.anisotropy || 0}
+                  onChange={(e) => onChange({ anisotropy: parseFloat(e.target.value) })}
+                  className="w-full accent-purple-500"
+                />
+              </div>
+
+              {/* Anisotropy Rotation */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-white/50">Döndürme</span>
+                  <span className="text-[10px] font-mono text-white/60">
+                    {Math.round((material.anisotropyRotation || 0) * (180 / Math.PI))}°
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={Math.PI}
+                  step={0.05}
+                  value={material.anisotropyRotation || 0}
+                  onChange={(e) => onChange({ anisotropyRotation: parseFloat(e.target.value) })}
+                  className="w-full accent-purple-500"
+                />
+              </div>
+            </div>
+
+            {/* Transmission Section */}
+            <div className="pt-2 border-t border-white/10">
+              <p className="text-[10px] font-medium text-white/70 mb-2">Transmission (Şeffaflık)</p>
+              
+              {/* Transmission */}
+              <div className="space-y-1 mb-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-white/50">Geçirgenlik</span>
+                  <span className="text-[10px] font-mono text-white/60">
+                    {Math.round((material.transmission || 0) * 100)}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={material.transmission || 0}
+                  onChange={(e) => onChange({ transmission: parseFloat(e.target.value) })}
+                  className="w-full accent-purple-500"
+                />
+              </div>
+
+              {/* IOR */}
+              <div className="space-y-1 mb-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-white/50">IOR (Kırılma İndeksi)</span>
+                  <span className="text-[10px] font-mono text-white/60">
+                    {(material.ior || 1.5).toFixed(2)}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={1}
+                  max={3}
+                  step={0.01}
+                  value={material.ior || 1.5}
+                  onChange={(e) => onChange({ ior: parseFloat(e.target.value) })}
+                  className="w-full accent-purple-500"
+                />
+              </div>
+
+              {/* Thickness */}
+              <div className="space-y-1 mb-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-white/50">Kalınlık</span>
+                  <span className="text-[10px] font-mono text-white/60">
+                    {(material.thickness || 0).toFixed(1)}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={10}
+                  step={0.1}
+                  value={material.thickness || 0}
+                  onChange={(e) => onChange({ thickness: parseFloat(e.target.value) })}
+                  className="w-full accent-purple-500"
+                />
+              </div>
+
+              {/* Attenuation Color */}
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] text-white/50">Emilim Rengi</span>
+                <input
+                  type="color"
+                  value={material.attenuationColor || '#ffffff'}
+                  onChange={(e) => onChange({ attenuationColor: e.target.value })}
+                  className="h-6 w-10 cursor-pointer rounded border border-white/10 bg-transparent"
+                />
+              </div>
+
+              {/* Attenuation Distance */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-white/50">Emilim Mesafesi</span>
+                  <span className="text-[10px] font-mono text-white/60">
+                    {(material.attenuationDistance || 0).toFixed(1)}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={20}
+                  step={0.5}
+                  value={material.attenuationDistance || 0}
+                  onChange={(e) => onChange({ attenuationDistance: parseFloat(e.target.value) })}
+                  className="w-full accent-purple-500"
+                />
+              </div>
+            </div>
+
+            {/* Specular Section */}
+            <div className="pt-2 border-t border-white/10">
+              <p className="text-[10px] font-medium text-white/70 mb-2">Specular</p>
+              
+              {/* Specular Intensity */}
+              <div className="space-y-1 mb-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-white/50">Yoğunluk</span>
+                  <span className="text-[10px] font-mono text-white/60">
+                    {Math.round((material.specularIntensity ?? 1) * 100)}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={2}
+                  step={0.05}
+                  value={material.specularIntensity ?? 1}
+                  onChange={(e) => onChange({ specularIntensity: parseFloat(e.target.value) })}
+                  className="w-full accent-purple-500"
+                />
+              </div>
+
+              {/* Specular Color */}
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-white/50">Renk</span>
+                <input
+                  type="color"
+                  value={material.specularColor || '#ffffff'}
+                  onChange={(e) => onChange({ specularColor: e.target.value })}
+                  className="h-6 w-10 cursor-pointer rounded border border-white/10 bg-transparent"
+                />
+              </div>
             </div>
           </motion.div>
         )}
