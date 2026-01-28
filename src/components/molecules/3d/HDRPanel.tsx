@@ -11,10 +11,57 @@
 
 'use client';
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useMemo, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, X, Check, RotateCw, Eye, EyeOff, Loader2, FolderOpen, RefreshCw } from 'lucide-react';
 import { useEnvironments, type EnvironmentFile } from '@/hooks/useEnvironments';
+
+// Memoized environment item to prevent unnecessary re-renders
+const EnvironmentItem = memo(function EnvironmentItem({
+  env,
+  isSelected,
+  onSelect,
+}: {
+  env: EnvironmentFile;
+  isSelected: boolean;
+  onSelect: () => void;
+}) {
+  const isGem = env.filename.includes('gem');
+  const gradientColors = isGem 
+    ? ['#1a1a3e', '#2a2a5e', '#3a3a7e']
+    : ['#3a3020', '#4a4030', '#5a5040'];
+  const gradient = `linear-gradient(135deg, ${gradientColors[0]} 0%, ${gradientColors[1]} 50%, ${gradientColors[2]} 100%)`;
+  
+  return (
+    <button
+      onClick={onSelect}
+      className={`flex w-full items-center gap-3 px-3 py-2 text-left transition-colors ${
+        isSelected ? 'bg-purple-500/20' : 'hover:bg-white/10'
+      }`}
+    >
+      <div 
+        className="h-8 w-8 flex-shrink-0 rounded-md ring-1 ring-white/20"
+        style={{ background: gradient }}
+      />
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-medium text-white/80 truncate">
+            {env.name}
+          </span>
+          {isSelected && (
+            <Check className="h-3 w-3 flex-shrink-0 text-purple-400" />
+          )}
+        </div>
+        <div className="flex items-center gap-2 mt-0.5">
+          <span className="rounded bg-white/10 px-1 py-0.5 text-[8px] font-medium uppercase text-white/50">
+            {env.format}
+          </span>
+          <span className="text-[9px] text-white/40">{env.sizeFormatted}</span>
+        </div>
+      </div>
+    </button>
+  );
+});
 
 // ============================================
 // TYPES
@@ -521,54 +568,17 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                 </div>
               )}
 
-              {/* Custom environments dropdown list */}
+              {/* Custom environments dropdown list - using memoized items */}
               {!customLoading && customEnvironments.length > 0 && (
-                <div className="space-y-1 max-h-72 overflow-y-auto rounded-lg border border-white/10 bg-white/5">
-                  {customEnvironments.map((env) => {
-                    const isSelected = config.customHDR === env.path;
-                    // Generate a gradient preview based on filename
-                    const isGem = env.filename.includes('gem');
-                    const gradientColors = isGem 
-                      ? ['#1a1a3e', '#2a2a5e', '#3a3a7e'] // Blue tones for gems
-                      : ['#3a3020', '#4a4030', '#5a5040']; // Warm tones for metals
-                    const gradient = `linear-gradient(135deg, ${gradientColors[0]} 0%, ${gradientColors[1]} 50%, ${gradientColors[2]} 100%)`;
-                    
-                    return (
-                      <button
-                        key={env.id}
-                        onClick={() => onChange({ customHDR: env.path, preset: null })}
-                        className={`flex w-full items-center gap-3 px-3 py-2 text-left transition-all ${
-                          isSelected
-                            ? 'bg-purple-500/20'
-                            : 'hover:bg-white/10'
-                        }`}
-                      >
-                        {/* Thumbnail preview */}
-                        <div 
-                          className="h-8 w-8 flex-shrink-0 rounded-md ring-1 ring-white/20"
-                          style={{ background: gradient }}
-                        />
-                        
-                        {/* Info */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="text-[11px] font-medium text-white/80 truncate">
-                              {env.name}
-                            </span>
-                            {isSelected && (
-                              <Check className="h-3 w-3 flex-shrink-0 text-purple-400" />
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <span className="rounded bg-white/10 px-1 py-0.5 text-[8px] font-medium uppercase text-white/50">
-                              {env.format}
-                            </span>
-                            <span className="text-[9px] text-white/40">{env.sizeFormatted}</span>
-                          </div>
-                        </div>
-                      </button>
-                    );
-                  })}
+                <div className="max-h-72 overflow-y-auto rounded-lg border border-white/10 bg-white/5">
+                  {customEnvironments.map((env) => (
+                    <EnvironmentItem
+                      key={env.id}
+                      env={env}
+                      isSelected={config.customHDR === env.path}
+                      onSelect={() => onChange({ customHDR: env.path, preset: null })}
+                    />
+                  ))}
                 </div>
               )}
 

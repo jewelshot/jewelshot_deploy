@@ -7,7 +7,7 @@
 
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { motion } from 'framer-motion';
 import {
   Sun,
@@ -27,7 +27,48 @@ import {
   type CustomEnvironmentFile,
   generatePreviewGradient,
 } from '@/lib/3d/hdr-presets';
-import { useEnvironments } from '@/hooks/useEnvironments';
+import { useEnvironments, type EnvironmentFile } from '@/hooks/useEnvironments';
+
+// Memoized environment item to prevent unnecessary re-renders
+const CustomEnvItem = memo(function CustomEnvItem({
+  env,
+  isSelected,
+  onSelect,
+}: {
+  env: EnvironmentFile;
+  isSelected: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      onClick={onSelect}
+      className={`flex w-full items-center gap-3 px-3 py-2 text-left transition-colors ${
+        isSelected ? 'bg-purple-500/20' : 'hover:bg-white/10'
+      }`}
+    >
+      <div 
+        className="h-8 w-8 flex-shrink-0 rounded-md ring-1 ring-white/20"
+        style={{ background: generatePreviewGradient(env.filename) }}
+      />
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-medium text-white/80 truncate">
+            {env.name}
+          </span>
+          {isSelected && (
+            <Check className="h-3 w-3 flex-shrink-0 text-purple-400" />
+          )}
+        </div>
+        <div className="flex items-center gap-2 mt-0.5">
+          <span className="rounded bg-white/10 px-1 py-0.5 text-[8px] font-medium uppercase text-white/50">
+            {env.format}
+          </span>
+          <span className="text-[9px] text-white/40">{env.sizeFormatted}</span>
+        </div>
+      </div>
+    </button>
+  );
+});
 
 // ============================================
 // TYPES
@@ -368,47 +409,18 @@ export function EnvironmentPicker({
             </div>
           )}
 
-          {/* Custom environments dropdown list */}
+          {/* Custom environments dropdown list - using memoized items */}
           {!customLoading && customEnvironments.length > 0 && (
             <>
-              <div className="space-y-1 max-h-64 overflow-y-auto rounded-lg border border-white/10 bg-white/5">
-                {customEnvironments.map((env) => {
-                  const isSelected = selected.type === 'custom' && selected.customPath === env.path;
-                  return (
-                    <motion.button
-                      key={env.id}
-                      onClick={() => handleCustomSelect(env)}
-                      whileHover={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
-                      className={`flex w-full items-center gap-3 px-3 py-2 text-left transition-all ${
-                        isSelected ? 'bg-purple-500/20' : ''
-                      }`}
-                    >
-                      {/* Thumbnail preview */}
-                      <div 
-                        className="h-8 w-8 flex-shrink-0 rounded-md ring-1 ring-white/20"
-                        style={{ background: generatePreviewGradient(env.filename) }}
-                      />
-                      
-                      {/* Info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[11px] font-medium text-white/80 truncate">
-                            {env.name}
-                          </span>
-                          {isSelected && (
-                            <Check className="h-3 w-3 flex-shrink-0 text-purple-400" />
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <span className="rounded bg-white/10 px-1 py-0.5 text-[8px] font-medium uppercase text-white/50">
-                            {env.format}
-                          </span>
-                          <span className="text-[9px] text-white/40">{env.sizeFormatted}</span>
-                        </div>
-                      </div>
-                    </motion.button>
-                  );
-                })}
+              <div className="max-h-64 overflow-y-auto rounded-lg border border-white/10 bg-white/5">
+                {customEnvironments.map((env) => (
+                  <CustomEnvItem
+                    key={env.id}
+                    env={env}
+                    isSelected={selected.type === 'custom' && selected.customPath === env.path}
+                    onSelect={() => handleCustomSelect(env)}
+                  />
+                ))}
               </div>
 
               {/* Custom Environment Controls */}
