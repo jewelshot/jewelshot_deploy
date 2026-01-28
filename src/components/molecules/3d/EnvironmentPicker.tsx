@@ -368,47 +368,47 @@ export function EnvironmentPicker({
             </div>
           )}
 
-          {/* Custom environments grid */}
+          {/* Custom environments dropdown list */}
           {!customLoading && customEnvironments.length > 0 && (
             <>
-              <div className={`grid gap-2 ${compact ? 'grid-cols-1' : 'grid-cols-2'}`}>
-                {customEnvironments.map((env) => (
-                  <motion.button
-                    key={env.id}
-                    onClick={() => handleCustomSelect(env)}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className={`relative overflow-hidden rounded-lg border p-3 text-left transition-all ${
-                      selected.type === 'custom' && selected.customPath === env.path
-                        ? 'border-purple-500/50 ring-2 ring-purple-500/30'
-                        : 'border-white/10 hover:border-white/20'
-                    }`}
-                  >
-                    {/* Gradient Background */}
-                    <div
-                      className="absolute inset-0 opacity-60"
-                      style={{ background: generatePreviewGradient(env.filename) }}
-                    />
-                    
-                    {/* Content */}
-                    <div className="relative z-10">
-                      <div className="mb-1 flex items-center justify-between">
-                        <span className="text-xs font-medium text-white line-clamp-1">{env.name}</span>
-                        {selected.type === 'custom' && selected.customPath === env.path && (
-                          <div className="flex h-4 w-4 items-center justify-center rounded-full bg-purple-500">
-                            <Check className="h-3 w-3 text-white" />
-                          </div>
-                        )}
+              <div className="space-y-1 max-h-64 overflow-y-auto rounded-lg border border-white/10 bg-white/5">
+                {customEnvironments.map((env) => {
+                  const isSelected = selected.type === 'custom' && selected.customPath === env.path;
+                  return (
+                    <motion.button
+                      key={env.id}
+                      onClick={() => handleCustomSelect(env)}
+                      whileHover={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
+                      className={`flex w-full items-center gap-3 px-3 py-2 text-left transition-all ${
+                        isSelected ? 'bg-purple-500/20' : ''
+                      }`}
+                    >
+                      {/* Thumbnail preview */}
+                      <div 
+                        className="h-8 w-8 flex-shrink-0 rounded-md ring-1 ring-white/20"
+                        style={{ background: generatePreviewGradient(env.filename) }}
+                      />
+                      
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] font-medium text-white/80 truncate">
+                            {env.name}
+                          </span>
+                          {isSelected && (
+                            <Check className="h-3 w-3 flex-shrink-0 text-purple-400" />
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="rounded bg-white/10 px-1 py-0.5 text-[8px] font-medium uppercase text-white/50">
+                            {env.format}
+                          </span>
+                          <span className="text-[9px] text-white/40">{env.sizeFormatted}</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="rounded bg-white/20 px-1 py-0.5 text-[9px] font-medium uppercase text-white/80">
-                          {env.format}
-                        </span>
-                        <span className="text-[10px] text-white/50">{env.sizeFormatted}</span>
-                      </div>
-                    </div>
-                  </motion.button>
-                ))}
+                    </motion.button>
+                  );
+                })}
               </div>
 
               {/* Custom Environment Controls */}

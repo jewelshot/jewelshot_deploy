@@ -521,34 +521,50 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                 </div>
               )}
 
-              {/* Custom environments grid */}
+              {/* Custom environments dropdown list */}
               {!customLoading && customEnvironments.length > 0 && (
-                <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
+                <div className="space-y-1 max-h-72 overflow-y-auto rounded-lg border border-white/10 bg-white/5">
                   {customEnvironments.map((env) => {
                     const isSelected = config.customHDR === env.path;
+                    // Generate a gradient preview based on filename
+                    const isGem = env.filename.includes('gem');
+                    const gradientColors = isGem 
+                      ? ['#1a1a3e', '#2a2a5e', '#3a3a7e'] // Blue tones for gems
+                      : ['#3a3020', '#4a4030', '#5a5040']; // Warm tones for metals
+                    const gradient = `linear-gradient(135deg, ${gradientColors[0]} 0%, ${gradientColors[1]} 50%, ${gradientColors[2]} 100%)`;
+                    
                     return (
                       <button
                         key={env.id}
                         onClick={() => onChange({ customHDR: env.path, preset: null })}
-                        className={`flex flex-col items-start gap-1 rounded-lg border p-2 text-left transition-all ${
+                        className={`flex w-full items-center gap-3 px-3 py-2 text-left transition-all ${
                           isSelected
-                            ? 'border-purple-500/50 bg-purple-500/10 ring-1 ring-purple-500/30'
-                            : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
+                            ? 'bg-purple-500/20'
+                            : 'hover:bg-white/10'
                         }`}
                       >
-                        <div className="flex w-full items-center justify-between">
-                          <span className="text-[10px] font-medium text-white/80 line-clamp-1">
-                            {env.name}
-                          </span>
-                          {isSelected && (
-                            <Check className="h-3 w-3 text-purple-400" />
-                          )}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <span className="rounded bg-white/10 px-1 py-0.5 text-[8px] font-medium uppercase text-white/60">
-                            {env.format}
-                          </span>
-                          <span className="text-[9px] text-white/40">{env.sizeFormatted}</span>
+                        {/* Thumbnail preview */}
+                        <div 
+                          className="h-8 w-8 flex-shrink-0 rounded-md ring-1 ring-white/20"
+                          style={{ background: gradient }}
+                        />
+                        
+                        {/* Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[11px] font-medium text-white/80 truncate">
+                              {env.name}
+                            </span>
+                            {isSelected && (
+                              <Check className="h-3 w-3 flex-shrink-0 text-purple-400" />
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="rounded bg-white/10 px-1 py-0.5 text-[8px] font-medium uppercase text-white/50">
+                              {env.format}
+                            </span>
+                            <span className="text-[9px] text-white/40">{env.sizeFormatted}</span>
+                          </div>
                         </div>
                       </button>
                     );
