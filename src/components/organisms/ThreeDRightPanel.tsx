@@ -212,6 +212,7 @@ interface ThreeDRightPanelProps {
   batchProgress: BatchExportProgress;
   onStartBatchExport: () => void;
   onCancelBatchExport: () => void;
+  onPreviewAngle?: (angle: { rotation: { x: number; y: number; z: number } }) => void;
   
   // Snapshot
   snapshotPreview?: string | null;
@@ -234,6 +235,7 @@ interface ThreeDRightPanelProps {
   viewConfig: ViewConfig;
   onViewChange: (config: Partial<ViewConfig>) => void;
   onCameraPreset?: (preset: CameraPreset) => void;
+  onViewAngle?: (angle: string) => void;
   onResetCamera?: () => void;
   
   // NEW: Focus
@@ -305,6 +307,7 @@ export function ThreeDRightPanel({
   batchProgress,
   onStartBatchExport,
   onCancelBatchExport,
+  onPreviewAngle,
   snapshotPreview,
   onDownloadSnapshot,
   onSaveToGallery,
@@ -320,6 +323,7 @@ export function ThreeDRightPanel({
   viewConfig,
   onViewChange,
   onCameraPreset,
+  onViewAngle,
   onResetCamera,
   focusConfig,
   onFocusChange,
@@ -592,6 +596,7 @@ export function ThreeDRightPanel({
                 config={viewConfig}
                 onChange={onViewChange}
                 onCameraPreset={onCameraPreset}
+                onViewAngle={onViewAngle}
                 onResetCamera={onResetCamera}
               />
             </Section>
@@ -678,6 +683,7 @@ export function ThreeDRightPanel({
                 progress={batchProgress}
                 onStartExport={onStartBatchExport}
                 onCancelExport={onCancelBatchExport}
+                onPreviewAngle={onPreviewAngle}
               />
             </Section>
           </div>

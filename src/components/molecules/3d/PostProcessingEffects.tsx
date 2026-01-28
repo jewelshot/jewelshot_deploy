@@ -27,13 +27,13 @@ import {
   ChromaticAberration,
   Noise,
   HueSaturation,
+  DepthOfField,
 } from '@react-three/postprocessing';
 import { ToneMappingMode, BlendFunction } from 'postprocessing';
 import * as THREE from 'three';
 
-// Note: SSAO and DepthOfField removed for now due to performance concerns
-// They can be added back when needed with proper conditional rendering
 import type { PostProcessingConfig, ToneMappingType } from './PostProcessingPanel';
+import type { FocusConfig } from './FocusPanel';
 
 // ============================================
 // TONE MAPPING MAP
@@ -54,9 +54,10 @@ const TONE_MAPPING_MAP: Record<ToneMappingType, ToneMappingMode> = {
 
 interface PostProcessingEffectsProps {
   config: PostProcessingConfig;
+  focusConfig?: FocusConfig;
 }
 
-export function PostProcessingEffects({ config }: PostProcessingEffectsProps) {
+export function PostProcessingEffects({ config, focusConfig }: PostProcessingEffectsProps) {
   const { camera } = useThree();
 
   // Memoize tone mapping mode
@@ -74,6 +75,9 @@ export function PostProcessingEffects({ config }: PostProcessingEffectsProps) {
   if (!config.enabled) {
     return null;
   }
+
+  // Check if DOF is enabled
+  const dofEnabled = focusConfig?.enabled && focusConfig.dof.enabled;
 
   return (
     <EffectComposer multisampling={4}>
@@ -124,6 +128,14 @@ export function PostProcessingEffects({ config }: PostProcessingEffectsProps) {
         premultiply
         blendFunction={BlendFunction.SOFT_LIGHT}
         opacity={config.filmGrain?.enabled ? config.filmGrain.intensity : 0}
+      />
+
+      {/* Depth of Field - from FocusPanel config */}
+      <DepthOfField
+        focusDistance={dofEnabled && focusConfig ? focusConfig.dof.focusDistance : 0}
+        focalLength={dofEnabled && focusConfig ? focusConfig.dof.focalLength / 1000 : 0.02}
+        bokehScale={dofEnabled && focusConfig ? focusConfig.dof.maxBlur * 10 : 0}
+        height={480}
       />
     </EffectComposer>
   );

@@ -622,6 +622,8 @@ function SceneContent({
   // Turntable
   turntableConfig,
   isTurntablePlaying,
+  // Focus
+  focusConfig,
 }: {
   geometry: THREE.BufferGeometry | null;
   material: MaterialPreset;
@@ -651,6 +653,8 @@ function SceneContent({
   // Turntable
   turntableConfig?: TurntableConfig;
   isTurntablePlaying?: boolean;
+  // Focus
+  focusConfig?: FocusConfig;
 }) {
   const controlsRef = useRef<any>(null);
   const groupRef = useRef<THREE.Group>(null);
@@ -1001,7 +1005,7 @@ function SceneContent({
       
       {/* Post-Processing Effects */}
       {postProcessingConfig.enabled && (
-        <PostProcessingEffects config={postProcessingConfig} />
+        <PostProcessingEffects config={postProcessingConfig} focusConfig={focusConfig} />
       )}
     </>
   );
@@ -2310,6 +2314,8 @@ export default function ThreeDViewContent() {
                 // Turntable
                 turntableConfig={turntableConfig}
                 isTurntablePlaying={isTurntablePlaying}
+                // Focus
+                focusConfig={focusConfig}
               />
               <SnapshotHelper onSnapshot={handleSnapshotResult} />
             </Suspense>
@@ -2508,6 +2514,16 @@ export default function ThreeDViewContent() {
               onCancelBatchExport={() => {
                 setIsExporting(false);
               }}
+              onPreviewAngle={(angle) => {
+                // Preview angle - apply rotation to model
+                if (angle.rotation) {
+                  setModelRotation([
+                    THREE.MathUtils.degToRad(angle.rotation.x) - Math.PI / 2,
+                    THREE.MathUtils.degToRad(angle.rotation.y),
+                    THREE.MathUtils.degToRad(angle.rotation.z),
+                  ]);
+                }
+              }}
               snapshotPreview={snapshotPreview}
               onDownloadSnapshot={handleDownloadSnapshot}
               onSaveToGallery={handleSaveToGallery}
@@ -2544,6 +2560,24 @@ export default function ThreeDViewContent() {
                   controlsRef.current.target.set(...preset.target);
                   controlsRef.current.object.fov = preset.fov;
                   controlsRef.current.object.updateProjectionMatrix();
+                  controlsRef.current.update();
+                }
+              }}
+              onViewAngle={(angleId) => {
+                // Apply view angle preset
+                const anglePresets: Record<string, [number, number, number]> = {
+                  front: [0, 0, 3],
+                  back: [0, 0, -3],
+                  left: [-3, 0, 0],
+                  right: [3, 0, 0],
+                  top: [0, 3, 0.01],
+                  bottom: [0, -3, 0.01],
+                  iso: [2, 2, 2],
+                };
+                const position = anglePresets[angleId];
+                if (position && controlsRef.current) {
+                  controlsRef.current.object.position.set(...position);
+                  controlsRef.current.target.set(0, 0, 0);
                   controlsRef.current.update();
                 }
               }}
