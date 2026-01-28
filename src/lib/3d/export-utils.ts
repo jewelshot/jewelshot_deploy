@@ -28,6 +28,12 @@ export interface ScreenshotConfig {
   quality: number; // 0-1 for jpeg/webp
   transparentBackground: boolean;
   filename?: string;
+  // NEW: Custom resolution support
+  useCustomResolution: boolean;
+  customWidth: number;
+  customHeight: number;
+  // NEW: Pixel density (device pixel ratio) - higher = sharper but larger file
+  pixelRatio: number; // 1, 2, 3, 4
 }
 
 export interface VideoConfig {
@@ -90,7 +96,32 @@ export const DEFAULT_SCREENSHOT_CONFIG: ScreenshotConfig = {
   format: 'png',
   quality: 0.92,
   transparentBackground: false,
+  useCustomResolution: false,
+  customWidth: 1024,
+  customHeight: 1024,
+  pixelRatio: 1,
 };
+
+// Pixel ratio presets
+export const PIXEL_RATIO_PRESETS = [
+  { value: 1, label: '1x', description: 'Standart' },
+  { value: 2, label: '2x', description: 'Retina' },
+  { value: 3, label: '3x', description: 'Yüksek DPI' },
+  { value: 4, label: '4x', description: 'Ultra HD' },
+];
+
+/**
+ * Get effective resolution considering pixel ratio
+ */
+export function getEffectiveResolution(config: ScreenshotConfig): { width: number; height: number } {
+  const baseWidth = config.useCustomResolution ? config.customWidth : config.resolution.width;
+  const baseHeight = config.useCustomResolution ? config.customHeight : config.resolution.height;
+  
+  return {
+    width: baseWidth * config.pixelRatio,
+    height: baseHeight * config.pixelRatio,
+  };
+}
 
 export const DEFAULT_VIDEO_CONFIG: VideoConfig = {
   resolution: RESOLUTION_PRESETS.find(r => r.id === 'sq-512') || RESOLUTION_PRESETS[0],
@@ -115,14 +146,15 @@ export const DEFAULT_MULTI_ANGLE_CONFIG: MultiAngleConfig = {
 // ============================================
 
 /**
- * Estimate file size based on resolution and format
+ * Estimate file size based on resolution, format, and pixel ratio
  */
 export function estimateFileSize(
   resolution: ExportResolution,
   format: ExportFormat,
-  quality: number
+  quality: number,
+  pixelRatio: number = 1
 ): string {
-  const pixels = resolution.width * resolution.height;
+  const pixels = resolution.width * resolution.height * pixelRatio * pixelRatio;
   
   let bytesPerPixel: number;
   switch (format) {

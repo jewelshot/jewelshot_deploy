@@ -31,7 +31,9 @@ import {
   DEFAULT_SCREENSHOT_CONFIG,
   DEFAULT_VIDEO_CONFIG,
   DEFAULT_MULTI_ANGLE_CONFIG,
+  PIXEL_RATIO_PRESETS,
   estimateFileSize,
+  getEffectiveResolution,
 } from '@/lib/3d/export-utils';
 import { CAMERA_VIEW_PRESETS } from '@/lib/3d/camera-presets';
 
@@ -203,19 +205,115 @@ interface ScreenshotTabProps {
 }
 
 function ScreenshotTab({ config, onChange, onExport, isExporting }: ScreenshotTabProps) {
+  const effectiveRes = useMemo(() => getEffectiveResolution(config), [config]);
+  
   const estimatedSize = useMemo(() => {
-    return estimateFileSize(config.resolution, config.format, config.quality);
+    const res = config.useCustomResolution 
+      ? { ...config.resolution, width: config.customWidth, height: config.customHeight }
+      : config.resolution;
+    return estimateFileSize(res, config.format, config.quality, config.pixelRatio);
   }, [config]);
 
   return (
     <div className="space-y-4">
-      {/* Resolution */}
+      {/* Resolution Mode Toggle */}
       <div className="space-y-2">
-        <span className="text-[10px] text-white/50">Çözünürlük</span>
-        <ResolutionSelector
-          value={config.resolution}
-          onChange={(resolution) => onChange({ ...config, resolution })}
-        />
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] text-white/50">Çözünürlük Modu</span>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            onClick={() => onChange({ ...config, useCustomResolution: false })}
+            className={`rounded-lg border px-3 py-2 text-xs transition-colors ${
+              !config.useCustomResolution
+                ? 'border-purple-500/50 bg-purple-500/10 text-purple-300'
+                : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20'
+            }`}
+          >
+            Hazır Boyutlar
+          </button>
+          <button
+            onClick={() => onChange({ ...config, useCustomResolution: true })}
+            className={`rounded-lg border px-3 py-2 text-xs transition-colors ${
+              config.useCustomResolution
+                ? 'border-purple-500/50 bg-purple-500/10 text-purple-300'
+                : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20'
+            }`}
+          >
+            Özel Boyut
+          </button>
+        </div>
+      </div>
+
+      {/* Preset Resolution */}
+      {!config.useCustomResolution && (
+        <div className="space-y-2">
+          <span className="text-[10px] text-white/50">Çözünürlük</span>
+          <ResolutionSelector
+            value={config.resolution}
+            onChange={(resolution) => onChange({ ...config, resolution })}
+          />
+        </div>
+      )}
+
+      {/* Custom Resolution */}
+      {config.useCustomResolution && (
+        <div className="space-y-2">
+          <span className="text-[10px] text-white/50">Özel Piksel Boyutu</span>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1">
+              <label className="text-[9px] text-white/40">Genişlik (px)</label>
+              <input
+                type="number"
+                value={config.customWidth}
+                onChange={(e) => onChange({ ...config, customWidth: Math.max(1, parseInt(e.target.value) || 1) })}
+                min={1}
+                max={8192}
+                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[9px] text-white/40">Yükseklik (px)</label>
+              <input
+                type="number"
+                value={config.customHeight}
+                onChange={(e) => onChange({ ...config, customHeight: Math.max(1, parseInt(e.target.value) || 1) })}
+                min={1}
+                max={8192}
+                className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Pixel Ratio / Density */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] text-white/50">Piksel Yoğunluğu</span>
+          <span className="text-[10px] text-white/40">
+            Sonuç: {effectiveRes.width} × {effectiveRes.height}
+          </span>
+        </div>
+        <div className="grid grid-cols-4 gap-1">
+          {PIXEL_RATIO_PRESETS.map((preset) => (
+            <button
+              key={preset.value}
+              onClick={() => onChange({ ...config, pixelRatio: preset.value })}
+              className={`flex flex-col items-center rounded-lg border py-2 transition-colors ${
+                config.pixelRatio === preset.value
+                  ? 'border-purple-500/50 bg-purple-500/10'
+                  : 'border-white/10 bg-white/5 hover:border-white/20'
+              }`}
+            >
+              <span className="text-xs font-medium text-white/80">{preset.label}</span>
+              <span className="text-[8px] text-white/40">{preset.description}</span>
+            </button>
+          ))}
+        </div>
+        <p className="text-[9px] text-white/30">
+          Yüksek yoğunluk = daha keskin görüntü, daha büyük dosya
+        </p>
       </div>
 
       {/* Format */}
@@ -267,7 +365,12 @@ function ScreenshotTab({ config, onChange, onExport, isExporting }: ScreenshotTa
         )}
 
         <div className="flex items-center justify-between text-xs">
-          <span className="text-white/50">Tahmini Boyut</span>
+          <span className="text-white/50">Çıktı Boyutu</span>
+          <span className="font-mono text-white/70">{effectiveRes.width} × {effectiveRes.height} px</span>
+        </div>
+
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-white/50">Tahmini Dosya</span>
           <span className="text-white/70">{estimatedSize}</span>
         </div>
       </div>
