@@ -4,10 +4,8 @@
  * Uses Three.js EffectComposer with OutlinePass for a professional
  * selection indicator like in KeyShot, Blender, etc.
  * 
- * NOTE: This component creates its own EffectComposer which renders
- * ONLY the outline effect on top of the existing scene. It does NOT
- * interfere with PostProcessingEffects because it only renders when
- * objects are selected, and it renders with priority after the main render.
+ * This component copies the renderer's output encoding and tone mapping
+ * settings to ensure the scene doesn't appear darker when outline is active.
  */
 
 'use client';
@@ -18,7 +16,7 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
+import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectionShader.js';
 import * as THREE from 'three';
 
 // Extend R3F with post-processing classes
@@ -51,21 +49,47 @@ export function SelectionOutline({
   
   const composer = useRef<EffectComposer | null>(null);
   const outlinePass = useRef<OutlinePass | null>(null);
-  const fxaaPass = useRef<ShaderPass | null>(null);
+  const renderPass = useRef<RenderPass | null>(null);
   const isInitialized = useRef(false);
   const lastSize = useRef({ width: 0, height: 0 });
+  
+  // Store original renderer settings
+  const originalSettings = useRef<{
+    toneMapping: THREE.ToneMapping;
+    toneMappingExposure: number;
+    outputColorSpace: string;
+  } | null>(null);
   
   // Initialize composer and passes only once
   const initComposer = useCallback(() => {
     if (isInitialized.current && composer.current) return;
     
-    // Create effect composer with a separate render target
-    const effectComposer = new EffectComposer(gl);
+    // Store original renderer settings
+    originalSettings.current = {
+      toneMapping: gl.toneMapping,
+      toneMappingExposure: gl.toneMappingExposure,
+      outputColorSpace: gl.outputColorSpace,
+    };
+    
+    // Create render target with proper color space
+    const renderTarget = new THREE.WebGLRenderTarget(size.width, size.height, {
+      minFilter: THREE.LinearFilter,
+      magFilter: THREE.LinearFilter,
+      format: THREE.RGBAFormat,
+      colorSpace: THREE.SRGBColorSpace,
+      type: THREE.HalfFloatType,
+    });
+    
+    // Create effect composer
+    const effectComposer = new EffectComposer(gl, renderTarget);
     composer.current = effectComposer;
     
-    // Render pass
-    const renderPass = new RenderPass(scene, camera);
-    effectComposer.addPass(renderPass);
+    // Render pass - will use renderer's current settings
+    const rPass = new RenderPass(scene, camera);
+    rPass.clearColor = new THREE.Color(0x000000);
+    rPass.clearAlpha = 0;
+    renderPass.current = rPass;
+    effectComposer.addPass(rPass);
     
     // Outline pass
     const outline = new OutlinePass(
@@ -74,19 +98,18 @@ export function SelectionOutline({
       camera
     );
     outline.edgeStrength = edgeStrength;
-    outline.edgeGlow = 0.5;
+    outline.edgeGlow = 0.3;
     outline.edgeThickness = edgeThickness;
     outline.pulsePeriod = 0; // No pulsing
     outline.visibleEdgeColor.set(visibleEdgeColor);
     outline.hiddenEdgeColor.set(hiddenEdgeColor);
+    outline.usePatternTexture = false;
     outlinePass.current = outline;
     effectComposer.addPass(outline);
     
-    // FXAA for smooth edges
-    const fxaa = new ShaderPass(FXAAShader);
-    fxaa.uniforms['resolution'].value.set(1 / size.width, 1 / size.height);
-    fxaaPass.current = fxaa;
-    effectComposer.addPass(fxaa);
+    // Gamma correction to match the main renderer output
+    const gammaPass = new ShaderPass(GammaCorrectionShader);
+    effectComposer.addPass(gammaPass);
     
     lastSize.current = { width: size.width, height: size.height };
     isInitialized.current = true;
@@ -103,7 +126,7 @@ export function SelectionOutline({
         composer.current.dispose();
         composer.current = null;
         outlinePass.current = null;
-        fxaaPass.current = null;
+        renderPass.current = null;
         isInitialized.current = false;
       }
     };
@@ -128,7 +151,7 @@ export function SelectionOutline({
   
   // Handle resize properly - update both composer and outline pass
   useEffect(() => {
-    if (!composer.current || !outlinePass.current || !fxaaPass.current) return;
+    if (!composer.current || !outlinePass.current) return;
     
     // Only update if size actually changed
     if (lastSize.current.width === size.width && lastSize.current.height === size.height) return;
@@ -139,9 +162,6 @@ export function SelectionOutline({
     // Update outline pass resolution
     outlinePass.current.resolution.set(size.width, size.height);
     
-    // Update FXAA resolution
-    fxaaPass.current.uniforms['resolution'].value.set(1 / size.width, 1 / size.height);
-    
     lastSize.current = { width: size.width, height: size.height };
   }, [size.width, size.height]);
   
@@ -150,6 +170,13 @@ export function SelectionOutline({
     if (!enabled || !composer.current || selectedObjects.length === 0) {
       return;
     }
+    
+    // Ensure renderer settings match the original
+    if (originalSettings.current) {
+      gl.toneMapping = originalSettings.current.toneMapping;
+      gl.toneMappingExposure = originalSettings.current.toneMappingExposure;
+    }
+    
     composer.current.render();
   }, 2); // Priority 2 = render after default (1) and post-processing
   
