@@ -421,9 +421,11 @@ function LayerModel({
 // Adaptive Resolution Controller - Handles progressive rendering
 function AdaptiveResolutionController({ 
   enabled = true,
+  autoRotate = false, // NEW: Skip adaptive resolution during auto-rotate
   onResolutionChange,
 }: { 
   enabled?: boolean;
+  autoRotate?: boolean;
   onResolutionChange?: (ratio: number, isRefining: boolean) => void;
 }) {
   const { gl, camera } = useThree();
@@ -439,6 +441,17 @@ function AdaptiveResolutionController({
   
   useFrame(() => {
     if (!enabled) return;
+    
+    // NEW: If auto-rotate is enabled, always use max resolution
+    // This prevents quality loss during auto-rotation
+    if (autoRotate) {
+      if (currentRatio.current !== maxRatio) {
+        currentRatio.current = maxRatio;
+        gl.setPixelRatio(maxRatio);
+        onResolutionChange?.(maxRatio, false);
+      }
+      return;
+    }
     
     const now = Date.now();
     const currentMatrix = camera.matrixWorld;
@@ -813,8 +826,10 @@ function SceneContent({
       )}
       
       {/* Adaptive Resolution - Progressive rendering for smooth interaction */}
+      {/* Disabled during auto-rotate to maintain full quality */}
       <AdaptiveResolutionController 
         enabled={adaptiveResolution}
+        autoRotate={autoRotate}
         onResolutionChange={onResolutionChange}
       />
     </>
