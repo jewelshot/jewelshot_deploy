@@ -89,6 +89,8 @@ import { DEFAULT_ANNOTATION_CONFIG, type AnnotationConfig, type AnnotationType }
 import { DEFAULT_TRANSFORM_ADVANCED_CONFIG, type TransformAdvancedConfig } from '@/components/molecules/3d/TransformPanelAdvanced';
 import { DEFAULT_TRANSFORM, DEFAULT_FLIP, type TransformState, type FlipState } from '@/lib/3d/types';
 import { DEFAULT_CAMERA_SETTINGS, type CameraSettings, type CameraViewPreset, CAMERA_VIEW_PRESETS } from '@/lib/3d/camera-presets';
+import { type LayerItem, type LayerCategory } from '@/components/molecules/3d/LayerGroupPanel';
+import { type SelectedEnvironment } from '@/components/molecules/3d/EnvironmentPicker';
 
 // Rhino3dm - Will be loaded dynamically when needed
 // Note: 3DM support requires additional setup due to WASM complexity
@@ -1160,6 +1162,25 @@ export default function ThreeDViewContent() {
   // Camera Settings
   const [cameraSettings, setCameraSettings] = useState<CameraSettings>(DEFAULT_CAMERA_SETTINGS);
   const [currentCameraPresetId, setCurrentCameraPresetId] = useState<string | null>(null);
+  
+  // Layer selection
+  const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
+  
+  // Material Picker Modal
+  const [materialPickerOpen, setMaterialPickerOpen] = useState(false);
+  const [materialPickerLayerId, setMaterialPickerLayerId] = useState<string | null>(null);
+  const [materialPickerCategory, setMaterialPickerCategory] = useState<'metal' | 'stone' | 'setting' | 'unknown'>('metal');
+  
+  // Environment Picker
+  const [selectedEnvironment, setSelectedEnvironment] = useState<SelectedEnvironment>({
+    type: 'hdri',
+    hdriPreset: undefined,
+    studioPresetId: undefined,
+    intensity: 1,
+    blur: 0,
+    rotation: 0,
+    backgroundVisible: true,
+  });
   
   // Model dimensions for measurement
   const [modelDimensions, setModelDimensions] = useState<Dimensions3D | null>(null);
@@ -2658,6 +2679,74 @@ export default function ThreeDViewContent() {
                 }
               }}
               onFitToView={() => fitToViewFn?.()}
+              // Layer Group Panel
+              layerItems={layers.map(l => ({
+                id: l.id,
+                name: l.name,
+                visible: l.visible,
+                color: l.color,
+                category: (l.category === 'setting' ? 'metal' : l.category || 'unknown') as LayerCategory,
+                materialId: layerMaterials[l.id]?.id || null,
+              }))}
+              selectedLayerId={selectedLayerId}
+              onSelectLayer={setSelectedLayerId}
+              onToggleLayerVisibility={(id) => {
+                setLayers(prev => prev.map(l => l.id === id ? { ...l, visible: !l.visible } : l));
+              }}
+              onToggleAllLayerVisibility={(category, visible) => {
+                setLayers(prev => prev.map(l => 
+                  (l.category === category || (category === 'metal' && l.category === 'setting'))
+                    ? { ...l, visible }
+                    : l
+                ));
+              }}
+              // Material Picker
+              materialPickerOpen={materialPickerOpen}
+              materialPickerLayerId={materialPickerLayerId}
+              materialPickerCategory={materialPickerCategory}
+              onMaterialPickerClose={() => setMaterialPickerOpen(false)}
+              onMaterialPickerOpen={(layerId) => {
+                const layer = layers.find(l => l.id === layerId);
+                if (layer) {
+                  setMaterialPickerLayerId(layerId);
+                  setMaterialPickerCategory(
+                    layer.category === 'stone' ? 'stone' : 
+                    layer.category === 'setting' ? 'setting' : 'metal'
+                  );
+                  setMaterialPickerOpen(true);
+                }
+              }}
+              onMaterialSelect={(materialId) => {
+                if (materialPickerLayerId) {
+                  const preset = METAL_PRESETS.find(p => p.id === materialId) || STONE_PRESETS.find(p => p.id === materialId);
+                  if (preset) {
+                    setLayerMaterials(prev => ({ ...prev, [materialPickerLayerId]: preset }));
+                  }
+                }
+                setMaterialPickerOpen(false);
+              }}
+              // Environment Picker
+              selectedEnvironment={selectedEnvironment}
+              onEnvironmentChange={(env) => {
+                setSelectedEnvironment(env);
+                // Sync with HDR settings
+                if (env.type === 'hdri') {
+                  setUseHDR(true);
+                  setLightIntensity(env.intensity);
+                } else if (env.type === 'studio') {
+                  setUseHDR(false);
+                }
+              }}
+              // Export Panel
+              onScreenshot={async (config) => {
+                await handleSnapshot();
+              }}
+              onVideoExport={async (config) => {
+                // Use existing video export
+              }}
+              onMultiAngleExport={async (config) => {
+                // Use existing batch export
+              }}
             />
           )}
         </div>

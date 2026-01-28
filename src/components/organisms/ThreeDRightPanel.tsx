@@ -57,6 +57,13 @@ import { TransformControls } from '@/components/molecules/3d/TransformControls';
 import { CameraControlsPanel } from '@/components/molecules/3d/CameraControlsPanel';
 import { DEFAULT_TRANSFORM, DEFAULT_FLIP, type TransformState, type FlipState } from '@/lib/3d/types';
 import { DEFAULT_CAMERA_SETTINGS, type CameraSettings, type CameraViewPreset } from '@/lib/3d/camera-presets';
+// NEW: Missing components
+import { LayerGroupPanel, type LayerItem, type LayerCategory } from '@/components/molecules/3d/LayerGroupPanel';
+import { MaterialPicker } from '@/components/molecules/3d/MaterialPicker';
+import { WeightSummaryCard } from '@/components/molecules/3d/WeightSummaryCard';
+import { EnvironmentPicker, type SelectedEnvironment } from '@/components/molecules/3d/EnvironmentPicker';
+import { ExportPanel } from '@/components/molecules/3d/ExportPanel';
+import { type ScreenshotConfig, type VideoConfig, type MultiAngleConfig } from '@/lib/3d/export-utils';
 
 // ============================================
 // TYPES
@@ -269,6 +276,30 @@ interface ThreeDRightPanelProps {
   onCameraSettingsChange: (settings: CameraSettings) => void;
   onCameraPresetSelect: (preset: CameraViewPreset) => void;
   onFitToView: () => void;
+  
+  // NEW: Layer Group Panel
+  layerItems: LayerItem[];
+  selectedLayerId: string | null;
+  onSelectLayer: (id: string | null) => void;
+  onToggleLayerVisibility: (id: string) => void;
+  onToggleAllLayerVisibility: (category: LayerCategory, visible: boolean) => void;
+  
+  // NEW: Material Picker Modal
+  materialPickerOpen: boolean;
+  materialPickerLayerId: string | null;
+  materialPickerCategory: 'metal' | 'stone' | 'setting' | 'unknown';
+  onMaterialPickerClose: () => void;
+  onMaterialPickerOpen: (layerId: string) => void;
+  onMaterialSelect: (materialId: string) => void;
+  
+  // NEW: Environment Picker
+  selectedEnvironment: SelectedEnvironment;
+  onEnvironmentChange: (env: SelectedEnvironment) => void;
+  
+  // NEW: Export Panel handlers
+  onScreenshot: (config: ScreenshotConfig) => Promise<void>;
+  onVideoExport?: (config: VideoConfig) => Promise<void>;
+  onMultiAngleExport?: (config: MultiAngleConfig) => Promise<void>;
 }
 
 // ============================================
@@ -362,6 +393,26 @@ export function ThreeDRightPanel({
   onCameraSettingsChange,
   onCameraPresetSelect,
   onFitToView,
+  // Layer Group Panel
+  layerItems,
+  selectedLayerId,
+  onSelectLayer,
+  onToggleLayerVisibility,
+  onToggleAllLayerVisibility,
+  // Material Picker
+  materialPickerOpen,
+  materialPickerLayerId,
+  materialPickerCategory,
+  onMaterialPickerClose,
+  onMaterialPickerOpen,
+  onMaterialSelect,
+  // Environment Picker
+  selectedEnvironment,
+  onEnvironmentChange,
+  // Export Panel
+  onScreenshot,
+  onVideoExport,
+  onMultiAngleExport,
 }: ThreeDRightPanelProps) {
   const [activeTab, setActiveTab] = useState<TabId>('model');
 
@@ -430,40 +481,25 @@ export function ThreeDRightPanel({
               </Section>
             )}
 
-            {/* Layers */}
-            {layers.length > 0 && (
-              <Section title={`Katmanlar (${layers.length})`} icon={<Layers className="h-4 w-4" />} defaultOpen>
-                <div className="space-y-1 max-h-48 overflow-y-auto">
-                  {layers.map((layer) => (
-                    <div
-                      key={layer.id}
-                      className="flex items-center gap-2 rounded-lg bg-white/5 p-2"
-                    >
-                      <button
-                        onClick={() => onLayerVisibilityChange?.(layer.id, !layer.visible)}
-                        className={`rounded p-1 ${layer.visible ? 'text-white/70' : 'text-white/30'}`}
-                      >
-                        {layer.visible ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
-                      </button>
-                      <div
-                        className="h-3 w-3 rounded-full ring-1 ring-white/20"
-                        style={{ backgroundColor: layer.color }}
-                      />
-                      <span className="flex-1 text-xs text-white/60 truncate">{layer.name}</span>
-                      {layer.category && (
-                        <span className={`text-[9px] px-1.5 py-0.5 rounded ${
-                          layer.category === 'metal' ? 'bg-yellow-500/20 text-yellow-400' :
-                          layer.category === 'stone' ? 'bg-cyan-500/20 text-cyan-400' :
-                          'bg-white/10 text-white/40'
-                        }`}>
-                          {layer.category}
-                        </span>
-                      )}
-                    </div>
-                  ))}
-                </div>
+            {/* Layers - Using LayerGroupPanel for grouped view */}
+            {layerItems.length > 0 && (
+              <Section title={`Katmanlar (${layerItems.length})`} icon={<Layers className="h-4 w-4" />} defaultOpen>
+                <LayerGroupPanel
+                  layers={layerItems}
+                  selectedLayerId={selectedLayerId}
+                  onSelectLayer={onSelectLayer}
+                  onToggleLayerVisibility={onToggleLayerVisibility}
+                  onToggleAllVisibility={onToggleAllLayerVisibility}
+                  onOpenMaterialPicker={onMaterialPickerOpen}
+                  compact
+                />
               </Section>
             )}
+
+            {/* Weight Summary */}
+            <Section title="Ağırlık Özeti" icon={<Box className="h-4 w-4" />}>
+              <WeightSummaryCard />
+            </Section>
 
             {/* Display Options */}
             <Section title="Görüntü Ayarları" icon={<Settings className="h-4 w-4" />} defaultOpen>
@@ -592,7 +628,16 @@ export function ThreeDRightPanel({
         {/* ========== LIGHTING TAB ========== */}
         {activeTab === 'lighting' && (
           <div>
-            <Section title="Ortam (HDR)" icon={<ImageIcon className="h-4 w-4" />} defaultOpen>
+            {/* Quick Environment Picker */}
+            <Section title="Hızlı Ortam Seçici" icon={<ImageIcon className="h-4 w-4" />} defaultOpen>
+              <EnvironmentPicker
+                selected={selectedEnvironment}
+                onChange={onEnvironmentChange}
+                compact
+              />
+            </Section>
+
+            <Section title="Ortam (HDR) Detaylı" icon={<ImageIcon className="h-4 w-4" />}>
               <HDRPanel
                 config={hdrConfig}
                 onChange={onHDRChange}
@@ -717,7 +762,18 @@ export function ThreeDRightPanel({
               </Section>
             )}
 
-            <Section title="Video / GIF / Görsel" icon={<Video className="h-4 w-4" />} defaultOpen>
+            {/* General Export Panel */}
+            <Section title="Hızlı Export" icon={<Download className="h-4 w-4" />} defaultOpen>
+              <ExportPanel
+                onScreenshot={onScreenshot}
+                onVideo={onVideoExport}
+                onMultiAngle={onMultiAngleExport}
+                isExporting={recordingState.isRecording || batchProgress.isExporting}
+                compact
+              />
+            </Section>
+
+            <Section title="Video / GIF / Görsel (Detaylı)" icon={<Video className="h-4 w-4" />}>
               <VideoExportPanel
                 config={videoConfig}
                 onChange={onVideoConfigChange}
@@ -747,6 +803,15 @@ export function ThreeDRightPanel({
       <div className="border-t border-white/10 px-4 py-2 text-center">
         <p className="text-[9px] text-white/30">JewelShot 3D Viewer v2.0</p>
       </div>
+
+      {/* Material Picker Modal */}
+      <MaterialPicker
+        isOpen={materialPickerOpen}
+        onClose={onMaterialPickerClose}
+        currentMaterialId={materialPickerLayerId}
+        layerCategory={materialPickerCategory}
+        onSelectMaterial={onMaterialSelect}
+      />
     </div>
   );
 }
