@@ -32,6 +32,7 @@ import {
   RefreshCw,
   X,
   Check,
+  Move,
 } from 'lucide-react';
 
 // Panels
@@ -52,6 +53,10 @@ import { ViewPanel, DEFAULT_VIEW_CONFIG, type ViewConfig, type CameraPreset } fr
 import { FocusPanel, DEFAULT_FOCUS_CONFIG, type FocusConfig } from '@/components/molecules/3d/FocusPanel';
 import { AnnotationPanel, DEFAULT_ANNOTATION_CONFIG, type AnnotationConfig, type AnnotationType } from '@/components/molecules/3d/AnnotationPanel';
 import { TransformPanelAdvanced, DEFAULT_TRANSFORM_ADVANCED_CONFIG, type TransformAdvancedConfig } from '@/components/molecules/3d/TransformPanelAdvanced';
+import { TransformControls } from '@/components/molecules/3d/TransformControls';
+import { CameraControlsPanel } from '@/components/molecules/3d/CameraControlsPanel';
+import { DEFAULT_TRANSFORM, DEFAULT_FLIP, type TransformState, type FlipState } from '@/lib/3d/types';
+import { DEFAULT_CAMERA_SETTINGS, type CameraSettings, type CameraViewPreset } from '@/lib/3d/camera-presets';
 
 // ============================================
 // TYPES
@@ -251,6 +256,19 @@ interface ThreeDRightPanelProps {
   transformConfig: TransformAdvancedConfig;
   onTransformChange: (config: Partial<TransformAdvancedConfig>) => void;
   onTransformReset?: () => void;
+  
+  // NEW: Product Transform (Position, Rotation, Scale, Flip)
+  productTransform: TransformState;
+  productFlip: FlipState;
+  onProductTransformChange: (transform: TransformState) => void;
+  onProductFlipChange: (flip: FlipState) => void;
+  
+  // NEW: Camera Controls
+  cameraSettings: CameraSettings;
+  currentCameraPresetId: string | null;
+  onCameraSettingsChange: (settings: CameraSettings) => void;
+  onCameraPresetSelect: (preset: CameraViewPreset) => void;
+  onFitToView: () => void;
 }
 
 // ============================================
@@ -333,6 +351,17 @@ export function ThreeDRightPanel({
   transformConfig,
   onTransformChange,
   onTransformReset,
+  // Product Transform
+  productTransform,
+  productFlip,
+  onProductTransformChange,
+  onProductFlipChange,
+  // Camera Controls
+  cameraSettings,
+  currentCameraPresetId,
+  onCameraSettingsChange,
+  onCameraPresetSelect,
+  onFitToView,
 }: ThreeDRightPanelProps) {
   const [activeTab, setActiveTab] = useState<TabId>('model');
 
@@ -512,6 +541,30 @@ export function ThreeDRightPanel({
                 isProcessing={isProcessingEdges}
                 modelInfo={modelInfo}
                 has3DMFile={has3DMFile}
+              />
+            </Section>
+
+            {/* Product Transform - Position, Rotation, Scale, Flip */}
+            <Section title="Ürün Transform" icon={<Move className="h-4 w-4" />}>
+              <TransformControls
+                transform={productTransform}
+                flip={productFlip}
+                onTransformChange={onProductTransformChange}
+                onFlipChange={onProductFlipChange}
+                compact
+              />
+            </Section>
+
+            {/* Camera Controls */}
+            <Section title="Kamera Kontrolleri" icon={<Camera className="h-4 w-4" />}>
+              <CameraControlsPanel
+                settings={cameraSettings}
+                currentPresetId={currentCameraPresetId}
+                onChange={onCameraSettingsChange}
+                onPresetSelect={onCameraPresetSelect}
+                onFitToView={onFitToView}
+                onResetCamera={onResetCamera || (() => {})}
+                compact
               />
             </Section>
           </div>

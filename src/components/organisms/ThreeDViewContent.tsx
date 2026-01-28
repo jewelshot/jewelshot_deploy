@@ -87,6 +87,8 @@ import { DEFAULT_VIEW_CONFIG, type ViewConfig, type CameraPreset } from '@/compo
 import { DEFAULT_FOCUS_CONFIG, type FocusConfig } from '@/components/molecules/3d/FocusPanel';
 import { DEFAULT_ANNOTATION_CONFIG, type AnnotationConfig, type AnnotationType } from '@/components/molecules/3d/AnnotationPanel';
 import { DEFAULT_TRANSFORM_ADVANCED_CONFIG, type TransformAdvancedConfig } from '@/components/molecules/3d/TransformPanelAdvanced';
+import { DEFAULT_TRANSFORM, DEFAULT_FLIP, type TransformState, type FlipState } from '@/lib/3d/types';
+import { DEFAULT_CAMERA_SETTINGS, type CameraSettings, type CameraViewPreset, CAMERA_VIEW_PRESETS } from '@/lib/3d/camera-presets';
 
 // Rhino3dm - Will be loaded dynamically when needed
 // Note: 3DM support requires additional setup due to WASM complexity
@@ -1150,6 +1152,14 @@ export default function ThreeDViewContent() {
   const [focusConfig, setFocusConfig] = useState<FocusConfig>(DEFAULT_FOCUS_CONFIG);
   const [annotationConfig, setAnnotationConfig] = useState<AnnotationConfig>(DEFAULT_ANNOTATION_CONFIG);
   const [transformAdvancedConfig, setTransformAdvancedConfig] = useState<TransformAdvancedConfig>(DEFAULT_TRANSFORM_ADVANCED_CONFIG);
+  
+  // Product Transform (Position, Rotation, Scale, Flip)
+  const [productTransform, setProductTransform] = useState<TransformState>(DEFAULT_TRANSFORM);
+  const [productFlip, setProductFlip] = useState<FlipState>(DEFAULT_FLIP);
+  
+  // Camera Settings
+  const [cameraSettings, setCameraSettings] = useState<CameraSettings>(DEFAULT_CAMERA_SETTINGS);
+  const [currentCameraPresetId, setCurrentCameraPresetId] = useState<string | null>(null);
   
   // Model dimensions for measurement
   const [modelDimensions, setModelDimensions] = useState<Dimensions3D | null>(null);
@@ -2602,6 +2612,52 @@ export default function ThreeDViewContent() {
                 setTransformAdvancedConfig(DEFAULT_TRANSFORM_ADVANCED_CONFIG);
                 setModelRotation([-Math.PI / 2, 0, 0]);
               }}
+              // Product Transform props
+              productTransform={productTransform}
+              productFlip={productFlip}
+              onProductTransformChange={(transform) => {
+                setProductTransform(transform);
+                // Apply rotation to modelRotation
+                setModelRotation([
+                  THREE.MathUtils.degToRad(transform.rotation.x) - Math.PI / 2,
+                  THREE.MathUtils.degToRad(transform.rotation.y),
+                  THREE.MathUtils.degToRad(transform.rotation.z),
+                ]);
+              }}
+              onProductFlipChange={setProductFlip}
+              // Camera Controls props
+              cameraSettings={cameraSettings}
+              currentCameraPresetId={currentCameraPresetId}
+              onCameraSettingsChange={(settings) => {
+                setCameraSettings(settings);
+                // Apply FOV to camera
+                if (controlsRef.current) {
+                  controlsRef.current.object.fov = settings.fov;
+                  controlsRef.current.object.updateProjectionMatrix();
+                  controlsRef.current.enableDamping = settings.enableDamping;
+                  controlsRef.current.dampingFactor = settings.dampingFactor;
+                  controlsRef.current.enablePan = settings.enablePan;
+                  controlsRef.current.panSpeed = settings.panSpeed;
+                  controlsRef.current.enableZoom = settings.enableZoom;
+                  controlsRef.current.zoomSpeed = settings.zoomSpeed;
+                  controlsRef.current.enableRotate = settings.enableRotate;
+                  controlsRef.current.rotateSpeed = settings.rotateSpeed;
+                  controlsRef.current.minDistance = settings.minDistance;
+                  controlsRef.current.maxDistance = settings.maxDistance;
+                  controlsRef.current.update();
+                }
+              }}
+              onCameraPresetSelect={(preset) => {
+                setCurrentCameraPresetId(preset.id);
+                if (controlsRef.current) {
+                  controlsRef.current.object.position.set(...preset.position);
+                  controlsRef.current.target.set(...preset.target);
+                  controlsRef.current.object.fov = preset.fov;
+                  controlsRef.current.object.updateProjectionMatrix();
+                  controlsRef.current.update();
+                }
+              }}
+              onFitToView={() => fitToViewFn?.()}
             />
           )}
         </div>
