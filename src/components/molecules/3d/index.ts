@@ -60,3 +60,6 @@ export { TurntableControls, TurntableAnimator, TurntableButton, type TurntableCo
 
 // Batch Export
 export { BatchExportPanel, type BatchExportConfig, type BatchExportProgress, type ViewAngle, DEFAULT_BATCH_CONFIG, PRESET_ANGLES, ANGLE_QUICK_SETS } from './BatchExportPanel';
+
+// Measurement Panel (NEW Phase 9)
+export { MeasurementPanel, type MeasurementConfig, type Dimensions3D, DEFAULT_MEASUREMENT_CONFIG } from './MeasurementPanel';
