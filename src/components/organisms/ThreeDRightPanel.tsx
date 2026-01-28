@@ -46,12 +46,18 @@ import { MaterialEditor, METAL_PRESETS, type MaterialConfig } from '@/components
 import { VideoExportPanel, DEFAULT_VIDEO_CONFIG, type VideoExportConfig, type RecordingState } from '@/components/molecules/3d/VideoExportPanel';
 import { TurntableControls, DEFAULT_TURNTABLE_CONFIG, type TurntableConfig } from '@/components/molecules/3d/TurntableController';
 import { BatchExportPanel, DEFAULT_BATCH_CONFIG, type BatchExportConfig, type BatchExportProgress } from '@/components/molecules/3d/BatchExportPanel';
+// NEW Panels
+import { MeasurementPanel, DEFAULT_MEASUREMENT_CONFIG, type MeasurementConfig, type Dimensions3D } from '@/components/molecules/3d/MeasurementPanel';
+import { ViewPanel, DEFAULT_VIEW_CONFIG, type ViewConfig, type CameraPreset } from '@/components/molecules/3d/ViewPanel';
+import { FocusPanel, DEFAULT_FOCUS_CONFIG, type FocusConfig } from '@/components/molecules/3d/FocusPanel';
+import { AnnotationPanel, DEFAULT_ANNOTATION_CONFIG, type AnnotationConfig, type AnnotationType } from '@/components/molecules/3d/AnnotationPanel';
+import { TransformPanelAdvanced, DEFAULT_TRANSFORM_ADVANCED_CONFIG, type TransformAdvancedConfig } from '@/components/molecules/3d/TransformPanelAdvanced';
 
 // ============================================
 // TYPES
 // ============================================
 
-type TabId = 'model' | 'materials' | 'lighting' | 'effects' | 'export';
+type TabId = 'model' | 'materials' | 'lighting' | 'effects' | 'view' | 'export';
 
 interface TabConfig {
   id: TabId;
@@ -64,6 +70,7 @@ const TABS: TabConfig[] = [
   { id: 'materials', label: 'Malzeme', icon: <Palette className="h-4 w-4" /> },
   { id: 'lighting', label: 'Işık', icon: <Sun className="h-4 w-4" /> },
   { id: 'effects', label: 'Efekt', icon: <Sparkles className="h-4 w-4" /> },
+  { id: 'view', label: 'Görünüm', icon: <Eye className="h-4 w-4" /> },
   { id: 'export', label: 'Export', icon: <Download className="h-4 w-4" /> },
 ];
 
@@ -216,6 +223,32 @@ interface ThreeDRightPanelProps {
   // File actions
   onFileUpload?: () => void;
   onClearModel?: () => void;
+  
+  // NEW: Measurement
+  measurementConfig: MeasurementConfig;
+  onMeasurementChange: (config: Partial<MeasurementConfig>) => void;
+  modelDimensions?: Dimensions3D | null;
+  onRecalculateDimensions?: () => void;
+  
+  // NEW: View
+  viewConfig: ViewConfig;
+  onViewChange: (config: Partial<ViewConfig>) => void;
+  onCameraPreset?: (preset: CameraPreset) => void;
+  onResetCamera?: () => void;
+  
+  // NEW: Focus
+  focusConfig: FocusConfig;
+  onFocusChange: (config: Partial<FocusConfig>) => void;
+  
+  // NEW: Annotation
+  annotationConfig: AnnotationConfig;
+  onAnnotationChange: (config: Partial<AnnotationConfig>) => void;
+  onAddAnnotation?: (type: AnnotationType) => void;
+  
+  // NEW: Transform Advanced
+  transformConfig: TransformAdvancedConfig;
+  onTransformChange: (config: Partial<TransformAdvancedConfig>) => void;
+  onTransformReset?: () => void;
 }
 
 // ============================================
@@ -279,6 +312,23 @@ export function ThreeDRightPanel({
   onClearSnapshot,
   onFileUpload,
   onClearModel,
+  // NEW panels
+  measurementConfig,
+  onMeasurementChange,
+  modelDimensions,
+  onRecalculateDimensions,
+  viewConfig,
+  onViewChange,
+  onCameraPreset,
+  onResetCamera,
+  focusConfig,
+  onFocusChange,
+  annotationConfig,
+  onAnnotationChange,
+  onAddAnnotation,
+  transformConfig,
+  onTransformChange,
+  onTransformReset,
 }: ThreeDRightPanelProps) {
   const [activeTab, setActiveTab] = useState<TabId>('model');
 
@@ -522,6 +572,52 @@ export function ThreeDRightPanel({
               <PostProcessingPanelNew
                 config={postProcessingConfig}
                 onChange={onPostProcessingChange}
+              />
+            </Section>
+
+            <Section title="Odak Efektleri (DOF)" icon={<Eye className="h-4 w-4" />}>
+              <FocusPanel
+                config={focusConfig}
+                onChange={onFocusChange}
+              />
+            </Section>
+          </div>
+        )}
+
+        {/* ========== VIEW TAB ========== */}
+        {activeTab === 'view' && (
+          <div>
+            <Section title="Görünüm Modu" icon={<Eye className="h-4 w-4" />} defaultOpen>
+              <ViewPanel
+                config={viewConfig}
+                onChange={onViewChange}
+                onCameraPreset={onCameraPreset}
+                onResetCamera={onResetCamera}
+              />
+            </Section>
+
+            <Section title="Ölçümler" icon={<Box className="h-4 w-4" />}>
+              <MeasurementPanel
+                config={measurementConfig}
+                onChange={onMeasurementChange}
+                dimensions={modelDimensions}
+                onRecalculate={onRecalculateDimensions}
+              />
+            </Section>
+
+            <Section title="Etiketler" icon={<Layers className="h-4 w-4" />}>
+              <AnnotationPanel
+                config={annotationConfig}
+                onChange={onAnnotationChange}
+                onAddAnnotation={onAddAnnotation}
+              />
+            </Section>
+
+            <Section title="Transform (Gelişmiş)" icon={<Settings className="h-4 w-4" />}>
+              <TransformPanelAdvanced
+                config={transformConfig}
+                onChange={onTransformChange}
+                onReset={onTransformReset}
               />
             </Section>
           </div>

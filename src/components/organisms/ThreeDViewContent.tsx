@@ -81,6 +81,12 @@ import { METAL_PRESETS as MATERIAL_METAL_PRESETS, type MaterialConfig } from '@/
 import { DEFAULT_VIDEO_CONFIG, type VideoExportConfig, type RecordingState } from '@/components/molecules/3d/VideoExportPanel';
 import { DEFAULT_TURNTABLE_CONFIG, type TurntableConfig } from '@/components/molecules/3d/TurntableController';
 import { DEFAULT_BATCH_CONFIG, type BatchExportConfig, type BatchExportProgress } from '@/components/molecules/3d/BatchExportPanel';
+// NEW panels
+import { DEFAULT_MEASUREMENT_CONFIG, type MeasurementConfig, type Dimensions3D } from '@/components/molecules/3d/MeasurementPanel';
+import { DEFAULT_VIEW_CONFIG, type ViewConfig, type CameraPreset } from '@/components/molecules/3d/ViewPanel';
+import { DEFAULT_FOCUS_CONFIG, type FocusConfig } from '@/components/molecules/3d/FocusPanel';
+import { DEFAULT_ANNOTATION_CONFIG, type AnnotationConfig, type AnnotationType } from '@/components/molecules/3d/AnnotationPanel';
+import { DEFAULT_TRANSFORM_ADVANCED_CONFIG, type TransformAdvancedConfig } from '@/components/molecules/3d/TransformPanelAdvanced';
 
 // Rhino3dm - Will be loaded dynamically when needed
 // Note: 3DM support requires additional setup due to WASM complexity
@@ -1134,6 +1140,16 @@ export default function ThreeDViewContent() {
     currentAngleName: ''
   });
   
+  // NEW panel states
+  const [measurementConfig, setMeasurementConfig] = useState<MeasurementConfig>(DEFAULT_MEASUREMENT_CONFIG);
+  const [viewConfig, setViewConfig] = useState<ViewConfig>(DEFAULT_VIEW_CONFIG);
+  const [focusConfig, setFocusConfig] = useState<FocusConfig>(DEFAULT_FOCUS_CONFIG);
+  const [annotationConfig, setAnnotationConfig] = useState<AnnotationConfig>(DEFAULT_ANNOTATION_CONFIG);
+  const [transformAdvancedConfig, setTransformAdvancedConfig] = useState<TransformAdvancedConfig>(DEFAULT_TRANSFORM_ADVANCED_CONFIG);
+  
+  // Model dimensions for measurement
+  const [modelDimensions, setModelDimensions] = useState<Dimensions3D | null>(null);
+  
   // ===== SYNC NEW CONFIGS TO OLD SCENE VARIABLES =====
   // Sync backgroundConfig with backgroundColor
   useEffect(() => {
@@ -1269,6 +1285,40 @@ export default function ThreeDViewContent() {
     };
     setSelectedMaterial(syncedMaterial);
   }, [materialConfig]);
+  
+  // Calculate model dimensions when geometry changes
+  useEffect(() => {
+    if (loadedGeometry) {
+      loadedGeometry.computeBoundingBox();
+      const box = loadedGeometry.boundingBox;
+      if (box) {
+        const size = new THREE.Vector3();
+        box.getSize(size);
+        setModelDimensions({
+          width: size.x * 10, // Convert to mm (assuming 1 unit = 1cm)
+          height: size.y * 10,
+          depth: size.z * 10,
+        });
+      }
+    } else {
+      setModelDimensions(null);
+    }
+  }, [loadedGeometry]);
+  
+  // Sync viewConfig with wireframe and showGrid
+  useEffect(() => {
+    // Debug view sets wireframe
+    if (viewConfig.debugView === 'wireframe') {
+      setWireframe(true);
+    } else if (viewConfig.debugView === 'none') {
+      setWireframe(false);
+    }
+    
+    // Show axes when enabled in view config
+    if (viewConfig.showAxes) {
+      setShowGrid(true);
+    }
+  }, [viewConfig.debugView, viewConfig.showAxes]);
   
   // Resolution change callback
   const handleResolutionChange = useCallback((ratio: number, refining: boolean) => {
@@ -2465,6 +2515,59 @@ export default function ThreeDViewContent() {
               onClearSnapshot={() => setSnapshotPreview(null)}
               onFileUpload={() => fileInputRef.current?.click()}
               onClearModel={handleClearModel}
+              // NEW panel props
+              measurementConfig={measurementConfig}
+              onMeasurementChange={(updates) => setMeasurementConfig(prev => ({ ...prev, ...updates }))}
+              modelDimensions={modelDimensions}
+              onRecalculateDimensions={() => {
+                // Recalculate dimensions from bounding box
+                if (loadedGeometry) {
+                  loadedGeometry.computeBoundingBox();
+                  const box = loadedGeometry.boundingBox;
+                  if (box) {
+                    const size = new THREE.Vector3();
+                    box.getSize(size);
+                    setModelDimensions({
+                      width: size.x * 10, // Convert to mm
+                      height: size.y * 10,
+                      depth: size.z * 10,
+                    });
+                  }
+                }
+              }}
+              viewConfig={viewConfig}
+              onViewChange={(updates) => setViewConfig(prev => ({ ...prev, ...updates }))}
+              onCameraPreset={(preset) => {
+                if (controlsRef.current) {
+                  // Apply camera preset
+                  controlsRef.current.object.position.set(...preset.position);
+                  controlsRef.current.target.set(...preset.target);
+                  controlsRef.current.object.fov = preset.fov;
+                  controlsRef.current.object.updateProjectionMatrix();
+                  controlsRef.current.update();
+                }
+              }}
+              onResetCamera={() => {
+                if (controlsRef.current) {
+                  controlsRef.current.object.position.set(3, 2, 3);
+                  controlsRef.current.target.set(0, 0, 0);
+                  controlsRef.current.update();
+                }
+              }}
+              focusConfig={focusConfig}
+              onFocusChange={(updates) => setFocusConfig(prev => ({ ...prev, ...updates }))}
+              annotationConfig={annotationConfig}
+              onAnnotationChange={(updates) => setAnnotationConfig(prev => ({ ...prev, ...updates }))}
+              onAddAnnotation={(type) => {
+                console.log('Add annotation:', type);
+                // Annotation functionality - add to state
+              }}
+              transformConfig={transformAdvancedConfig}
+              onTransformChange={(updates) => setTransformAdvancedConfig(prev => ({ ...prev, ...updates }))}
+              onTransformReset={() => {
+                setTransformAdvancedConfig(DEFAULT_TRANSFORM_ADVANCED_CONFIG);
+                setModelRotation([-Math.PI / 2, 0, 0]);
+              }}
             />
           )}
         </div>
