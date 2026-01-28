@@ -69,3 +69,6 @@ export { ViewPanel, type ViewConfig, type ViewMode, type DebugView, type CameraT
 
 // Focus Panel (NEW Phase 11)
 export { FocusPanel, type FocusConfig, type DOFConfig, type BokehConfig, type TiltShiftConfig, DEFAULT_FOCUS_CONFIG, FOCUS_PRESETS } from './FocusPanel';
+
+// Annotation Panel (NEW Phase 12)
+export { AnnotationPanel, type AnnotationConfig, type Annotation, type AnnotationType, type LabelStyle, DEFAULT_ANNOTATION_CONFIG, LABEL_STYLE_PRESETS } from './AnnotationPanel';
