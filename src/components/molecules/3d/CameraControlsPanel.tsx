@@ -7,7 +7,7 @@
 
 'use client';
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, useRef, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Camera,
@@ -56,7 +56,7 @@ interface PresetButtonProps {
   onClick: () => void;
 }
 
-function PresetButton({ preset, isSelected, onClick }: PresetButtonProps) {
+const PresetButton = memo(function PresetButton({ preset, isSelected, onClick }: PresetButtonProps) {
   return (
     <button
       onClick={onClick}
@@ -71,7 +71,7 @@ function PresetButton({ preset, isSelected, onClick }: PresetButtonProps) {
       <span className="text-[9px] text-white/60">{preset.nameTr}</span>
     </button>
   );
-}
+});
 
 // ============================================
 // SLIDER
@@ -88,7 +88,47 @@ interface SliderProps {
   icon?: React.ReactNode;
 }
 
-function Slider({ label, value, onChange, min, max, step = 1, unit = '', icon }: SliderProps) {
+const Slider = memo(function Slider({ label, value, onChange, min, max, step = 1, unit = '', icon }: SliderProps) {
+  // Local state for immediate visual feedback
+  const [localValue, setLocalValue] = useState(value);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastCallRef = useRef<number>(0);
+
+  // Sync local value with prop
+  useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = parseFloat(e.target.value);
+    setLocalValue(newValue);
+
+    const now = Date.now();
+    const delay = 16; // ~60fps throttle
+    if (now - lastCallRef.current >= delay) {
+      lastCallRef.current = now;
+      onChange(newValue);
+    } else {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => {
+        lastCallRef.current = Date.now();
+        onChange(newValue);
+      }, delay);
+    }
+  }, [onChange]);
+
+  const handleChangeEnd = useCallback(() => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    onChange(localValue);
+  }, [onChange, localValue]);
+
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between">
@@ -97,7 +137,7 @@ function Slider({ label, value, onChange, min, max, step = 1, unit = '', icon }:
           <span className="text-[10px] text-white/50">{label}</span>
         </div>
         <span className="text-[10px] font-mono text-white/60">
-          {value.toFixed(step < 1 ? 1 : 0)}{unit}
+          {localValue.toFixed(step < 1 ? 1 : 0)}{unit}
         </span>
       </div>
       <input
@@ -105,13 +145,15 @@ function Slider({ label, value, onChange, min, max, step = 1, unit = '', icon }:
         min={min}
         max={max}
         step={step}
-        value={value}
-        onChange={(e) => onChange(parseFloat(e.target.value))}
+        value={localValue}
+        onChange={handleChange}
+        onMouseUp={handleChangeEnd}
+        onTouchEnd={handleChangeEnd}
         className="w-full accent-purple-500"
       />
     </div>
   );
-}
+});
 
 // ============================================
 // TOGGLE
@@ -123,12 +165,14 @@ interface ToggleProps {
   onChange: (value: boolean) => void;
 }
 
-function Toggle({ label, value, onChange }: ToggleProps) {
+const Toggle = memo(function Toggle({ label, value, onChange }: ToggleProps) {
+  const handleClick = useCallback(() => onChange(!value), [onChange, value]);
+  
   return (
     <label className="flex cursor-pointer items-center justify-between">
       <span className="text-[10px] text-white/60">{label}</span>
       <button
-        onClick={() => onChange(!value)}
+        onClick={handleClick}
         className={`relative h-4 w-7 rounded-full transition-colors ${
           value ? 'bg-purple-500' : 'bg-white/20'
         }`}
@@ -141,7 +185,7 @@ function Toggle({ label, value, onChange }: ToggleProps) {
       </button>
     </label>
   );
-}
+});
 
 // ============================================
 // MAIN COMPONENT

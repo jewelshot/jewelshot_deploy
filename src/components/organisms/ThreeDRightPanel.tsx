@@ -9,7 +9,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import * as THREE from 'three';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -101,13 +101,14 @@ interface SectionProps {
   children: React.ReactNode;
 }
 
-function Section({ title, icon, defaultOpen = false, children }: SectionProps) {
+const Section = memo(function Section({ title, icon, defaultOpen = false, children }: SectionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
+  const toggleOpen = useCallback(() => setIsOpen(prev => !prev), []);
 
   return (
     <div className="border-b border-white/5 last:border-b-0">
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={toggleOpen}
         className="flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-white/5"
       >
         <div className="flex items-center gap-2">
@@ -123,22 +124,18 @@ function Section({ title, icon, defaultOpen = false, children }: SectionProps) {
         )}
       </button>
       
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden"
-          >
-            <div className="px-4 pb-4">{children}</div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Use CSS grid for performant height animation - no layout thrashing */}
+      <div 
+        className="grid transition-[grid-template-rows] duration-200 ease-out"
+        style={{ gridTemplateRows: isOpen ? '1fr' : '0fr' }}
+      >
+        <div className="overflow-hidden">
+          <div className="px-4 pb-4">{children}</div>
+        </div>
+      </div>
     </div>
   );
-}
+});
 
 // ============================================
 // MAIN COMPONENT PROPS

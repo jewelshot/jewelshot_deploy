@@ -9,8 +9,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, memo } from 'react';
 import {
   ChevronDown,
   ChevronRight,
@@ -59,7 +58,7 @@ interface AccordionSectionProps {
   badge?: string | number;
 }
 
-function AccordionSection({
+const AccordionSection = memo(function AccordionSection({
   id,
   title,
   icon,
@@ -94,22 +93,18 @@ function AccordionSection({
         )}
       </button>
       
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden"
-          >
-            <div className="px-4 pb-4">{children}</div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Use CSS grid for performant height animation - no layout thrashing */}
+      <div 
+        className="grid transition-[grid-template-rows] duration-200 ease-out"
+        style={{ gridTemplateRows: isOpen ? '1fr' : '0fr' }}
+      >
+        <div className="overflow-hidden">
+          <div className="px-4 pb-4">{children}</div>
+        </div>
+      </div>
     </div>
   );
-}
+});
 
 // ============================================
 // MAIN SIDEBAR COMPONENT

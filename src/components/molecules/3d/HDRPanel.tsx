@@ -11,10 +11,78 @@
 
 'use client';
 
-import React, { useState, useRef, useCallback, useMemo, memo } from 'react';
+import React, { useState, useRef, useCallback, useMemo, memo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, X, Check, RotateCw, Eye, EyeOff, Loader2, FolderOpen, RefreshCw } from 'lucide-react';
 import { useEnvironments, type EnvironmentFile } from '@/hooks/useEnvironments';
+
+// Throttled slider for performance - prevents excessive re-renders
+const ThrottledSlider = memo(function ThrottledSlider({
+  value,
+  onChange,
+  min,
+  max,
+  step = 1,
+  className = 'w-full accent-purple-500',
+}: {
+  value: number;
+  onChange: (value: number) => void;
+  min: number;
+  max: number;
+  step?: number;
+  className?: string;
+}) {
+  const [localValue, setLocalValue] = useState(value);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastCallRef = useRef<number>(0);
+
+  useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = parseFloat(e.target.value);
+    setLocalValue(newValue);
+
+    const now = Date.now();
+    const delay = 16;
+    if (now - lastCallRef.current >= delay) {
+      lastCallRef.current = now;
+      onChange(newValue);
+    } else {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => {
+        lastCallRef.current = Date.now();
+        onChange(newValue);
+      }, delay);
+    }
+  }, [onChange]);
+
+  const handleChangeEnd = useCallback(() => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    onChange(localValue);
+  }, [onChange, localValue]);
+
+  return (
+    <input
+      type="range"
+      min={min}
+      max={max}
+      step={step}
+      value={localValue}
+      onChange={handleChange}
+      onMouseUp={handleChangeEnd}
+      onTouchEnd={handleChangeEnd}
+      className={className}
+    />
+  );
+});
 
 // Memoized environment item to prevent unnecessary re-renders
 const EnvironmentItem = memo(function EnvironmentItem({
@@ -596,14 +664,12 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                 {config.intensity.toFixed(1)}
               </span>
             </div>
-            <input
-              type="range"
+            <ThrottledSlider
               min={0}
               max={3}
               step={0.1}
               value={config.intensity}
-              onChange={(e) => onChange({ intensity: parseFloat(e.target.value) })}
-              className="w-full accent-purple-500"
+              onChange={(v) => onChange({ intensity: v })}
             />
           </div>
 
@@ -615,13 +681,12 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                 {(config.reflectionIntensity || 1).toFixed(1)}
               </span>
             </div>
-            <input
-              type="range"
+            <ThrottledSlider
               min={0}
               max={3}
               step={0.1}
               value={config.reflectionIntensity || 1}
-              onChange={(e) => onChange({ reflectionIntensity: parseFloat(e.target.value) })}
+              onChange={(v) => onChange({ reflectionIntensity: v })}
               className="w-full accent-cyan-500"
             />
             <p className="text-[9px] text-white/30">Metal ve taş yansımaları</p>
@@ -635,14 +700,12 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                 {(config.contrast || 1).toFixed(1)}
               </span>
             </div>
-            <input
-              type="range"
+            <ThrottledSlider
               min={0.5}
               max={2}
               step={0.1}
               value={config.contrast || 1}
-              onChange={(e) => onChange({ contrast: parseFloat(e.target.value) })}
-              className="w-full accent-purple-500"
+              onChange={(v) => onChange({ contrast: v })}
             />
           </div>
 
@@ -666,14 +729,12 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                   {Math.round((config.tintStrength || 0) * 100)}%
                 </span>
               </div>
-              <input
-                type="range"
+              <ThrottledSlider
                 min={0}
                 max={1}
                 step={0.05}
                 value={config.tintStrength || 0}
-                onChange={(e) => onChange({ tintStrength: parseFloat(e.target.value) })}
-                className="w-full accent-purple-500"
+                onChange={(v) => onChange({ tintStrength: v })}
               />
             </div>
           </div>
@@ -704,55 +765,34 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
             <div className="grid grid-cols-3 gap-2">
               <div>
                 <label className="text-[9px] text-white/30">X</label>
-                <input
-                  type="range"
+                <ThrottledSlider
                   min={0}
                   max={360}
+                  step={1}
                   value={(config.rotation.x * 180) / Math.PI}
-                  onChange={(e) =>
-                    onChange({
-                      rotation: {
-                        ...config.rotation,
-                        x: (parseFloat(e.target.value) * Math.PI) / 180,
-                      },
-                    })
-                  }
+                  onChange={(v) => onChange({ rotation: { ...config.rotation, x: (v * Math.PI) / 180 } })}
                   className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-purple-500"
                 />
               </div>
               <div>
                 <label className="text-[9px] text-white/30">Y</label>
-                <input
-                  type="range"
+                <ThrottledSlider
                   min={0}
                   max={360}
+                  step={1}
                   value={(config.rotation.y * 180) / Math.PI}
-                  onChange={(e) =>
-                    onChange({
-                      rotation: {
-                        ...config.rotation,
-                        y: (parseFloat(e.target.value) * Math.PI) / 180,
-                      },
-                    })
-                  }
+                  onChange={(v) => onChange({ rotation: { ...config.rotation, y: (v * Math.PI) / 180 } })}
                   className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-purple-500"
                 />
               </div>
               <div>
                 <label className="text-[9px] text-white/30">Z</label>
-                <input
-                  type="range"
+                <ThrottledSlider
                   min={0}
                   max={360}
+                  step={1}
                   value={(config.rotation.z * 180) / Math.PI}
-                  onChange={(e) =>
-                    onChange({
-                      rotation: {
-                        ...config.rotation,
-                        z: (parseFloat(e.target.value) * Math.PI) / 180,
-                      },
-                    })
-                  }
+                  onChange={(v) => onChange({ rotation: { ...config.rotation, z: (v * Math.PI) / 180 } })}
                   className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-purple-500"
                 />
               </div>
@@ -787,14 +827,12 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                   <span className="text-[10px] text-white/50">Bulanıklık</span>
                   <span className="text-[10px] font-mono text-white/60">{config.blur}</span>
                 </div>
-                <input
-                  type="range"
+                <ThrottledSlider
                   min={0}
                   max={1}
                   step={0.1}
                   value={config.blur}
-                  onChange={(e) => onChange({ blur: parseFloat(e.target.value) })}
-                  className="w-full accent-purple-500"
+                  onChange={(v) => onChange({ blur: v })}
                 />
               </div>
 
@@ -806,14 +844,12 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                     {(config.backgroundIntensity || 1).toFixed(1)}
                   </span>
                 </div>
-                <input
-                  type="range"
+                <ThrottledSlider
                   min={0}
                   max={3}
                   step={0.1}
                   value={config.backgroundIntensity || 1}
-                  onChange={(e) => onChange({ backgroundIntensity: parseFloat(e.target.value) })}
-                  className="w-full accent-purple-500"
+                  onChange={(v) => onChange({ backgroundIntensity: v })}
                 />
               </div>
             </div>
@@ -848,14 +884,12 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                       {(config.groundHeight || -0.5).toFixed(1)}
                     </span>
                   </div>
-                  <input
-                    type="range"
+                  <ThrottledSlider
                     min={-5}
                     max={0}
                     step={0.1}
                     value={config.groundHeight || -0.5}
-                    onChange={(e) => onChange({ groundHeight: parseFloat(e.target.value) })}
-                    className="w-full accent-purple-500"
+                    onChange={(v) => onChange({ groundHeight: v })}
                   />
                 </div>
 
@@ -867,14 +901,12 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                       {config.groundRadius || 50}
                     </span>
                   </div>
-                  <input
-                    type="range"
+                  <ThrottledSlider
                     min={10}
                     max={200}
                     step={5}
                     value={config.groundRadius || 50}
-                    onChange={(e) => onChange({ groundRadius: parseFloat(e.target.value) })}
-                    className="w-full accent-purple-500"
+                    onChange={(v) => onChange({ groundRadius: v })}
                   />
                 </div>
               </div>
