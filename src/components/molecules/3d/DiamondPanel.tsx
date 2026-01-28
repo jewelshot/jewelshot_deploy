@@ -22,6 +22,8 @@ export interface DiamondConfig {
   enabled: boolean;
   dispersion: number; // 0-1, rainbow fire effect
   brilliance: number; // 0-1, light scatter/sparkle
+  scintillation: number; // 0-1, sparkle movement on rotation
+  fire: number; // 0-1, color flashes intensity
   ior: number; // Index of refraction (1.0 - 3.0)
   transmission: number; // 0-1, transparency
   thickness: number; // Material thickness for refraction
@@ -29,12 +31,30 @@ export interface DiamondConfig {
   clearcoatRoughness: number; // 0-1, clear layer roughness
   envMapIntensity: number; // Environment reflection intensity
   color: string; // Base color tint
+  // Cut Quality Parameters
+  cutQuality: 'excellent' | 'very-good' | 'good' | 'fair' | 'poor';
+  tablePercent: number; // 52-62%
+  crownAngle: number; // 31-37 degrees
+  pavilionAngle: number; // 40-42 degrees
+  depth: number; // 58-63%
+  // Clarity Simulation
+  clarity: 'IF' | 'VVS1' | 'VVS2' | 'VS1' | 'VS2' | 'SI1' | 'SI2' | 'I1';
+  showInclusions: boolean;
+  // Special Effects
+  starEffect: boolean; // Star sapphire/ruby
+  catsEyeEffect: boolean; // Chrysoberyl cats eye
+  colorChange: boolean; // Alexandrite effect
+  // Fluorescence
+  fluorescence: 'none' | 'faint' | 'medium' | 'strong' | 'very-strong';
+  fluorescenceColor: string;
 }
 
 export const DEFAULT_DIAMOND_CONFIG: DiamondConfig = {
   enabled: true,
   dispersion: 0.5,
   brilliance: 0.8,
+  scintillation: 0.6,
+  fire: 0.7,
   ior: 2.42, // Diamond IOR
   transmission: 0.95,
   thickness: 0.5,
@@ -42,7 +62,52 @@ export const DEFAULT_DIAMOND_CONFIG: DiamondConfig = {
   clearcoatRoughness: 0,
   envMapIntensity: 2.5,
   color: '#ffffff',
+  // Cut Quality - Excellent round brilliant
+  cutQuality: 'excellent',
+  tablePercent: 57,
+  crownAngle: 34.5,
+  pavilionAngle: 40.8,
+  depth: 61.5,
+  // Clarity
+  clarity: 'VS1',
+  showInclusions: false,
+  // Special Effects
+  starEffect: false,
+  catsEyeEffect: false,
+  colorChange: false,
+  // Fluorescence
+  fluorescence: 'none',
+  fluorescenceColor: '#4169e1',
 };
+
+// ============================================
+// CUT QUALITY PRESETS
+// ============================================
+
+export const CUT_QUALITY_PRESETS: Record<string, { tablePercent: number; crownAngle: number; pavilionAngle: number; depth: number; brilliance: number; fire: number }> = {
+  excellent: { tablePercent: 57, crownAngle: 34.5, pavilionAngle: 40.8, depth: 61.5, brilliance: 0.95, fire: 0.9 },
+  'very-good': { tablePercent: 58, crownAngle: 33.5, pavilionAngle: 41.2, depth: 62, brilliance: 0.85, fire: 0.8 },
+  good: { tablePercent: 60, crownAngle: 32, pavilionAngle: 42, depth: 63, brilliance: 0.7, fire: 0.65 },
+  fair: { tablePercent: 62, crownAngle: 30, pavilionAngle: 43, depth: 65, brilliance: 0.55, fire: 0.5 },
+  poor: { tablePercent: 65, crownAngle: 28, pavilionAngle: 44, depth: 68, brilliance: 0.4, fire: 0.35 },
+};
+
+// ============================================
+// FANCY COLOR PRESETS
+// ============================================
+
+export const FANCY_DIAMOND_COLORS = [
+  { id: 'canary', name: 'Canary Yellow', color: '#ffeb3b' },
+  { id: 'cognac', name: 'Cognac', color: '#d2691e' },
+  { id: 'champagne', name: 'Champagne', color: '#f7e7ce' },
+  { id: 'pink', name: 'Pink', color: '#ffb6c1' },
+  { id: 'blue', name: 'Blue', color: '#add8e6' },
+  { id: 'green', name: 'Green', color: '#90ee90' },
+  { id: 'orange', name: 'Orange', color: '#ffa500' },
+  { id: 'red', name: 'Red', color: '#ff6b6b' },
+  { id: 'purple', name: 'Purple', color: '#dda0dd' },
+  { id: 'black', name: 'Black', color: '#2d2d2d' },
+];
 
 // ============================================
 // GEMSTONE PRESETS
@@ -320,33 +385,10 @@ export function DiamondPanel({ config, onChange }: DiamondPanelProps) {
 
       {/* Main Controls */}
       <div className="space-y-3">
-        {/* Dispersion (Fire) */}
-        <div className="space-y-1">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] text-white/50 flex items-center gap-1">
-              <Sparkles className="h-3 w-3" />
-              Dispersiyon (Ateş)
-            </span>
-            <span className="text-[10px] font-mono text-white/60">
-              {config.dispersion.toFixed(2)}
-            </span>
-          </div>
-          <input
-            type="range"
-            min={0}
-            max={1}
-            step={0.01}
-            value={config.dispersion}
-            onChange={(e) => onChange({ dispersion: parseFloat(e.target.value) })}
-            className="w-full accent-cyan-500"
-          />
-          <p className="text-[9px] text-white/30">Gökkuşağı ışık kırılması</p>
-        </div>
-
         {/* Brilliance */}
         <div className="space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] text-white/50">Parlaklık</span>
+            <span className="text-[10px] text-white/50">Brilliance (Parlaklık)</span>
             <span className="text-[10px] font-mono text-white/60">
               {Math.round(config.brilliance * 100)}%
             </span>
@@ -358,6 +400,69 @@ export function DiamondPanel({ config, onChange }: DiamondPanelProps) {
             step={0.05}
             value={config.brilliance}
             onChange={(e) => onChange({ brilliance: parseFloat(e.target.value) })}
+            className="w-full accent-cyan-500"
+          />
+          <p className="text-[9px] text-white/30">Beyaz ışık yansıması</p>
+        </div>
+
+        {/* Fire */}
+        <div className="space-y-1">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] text-white/50 flex items-center gap-1">
+              <Sparkles className="h-3 w-3" />
+              Fire (Ateş)
+            </span>
+            <span className="text-[10px] font-mono text-white/60">
+              {Math.round((config.fire || 0) * 100)}%
+            </span>
+          </div>
+          <input
+            type="range"
+            min={0}
+            max={1}
+            step={0.05}
+            value={config.fire || 0}
+            onChange={(e) => onChange({ fire: parseFloat(e.target.value) })}
+            className="w-full accent-orange-500"
+          />
+          <p className="text-[9px] text-white/30">Renkli ışık parıltıları</p>
+        </div>
+
+        {/* Scintillation */}
+        <div className="space-y-1">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] text-white/50">Scintillation (Kıvılcım)</span>
+            <span className="text-[10px] font-mono text-white/60">
+              {Math.round((config.scintillation || 0) * 100)}%
+            </span>
+          </div>
+          <input
+            type="range"
+            min={0}
+            max={1}
+            step={0.05}
+            value={config.scintillation || 0}
+            onChange={(e) => onChange({ scintillation: parseFloat(e.target.value) })}
+            className="w-full accent-yellow-500"
+          />
+          <p className="text-[9px] text-white/30">Hareket halinde parıltı</p>
+        </div>
+
+        {/* Dispersion */}
+        <div className="space-y-1">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] text-white/50">Dispersion</span>
+            <span className="text-[10px] font-mono text-white/60">
+              {config.dispersion.toFixed(2)}
+            </span>
+          </div>
+          <input
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={config.dispersion}
+            onChange={(e) => onChange({ dispersion: parseFloat(e.target.value) })}
             className="w-full accent-cyan-500"
           />
         </div>
@@ -387,14 +492,156 @@ export function DiamondPanel({ config, onChange }: DiamondPanelProps) {
         </div>
 
         {/* Color Tint */}
-        <div className="flex items-center justify-between">
-          <span className="text-[10px] text-white/50">Renk</span>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] text-white/50">Renk</span>
+            <input
+              type="color"
+              value={config.color}
+              onChange={(e) => onChange({ color: e.target.value })}
+              className="h-6 w-10 cursor-pointer rounded border border-white/10 bg-transparent"
+            />
+          </div>
+          {/* Fancy Color Quick Select */}
+          <div className="flex flex-wrap gap-1">
+            {FANCY_DIAMOND_COLORS.map((fc) => (
+              <button
+                key={fc.id}
+                onClick={() => onChange({ color: fc.color })}
+                className="h-5 w-5 rounded-full ring-1 ring-white/20 hover:ring-2 hover:ring-white/40 transition-all"
+                style={{ backgroundColor: fc.color }}
+                title={fc.name}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Cut Quality Section */}
+      <div className="pt-2 border-t border-white/10 space-y-2">
+        <span className="text-[10px] font-medium text-white/70">Kesim Kalitesi</span>
+        <div className="grid grid-cols-5 gap-1">
+          {(['excellent', 'very-good', 'good', 'fair', 'poor'] as const).map((quality) => (
+            <button
+              key={quality}
+              onClick={() => {
+                const preset = CUT_QUALITY_PRESETS[quality];
+                onChange({ 
+                  cutQuality: quality,
+                  tablePercent: preset.tablePercent,
+                  crownAngle: preset.crownAngle,
+                  pavilionAngle: preset.pavilionAngle,
+                  depth: preset.depth,
+                  brilliance: preset.brilliance,
+                  fire: preset.fire,
+                });
+              }}
+              className={`rounded-md py-1 text-[8px] transition-all ${
+                config.cutQuality === quality
+                  ? 'bg-cyan-500/20 text-cyan-300 ring-1 ring-cyan-500/50'
+                  : 'bg-white/5 text-white/50 hover:bg-white/10'
+              }`}
+            >
+              {quality === 'excellent' ? 'EX' : quality === 'very-good' ? 'VG' : quality === 'good' ? 'G' : quality === 'fair' ? 'F' : 'P'}
+            </button>
+          ))}
+        </div>
+        <p className="text-[9px] text-white/30">
+          Table: {config.tablePercent || 57}% | Crown: {config.crownAngle || 34.5}° | Depth: {config.depth || 61.5}%
+        </p>
+      </div>
+
+      {/* Clarity Section */}
+      <div className="pt-2 border-t border-white/10 space-y-2">
+        <span className="text-[10px] font-medium text-white/70">Saflık (Clarity)</span>
+        <div className="grid grid-cols-4 gap-1">
+          {(['IF', 'VVS1', 'VVS2', 'VS1', 'VS2', 'SI1', 'SI2', 'I1'] as const).map((clarity) => (
+            <button
+              key={clarity}
+              onClick={() => onChange({ clarity })}
+              className={`rounded-md py-1 text-[8px] transition-all ${
+                config.clarity === clarity
+                  ? 'bg-cyan-500/20 text-cyan-300 ring-1 ring-cyan-500/50'
+                  : 'bg-white/5 text-white/50 hover:bg-white/10'
+              }`}
+            >
+              {clarity}
+            </button>
+          ))}
+        </div>
+        <label className="flex items-center gap-2 text-[10px] text-white/50">
           <input
-            type="color"
-            value={config.color}
-            onChange={(e) => onChange({ color: e.target.value })}
-            className="h-6 w-10 cursor-pointer rounded border border-white/10 bg-transparent"
+            type="checkbox"
+            checked={config.showInclusions || false}
+            onChange={(e) => onChange({ showInclusions: e.target.checked })}
+            className="accent-cyan-500"
           />
+          İnklüzyonları Göster
+        </label>
+      </div>
+
+      {/* Fluorescence Section */}
+      <div className="pt-2 border-t border-white/10 space-y-2">
+        <span className="text-[10px] font-medium text-white/70">Floresans</span>
+        <div className="grid grid-cols-5 gap-1">
+          {(['none', 'faint', 'medium', 'strong', 'very-strong'] as const).map((f) => (
+            <button
+              key={f}
+              onClick={() => onChange({ fluorescence: f })}
+              className={`rounded-md py-1 text-[7px] transition-all ${
+                config.fluorescence === f
+                  ? 'bg-blue-500/20 text-blue-300 ring-1 ring-blue-500/50'
+                  : 'bg-white/5 text-white/50 hover:bg-white/10'
+              }`}
+            >
+              {f === 'none' ? 'Yok' : f === 'faint' ? 'Zayıf' : f === 'medium' ? 'Orta' : f === 'strong' ? 'Güçlü' : 'Çok G'}
+            </button>
+          ))}
+        </div>
+        {config.fluorescence !== 'none' && (
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] text-white/50">Floresans Rengi</span>
+            <input
+              type="color"
+              value={config.fluorescenceColor || '#4169e1'}
+              onChange={(e) => onChange({ fluorescenceColor: e.target.value })}
+              className="h-5 w-8 cursor-pointer rounded border border-white/10 bg-transparent"
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Special Effects */}
+      <div className="pt-2 border-t border-white/10 space-y-2">
+        <span className="text-[10px] font-medium text-white/70">Özel Efektler</span>
+        <div className="space-y-1">
+          <label className="flex items-center gap-2 text-[10px] text-white/50">
+            <input
+              type="checkbox"
+              checked={config.starEffect || false}
+              onChange={(e) => onChange({ starEffect: e.target.checked })}
+              className="accent-cyan-500"
+            />
+            Yıldız Efekti (Star Sapphire)
+          </label>
+          <label className="flex items-center gap-2 text-[10px] text-white/50">
+            <input
+              type="checkbox"
+              checked={config.catsEyeEffect || false}
+              onChange={(e) => onChange({ catsEyeEffect: e.target.checked })}
+              className="accent-cyan-500"
+            />
+            Kedi Gözü (Cat's Eye)
+          </label>
+          <label className="flex items-center gap-2 text-[10px] text-white/50">
+            <input
+              type="checkbox"
+              checked={config.colorChange || false}
+              onChange={(e) => onChange({ colorChange: e.target.checked })}
+              className="accent-cyan-500"
+            />
+            Renk Değişimi (Alexandrite)
+          </label>
         </div>
       </div>
 
