@@ -1,39 +1,49 @@
 # Environment Maps for 3D Viewer
 
-Place your HDR and EXR environment map files in this folder.
+HDR ve EXR ortam haritası dosyalarınızı bu klasöre ekleyin.
+Dosyalar otomatik olarak 3D görüntüleyicideki "Özel" sekmesinde listelenecektir.
 
-## Supported Formats
+## Desteklenen Formatlar
 
-- `.hdr` - Radiance HDR format
-- `.exr` - OpenEXR format (recommended for high quality)
+- `.hdr` - Radiance HDR formatı
+- `.exr` - OpenEXR formatı (yüksek kalite için önerilir)
 
-## Recommended Specifications
+## Önerilen Özellikler
 
-| Property | Recommendation |
-|----------|----------------|
-| Resolution | 2048x1024 (2K) or 4096x2048 (4K) |
-| Format | Equirectangular |
-| Dynamic Range | HDR (High Dynamic Range) |
-| File Size | < 10MB for optimal loading |
+| Özellik | Öneri |
+|---------|-------|
+| Çözünürlük | 2048x1024 (2K) veya 4096x2048 (4K) |
+| Format | Equirectangular (küresel) |
+| Dinamik Aralık | HDR (Yüksek Dinamik Aralık) |
+| Dosya Boyutu | Optimal yükleme için < 10MB |
 
-## Usage
+## Kullanım
 
-Files placed here will be accessible at `/environments/your-file.hdr`
+1. HDR veya EXR dosyanızı bu klasöre sürükleyip bırakın
+2. 3D görüntüleyiciye gidin
+3. Environment Picker'da "Özel" sekmesine tıklayın
+4. Dosyanız listede görünecektir
+5. "Yenile" butonuna tıklayarak listeyi güncelleyebilirsiniz
 
-## Suggested Environment Types for Jewelry
+## Mücevher için Önerilen Ortam Türleri
 
-1. **Studio Lighting** - Clean, controlled lighting for product shots
-2. **Golden Hour** - Warm, sunset-like lighting
-3. **Overcast Sky** - Soft, diffused lighting
-4. **Indoor Luxury** - Interior lighting with warm tones
-5. **Neutral Gray** - For accurate material visualization
+1. **Stüdyo Aydınlatması** - Ürün çekimleri için temiz, kontrollü ışık
+2. **Altın Saat** - Sıcak, gün batımı benzeri aydınlatma
+3. **Bulutlu Gökyüzü** - Yumuşak, dağınık aydınlatma
+4. **Lüks İç Mekan** - Sıcak tonlarda iç mekan aydınlatması
+5. **Nötr Gri** - Doğru malzeme görselleştirmesi için
 
-## Free HDR Sources
+## Ücretsiz HDR Kaynakları
 
-- [Poly Haven](https://polyhaven.com/hdris) - Free HDRIs
-- [HDRIHaven](https://hdri-haven.com/) - Free HDR images
-- [sIBL Archive](http://www.hdrlabs.com/sibl/archive.html) - Free HDRIs
+- [Poly Haven](https://polyhaven.com/hdris) - Ücretsiz HDRI'lar
+- [HDRIHaven](https://hdri-haven.com/) - Ücretsiz HDR görüntüler
+- [sIBL Archive](http://www.hdrlabs.com/sibl/archive.html) - Ücretsiz HDRI'lar
 
-## Current Files
+## Mevcut Dosyalar
 
-Add your files here and they will be listed below.
+Bu klasöre eklediğiniz dosyalar aşağıda otomatik olarak listelenecektir.
+
+---
+
+**Not:** Dosya adları otomatik olarak gösterim adına dönüştürülür.
+Örnek: `studio_warm_light.hdr` → "Studio Warm Light"

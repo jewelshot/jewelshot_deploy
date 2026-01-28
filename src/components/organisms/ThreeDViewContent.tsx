@@ -1178,6 +1178,8 @@ export default function ThreeDViewContent() {
     type: 'hdri',
     hdriPreset: undefined,
     studioPresetId: undefined,
+    customPath: undefined,
+    customName: undefined,
     intensity: 1,
     blur: 0,
     rotation: 0,
@@ -2743,6 +2745,19 @@ export default function ThreeDViewContent() {
                 if (env.type === 'hdri') {
                   setUseHDR(true);
                   setLightIntensity(env.intensity);
+                  setHdrPreset(HDR_PRESETS.find(p => p.id === env.hdriPreset) || null);
+                } else if (env.type === 'custom' && env.customPath) {
+                  // Custom HDR/EXR file from public/environments
+                  setUseHDR(true);
+                  setLightIntensity(env.intensity);
+                  // Set custom HDR preset with the file path
+                  setHdrPreset({
+                    id: 'custom',
+                    name: env.customName || 'Custom',
+                    file: env.customPath,
+                    intensity: env.intensity,
+                    description: 'Custom environment',
+                  });
                 } else if (env.type === 'studio') {
                   setUseHDR(false);
                 }

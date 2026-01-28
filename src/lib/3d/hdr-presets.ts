@@ -42,6 +42,55 @@ export interface HDRPreset {
 }
 
 // ============================================
+// CUSTOM ENVIRONMENT FILE TYPE
+// ============================================
+
+export interface CustomEnvironmentFile {
+  id: string;
+  name: string;
+  filename: string;
+  path: string;
+  format: 'hdr' | 'exr';
+  size: number;
+  sizeFormatted: string;
+  createdAt: string;
+}
+
+// Generate a preview gradient based on filename
+export function generatePreviewGradient(filename: string): string {
+  // Use filename hash to generate consistent colors
+  let hash = 0;
+  for (let i = 0; i < filename.length; i++) {
+    const char = filename.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  
+  const hue1 = Math.abs(hash % 360);
+  const hue2 = (hue1 + 40) % 360;
+  const hue3 = (hue1 + 80) % 360;
+  
+  return `linear-gradient(135deg, hsl(${hue1}, 30%, 25%) 0%, hsl(${hue2}, 40%, 35%) 50%, hsl(${hue3}, 35%, 45%) 100%)`;
+}
+
+// Convert custom environment file to HDRPreset
+export function customFileToPreset(file: CustomEnvironmentFile): HDRPreset {
+  return {
+    id: `custom-${file.id}`,
+    name: file.name,
+    nameTr: file.name,
+    type: 'custom',
+    path: file.path,
+    description: `Custom ${file.format.toUpperCase()} - ${file.sizeFormatted}`,
+    descriptionTr: `Özel ${file.format.toUpperCase()} - ${file.sizeFormatted}`,
+    previewGradient: generatePreviewGradient(file.filename),
+    intensity: 1.0,
+    blur: 0,
+    bestFor: ['all'],
+  };
+}
+
+// ============================================
 // BUILT-IN PRESETS (drei)
 // ============================================
 
