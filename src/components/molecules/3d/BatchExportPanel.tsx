@@ -48,6 +48,42 @@ export interface BatchExportConfig {
   namingPattern: 'angle' | 'number' | 'custom';
   customPrefix?: string;
   includeMetadata: boolean;
+  // NEW: Composite/Sheet options
+  compositeSheet: {
+    enabled: boolean;
+    columns: number;
+    spacing: number;
+    backgroundColor: string;
+  };
+  contactSheet: {
+    enabled: boolean;
+    thumbnailSize: number;
+    columns: number;
+    showLabels: boolean;
+  };
+  // NEW: Auto-crop
+  autoCrop: {
+    enabled: boolean;
+    padding: number; // pixels
+    backgroundColor: string;
+  };
+  // NEW: Spritesheet for game engines
+  spritesheet: {
+    enabled: boolean;
+    columns: number;
+    exportJson: boolean; // Export sprite data JSON
+  };
+  // NEW: Background per batch
+  batchBackground: {
+    type: 'transparent' | 'solid' | 'gradient';
+    color: string;
+    gradientStart: string;
+    gradientEnd: string;
+    gradientAngle: number;
+  };
+  // NEW: Aspect ratio lock
+  aspectRatioLock: boolean;
+  aspectRatio: '1:1' | '4:3' | '16:9' | '3:4' | '9:16' | 'custom';
 }
 
 export interface BatchExportProgress {
@@ -67,6 +103,38 @@ export const DEFAULT_BATCH_CONFIG: BatchExportConfig = {
   transparentBackground: true,
   namingPattern: 'angle',
   includeMetadata: true,
+  // NEW defaults
+  compositeSheet: {
+    enabled: false,
+    columns: 4,
+    spacing: 10,
+    backgroundColor: '#ffffff',
+  },
+  contactSheet: {
+    enabled: false,
+    thumbnailSize: 200,
+    columns: 4,
+    showLabels: true,
+  },
+  autoCrop: {
+    enabled: false,
+    padding: 20,
+    backgroundColor: '#ffffff',
+  },
+  spritesheet: {
+    enabled: false,
+    columns: 4,
+    exportJson: true,
+  },
+  batchBackground: {
+    type: 'transparent',
+    color: '#ffffff',
+    gradientStart: '#ffffff',
+    gradientEnd: '#f0f0f0',
+    gradientAngle: 180,
+  },
+  aspectRatioLock: true,
+  aspectRatio: '1:1',
 };
 
 // ============================================
@@ -443,6 +511,26 @@ export function BatchExportPanel({
               ))}
             </div>
 
+            {/* Aspect Ratio */}
+            <div className="space-y-1">
+              <span className="text-[10px] text-white/50">En-Boy Oranı</span>
+              <div className="grid grid-cols-6 gap-1">
+                {(['1:1', '4:3', '16:9', '3:4', '9:16', 'custom'] as const).map((ratio) => (
+                  <button
+                    key={ratio}
+                    onClick={() => onChange({ aspectRatio: ratio })}
+                    className={`rounded-md py-1 text-[8px] transition-all ${
+                      config.aspectRatio === ratio
+                        ? 'bg-purple-500/20 text-purple-300'
+                        : 'bg-white/5 text-white/50 hover:bg-white/10'
+                    }`}
+                  >
+                    {ratio}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Resolution */}
             <div className="flex gap-1">
               {[
@@ -464,24 +552,230 @@ export function BatchExportPanel({
               ))}
             </div>
 
-            {/* Transparent BG */}
-            {config.format === 'png' && (
+            {/* Background Type */}
+            <div className="space-y-1">
+              <span className="text-[10px] text-white/50">Arka Plan</span>
+              <div className="flex gap-1">
+                {([
+                  { id: 'transparent', name: 'Şeffaf' },
+                  { id: 'solid', name: 'Düz Renk' },
+                  { id: 'gradient', name: 'Gradyan' },
+                ] as const).map((bg) => (
+                  <button
+                    key={bg.id}
+                    onClick={() => onChange({ 
+                      batchBackground: { ...config.batchBackground, type: bg.id } 
+                    })}
+                    className={`flex-1 rounded-md py-1.5 text-[9px] transition-all ${
+                      config.batchBackground.type === bg.id
+                        ? 'bg-purple-500/20 text-purple-300'
+                        : 'bg-white/5 text-white/50 hover:bg-white/10'
+                    }`}
+                  >
+                    {bg.name}
+                  </button>
+                ))}
+              </div>
+
+              {config.batchBackground.type === 'solid' && (
+                <div className="flex items-center justify-between pt-2">
+                  <span className="text-[10px] text-white/40">Renk</span>
+                  <input
+                    type="color"
+                    value={config.batchBackground.color}
+                    onChange={(e) => onChange({ 
+                      batchBackground: { ...config.batchBackground, color: e.target.value } 
+                    })}
+                    className="h-5 w-8 cursor-pointer rounded border border-white/10 bg-transparent"
+                  />
+                </div>
+              )}
+
+              {config.batchBackground.type === 'gradient' && (
+                <div className="flex items-center gap-2 pt-2">
+                  <input
+                    type="color"
+                    value={config.batchBackground.gradientStart}
+                    onChange={(e) => onChange({ 
+                      batchBackground: { ...config.batchBackground, gradientStart: e.target.value } 
+                    })}
+                    className="h-5 w-8 cursor-pointer rounded border border-white/10 bg-transparent"
+                  />
+                  <span className="text-[10px] text-white/40">→</span>
+                  <input
+                    type="color"
+                    value={config.batchBackground.gradientEnd}
+                    onChange={(e) => onChange({ 
+                      batchBackground: { ...config.batchBackground, gradientEnd: e.target.value } 
+                    })}
+                    className="h-5 w-8 cursor-pointer rounded border border-white/10 bg-transparent"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Advanced Options */}
+          <div className="space-y-2">
+            <span className="text-[10px] font-medium text-white/60">Çıktı Seçenekleri</span>
+
+            {/* Auto Crop */}
+            <div className="rounded-lg border border-white/10 bg-white/5 p-2 space-y-2">
               <label className="flex cursor-pointer items-center justify-between">
-                <span className="text-[10px] text-white/50">Şeffaf Arka Plan</span>
+                <span className="text-[10px] text-white/50">Otomatik Kırpma</span>
                 <button
-                  onClick={() => onChange({ transparentBackground: !config.transparentBackground })}
+                  onClick={() => onChange({ 
+                    autoCrop: { ...config.autoCrop, enabled: !config.autoCrop.enabled } 
+                  })}
                   className={`relative h-4 w-7 rounded-full transition-colors ${
-                    config.transparentBackground ? 'bg-purple-500' : 'bg-white/20'
+                    config.autoCrop.enabled ? 'bg-purple-500' : 'bg-white/20'
                   }`}
                 >
                   <span
                     className={`absolute left-0.5 top-0.5 h-3 w-3 rounded-full bg-white transition-transform ${
-                      config.transparentBackground ? 'translate-x-3' : 'translate-x-0'
+                      config.autoCrop.enabled ? 'translate-x-3' : 'translate-x-0'
                     }`}
                   />
                 </button>
               </label>
-            )}
+              {config.autoCrop.enabled && (
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-white/40">Kenar Boşluğu (px)</span>
+                  <input
+                    type="number"
+                    value={config.autoCrop.padding}
+                    onChange={(e) => onChange({ 
+                      autoCrop: { ...config.autoCrop, padding: parseInt(e.target.value) || 0 } 
+                    })}
+                    className="w-16 rounded border border-white/10 bg-white/5 px-2 py-1 text-[10px] text-white"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Composite Sheet */}
+            <div className="rounded-lg border border-white/10 bg-white/5 p-2 space-y-2">
+              <label className="flex cursor-pointer items-center justify-between">
+                <span className="text-[10px] text-white/50">Birleşik Sayfa</span>
+                <button
+                  onClick={() => onChange({ 
+                    compositeSheet: { ...config.compositeSheet, enabled: !config.compositeSheet.enabled } 
+                  })}
+                  className={`relative h-4 w-7 rounded-full transition-colors ${
+                    config.compositeSheet.enabled ? 'bg-purple-500' : 'bg-white/20'
+                  }`}
+                >
+                  <span
+                    className={`absolute left-0.5 top-0.5 h-3 w-3 rounded-full bg-white transition-transform ${
+                      config.compositeSheet.enabled ? 'translate-x-3' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </label>
+              {config.compositeSheet.enabled && (
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-[9px] text-white/30">Sütun</label>
+                    <input
+                      type="number"
+                      value={config.compositeSheet.columns}
+                      onChange={(e) => onChange({ 
+                        compositeSheet: { ...config.compositeSheet, columns: parseInt(e.target.value) || 1 } 
+                      })}
+                      className="w-full rounded border border-white/10 bg-white/5 px-2 py-1 text-[10px] text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[9px] text-white/30">Aralık (px)</label>
+                    <input
+                      type="number"
+                      value={config.compositeSheet.spacing}
+                      onChange={(e) => onChange({ 
+                        compositeSheet: { ...config.compositeSheet, spacing: parseInt(e.target.value) || 0 } 
+                      })}
+                      className="w-full rounded border border-white/10 bg-white/5 px-2 py-1 text-[10px] text-white"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Contact Sheet */}
+            <div className="rounded-lg border border-white/10 bg-white/5 p-2 space-y-2">
+              <label className="flex cursor-pointer items-center justify-between">
+                <span className="text-[10px] text-white/50">Küçük Resim Sayfası</span>
+                <button
+                  onClick={() => onChange({ 
+                    contactSheet: { ...config.contactSheet, enabled: !config.contactSheet.enabled } 
+                  })}
+                  className={`relative h-4 w-7 rounded-full transition-colors ${
+                    config.contactSheet.enabled ? 'bg-purple-500' : 'bg-white/20'
+                  }`}
+                >
+                  <span
+                    className={`absolute left-0.5 top-0.5 h-3 w-3 rounded-full bg-white transition-transform ${
+                      config.contactSheet.enabled ? 'translate-x-3' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </label>
+              {config.contactSheet.enabled && (
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-white/40">Boyut (px)</span>
+                  <div className="flex gap-1">
+                    {[100, 150, 200, 300].map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => onChange({ 
+                          contactSheet: { ...config.contactSheet, thumbnailSize: size } 
+                        })}
+                        className={`rounded px-2 py-1 text-[8px] ${
+                          config.contactSheet.thumbnailSize === size
+                            ? 'bg-purple-500/20 text-purple-300'
+                            : 'bg-white/5 text-white/40'
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Spritesheet */}
+            <div className="rounded-lg border border-white/10 bg-white/5 p-2 space-y-2">
+              <label className="flex cursor-pointer items-center justify-between">
+                <span className="text-[10px] text-white/50">Spritesheet (Oyun)</span>
+                <button
+                  onClick={() => onChange({ 
+                    spritesheet: { ...config.spritesheet, enabled: !config.spritesheet.enabled } 
+                  })}
+                  className={`relative h-4 w-7 rounded-full transition-colors ${
+                    config.spritesheet.enabled ? 'bg-purple-500' : 'bg-white/20'
+                  }`}
+                >
+                  <span
+                    className={`absolute left-0.5 top-0.5 h-3 w-3 rounded-full bg-white transition-transform ${
+                      config.spritesheet.enabled ? 'translate-x-3' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </label>
+              {config.spritesheet.enabled && (
+                <label className="flex cursor-pointer items-center justify-between">
+                  <span className="text-[10px] text-white/40">JSON Meta Verisini Dahil Et</span>
+                  <input
+                    type="checkbox"
+                    checked={config.spritesheet.exportJson}
+                    onChange={(e) => onChange({ 
+                      spritesheet: { ...config.spritesheet, exportJson: e.target.checked } 
+                    })}
+                    className="accent-purple-500"
+                  />
+                </label>
+              )}
+            </div>
           </div>
 
           {/* Export Button */}
