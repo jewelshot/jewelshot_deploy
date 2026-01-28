@@ -373,30 +373,73 @@ function rhinoBrepToMesh(brep: any, rhino: any, quality?: number): THREE.BufferG
     
     // Calculate meshing parameters based on quality
     // Higher quality = smaller edge lengths, more grid cells
-    const minEdge = 0.01 / tessQuality;  // At quality 5, minEdge = 0.002
-    const maxEdge = 10 / tessQuality;     // At quality 5, maxEdge = 2
-    const gridMin = Math.round(4 * tessQuality); // At quality 5, gridMin = 20
+    const minEdge = 0.001 / tessQuality;  // Smaller for jewelry
+    const maxEdge = 1 / tessQuality;       // Smaller for jewelry
+    const gridMin = Math.round(16 * tessQuality); // More grid cells
     
     console.log(`[Rhino3dm] Meshing params: minEdge=${minEdge}, maxEdge=${maxEdge}, gridMin=${gridMin}`);
     
-    // Approach 1: Use MeshingParameters with quality-based settings
+    // Approach 1: Try to get existing render mesh from brep first (fastest)
     try {
-      if (rhino.MeshingParameters) {
-        const meshParameters = new rhino.MeshingParameters();
-        meshParameters.minEdgeLength = minEdge;
-        meshParameters.maxEdgeLength = maxEdge;
-        meshParameters.gridAspectRatio = 0;
-        meshParameters.gridMinCount = gridMin;
-        meshParameters.refine = tessQuality >= 1.0; // Only refine at medium+ quality
-        
-        console.log('[Rhino3dm] rhinoBrepToMesh: Trying createFromBrep with MeshingParameters...');
-        meshes = rhino.Mesh.createFromBrep(brep, meshParameters);
+      if (typeof brep.getRenderMesh === 'function') {
+        console.log('[Rhino3dm] rhinoBrepToMesh: Trying brep.getRenderMesh()...');
+        const mesh = brep.getRenderMesh(rhino.MeshType?.Render ?? 1, true);
+        if (mesh) {
+          meshes = [mesh];
+        }
       }
     } catch (e) {
-      console.log('[Rhino3dm] rhinoBrepToMesh: MeshingParameters approach failed:', e);
+      console.log('[Rhino3dm] rhinoBrepToMesh: getRenderMesh failed:', e);
     }
     
-    // Approach 2: Try without parameters
+    // Approach 2: Try getMesh with different types
+    if (!meshes || meshes.length === 0) {
+      try {
+        if (typeof brep.getMesh === 'function') {
+          console.log('[Rhino3dm] rhinoBrepToMesh: Trying brep.getMesh()...');
+          // Try render mesh first, then any
+          for (const meshType of [rhino.MeshType?.Render, rhino.MeshType?.Analysis, rhino.MeshType?.Any, 1, 2, 0]) {
+            if (meshType !== undefined) {
+              try {
+                const mesh = brep.getMesh(meshType);
+                if (mesh) {
+                  meshes = [mesh];
+                  console.log(`[Rhino3dm] rhinoBrepToMesh: getMesh(${meshType}) succeeded`);
+                  break;
+                }
+              } catch (e) {
+                // Try next type
+              }
+            }
+          }
+        }
+      } catch (e) {
+        console.log('[Rhino3dm] rhinoBrepToMesh: getMesh approach failed:', e);
+      }
+    }
+    
+    // Approach 3: Use MeshingParameters with quality-based settings
+    if (!meshes || meshes.length === 0) {
+      try {
+        if (rhino.MeshingParameters) {
+          const meshParameters = new rhino.MeshingParameters();
+          meshParameters.minEdgeLength = minEdge;
+          meshParameters.maxEdgeLength = maxEdge;
+          meshParameters.gridAspectRatio = 0;
+          meshParameters.gridMinCount = gridMin;
+          meshParameters.refine = true;
+          meshParameters.jaggedSeams = false;
+          meshParameters.simplePlanes = true;
+          
+          console.log('[Rhino3dm] rhinoBrepToMesh: Trying createFromBrep with MeshingParameters...');
+          meshes = rhino.Mesh.createFromBrep(brep, meshParameters);
+        }
+      } catch (e) {
+        console.log('[Rhino3dm] rhinoBrepToMesh: MeshingParameters approach failed:', e);
+      }
+    }
+    
+    // Approach 4: Try without parameters
     if (!meshes || meshes.length === 0) {
       try {
         console.log('[Rhino3dm] rhinoBrepToMesh: Trying createFromBrep without parameters...');
@@ -406,7 +449,7 @@ function rhinoBrepToMesh(brep: any, rhino: any, quality?: number): THREE.BufferG
       }
     }
     
-    // Approach 3: Try default meshing parameters
+    // Approach 5: Try default meshing parameters
     if (!meshes || meshes.length === 0) {
       try {
         if (rhino.MeshingParameters?.Default) {
@@ -418,7 +461,7 @@ function rhinoBrepToMesh(brep: any, rhino: any, quality?: number): THREE.BufferG
       }
     }
     
-    // Approach 4: Try FastRenderMesh
+    // Approach 6: Try FastRenderMesh
     if (!meshes || meshes.length === 0) {
       try {
         if (rhino.MeshingParameters?.FastRenderMesh) {
@@ -430,18 +473,49 @@ function rhinoBrepToMesh(brep: any, rhino: any, quality?: number): THREE.BufferG
       }
     }
     
-    // Approach 5: Try to get render mesh directly from brep
+    // Approach 7: Try QualityRenderMesh for higher quality
     if (!meshes || meshes.length === 0) {
       try {
-        if (typeof brep.getMesh === 'function') {
-          console.log('[Rhino3dm] rhinoBrepToMesh: Trying brep.getMesh()...');
-          const mesh = brep.getMesh(rhino.MeshType?.Render || rhino.MeshType?.Any || 0);
-          if (mesh) {
-            meshes = [mesh];
+        if (rhino.MeshingParameters?.QualityRenderMesh) {
+          console.log('[Rhino3dm] rhinoBrepToMesh: Trying with QualityRenderMesh...');
+          meshes = rhino.Mesh.createFromBrep(brep, rhino.MeshingParameters.QualityRenderMesh);
+        }
+      } catch (e) {
+        console.log('[Rhino3dm] rhinoBrepToMesh: QualityRenderMesh approach failed:', e);
+      }
+    }
+    
+    // Approach 8: Try creating mesh from faces individually
+    if (!meshes || meshes.length === 0) {
+      try {
+        if (typeof brep.faces === 'function') {
+          const faces = brep.faces();
+          if (faces && faces.count > 0) {
+            console.log(`[Rhino3dm] rhinoBrepToMesh: Trying individual face meshing (${faces.count} faces)...`);
+            meshes = [];
+            for (let i = 0; i < faces.count; i++) {
+              try {
+                const face = faces.get(i);
+                if (face) {
+                  // Try to get mesh from face
+                  if (typeof face.getMesh === 'function') {
+                    const faceMesh = face.getMesh(rhino.MeshType?.Render ?? 1);
+                    if (faceMesh) {
+                      meshes.push(faceMesh);
+                    }
+                  }
+                }
+              } catch (e) {
+                // Skip this face
+              }
+            }
+            if (meshes.length > 0) {
+              console.log(`[Rhino3dm] rhinoBrepToMesh: Got ${meshes.length} face meshes`);
+            }
           }
         }
       } catch (e) {
-        console.log('[Rhino3dm] rhinoBrepToMesh: getMesh approach failed:', e);
+        console.log('[Rhino3dm] rhinoBrepToMesh: Face meshing approach failed:', e);
       }
     }
     
@@ -557,6 +631,136 @@ function mergeBufferGeometries(geometries: THREE.BufferGeometry[]): THREE.Buffer
 // ============================================
 
 /**
+ * Try to convert any geometry to mesh using all available methods
+ */
+function tryConvertToMesh(geometry: any, rhino: any, objectIndex: number): THREE.BufferGeometry | null {
+  const geometryTypeName = geometry.constructor?.name || 'Unknown';
+  
+  // Method 1: Direct mesh
+  if (geometryTypeName === 'Mesh' || geometry.objectType === rhino.ObjectType?.Mesh) {
+    console.log(`[Rhino3dm] Object ${objectIndex}: Direct Mesh conversion`);
+    return rhinoMeshToBufferGeometry(geometry);
+  }
+  
+  // Method 2: getRenderMesh - works for many geometry types
+  if (typeof geometry.getRenderMesh === 'function') {
+    try {
+      console.log(`[Rhino3dm] Object ${objectIndex}: Trying getRenderMesh()`);
+      const renderMesh = geometry.getRenderMesh(rhino.MeshType?.Render ?? rhino.MeshType?.Any ?? 1, true);
+      if (renderMesh) {
+        const geo = rhinoMeshToBufferGeometry(renderMesh);
+        if (geo && (geo.getAttribute('position')?.count || 0) > 0) {
+          console.log(`[Rhino3dm] Object ${objectIndex}: getRenderMesh succeeded`);
+          return geo;
+        }
+      }
+    } catch (e) {
+      console.log(`[Rhino3dm] Object ${objectIndex}: getRenderMesh failed:`, e);
+    }
+  }
+  
+  // Method 3: toMesh - SubD, Extrusion, etc.
+  if (typeof geometry.toMesh === 'function') {
+    try {
+      console.log(`[Rhino3dm] Object ${objectIndex}: Trying toMesh()`);
+      const mesh = geometry.toMesh(rhino.MeshType?.Any ?? 0);
+      if (mesh) {
+        const geo = rhinoMeshToBufferGeometry(mesh);
+        if (geo && (geo.getAttribute('position')?.count || 0) > 0) {
+          console.log(`[Rhino3dm] Object ${objectIndex}: toMesh succeeded`);
+          return geo;
+        }
+      }
+    } catch (e) {
+      console.log(`[Rhino3dm] Object ${objectIndex}: toMesh failed:`, e);
+    }
+  }
+  
+  // Method 4: Brep conversion with multiple parameter sets
+  if (geometryTypeName === 'Brep' || geometry.objectType === rhino.ObjectType?.Brep) {
+    console.log(`[Rhino3dm] Object ${objectIndex}: Brep - trying multiple meshing strategies`);
+    const geo = rhinoBrepToMesh(geometry, rhino);
+    if (geo && (geo.getAttribute('position')?.count || 0) > 0) {
+      return geo;
+    }
+  }
+  
+  // Method 5: Extrusion -> Brep -> Mesh
+  if (geometryTypeName === 'Extrusion' || geometry.objectType === rhino.ObjectType?.Extrusion) {
+    try {
+      console.log(`[Rhino3dm] Object ${objectIndex}: Extrusion.toBrep()`);
+      const brep = geometry.toBrep(true);
+      if (brep) {
+        const geo = rhinoBrepToMesh(brep, rhino);
+        if (geo && (geo.getAttribute('position')?.count || 0) > 0) {
+          return geo;
+        }
+      }
+    } catch (e) {
+      console.log(`[Rhino3dm] Object ${objectIndex}: Extrusion.toBrep failed:`, e);
+    }
+  }
+  
+  // Method 6: Surface -> Brep -> Mesh
+  if (geometryTypeName === 'Surface' || geometryTypeName === 'NurbsSurface' || 
+      geometry.objectType === rhino.ObjectType?.Surface) {
+    try {
+      console.log(`[Rhino3dm] Object ${objectIndex}: Surface.toBrep()`);
+      const brep = geometry.toBrep();
+      if (brep) {
+        const geo = rhinoBrepToMesh(brep, rhino);
+        if (geo && (geo.getAttribute('position')?.count || 0) > 0) {
+          return geo;
+        }
+      }
+    } catch (e) {
+      console.log(`[Rhino3dm] Object ${objectIndex}: Surface.toBrep failed:`, e);
+    }
+  }
+  
+  // Method 7: SubD special handling
+  if (geometryTypeName === 'SubD' || geometry.objectType === rhino.ObjectType?.SubD) {
+    try {
+      console.log(`[Rhino3dm] Object ${objectIndex}: SubD.toMesh()`);
+      // Try different subdivision levels
+      for (const level of [0, 1, 2]) {
+        try {
+          const mesh = geometry.toMesh(level);
+          if (mesh) {
+            const geo = rhinoMeshToBufferGeometry(mesh);
+            if (geo && (geo.getAttribute('position')?.count || 0) > 0) {
+              return geo;
+            }
+          }
+        } catch (e) {
+          // Try next level
+        }
+      }
+    } catch (e) {
+      console.log(`[Rhino3dm] Object ${objectIndex}: SubD.toMesh failed:`, e);
+    }
+  }
+  
+  // Method 8: Generic toBrep fallback
+  if (typeof geometry.toBrep === 'function' && geometryTypeName !== 'Brep') {
+    try {
+      console.log(`[Rhino3dm] Object ${objectIndex}: Generic toBrep()`);
+      const brep = geometry.toBrep();
+      if (brep) {
+        const geo = rhinoBrepToMesh(brep, rhino);
+        if (geo && (geo.getAttribute('position')?.count || 0) > 0) {
+          return geo;
+        }
+      }
+    } catch (e) {
+      console.log(`[Rhino3dm] Object ${objectIndex}: Generic toBrep failed:`, e);
+    }
+  }
+  
+  return null;
+}
+
+/**
  * Parse a 3DM file and extract layers, objects, and metadata
  */
 /**
@@ -622,6 +826,30 @@ export async function parse3DMFile(
   
   console.log(`[Rhino3dm] Extracted ${layers.length} layers`);
   
+  // Extract instance definitions (blocks) for InstanceReference expansion
+  const instanceDefinitions: Map<string, any[]> = new Map();
+  try {
+    const idefTable = doc.instanceDefinitions?.() || null;
+    if (idefTable) {
+      console.log(`[Rhino3dm] Found ${idefTable.count || 0} instance definitions`);
+      for (let i = 0; i < (idefTable.count || 0); i++) {
+        try {
+          const idef = idefTable.get(i);
+          if (idef) {
+            const id = idef.id || `idef-${i}`;
+            const geometry = idef.getObjects?.() || [];
+            console.log(`[Rhino3dm] InstanceDefinition ${i}: id=${id}, objectCount=${geometry.length}`);
+            instanceDefinitions.set(id, geometry);
+          }
+        } catch (e) {
+          console.warn(`[Rhino3dm] Failed to get instance definition ${i}:`, e);
+        }
+      }
+    }
+  } catch (e) {
+    console.log('[Rhino3dm] No instance definitions table or failed to read:', e);
+  }
+  
   // Extract objects
   const objects: RhinoObject[] = [];
   const objectTable = doc.objects();
@@ -638,12 +866,73 @@ export async function parse3DMFile(
     Surface: rhino.ObjectType?.Surface,
     Curve: rhino.ObjectType?.Curve,
     Point: rhino.ObjectType?.Point,
+    InstanceReference: rhino.ObjectType?.InstanceReference,
   });
   
   let skippedCount = 0;
   let errorCount = 0;
   const geometryTypesFound: Record<string, number> = {};
   
+  // Helper to add object to results
+  const addObject = (
+    bufferGeometry: THREE.BufferGeometry,
+    attributes: any,
+    geometryTypeName: string,
+    objectIndex: number,
+    transform?: any
+  ) => {
+    const vertexCount = bufferGeometry.getAttribute('position')?.count || 0;
+    if (vertexCount === 0) {
+      console.warn(`[Rhino3dm] Object ${objectIndex}: Geometry has 0 vertices`);
+      return false;
+    }
+    
+    // Apply transform if provided (for InstanceReferences)
+    if (transform) {
+      try {
+        const matrix = new THREE.Matrix4();
+        // rhino3dm transform is a 4x4 matrix in column-major order
+        if (transform.toFloatArray) {
+          const arr = transform.toFloatArray(true); // true = column major
+          if (arr && arr.length === 16) {
+            matrix.fromArray(arr);
+            bufferGeometry.applyMatrix4(matrix);
+          }
+        }
+      } catch (e) {
+        console.warn(`[Rhino3dm] Object ${objectIndex}: Failed to apply transform:`, e);
+      }
+    }
+    
+    const layerIndex = attributes.layerIndex;
+    const layer = layers[layerIndex] || layers[0];
+    
+    // Get object color (from attributes or layer)
+    let objColor: string | null = null;
+    try {
+      const colorSource = attributes.colorSource;
+      if (colorSource === rhino.ObjectColorSource?.ColorFromObject) {
+        const c = attributes.objectColor;
+        objColor = rgbToHex(c.r, c.g, c.b);
+      }
+    } catch (e) {
+      // Use layer color as fallback
+    }
+    
+    objects.push({
+      id: attributes.id || `object-${objectIndex}`,
+      layerIndex,
+      layerId: layer.id,
+      geometry: bufferGeometry,
+      objectType: geometryTypeName,
+      name: attributes.name || `Object ${objectIndex}`,
+      color: objColor,
+    });
+    
+    console.log(`[Rhino3dm] Object ${objectIndex} converted successfully (${vertexCount} vertices)`);
+    return true;
+  };
+
   for (let i = 0; i < totalObjects; i++) {
     try {
       const obj = objectTable.get(i);
@@ -662,7 +951,6 @@ export async function parse3DMFile(
         continue;
       }
       
-      let bufferGeometry: THREE.BufferGeometry | null = null;
       const geometryType = geometry.objectType;
       const geometryTypeName = geometry.constructor?.name || 'Unknown';
       
@@ -673,166 +961,77 @@ export async function parse3DMFile(
       // Log geometry type for debugging
       console.log(`[Rhino3dm] Object ${i}: type=${geometryType}, typeName=${geometryTypeName}`);
       
-      // Try to convert geometry to mesh using multiple approaches
-      try {
-        // Approach 1: Check if it's already a Mesh
-        if (geometryTypeName === 'Mesh' || geometryType === rhino.ObjectType?.Mesh) {
-          console.log(`[Rhino3dm] Object ${i}: Converting as Mesh`);
-          bufferGeometry = rhinoMeshToBufferGeometry(geometry);
+      // Special handling for InstanceReference (Block instances)
+      if (geometryTypeName === 'InstanceReference' || geometryType === rhino.ObjectType?.InstanceReference) {
+        console.log(`[Rhino3dm] Object ${i}: InstanceReference detected`);
+        
+        let instanceConverted = false;
+        
+        // Get the transform for this instance
+        let instanceTransform = null;
+        try {
+          instanceTransform = geometry.xform || geometry.transform;
+        } catch (e) {
+          console.log(`[Rhino3dm] Object ${i}: No transform available`);
         }
-        // Approach 2: Check if it's a Brep (polysurface) - common for jewelry settings and stones
-        else if (geometryTypeName === 'Brep' || geometryType === rhino.ObjectType?.Brep) {
-          console.log(`[Rhino3dm] Object ${i}: Converting Brep to Mesh`);
-          bufferGeometry = rhinoBrepToMesh(geometry, rhino);
-        }
-        // Approach 3: Check if it's an Extrusion
-        else if (geometryTypeName === 'Extrusion' || geometryType === rhino.ObjectType?.Extrusion) {
-          console.log(`[Rhino3dm] Object ${i}: Converting Extrusion`);
-          // Try to get brep from extrusion first
-          try {
-            const brep = geometry.toBrep(true);
-            if (brep) {
-              bufferGeometry = rhinoBrepToMesh(brep, rhino);
-            }
-          } catch (e) {
-            console.log(`[Rhino3dm] Object ${i}: Extrusion.toBrep failed, trying direct mesh`);
-          }
-          // If that fails, try to convert directly
-          if (!bufferGeometry) {
-            bufferGeometry = rhinoBrepToMesh(geometry, rhino);
-          }
-        }
-        // Approach 4: Check if it's a SubD
-        else if (geometryTypeName === 'SubD' || geometryType === rhino.ObjectType?.SubD) {
-          console.log(`[Rhino3dm] Object ${i}: Converting SubD to Mesh`);
-          try {
-            const subdMesh = geometry.toMesh(rhino.MeshType?.Any || 0);
-            if (subdMesh) {
-              bufferGeometry = rhinoMeshToBufferGeometry(subdMesh);
-            }
-          } catch (e) {
-            console.warn(`[Rhino3dm] Object ${i}: SubD.toMesh failed:`, e);
-          }
-        }
-        // Approach 5: Check if it's a Surface
-        else if (geometryTypeName === 'Surface' || geometryTypeName === 'NurbsSurface' || geometryType === rhino.ObjectType?.Surface) {
-          console.log(`[Rhino3dm] Object ${i}: Converting Surface to Mesh`);
-          try {
-            const brep = geometry.toBrep();
-            if (brep) {
-              bufferGeometry = rhinoBrepToMesh(brep, rhino);
-            }
-          } catch (e) {
-            console.warn(`[Rhino3dm] Object ${i}: Surface.toBrep failed:`, e);
-          }
-        }
-        // Approach 6: InstanceReference (Block) - common for Matrix stones
-        // Note: rhino3dm WASM doesn't fully support instance expansion, but log it for debugging
-        else if (geometryTypeName === 'InstanceReference' || geometryType === rhino.ObjectType?.InstanceReference) {
-          console.log(`[Rhino3dm] Object ${i}: InstanceReference (Block) detected - attempting to extract`);
-          // Try to get the block definition and create geometry
-          // Note: Full block support requires doc.instanceDefinitions() which may not be available in WASM
-          try {
-            if (typeof geometry.geometry === 'function') {
-              const blockGeom = geometry.geometry();
-              if (blockGeom) {
-                // Try mesh first
-                if (typeof blockGeom.toMesh === 'function') {
-                  const mesh = blockGeom.toMesh(rhino.MeshType?.Any || 0);
-                  if (mesh) {
-                    bufferGeometry = rhinoMeshToBufferGeometry(mesh);
-                  }
-                }
-                // Try brep conversion
-                if (!bufferGeometry && typeof blockGeom.toBrep === 'function') {
-                  const brep = blockGeom.toBrep();
-                  if (brep) {
-                    bufferGeometry = rhinoBrepToMesh(brep, rhino);
+        
+        // Try to get the parent definition ID
+        try {
+          const parentIdefId = geometry.parentIdefId;
+          console.log(`[Rhino3dm] Object ${i}: InstanceReference parentIdefId=${parentIdefId}`);
+          
+          // Look up in our instance definitions map
+          if (parentIdefId && instanceDefinitions.has(parentIdefId)) {
+            const defObjects = instanceDefinitions.get(parentIdefId)!;
+            console.log(`[Rhino3dm] Object ${i}: Found ${defObjects.length} objects in definition`);
+            
+            for (let j = 0; j < defObjects.length; j++) {
+              const defObj = defObjects[j];
+              if (defObj) {
+                const defGeom = defObj.geometry?.() || defObj;
+                if (defGeom) {
+                  const bufferGeometry = tryConvertToMesh(defGeom, rhino, i);
+                  if (bufferGeometry && addObject(bufferGeometry, attributes, geometryTypeName, i, instanceTransform)) {
+                    instanceConverted = true;
                   }
                 }
               }
             }
-          } catch (e) {
-            console.warn(`[Rhino3dm] Object ${i}: InstanceReference extraction failed:`, e);
           }
-          if (!bufferGeometry) {
-            console.log(`[Rhino3dm] Object ${i}: InstanceReference couldn't be converted - block geometry may need Rhino to expand`);
-            skippedCount++;
-            continue;
-          }
+        } catch (e) {
+          console.warn(`[Rhino3dm] Object ${i}: Failed to expand InstanceReference:`, e);
         }
-        // Approach 7: Try generic toMesh if available
-        else if (typeof geometry.toMesh === 'function') {
-          console.log(`[Rhino3dm] Object ${i}: Trying generic toMesh()`);
-          try {
-            const mesh = geometry.toMesh(rhino.MeshType?.Any || 0);
-            if (mesh) {
-              bufferGeometry = rhinoMeshToBufferGeometry(mesh);
-            }
-          } catch (e) {
-            console.warn(`[Rhino3dm] Object ${i}: Generic toMesh failed:`, e);
-          }
-        }
-        // Approach 8: Try toBrep then to mesh
-        else if (typeof geometry.toBrep === 'function') {
-          console.log(`[Rhino3dm] Object ${i}: Trying toBrep() then mesh`);
-          try {
-            const brep = geometry.toBrep();
-            if (brep) {
-              bufferGeometry = rhinoBrepToMesh(brep, rhino);
-            }
-          } catch (e) {
-            console.warn(`[Rhino3dm] Object ${i}: toBrep failed:`, e);
-          }
-        }
-        // Skip non-meshable geometry types (curves, points, annotations, etc.)
-        else {
-          console.log(`[Rhino3dm] Object ${i}: Skipping non-meshable type: ${geometryTypeName} (${geometryType})`);
+        
+        if (!instanceConverted) {
+          console.log(`[Rhino3dm] Object ${i}: InstanceReference couldn't be expanded - this is a limitation of rhino3dm WASM`);
           skippedCount++;
-          continue;
         }
-      } catch (conversionError) {
-        console.warn(`[Rhino3dm] Failed to convert object ${i}:`, conversionError);
-        errorCount++;
         continue;
       }
       
-      if (bufferGeometry) {
-        const vertexCount = bufferGeometry.getAttribute('position')?.count || 0;
-        if (vertexCount === 0) {
-          console.warn(`[Rhino3dm] Object ${i}: Conversion returned geometry with 0 vertices`);
-          errorCount++;
-          continue;
-        }
+      // Try to convert geometry using our comprehensive method
+      try {
+        const bufferGeometry = tryConvertToMesh(geometry, rhino, i);
         
-        const layerIndex = attributes.layerIndex;
-        const layer = layers[layerIndex] || layers[0];
-        
-        // Get object color (from attributes or layer)
-        let objColor: string | null = null;
-        try {
-          const colorSource = attributes.colorSource;
-          if (colorSource === rhino.ObjectColorSource?.ColorFromObject) {
-            const c = attributes.objectColor;
-            objColor = rgbToHex(c.r, c.g, c.b);
+        if (bufferGeometry) {
+          if (!addObject(bufferGeometry, attributes, geometryTypeName, i)) {
+            errorCount++;
           }
-        } catch (e) {
-          // Use layer color as fallback
+        } else {
+          // Check if it's a non-meshable type
+          const nonMeshableTypes = ['Curve', 'Point', 'PointCloud', 'TextDot', 'Annotation', 'Hatch', 'Light'];
+          const isNonMeshable = nonMeshableTypes.some(t => geometryTypeName.includes(t));
+          
+          if (isNonMeshable) {
+            console.log(`[Rhino3dm] Object ${i}: Skipping non-meshable type: ${geometryTypeName}`);
+            skippedCount++;
+          } else {
+            console.warn(`[Rhino3dm] Object ${i}: All conversion methods failed for ${geometryTypeName}`);
+            errorCount++;
+          }
         }
-        
-        objects.push({
-          id: attributes.id || `object-${i}`,
-          layerIndex,
-          layerId: layer.id,
-          geometry: bufferGeometry,
-          objectType: geometryTypeName,
-          name: attributes.name || `Object ${i}`,
-          color: objColor,
-        });
-        
-        console.log(`[Rhino3dm] Object ${i} converted successfully (${vertexCount} vertices)`);
-      } else {
-        console.warn(`[Rhino3dm] Object ${i}: conversion returned null geometry`);
+      } catch (conversionError) {
+        console.warn(`[Rhino3dm] Failed to convert object ${i}:`, conversionError);
         errorCount++;
       }
     } catch (objError) {
