@@ -64,6 +64,58 @@ export interface ColorGradingConfig {
   hue: number;
 }
 
+// NEW: Chromatic Aberration Config
+export interface ChromaticAberrationConfig {
+  enabled: boolean;
+  offset: number; // 0-0.01
+  radialModulation: boolean;
+}
+
+// NEW: Film Grain Config
+export interface FilmGrainConfig {
+  enabled: boolean;
+  intensity: number; // 0-1
+  size: number; // 1-5
+  animated: boolean;
+}
+
+// NEW: Noise Config
+export interface NoiseConfig {
+  enabled: boolean;
+  intensity: number; // 0-1
+  premultiply: boolean;
+}
+
+// NEW: Sharpen Config
+export interface SharpenConfig {
+  enabled: boolean;
+  intensity: number; // 0-2
+}
+
+// NEW: Split Toning Config
+export interface SplitToningConfig {
+  enabled: boolean;
+  highlightColor: string;
+  highlightIntensity: number; // 0-1
+  shadowColor: string;
+  shadowIntensity: number; // 0-1
+  balance: number; // -1 to 1 (shadows to highlights)
+}
+
+// NEW: Lens Distortion Config
+export interface LensDistortionConfig {
+  enabled: boolean;
+  distortion: number; // -1 to 1
+  focalLength: number; // 0.5-2
+}
+
+// NEW: LUT Config
+export interface LUTConfig {
+  enabled: boolean;
+  preset: 'none' | 'warm' | 'cool' | 'vintage' | 'noir' | 'cinema' | 'desaturated';
+  intensity: number; // 0-1
+}
+
 export interface PostProcessingConfig {
   enabled: boolean;
   toneMapping: ToneMappingType;
@@ -73,6 +125,14 @@ export interface PostProcessingConfig {
   ssao: SSAOConfig;
   vignette: VignetteConfig;
   colorGrading: ColorGradingConfig;
+  // NEW Effects
+  chromaticAberration: ChromaticAberrationConfig;
+  filmGrain: FilmGrainConfig;
+  noise: NoiseConfig;
+  sharpen: SharpenConfig;
+  splitToning: SplitToningConfig;
+  lensDistortion: LensDistortionConfig;
+  lut: LUTConfig;
 }
 
 export const DEFAULT_POST_PROCESSING_CONFIG: PostProcessingConfig = {
@@ -109,6 +169,45 @@ export const DEFAULT_POST_PROCESSING_CONFIG: PostProcessingConfig = {
     contrast: 1.0,
     brightness: 0,
     hue: 0,
+  },
+  // NEW Effects Defaults
+  chromaticAberration: {
+    enabled: false,
+    offset: 0.002,
+    radialModulation: true,
+  },
+  filmGrain: {
+    enabled: false,
+    intensity: 0.3,
+    size: 2,
+    animated: true,
+  },
+  noise: {
+    enabled: false,
+    intensity: 0.1,
+    premultiply: false,
+  },
+  sharpen: {
+    enabled: false,
+    intensity: 0.5,
+  },
+  splitToning: {
+    enabled: false,
+    highlightColor: '#ffeebb',
+    highlightIntensity: 0.3,
+    shadowColor: '#334455',
+    shadowIntensity: 0.3,
+    balance: 0,
+  },
+  lensDistortion: {
+    enabled: false,
+    distortion: 0,
+    focalLength: 1,
+  },
+  lut: {
+    enabled: false,
+    preset: 'none',
+    intensity: 1.0,
   },
 };
 
@@ -307,6 +406,34 @@ export function PostProcessingPanel({ config, onChange }: PostProcessingPanelPro
 
   const updateColorGrading = (updates: Partial<ColorGradingConfig>) => {
     onChange({ colorGrading: { ...config.colorGrading, ...updates } });
+  };
+
+  const updateChromaticAberration = (updates: Partial<ChromaticAberrationConfig>) => {
+    onChange({ chromaticAberration: { ...config.chromaticAberration, ...updates } });
+  };
+
+  const updateFilmGrain = (updates: Partial<FilmGrainConfig>) => {
+    onChange({ filmGrain: { ...config.filmGrain, ...updates } });
+  };
+
+  const updateNoise = (updates: Partial<NoiseConfig>) => {
+    onChange({ noise: { ...config.noise, ...updates } });
+  };
+
+  const updateSharpen = (updates: Partial<SharpenConfig>) => {
+    onChange({ sharpen: { ...config.sharpen, ...updates } });
+  };
+
+  const updateSplitToning = (updates: Partial<SplitToningConfig>) => {
+    onChange({ splitToning: { ...config.splitToning, ...updates } });
+  };
+
+  const updateLensDistortion = (updates: Partial<LensDistortionConfig>) => {
+    onChange({ lensDistortion: { ...config.lensDistortion, ...updates } });
+  };
+
+  const updateLUT = (updates: Partial<LUTConfig>) => {
+    onChange({ lut: { ...config.lut, ...updates } });
   };
 
   return (
@@ -537,6 +664,220 @@ export function PostProcessingPanel({ config, onChange }: PostProcessingPanelPro
               max={180}
               step={1}
               format={(v) => `${v}°`}
+            />
+          </EffectSection>
+
+          {/* Chromatic Aberration */}
+          <EffectSection
+            title="Kromatik Aberasyon"
+            icon={<div className="h-3.5 w-3.5 rounded-full" style={{ background: 'linear-gradient(135deg, #ff0000, #00ff00, #0000ff)' }} />}
+            enabled={config.chromaticAberration.enabled}
+            onToggle={() => updateChromaticAberration({ enabled: !config.chromaticAberration.enabled })}
+          >
+            <Slider
+              label="Ofset"
+              value={config.chromaticAberration.offset}
+              onChange={(offset) => updateChromaticAberration({ offset })}
+              min={0}
+              max={0.02}
+              step={0.001}
+              format={(v) => v.toFixed(3)}
+            />
+            <label className="flex cursor-pointer items-center justify-between">
+              <span className="text-[10px] text-white/50">Radyal Modülasyon</span>
+              <button
+                onClick={() => updateChromaticAberration({ radialModulation: !config.chromaticAberration.radialModulation })}
+                className={`relative h-4 w-7 rounded-full transition-colors ${
+                  config.chromaticAberration.radialModulation ? 'bg-purple-500' : 'bg-white/20'
+                }`}
+              >
+                <span
+                  className={`absolute left-0.5 top-0.5 h-3 w-3 rounded-full bg-white transition-transform ${
+                    config.chromaticAberration.radialModulation ? 'translate-x-3' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </label>
+          </EffectSection>
+
+          {/* Film Grain */}
+          <EffectSection
+            title="Film Grain"
+            icon={<div className="h-3.5 w-3.5 rounded-sm bg-white/30" />}
+            enabled={config.filmGrain.enabled}
+            onToggle={() => updateFilmGrain({ enabled: !config.filmGrain.enabled })}
+          >
+            <Slider
+              label="Yoğunluk"
+              value={config.filmGrain.intensity}
+              onChange={(intensity) => updateFilmGrain({ intensity })}
+              min={0}
+              max={1}
+              step={0.05}
+            />
+            <Slider
+              label="Boyut"
+              value={config.filmGrain.size}
+              onChange={(size) => updateFilmGrain({ size })}
+              min={1}
+              max={5}
+              step={0.5}
+            />
+            <label className="flex cursor-pointer items-center justify-between">
+              <span className="text-[10px] text-white/50">Animasyonlu</span>
+              <button
+                onClick={() => updateFilmGrain({ animated: !config.filmGrain.animated })}
+                className={`relative h-4 w-7 rounded-full transition-colors ${
+                  config.filmGrain.animated ? 'bg-purple-500' : 'bg-white/20'
+                }`}
+              >
+                <span
+                  className={`absolute left-0.5 top-0.5 h-3 w-3 rounded-full bg-white transition-transform ${
+                    config.filmGrain.animated ? 'translate-x-3' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </label>
+          </EffectSection>
+
+          {/* Sharpen */}
+          <EffectSection
+            title="Keskinleştirme"
+            icon={<div className="h-3.5 w-3.5 border-2 border-white/60 rounded-sm" />}
+            enabled={config.sharpen.enabled}
+            onToggle={() => updateSharpen({ enabled: !config.sharpen.enabled })}
+          >
+            <Slider
+              label="Yoğunluk"
+              value={config.sharpen.intensity}
+              onChange={(intensity) => updateSharpen({ intensity })}
+              min={0}
+              max={2}
+              step={0.1}
+            />
+          </EffectSection>
+
+          {/* Split Toning */}
+          <EffectSection
+            title="Split Toning"
+            icon={<div className="h-3.5 w-3.5 rounded-sm" style={{ background: 'linear-gradient(to right, #334455, #ffeebb)' }} />}
+            enabled={config.splitToning.enabled}
+            onToggle={() => updateSplitToning({ enabled: !config.splitToning.enabled })}
+          >
+            {/* Highlights */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-white/50">Aydınlık Tonları</span>
+                <input
+                  type="color"
+                  value={config.splitToning.highlightColor}
+                  onChange={(e) => updateSplitToning({ highlightColor: e.target.value })}
+                  className="h-5 w-8 cursor-pointer rounded border border-white/10 bg-transparent"
+                />
+              </div>
+              <Slider
+                label="Aydınlık Yoğunluğu"
+                value={config.splitToning.highlightIntensity}
+                onChange={(highlightIntensity) => updateSplitToning({ highlightIntensity })}
+                min={0}
+                max={1}
+                step={0.05}
+              />
+            </div>
+
+            {/* Shadows */}
+            <div className="space-y-2 pt-2 border-t border-white/10">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-white/50">Gölge Tonları</span>
+                <input
+                  type="color"
+                  value={config.splitToning.shadowColor}
+                  onChange={(e) => updateSplitToning({ shadowColor: e.target.value })}
+                  className="h-5 w-8 cursor-pointer rounded border border-white/10 bg-transparent"
+                />
+              </div>
+              <Slider
+                label="Gölge Yoğunluğu"
+                value={config.splitToning.shadowIntensity}
+                onChange={(shadowIntensity) => updateSplitToning({ shadowIntensity })}
+                min={0}
+                max={1}
+                step={0.05}
+              />
+            </div>
+
+            {/* Balance */}
+            <Slider
+              label="Denge"
+              value={config.splitToning.balance}
+              onChange={(balance) => updateSplitToning({ balance })}
+              min={-1}
+              max={1}
+              step={0.1}
+              format={(v) => (v < 0 ? `Gölge ${Math.abs(v * 100).toFixed(0)}%` : v > 0 ? `Aydın ${(v * 100).toFixed(0)}%` : 'Dengeli')}
+            />
+          </EffectSection>
+
+          {/* Lens Distortion */}
+          <EffectSection
+            title="Mercek Bozulması"
+            icon={<div className="h-3.5 w-3.5 rounded-full border border-white/50" style={{ transform: 'scaleX(1.3)' }} />}
+            enabled={config.lensDistortion.enabled}
+            onToggle={() => updateLensDistortion({ enabled: !config.lensDistortion.enabled })}
+          >
+            <Slider
+              label="Distorsiyon"
+              value={config.lensDistortion.distortion}
+              onChange={(distortion) => updateLensDistortion({ distortion })}
+              min={-0.5}
+              max={0.5}
+              step={0.05}
+              format={(v) => (v < 0 ? `Fıçı ${Math.abs(v * 100).toFixed(0)}%` : v > 0 ? `Yastık ${(v * 100).toFixed(0)}%` : 'Yok')}
+            />
+            <Slider
+              label="Odak Uzunluğu"
+              value={config.lensDistortion.focalLength}
+              onChange={(focalLength) => updateLensDistortion({ focalLength })}
+              min={0.5}
+              max={2}
+              step={0.05}
+            />
+          </EffectSection>
+
+          {/* LUT / Color Presets */}
+          <EffectSection
+            title="Renk Profili (LUT)"
+            icon={<Palette className="h-3.5 w-3.5" />}
+            enabled={config.lut.enabled}
+            onToggle={() => updateLUT({ enabled: !config.lut.enabled })}
+          >
+            <div className="grid grid-cols-4 gap-1">
+              {(['none', 'warm', 'cool', 'vintage', 'noir', 'cinema', 'desaturated'] as const).map((preset) => (
+                <button
+                  key={preset}
+                  onClick={() => updateLUT({ preset })}
+                  className={`rounded-md py-1.5 text-[8px] transition-all ${
+                    config.lut.preset === preset
+                      ? 'bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/50'
+                      : 'bg-white/5 text-white/50 hover:bg-white/10'
+                  }`}
+                >
+                  {preset === 'none' ? 'Yok' : 
+                   preset === 'warm' ? 'Sıcak' : 
+                   preset === 'cool' ? 'Soğuk' : 
+                   preset === 'vintage' ? 'Vintage' : 
+                   preset === 'noir' ? 'Noir' : 
+                   preset === 'cinema' ? 'Sinema' : 'Pastel'}
+                </button>
+              ))}
+            </div>
+            <Slider
+              label="Yoğunluk"
+              value={config.lut.intensity}
+              onChange={(intensity) => updateLUT({ intensity })}
+              min={0}
+              max={1}
+              step={0.05}
             />
           </EffectSection>
         </>
