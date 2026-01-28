@@ -8,6 +8,7 @@
 'use client';
 
 import React, { useState, useCallback, useEffect, useRef, Suspense } from 'react';
+import { ThrottledRangeInput } from '@/components/atoms/ThrottledRangeInput';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { OrbitControls, Center, Environment } from '@react-three/drei';
@@ -392,14 +393,14 @@ export function OrientationModal({
                   <span>Ölçek</span>
                   <span className="text-white/40">{config.scale.toFixed(2)}x</span>
                 </label>
-                <input
-                  type="range"
+                <ThrottledRangeInput
+                  
                   min="0.1"
                   max="10"
                   step="0.1"
                   value={config.scale}
-                  onChange={(e) => setConfig(prev => ({ ...prev, scale: parseFloat(e.target.value) }))}
-                  className="w-full accent-purple-500"
+                  onChange={(v) => setConfig(prev => ({ ...prev, scale: v }))}
+                  
                 />
               </div>
 

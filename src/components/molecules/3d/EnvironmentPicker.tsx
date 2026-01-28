@@ -8,6 +8,7 @@
 'use client';
 
 import React, { useState, useCallback, memo } from 'react';
+import { ThrottledRangeInput } from '@/components/atoms/ThrottledRangeInput';
 import { motion } from 'framer-motion';
 import {
   Sun,
@@ -282,14 +283,14 @@ export function EnvironmentPicker({
                 <span className="text-[10px] text-white/50">Yoğunluk</span>
                 <span className="text-[10px] text-white/60">{selected.intensity.toFixed(1)}</span>
               </div>
-              <input
-                type="range"
+              <ThrottledRangeInput
+                
                 min="0"
                 max="3"
                 step="0.1"
                 value={selected.intensity}
-                onChange={(e) => handleIntensityChange(parseFloat(e.target.value))}
-                className="w-full accent-purple-500"
+                onChange={(v) => handleIntensityChange(v)}
+                
               />
             </div>
 
@@ -299,14 +300,14 @@ export function EnvironmentPicker({
                 <span className="text-[10px] text-white/50">Bulanıklık</span>
                 <span className="text-[10px] text-white/60">{selected.blur.toFixed(1)}</span>
               </div>
-              <input
-                type="range"
+              <ThrottledRangeInput
+                
                 min="0"
                 max="1"
                 step="0.05"
                 value={selected.blur}
-                onChange={(e) => handleBlurChange(parseFloat(e.target.value))}
-                className="w-full accent-purple-500"
+                onChange={(v) => handleBlurChange(v)}
+                
               />
             </div>
 
@@ -316,14 +317,14 @@ export function EnvironmentPicker({
                 <span className="text-[10px] text-white/50">Döndürme</span>
                 <span className="text-[10px] text-white/60">{selected.rotation}°</span>
               </div>
-              <input
-                type="range"
+              <ThrottledRangeInput
+                
                 min="0"
                 max="360"
                 step="15"
                 value={selected.rotation}
-                onChange={(e) => handleRotationChange(parseFloat(e.target.value))}
-                className="w-full accent-purple-500"
+                onChange={(v) => handleRotationChange(v)}
+                
               />
             </div>
 
@@ -432,14 +433,14 @@ export function EnvironmentPicker({
                       <span className="text-[10px] text-white/50">Yoğunluk</span>
                       <span className="text-[10px] text-white/60">{selected.intensity.toFixed(1)}</span>
                     </div>
-                    <input
-                      type="range"
+                    <ThrottledRangeInput
+                      
                       min="0"
                       max="3"
                       step="0.1"
                       value={selected.intensity}
-                      onChange={(e) => handleIntensityChange(parseFloat(e.target.value))}
-                      className="w-full accent-purple-500"
+                      onChange={(v) => handleIntensityChange(v)}
+                      
                     />
                   </div>
 
@@ -449,14 +450,14 @@ export function EnvironmentPicker({
                       <span className="text-[10px] text-white/50">Bulanıklık</span>
                       <span className="text-[10px] text-white/60">{selected.blur.toFixed(1)}</span>
                     </div>
-                    <input
-                      type="range"
+                    <ThrottledRangeInput
+                      
                       min="0"
                       max="1"
                       step="0.05"
                       value={selected.blur}
-                      onChange={(e) => handleBlurChange(parseFloat(e.target.value))}
-                      className="w-full accent-purple-500"
+                      onChange={(v) => handleBlurChange(v)}
+                      
                     />
                   </div>
 
@@ -466,14 +467,14 @@ export function EnvironmentPicker({
                       <span className="text-[10px] text-white/50">Döndürme</span>
                       <span className="text-[10px] text-white/60">{selected.rotation}°</span>
                     </div>
-                    <input
-                      type="range"
+                    <ThrottledRangeInput
+                      
                       min="0"
                       max="360"
                       step="15"
                       value={selected.rotation}
-                      onChange={(e) => handleRotationChange(parseFloat(e.target.value))}
-                      className="w-full accent-purple-500"
+                      onChange={(v) => handleRotationChange(v)}
+                      
                     />
                   </div>
 

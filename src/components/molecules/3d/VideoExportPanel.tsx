@@ -12,6 +12,7 @@
 'use client';
 
 import React, { useState, useRef, useCallback } from 'react';
+import { ThrottledRangeInput } from '@/components/atoms/ThrottledRangeInput';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Video, 
@@ -471,14 +472,14 @@ export function VideoExportPanel({
                     {config.turntableSpeed}x
                   </span>
                 </div>
-                <input
-                  type="range"
+                <ThrottledRangeInput
+                  
                   min={0.5}
                   max={3}
                   step={0.5}
                   value={config.turntableSpeed}
-                  onChange={(e) => onChange({ turntableSpeed: parseFloat(e.target.value) })}
-                  className="w-full accent-purple-500"
+                  onChange={(v) => onChange({ turntableSpeed: v })}
+                  
                 />
               </div>
             </div>
@@ -635,16 +636,16 @@ export function VideoExportPanel({
                             {config.watermark.size}%
                           </span>
                         </div>
-                        <input
-                          type="range"
+                        <ThrottledRangeInput
+                          
                           min={5}
                           max={30}
                           step={1}
                           value={config.watermark.size}
-                          onChange={(e) => onChange({ 
-                            watermark: { ...config.watermark, size: parseInt(e.target.value) } 
+                          onChange={(v) => onChange({ 
+                            watermark: { ...config.watermark, size: v } 
                           })}
-                          className="w-full accent-purple-500"
+                          
                         />
                       </div>
 
@@ -656,16 +657,16 @@ export function VideoExportPanel({
                             {Math.round(config.watermark.opacity * 100)}%
                           </span>
                         </div>
-                        <input
-                          type="range"
+                        <ThrottledRangeInput
+                          
                           min={0.1}
                           max={1}
                           step={0.1}
                           value={config.watermark.opacity}
-                          onChange={(e) => onChange({ 
-                            watermark: { ...config.watermark, opacity: parseFloat(e.target.value) } 
+                          onChange={(v) => onChange({ 
+                            watermark: { ...config.watermark, opacity: v } 
                           })}
-                          className="w-full accent-purple-500"
+                          
                         />
                       </div>
                     </div>
@@ -702,16 +703,16 @@ export function VideoExportPanel({
                             {config.speedRamping.startSpeed}x
                           </span>
                         </div>
-                        <input
-                          type="range"
+                        <ThrottledRangeInput
+                          
                           min={0.25}
                           max={2}
                           step={0.25}
                           value={config.speedRamping.startSpeed}
-                          onChange={(e) => onChange({ 
-                            speedRamping: { ...config.speedRamping, startSpeed: parseFloat(e.target.value) } 
+                          onChange={(v) => onChange({ 
+                            speedRamping: { ...config.speedRamping, startSpeed: v } 
                           })}
-                          className="w-full accent-purple-500"
+                          
                         />
                       </div>
 
@@ -723,16 +724,16 @@ export function VideoExportPanel({
                             {config.speedRamping.endSpeed}x
                           </span>
                         </div>
-                        <input
-                          type="range"
+                        <ThrottledRangeInput
+                          
                           min={0.25}
                           max={2}
                           step={0.25}
                           value={config.speedRamping.endSpeed}
-                          onChange={(e) => onChange({ 
-                            speedRamping: { ...config.speedRamping, endSpeed: parseFloat(e.target.value) } 
+                          onChange={(v) => onChange({ 
+                            speedRamping: { ...config.speedRamping, endSpeed: v } 
                           })}
-                          className="w-full accent-purple-500"
+                          
                         />
                       </div>
                     </div>

@@ -12,6 +12,7 @@
 'use client';
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { ThrottledRangeInput } from '@/components/atoms/ThrottledRangeInput';
 import { useFrame } from '@react-three/fiber';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RotateCw, Play, Pause, RotateCcw, RefreshCw } from 'lucide-react';
@@ -238,14 +239,14 @@ export function TurntableControls({
                 {config.speed.toFixed(2)} r/s
               </span>
             </div>
-            <input
-              type="range"
+            <ThrottledRangeInput
+              
               min={0.1}
               max={2}
               step={0.1}
               value={config.speed}
-              onChange={(e) => onChange({ speed: parseFloat(e.target.value) })}
-              className="w-full accent-purple-500"
+              onChange={(v) => onChange({ speed: v })}
+              
             />
             <div className="flex justify-between text-[9px] text-white/30">
               <span>Yavaş</span>

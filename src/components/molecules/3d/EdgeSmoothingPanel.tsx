@@ -11,6 +11,7 @@
 'use client';
 
 import React from 'react';
+import { ThrottledRangeInput } from '@/components/atoms/ThrottledRangeInput';
 import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 
@@ -155,14 +156,14 @@ export function EdgeSmoothingPanel({
           <span className="text-[10px] text-white/50">Subdivision Seviyesi</span>
           <span className="text-[10px] font-mono text-white/60">{config.subdivisionLevel}x</span>
         </div>
-        <input
-          type="range"
+        <ThrottledRangeInput
+          
           min={0}
           max={3}
           step={1}
           value={config.subdivisionLevel}
-          onChange={(e) => onChange({ subdivisionLevel: parseInt(e.target.value) })}
-          className="w-full accent-purple-500"
+          onChange={(v) => onChange({ subdivisionLevel: v })}
+          
         />
         <div className="flex justify-between text-[9px] text-white/30">
           <span>Orijinal</span>
@@ -185,14 +186,14 @@ export function EdgeSmoothingPanel({
             {Math.round(config.edgeSmoothing * 100)}%
           </span>
         </div>
-        <input
-          type="range"
+        <ThrottledRangeInput
+          
           min={0}
           max={1}
           step={0.1}
           value={config.edgeSmoothing}
-          onChange={(e) => onChange({ edgeSmoothing: parseFloat(e.target.value) })}
-          className="w-full accent-purple-500"
+          onChange={(v) => onChange({ edgeSmoothing: v })}
+          
         />
         <div className="flex justify-between text-[9px] text-white/30">
           <span>Keskin</span>
@@ -209,14 +210,14 @@ export function EdgeSmoothingPanel({
               {config.tessellationQuality.toFixed(2)}
             </span>
           </div>
-          <input
-            type="range"
+          <ThrottledRangeInput
+            
             min={0.25}
             max={5}
             step={0.25}
             value={config.tessellationQuality}
-            onChange={(e) => onChange({ tessellationQuality: parseFloat(e.target.value) })}
-            className="w-full accent-purple-500"
+            onChange={(v) => onChange({ tessellationQuality: v })}
+            
           />
           <div className="flex justify-between text-[9px] text-white/30">
             <span>Hızlı</span>

@@ -13,6 +13,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Palette, Sparkles, Eye, Check } from 'lucide-react';
+import { ThrottledRangeInput } from '@/components/atoms/ThrottledRangeInput';
 
 // ============================================
 // TYPES
@@ -399,14 +400,12 @@ export function MaterialEditor({ material, onChange, onPresetSelect }: MaterialE
               {Math.round(material.metalness * 100)}%
             </span>
           </div>
-          <input
-            type="range"
+          <ThrottledRangeInput
             min={0}
             max={1}
             step={0.01}
             value={material.metalness}
-            onChange={(e) => onChange({ metalness: parseFloat(e.target.value) })}
-            className="w-full accent-purple-500"
+            onChange={(v) => onChange({ metalness: v })}
           />
         </div>
 
@@ -418,14 +417,12 @@ export function MaterialEditor({ material, onChange, onPresetSelect }: MaterialE
               {Math.round(material.roughness * 100)}%
             </span>
           </div>
-          <input
-            type="range"
+          <ThrottledRangeInput
             min={0}
             max={1}
             step={0.01}
             value={material.roughness}
-            onChange={(e) => onChange({ roughness: parseFloat(e.target.value) })}
-            className="w-full accent-purple-500"
+            onChange={(v) => onChange({ roughness: v })}
           />
         </div>
 
@@ -437,13 +434,12 @@ export function MaterialEditor({ material, onChange, onPresetSelect }: MaterialE
               {material.envMapIntensity.toFixed(1)}
             </span>
           </div>
-          <input
-            type="range"
+          <ThrottledRangeInput
             min={0}
             max={3}
             step={0.1}
             value={material.envMapIntensity}
-            onChange={(e) => onChange({ envMapIntensity: parseFloat(e.target.value) })}
+            onChange={(v) => onChange({ envMapIntensity: v })}
             className="w-full accent-purple-500"
           />
         </div>
@@ -474,14 +470,12 @@ export function MaterialEditor({ material, onChange, onPresetSelect }: MaterialE
                   {Math.round((material.clearcoat || 0) * 100)}%
                 </span>
               </div>
-              <input
-                type="range"
+              <ThrottledRangeInput
                 min={0}
                 max={1}
                 step={0.05}
                 value={material.clearcoat || 0}
-                onChange={(e) => onChange({ clearcoat: parseFloat(e.target.value) })}
-                className="w-full accent-purple-500"
+                onChange={(v) => onChange({ clearcoat: v })}
               />
             </div>
 
@@ -493,14 +487,12 @@ export function MaterialEditor({ material, onChange, onPresetSelect }: MaterialE
                   {Math.round((material.clearcoatRoughness || 0) * 100)}%
                 </span>
               </div>
-              <input
-                type="range"
+              <ThrottledRangeInput
                 min={0}
                 max={1}
                 step={0.05}
                 value={material.clearcoatRoughness || 0}
-                onChange={(e) => onChange({ clearcoatRoughness: parseFloat(e.target.value) })}
-                className="w-full accent-purple-500"
+                onChange={(v) => onChange({ clearcoatRoughness: v })}
               />
             </div>
 
@@ -512,14 +504,12 @@ export function MaterialEditor({ material, onChange, onPresetSelect }: MaterialE
                   {Math.round((material.sheen || 0) * 100)}%
                 </span>
               </div>
-              <input
-                type="range"
+              <ThrottledRangeInput
                 min={0}
                 max={1}
                 step={0.05}
                 value={material.sheen || 0}
-                onChange={(e) => onChange({ sheen: parseFloat(e.target.value) })}
-                className="w-full accent-purple-500"
+                onChange={(v) => onChange({ sheen: v })}
               />
             </div>
 
@@ -531,14 +521,12 @@ export function MaterialEditor({ material, onChange, onPresetSelect }: MaterialE
                   {Math.round((material.iridescence || 0) * 100)}%
                 </span>
               </div>
-              <input
-                type="range"
+              <ThrottledRangeInput
                 min={0}
                 max={1}
                 step={0.05}
                 value={material.iridescence || 0}
-                onChange={(e) => onChange({ iridescence: parseFloat(e.target.value) })}
-                className="w-full accent-purple-500"
+                onChange={(v) => onChange({ iridescence: v })}
               />
             </div>
 
@@ -554,14 +542,12 @@ export function MaterialEditor({ material, onChange, onPresetSelect }: MaterialE
                     {(material.anisotropy || 0).toFixed(2)}
                   </span>
                 </div>
-                <input
-                  type="range"
+                <ThrottledRangeInput
                   min={-1}
                   max={1}
                   step={0.05}
                   value={material.anisotropy || 0}
-                  onChange={(e) => onChange({ anisotropy: parseFloat(e.target.value) })}
-                  className="w-full accent-purple-500"
+                  onChange={(v) => onChange({ anisotropy: v })}
                 />
               </div>
 
@@ -573,14 +559,12 @@ export function MaterialEditor({ material, onChange, onPresetSelect }: MaterialE
                     {Math.round((material.anisotropyRotation || 0) * (180 / Math.PI))}°
                   </span>
                 </div>
-                <input
-                  type="range"
+                <ThrottledRangeInput
                   min={0}
                   max={Math.PI}
                   step={0.05}
                   value={material.anisotropyRotation || 0}
-                  onChange={(e) => onChange({ anisotropyRotation: parseFloat(e.target.value) })}
-                  className="w-full accent-purple-500"
+                  onChange={(v) => onChange({ anisotropyRotation: v })}
                 />
               </div>
             </div>
@@ -597,14 +581,12 @@ export function MaterialEditor({ material, onChange, onPresetSelect }: MaterialE
                     {Math.round((material.transmission || 0) * 100)}%
                   </span>
                 </div>
-                <input
-                  type="range"
+                <ThrottledRangeInput
                   min={0}
                   max={1}
                   step={0.05}
                   value={material.transmission || 0}
-                  onChange={(e) => onChange({ transmission: parseFloat(e.target.value) })}
-                  className="w-full accent-purple-500"
+                  onChange={(v) => onChange({ transmission: v })}
                 />
               </div>
 
@@ -616,14 +598,12 @@ export function MaterialEditor({ material, onChange, onPresetSelect }: MaterialE
                     {(material.ior || 1.5).toFixed(2)}
                   </span>
                 </div>
-                <input
-                  type="range"
+                <ThrottledRangeInput
                   min={1}
                   max={3}
                   step={0.01}
                   value={material.ior || 1.5}
-                  onChange={(e) => onChange({ ior: parseFloat(e.target.value) })}
-                  className="w-full accent-purple-500"
+                  onChange={(v) => onChange({ ior: v })}
                 />
               </div>
 
@@ -635,14 +615,12 @@ export function MaterialEditor({ material, onChange, onPresetSelect }: MaterialE
                     {(material.thickness || 0).toFixed(1)}
                   </span>
                 </div>
-                <input
-                  type="range"
+                <ThrottledRangeInput
                   min={0}
                   max={10}
                   step={0.1}
                   value={material.thickness || 0}
-                  onChange={(e) => onChange({ thickness: parseFloat(e.target.value) })}
-                  className="w-full accent-purple-500"
+                  onChange={(v) => onChange({ thickness: v })}
                 />
               </div>
 
@@ -665,13 +643,12 @@ export function MaterialEditor({ material, onChange, onPresetSelect }: MaterialE
                     {(material.attenuationDistance || 0).toFixed(1)}
                   </span>
                 </div>
-                <input
-                  type="range"
+                <ThrottledRangeInput
                   min={0}
                   max={20}
                   step={0.5}
                   value={material.attenuationDistance || 0}
-                  onChange={(e) => onChange({ attenuationDistance: parseFloat(e.target.value) })}
+                  onChange={(v) => onChange({ attenuationDistance: v })}
                   className="w-full accent-purple-500"
                 />
               </div>
@@ -689,13 +666,12 @@ export function MaterialEditor({ material, onChange, onPresetSelect }: MaterialE
                     {Math.round((material.specularIntensity ?? 1) * 100)}%
                   </span>
                 </div>
-                <input
-                  type="range"
+                <ThrottledRangeInput
                   min={0}
                   max={2}
                   step={0.05}
                   value={material.specularIntensity ?? 1}
-                  onChange={(e) => onChange({ specularIntensity: parseFloat(e.target.value) })}
+                  onChange={(v) => onChange({ specularIntensity: v })}
                   className="w-full accent-purple-500"
                 />
               </div>

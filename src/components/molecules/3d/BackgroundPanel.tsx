@@ -11,6 +11,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { ThrottledRangeInput } from '@/components/atoms/ThrottledRangeInput';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // ============================================
@@ -296,14 +297,14 @@ export function BackgroundPanel({ config, onChange }: BackgroundPanelProps) {
                 {Math.round(config.opacity * 100)}%
               </span>
             </div>
-            <input
-              type="range"
+            <ThrottledRangeInput
+              
               min={0}
               max={1}
               step={0.05}
               value={config.opacity}
-              onChange={(e) => onChange({ opacity: parseFloat(e.target.value) })}
-              className="w-full accent-purple-500"
+              onChange={(v) => onChange({ opacity: v })}
+              
             />
           </div>
         </div>

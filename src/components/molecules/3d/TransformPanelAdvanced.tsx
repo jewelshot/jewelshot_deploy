@@ -14,6 +14,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
+import { ThrottledRangeInput } from '@/components/atoms/ThrottledRangeInput';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Move,
@@ -171,7 +172,7 @@ function Vec3Input({
           <span className={`text-[9px] ${colors[i]}`}>{labels[i]}</span>
           <input
             type="number"
-            value={value[axis].toFixed(precision)}
+            value={value[axis]}
             onChange={(e) => onChange({ ...value, [axis]: parseFloat(e.target.value) || 0 })}
             step={step}
             min={min}
@@ -414,17 +415,16 @@ export function TransformPanelAdvanced({
                 {config.scale.x.toFixed(2)}x
               </span>
             </div>
-            <input
-              type="range"
+            <ThrottledRangeInput
+              
               min={0.1}
               max={5}
               step={0.1}
               value={config.scale.x}
-              onChange={(e) => {
-                const v = parseFloat(e.target.value);
+              onChange={(v) => {
                 onChange({ scale: { x: v, y: v, z: v } });
               }}
-              className="w-full accent-purple-500"
+              
             />
           </div>
         ) : (
@@ -630,14 +630,14 @@ export function TransformPanelAdvanced({
                 <span className="text-[10px] text-white/50">Adet</span>
                 <span className="text-[10px] font-mono text-white/60">{config.array.count}</span>
               </div>
-              <input
-                type="range"
+              <ThrottledRangeInput
+                
                 min={2}
                 max={20}
                 step={1}
                 value={config.array.count}
-                onChange={(e) => onChange({ array: { ...config.array, count: parseInt(e.target.value) } })}
-                className="w-full accent-purple-500"
+                onChange={(v) => onChange({ array: { ...config.array, count: v } })}
+                
               />
             </div>
 
@@ -660,14 +660,14 @@ export function TransformPanelAdvanced({
                     <span className="text-[10px] text-white/50">Yarıçap</span>
                     <span className="text-[10px] font-mono text-white/60">{config.array.radius.toFixed(1)}</span>
                   </div>
-                  <input
-                    type="range"
+                  <ThrottledRangeInput
+                    
                     min={0.5}
                     max={10}
                     step={0.1}
                     value={config.array.radius}
-                    onChange={(e) => onChange({ array: { ...config.array, radius: parseFloat(e.target.value) } })}
-                    className="w-full accent-purple-500"
+                    onChange={(v) => onChange({ array: { ...config.array, radius: v } })}
+                    
                   />
                 </div>
                 <div className="grid grid-cols-3 gap-1">

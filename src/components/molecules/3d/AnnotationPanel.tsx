@@ -12,6 +12,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
+import { ThrottledRangeInput } from '@/components/atoms/ThrottledRangeInput';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Tag,
@@ -511,14 +512,14 @@ export function AnnotationPanel({
                   {config.globalLabelStyle.fontSize}px
                 </span>
               </div>
-              <input
-                type="range"
+              <ThrottledRangeInput
+                
                 min={8}
                 max={24}
                 step={1}
                 value={config.globalLabelStyle.fontSize}
-                onChange={(e) => updateGlobalLabelStyle({ fontSize: parseInt(e.target.value) })}
-                className="w-full accent-purple-500"
+                onChange={(v) => updateGlobalLabelStyle({ fontSize: v })}
+                
               />
             </div>
 
@@ -570,14 +571,14 @@ export function AnnotationPanel({
                   {Math.round(config.globalLabelStyle.backgroundOpacity * 100)}%
                 </span>
               </div>
-              <input
-                type="range"
+              <ThrottledRangeInput
+                
                 min={0}
                 max={1}
                 step={0.05}
                 value={config.globalLabelStyle.backgroundOpacity}
-                onChange={(e) => updateGlobalLabelStyle({ backgroundOpacity: parseFloat(e.target.value) })}
-                className="w-full accent-purple-500"
+                onChange={(v) => updateGlobalLabelStyle({ backgroundOpacity: v })}
+                
               />
             </div>
 

@@ -12,6 +12,7 @@
 'use client';
 
 import React, { useRef, useMemo, useEffect } from 'react';
+import { ThrottledRangeInput } from '@/components/atoms/ThrottledRangeInput';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { MeshReflectorMaterial } from '@react-three/drei';
@@ -270,14 +271,14 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
                 {config.height.toFixed(2)}
               </span>
             </div>
-            <input
-              type="range"
+            <ThrottledRangeInput
+              
               min={-2}
               max={2}
               step={0.05}
               value={config.height}
-              onChange={(e) => onChange({ height: parseFloat(e.target.value) })}
-              className="w-full accent-purple-500"
+              onChange={(v) => onChange({ height: v })}
+              
             />
           </div>
 
@@ -300,14 +301,14 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
                 {Math.round(config.reflectivity * 100)}%
               </span>
             </div>
-            <input
-              type="range"
+            <ThrottledRangeInput
+              
               min={0}
               max={1}
               step={0.05}
               value={config.reflectivity}
-              onChange={(e) => onChange({ reflectivity: parseFloat(e.target.value) })}
-              className="w-full accent-purple-500"
+              onChange={(v) => onChange({ reflectivity: v })}
+              
             />
           </div>
 
@@ -319,14 +320,14 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
                 {config.blur}
               </span>
             </div>
-            <input
-              type="range"
+            <ThrottledRangeInput
+              
               min={0}
               max={1000}
               step={50}
               value={config.blur}
-              onChange={(e) => onChange({ blur: parseInt(e.target.value) })}
-              className="w-full accent-purple-500"
+              onChange={(v) => onChange({ blur: v })}
+              
             />
           </div>
 
@@ -355,14 +356,14 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
                 {config.size}
               </span>
             </div>
-            <input
-              type="range"
+            <ThrottledRangeInput
+              
               min={5}
               max={50}
               step={5}
               value={config.size}
-              onChange={(e) => onChange({ size: parseInt(e.target.value) })}
-              className="w-full accent-purple-500"
+              onChange={(v) => onChange({ size: v })}
+              
             />
           </div>
 
@@ -374,14 +375,14 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
                 {Math.round((config.roughness || 0.8) * 100)}%
               </span>
             </div>
-            <input
-              type="range"
+            <ThrottledRangeInput
+              
               min={0}
               max={1}
               step={0.05}
               value={config.roughness || 0.8}
-              onChange={(e) => onChange({ roughness: parseFloat(e.target.value) })}
-              className="w-full accent-purple-500"
+              onChange={(v) => onChange({ roughness: v })}
+              
             />
           </div>
 
@@ -432,14 +433,14 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
                     {Math.round((config.shadowOpacity || 0.5) * 100)}%
                   </span>
                 </div>
-                <input
-                  type="range"
+                <ThrottledRangeInput
+                  
                   min={0}
                   max={1}
                   step={0.05}
                   value={config.shadowOpacity || 0.5}
-                  onChange={(e) => onChange({ shadowOpacity: parseFloat(e.target.value) })}
-                  className="w-full accent-purple-500"
+                  onChange={(v) => onChange({ shadowOpacity: v })}
+                  
                 />
               </div>
             )}
@@ -476,14 +477,14 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
                     {(config.textureScale || 1).toFixed(1)}
                   </span>
                 </div>
-                <input
-                  type="range"
+                <ThrottledRangeInput
+                  
                   min={0.1}
                   max={5}
                   step={0.1}
                   value={config.textureScale || 1}
-                  onChange={(e) => onChange({ textureScale: parseFloat(e.target.value) })}
-                  className="w-full accent-purple-500"
+                  onChange={(v) => onChange({ textureScale: v })}
+                  
                 />
               </div>
             )}
@@ -529,14 +530,14 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
                       {config.curvedBackgroundHeight || 5}
                     </span>
                   </div>
-                  <input
-                    type="range"
+                  <ThrottledRangeInput
+                    
                     min={2}
                     max={20}
                     step={1}
                     value={config.curvedBackgroundHeight || 5}
-                    onChange={(e) => onChange({ curvedBackgroundHeight: parseFloat(e.target.value) })}
-                    className="w-full accent-purple-500"
+                    onChange={(v) => onChange({ curvedBackgroundHeight: v })}
+                    
                   />
                 </div>
 
@@ -548,14 +549,14 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
                       {config.curvedBackgroundRadius || 3}
                     </span>
                   </div>
-                  <input
-                    type="range"
+                  <ThrottledRangeInput
+                    
                     min={1}
                     max={10}
                     step={0.5}
                     value={config.curvedBackgroundRadius || 3}
-                    onChange={(e) => onChange({ curvedBackgroundRadius: parseFloat(e.target.value) })}
-                    className="w-full accent-purple-500"
+                    onChange={(v) => onChange({ curvedBackgroundRadius: v })}
+                    
                   />
                 </div>
               </div>

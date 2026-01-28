@@ -13,6 +13,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
+import { ThrottledRangeInput } from '@/components/atoms/ThrottledRangeInput';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Split,
@@ -296,14 +297,14 @@ export function ViewPanel({
               <span className="text-[10px] text-white/50">FOV (Görüş Alanı)</span>
               <span className="text-[10px] font-mono text-white/60">{config.fov}°</span>
             </div>
-            <input
-              type="range"
+            <ThrottledRangeInput
+              
               min={20}
               max={100}
               step={5}
               value={config.fov}
-              onChange={(e) => onChange({ fov: parseInt(e.target.value) })}
-              className="w-full accent-purple-500"
+              onChange={(v) => onChange({ fov: v })}
+              
             />
           </div>
         ) : (
@@ -312,14 +313,14 @@ export function ViewPanel({
               <span className="text-[10px] text-white/50">Ortografik Zoom</span>
               <span className="text-[10px] font-mono text-white/60">{config.orthoZoom}x</span>
             </div>
-            <input
-              type="range"
+            <ThrottledRangeInput
+              
               min={1}
               max={20}
               step={0.5}
               value={config.orthoZoom}
-              onChange={(e) => onChange({ orthoZoom: parseFloat(e.target.value) })}
-              className="w-full accent-purple-500"
+              onChange={(v) => onChange({ orthoZoom: v })}
+              
             />
           </div>
         )}
@@ -442,14 +443,14 @@ export function ViewPanel({
                 {Math.round(config.debugOpacity * 100)}%
               </span>
             </div>
-            <input
-              type="range"
+            <ThrottledRangeInput
+              
               min={0.1}
               max={1}
               step={0.1}
               value={config.debugOpacity}
-              onChange={(e) => onChange({ debugOpacity: parseFloat(e.target.value) })}
-              className="w-full accent-purple-500"
+              onChange={(v) => onChange({ debugOpacity: v })}
+              
             />
           </div>
         )}
@@ -490,16 +491,16 @@ export function ViewPanel({
                   {config.comparison.splitPosition}%
                 </span>
               </div>
-              <input
-                type="range"
+              <ThrottledRangeInput
+                
                 min={10}
                 max={90}
                 step={5}
                 value={config.comparison.splitPosition}
-                onChange={(e) => onChange({
-                  comparison: { ...config.comparison, splitPosition: parseInt(e.target.value) }
+                onChange={(v) => onChange({
+                  comparison: { ...config.comparison, splitPosition: v }
                 })}
-                className="w-full accent-purple-500"
+                
               />
             </div>
 

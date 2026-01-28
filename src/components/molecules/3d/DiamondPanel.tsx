@@ -11,6 +11,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { ThrottledRangeInput } from '@/components/atoms/ThrottledRangeInput';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Diamond } from 'lucide-react';
 
@@ -393,13 +394,13 @@ export function DiamondPanel({ config, onChange }: DiamondPanelProps) {
               {Math.round(config.brilliance * 100)}%
             </span>
           </div>
-          <input
-            type="range"
+          <ThrottledRangeInput
+            
             min={0}
             max={1}
             step={0.05}
             value={config.brilliance}
-            onChange={(e) => onChange({ brilliance: parseFloat(e.target.value) })}
+            onChange={(v) => onChange({ brilliance: v })}
             className="w-full accent-cyan-500"
           />
           <p className="text-[9px] text-white/30">Beyaz ışık yansıması</p>
@@ -416,13 +417,13 @@ export function DiamondPanel({ config, onChange }: DiamondPanelProps) {
               {Math.round((config.fire || 0) * 100)}%
             </span>
           </div>
-          <input
-            type="range"
+          <ThrottledRangeInput
+            
             min={0}
             max={1}
             step={0.05}
             value={config.fire || 0}
-            onChange={(e) => onChange({ fire: parseFloat(e.target.value) })}
+            onChange={(v) => onChange({ fire: v })}
             className="w-full accent-orange-500"
           />
           <p className="text-[9px] text-white/30">Renkli ışık parıltıları</p>
@@ -436,13 +437,13 @@ export function DiamondPanel({ config, onChange }: DiamondPanelProps) {
               {Math.round((config.scintillation || 0) * 100)}%
             </span>
           </div>
-          <input
-            type="range"
+          <ThrottledRangeInput
+            
             min={0}
             max={1}
             step={0.05}
             value={config.scintillation || 0}
-            onChange={(e) => onChange({ scintillation: parseFloat(e.target.value) })}
+            onChange={(v) => onChange({ scintillation: v })}
             className="w-full accent-yellow-500"
           />
           <p className="text-[9px] text-white/30">Hareket halinde parıltı</p>
@@ -456,13 +457,13 @@ export function DiamondPanel({ config, onChange }: DiamondPanelProps) {
               {config.dispersion.toFixed(2)}
             </span>
           </div>
-          <input
-            type="range"
+          <ThrottledRangeInput
+            
             min={0}
             max={1}
             step={0.01}
             value={config.dispersion}
-            onChange={(e) => onChange({ dispersion: parseFloat(e.target.value) })}
+            onChange={(v) => onChange({ dispersion: v })}
             className="w-full accent-cyan-500"
           />
         </div>
@@ -475,13 +476,13 @@ export function DiamondPanel({ config, onChange }: DiamondPanelProps) {
               {config.ior.toFixed(2)}
             </span>
           </div>
-          <input
-            type="range"
+          <ThrottledRangeInput
+            
             min={1.0}
             max={3.0}
             step={0.01}
             value={config.ior}
-            onChange={(e) => onChange({ ior: parseFloat(e.target.value) })}
+            onChange={(v) => onChange({ ior: v })}
             className="w-full accent-cyan-500"
           />
           <div className="flex justify-between text-[8px] text-white/30">
@@ -670,13 +671,13 @@ export function DiamondPanel({ config, onChange }: DiamondPanelProps) {
                   {Math.round(config.transmission * 100)}%
                 </span>
               </div>
-              <input
-                type="range"
+              <ThrottledRangeInput
+                
                 min={0}
                 max={1}
                 step={0.05}
                 value={config.transmission}
-                onChange={(e) => onChange({ transmission: parseFloat(e.target.value) })}
+                onChange={(v) => onChange({ transmission: v })}
                 className="w-full accent-cyan-500"
               />
             </div>
@@ -689,13 +690,13 @@ export function DiamondPanel({ config, onChange }: DiamondPanelProps) {
                   {config.thickness.toFixed(2)}
                 </span>
               </div>
-              <input
-                type="range"
+              <ThrottledRangeInput
+                
                 min={0.1}
                 max={2}
                 step={0.1}
                 value={config.thickness}
-                onChange={(e) => onChange({ thickness: parseFloat(e.target.value) })}
+                onChange={(v) => onChange({ thickness: v })}
                 className="w-full accent-cyan-500"
               />
             </div>
@@ -708,13 +709,13 @@ export function DiamondPanel({ config, onChange }: DiamondPanelProps) {
                   {Math.round(config.clearcoat * 100)}%
                 </span>
               </div>
-              <input
-                type="range"
+              <ThrottledRangeInput
+                
                 min={0}
                 max={1}
                 step={0.05}
                 value={config.clearcoat}
-                onChange={(e) => onChange({ clearcoat: parseFloat(e.target.value) })}
+                onChange={(v) => onChange({ clearcoat: v })}
                 className="w-full accent-cyan-500"
               />
             </div>
@@ -727,14 +728,14 @@ export function DiamondPanel({ config, onChange }: DiamondPanelProps) {
                   {config.envMapIntensity.toFixed(1)}
                 </span>
               </div>
-              <input
-                type="range"
+              <ThrottledRangeInput
+                
                 min={0}
                 max={5}
                 step={0.1}
                 value={config.envMapIntensity}
-                onChange={(e) =>
-                  onChange({ envMapIntensity: parseFloat(e.target.value) })
+                onChange={(v) =>
+                  onChange({ envMapIntensity: v })
                 }
                 className="w-full accent-cyan-500"
               />

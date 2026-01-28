@@ -13,6 +13,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { ThrottledRangeInput } from '@/components/atoms/ThrottledRangeInput';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Eye, Sun, Palette, Target } from 'lucide-react';
 
@@ -360,14 +361,14 @@ function Slider({ label, value, onChange, min, max, step, format }: SliderProps)
           {format ? format(value) : value.toFixed(2)}
         </span>
       </div>
-      <input
-        type="range"
+      <ThrottledRangeInput
+        
         min={min}
         max={max}
         step={step}
         value={value}
-        onChange={(e) => onChange(parseFloat(e.target.value))}
-        className="w-full accent-purple-500"
+        onChange={(v) => onChange(v)}
+        
       />
     </div>
   );

@@ -8,6 +8,7 @@
 'use client';
 
 import React, { useState, useCallback, useMemo } from 'react';
+import { ThrottledRangeInput } from '@/components/atoms/ThrottledRangeInput';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Camera,
@@ -332,14 +333,14 @@ function ScreenshotTab({ config, onChange, onExport, isExporting }: ScreenshotTa
             <span className="text-[10px] text-white/50">Kalite</span>
             <span className="text-[10px] text-white/60">{Math.round(config.quality * 100)}%</span>
           </div>
-          <input
-            type="range"
+          <ThrottledRangeInput
+            
             min={0.1}
             max={1}
             step={0.05}
             value={config.quality}
-            onChange={(e) => onChange({ ...config, quality: parseFloat(e.target.value) })}
-            className="w-full accent-purple-500"
+            onChange={(v) => onChange({ ...config, quality: v })}
+            
           />
         </div>
       )}
@@ -451,7 +452,7 @@ function VideoTab({ config, onChange, onExport, isExporting }: VideoTabProps) {
           <input
             type="number"
             value={config.duration}
-            onChange={(e) => onChange({ ...config, duration: parseFloat(e.target.value) })}
+            onChange={(e) => onChange({ ...config, duration: parseInt(e.target.value) || 1 })}
             min={1}
             max={30}
             step={1}
@@ -506,14 +507,14 @@ function VideoTab({ config, onChange, onExport, isExporting }: VideoTabProps) {
           <span className="text-[10px] text-white/50">Döndürme Miktarı</span>
           <span className="text-[10px] text-white/60">{config.rotationDegrees}°</span>
         </div>
-        <input
-          type="range"
+        <ThrottledRangeInput
+          
           min={90}
           max={720}
           step={45}
           value={config.rotationDegrees}
-          onChange={(e) => onChange({ ...config, rotationDegrees: parseInt(e.target.value) })}
-          className="w-full accent-purple-500"
+          onChange={(v) => onChange({ ...config, rotationDegrees: v })}
+          
         />
       </div>
 

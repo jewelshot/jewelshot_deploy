@@ -11,6 +11,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { ThrottledRangeInput } from '@/components/atoms/ThrottledRangeInput';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sun,
@@ -250,14 +251,14 @@ function LightItem({ light, onUpdate, onDelete }: LightItemProps) {
                       {light.colorTemperature || 5500}K
                     </span>
                   </div>
-                  <input
-                    type="range"
+                  <ThrottledRangeInput
+                    
                     min={2000}
                     max={10000}
                     step={100}
                     value={light.colorTemperature || 5500}
-                    onChange={(e) => {
-                      const temp = parseInt(e.target.value);
+                    onChange={(v) => {
+                      const temp = v;
                       onUpdate({ 
                         colorTemperature: temp, 
                         color: kelvinToHex(temp) 
@@ -309,14 +310,14 @@ function LightItem({ light, onUpdate, onDelete }: LightItemProps) {
                     {light.intensity.toFixed(1)}
                   </span>
                 </div>
-                <input
-                  type="range"
+                <ThrottledRangeInput
+                  
                   min={0}
                   max={5}
                   step={0.1}
                   value={light.intensity}
-                  onChange={(e) => onUpdate({ intensity: parseFloat(e.target.value) })}
-                  className="w-full accent-purple-500"
+                  onChange={(v) => onUpdate({ intensity: v })}
+                  
                 />
               </div>
 
@@ -380,13 +381,13 @@ function LightItem({ light, onUpdate, onDelete }: LightItemProps) {
                         {Math.round((light.angle || 0.5) * 180 / Math.PI)}°
                       </span>
                     </div>
-                    <input
-                      type="range"
+                    <ThrottledRangeInput
+                      
                       min={0.1}
                       max={1.5}
                       step={0.05}
                       value={light.angle || 0.5}
-                      onChange={(e) => onUpdate({ angle: parseFloat(e.target.value) })}
+                      onChange={(v) => onUpdate({ angle: v })}
                       className="w-full accent-yellow-500"
                     />
                   </div>
@@ -398,13 +399,13 @@ function LightItem({ light, onUpdate, onDelete }: LightItemProps) {
                         {Math.round((light.penumbra || 0) * 100)}%
                       </span>
                     </div>
-                    <input
-                      type="range"
+                    <ThrottledRangeInput
+                      
                       min={0}
                       max={1}
                       step={0.05}
                       value={light.penumbra || 0}
-                      onChange={(e) => onUpdate({ penumbra: parseFloat(e.target.value) })}
+                      onChange={(v) => onUpdate({ penumbra: v })}
                       className="w-full accent-yellow-500"
                     />
                   </div>
@@ -423,13 +424,13 @@ function LightItem({ light, onUpdate, onDelete }: LightItemProps) {
                         {light.distance || 0}
                       </span>
                     </div>
-                    <input
-                      type="range"
+                    <ThrottledRangeInput
+                      
                       min={0}
                       max={50}
                       step={1}
                       value={light.distance || 0}
-                      onChange={(e) => onUpdate({ distance: parseFloat(e.target.value) })}
+                      onChange={(v) => onUpdate({ distance: v })}
                       className="w-full accent-blue-500"
                     />
                     <p className="text-[8px] text-white/30">0 = Sonsuz</p>
@@ -442,13 +443,13 @@ function LightItem({ light, onUpdate, onDelete }: LightItemProps) {
                         {(light.decay || 2).toFixed(1)}
                       </span>
                     </div>
-                    <input
-                      type="range"
+                    <ThrottledRangeInput
+                      
                       min={0}
                       max={5}
                       step={0.1}
                       value={light.decay || 2}
-                      onChange={(e) => onUpdate({ decay: parseFloat(e.target.value) })}
+                      onChange={(v) => onUpdate({ decay: v })}
                       className="w-full accent-blue-500"
                     />
                   </div>
@@ -482,14 +483,14 @@ function LightItem({ light, onUpdate, onDelete }: LightItemProps) {
                           {Math.round((light.shadowSoftness || 0.5) * 100)}%
                         </span>
                       </div>
-                      <input
-                        type="range"
+                      <ThrottledRangeInput
+                        
                         min={0}
                         max={1}
                         step={0.05}
                         value={light.shadowSoftness || 0.5}
-                        onChange={(e) => onUpdate({ shadowSoftness: parseFloat(e.target.value) })}
-                        className="w-full accent-purple-500"
+                        onChange={(v) => onUpdate({ shadowSoftness: v })}
+                        
                       />
                     </div>
                   )}
@@ -571,14 +572,14 @@ export function LightingPanel({ config, onChange }: LightingPanelProps) {
               {config.environmentIntensity.toFixed(1)}
             </span>
           </div>
-          <input
-            type="range"
+          <ThrottledRangeInput
+            
             min={0}
             max={3}
             step={0.1}
             value={config.environmentIntensity}
-            onChange={(e) => onChange({ environmentIntensity: parseFloat(e.target.value) })}
-            className="w-full accent-purple-500"
+            onChange={(v) => onChange({ environmentIntensity: v })}
+            
           />
         </div>
 
@@ -594,13 +595,13 @@ export function LightingPanel({ config, onChange }: LightingPanelProps) {
               className="ml-auto h-5 w-8 cursor-pointer rounded border border-white/10 bg-transparent"
             />
           </div>
-          <input
-            type="range"
+          <ThrottledRangeInput
+            
             min={0}
             max={2}
             step={0.05}
             value={config.ambientIntensity}
-            onChange={(e) => onChange({ ambientIntensity: parseFloat(e.target.value) })}
+            onChange={(v) => onChange({ ambientIntensity: v })}
             className="mt-2 w-full accent-purple-500"
           />
         </div>
@@ -652,13 +653,13 @@ export function LightingPanel({ config, onChange }: LightingPanelProps) {
               {(config.exposure || 1).toFixed(2)}
             </span>
           </div>
-          <input
-            type="range"
+          <ThrottledRangeInput
+            
             min={0}
             max={3}
             step={0.05}
             value={config.exposure || 1}
-            onChange={(e) => onChange({ exposure: parseFloat(e.target.value) })}
+            onChange={(v) => onChange({ exposure: v })}
             className="w-full accent-yellow-500"
           />
         </div>

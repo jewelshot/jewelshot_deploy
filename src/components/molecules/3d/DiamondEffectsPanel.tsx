@@ -8,6 +8,7 @@
 'use client';
 
 import React, { useState, useCallback, useMemo } from 'react';
+import { ThrottledRangeInput } from '@/components/atoms/ThrottledRangeInput';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Gem,
@@ -79,13 +80,13 @@ function EffectSlider({
           {(value * 100).toFixed(0)}%
         </span>
       </div>
-      <input
-        type="range"
+      <ThrottledRangeInput
+        
         min={min}
         max={max}
         step={step}
         value={value}
-        onChange={(e) => onChange(parseFloat(e.target.value))}
+        onChange={(v) => onChange(v)}
         className="w-full accent-cyan-500"
       />
       {description && (
@@ -408,13 +409,13 @@ export function DiamondEffectsPanel({
                     {effects.internalReflections}
                   </span>
                 </div>
-                <input
-                  type="range"
+                <ThrottledRangeInput
+                  
                   min={1}
                   max={10}
                   step={1}
                   value={effects.internalReflections}
-                  onChange={(e) => updateEffect('internalReflections', parseInt(e.target.value))}
+                  onChange={(v) => updateEffect('internalReflections', v)}
                   className="w-full accent-cyan-500"
                 />
               </div>

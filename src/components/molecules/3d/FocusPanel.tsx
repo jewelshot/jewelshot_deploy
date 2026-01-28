@@ -13,6 +13,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { ThrottledRangeInput } from '@/components/atoms/ThrottledRangeInput';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Focus,
@@ -393,14 +394,14 @@ export function FocusPanel({ config, onChange, onFocusPointPick }: FocusPanelPro
                   {config.dof.focusDistance.toFixed(1)}m
                 </span>
               </div>
-              <input
-                type="range"
+              <ThrottledRangeInput
+                
                 min={0.1}
                 max={20}
                 step={0.1}
                 value={config.dof.focusDistance}
-                onChange={(e) => updateDOF({ focusDistance: parseFloat(e.target.value) })}
-                className="w-full accent-purple-500"
+                onChange={(v) => updateDOF({ focusDistance: v })}
+                
               />
             </div>
 
@@ -472,14 +473,14 @@ export function FocusPanel({ config, onChange, onFocusPointPick }: FocusPanelPro
                   {(config.dof.maxBlur * 100).toFixed(1)}%
                 </span>
               </div>
-              <input
-                type="range"
+              <ThrottledRangeInput
+                
                 min={0}
                 max={0.05}
                 step={0.001}
                 value={config.dof.maxBlur}
-                onChange={(e) => updateDOF({ maxBlur: parseFloat(e.target.value) })}
-                className="w-full accent-purple-500"
+                onChange={(v) => updateDOF({ maxBlur: v })}
+                
               />
             </div>
           </Section>
@@ -527,14 +528,14 @@ export function FocusPanel({ config, onChange, onFocusPointPick }: FocusPanelPro
                   {config.bokeh.rotation}°
                 </span>
               </div>
-              <input
-                type="range"
+              <ThrottledRangeInput
+                
                 min={0}
                 max={360}
                 step={15}
                 value={config.bokeh.rotation}
-                onChange={(e) => updateBokeh({ rotation: parseInt(e.target.value) })}
-                className="w-full accent-purple-500"
+                onChange={(v) => updateBokeh({ rotation: v })}
+                
               />
             </div>
 
@@ -546,14 +547,14 @@ export function FocusPanel({ config, onChange, onFocusPointPick }: FocusPanelPro
                   {(config.bokeh.luminanceThreshold * 100).toFixed(0)}%
                 </span>
               </div>
-              <input
-                type="range"
+              <ThrottledRangeInput
+                
                 min={0}
                 max={1}
                 step={0.05}
                 value={config.bokeh.luminanceThreshold}
-                onChange={(e) => updateBokeh({ luminanceThreshold: parseFloat(e.target.value) })}
-                className="w-full accent-purple-500"
+                onChange={(v) => updateBokeh({ luminanceThreshold: v })}
+                
               />
             </div>
 
@@ -565,14 +566,14 @@ export function FocusPanel({ config, onChange, onFocusPointPick }: FocusPanelPro
                   {config.bokeh.luminanceGain.toFixed(1)}x
                 </span>
               </div>
-              <input
-                type="range"
+              <ThrottledRangeInput
+                
                 min={0}
                 max={2}
                 step={0.1}
                 value={config.bokeh.luminanceGain}
-                onChange={(e) => updateBokeh({ luminanceGain: parseFloat(e.target.value) })}
-                className="w-full accent-purple-500"
+                onChange={(v) => updateBokeh({ luminanceGain: v })}
+                
               />
             </div>
           </Section>
@@ -594,14 +595,14 @@ export function FocusPanel({ config, onChange, onFocusPointPick }: FocusPanelPro
                   {(config.tiltShift.blur * 100).toFixed(0)}%
                 </span>
               </div>
-              <input
-                type="range"
+              <ThrottledRangeInput
+                
                 min={0}
                 max={1}
                 step={0.05}
                 value={config.tiltShift.blur}
-                onChange={(e) => updateTiltShift({ blur: parseFloat(e.target.value) })}
-                className="w-full accent-purple-500"
+                onChange={(v) => updateTiltShift({ blur: v })}
+                
               />
             </div>
 
@@ -611,26 +612,26 @@ export function FocusPanel({ config, onChange, onFocusPointPick }: FocusPanelPro
               <div className="flex gap-2">
                 <div className="flex-1">
                   <label className="text-[9px] text-white/30">Başlangıç</label>
-                  <input
-                    type="range"
+                  <ThrottledRangeInput
+                    
                     min={0}
                     max={0.5}
                     step={0.05}
                     value={config.tiltShift.gradientStart}
-                    onChange={(e) => updateTiltShift({ gradientStart: parseFloat(e.target.value) })}
-                    className="w-full accent-purple-500"
+                    onChange={(v) => updateTiltShift({ gradientStart: v })}
+                    
                   />
                 </div>
                 <div className="flex-1">
                   <label className="text-[9px] text-white/30">Bitiş</label>
-                  <input
-                    type="range"
+                  <ThrottledRangeInput
+                    
                     min={0.5}
                     max={1}
                     step={0.05}
                     value={config.tiltShift.gradientEnd}
-                    onChange={(e) => updateTiltShift({ gradientEnd: parseFloat(e.target.value) })}
-                    className="w-full accent-purple-500"
+                    onChange={(v) => updateTiltShift({ gradientEnd: v })}
+                    
                   />
                 </div>
               </div>
@@ -644,14 +645,14 @@ export function FocusPanel({ config, onChange, onFocusPointPick }: FocusPanelPro
                   {config.tiltShift.angle}°
                 </span>
               </div>
-              <input
-                type="range"
+              <ThrottledRangeInput
+                
                 min={-90}
                 max={90}
                 step={15}
                 value={config.tiltShift.angle}
-                onChange={(e) => updateTiltShift({ angle: parseInt(e.target.value) })}
-                className="w-full accent-purple-500"
+                onChange={(v) => updateTiltShift({ angle: v })}
+                
               />
             </div>
 
@@ -663,14 +664,14 @@ export function FocusPanel({ config, onChange, onFocusPointPick }: FocusPanelPro
                   {(config.tiltShift.focusBandWidth * 100).toFixed(0)}%
                 </span>
               </div>
-              <input
-                type="range"
+              <ThrottledRangeInput
+                
                 min={0.1}
                 max={0.8}
                 step={0.05}
                 value={config.tiltShift.focusBandWidth}
-                onChange={(e) => updateTiltShift({ focusBandWidth: parseFloat(e.target.value) })}
-                className="w-full accent-purple-500"
+                onChange={(v) => updateTiltShift({ focusBandWidth: v })}
+                
               />
             </div>
           </Section>
@@ -693,16 +694,16 @@ export function FocusPanel({ config, onChange, onFocusPointPick }: FocusPanelPro
                   {(config.focusBreathing.amount * 100).toFixed(0)}%
                 </span>
               </div>
-              <input
-                type="range"
+              <ThrottledRangeInput
+                
                 min={0}
                 max={0.3}
                 step={0.01}
                 value={config.focusBreathing.amount}
-                onChange={(e) => onChange({
-                  focusBreathing: { ...config.focusBreathing, amount: parseFloat(e.target.value) }
+                onChange={(v) => onChange({
+                  focusBreathing: { ...config.focusBreathing, amount: v }
                 })}
-                className="w-full accent-purple-500"
+                
               />
             </div>
 
@@ -713,16 +714,16 @@ export function FocusPanel({ config, onChange, onFocusPointPick }: FocusPanelPro
                   {config.focusBreathing.speed.toFixed(1)} Hz
                 </span>
               </div>
-              <input
-                type="range"
+              <ThrottledRangeInput
+                
                 min={0.1}
                 max={2}
                 step={0.1}
                 value={config.focusBreathing.speed}
-                onChange={(e) => onChange({
-                  focusBreathing: { ...config.focusBreathing, speed: parseFloat(e.target.value) }
+                onChange={(v) => onChange({
+                  focusBreathing: { ...config.focusBreathing, speed: v }
                 })}
-                className="w-full accent-purple-500"
+                
               />
             </div>
           </Section>
