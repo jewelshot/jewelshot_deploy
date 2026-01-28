@@ -70,13 +70,13 @@ import {
 
 // New organized right panel
 import { ThreeDRightPanel } from '@/components/organisms/ThreeDRightPanel';
-import { DEFAULT_GROUND_CONFIG, type GroundPlaneConfig } from '@/components/molecules/3d/GroundPlane';
+import { GroundPlane, DEFAULT_GROUND_CONFIG, type GroundPlaneConfig } from '@/components/molecules/3d/GroundPlane';
 import { DEFAULT_LIGHTING_CONFIG, type LightingConfig } from '@/components/molecules/3d/LightingPanel';
 import { DEFAULT_BACKGROUND_CONFIG, type BackgroundConfig } from '@/components/molecules/3d/BackgroundPanel';
 import { DEFAULT_EDGE_SMOOTHING_CONFIG, type EdgeSmoothingConfig } from '@/components/molecules/3d/EdgeSmoothingPanel';
 import { DEFAULT_HDR_CONFIG, type HDRConfig } from '@/components/molecules/3d/HDRPanel';
 import { DEFAULT_DIAMOND_CONFIG, type DiamondConfig } from '@/components/molecules/3d/DiamondPanel';
-import { DEFAULT_POST_PROCESSING_CONFIG, type PostProcessingConfig } from '@/components/molecules/3d';
+import { DEFAULT_POST_PROCESSING_CONFIG, type PostProcessingConfig, PostProcessingEffects } from '@/components/molecules/3d';
 import { METAL_PRESETS as MATERIAL_METAL_PRESETS, type MaterialConfig } from '@/components/molecules/3d/MaterialEditor';
 import { DEFAULT_VIDEO_CONFIG, type VideoExportConfig, type RecordingState } from '@/components/molecules/3d/VideoExportPanel';
 import { DEFAULT_TURNTABLE_CONFIG, type TurntableConfig } from '@/components/molecules/3d/TurntableController';
@@ -388,10 +388,12 @@ function LayerModel({
   layer,
   material,
   wireframe = false,
+  diamondConfig,
 }: { 
   layer: ModelLayer;
   material: MaterialPreset;
   wireframe?: boolean;
+  diamondConfig?: DiamondConfig;
 }) {
   if (!layer.visible) return null;
   
@@ -404,15 +406,30 @@ function LayerModel({
       castShadow 
       receiveShadow
     >
-      {isGem ? (
-        // Enhanced gem material with transparency and refraction (for diamonds, rubies, etc.)
+      {isGem && diamondConfig?.enabled ? (
+        // Enhanced gem material using diamondConfig
+        <meshPhysicalMaterial
+          color={diamondConfig.color || material.color}
+          metalness={0}
+          roughness={material.roughness}
+          transmission={diamondConfig.transmission}
+          thickness={diamondConfig.thickness}
+          ior={diamondConfig.ior}
+          envMapIntensity={diamondConfig.envMapIntensity}
+          clearcoat={diamondConfig.clearcoat}
+          clearcoatRoughness={diamondConfig.clearcoatRoughness}
+          wireframe={wireframe}
+          // Note: dispersion/brilliance require custom shader
+        />
+      ) : isGem ? (
+        // Default gem material (no config)
         <meshPhysicalMaterial
           color={material.color}
           metalness={0}
           roughness={material.roughness}
           transmission={0.95}
           thickness={0.5}
-          ior={2.42} // Diamond IOR
+          ior={2.42}
           envMapIntensity={2.5}
           clearcoat={1}
           clearcoatRoughness={0}
@@ -541,6 +558,11 @@ function SceneContent({
   envRotation,
   adaptiveResolution,
   onResolutionChange,
+  // New configs
+  groundConfig,
+  postProcessingConfig,
+  diamondConfig,
+  onBoundingBoxChange,
 }: {
   geometry: THREE.BufferGeometry | null;
   material: MaterialPreset;
@@ -561,6 +583,11 @@ function SceneContent({
   envRotation: [number, number, number];
   adaptiveResolution: boolean;
   onResolutionChange?: (ratio: number, isRefining: boolean) => void;
+  // New configs
+  groundConfig: GroundPlaneConfig;
+  postProcessingConfig: PostProcessingConfig;
+  diamondConfig: DiamondConfig;
+  onBoundingBoxChange?: (box: THREE.Box3 | null) => void;
 }) {
   const controlsRef = useRef<any>(null);
   const groupRef = useRef<THREE.Group>(null);
@@ -570,12 +597,43 @@ function SceneContent({
     position: THREE.Vector3;
     scale: number;
   } | null>(null);
+  const [modelBoundingBox, setModelBoundingBox] = useState<THREE.Box3 | null>(null);
 
   useEffect(() => {
     if (controlsRef.current) {
       onControlsReady(controlsRef.current);
     }
   }, [onControlsReady]);
+  
+  // Calculate bounding box for ground plane
+  useEffect(() => {
+    if (geometry) {
+      const tempGeom = geometry.clone();
+      tempGeom.computeBoundingBox();
+      if (tempGeom.boundingBox) {
+        setModelBoundingBox(tempGeom.boundingBox.clone());
+        onBoundingBoxChange?.(tempGeom.boundingBox.clone());
+      }
+    } else if (layers.length > 0) {
+      // Calculate combined bounding box from layers
+      const combinedBox = new THREE.Box3();
+      layers.forEach(layer => {
+        if (layer.visible && layer.geometry) {
+          layer.geometry.computeBoundingBox();
+          if (layer.geometry.boundingBox) {
+            combinedBox.union(layer.geometry.boundingBox);
+          }
+        }
+      });
+      if (!combinedBox.isEmpty()) {
+        setModelBoundingBox(combinedBox);
+        onBoundingBoxChange?.(combinedBox);
+      }
+    } else {
+      setModelBoundingBox(null);
+      onBoundingBoxChange?.(null);
+    }
+  }, [geometry, layers, onBoundingBoxChange]);
 
   // Fit camera to model
   const fitToView = useCallback(() => {
@@ -772,6 +830,14 @@ function SceneContent({
           infiniteGrid
         />
       )}
+      
+      {/* Ground Plane */}
+      {groundConfig.enabled && (
+        <GroundPlane 
+          config={groundConfig}
+          modelBoundingBox={modelBoundingBox}
+        />
+      )}
 
       {/* STL Model */}
       {geometry && modelTransform && (
@@ -806,6 +872,7 @@ function SceneContent({
               layer={layer}
               material={layerMaterials[layer.id] || METAL_PRESETS[0]}
               wireframe={wireframe}
+              diamondConfig={diamondConfig}
             />
           ))}
         </group>
@@ -846,6 +913,11 @@ function SceneContent({
         autoRotate={autoRotate}
         onResolutionChange={onResolutionChange}
       />
+      
+      {/* Post-Processing Effects */}
+      {postProcessingConfig.enabled && (
+        <PostProcessingEffects config={postProcessingConfig} />
+      )}
     </>
   );
 }
@@ -982,6 +1054,14 @@ export default function ThreeDViewContent() {
     completedImages: [],
     currentAngleName: ''
   });
+  
+  // ===== SYNC NEW CONFIGS TO OLD SCENE VARIABLES =====
+  // Sync backgroundConfig with backgroundColor
+  useEffect(() => {
+    if (backgroundConfig.type === 'solid' && backgroundConfig.solidColor) {
+      setBackgroundColor(backgroundConfig.solidColor);
+    }
+  }, [backgroundConfig]);
   
   // Resolution change callback
   const handleResolutionChange = useCallback((ratio: number, refining: boolean) => {
@@ -1960,6 +2040,10 @@ export default function ThreeDViewContent() {
                 envRotation={envRotation}
                 adaptiveResolution={adaptiveResolution}
                 onResolutionChange={handleResolutionChange}
+                // New configs
+                groundConfig={groundConfig}
+                postProcessingConfig={postProcessingConfig}
+                diamondConfig={diamondConfig}
               />
               <SnapshotHelper onSnapshot={handleSnapshotResult} />
             </Suspense>

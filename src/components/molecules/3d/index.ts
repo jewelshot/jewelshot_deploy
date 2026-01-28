@@ -50,6 +50,7 @@ export { DiamondEffectsPanel } from './DiamondEffectsPanel';
 
 // Post-Processing
 export { PostProcessingPanel as PostProcessingPanelNew, type PostProcessingConfig, DEFAULT_POST_PROCESSING_CONFIG, POST_PROCESSING_PRESETS } from './PostProcessingPanel';
+export { PostProcessingEffects } from './PostProcessingEffects';
 
 // Video Export
 export { VideoExportPanel, type VideoExportConfig, type RecordingState, DEFAULT_VIDEO_CONFIG } from './VideoExportPanel';
