@@ -8,7 +8,7 @@
 
 'use client';
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Layers,
@@ -119,7 +119,7 @@ interface LayerItemRowProps {
   compact?: boolean;
 }
 
-function LayerItemRow({
+const LayerItemRow = memo(function LayerItemRow({
   layer,
   isSelected,
   onSelect,
@@ -199,7 +199,7 @@ function LayerItemRow({
       )}
     </motion.div>
   );
-}
+});
 
 // ============================================
 // GROUP HEADER COMPONENT
@@ -211,7 +211,7 @@ interface GroupHeaderProps {
   onToggleAllVisibility: () => void;
 }
 
-function GroupHeader({ group, onToggleExpand, onToggleAllVisibility }: GroupHeaderProps) {
+const GroupHeader = memo(function GroupHeader({ group, onToggleExpand, onToggleAllVisibility }: GroupHeaderProps) {
   const categoryConfig = CATEGORY_CONFIG[group.id as LayerCategory] || CATEGORY_CONFIG.unknown;
   
   return (
@@ -252,7 +252,7 @@ function GroupHeader({ group, onToggleExpand, onToggleAllVisibility }: GroupHead
       </button>
     </div>
   );
-}
+});
 
 // ============================================
 // MAIN COMPONENT
