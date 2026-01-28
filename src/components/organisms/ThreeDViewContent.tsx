@@ -2268,15 +2268,54 @@ export default function ThreeDViewContent() {
               videoConfig={videoConfig}
               onVideoConfigChange={(updates) => setVideoConfig(prev => ({ ...prev, ...updates }))}
               recordingState={recordingState}
-              onStartRecording={() => console.log('Start recording')}
-              onStopRecording={() => console.log('Stop recording')}
-              onPauseRecording={() => console.log('Pause recording')}
+              onStartRecording={() => {
+                // Convert videoConfig to VideoConfig format and export
+                const config: VideoConfig = {
+                  format: videoConfig.format === 'gif' ? 'gif' : 'webm',
+                  quality: videoConfig.quality === 'high' ? 0.95 : videoConfig.quality === 'medium' ? 0.8 : 0.6,
+                  fps: videoConfig.fps,
+                  duration: videoConfig.duration,
+                  resolution: { 
+                    id: 'custom',
+                    name: `${videoConfig.width}x${videoConfig.height}`,
+                    width: videoConfig.width, 
+                    height: videoConfig.height,
+                    aspectRatio: `${videoConfig.width}:${videoConfig.height}`,
+                  },
+                  rotationType: 'turntable',
+                  rotationDegrees: 360,
+                };
+                handleExportVideo(config);
+              }}
+              onStopRecording={() => {
+                setIsExporting(false);
+                setExportProgress(null);
+              }}
+              onPauseRecording={() => console.log('Pause not supported')}
               onTakeScreenshot={handleSnapshot}
               batchConfig={batchConfig}
               onBatchConfigChange={(updates) => setBatchConfig(prev => ({ ...prev, ...updates }))}
               batchProgress={batchProgress}
-              onStartBatchExport={() => console.log('Start batch export')}
-              onCancelBatchExport={() => console.log('Cancel batch export')}
+              onStartBatchExport={() => {
+                // Convert batchConfig angles to MultiAngleConfig format
+                const config: MultiAngleConfig = {
+                  angles: batchConfig.angles.map(a => a.id),
+                  format: batchConfig.format === 'png' ? 'png' : 'jpeg',
+                  resolution: { 
+                    id: 'custom',
+                    name: `${batchConfig.width}x${batchConfig.height}`,
+                    width: batchConfig.width, 
+                    height: batchConfig.height,
+                    aspectRatio: `${batchConfig.width}:${batchConfig.height}`,
+                  },
+                  quality: batchConfig.quality,
+                  namingPattern: batchConfig.namingPattern === 'angle' ? 'preset-name' : 'numbered',
+                };
+                handleExportMultiAngle(config);
+              }}
+              onCancelBatchExport={() => {
+                setIsExporting(false);
+              }}
               snapshotPreview={snapshotPreview}
               onDownloadSnapshot={handleDownloadSnapshot}
               onSaveToGallery={handleSaveToGallery}
