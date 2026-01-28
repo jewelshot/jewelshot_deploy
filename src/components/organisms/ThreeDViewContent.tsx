@@ -109,6 +109,27 @@ interface MaterialPreset {
   metalness: number;
   roughness: number;
   envMapIntensity: number;
+  // Advanced properties (optional for backwards compatibility)
+  clearcoat?: number;
+  clearcoatRoughness?: number;
+  transmission?: number;
+  thickness?: number;
+  ior?: number;
+  sheen?: number;
+  sheenRoughness?: number;
+  sheenColor?: string;
+  anisotropy?: number;
+  anisotropyRotation?: number;
+  iridescence?: number;
+  iridescenceIOR?: number;
+  specularIntensity?: number;
+  specularColor?: string;
+  emissive?: string;
+  emissiveIntensity?: number;
+  flatShading?: boolean;
+  wireframe?: boolean;
+  transparent?: boolean;
+  opacity?: number;
 }
 
 // Metal material presets
@@ -372,12 +393,19 @@ function Model({
 
   return (
     <mesh ref={meshRef} geometry={geometry} castShadow receiveShadow>
-      <meshStandardMaterial
+      <meshPhysicalMaterial
         color={material.color}
         metalness={material.metalness}
         roughness={material.roughness}
         envMapIntensity={material.envMapIntensity}
         wireframe={wireframe}
+        clearcoat={material.clearcoat ?? 0}
+        clearcoatRoughness={material.clearcoatRoughness ?? 0}
+        sheen={material.sheen ?? 0}
+        sheenRoughness={material.sheenRoughness ?? 0}
+        sheenColor={material.sheenColor || '#ffffff'}
+        anisotropy={material.anisotropy ?? 0}
+        specularIntensity={material.specularIntensity ?? 1}
       />
     </mesh>
   );
@@ -407,19 +435,30 @@ function LayerModel({
       receiveShadow
     >
       {isGem && diamondConfig?.enabled ? (
-        // Enhanced gem material using diamondConfig
+        // Enhanced gem material using full diamondConfig
         <meshPhysicalMaterial
           color={diamondConfig.color || material.color}
           metalness={0}
-          roughness={material.roughness}
+          roughness={0.02} // Gems are very smooth
           transmission={diamondConfig.transmission}
           thickness={diamondConfig.thickness}
           ior={diamondConfig.ior}
           envMapIntensity={diamondConfig.envMapIntensity}
           clearcoat={diamondConfig.clearcoat}
           clearcoatRoughness={diamondConfig.clearcoatRoughness}
+          // Use brilliance and fire for sheen
+          sheen={diamondConfig.brilliance || 0}
+          sheenRoughness={0.3}
+          sheenColor={diamondConfig.color || '#ffffff'}
+          // Use dispersion for iridescence (rainbow effect)
+          iridescence={diamondConfig.dispersion || 0}
+          iridescenceIOR={diamondConfig.ior || 2.42}
+          iridescenceThicknessRange={[100, 400]}
+          // Scintillation affects specular
+          specularIntensity={1 + (diamondConfig.scintillation || 0)}
           wireframe={wireframe}
-          // Note: dispersion/brilliance require custom shader
+          transparent
+          opacity={1}
         />
       ) : isGem ? (
         // Default gem material (no config)
@@ -436,13 +475,21 @@ function LayerModel({
           wireframe={wireframe}
         />
       ) : (
-        // Metal material (gold, silver, platinum, etc.)
-        <meshStandardMaterial
+        // Metal material (gold, silver, platinum, etc.) with advanced properties
+        <meshPhysicalMaterial
           color={material.color}
           metalness={material.metalness}
           roughness={material.roughness}
           envMapIntensity={material.envMapIntensity}
           wireframe={wireframe}
+          // Advanced properties
+          clearcoat={material.clearcoat ?? 0}
+          clearcoatRoughness={material.clearcoatRoughness ?? 0}
+          sheen={material.sheen ?? 0}
+          sheenRoughness={material.sheenRoughness ?? 0}
+          sheenColor={material.sheenColor || '#ffffff'}
+          anisotropy={material.anisotropy ?? 0}
+          specularIntensity={material.specularIntensity ?? 1}
         />
       )}
     </mesh>
@@ -465,10 +512,12 @@ function AdaptiveResolutionController({
   const refinementStartTime = useRef<number | null>(null);
   const currentRatio = useRef(1);
   
-  const minRatio = 0.3;
+  // FIXED: Previous minRatio=0.3 caused smudge/muddy effect
+  // Now using 0.75 for much better quality during movement
+  const minRatio = 0.75;
   const maxRatio = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, 2) : 2;
-  const idleDelay = 80; // ms before starting refinement
-  const refinementDuration = 400; // ms for full refinement
+  const idleDelay = 50; // ms before starting refinement (faster)
+  const refinementDuration = 200; // ms for full refinement (faster)
   
   useFrame(() => {
     if (!enabled) return;
@@ -861,12 +910,32 @@ function SceneContent({
             scale={[modelTransform.scale, modelTransform.scale, modelTransform.scale]}
           >
             <mesh ref={meshRef} geometry={geometry} castShadow receiveShadow>
-              <meshStandardMaterial
+              <meshPhysicalMaterial
                 color={material.color}
                 metalness={material.metalness}
                 roughness={material.roughness}
                 envMapIntensity={material.envMapIntensity}
-                wireframe={wireframe}
+                wireframe={material.wireframe || wireframe}
+                // Advanced properties from materialConfig
+                clearcoat={material.clearcoat ?? 0}
+                clearcoatRoughness={material.clearcoatRoughness ?? 0}
+                transmission={material.transmission ?? 0}
+                thickness={material.thickness ?? 0}
+                ior={material.ior ?? 1.5}
+                sheen={material.sheen ?? 0}
+                sheenRoughness={material.sheenRoughness ?? 0}
+                sheenColor={material.sheenColor || '#ffffff'}
+                anisotropy={material.anisotropy ?? 0}
+                anisotropyRotation={material.anisotropyRotation ?? 0}
+                iridescence={material.iridescence ?? 0}
+                iridescenceIOR={material.iridescenceIOR ?? 1.3}
+                specularIntensity={material.specularIntensity ?? 1}
+                specularColor={material.specularColor || '#ffffff'}
+                emissive={material.emissive || '#000000'}
+                emissiveIntensity={material.emissiveIntensity ?? 0}
+                flatShading={material.flatShading ?? false}
+                transparent={material.transparent ?? false}
+                opacity={material.opacity ?? 1}
               />
             </mesh>
           </group>
@@ -1172,16 +1241,31 @@ export default function ThreeDViewContent() {
     }
   }, [lightingConfig]);
   
-  // Sync materialConfig with selectedMaterial
+  // Sync materialConfig with selectedMaterial - using available properties
   useEffect(() => {
     // Map new material config to old format
-    const syncedMaterial = {
+    const syncedMaterial: MaterialPreset = {
       id: materialConfig.id || 'custom',
       name: materialConfig.name || 'Custom',
       color: materialConfig.color,
       metalness: materialConfig.metalness,
       roughness: materialConfig.roughness,
       envMapIntensity: materialConfig.envMapIntensity || 1.5,
+      // Advanced properties from MaterialConfig
+      clearcoat: materialConfig.clearcoat,
+      clearcoatRoughness: materialConfig.clearcoatRoughness,
+      transmission: materialConfig.transmission,
+      thickness: materialConfig.thickness,
+      ior: materialConfig.ior,
+      sheen: materialConfig.sheen ?? (materialConfig.sheenRoughness ? 1 : 0),
+      sheenRoughness: materialConfig.sheenRoughness,
+      sheenColor: materialConfig.sheenColor,
+      anisotropy: materialConfig.anisotropy,
+      anisotropyRotation: materialConfig.anisotropyRotation,
+      iridescence: materialConfig.iridescence ?? (materialConfig.iridescenceIOR ? 1 : 0),
+      iridescenceIOR: materialConfig.iridescenceIOR,
+      specularIntensity: materialConfig.specularIntensity,
+      specularColor: materialConfig.specularColor,
     };
     setSelectedMaterial(syncedMaterial);
   }, [materialConfig]);

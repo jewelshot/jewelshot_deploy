@@ -125,34 +125,88 @@ export function GroundPlane({
     return null;
   }
 
+  // Calculate plane size (infinite or fixed)
+  const planeSize = config.infinitePlane ? 100 : config.size;
+  
+  // Get texture color based on preset
+  const getTextureColor = () => {
+    switch (config.texture) {
+      case 'marble': return '#e8e8e8';
+      case 'wood': return '#8b4513';
+      case 'velvet': return '#3d2317';
+      case 'concrete': return '#7a7a7a';
+      default: return config.color;
+    }
+  };
+
   return (
     <group position={[0, finalHeight, 0]}>
-      {/* Main reflective ground plane */}
-      <mesh
-        ref={meshRef}
-        rotation={[-Math.PI / 2, 0, 0]}
-        receiveShadow={config.receiveShadow}
-      >
-        <planeGeometry args={[config.size, config.size]} />
-        <MeshReflectorMaterial
-          color={config.color}
-          blur={[config.blur, config.blur]}
-          resolution={512}
-          mixBlur={1}
-          mixStrength={config.reflectivity}
-          roughness={1}
-          depthScale={1}
-          minDepthThreshold={0.4}
-          maxDepthThreshold={1.4}
-          metalness={0}
-          mirror={0}
-        />
-      </mesh>
+      {/* Shadow Catcher Mode - transparent ground that only shows shadows */}
+      {config.shadowCatcherOnly ? (
+        <mesh
+          ref={meshRef}
+          rotation={[-Math.PI / 2, 0, 0]}
+          receiveShadow
+        >
+          <planeGeometry args={[planeSize, planeSize]} />
+          <shadowMaterial 
+            transparent 
+            opacity={config.shadowOpacity ?? 0.5} 
+          />
+        </mesh>
+      ) : (
+        /* Main reflective ground plane */
+        <mesh
+          ref={meshRef}
+          rotation={[-Math.PI / 2, 0, 0]}
+          receiveShadow={config.receiveShadow}
+        >
+          <planeGeometry args={[planeSize, planeSize]} />
+          <MeshReflectorMaterial
+            color={getTextureColor()}
+            blur={[config.blur, config.blur]}
+            resolution={config.reflectionResolution || 512}
+            mixBlur={1}
+            mixStrength={config.reflectivity}
+            roughness={config.roughness ?? 0.8}
+            depthScale={1}
+            minDepthThreshold={0.4}
+            maxDepthThreshold={1.4}
+            metalness={0}
+            mirror={0}
+          />
+        </mesh>
+      )}
+
+      {/* Curved Background (Cyclorama) */}
+      {config.curvedBackground && (
+        <mesh
+          position={[0, config.curvedBackgroundHeight / 2, -planeSize / 2]}
+          rotation={[0, 0, 0]}
+        >
+          <cylinderGeometry 
+            args={[
+              planeSize / 2 + config.curvedBackgroundRadius, 
+              planeSize / 2 + config.curvedBackgroundRadius, 
+              config.curvedBackgroundHeight, 
+              32, 
+              1, 
+              true, 
+              Math.PI * 0.75, 
+              Math.PI * 0.5
+            ]} 
+          />
+          <meshStandardMaterial 
+            color={config.curvedBackgroundColor || config.color}
+            side={THREE.BackSide}
+          />
+        </mesh>
+      )}
 
       {/* Optional grid overlay */}
       {config.showGrid && (
         <gridHelper
-          args={[config.size, config.size / config.gridSize, config.gridColor, config.gridColor]}
+          args={[planeSize, planeSize / (config.gridSize || 1), config.gridColor, config.gridColor]}
           position={[0, 0.001, 0]}
         />
       )}
