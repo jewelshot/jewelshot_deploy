@@ -826,20 +826,95 @@ export async function parse3DMFile(
   
   console.log(`[Rhino3dm] Extracted ${layers.length} layers`);
   
+  // Extract objects first to build a lookup map
+  const objectTable = doc.objects();
+  const totalObjects = objectTable.count;
+  
+  // Build object lookup map by ID for instance reference resolution
+  const objectById: Map<string, { obj: any; index: number }> = new Map();
+  for (let i = 0; i < totalObjects; i++) {
+    try {
+      const obj = objectTable.get(i);
+      if (obj) {
+        const attrs = obj.attributes();
+        const id = attrs?.id;
+        if (id) {
+          objectById.set(id, { obj, index: i });
+        }
+      }
+    } catch (e) {
+      // Skip
+    }
+  }
+  console.log(`[Rhino3dm] Built object lookup map with ${objectById.size} entries`);
+  
   // Extract instance definitions (blocks) for InstanceReference expansion
-  const instanceDefinitions: Map<string, any[]> = new Map();
+  // Map from definition ID to array of object IDs in that definition
+  const instanceDefinitionObjectIds: Map<string, string[]> = new Map();
   try {
     const idefTable = doc.instanceDefinitions?.() || null;
     if (idefTable) {
-      console.log(`[Rhino3dm] Found ${idefTable.count || 0} instance definitions`);
-      for (let i = 0; i < (idefTable.count || 0); i++) {
+      const idefCount = idefTable.count ?? idefTable.length ?? 0;
+      console.log(`[Rhino3dm] Found ${idefCount} instance definitions`);
+      
+      for (let i = 0; i < idefCount; i++) {
         try {
           const idef = idefTable.get(i);
           if (idef) {
-            const id = idef.id || `idef-${i}`;
-            const geometry = idef.getObjects?.() || [];
-            console.log(`[Rhino3dm] InstanceDefinition ${i}: id=${id}, objectCount=${geometry.length}`);
-            instanceDefinitions.set(id, geometry);
+            const defId = idef.id || `idef-${i}`;
+            const defName = idef.name || `Block ${i}`;
+            
+            // Try getObjectIds() first (RhinoCommon API)
+            let objectIds: string[] = [];
+            
+            if (typeof idef.getObjectIds === 'function') {
+              try {
+                const ids = idef.getObjectIds();
+                if (ids && ids.length > 0) {
+                  objectIds = Array.from(ids);
+                  console.log(`[Rhino3dm] InstanceDefinition "${defName}" (${defId}): ${objectIds.length} object IDs via getObjectIds()`);
+                }
+              } catch (e) {
+                console.log(`[Rhino3dm] getObjectIds() failed for ${defName}:`, e);
+              }
+            }
+            
+            // Try objectIds property
+            if (objectIds.length === 0 && idef.objectIds) {
+              try {
+                const ids = idef.objectIds;
+                if (ids && (ids.length || ids.count)) {
+                  const count = ids.length || ids.count || 0;
+                  for (let j = 0; j < count; j++) {
+                    const id = typeof ids.get === 'function' ? ids.get(j) : ids[j];
+                    if (id) objectIds.push(id);
+                  }
+                  console.log(`[Rhino3dm] InstanceDefinition "${defName}": ${objectIds.length} object IDs via objectIds property`);
+                }
+              } catch (e) {
+                console.log(`[Rhino3dm] objectIds property failed for ${defName}:`, e);
+              }
+            }
+            
+            // Try getObjects() (legacy approach)
+            if (objectIds.length === 0 && typeof idef.getObjects === 'function') {
+              try {
+                const objs = idef.getObjects();
+                if (objs && objs.length > 0) {
+                  // These might be the actual objects, not IDs
+                  // Store them as special entries
+                  console.log(`[Rhino3dm] InstanceDefinition "${defName}": ${objs.length} objects via getObjects()`);
+                  // We'll handle this case in the InstanceReference processing
+                  (instanceDefinitionObjectIds as any).set(`${defId}:objects`, objs);
+                }
+              } catch (e) {
+                console.log(`[Rhino3dm] getObjects() failed for ${defName}:`, e);
+              }
+            }
+            
+            if (objectIds.length > 0) {
+              instanceDefinitionObjectIds.set(defId, objectIds);
+            }
           }
         } catch (e) {
           console.warn(`[Rhino3dm] Failed to get instance definition ${i}:`, e);
@@ -850,10 +925,10 @@ export async function parse3DMFile(
     console.log('[Rhino3dm] No instance definitions table or failed to read:', e);
   }
   
-  // Extract objects
+  console.log(`[Rhino3dm] Extracted ${instanceDefinitionObjectIds.size} instance definitions with object IDs`);
+  
+  // Now process objects
   const objects: RhinoObject[] = [];
-  const objectTable = doc.objects();
-  const totalObjects = objectTable.count;
   
   console.log(`[Rhino3dm] Processing ${totalObjects} objects...`);
   
@@ -970,29 +1045,65 @@ export async function parse3DMFile(
         // Get the transform for this instance
         let instanceTransform = null;
         try {
-          instanceTransform = geometry.xform || geometry.transform;
+          // Try different property names for transform
+          instanceTransform = geometry.xform || geometry.transform || geometry.Xform;
+          if (!instanceTransform && typeof geometry.xform === 'function') {
+            instanceTransform = geometry.xform();
+          }
+          console.log(`[Rhino3dm] Object ${i}: Transform available: ${!!instanceTransform}`);
         } catch (e) {
           console.log(`[Rhino3dm] Object ${i}: No transform available`);
         }
         
         // Try to get the parent definition ID
         try {
-          const parentIdefId = geometry.parentIdefId;
+          // Try different property names
+          const parentIdefId = geometry.parentIdefId || geometry.ParentIdefId || geometry.parentId;
           console.log(`[Rhino3dm] Object ${i}: InstanceReference parentIdefId=${parentIdefId}`);
           
-          // Look up in our instance definitions map
-          if (parentIdefId && instanceDefinitions.has(parentIdefId)) {
-            const defObjects = instanceDefinitions.get(parentIdefId)!;
-            console.log(`[Rhino3dm] Object ${i}: Found ${defObjects.length} objects in definition`);
+          if (parentIdefId) {
+            // Method 1: Look up by object IDs in the definition
+            if (instanceDefinitionObjectIds.has(parentIdefId)) {
+              const objectIds = instanceDefinitionObjectIds.get(parentIdefId)!;
+              console.log(`[Rhino3dm] Object ${i}: Found ${objectIds.length} object IDs in definition`);
+              
+              for (const objId of objectIds) {
+                const objEntry = objectById.get(objId);
+                if (objEntry) {
+                  const defObj = objEntry.obj;
+                  const defGeom = defObj.geometry?.() || defObj.geometry;
+                  if (defGeom) {
+                    // Clone the geometry to avoid modifying the original
+                    const bufferGeometry = tryConvertToMesh(defGeom, rhino, i);
+                    if (bufferGeometry) {
+                      // Clone geometry before applying transform
+                      const clonedGeometry = bufferGeometry.clone();
+                      if (addObject(clonedGeometry, attributes, `InstanceOf:${geometryTypeName}`, i, instanceTransform)) {
+                        instanceConverted = true;
+                      }
+                    }
+                  }
+                }
+              }
+            }
             
-            for (let j = 0; j < defObjects.length; j++) {
-              const defObj = defObjects[j];
-              if (defObj) {
-                const defGeom = defObj.geometry?.() || defObj;
-                if (defGeom) {
-                  const bufferGeometry = tryConvertToMesh(defGeom, rhino, i);
-                  if (bufferGeometry && addObject(bufferGeometry, attributes, geometryTypeName, i, instanceTransform)) {
-                    instanceConverted = true;
+            // Method 2: Try direct objects from getObjects()
+            const directObjects = (instanceDefinitionObjectIds as any).get(`${parentIdefId}:objects`);
+            if (!instanceConverted && directObjects && directObjects.length > 0) {
+              console.log(`[Rhino3dm] Object ${i}: Trying ${directObjects.length} direct objects from getObjects()`);
+              
+              for (let j = 0; j < directObjects.length; j++) {
+                const defObj = directObjects[j];
+                if (defObj) {
+                  const defGeom = typeof defObj.geometry === 'function' ? defObj.geometry() : defObj;
+                  if (defGeom) {
+                    const bufferGeometry = tryConvertToMesh(defGeom, rhino, i);
+                    if (bufferGeometry) {
+                      const clonedGeometry = bufferGeometry.clone();
+                      if (addObject(clonedGeometry, attributes, `InstanceOf:${geometryTypeName}`, i, instanceTransform)) {
+                        instanceConverted = true;
+                      }
+                    }
                   }
                 }
               }
@@ -1003,7 +1114,15 @@ export async function parse3DMFile(
         }
         
         if (!instanceConverted) {
-          console.log(`[Rhino3dm] Object ${i}: InstanceReference couldn't be expanded - this is a limitation of rhino3dm WASM`);
+          // Log more details about why it failed
+          console.log(`[Rhino3dm] Object ${i}: InstanceReference couldn't be expanded.`);
+          console.log(`[Rhino3dm] Available properties on geometry:`, Object.keys(geometry || {}).slice(0, 20));
+          try {
+            console.log(`[Rhino3dm] geometry.parentIdefId:`, geometry.parentIdefId);
+            console.log(`[Rhino3dm] geometry.objectType:`, geometry.objectType);
+          } catch (e) {
+            // Ignore
+          }
           skippedCount++;
         }
         continue;
