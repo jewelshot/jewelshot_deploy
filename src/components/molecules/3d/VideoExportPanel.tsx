@@ -35,6 +35,12 @@ export type VideoFormat = 'webm' | 'mp4' | 'gif';
 export type VideoQuality = 'low' | 'medium' | 'high' | 'ultra';
 export type AnimationType = 'turntable' | 'custom' | 'static';
 
+// Easing types
+export type EasingType = 'linear' | 'easeIn' | 'easeOut' | 'easeInOut' | 'bounce' | 'elastic';
+
+// Loop modes
+export type LoopMode = 'none' | 'loop' | 'pingPong' | 'boomerang';
+
 export interface VideoExportConfig {
   format: VideoFormat;
   quality: VideoQuality;
@@ -48,6 +54,39 @@ export interface VideoExportConfig {
   turntableAxis: 'y' | 'x' | 'z';
   includeAudio: boolean;
   transparentBackground: boolean;
+  // NEW: Easing
+  easing: EasingType;
+  // NEW: Loop mode
+  loopMode: LoopMode;
+  loopCount: number; // 0 = infinite
+  // NEW: Watermark/Logo
+  watermark: {
+    enabled: boolean;
+    imageUrl: string | null;
+    position: 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight' | 'center';
+    size: number; // percentage 5-30
+    opacity: number; // 0-1
+  };
+  // NEW: Intro/Outro
+  intro: {
+    enabled: boolean;
+    duration: number; // seconds
+    fadeIn: boolean;
+    text: string;
+  };
+  outro: {
+    enabled: boolean;
+    duration: number;
+    fadeOut: boolean;
+    text: string;
+  };
+  // NEW: Speed ramping
+  speedRamping: {
+    enabled: boolean;
+    startSpeed: number; // 0.5-2
+    endSpeed: number;
+    curve: 'linear' | 'smooth';
+  };
 }
 
 export const DEFAULT_VIDEO_CONFIG: VideoExportConfig = {
@@ -63,7 +102,55 @@ export const DEFAULT_VIDEO_CONFIG: VideoExportConfig = {
   turntableAxis: 'y',
   includeAudio: false,
   transparentBackground: false,
+  // NEW defaults
+  easing: 'linear',
+  loopMode: 'none',
+  loopCount: 0,
+  watermark: {
+    enabled: false,
+    imageUrl: null,
+    position: 'bottomRight',
+    size: 10,
+    opacity: 0.8,
+  },
+  intro: {
+    enabled: false,
+    duration: 1,
+    fadeIn: true,
+    text: '',
+  },
+  outro: {
+    enabled: false,
+    duration: 1,
+    fadeOut: true,
+    text: '',
+  },
+  speedRamping: {
+    enabled: false,
+    startSpeed: 1,
+    endSpeed: 1,
+    curve: 'smooth',
+  },
 };
+
+// Easing options for UI
+const EASING_OPTIONS: { id: EasingType; name: string }[] = [
+  { id: 'linear', name: 'Doğrusal' },
+  { id: 'easeIn', name: 'Yavaş Başla' },
+  { id: 'easeOut', name: 'Yavaş Bitir' },
+  { id: 'easeInOut', name: 'Yumuşak' },
+  { id: 'bounce', name: 'Zıplama' },
+  { id: 'elastic', name: 'Elastik' },
+];
+
+// Watermark positions
+const WATERMARK_POSITIONS = [
+  { id: 'topLeft', name: 'Sol Üst' },
+  { id: 'topRight', name: 'Sağ Üst' },
+  { id: 'bottomLeft', name: 'Sol Alt' },
+  { id: 'bottomRight', name: 'Sağ Alt' },
+  { id: 'center', name: 'Orta' },
+] as const;
 
 export interface RecordingState {
   isRecording: boolean;
@@ -436,6 +523,330 @@ export function VideoExportPanel({
               </div>
             </div>
           </div>
+
+          {/* Easing */}
+          <div className="space-y-2">
+            <span className="text-[10px] text-white/50">Animasyon Easing</span>
+            <div className="grid grid-cols-3 gap-1">
+              {EASING_OPTIONS.map((opt) => (
+                <button
+                  key={opt.id}
+                  onClick={() => onChange({ easing: opt.id })}
+                  className={`rounded-md py-1.5 text-[9px] transition-all ${
+                    config.easing === opt.id
+                      ? 'bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/50'
+                      : 'bg-white/5 text-white/50 hover:bg-white/10'
+                  }`}
+                >
+                  {opt.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Loop Mode */}
+          <div className="space-y-2">
+            <span className="text-[10px] text-white/50">Döngü Modu</span>
+            <div className="grid grid-cols-4 gap-1">
+              {([
+                { id: 'none', name: 'Yok' },
+                { id: 'loop', name: 'Döngü' },
+                { id: 'pingPong', name: 'İleri-Geri' },
+                { id: 'boomerang', name: 'Bumerang' },
+              ] as const).map((mode) => (
+                <button
+                  key={mode.id}
+                  onClick={() => onChange({ loopMode: mode.id })}
+                  className={`rounded-md py-1.5 text-[8px] transition-all ${
+                    config.loopMode === mode.id
+                      ? 'bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/50'
+                      : 'bg-white/5 text-white/50 hover:bg-white/10'
+                  }`}
+                >
+                  {mode.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Advanced Toggle */}
+          <button
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            className="w-full rounded-md border border-white/10 bg-white/5 py-1.5 text-[10px] text-white/50 hover:bg-white/10"
+          >
+            {showAdvanced ? 'Gelişmiş Ayarları Gizle' : 'Gelişmiş Ayarlar'}
+          </button>
+
+          {/* Advanced Settings */}
+          <AnimatePresence>
+            {showAdvanced && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="space-y-3 overflow-hidden"
+              >
+                {/* Watermark */}
+                <div className="rounded-lg border border-white/10 bg-white/5 p-3 space-y-2">
+                  <label className="flex cursor-pointer items-center justify-between">
+                    <span className="text-[10px] text-white/60">Logo/Filigran</span>
+                    <button
+                      onClick={() => onChange({ 
+                        watermark: { ...config.watermark, enabled: !config.watermark.enabled } 
+                      })}
+                      className={`relative h-4 w-7 rounded-full transition-colors ${
+                        config.watermark.enabled ? 'bg-purple-500' : 'bg-white/20'
+                      }`}
+                    >
+                      <span
+                        className={`absolute left-0.5 top-0.5 h-3 w-3 rounded-full bg-white transition-transform ${
+                          config.watermark.enabled ? 'translate-x-3' : 'translate-x-0'
+                        }`}
+                      />
+                    </button>
+                  </label>
+
+                  {config.watermark.enabled && (
+                    <div className="space-y-2 pt-2">
+                      {/* Position */}
+                      <div className="grid grid-cols-5 gap-1">
+                        {WATERMARK_POSITIONS.map((pos) => (
+                          <button
+                            key={pos.id}
+                            onClick={() => onChange({ 
+                              watermark: { ...config.watermark, position: pos.id } 
+                            })}
+                            className={`rounded py-1 text-[7px] transition-all ${
+                              config.watermark.position === pos.id
+                                ? 'bg-purple-500/20 text-purple-300'
+                                : 'bg-white/5 text-white/40 hover:bg-white/10'
+                            }`}
+                          >
+                            {pos.name}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Size */}
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] text-white/40">Boyut</span>
+                          <span className="text-[10px] font-mono text-white/50">
+                            {config.watermark.size}%
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min={5}
+                          max={30}
+                          step={1}
+                          value={config.watermark.size}
+                          onChange={(e) => onChange({ 
+                            watermark: { ...config.watermark, size: parseInt(e.target.value) } 
+                          })}
+                          className="w-full accent-purple-500"
+                        />
+                      </div>
+
+                      {/* Opacity */}
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] text-white/40">Opaklık</span>
+                          <span className="text-[10px] font-mono text-white/50">
+                            {Math.round(config.watermark.opacity * 100)}%
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min={0.1}
+                          max={1}
+                          step={0.1}
+                          value={config.watermark.opacity}
+                          onChange={(e) => onChange({ 
+                            watermark: { ...config.watermark, opacity: parseFloat(e.target.value) } 
+                          })}
+                          className="w-full accent-purple-500"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Speed Ramping */}
+                <div className="rounded-lg border border-white/10 bg-white/5 p-3 space-y-2">
+                  <label className="flex cursor-pointer items-center justify-between">
+                    <span className="text-[10px] text-white/60">Hız Geçişi</span>
+                    <button
+                      onClick={() => onChange({ 
+                        speedRamping: { ...config.speedRamping, enabled: !config.speedRamping.enabled } 
+                      })}
+                      className={`relative h-4 w-7 rounded-full transition-colors ${
+                        config.speedRamping.enabled ? 'bg-purple-500' : 'bg-white/20'
+                      }`}
+                    >
+                      <span
+                        className={`absolute left-0.5 top-0.5 h-3 w-3 rounded-full bg-white transition-transform ${
+                          config.speedRamping.enabled ? 'translate-x-3' : 'translate-x-0'
+                        }`}
+                      />
+                    </button>
+                  </label>
+
+                  {config.speedRamping.enabled && (
+                    <div className="space-y-2 pt-2">
+                      {/* Start Speed */}
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] text-white/40">Başlangıç Hızı</span>
+                          <span className="text-[10px] font-mono text-white/50">
+                            {config.speedRamping.startSpeed}x
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min={0.25}
+                          max={2}
+                          step={0.25}
+                          value={config.speedRamping.startSpeed}
+                          onChange={(e) => onChange({ 
+                            speedRamping: { ...config.speedRamping, startSpeed: parseFloat(e.target.value) } 
+                          })}
+                          className="w-full accent-purple-500"
+                        />
+                      </div>
+
+                      {/* End Speed */}
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] text-white/40">Bitiş Hızı</span>
+                          <span className="text-[10px] font-mono text-white/50">
+                            {config.speedRamping.endSpeed}x
+                          </span>
+                        </div>
+                        <input
+                          type="range"
+                          min={0.25}
+                          max={2}
+                          step={0.25}
+                          value={config.speedRamping.endSpeed}
+                          onChange={(e) => onChange({ 
+                            speedRamping: { ...config.speedRamping, endSpeed: parseFloat(e.target.value) } 
+                          })}
+                          className="w-full accent-purple-500"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Intro */}
+                <div className="rounded-lg border border-white/10 bg-white/5 p-3 space-y-2">
+                  <label className="flex cursor-pointer items-center justify-between">
+                    <span className="text-[10px] text-white/60">Açılış (Intro)</span>
+                    <button
+                      onClick={() => onChange({ 
+                        intro: { ...config.intro, enabled: !config.intro.enabled } 
+                      })}
+                      className={`relative h-4 w-7 rounded-full transition-colors ${
+                        config.intro.enabled ? 'bg-purple-500' : 'bg-white/20'
+                      }`}
+                    >
+                      <span
+                        className={`absolute left-0.5 top-0.5 h-3 w-3 rounded-full bg-white transition-transform ${
+                          config.intro.enabled ? 'translate-x-3' : 'translate-x-0'
+                        }`}
+                      />
+                    </button>
+                  </label>
+
+                  {config.intro.enabled && (
+                    <div className="space-y-2 pt-2">
+                      <div className="space-y-1">
+                        <span className="text-[10px] text-white/40">Süre (sn)</span>
+                        <div className="flex gap-1">
+                          {[0.5, 1, 2, 3].map((d) => (
+                            <button
+                              key={d}
+                              onClick={() => onChange({ intro: { ...config.intro, duration: d } })}
+                              className={`flex-1 rounded-md py-1 text-[9px] transition-all ${
+                                config.intro.duration === d
+                                  ? 'bg-purple-500/20 text-purple-300'
+                                  : 'bg-white/5 text-white/40 hover:bg-white/10'
+                              }`}
+                            >
+                              {d}s
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <label className="flex cursor-pointer items-center justify-between">
+                        <span className="text-[10px] text-white/40">Fade In</span>
+                        <input
+                          type="checkbox"
+                          checked={config.intro.fadeIn}
+                          onChange={(e) => onChange({ intro: { ...config.intro, fadeIn: e.target.checked } })}
+                          className="accent-purple-500"
+                        />
+                      </label>
+                    </div>
+                  )}
+                </div>
+
+                {/* Outro */}
+                <div className="rounded-lg border border-white/10 bg-white/5 p-3 space-y-2">
+                  <label className="flex cursor-pointer items-center justify-between">
+                    <span className="text-[10px] text-white/60">Kapanış (Outro)</span>
+                    <button
+                      onClick={() => onChange({ 
+                        outro: { ...config.outro, enabled: !config.outro.enabled } 
+                      })}
+                      className={`relative h-4 w-7 rounded-full transition-colors ${
+                        config.outro.enabled ? 'bg-purple-500' : 'bg-white/20'
+                      }`}
+                    >
+                      <span
+                        className={`absolute left-0.5 top-0.5 h-3 w-3 rounded-full bg-white transition-transform ${
+                          config.outro.enabled ? 'translate-x-3' : 'translate-x-0'
+                        }`}
+                      />
+                    </button>
+                  </label>
+
+                  {config.outro.enabled && (
+                    <div className="space-y-2 pt-2">
+                      <div className="space-y-1">
+                        <span className="text-[10px] text-white/40">Süre (sn)</span>
+                        <div className="flex gap-1">
+                          {[0.5, 1, 2, 3].map((d) => (
+                            <button
+                              key={d}
+                              onClick={() => onChange({ outro: { ...config.outro, duration: d } })}
+                              className={`flex-1 rounded-md py-1 text-[9px] transition-all ${
+                                config.outro.duration === d
+                                  ? 'bg-purple-500/20 text-purple-300'
+                                  : 'bg-white/5 text-white/40 hover:bg-white/10'
+                              }`}
+                            >
+                              {d}s
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <label className="flex cursor-pointer items-center justify-between">
+                        <span className="text-[10px] text-white/40">Fade Out</span>
+                        <input
+                          type="checkbox"
+                          checked={config.outro.fadeOut}
+                          onChange={(e) => onChange({ outro: { ...config.outro, fadeOut: e.target.checked } })}
+                          className="accent-purple-500"
+                        />
+                      </label>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Info */}
           <div className="rounded-lg border border-white/10 bg-white/5 p-2 flex justify-between text-[10px] text-white/50">
