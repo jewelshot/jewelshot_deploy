@@ -563,6 +563,9 @@ function SceneContent({
   postProcessingConfig,
   diamondConfig,
   onBoundingBoxChange,
+  // Turntable
+  turntableConfig,
+  isTurntablePlaying,
 }: {
   geometry: THREE.BufferGeometry | null;
   material: MaterialPreset;
@@ -588,6 +591,9 @@ function SceneContent({
   postProcessingConfig: PostProcessingConfig;
   diamondConfig: DiamondConfig;
   onBoundingBoxChange?: (box: THREE.Box3 | null) => void;
+  // Turntable
+  turntableConfig?: TurntableConfig;
+  isTurntablePlaying?: boolean;
 }) {
   const controlsRef = useRef<any>(null);
   const groupRef = useRef<THREE.Group>(null);
@@ -887,8 +893,8 @@ function SceneContent({
         enablePan
         enableZoom
         enableRotate
-        autoRotate={autoRotate}
-        autoRotateSpeed={2}
+        autoRotate={autoRotate || isTurntablePlaying}
+        autoRotateSpeed={turntableConfig?.speed || 2}
         minDistance={0.5}
         maxDistance={20}
         target={[0, 0, 0]}
@@ -1062,6 +1068,71 @@ export default function ThreeDViewContent() {
       setBackgroundColor(backgroundConfig.solidColor);
     }
   }, [backgroundConfig]);
+  
+  // Sync hdrConfig with useHDR and environment settings
+  useEffect(() => {
+    setUseHDR(hdrConfig.enabled);
+    setLightIntensity(hdrConfig.intensity);
+    // Sync environment rotation
+    setEnvRotation([
+      hdrConfig.rotation.x * (Math.PI / 180),
+      hdrConfig.rotation.y * (Math.PI / 180),
+      hdrConfig.rotation.z * (Math.PI / 180)
+    ]);
+  }, [hdrConfig]);
+  
+  // Sync lightingConfig with lighting settings
+  useEffect(() => {
+    // Map new lighting config to old format
+    if (lightingConfig.lights.length > 0) {
+      const keyLight = lightingConfig.lights.find(l => l.name.toLowerCase().includes('key')) || lightingConfig.lights[0];
+      const fillLight = lightingConfig.lights.find(l => l.name.toLowerCase().includes('fill'));
+      const backLight = lightingConfig.lights.find(l => l.name.toLowerCase().includes('back') || l.name.toLowerCase().includes('rim'));
+      
+      // Helper to convert position to tuple
+      const posToTuple = (pos: { x: number; y: number; z: number } | undefined, fallback: [number, number, number]): [number, number, number] => {
+        if (!pos) return fallback;
+        return [pos.x, pos.y, pos.z];
+      };
+      
+      // Create a compatible lighting preset from new config
+      const syncedLighting: LightingPreset = {
+        id: 'synced',
+        name: 'Custom',
+        ambient: lightingConfig.ambientIntensity,
+        main: {
+          intensity: keyLight?.intensity || 4.0,
+          color: keyLight?.color || '#ffffff',
+          position: posToTuple(keyLight?.position, [5, 8, 5]),
+        },
+        fill: {
+          intensity: fillLight?.intensity || 2.5,
+          color: fillLight?.color || '#e0e8ff',
+          position: posToTuple(fillLight?.position, [-5, 3, -3]),
+        },
+        back: {
+          intensity: backLight?.intensity || 2.0,
+          color: backLight?.color || '#fff5e0',
+          position: posToTuple(backLight?.position, [0, 5, -8]),
+        },
+      };
+      setSelectedLighting(syncedLighting);
+    }
+  }, [lightingConfig]);
+  
+  // Sync materialConfig with selectedMaterial
+  useEffect(() => {
+    // Map new material config to old format
+    const syncedMaterial = {
+      id: materialConfig.id || 'custom',
+      name: materialConfig.name || 'Custom',
+      color: materialConfig.color,
+      metalness: materialConfig.metalness,
+      roughness: materialConfig.roughness,
+      envMapIntensity: materialConfig.envMapIntensity || 1.5,
+    };
+    setSelectedMaterial(syncedMaterial);
+  }, [materialConfig]);
   
   // Resolution change callback
   const handleResolutionChange = useCallback((ratio: number, refining: boolean) => {
@@ -2044,6 +2115,9 @@ export default function ThreeDViewContent() {
                 groundConfig={groundConfig}
                 postProcessingConfig={postProcessingConfig}
                 diamondConfig={diamondConfig}
+                // Turntable
+                turntableConfig={turntableConfig}
+                isTurntablePlaying={isTurntablePlaying}
               />
               <SnapshotHelper onSnapshot={handleSnapshotResult} />
             </Suspense>
