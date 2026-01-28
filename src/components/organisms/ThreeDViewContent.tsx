@@ -54,6 +54,8 @@ import {
   MousePointer2,
 } from 'lucide-react';
 import { useSidebarStore } from '@/store/sidebarStore';
+import { useObjectPicker } from '@/hooks/useObjectPicker';
+import { SelectionOutline } from '@/components/organisms/canvas/SelectionOutline';
 import { Accordion } from '@/components/atoms/Accordion';
 import { ExportPanel } from '@/components/molecules/3d/ExportPanel';
 import { 
@@ -404,7 +406,7 @@ function Model({
   const meshRef = useRef<THREE.Mesh>(null);
 
   return (
-    <mesh ref={meshRef} geometry={geometry} castShadow receiveShadow>
+    <mesh ref={meshRef} geometry={geometry} castShadow receiveShadow userData={{ selectable: true, id: 'main-mesh' }}>
       <meshPhysicalMaterial
         color={material.color}
         metalness={material.metalness}
@@ -445,6 +447,7 @@ function LayerModel({
       geometry={layer.geometry} 
       castShadow 
       receiveShadow
+      userData={{ selectable: true, layerId: layer.id, layerName: layer.name }}
     >
       {isGem && diamondConfig?.enabled ? (
         // Enhanced gem material using full diamondConfig
@@ -598,6 +601,39 @@ function AdaptiveResolutionController({
   return null;
 }
 
+// Selection Manager - handles object picking and selection outline
+function SelectionManager({
+  onSelect,
+  selectedObject,
+  enabled = true,
+}: {
+  onSelect: (objectId: string | null, mesh: THREE.Object3D | null) => void;
+  selectedObject: THREE.Object3D | null;
+  enabled?: boolean;
+}) {
+  // Use the object picker hook
+  useObjectPicker({
+    onSelect,
+    enabled,
+    hoverCursor: 'pointer',
+  });
+
+  // Render selection outline for selected object
+  const selectedObjects = useMemo(() => {
+    return selectedObject ? [selectedObject] : [];
+  }, [selectedObject]);
+
+  return (
+    <SelectionOutline
+      selectedObjects={selectedObjects}
+      outlineColor="#ff6600"
+      edgeStrength={4}
+      edgeThickness={1.5}
+      enabled={enabled && selectedObjects.length > 0}
+    />
+  );
+}
+
 // Scene content component
 function SceneContent({
   geometry,
@@ -630,6 +666,10 @@ function SceneContent({
   isTurntablePlaying,
   // Focus
   focusConfig,
+  // Selection
+  onSelectObject,
+  selectedMesh,
+  selectionEnabled = true,
 }: {
   geometry: THREE.BufferGeometry | null;
   material: MaterialPreset;
@@ -661,6 +701,10 @@ function SceneContent({
   isTurntablePlaying?: boolean;
   // Focus
   focusConfig?: FocusConfig;
+  // Selection
+  onSelectObject?: (objectId: string | null, mesh: THREE.Object3D | null) => void;
+  selectedMesh?: THREE.Object3D | null;
+  selectionEnabled?: boolean;
 }) {
   const controlsRef = useRef<any>(null);
   const groupRef = useRef<THREE.Group>(null);
@@ -925,7 +969,7 @@ function SceneContent({
             ]}
             scale={[modelTransform.scale, modelTransform.scale, modelTransform.scale]}
           >
-            <mesh ref={meshRef} geometry={geometry} castShadow receiveShadow>
+            <mesh ref={meshRef} geometry={geometry} castShadow receiveShadow userData={{ selectable: true, id: 'stl-mesh' }}>
               <meshPhysicalMaterial
                 color={material.color}
                 metalness={material.metalness}
@@ -1010,6 +1054,15 @@ function SceneContent({
       {/* Post-Processing Effects */}
       {postProcessingConfig.enabled && (
         <PostProcessingEffects config={postProcessingConfig} focusConfig={focusConfig} />
+      )}
+      
+      {/* Selection Manager - handles object picking and outline */}
+      {onSelectObject && (
+        <SelectionManager
+          onSelect={onSelectObject}
+          selectedObject={selectedMesh || null}
+          enabled={selectionEnabled}
+        />
       )}
     </>
   );
@@ -1147,6 +1200,12 @@ export default function ThreeDViewContent() {
     completedImages: [],
     currentAngleName: ''
   });
+  
+  // ===== SELECTION STATE =====
+  const [selectedObjectId, setSelectedObjectId] = useState<string | null>(null);
+  const [selectedMeshRef, setSelectedMeshRef] = useState<THREE.Object3D | null>(null);
+  const [transformMode, setTransformMode] = useState<'translate' | 'rotate' | 'scale'>('translate');
+  const [isTransforming, setIsTransforming] = useState(false);
   
   // NEW panel states
   const [measurementConfig, setMeasurementConfig] = useState<MeasurementConfig>(DEFAULT_MEASUREMENT_CONFIG);
@@ -2357,6 +2416,13 @@ export default function ThreeDViewContent() {
                 isTurntablePlaying={isTurntablePlaying}
                 // Focus
                 focusConfig={focusConfig}
+                // Selection
+                onSelectObject={(objectId, mesh) => {
+                  setSelectedObjectId(objectId);
+                  setSelectedMeshRef(mesh);
+                }}
+                selectedMesh={selectedMeshRef}
+                selectionEnabled={!isTransforming}
               />
               <SnapshotHelper onSnapshot={handleSnapshotResult} />
             </Suspense>
