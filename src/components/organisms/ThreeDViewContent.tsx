@@ -55,6 +55,18 @@ import {
 } from 'lucide-react';
 import { useSidebarStore } from '@/store/sidebarStore';
 import { Accordion } from '@/components/atoms/Accordion';
+import { ExportPanel } from '@/components/molecules/3d/ExportPanel';
+import { 
+  type ScreenshotConfig, 
+  type VideoConfig, 
+  type MultiAngleConfig,
+  downloadBlob,
+  generateFilename,
+} from '@/lib/3d/export-utils';
+import { 
+  exportTurntableVideo,
+  type FrameCaptureProgress,
+} from '@/lib/3d/video-export';
 
 // Rhino3dm - Will be loaded dynamically when needed
 // Note: 3DM support requires additional setup due to WASM complexity
@@ -884,6 +896,12 @@ export default function ThreeDViewContent() {
   // Edge smoothing (0 = sharp, 1 = smooth)
   const [edgeSmoothing, setEdgeSmoothing] = useState(0);
   
+  // Export state
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState<FrameCaptureProgress | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const initialRotation = useRef<[number, number, number]>(modelRotation);
+  
   // Resolution change callback
   const handleResolutionChange = useCallback((ratio: number, refining: boolean) => {
     setCurrentResolution(ratio);
@@ -1373,6 +1391,223 @@ export default function ThreeDViewContent() {
     setModelInfo(null);
   }, []);
 
+  // Export: Screenshot with config
+  const handleExportScreenshot = useCallback(async (config: ScreenshotConfig) => {
+    setIsExporting(true);
+    
+    // Hide grid/gizmo during export
+    setIsSnapshotMode(true);
+    
+    await new Promise(resolve => setTimeout(resolve, 150)); // Wait for re-render
+    
+    try {
+      const canvas = document.querySelector('canvas');
+      if (!canvas) throw new Error('Canvas not found');
+      
+      // Create offscreen canvas at target resolution
+      const offscreenCanvas = document.createElement('canvas');
+      offscreenCanvas.width = config.resolution.width;
+      offscreenCanvas.height = config.resolution.height;
+      const ctx = offscreenCanvas.getContext('2d');
+      
+      if (!ctx) throw new Error('Failed to get 2D context');
+      
+      // Handle background
+      if (!config.transparentBackground || config.format !== 'png') {
+        ctx.fillStyle = config.format === 'jpeg' ? '#ffffff' : backgroundColor;
+        ctx.fillRect(0, 0, config.resolution.width, config.resolution.height);
+      }
+      
+      // Draw the WebGL canvas to offscreen canvas
+      ctx.drawImage(canvas, 0, 0, config.resolution.width, config.resolution.height);
+      
+      // Convert to blob and download
+      const mimeType = config.format === 'png' ? 'image/png' : config.format === 'jpeg' ? 'image/jpeg' : 'image/webp';
+      const blob = await new Promise<Blob>((resolve, reject) => {
+        offscreenCanvas.toBlob(
+          (b) => b ? resolve(b) : reject(new Error('Failed to create blob')),
+          mimeType,
+          config.quality
+        );
+      });
+      
+      const filename = generateFilename(fileName?.replace(/\.[^/.]+$/, '') || 'model', config.format);
+      downloadBlob(blob, filename);
+      
+      // Also set as preview
+      setSnapshotPreview(offscreenCanvas.toDataURL(mimeType, config.quality));
+    } catch (error) {
+      console.error('Screenshot export error:', error);
+      alert('Failed to export screenshot');
+    } finally {
+      setIsSnapshotMode(false);
+      setIsExporting(false);
+    }
+  }, [backgroundColor, fileName]);
+
+  // Export: Video/GIF
+  const handleExportVideo = useCallback(async (config: VideoConfig) => {
+    setIsExporting(true);
+    setExportProgress({ currentFrame: 0, totalFrames: config.fps * config.duration, phase: 'capturing' });
+    
+    // Store initial rotation
+    initialRotation.current = [...modelRotation];
+    
+    // Hide UI during capture
+    setIsSnapshotMode(true);
+    await new Promise(resolve => setTimeout(resolve, 150));
+    
+    try {
+      const canvas = document.querySelector('canvas');
+      if (!canvas) throw new Error('Canvas not found');
+      
+      // Function to rotate model during capture
+      const rotateModelForCapture = (angleDegrees: number) => {
+        const angleRad = (angleDegrees * Math.PI) / 180;
+        setModelRotation([
+          initialRotation.current[0],
+          initialRotation.current[1] + angleRad,
+          initialRotation.current[2],
+        ]);
+      };
+      
+      await exportTurntableVideo({
+        canvas,
+        config,
+        rotateModel: rotateModelForCapture,
+        onProgress: setExportProgress,
+        hideUI: () => setIsSnapshotMode(true),
+        restoreUI: () => {
+          setIsSnapshotMode(false);
+          // Restore original rotation
+          setModelRotation(initialRotation.current);
+        },
+      });
+      
+    } catch (error) {
+      console.error('Video export error:', error);
+      alert(`Video export failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsSnapshotMode(false);
+      setIsExporting(false);
+      setExportProgress(null);
+      // Restore original rotation
+      setModelRotation(initialRotation.current);
+    }
+  }, [modelRotation]);
+
+  // Export: Multi-angle
+  const handleExportMultiAngle = useCallback(async (config: MultiAngleConfig) => {
+    setIsExporting(true);
+    
+    // Hide UI during capture
+    setIsSnapshotMode(true);
+    await new Promise(resolve => setTimeout(resolve, 150));
+    
+    try {
+      const canvas = document.querySelector('canvas');
+      if (!canvas) throw new Error('Canvas not found');
+      
+      const exportedImages: { name: string; dataUrl: string }[] = [];
+      
+      // Save current camera position
+      const currentRotation = [...modelRotation] as [number, number, number];
+      
+      // Camera angle mappings (simplified Y-axis rotations for demo)
+      const angleMap: Record<string, [number, number, number]> = {
+        'front': [currentRotation[0], 0, currentRotation[2]],
+        'back': [currentRotation[0], Math.PI, currentRotation[2]],
+        'left': [currentRotation[0], -Math.PI / 2, currentRotation[2]],
+        'right': [currentRotation[0], Math.PI / 2, currentRotation[2]],
+        'top': [-Math.PI / 2, 0, currentRotation[2]],
+        'bottom': [Math.PI / 2, 0, currentRotation[2]],
+        'three-quarter': [currentRotation[0] - 0.3, Math.PI / 4, currentRotation[2]],
+        'hero': [currentRotation[0] - 0.2, Math.PI / 5, currentRotation[2]],
+        'low-angle': [currentRotation[0] + 0.3, Math.PI / 4, currentRotation[2]],
+        'close-up': [currentRotation[0], 0, currentRotation[2]],
+      };
+      
+      for (let i = 0; i < config.angles.length; i++) {
+        const angleId = config.angles[i];
+        const rotation = angleMap[angleId] || currentRotation;
+        
+        // Set rotation
+        setModelRotation(rotation);
+        
+        // Wait for render
+        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise(resolve => requestAnimationFrame(() => {
+          requestAnimationFrame(resolve);
+        }));
+        
+        // Create offscreen canvas at target resolution
+        const offscreenCanvas = document.createElement('canvas');
+        offscreenCanvas.width = config.resolution.width;
+        offscreenCanvas.height = config.resolution.height;
+        const ctx = offscreenCanvas.getContext('2d');
+        
+        if (!ctx) throw new Error('Failed to get 2D context');
+        
+        // Handle background
+        if (config.format === 'jpeg') {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, config.resolution.width, config.resolution.height);
+        }
+        
+        // Draw canvas
+        ctx.drawImage(canvas, 0, 0, config.resolution.width, config.resolution.height);
+        
+        const mimeType = config.format === 'png' ? 'image/png' : config.format === 'jpeg' ? 'image/jpeg' : 'image/webp';
+        const dataUrl = offscreenCanvas.toDataURL(mimeType, config.quality);
+        
+        exportedImages.push({
+          name: `${fileName?.replace(/\.[^/.]+$/, '') || 'model'}_${angleId}.${config.format}`,
+          dataUrl,
+        });
+        
+        setExportProgress({
+          currentFrame: i + 1,
+          totalFrames: config.angles.length,
+          phase: 'capturing',
+        });
+      }
+      
+      // Restore rotation
+      setModelRotation(currentRotation);
+      
+      // Download all images
+      setExportProgress({
+        currentFrame: config.angles.length,
+        totalFrames: config.angles.length,
+        phase: 'encoding',
+      });
+      
+      // Download each image with a small delay
+      for (let i = 0; i < exportedImages.length; i++) {
+        const { name, dataUrl } = exportedImages[i];
+        const link = document.createElement('a');
+        link.download = name;
+        link.href = dataUrl;
+        link.click();
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
+      
+      setExportProgress({
+        currentFrame: config.angles.length,
+        totalFrames: config.angles.length,
+        phase: 'complete',
+      });
+      
+    } catch (error) {
+      console.error('Multi-angle export error:', error);
+      alert(`Multi-angle export failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsSnapshotMode(false);
+      setIsExporting(false);
+      setExportProgress(null);
+    }
+  }, [modelRotation, fileName]);
+
   // Get current material presets
   const currentPresets = materialType === 'metal' 
     ? METAL_PRESETS 
@@ -1659,7 +1894,7 @@ export default function ThreeDViewContent() {
           )}
           
           {/* Resolution indicator */}
-          {adaptiveResolution && (loadedGeometry || layers.length > 0) && (
+          {adaptiveResolution && (loadedGeometry || layers.length > 0) && !exportProgress && (
             <div className="absolute bottom-4 right-4 flex items-center gap-2 rounded-lg bg-black/60 px-3 py-2 backdrop-blur-sm">
               <div className={`h-2 w-2 rounded-full ${isRefining ? 'bg-orange-400 animate-pulse' : 'bg-green-400'}`} />
               <span className="text-[10px] text-white/50">
@@ -1668,6 +1903,33 @@ export default function ThreeDViewContent() {
               <span className="text-[10px] font-mono text-white/30">
                 {Math.round(currentResolution * 100)}%
               </span>
+            </div>
+          )}
+          
+          {/* Export Progress Indicator */}
+          {exportProgress && (
+            <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+              <div className="rounded-2xl border border-white/10 bg-black/80 p-6 text-center shadow-2xl">
+                <Loader2 className="mx-auto h-8 w-8 animate-spin text-purple-400" />
+                <h3 className="mt-4 text-lg font-medium text-white">
+                  {exportProgress.phase === 'capturing' ? 'Capturing Frames...' : 
+                   exportProgress.phase === 'encoding' ? 'Encoding Video...' : 'Complete!'}
+                </h3>
+                <p className="mt-2 text-sm text-white/60">
+                  Frame {exportProgress.currentFrame} / {exportProgress.totalFrames}
+                </p>
+                <div className="mt-4 h-2 w-48 overflow-hidden rounded-full bg-white/10">
+                  <div 
+                    className="h-full rounded-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-150"
+                    style={{ width: `${(exportProgress.currentFrame / exportProgress.totalFrames) * 100}%` }}
+                  />
+                </div>
+                {exportProgress.estimatedSize && (
+                  <p className="mt-2 text-xs text-white/40">
+                    Size: {exportProgress.estimatedSize}
+                  </p>
+                )}
+              </div>
             </div>
           )}
         </div>
@@ -1742,6 +2004,20 @@ export default function ThreeDViewContent() {
                 </div>
               )}
               
+              {/* Export Panel */}
+              {(loadedGeometry || layers.length > 0) && (
+                <div className="mb-6">
+                  <Accordion title="Export" defaultOpen={true}>
+                    <ExportPanel
+                      onScreenshot={handleExportScreenshot}
+                      onVideo={handleExportVideo}
+                      onMultiAngle={handleExportMultiAngle}
+                      isExporting={isExporting}
+                    />
+                  </Accordion>
+                </div>
+              )}
+
               {/* File Upload */}
               <div className="mb-6">
                 <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-white/50">

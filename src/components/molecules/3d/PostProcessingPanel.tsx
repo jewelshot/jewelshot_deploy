@@ -1,51 +1,191 @@
 /**
- * PostProcessingPanel - Post-processing effects control panel
+ * PostProcessingPanel - Post-processing effects controls
  * 
- * Atomic Architecture: Molecule component
- * Controls: Bloom, SSAO, DoF, Vignette, Tone Mapping, etc.
+ * Features:
+ * - Bloom (glow effect)
+ * - Depth of Field (bokeh)
+ * - SSAO (ambient occlusion)
+ * - Tone Mapping
+ * - Vignette
+ * - Color Grading
  */
 
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Sparkles,
-  Sun,
-  Eye,
-  Aperture,
-  Circle,
-  Contrast,
-  Film,
-  ChevronDown,
-  Check,
-  RotateCcw,
-} from 'lucide-react';
-import {
-  type PostProcessingConfig,
-  type BloomConfig,
-  type SSAOConfig,
-  type DepthOfFieldConfig,
-  type VignetteConfig,
-  type ToneMappingConfig,
-  POST_PROCESSING_PRESETS,
-  TONE_MAPPING_OPTIONS,
-  DEFAULT_POST_PROCESSING,
-  applyPreset,
-} from '@/lib/3d/post-processing';
+import { Sparkles, Eye, Sun, Palette, Target } from 'lucide-react';
 
 // ============================================
 // TYPES
 // ============================================
 
-interface PostProcessingPanelProps {
-  config: PostProcessingConfig;
-  onChange: (config: PostProcessingConfig) => void;
-  compact?: boolean;
+export type ToneMappingType = 
+  | 'none'
+  | 'linear'
+  | 'reinhard'
+  | 'cineon'
+  | 'aces'
+  | 'agx';
+
+export interface BloomConfig {
+  enabled: boolean;
+  intensity: number;
+  luminanceThreshold: number;
+  luminanceSmoothing: number;
+  radius: number;
 }
 
+export interface DOFConfig {
+  enabled: boolean;
+  focusDistance: number;
+  focalLength: number;
+  bokehScale: number;
+}
+
+export interface SSAOConfig {
+  enabled: boolean;
+  intensity: number;
+  radius: number;
+  samples: number;
+}
+
+export interface VignetteConfig {
+  enabled: boolean;
+  offset: number;
+  darkness: number;
+}
+
+export interface ColorGradingConfig {
+  enabled: boolean;
+  saturation: number;
+  contrast: number;
+  brightness: number;
+  hue: number;
+}
+
+export interface PostProcessingConfig {
+  enabled: boolean;
+  toneMapping: ToneMappingType;
+  exposure: number;
+  bloom: BloomConfig;
+  dof: DOFConfig;
+  ssao: SSAOConfig;
+  vignette: VignetteConfig;
+  colorGrading: ColorGradingConfig;
+}
+
+export const DEFAULT_POST_PROCESSING_CONFIG: PostProcessingConfig = {
+  enabled: true,
+  toneMapping: 'aces',
+  exposure: 1.0,
+  bloom: {
+    enabled: true,
+    intensity: 0.5,
+    luminanceThreshold: 0.9,
+    luminanceSmoothing: 0.025,
+    radius: 0.8,
+  },
+  dof: {
+    enabled: false,
+    focusDistance: 3,
+    focalLength: 50,
+    bokehScale: 2,
+  },
+  ssao: {
+    enabled: true,
+    intensity: 0.5,
+    radius: 0.1,
+    samples: 16,
+  },
+  vignette: {
+    enabled: false,
+    offset: 0.5,
+    darkness: 0.5,
+  },
+  colorGrading: {
+    enabled: false,
+    saturation: 1.0,
+    contrast: 1.0,
+    brightness: 0,
+    hue: 0,
+  },
+};
+
 // ============================================
-// TOGGLE EFFECT SECTION
+// PRESETS
+// ============================================
+
+export interface PostProcessingPreset {
+  id: string;
+  name: string;
+  nameTr: string;
+  config: Partial<PostProcessingConfig>;
+}
+
+export const POST_PROCESSING_PRESETS: PostProcessingPreset[] = [
+  {
+    id: 'none',
+    name: 'None',
+    nameTr: 'Yok',
+    config: {
+      enabled: false,
+    },
+  },
+  {
+    id: 'subtle',
+    name: 'Subtle',
+    nameTr: 'Hafif',
+    config: {
+      enabled: true,
+      toneMapping: 'aces',
+      exposure: 1.0,
+      bloom: { enabled: true, intensity: 0.3, luminanceThreshold: 0.95, luminanceSmoothing: 0.025, radius: 0.6 },
+      ssao: { enabled: true, intensity: 0.3, radius: 0.08, samples: 16 },
+    },
+  },
+  {
+    id: 'jewelry',
+    name: 'Jewelry',
+    nameTr: 'Mücevher',
+    config: {
+      enabled: true,
+      toneMapping: 'aces',
+      exposure: 1.1,
+      bloom: { enabled: true, intensity: 0.6, luminanceThreshold: 0.85, luminanceSmoothing: 0.03, radius: 0.9 },
+      ssao: { enabled: true, intensity: 0.5, radius: 0.1, samples: 24 },
+    },
+  },
+  {
+    id: 'dramatic',
+    name: 'Dramatic',
+    nameTr: 'Dramatik',
+    config: {
+      enabled: true,
+      toneMapping: 'cineon',
+      exposure: 1.2,
+      bloom: { enabled: true, intensity: 0.8, luminanceThreshold: 0.8, luminanceSmoothing: 0.04, radius: 1.0 },
+      vignette: { enabled: true, offset: 0.4, darkness: 0.6 },
+      ssao: { enabled: true, intensity: 0.7, radius: 0.15, samples: 32 },
+    },
+  },
+  {
+    id: 'cinematic',
+    name: 'Cinematic',
+    nameTr: 'Sinematik',
+    config: {
+      enabled: true,
+      toneMapping: 'agx',
+      exposure: 1.0,
+      bloom: { enabled: true, intensity: 0.4, luminanceThreshold: 0.9, luminanceSmoothing: 0.025, radius: 0.7 },
+      dof: { enabled: true, focusDistance: 3, focalLength: 85, bokehScale: 3 },
+      vignette: { enabled: true, offset: 0.5, darkness: 0.4 },
+    },
+  },
+];
+
+// ============================================
+// EFFECT SECTION COMPONENT
 // ============================================
 
 interface EffectSectionProps {
@@ -53,73 +193,44 @@ interface EffectSectionProps {
   icon: React.ReactNode;
   enabled: boolean;
   onToggle: () => void;
-  isOpen: boolean;
-  onToggleOpen: () => void;
   children: React.ReactNode;
-  color?: string;
 }
 
-function EffectSection({
-  title,
-  icon,
-  enabled,
-  onToggle,
-  isOpen,
-  onToggleOpen,
-  children,
-  color = 'purple',
-}: EffectSectionProps) {
-  const colorClasses = {
-    purple: 'border-purple-500/20 bg-purple-500/5',
-    cyan: 'border-cyan-500/20 bg-cyan-500/5',
-    amber: 'border-amber-500/20 bg-amber-500/5',
-    green: 'border-green-500/20 bg-green-500/5',
-  };
-
+function EffectSection({ title, icon, enabled, onToggle, children }: EffectSectionProps) {
   return (
-    <div className={`rounded-lg border ${enabled ? colorClasses[color as keyof typeof colorClasses] : 'border-white/10 bg-white/5'}`}>
-      <div
-        className="flex cursor-pointer items-center justify-between px-3 py-2"
-        onClick={onToggleOpen}
+    <div className="rounded-lg border border-white/10 bg-white/5">
+      <button
+        onClick={onToggle}
+        className="flex w-full items-center justify-between p-3"
       >
         <div className="flex items-center gap-2">
-          {/* Enable Toggle */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggle();
-            }}
-            className={`relative h-4 w-8 rounded-full transition-colors ${
-              enabled ? 'bg-purple-500' : 'bg-white/20'
-            }`}
-          >
-            <span
-              className={`absolute top-0.5 h-3 w-3 rounded-full bg-white transition-transform ${
-                enabled ? 'left-[16px]' : 'left-0.5'
-              }`}
-            />
-          </button>
-          
-          <span className={enabled ? 'text-white/80' : 'text-white/40'}>{icon}</span>
-          <span className={`text-xs font-medium ${enabled ? 'text-white/80' : 'text-white/40'}`}>
+          <span className={enabled ? 'text-purple-400' : 'text-white/40'}>{icon}</span>
+          <span className={`text-xs font-medium ${enabled ? 'text-white/80' : 'text-white/50'}`}>
             {title}
           </span>
         </div>
-        
-        <ChevronDown className={`h-4 w-4 text-white/40 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-      </div>
+        <div
+          className={`relative h-4 w-7 rounded-full transition-colors ${
+            enabled ? 'bg-purple-500' : 'bg-white/20'
+          }`}
+        >
+          <span
+            className={`absolute left-0.5 top-0.5 h-3 w-3 rounded-full bg-white transition-transform ${
+              enabled ? 'translate-x-3' : 'translate-x-0'
+            }`}
+          />
+        </div>
+      </button>
       
       <AnimatePresence>
-        {isOpen && enabled && (
+        {enabled && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden"
+            className="overflow-hidden border-t border-white/5"
           >
-            <div className="border-t border-white/10 px-3 py-3">
-              {children}
-            </div>
+            <div className="space-y-3 p-3">{children}</div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -128,7 +239,7 @@ function EffectSection({
 }
 
 // ============================================
-// SLIDER
+// SLIDER COMPONENT
 // ============================================
 
 interface SliderProps {
@@ -137,17 +248,17 @@ interface SliderProps {
   onChange: (value: number) => void;
   min: number;
   max: number;
-  step?: number;
-  unit?: string;
+  step: number;
+  format?: (v: number) => string;
 }
 
-function Slider({ label, value, onChange, min, max, step = 0.01, unit = '' }: SliderProps) {
+function Slider({ label, value, onChange, min, max, step, format }: SliderProps) {
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between">
         <span className="text-[10px] text-white/50">{label}</span>
         <span className="text-[10px] font-mono text-white/60">
-          {value.toFixed(step < 0.1 ? 2 : step < 1 ? 1 : 0)}{unit}
+          {format ? format(value) : value.toFixed(2)}
         </span>
       </div>
       <input
@@ -164,311 +275,272 @@ function Slider({ label, value, onChange, min, max, step = 0.01, unit = '' }: Sl
 }
 
 // ============================================
-// PRESET SELECTOR
+// MAIN PANEL COMPONENT
 // ============================================
 
-interface PresetSelectorProps {
-  onSelect: (presetId: string) => void;
+interface PostProcessingPanelProps {
+  config: PostProcessingConfig;
+  onChange: (config: Partial<PostProcessingConfig>) => void;
 }
 
-function PresetSelector({ onSelect }: PresetSelectorProps) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2"
-      >
-        <div className="flex items-center gap-2">
-          <Film className="h-4 w-4 text-purple-400" />
-          <span className="text-xs text-white/70">Hazır Stiller</span>
-        </div>
-        <ChevronDown className={`h-4 w-4 text-white/40 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-      </button>
-
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="absolute left-0 right-0 top-full z-20 mt-1 max-h-60 overflow-y-auto rounded-lg border border-white/10 bg-[#0a0a0a] p-1 shadow-xl"
-          >
-            {POST_PROCESSING_PRESETS.map((preset) => (
-              <button
-                key={preset.id}
-                onClick={() => {
-                  onSelect(preset.id);
-                  setIsOpen(false);
-                }}
-                className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left transition-colors hover:bg-white/10"
-              >
-                <div className="flex-1">
-                  <span className="text-xs font-medium text-white/80">{preset.nameTr}</span>
-                  <p className="text-[9px] text-white/40">{preset.descriptionTr}</p>
-                </div>
-              </button>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-// ============================================
-// MAIN COMPONENT
-// ============================================
-
-export function PostProcessingPanel({
-  config,
-  onChange,
-  compact = false,
-}: PostProcessingPanelProps) {
-  const [openSections, setOpenSections] = useState<Set<string>>(new Set(['bloom']));
-
-  const toggleSection = useCallback((section: string) => {
-    setOpenSections((prev) => {
-      const next = new Set(prev);
-      if (next.has(section)) {
-        next.delete(section);
-      } else {
-        next.add(section);
-      }
-      return next;
-    });
-  }, []);
-
-  // Update specific effect
-  const updateBloom = useCallback((updates: Partial<BloomConfig>) => {
-    onChange({ ...config, bloom: { ...config.bloom, ...updates } });
-  }, [config, onChange]);
-
-  const updateSSAO = useCallback((updates: Partial<SSAOConfig>) => {
-    onChange({ ...config, ssao: { ...config.ssao, ...updates } });
-  }, [config, onChange]);
-
-  const updateDoF = useCallback((updates: Partial<DepthOfFieldConfig>) => {
-    onChange({ ...config, dof: { ...config.dof, ...updates } });
-  }, [config, onChange]);
-
-  const updateVignette = useCallback((updates: Partial<VignetteConfig>) => {
-    onChange({ ...config, vignette: { ...config.vignette, ...updates } });
-  }, [config, onChange]);
-
-  const updateToneMapping = useCallback((updates: Partial<ToneMappingConfig>) => {
-    onChange({ ...config, toneMapping: { ...config.toneMapping, ...updates } });
-  }, [config, onChange]);
-
+export function PostProcessingPanel({ config, onChange }: PostProcessingPanelProps) {
   // Apply preset
-  const handlePresetSelect = useCallback((presetId: string) => {
-    onChange(applyPreset(config, presetId));
-  }, [config, onChange]);
+  const applyPreset = (preset: PostProcessingPreset) => {
+    onChange(preset.config);
+  };
 
-  // Reset
-  const handleReset = useCallback(() => {
-    onChange(DEFAULT_POST_PROCESSING);
-  }, [onChange]);
+  const updateBloom = (updates: Partial<BloomConfig>) => {
+    onChange({ bloom: { ...config.bloom, ...updates } });
+  };
+
+  const updateDOF = (updates: Partial<DOFConfig>) => {
+    onChange({ dof: { ...config.dof, ...updates } });
+  };
+
+  const updateSSAO = (updates: Partial<SSAOConfig>) => {
+    onChange({ ssao: { ...config.ssao, ...updates } });
+  };
+
+  const updateVignette = (updates: Partial<VignetteConfig>) => {
+    onChange({ vignette: { ...config.vignette, ...updates } });
+  };
+
+  const updateColorGrading = (updates: Partial<ColorGradingConfig>) => {
+    onChange({ colorGrading: { ...config.colorGrading, ...updates } });
+  };
 
   return (
-    <div className="space-y-3">
-      {/* Preset Selector */}
-      <PresetSelector onSelect={handlePresetSelect} />
+    <div className="space-y-4">
+      {/* Master Toggle */}
+      <label className="flex cursor-pointer items-center justify-between">
+        <span className="text-xs text-white/70">Post-Processing</span>
+        <button
+          onClick={() => onChange({ enabled: !config.enabled })}
+          className={`relative h-5 w-9 rounded-full transition-colors ${
+            config.enabled ? 'bg-purple-500' : 'bg-white/20'
+          }`}
+        >
+          <span
+            className={`absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white transition-transform ${
+              config.enabled ? 'translate-x-4' : 'translate-x-0'
+            }`}
+          />
+        </button>
+      </label>
 
-      {/* Reset Button */}
-      <button
-        onClick={handleReset}
-        className="flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 py-2 text-xs text-white/50 transition-colors hover:bg-white/10"
-      >
-        <RotateCcw className="h-3 w-3" />
-        Varsayılana Sıfırla
-      </button>
-
-      {/* Bloom */}
-      <EffectSection
-        title="Bloom (Parıltı Yayılması)"
-        icon={<Sparkles className="h-4 w-4" />}
-        enabled={config.bloom.enabled}
-        onToggle={() => updateBloom({ enabled: !config.bloom.enabled })}
-        isOpen={openSections.has('bloom')}
-        onToggleOpen={() => toggleSection('bloom')}
-        color="purple"
-      >
-        <div className="space-y-3">
-          <Slider
-            label="Yoğunluk"
-            value={config.bloom.intensity}
-            onChange={(v) => updateBloom({ intensity: v })}
-            min={0}
-            max={3}
-            step={0.1}
-          />
-          <Slider
-            label="Eşik"
-            value={config.bloom.threshold}
-            onChange={(v) => updateBloom({ threshold: v })}
-            min={0}
-            max={1}
-          />
-          <Slider
-            label="Yumuşaklık"
-            value={config.bloom.smoothing}
-            onChange={(v) => updateBloom({ smoothing: v })}
-            min={0}
-            max={0.1}
-            step={0.005}
-          />
-        </div>
-      </EffectSection>
-
-      {/* SSAO */}
-      <EffectSection
-        title="SSAO (Köşe Gölgeleri)"
-        icon={<Circle className="h-4 w-4" />}
-        enabled={config.ssao.enabled}
-        onToggle={() => updateSSAO({ enabled: !config.ssao.enabled })}
-        isOpen={openSections.has('ssao')}
-        onToggleOpen={() => toggleSection('ssao')}
-        color="cyan"
-      >
-        <div className="space-y-3">
-          <Slider
-            label="Yoğunluk"
-            value={config.ssao.intensity}
-            onChange={(v) => updateSSAO({ intensity: v })}
-            min={0}
-            max={1}
-          />
-          <Slider
-            label="Yarıçap"
-            value={config.ssao.radius}
-            onChange={(v) => updateSSAO({ radius: v })}
-            min={0.01}
-            max={0.5}
-          />
-          <Slider
-            label="Örnekler"
-            value={config.ssao.samples}
-            onChange={(v) => updateSSAO({ samples: Math.round(v) })}
-            min={8}
-            max={64}
-            step={4}
-          />
-        </div>
-      </EffectSection>
-
-      {/* Depth of Field */}
-      <EffectSection
-        title="Alan Derinliği (DoF)"
-        icon={<Aperture className="h-4 w-4" />}
-        enabled={config.dof.enabled}
-        onToggle={() => updateDoF({ enabled: !config.dof.enabled })}
-        isOpen={openSections.has('dof')}
-        onToggleOpen={() => toggleSection('dof')}
-        color="amber"
-      >
-        <div className="space-y-3">
-          <Slider
-            label="Odak Mesafesi"
-            value={config.dof.focusDistance}
-            onChange={(v) => updateDoF({ focusDistance: v })}
-            min={0.1}
-            max={20}
-            step={0.1}
-            unit="m"
-          />
-          <Slider
-            label="Diyafram (f-stop)"
-            value={config.dof.aperture}
-            onChange={(v) => updateDoF({ aperture: v })}
-            min={1.4}
-            max={22}
-            step={0.1}
-          />
-          <Slider
-            label="Bokeh Boyutu"
-            value={config.dof.bokehScale}
-            onChange={(v) => updateDoF({ bokehScale: v })}
-            min={0}
-            max={10}
-            step={0.5}
-          />
-        </div>
-      </EffectSection>
-
-      {/* Vignette */}
-      <EffectSection
-        title="Kenar Karartma"
-        icon={<Eye className="h-4 w-4" />}
-        enabled={config.vignette.enabled}
-        onToggle={() => updateVignette({ enabled: !config.vignette.enabled })}
-        isOpen={openSections.has('vignette')}
-        onToggleOpen={() => toggleSection('vignette')}
-        color="green"
-      >
-        <div className="space-y-3">
-          <Slider
-            label="Başlangıç"
-            value={config.vignette.offset}
-            onChange={(v) => updateVignette({ offset: v })}
-            min={0}
-            max={1}
-          />
-          <Slider
-            label="Karartma"
-            value={config.vignette.darkness}
-            onChange={(v) => updateVignette({ darkness: v })}
-            min={0}
-            max={1}
-          />
-        </div>
-      </EffectSection>
-
-      {/* Tone Mapping */}
-      <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-        <div className="mb-3 flex items-center gap-2">
-          <Contrast className="h-4 w-4 text-white/60" />
-          <span className="text-xs font-medium text-white/70">Ton Haritalama</span>
-        </div>
-        
-        <div className="space-y-3">
-          {/* Type Selector */}
-          <div className="grid grid-cols-3 gap-1">
-            {TONE_MAPPING_OPTIONS.map((opt) => (
-              <button
-                key={opt.id}
-                onClick={() => updateToneMapping({ type: opt.id as ToneMappingConfig['type'] })}
-                className={`rounded py-1.5 text-[9px] font-medium transition-colors ${
-                  config.toneMapping.type === opt.id
-                    ? 'bg-purple-500/30 text-purple-300'
-                    : 'bg-white/5 text-white/50 hover:bg-white/10'
-                }`}
-              >
-                {opt.nameTr}
-              </button>
-            ))}
+      {config.enabled && (
+        <>
+          {/* Presets */}
+          <div className="space-y-2">
+            <span className="text-[10px] text-white/50">Presetler</span>
+            <div className="grid grid-cols-3 gap-1">
+              {POST_PROCESSING_PRESETS.map((preset) => (
+                <button
+                  key={preset.id}
+                  onClick={() => applyPreset(preset)}
+                  className="rounded-md border border-white/10 bg-white/5 py-1.5 text-[10px] text-white/60 hover:bg-white/10"
+                >
+                  {preset.nameTr}
+                </button>
+              ))}
+            </div>
           </div>
-          
-          <Slider
-            label="Pozlama"
-            value={config.toneMapping.exposure}
-            onChange={(v) => updateToneMapping({ exposure: v })}
-            min={0}
-            max={4}
-            step={0.1}
-          />
-          
-          <Slider
-            label="Gama"
-            value={config.toneMapping.gamma}
-            onChange={(v) => updateToneMapping({ gamma: v })}
-            min={0.5}
-            max={2.5}
-            step={0.1}
-          />
-        </div>
-      </div>
+
+          {/* Tone Mapping & Exposure */}
+          <div className="rounded-lg border border-white/10 bg-white/5 p-3 space-y-3">
+            <div className="flex items-center gap-2">
+              <Sun className="h-3.5 w-3.5 text-white/50" />
+              <span className="text-xs text-white/70">Ton Haritalama</span>
+            </div>
+            
+            <div className="grid grid-cols-3 gap-1">
+              {(['none', 'linear', 'reinhard', 'cineon', 'aces', 'agx'] as ToneMappingType[]).map(
+                (type) => (
+                  <button
+                    key={type}
+                    onClick={() => onChange({ toneMapping: type })}
+                    className={`rounded-md py-1 text-[9px] transition-all ${
+                      config.toneMapping === type
+                        ? 'bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/50'
+                        : 'bg-white/5 text-white/50 hover:bg-white/10'
+                    }`}
+                  >
+                    {type.toUpperCase()}
+                  </button>
+                )
+              )}
+            </div>
+
+            <Slider
+              label="Pozlama"
+              value={config.exposure}
+              onChange={(exposure) => onChange({ exposure })}
+              min={0.1}
+              max={3}
+              step={0.1}
+            />
+          </div>
+
+          {/* Bloom */}
+          <EffectSection
+            title="Bloom"
+            icon={<Sparkles className="h-3.5 w-3.5" />}
+            enabled={config.bloom.enabled}
+            onToggle={() => updateBloom({ enabled: !config.bloom.enabled })}
+          >
+            <Slider
+              label="Yoğunluk"
+              value={config.bloom.intensity}
+              onChange={(intensity) => updateBloom({ intensity })}
+              min={0}
+              max={2}
+              step={0.1}
+            />
+            <Slider
+              label="Eşik"
+              value={config.bloom.luminanceThreshold}
+              onChange={(luminanceThreshold) => updateBloom({ luminanceThreshold })}
+              min={0}
+              max={1}
+              step={0.05}
+            />
+            <Slider
+              label="Yarıçap"
+              value={config.bloom.radius}
+              onChange={(radius) => updateBloom({ radius })}
+              min={0}
+              max={1.5}
+              step={0.1}
+            />
+          </EffectSection>
+
+          {/* Depth of Field */}
+          <EffectSection
+            title="Alan Derinliği"
+            icon={<Target className="h-3.5 w-3.5" />}
+            enabled={config.dof.enabled}
+            onToggle={() => updateDOF({ enabled: !config.dof.enabled })}
+          >
+            <Slider
+              label="Odak Mesafesi"
+              value={config.dof.focusDistance}
+              onChange={(focusDistance) => updateDOF({ focusDistance })}
+              min={0.5}
+              max={10}
+              step={0.1}
+            />
+            <Slider
+              label="Odak Uzunluğu (mm)"
+              value={config.dof.focalLength}
+              onChange={(focalLength) => updateDOF({ focalLength })}
+              min={20}
+              max={200}
+              step={5}
+              format={(v) => `${v}mm`}
+            />
+            <Slider
+              label="Bokeh Ölçeği"
+              value={config.dof.bokehScale}
+              onChange={(bokehScale) => updateDOF({ bokehScale })}
+              min={0}
+              max={6}
+              step={0.5}
+            />
+          </EffectSection>
+
+          {/* SSAO */}
+          <EffectSection
+            title="Ortam Tıkanıklığı (SSAO)"
+            icon={<Eye className="h-3.5 w-3.5" />}
+            enabled={config.ssao.enabled}
+            onToggle={() => updateSSAO({ enabled: !config.ssao.enabled })}
+          >
+            <Slider
+              label="Yoğunluk"
+              value={config.ssao.intensity}
+              onChange={(intensity) => updateSSAO({ intensity })}
+              min={0}
+              max={2}
+              step={0.1}
+            />
+            <Slider
+              label="Yarıçap"
+              value={config.ssao.radius}
+              onChange={(radius) => updateSSAO({ radius })}
+              min={0.01}
+              max={0.5}
+              step={0.01}
+            />
+          </EffectSection>
+
+          {/* Vignette */}
+          <EffectSection
+            title="Vinyet"
+            icon={<div className="h-3.5 w-3.5 rounded-full border border-white/50" />}
+            enabled={config.vignette.enabled}
+            onToggle={() => updateVignette({ enabled: !config.vignette.enabled })}
+          >
+            <Slider
+              label="Ofset"
+              value={config.vignette.offset}
+              onChange={(offset) => updateVignette({ offset })}
+              min={0}
+              max={1}
+              step={0.05}
+            />
+            <Slider
+              label="Karanlık"
+              value={config.vignette.darkness}
+              onChange={(darkness) => updateVignette({ darkness })}
+              min={0}
+              max={1}
+              step={0.05}
+            />
+          </EffectSection>
+
+          {/* Color Grading */}
+          <EffectSection
+            title="Renk Ayarlama"
+            icon={<Palette className="h-3.5 w-3.5" />}
+            enabled={config.colorGrading.enabled}
+            onToggle={() => updateColorGrading({ enabled: !config.colorGrading.enabled })}
+          >
+            <Slider
+              label="Doygunluk"
+              value={config.colorGrading.saturation}
+              onChange={(saturation) => updateColorGrading({ saturation })}
+              min={0}
+              max={2}
+              step={0.05}
+            />
+            <Slider
+              label="Kontrast"
+              value={config.colorGrading.contrast}
+              onChange={(contrast) => updateColorGrading({ contrast })}
+              min={0.5}
+              max={2}
+              step={0.05}
+            />
+            <Slider
+              label="Parlaklık"
+              value={config.colorGrading.brightness}
+              onChange={(brightness) => updateColorGrading({ brightness })}
+              min={-0.5}
+              max={0.5}
+              step={0.05}
+            />
+            <Slider
+              label="Ton (Hue)"
+              value={config.colorGrading.hue}
+              onChange={(hue) => updateColorGrading({ hue })}
+              min={-180}
+              max={180}
+              step={1}
+              format={(v) => `${v}°`}
+            />
+          </EffectSection>
+        </>
+      )}
     </div>
   );
 }

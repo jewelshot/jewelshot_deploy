@@ -1,308 +1,467 @@
 /**
- * 3D Viewer Store
+ * 3D Viewer Store - Global state management for 3D viewer
  * 
- * Global state management for 3D viewer using Zustand
- * Manages: transform, layers, background, quality, etc.
+ * Manages all viewer configurations and state across components
  */
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type {
-  TransformState,
-  FlipState,
-  BackgroundConfig,
-  GroundPlaneConfig,
-  QualityConfig,
-  AutoRotateConfig,
-  LightConfig,
-} from '@/lib/3d/types';
-import {
-  DEFAULT_TRANSFORM,
-  DEFAULT_FLIP,
-  DEFAULT_BACKGROUND,
-  DEFAULT_GROUND_PLANE,
-  DEFAULT_QUALITY,
-  DEFAULT_AUTO_ROTATE,
-} from '@/lib/3d/types';
+
+// Import all config types
+import type { GroundPlaneConfig } from '@/components/molecules/3d/GroundPlane';
+import type { LightingConfig } from '@/components/molecules/3d/LightingPanel';
+import type { BackgroundConfig } from '@/components/molecules/3d/BackgroundPanel';
+import type { EdgeSmoothingConfig } from '@/components/molecules/3d/EdgeSmoothingPanel';
+import type { HDRConfig } from '@/components/molecules/3d/HDRPanel';
+import type { DiamondConfig } from '@/components/molecules/3d/DiamondPanel';
+import type { PostProcessingConfig } from '@/components/molecules/3d/PostProcessingPanel';
+import type { MaterialConfig } from '@/components/molecules/3d/MaterialEditor';
+import type { VideoExportConfig, RecordingState } from '@/components/molecules/3d/VideoExportPanel';
+import type { TurntableConfig } from '@/components/molecules/3d/TurntableController';
+import type { BatchExportConfig, BatchExportProgress, ViewAngle } from '@/components/molecules/3d/BatchExportPanel';
+
+// Import defaults
+import { DEFAULT_GROUND_CONFIG } from '@/components/molecules/3d/GroundPlane';
+import { DEFAULT_LIGHTING_CONFIG } from '@/components/molecules/3d/LightingPanel';
+import { DEFAULT_BACKGROUND_CONFIG } from '@/components/molecules/3d/BackgroundPanel';
+import { DEFAULT_EDGE_SMOOTHING_CONFIG } from '@/components/molecules/3d/EdgeSmoothingPanel';
+import { DEFAULT_HDR_CONFIG } from '@/components/molecules/3d/HDRPanel';
+import { DEFAULT_DIAMOND_CONFIG } from '@/components/molecules/3d/DiamondPanel';
+import { DEFAULT_POST_PROCESSING_CONFIG } from '@/components/molecules/3d/PostProcessingPanel';
+import { DEFAULT_VIDEO_CONFIG } from '@/components/molecules/3d/VideoExportPanel';
+import { DEFAULT_TURNTABLE_CONFIG } from '@/components/molecules/3d/TurntableController';
+import { DEFAULT_BATCH_CONFIG } from '@/components/molecules/3d/BatchExportPanel';
 
 // ============================================
-// LAYER TYPES (specific to store)
+// TYPES
 // ============================================
 
-export interface StoredLayer {
+export interface Transform3D {
+  position: { x: number; y: number; z: number };
+  rotation: { x: number; y: number; z: number };
+  scale: number;
+}
+
+export interface CameraState {
+  position: { x: number; y: number; z: number };
+  target: { x: number; y: number; z: number };
+  fov: number;
+  near: number;
+  far: number;
+  zoom: number;
+}
+
+export interface ModelInfo {
+  filename: string;
+  fileSize: number;
+  format: string;
+  vertices: number;
+  faces: number;
+  materials: number;
+  boundingBox: {
+    min: { x: number; y: number; z: number };
+    max: { x: number; y: number; z: number };
+  } | null;
+}
+
+export interface Layer3D {
   id: string;
   name: string;
+  type: 'metal' | 'stone' | 'other';
   visible: boolean;
-  materialId: string;
-  category: 'metal' | 'stone' | 'setting' | 'other' | 'unknown';
+  locked: boolean;
   color: string;
+  materialId: string | null;
 }
 
-export interface LayerGroup {
-  id: string;
-  name: string;
-  category: 'metal' | 'stone' | 'other';
-  expanded: boolean;
-  visible: boolean;
-  layerIds: string[];
-}
+export type ViewMode3D = 'default' | 'wireframe' | 'solid' | 'textured' | 'matcap';
+export type ActivePanel = 'none' | 'transform' | 'materials' | 'lighting' | 'environment' | 'effects' | 'export';
 
 // ============================================
-// STORE STATE
+// STORE STATE INTERFACE
 // ============================================
 
 interface ThreeDViewerState {
-  // Model Info
-  fileName: string | null;
-  format: string | null;
+  // Model
+  modelUrl: string | null;
+  modelInfo: ModelInfo | null;
+  isModelLoading: boolean;
+  modelError: string | null;
   
   // Transform
-  transform: TransformState;
-  flip: FlipState;
+  transform: Transform3D;
+  
+  // Camera
+  camera: CameraState;
+  autoRotate: boolean;
+  
+  // View
+  viewMode: ViewMode3D;
+  showGrid: boolean;
+  showAxes: boolean;
+  showStats: boolean;
+  showWireframe: boolean;
   
   // Layers
-  layers: StoredLayer[];
-  layerGroups: LayerGroup[];
+  layers: Layer3D[];
   selectedLayerId: string | null;
   
-  // Visual Settings
-  background: BackgroundConfig;
-  groundPlane: GroundPlaneConfig;
-  quality: QualityConfig;
-  autoRotate: AutoRotateConfig;
-  
-  // Lighting
-  lights: LightConfig[];
-  
   // UI State
-  showGrid: boolean;
-  showGizmo: boolean;
+  activePanel: ActivePanel;
+  sidebarOpen: boolean;
+  fullscreen: boolean;
+  controlsVisible: boolean;
   
-  // Actions - Model
-  setFileName: (name: string | null) => void;
-  setFormat: (format: string | null) => void;
+  // Configurations
+  groundPlane: GroundPlaneConfig;
+  lighting: LightingConfig;
+  background: BackgroundConfig;
+  edgeSmoothing: EdgeSmoothingConfig;
+  hdr: HDRConfig;
+  diamond: DiamondConfig;
+  postProcessing: PostProcessingConfig;
+  turntable: TurntableConfig;
+  videoExport: VideoExportConfig;
+  batchExport: BatchExportConfig;
+  
+  // Recording State
+  recordingState: RecordingState;
+  batchExportProgress: BatchExportProgress;
+  
+  // Turntable
+  isTurntablePlaying: boolean;
+  
+  // Selected Material (for editing)
+  selectedMaterial: MaterialConfig | null;
+  
+  // Environment rotation
+  environmentRotation: { x: number; y: number; z: number };
+}
+
+interface ThreeDViewerActions {
+  // Model actions
+  setModelUrl: (url: string | null) => void;
+  setModelInfo: (info: ModelInfo | null) => void;
+  setModelLoading: (loading: boolean) => void;
+  setModelError: (error: string | null) => void;
   clearModel: () => void;
   
-  // Actions - Transform
-  setTransform: (transform: TransformState) => void;
-  setPosition: (x: number, y: number, z: number) => void;
-  setRotation: (x: number, y: number, z: number) => void;
-  setScale: (x: number, y: number, z: number) => void;
-  setFlip: (flip: FlipState) => void;
-  toggleFlipAxis: (axis: keyof FlipState) => void;
+  // Transform actions
+  setTransform: (transform: Partial<Transform3D>) => void;
   resetTransform: () => void;
   
-  // Actions - Layers
-  setLayers: (layers: StoredLayer[]) => void;
-  setLayerGroups: (groups: LayerGroup[]) => void;
-  toggleLayerVisibility: (layerId: string) => void;
-  toggleGroupVisibility: (groupId: string) => void;
-  toggleGroupExpanded: (groupId: string) => void;
-  setLayerMaterial: (layerId: string, materialId: string) => void;
-  selectLayer: (layerId: string | null) => void;
+  // Camera actions
+  setCamera: (camera: Partial<CameraState>) => void;
+  resetCamera: () => void;
+  setAutoRotate: (autoRotate: boolean) => void;
   
-  // Actions - Visual
-  setBackground: (background: Partial<BackgroundConfig>) => void;
+  // View actions
+  setViewMode: (mode: ViewMode3D) => void;
+  toggleGrid: () => void;
+  toggleAxes: () => void;
+  toggleStats: () => void;
+  toggleWireframe: () => void;
+  
+  // Layer actions
+  setLayers: (layers: Layer3D[]) => void;
+  updateLayer: (id: string, updates: Partial<Layer3D>) => void;
+  selectLayer: (id: string | null) => void;
+  toggleLayerVisibility: (id: string) => void;
+  
+  // UI actions
+  setActivePanel: (panel: ActivePanel) => void;
+  toggleSidebar: () => void;
+  toggleFullscreen: () => void;
+  toggleControls: () => void;
+  
+  // Configuration actions
   setGroundPlane: (config: Partial<GroundPlaneConfig>) => void;
-  setQuality: (config: Partial<QualityConfig>) => void;
-  setAutoRotate: (config: Partial<AutoRotateConfig>) => void;
+  setLighting: (config: Partial<LightingConfig>) => void;
+  setBackground: (config: Partial<BackgroundConfig>) => void;
+  setEdgeSmoothing: (config: Partial<EdgeSmoothingConfig>) => void;
+  setHDR: (config: Partial<HDRConfig>) => void;
+  setDiamond: (config: Partial<DiamondConfig>) => void;
+  setPostProcessing: (config: Partial<PostProcessingConfig>) => void;
+  setTurntable: (config: Partial<TurntableConfig>) => void;
+  setVideoExport: (config: Partial<VideoExportConfig>) => void;
+  setBatchExport: (config: Partial<BatchExportConfig>) => void;
   
-  // Actions - Lighting
-  setLights: (lights: LightConfig[]) => void;
-  addLight: (light: LightConfig) => void;
-  updateLight: (id: string, updates: Partial<LightConfig>) => void;
-  removeLight: (id: string) => void;
+  // Recording actions
+  setRecordingState: (state: Partial<RecordingState>) => void;
+  setBatchExportProgress: (progress: Partial<BatchExportProgress>) => void;
   
-  // Actions - UI
-  setShowGrid: (show: boolean) => void;
-  setShowGizmo: (show: boolean) => void;
+  // Turntable actions
+  toggleTurntable: () => void;
+  setTurntablePlaying: (playing: boolean) => void;
   
-  // Reset
+  // Material actions
+  setSelectedMaterial: (material: MaterialConfig | null) => void;
+  
+  // Environment actions
+  setEnvironmentRotation: (rotation: { x: number; y: number; z: number }) => void;
+  
+  // Reset all
   resetAll: () => void;
 }
 
 // ============================================
-// DEFAULT LIGHTS
+// DEFAULT VALUES
 // ============================================
 
-const DEFAULT_LIGHTS: LightConfig[] = [
-  {
-    id: 'key',
-    type: 'directional',
-    color: '#ffffff',
-    intensity: 1,
-    position: { x: 5, y: 10, z: 5 },
-    castShadow: true,
-  },
-  {
-    id: 'fill',
-    type: 'directional',
-    color: '#ffffff',
-    intensity: 0.5,
-    position: { x: -5, y: 5, z: -5 },
-    castShadow: false,
-  },
-  {
-    id: 'ambient',
-    type: 'ambient',
-    color: '#ffffff',
-    intensity: 0.3,
-    position: { x: 0, y: 0, z: 0 },
-    castShadow: false,
-  },
-];
+const DEFAULT_TRANSFORM: Transform3D = {
+  position: { x: 0, y: 0, z: 0 },
+  rotation: { x: 0, y: 0, z: 0 },
+  scale: 1,
+};
+
+const DEFAULT_CAMERA: CameraState = {
+  position: { x: 5, y: 5, z: 5 },
+  target: { x: 0, y: 0, z: 0 },
+  fov: 45,
+  near: 0.1,
+  far: 1000,
+  zoom: 1,
+};
+
+const DEFAULT_RECORDING_STATE: RecordingState = {
+  isRecording: false,
+  isPaused: false,
+  progress: 0,
+  currentFrame: 0,
+  totalFrames: 0,
+  elapsedTime: 0,
+  estimatedTimeRemaining: 0,
+};
+
+const DEFAULT_BATCH_PROGRESS: BatchExportProgress = {
+  isExporting: false,
+  currentAngle: 0,
+  totalAngles: 0,
+  completedImages: [],
+  currentAngleName: '',
+};
 
 // ============================================
 // STORE
 // ============================================
 
-export const useThreeDViewerStore = create<ThreeDViewerState>()(
+export const useThreeDViewerStore = create<ThreeDViewerState & ThreeDViewerActions>()(
   persist(
     (set, get) => ({
-      // Initial State
-      fileName: null,
-      format: null,
+      // ========== Initial State ==========
+      
+      // Model
+      modelUrl: null,
+      modelInfo: null,
+      isModelLoading: false,
+      modelError: null,
+      
+      // Transform
       transform: DEFAULT_TRANSFORM,
-      flip: DEFAULT_FLIP,
-      layers: [],
-      layerGroups: [],
-      selectedLayerId: null,
-      background: DEFAULT_BACKGROUND,
-      groundPlane: DEFAULT_GROUND_PLANE,
-      quality: DEFAULT_QUALITY,
-      autoRotate: DEFAULT_AUTO_ROTATE,
-      lights: DEFAULT_LIGHTS,
+      
+      // Camera
+      camera: DEFAULT_CAMERA,
+      autoRotate: false,
+      
+      // View
+      viewMode: 'default',
       showGrid: false,
-      showGizmo: true,
-
-      // Model Actions
-      setFileName: (name) => set({ fileName: name }),
-      setFormat: (format) => set({ format }),
+      showAxes: false,
+      showStats: false,
+      showWireframe: false,
+      
+      // Layers
+      layers: [],
+      selectedLayerId: null,
+      
+      // UI
+      activePanel: 'none',
+      sidebarOpen: true,
+      fullscreen: false,
+      controlsVisible: true,
+      
+      // Configurations
+      groundPlane: DEFAULT_GROUND_CONFIG,
+      lighting: DEFAULT_LIGHTING_CONFIG,
+      background: DEFAULT_BACKGROUND_CONFIG,
+      edgeSmoothing: DEFAULT_EDGE_SMOOTHING_CONFIG,
+      hdr: DEFAULT_HDR_CONFIG,
+      diamond: DEFAULT_DIAMOND_CONFIG,
+      postProcessing: DEFAULT_POST_PROCESSING_CONFIG,
+      turntable: DEFAULT_TURNTABLE_CONFIG,
+      videoExport: DEFAULT_VIDEO_CONFIG,
+      batchExport: DEFAULT_BATCH_CONFIG,
+      
+      // Recording
+      recordingState: DEFAULT_RECORDING_STATE,
+      batchExportProgress: DEFAULT_BATCH_PROGRESS,
+      
+      // Turntable
+      isTurntablePlaying: false,
+      
+      // Material
+      selectedMaterial: null,
+      
+      // Environment
+      environmentRotation: { x: 0, y: 0, z: 0 },
+      
+      // ========== Actions ==========
+      
+      // Model actions
+      setModelUrl: (url) => set({ modelUrl: url }),
+      setModelInfo: (info) => set({ modelInfo: info }),
+      setModelLoading: (loading) => set({ isModelLoading: loading }),
+      setModelError: (error) => set({ modelError: error }),
       clearModel: () => set({
-        fileName: null,
-        format: null,
+        modelUrl: null,
+        modelInfo: null,
+        modelError: null,
         layers: [],
-        layerGroups: [],
         selectedLayerId: null,
-        transform: DEFAULT_TRANSFORM,
-        flip: DEFAULT_FLIP,
       }),
-
-      // Transform Actions
-      setTransform: (transform) => set({ transform }),
-      setPosition: (x, y, z) => set((state) => ({
-        transform: { ...state.transform, position: { x, y, z } },
+      
+      // Transform actions
+      setTransform: (transform) => set((state) => ({
+        transform: { ...state.transform, ...transform },
       })),
-      setRotation: (x, y, z) => set((state) => ({
-        transform: { ...state.transform, rotation: { x, y, z } },
+      resetTransform: () => set({ transform: DEFAULT_TRANSFORM }),
+      
+      // Camera actions
+      setCamera: (camera) => set((state) => ({
+        camera: { ...state.camera, ...camera },
       })),
-      setScale: (x, y, z) => set((state) => ({
-        transform: { ...state.transform, scale: { x, y, z } },
-      })),
-      setFlip: (flip) => set({ flip }),
-      toggleFlipAxis: (axis) => set((state) => ({
-        flip: { ...state.flip, [axis]: !state.flip[axis] },
-      })),
-      resetTransform: () => set({
-        transform: DEFAULT_TRANSFORM,
-        flip: DEFAULT_FLIP,
-      }),
-
-      // Layer Actions
+      resetCamera: () => set({ camera: DEFAULT_CAMERA }),
+      setAutoRotate: (autoRotate) => set({ autoRotate }),
+      
+      // View actions
+      setViewMode: (mode) => set({ viewMode: mode }),
+      toggleGrid: () => set((state) => ({ showGrid: !state.showGrid })),
+      toggleAxes: () => set((state) => ({ showAxes: !state.showAxes })),
+      toggleStats: () => set((state) => ({ showStats: !state.showStats })),
+      toggleWireframe: () => set((state) => ({ showWireframe: !state.showWireframe })),
+      
+      // Layer actions
       setLayers: (layers) => set({ layers }),
-      setLayerGroups: (groups) => set({ layerGroups: groups }),
-      toggleLayerVisibility: (layerId) => set((state) => ({
+      updateLayer: (id, updates) => set((state) => ({
         layers: state.layers.map((l) =>
-          l.id === layerId ? { ...l, visible: !l.visible } : l
-        ),
-      })),
-      toggleGroupVisibility: (groupId) => set((state) => {
-        const group = state.layerGroups.find((g) => g.id === groupId);
-        if (!group) return state;
-        
-        const newVisible = !group.visible;
-        return {
-          layerGroups: state.layerGroups.map((g) =>
-            g.id === groupId ? { ...g, visible: newVisible } : g
-          ),
-          layers: state.layers.map((l) =>
-            group.layerIds.includes(l.id) ? { ...l, visible: newVisible } : l
-          ),
-        };
-      }),
-      toggleGroupExpanded: (groupId) => set((state) => ({
-        layerGroups: state.layerGroups.map((g) =>
-          g.id === groupId ? { ...g, expanded: !g.expanded } : g
-        ),
-      })),
-      setLayerMaterial: (layerId, materialId) => set((state) => ({
-        layers: state.layers.map((l) =>
-          l.id === layerId ? { ...l, materialId } : l
-        ),
-      })),
-      selectLayer: (layerId) => set({ selectedLayerId: layerId }),
-
-      // Visual Actions
-      setBackground: (background) => set((state) => ({
-        background: { ...state.background, ...background },
-      })),
-      setGroundPlane: (config) => set((state) => ({
-        groundPlane: { ...state.groundPlane, ...config },
-      })),
-      setQuality: (config) => set((state) => ({
-        quality: { ...state.quality, ...config },
-      })),
-      setAutoRotate: (config) => set((state) => ({
-        autoRotate: { ...state.autoRotate, ...config },
-      })),
-
-      // Lighting Actions
-      setLights: (lights) => set({ lights }),
-      addLight: (light) => set((state) => ({
-        lights: [...state.lights, light],
-      })),
-      updateLight: (id, updates) => set((state) => ({
-        lights: state.lights.map((l) =>
           l.id === id ? { ...l, ...updates } : l
         ),
       })),
-      removeLight: (id) => set((state) => ({
-        lights: state.lights.filter((l) => l.id !== id),
+      selectLayer: (id) => set({ selectedLayerId: id }),
+      toggleLayerVisibility: (id) => set((state) => ({
+        layers: state.layers.map((l) =>
+          l.id === id ? { ...l, visible: !l.visible } : l
+        ),
       })),
-
-      // UI Actions
-      setShowGrid: (show) => set({ showGrid: show }),
-      setShowGizmo: (show) => set({ showGizmo: show }),
-
-      // Reset All
+      
+      // UI actions
+      setActivePanel: (panel) => set({ activePanel: panel }),
+      toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+      toggleFullscreen: () => set((state) => ({ fullscreen: !state.fullscreen })),
+      toggleControls: () => set((state) => ({ controlsVisible: !state.controlsVisible })),
+      
+      // Configuration actions
+      setGroundPlane: (config) => set((state) => ({
+        groundPlane: { ...state.groundPlane, ...config },
+      })),
+      setLighting: (config) => set((state) => ({
+        lighting: { ...state.lighting, ...config },
+      })),
+      setBackground: (config) => set((state) => ({
+        background: { ...state.background, ...config },
+      })),
+      setEdgeSmoothing: (config) => set((state) => ({
+        edgeSmoothing: { ...state.edgeSmoothing, ...config },
+      })),
+      setHDR: (config) => set((state) => ({
+        hdr: { ...state.hdr, ...config },
+      })),
+      setDiamond: (config) => set((state) => ({
+        diamond: { ...state.diamond, ...config },
+      })),
+      setPostProcessing: (config) => set((state) => ({
+        postProcessing: { ...state.postProcessing, ...config },
+      })),
+      setTurntable: (config) => set((state) => ({
+        turntable: { ...state.turntable, ...config },
+      })),
+      setVideoExport: (config) => set((state) => ({
+        videoExport: { ...state.videoExport, ...config },
+      })),
+      setBatchExport: (config) => set((state) => ({
+        batchExport: { ...state.batchExport, ...config },
+      })),
+      
+      // Recording actions
+      setRecordingState: (state) => set((prev) => ({
+        recordingState: { ...prev.recordingState, ...state },
+      })),
+      setBatchExportProgress: (progress) => set((prev) => ({
+        batchExportProgress: { ...prev.batchExportProgress, ...progress },
+      })),
+      
+      // Turntable actions
+      toggleTurntable: () => set((state) => ({
+        isTurntablePlaying: !state.isTurntablePlaying,
+        turntable: { ...state.turntable, enabled: true },
+      })),
+      setTurntablePlaying: (playing) => set({ isTurntablePlaying: playing }),
+      
+      // Material actions
+      setSelectedMaterial: (material) => set({ selectedMaterial: material }),
+      
+      // Environment actions
+      setEnvironmentRotation: (rotation) => set({ environmentRotation: rotation }),
+      
+      // Reset all
       resetAll: () => set({
-        fileName: null,
-        format: null,
+        modelUrl: null,
+        modelInfo: null,
+        isModelLoading: false,
+        modelError: null,
         transform: DEFAULT_TRANSFORM,
-        flip: DEFAULT_FLIP,
-        layers: [],
-        layerGroups: [],
-        selectedLayerId: null,
-        background: DEFAULT_BACKGROUND,
-        groundPlane: DEFAULT_GROUND_PLANE,
-        quality: DEFAULT_QUALITY,
-        autoRotate: DEFAULT_AUTO_ROTATE,
-        lights: DEFAULT_LIGHTS,
+        camera: DEFAULT_CAMERA,
+        autoRotate: false,
+        viewMode: 'default',
         showGrid: false,
-        showGizmo: true,
+        showAxes: false,
+        showStats: false,
+        showWireframe: false,
+        layers: [],
+        selectedLayerId: null,
+        activePanel: 'none',
+        groundPlane: DEFAULT_GROUND_CONFIG,
+        lighting: DEFAULT_LIGHTING_CONFIG,
+        background: DEFAULT_BACKGROUND_CONFIG,
+        edgeSmoothing: DEFAULT_EDGE_SMOOTHING_CONFIG,
+        hdr: DEFAULT_HDR_CONFIG,
+        diamond: DEFAULT_DIAMOND_CONFIG,
+        postProcessing: DEFAULT_POST_PROCESSING_CONFIG,
+        turntable: DEFAULT_TURNTABLE_CONFIG,
+        videoExport: DEFAULT_VIDEO_CONFIG,
+        batchExport: DEFAULT_BATCH_CONFIG,
+        recordingState: DEFAULT_RECORDING_STATE,
+        batchExportProgress: DEFAULT_BATCH_PROGRESS,
+        isTurntablePlaying: false,
+        selectedMaterial: null,
+        environmentRotation: { x: 0, y: 0, z: 0 },
       }),
     }),
     {
-      name: 'jewelshot-3d-viewer',
+      name: 'jewelshot-3d-viewer-store',
       partialize: (state) => ({
-        // Only persist settings, not model data
-        background: state.background,
-        groundPlane: state.groundPlane,
-        quality: state.quality,
-        autoRotate: state.autoRotate,
-        lights: state.lights,
+        // Only persist these settings
         showGrid: state.showGrid,
-        showGizmo: state.showGizmo,
+        showAxes: state.showAxes,
+        groundPlane: state.groundPlane,
+        lighting: state.lighting,
+        background: state.background,
+        edgeSmoothing: state.edgeSmoothing,
+        hdr: state.hdr,
+        postProcessing: state.postProcessing,
+        turntable: state.turntable,
+        videoExport: state.videoExport,
+        sidebarOpen: state.sidebarOpen,
       }),
     }
   )
