@@ -66,3 +66,6 @@ export { MeasurementPanel, type MeasurementConfig, type Dimensions3D, DEFAULT_ME
 
 // View Panel (NEW Phase 10)
 export { ViewPanel, type ViewConfig, type ViewMode, type DebugView, type CameraType, type CameraPreset, DEFAULT_VIEW_CONFIG, CAMERA_PRESETS, VIEW_ANGLE_PRESETS, DEBUG_VIEWS } from './ViewPanel';
+
+// Focus Panel (NEW Phase 11)
+export { FocusPanel, type FocusConfig, type DOFConfig, type BokehConfig, type TiltShiftConfig, DEFAULT_FOCUS_CONFIG, FOCUS_PRESETS } from './FocusPanel';
