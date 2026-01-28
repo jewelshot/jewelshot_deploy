@@ -55,9 +55,20 @@ function WeightRow({ label, value, icon, color = 'text-white/70' }: WeightRowPro
 
 interface WeightSummaryCardProps {
   className?: string;
+  /** Optional: Single STL geometry weight in grams (when no layers available) */
+  singleGeometryWeight?: number;
+  /** Optional: Single STL geometry volume in mm³ */
+  singleGeometryVolume?: number;
+  /** Optional: Material name for single geometry */
+  singleGeometryMaterial?: string;
 }
 
-export function WeightSummaryCard({ className = '' }: WeightSummaryCardProps) {
+export function WeightSummaryCard({ 
+  className = '',
+  singleGeometryWeight,
+  singleGeometryVolume,
+  singleGeometryMaterial = 'Custom Metal',
+}: WeightSummaryCardProps) {
   const { t } = useLanguage();
   const weightSummary = useViewer3DStore((state) => state.weightSummary);
   const layers = useViewer3DStore((state) => state.layers);
@@ -66,9 +77,13 @@ export function WeightSummaryCard({ className = '' }: WeightSummaryCardProps) {
 
   const [showBreakdown, setShowBreakdown] = useState(false);
   const [copied, setCopied] = useState(false);
+  
+  // Check if we have single geometry data (STL files)
+  const hasSingleGeometry = singleGeometryWeight !== undefined && singleGeometryWeight > 0;
+  const hasLayerData = weightSummary && layers.length > 0;
 
-  // No data state
-  if (!weightSummary || layers.length === 0) {
+  // No data state - only show if neither single geometry nor layers available
+  if (!hasLayerData && !hasSingleGeometry) {
     return (
       <div className={`rounded-xl border border-white/10 bg-black/40 p-4 backdrop-blur-md ${className}`}>
         <div className="flex items-center gap-2 mb-3">
@@ -89,6 +104,47 @@ export function WeightSummaryCard({ className = '' }: WeightSummaryCardProps) {
       </div>
     );
   }
+  
+  // Single geometry mode (STL files without layers)
+  if (hasSingleGeometry && !hasLayerData) {
+    return (
+      <div className={`rounded-xl border border-white/10 bg-black/40 p-4 backdrop-blur-md ${className}`}>
+        {/* Header */}
+        <div className="flex items-center gap-2 mb-4">
+          <Scale className="h-4 w-4 text-purple-400" />
+          <h3 className="text-sm font-medium text-white/90">
+            {t.viewer3d?.weightSummary || 'Weight Summary'}
+          </h3>
+        </div>
+
+        {/* Single Geometry Weight */}
+        <div className="rounded-lg bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 border border-yellow-500/20 p-3">
+          <div className="flex items-center gap-1.5 mb-1">
+            <CircleDot className="h-3 w-3 text-yellow-400" />
+            <span className="text-[10px] uppercase tracking-wider text-yellow-400/70">
+              {singleGeometryMaterial}
+            </span>
+          </div>
+          <div className="text-lg font-semibold text-yellow-300">
+            {formatWeight(singleGeometryWeight)}
+          </div>
+          <div className="text-[10px] text-yellow-400/50 space-y-0.5">
+            <div>{(singleGeometryWeight / 31.1035).toFixed(3)} oz troy</div>
+            {singleGeometryVolume !== undefined && (
+              <div>Volume: {singleGeometryVolume.toFixed(2)} mm³</div>
+            )}
+          </div>
+        </div>
+        
+        <p className="mt-3 text-[9px] text-white/30 text-center">
+          Weight calculated based on selected material density
+        </p>
+      </div>
+    );
+  }
+  
+  // At this point we must have layer data with valid weightSummary
+  if (!weightSummary) return null;
 
   const { totalMetalGrams, totalStoneCarats, breakdown } = weightSummary;
 

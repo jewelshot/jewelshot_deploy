@@ -1207,6 +1207,10 @@ export default function ThreeDViewContent() {
   const [transformMode, setTransformMode] = useState<'translate' | 'rotate' | 'scale'>('translate');
   const [isTransforming, setIsTransforming] = useState(false);
   
+  // ===== SINGLE GEOMETRY WEIGHT STATE (for STL files) =====
+  const [singleGeometryWeight, setSingleGeometryWeight] = useState<number | undefined>(undefined);
+  const [singleGeometryVolume, setSingleGeometryVolume] = useState<number | undefined>(undefined);
+  
   // NEW panel states
   const [measurementConfig, setMeasurementConfig] = useState<MeasurementConfig>(DEFAULT_MEASUREMENT_CONFIG);
   const [viewConfig, setViewConfig] = useState<ViewConfig>(DEFAULT_VIEW_CONFIG);
@@ -1458,6 +1462,38 @@ export default function ThreeDViewContent() {
       }
     }
   }, [subdivisionLevel, originalGeometry]);
+  
+  // Calculate weight for single STL geometry (not 3DM with layers)
+  useEffect(() => {
+    if (!loadedGeometry || layers.length > 0) {
+      // Don't calculate for 3DM files with layers - they have their own weight calculation
+      setSingleGeometryWeight(undefined);
+      setSingleGeometryVolume(undefined);
+      return;
+    }
+    
+    const calculateSTLWeight = async () => {
+      try {
+        const { calculateMeshVolume, calculateGeometryWeight } = await import('@/lib/3d/weight-calculator');
+        const volResult = calculateMeshVolume(loadedGeometry);
+        
+        // Use selected material's id for weight calculation
+        const materialId = selectedMaterial?.id || 'gold-18k';
+        const weightResult = calculateGeometryWeight(loadedGeometry, materialId);
+        
+        setSingleGeometryVolume(volResult.volumeMm3);
+        if (weightResult) {
+          setSingleGeometryWeight(weightResult.weightGrams);
+        }
+      } catch (error) {
+        console.error('Weight calculation error:', error);
+        setSingleGeometryWeight(undefined);
+        setSingleGeometryVolume(undefined);
+      }
+    };
+    
+    calculateSTLWeight();
+  }, [loadedGeometry, selectedMaterial, layers.length]);
 
   // Re-tessellate 3DM when quality changes
   const reTessellate = useCallback(async (newQuality: number) => {
@@ -2856,6 +2892,10 @@ export default function ThreeDViewContent() {
               }}
               orientationGeometry={loadedGeometry || undefined}
               orientationScene={undefined}
+              // Single geometry weight (for STL files)
+              singleGeometryWeight={singleGeometryWeight}
+              singleGeometryVolume={singleGeometryVolume}
+              singleGeometryMaterial={selectedMaterial?.name}
             />
           )}
         </div>

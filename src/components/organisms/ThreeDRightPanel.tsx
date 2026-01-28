@@ -316,6 +316,11 @@ interface ThreeDRightPanelProps {
   onOrientationConfirm: (config: OrientationConfig) => void;
   orientationGeometry?: THREE.BufferGeometry;
   orientationScene?: THREE.Group;
+  
+  // NEW: Single geometry weight (for STL files)
+  singleGeometryWeight?: number;
+  singleGeometryVolume?: number;
+  singleGeometryMaterial?: string;
 }
 
 // ============================================
@@ -442,6 +447,10 @@ export function ThreeDRightPanel({
   onOrientationConfirm,
   orientationGeometry,
   orientationScene,
+  // Single geometry weight (for STL files)
+  singleGeometryWeight,
+  singleGeometryVolume,
+  singleGeometryMaterial,
 }: ThreeDRightPanelProps) {
   const [activeTab, setActiveTab] = useState<TabId>('model');
 
@@ -527,7 +536,11 @@ export function ThreeDRightPanel({
 
             {/* Weight Summary */}
             <Section title="Ağırlık Özeti" icon={<Box className="h-4 w-4" />}>
-              <WeightSummaryCard />
+              <WeightSummaryCard 
+                singleGeometryWeight={singleGeometryWeight}
+                singleGeometryVolume={singleGeometryVolume}
+                singleGeometryMaterial={singleGeometryMaterial}
+              />
             </Section>
 
             {/* Display Options */}
