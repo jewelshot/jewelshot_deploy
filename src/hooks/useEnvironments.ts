@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 export interface EnvironmentFile {
   id: string;
@@ -31,13 +31,32 @@ export function useEnvironments(): UseEnvironmentsResult {
   const [environments, setEnvironments] = useState<EnvironmentFile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // AbortController ref for cleanup
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const fetchEnvironments = useCallback(async () => {
+    // Cancel any pending request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
+    // Create new abort controller
+    abortControllerRef.current = new AbortController();
+    
     try {
       setIsLoading(true);
       setError(null);
       
-      const response = await fetch('/api/environments');
+      const response = await fetch('/api/environments', {
+        signal: abortControllerRef.current.signal,
+      });
+      
+      // Check response status first
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+      
       const data = await response.json();
       
       if (data.success) {
@@ -46,6 +65,10 @@ export function useEnvironments(): UseEnvironmentsResult {
         setError(data.error || 'Failed to fetch environments');
       }
     } catch (err) {
+      // Ignore abort errors
+      if (err instanceof Error && err.name === 'AbortError') {
+        return;
+      }
       console.error('Error fetching environments:', err);
       setError('Failed to fetch environments');
     } finally {
@@ -55,6 +78,13 @@ export function useEnvironments(): UseEnvironmentsResult {
 
   useEffect(() => {
     fetchEnvironments();
+    
+    // Cleanup: abort fetch on unmount
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, [fetchEnvironments]);
 
   return {

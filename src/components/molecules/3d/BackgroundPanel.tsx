@@ -10,7 +10,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ThrottledRangeInput } from '@/components/atoms/ThrottledRangeInput';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -76,6 +76,13 @@ interface BackgroundPanelProps {
 
 export function BackgroundPanel({ config, onChange }: BackgroundPanelProps) {
   const [activeTab, setActiveTab] = useState<BackgroundType>(config.type);
+
+  // Sync activeTab with config.type when it changes externally
+  useEffect(() => {
+    if (config.type !== activeTab) {
+      setActiveTab(config.type);
+    }
+  }, [config.type, activeTab]);
 
   const handleTypeChange = (type: BackgroundType) => {
     setActiveTab(type);

@@ -43,23 +43,32 @@ export function useObjectPicker(options: UseObjectPickerOptions = {}) {
   const handleMouseMove = useCallback((event: MouseEvent) => {
     if (!enabled) return;
     
-    const rect = gl.domElement.getBoundingClientRect();
-    mouse.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    mouse.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-    
-    raycaster.current.setFromCamera(mouse.current, camera);
-    const meshes = getSelectableMeshes();
-    const intersects = raycaster.current.intersectObjects(meshes, false);
-    
-    if (intersects.length > 0) {
-      const hitObject = intersects[0].object;
-      setHoveredObject(hitObject);
-      gl.domElement.style.cursor = hoverCursor;
-    } else {
+    try {
+      const rect = gl.domElement.getBoundingClientRect();
+      mouse.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      
+      raycaster.current.setFromCamera(mouse.current, camera);
+      const meshes = getSelectableMeshes();
+      const intersects = raycaster.current.intersectObjects(meshes, false);
+      
+      if (intersects.length > 0) {
+        const hitObject = intersects[0].object;
+        setHoveredObject(hitObject);
+        gl.domElement.style.cursor = hoverCursor;
+      } else {
+        setHoveredObject(null);
+        gl.domElement.style.cursor = 'default';
+      }
+    } catch (err) {
+      console.warn('Object picker hover error:', err);
       setHoveredObject(null);
-      gl.domElement.style.cursor = 'default';
     }
   }, [enabled, gl, camera, getSelectableMeshes, hoverCursor]);
+  
+  // Use ref to avoid stale closure issues with selectedId
+  const selectedIdRef = useRef(selectedId);
+  selectedIdRef.current = selectedId;
   
   // Handle click for selection
   const handleClick = useCallback((event: MouseEvent) => {
@@ -68,35 +77,39 @@ export function useObjectPicker(options: UseObjectPickerOptions = {}) {
     // Ignore right-click and middle-click
     if (event.button !== 0) return;
     
-    const rect = gl.domElement.getBoundingClientRect();
-    mouse.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    mouse.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-    
-    raycaster.current.setFromCamera(mouse.current, camera);
-    const meshes = getSelectableMeshes();
-    const intersects = raycaster.current.intersectObjects(meshes, false);
-    
-    if (intersects.length > 0) {
-      const hitObject = intersects[0].object;
-      const objectId = hitObject.userData.layerId || hitObject.userData.id || hitObject.uuid;
+    try {
+      const rect = gl.domElement.getBoundingClientRect();
+      mouse.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
       
-      // Toggle selection if clicking same object
-      if (selectedId === objectId) {
+      raycaster.current.setFromCamera(mouse.current, camera);
+      const meshes = getSelectableMeshes();
+      const intersects = raycaster.current.intersectObjects(meshes, false);
+      
+      if (intersects.length > 0) {
+        const hitObject = intersects[0].object;
+        const objectId = hitObject.userData.layerId || hitObject.userData.id || hitObject.uuid;
+        
+        // Toggle selection if clicking same object (use ref for latest value)
+        if (selectedIdRef.current === objectId) {
+          setSelectedObject(null);
+          setSelectedId(null);
+          onSelect?.(null, null);
+        } else {
+          setSelectedObject(hitObject);
+          setSelectedId(objectId);
+          onSelect?.(objectId, hitObject);
+        }
+      } else {
+        // Click on empty space - deselect
         setSelectedObject(null);
         setSelectedId(null);
         onSelect?.(null, null);
-      } else {
-        setSelectedObject(hitObject);
-        setSelectedId(objectId);
-        onSelect?.(objectId, hitObject);
       }
-    } else {
-      // Click on empty space - deselect
-      setSelectedObject(null);
-      setSelectedId(null);
-      onSelect?.(null, null);
+    } catch (err) {
+      console.warn('Object picker click error:', err);
     }
-  }, [enabled, gl, camera, getSelectableMeshes, selectedId, onSelect]);
+  }, [enabled, gl, camera, getSelectableMeshes, onSelect]);
   
   // Attach event listeners
   useEffect(() => {

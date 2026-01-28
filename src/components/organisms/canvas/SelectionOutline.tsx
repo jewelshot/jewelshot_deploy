@@ -3,11 +3,16 @@
  * 
  * Uses Three.js EffectComposer with OutlinePass for a professional
  * selection indicator like in KeyShot, Blender, etc.
+ * 
+ * NOTE: This component creates its own EffectComposer which renders
+ * ONLY the outline effect on top of the existing scene. It does NOT
+ * interfere with PostProcessingEffects because it only renders when
+ * objects are selected, and it renders with priority after the main render.
  */
 
 'use client';
 
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useThree, useFrame, extend } from '@react-three/fiber';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
@@ -22,10 +27,6 @@ extend({ EffectComposer, RenderPass, OutlinePass, ShaderPass });
 interface SelectionOutlineProps {
   /** Array of selected meshes to outline */
   selectedObjects: THREE.Object3D[];
-  /** Outline color (default: orange) */
-  outlineColor?: string;
-  /** Edge glow color */
-  edgeGlowColor?: string;
   /** Edge thickness */
   edgeThickness?: number;
   /** Edge strength/intensity */
@@ -40,8 +41,6 @@ interface SelectionOutlineProps {
 
 export function SelectionOutline({
   selectedObjects,
-  outlineColor = '#ff6600',
-  edgeGlowColor = '#ff8800',
   edgeThickness = 2,
   edgeStrength = 5,
   visibleEdgeColor = '#ff6600',
@@ -52,12 +51,15 @@ export function SelectionOutline({
   
   const composer = useRef<EffectComposer | null>(null);
   const outlinePass = useRef<OutlinePass | null>(null);
+  const fxaaPass = useRef<ShaderPass | null>(null);
+  const isInitialized = useRef(false);
+  const lastSize = useRef({ width: 0, height: 0 });
   
-  // Create composer and passes
-  useEffect(() => {
-    if (!enabled) return;
+  // Initialize composer and passes only once
+  const initComposer = useCallback(() => {
+    if (isInitialized.current && composer.current) return;
     
-    // Create effect composer
+    // Create effect composer with a separate render target
     const effectComposer = new EffectComposer(gl);
     composer.current = effectComposer;
     
@@ -81,16 +83,31 @@ export function SelectionOutline({
     effectComposer.addPass(outline);
     
     // FXAA for smooth edges
-    const fxaaPass = new ShaderPass(FXAAShader);
-    fxaaPass.uniforms['resolution'].value.set(1 / size.width, 1 / size.height);
-    effectComposer.addPass(fxaaPass);
+    const fxaa = new ShaderPass(FXAAShader);
+    fxaa.uniforms['resolution'].value.set(1 / size.width, 1 / size.height);
+    fxaaPass.current = fxaa;
+    effectComposer.addPass(fxaa);
+    
+    lastSize.current = { width: size.width, height: size.height };
+    isInitialized.current = true;
+  }, [gl, scene, camera, size.width, size.height, edgeStrength, edgeThickness, visibleEdgeColor, hiddenEdgeColor]);
+  
+  // Initialize on mount
+  useEffect(() => {
+    if (enabled) {
+      initComposer();
+    }
     
     return () => {
-      effectComposer.dispose();
-      composer.current = null;
-      outlinePass.current = null;
+      if (composer.current) {
+        composer.current.dispose();
+        composer.current = null;
+        outlinePass.current = null;
+        fxaaPass.current = null;
+        isInitialized.current = false;
+      }
     };
-  }, [gl, scene, camera, size, enabled, edgeStrength, edgeThickness, visibleEdgeColor, hiddenEdgeColor]);
+  }, [enabled, initComposer]);
   
   // Update selected objects
   useEffect(() => {
@@ -99,27 +116,42 @@ export function SelectionOutline({
     }
   }, [selectedObjects]);
   
-  // Update outline colors
+  // Update outline parameters without recreating composer
   useEffect(() => {
     if (outlinePass.current) {
+      outlinePass.current.edgeStrength = edgeStrength;
+      outlinePass.current.edgeThickness = edgeThickness;
       outlinePass.current.visibleEdgeColor.set(visibleEdgeColor);
       outlinePass.current.hiddenEdgeColor.set(hiddenEdgeColor);
     }
-  }, [visibleEdgeColor, hiddenEdgeColor]);
+  }, [edgeStrength, edgeThickness, visibleEdgeColor, hiddenEdgeColor]);
   
-  // Handle resize
+  // Handle resize properly - update both composer and outline pass
   useEffect(() => {
-    if (composer.current) {
-      composer.current.setSize(size.width, size.height);
-    }
-  }, [size]);
+    if (!composer.current || !outlinePass.current || !fxaaPass.current) return;
+    
+    // Only update if size actually changed
+    if (lastSize.current.width === size.width && lastSize.current.height === size.height) return;
+    
+    // Update composer size
+    composer.current.setSize(size.width, size.height);
+    
+    // Update outline pass resolution
+    outlinePass.current.resolution.set(size.width, size.height);
+    
+    // Update FXAA resolution
+    fxaaPass.current.uniforms['resolution'].value.set(1 / size.width, 1 / size.height);
+    
+    lastSize.current = { width: size.width, height: size.height };
+  }, [size.width, size.height]);
   
-  // Render with composer
+  // Render with composer - only when enabled and objects are selected
   useFrame(() => {
-    if (enabled && composer.current && selectedObjects.length > 0) {
-      composer.current.render();
+    if (!enabled || !composer.current || selectedObjects.length === 0) {
+      return;
     }
-  }, 1); // Priority 1 = render after default
+    composer.current.render();
+  }, 2); // Priority 2 = render after default (1) and post-processing
   
   return null;
 }

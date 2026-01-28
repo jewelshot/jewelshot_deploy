@@ -117,6 +117,22 @@ export async function createWebMFromCanvas(
   return new Promise((resolve, reject) => {
     const chunks: Blob[] = [];
     const stream = canvas.captureStream(fps);
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    let isCleanedUp = false;
+    
+    const cleanup = () => {
+      if (isCleanedUp) return;
+      isCleanedUp = true;
+      
+      // Clear any pending timeout
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+      
+      // Stop all stream tracks
+      stream.getTracks().forEach(track => track.stop());
+    };
     
     const recorder = new MediaRecorder(stream, {
       mimeType,
@@ -130,6 +146,7 @@ export async function createWebMFromCanvas(
     };
 
     recorder.onstop = () => {
+      cleanup();
       const blob = new Blob(chunks, { type: mimeType });
       resolve({
         blob,
@@ -141,6 +158,7 @@ export async function createWebMFromCanvas(
     };
 
     recorder.onerror = (e) => {
+      cleanup();
       reject(new Error(`MediaRecorder error: ${e}`));
     };
 
@@ -173,8 +191,8 @@ export async function createWebMFromCanvas(
         phase: 'capturing',
       });
 
-      // Schedule next frame
-      setTimeout(captureFrame, frameInterval);
+      // Schedule next frame with tracked timeout
+      timeoutId = setTimeout(captureFrame, frameInterval);
     };
 
     captureFrame();

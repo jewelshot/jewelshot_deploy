@@ -150,6 +150,7 @@ export interface HDRConfig {
   enabled: boolean;
   preset: string | null; // Preset ID or null for custom
   customHDR: string | null; // Data URL or path for custom HDR
+  customHDRId: string | null; // ID of selected custom environment (for comparison)
   intensity: number;
   rotation: { x: number; y: number; z: number };
   showBackground: boolean;
@@ -174,6 +175,7 @@ export const DEFAULT_HDR_CONFIG: HDRConfig = {
   enabled: true,
   preset: 'studio-soft',
   customHDR: null,
+  customHDRId: null,
   intensity: 1.0,
   rotation: { x: 0, y: 0, z: 0 },
   showBackground: false,
@@ -406,7 +408,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
     try {
       // For now, we'll store the file path or create a blob URL
       const url = URL.createObjectURL(file);
-      onChange({ customHDR: url, preset: null });
+      onChange({ customHDR: url, customHDRId: null, preset: null });
     } catch (error) {
       console.error('HDR upload error:', error);
       alert('HDR yükleme hatası');
@@ -553,7 +555,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                 ).map((preset) => (
                   <button
                     key={preset.id}
-                    onClick={() => onChange({ preset: preset.id, customHDR: null })}
+                    onClick={() => onChange({ preset: preset.id, customHDR: null, customHDRId: null })}
                     className={`flex flex-col items-center gap-1 rounded-lg border p-2 transition-all ${
                       config.preset === preset.id
                         ? 'border-purple-500/50 bg-purple-500/10'
@@ -592,7 +594,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                 </button>
                 {config.customHDR && (
                   <button
-                    onClick={() => onChange({ customHDR: null })}
+                    onClick={() => onChange({ customHDR: null, customHDRId: null })}
                     className="mt-2 w-full text-[10px] text-red-400 hover:text-red-300"
                   >
                     Özel HDR'ı Kaldır
@@ -643,8 +645,8 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                     <EnvironmentItem
                       key={env.id}
                       env={env}
-                      isSelected={config.customHDR === env.path}
-                      onSelect={() => onChange({ customHDR: env.path, preset: null })}
+                      isSelected={config.customHDRId === env.id}
+                      onSelect={() => onChange({ customHDR: env.path, customHDRId: env.id, preset: null })}
                     />
                   ))}
                 </div>

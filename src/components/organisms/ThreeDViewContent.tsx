@@ -626,9 +626,9 @@ function SelectionManager({
   return (
     <SelectionOutline
       selectedObjects={selectedObjects}
-      outlineColor="#ff6600"
       edgeStrength={4}
       edgeThickness={1.5}
+      visibleEdgeColor="#ff6600"
       enabled={enabled && selectedObjects.length > 0}
     />
   );
@@ -759,12 +759,25 @@ function SceneContent({
     // Calculate bounding box
     const box = new THREE.Box3();
     
+    // Handle single geometry (STL, OBJ, etc.)
     if (geometry) {
       const tempGeom = geometry.clone();
       tempGeom.computeBoundingBox();
       if (tempGeom.boundingBox) {
         box.copy(tempGeom.boundingBox);
       }
+    }
+    
+    // Handle layers (3DM files)
+    if (layers.length > 0) {
+      layers.forEach(layer => {
+        if (layer.visible && layer.geometry) {
+          layer.geometry.computeBoundingBox();
+          if (layer.geometry.boundingBox) {
+            box.union(layer.geometry.boundingBox);
+          }
+        }
+      });
     }
     
     if (box.isEmpty()) return;
@@ -777,15 +790,17 @@ function SceneContent({
     const maxDim = Math.max(size.x, size.y, size.z);
     
     // Position camera to see the whole model
-    const fov = 50 * (Math.PI / 180);
+    // Use camera's actual FOV if available (PerspectiveCamera)
+    const cameraFov = 'fov' in camera ? (camera as THREE.PerspectiveCamera).fov : 50;
+    const fov = cameraFov * (Math.PI / 180);
     const cameraDistance = (maxDim / 2) / Math.tan(fov / 2) * 2.5;
     
     camera.position.set(cameraDistance, cameraDistance * 0.7, cameraDistance);
-    camera.lookAt(0, 0, 0);
+    camera.lookAt(center.x, center.y, center.z);
     
-    controlsRef.current.target.set(0, 0, 0);
+    controlsRef.current.target.copy(center);
     controlsRef.current.update();
-  }, [geometry, camera]);
+  }, [geometry, layers, camera]);
 
   // Expose fitToView function
   useEffect(() => {
@@ -1940,14 +1955,26 @@ export default function ThreeDViewContent() {
     }
   }, [snapshotPreview, fileName]);
 
-  // Clear model
+  // Clear model - properly dispose geometries to prevent memory leaks
   const handleClearModel = useCallback(() => {
+    // Dispose single geometry
+    if (loadedGeometry) {
+      loadedGeometry.dispose();
+    }
+    
+    // Dispose all layer geometries
+    layers.forEach(layer => {
+      if (layer.geometry) {
+        layer.geometry.dispose();
+      }
+    });
+    
     setLoadedGeometry(null);
     setFileName(null);
     setLayers([]);
     setLayerMaterials({});
     setModelInfo(null);
-  }, []);
+  }, [loadedGeometry, layers]);
 
   // Export: Screenshot with config
   const handleExportScreenshot = useCallback(async (config: ScreenshotConfig) => {
@@ -2867,10 +2894,10 @@ export default function ThreeDViewContent() {
                 await handleSnapshot();
               }}
               onVideoExport={async (config) => {
-                // Use existing video export
+                await handleExportVideo(config);
               }}
               onMultiAngleExport={async (config) => {
-                // Use existing batch export
+                await handleExportMultiAngle(config);
               }}
               // Diamond Effects
               diamondEffects={diamondEffects}
