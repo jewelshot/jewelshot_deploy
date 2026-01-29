@@ -31,6 +31,11 @@ export interface GroundPlaneConfig {
   opacity: number;
   reflectivity: number;
   blur: number;
+  // NEW: Gradient
+  gradientType: 'none' | 'linear' | 'radial';
+  gradientColorStart: string;
+  gradientColorEnd: string;
+  gradientAngle: number; // degrees for linear gradient
   // Grid
   showGrid: boolean;
   gridColor: string;
@@ -66,6 +71,10 @@ export const DEFAULT_GROUND_CONFIG: GroundPlaneConfig = {
   opacity: 1,
   reflectivity: 0.3,
   blur: 300,
+  gradientType: 'none',
+  gradientColorStart: '#2a2a2a',
+  gradientColorEnd: '#0a0a0a',
+  gradientAngle: 0,
   showGrid: false,
   gridColor: '#333333',
   gridSize: 1,
@@ -92,6 +101,82 @@ export const TEXTURE_PRESETS = [
   { id: 'concrete', name: 'Beton', preview: 'linear-gradient(135deg, #7a7a7a 0%, #8a8a8a 50%, #6a6a6a 100%)' },
 ];
 
+// Ground color/style presets
+export const GROUND_STYLE_PRESETS = [
+  { 
+    id: 'dark', 
+    name: 'Koyu', 
+    preview: '#1a1a1a',
+    config: { color: '#1a1a1a', gradientType: 'none' as const }
+  },
+  { 
+    id: 'charcoal', 
+    name: 'Kömür', 
+    preview: '#2d2d2d',
+    config: { color: '#2d2d2d', gradientType: 'none' as const }
+  },
+  { 
+    id: 'light', 
+    name: 'Açık', 
+    preview: '#e0e0e0',
+    config: { color: '#e0e0e0', gradientType: 'none' as const }
+  },
+  { 
+    id: 'white', 
+    name: 'Beyaz', 
+    preview: '#ffffff',
+    config: { color: '#ffffff', gradientType: 'none' as const }
+  },
+  { 
+    id: 'gradient-dark', 
+    name: 'Koyu Gradyan', 
+    preview: 'linear-gradient(180deg, #3a3a3a 0%, #0a0a0a 100%)',
+    config: { gradientType: 'linear' as const, gradientColorStart: '#3a3a3a', gradientColorEnd: '#0a0a0a', gradientAngle: 0 }
+  },
+  { 
+    id: 'gradient-light', 
+    name: 'Açık Gradyan', 
+    preview: 'linear-gradient(180deg, #ffffff 0%, #d0d0d0 100%)',
+    config: { gradientType: 'linear' as const, gradientColorStart: '#ffffff', gradientColorEnd: '#d0d0d0', gradientAngle: 0 }
+  },
+  { 
+    id: 'gradient-warm', 
+    name: 'Sıcak Gradyan', 
+    preview: 'linear-gradient(180deg, #4a3a2a 0%, #1a1008 100%)',
+    config: { gradientType: 'linear' as const, gradientColorStart: '#4a3a2a', gradientColorEnd: '#1a1008', gradientAngle: 0 }
+  },
+  { 
+    id: 'gradient-cool', 
+    name: 'Soğuk Gradyan', 
+    preview: 'linear-gradient(180deg, #2a3a4a 0%, #0a1018 100%)',
+    config: { gradientType: 'linear' as const, gradientColorStart: '#2a3a4a', gradientColorEnd: '#0a1018', gradientAngle: 0 }
+  },
+  { 
+    id: 'radial-spotlight', 
+    name: 'Spot Işık', 
+    preview: 'radial-gradient(circle, #4a4a4a 0%, #0a0a0a 70%)',
+    config: { gradientType: 'radial' as const, gradientColorStart: '#4a4a4a', gradientColorEnd: '#0a0a0a' }
+  },
+  { 
+    id: 'radial-glow', 
+    name: 'Işıltı', 
+    preview: 'radial-gradient(circle, #5a4a3a 0%, #1a1a1a 70%)',
+    config: { gradientType: 'radial' as const, gradientColorStart: '#5a4a3a', gradientColorEnd: '#1a1a1a' }
+  },
+  { 
+    id: 'radial-white', 
+    name: 'Beyaz Spot', 
+    preview: 'radial-gradient(circle, #ffffff 0%, #c0c0c0 70%)',
+    config: { gradientType: 'radial' as const, gradientColorStart: '#ffffff', gradientColorEnd: '#c0c0c0' }
+  },
+  { 
+    id: 'gradient-purple', 
+    name: 'Mor Gradyan', 
+    preview: 'linear-gradient(180deg, #3a2a4a 0%, #1a0a28 100%)',
+    config: { gradientType: 'linear' as const, gradientColorStart: '#3a2a4a', gradientColorEnd: '#1a0a28', gradientAngle: 0 }
+  },
+];
+
 interface GroundPlaneProps {
   config: GroundPlaneConfig;
   modelBoundingBox?: THREE.Box3 | null;
@@ -102,6 +187,53 @@ interface GroundPlaneProps {
 // GROUND PLANE COMPONENT
 // ============================================
 
+// Create gradient texture using canvas
+function useGradientTexture(
+  type: 'linear' | 'radial',
+  colorStart: string,
+  colorEnd: string,
+  angle: number = 0,
+  size: number = 512
+): THREE.CanvasTexture | null {
+  return useMemo(() => {
+    if (typeof window === 'undefined') return null;
+    
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+
+    let gradient: CanvasGradient;
+    
+    if (type === 'radial') {
+      // Radial gradient from center
+      gradient = ctx.createRadialGradient(
+        size / 2, size / 2, 0,
+        size / 2, size / 2, size / 2
+      );
+    } else {
+      // Linear gradient with angle
+      const angleRad = (angle * Math.PI) / 180;
+      const x1 = size / 2 - Math.cos(angleRad) * size / 2;
+      const y1 = size / 2 - Math.sin(angleRad) * size / 2;
+      const x2 = size / 2 + Math.cos(angleRad) * size / 2;
+      const y2 = size / 2 + Math.sin(angleRad) * size / 2;
+      gradient = ctx.createLinearGradient(x1, y1, x2, y2);
+    }
+
+    gradient.addColorStop(0, colorStart);
+    gradient.addColorStop(1, colorEnd);
+
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, size, size);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = true;
+    return texture;
+  }, [type, colorStart, colorEnd, angle, size]);
+}
+
 export function GroundPlane({ 
   config, 
   modelBoundingBox,
@@ -109,6 +241,15 @@ export function GroundPlane({
 }: GroundPlaneProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const { scene } = useThree();
+
+  // Create gradient texture if needed
+  const gradientTexture = useGradientTexture(
+    config.gradientType === 'none' ? 'linear' : config.gradientType,
+    config.gradientColorStart || '#3a3a3a',
+    config.gradientColorEnd || '#0a0a0a',
+    config.gradientAngle || 0,
+    1024
+  );
 
   // Calculate auto-position height based on model bounding box
   const autoHeight = useMemo(() => {
@@ -140,6 +281,9 @@ export function GroundPlane({
     }
   };
 
+  // Use gradient or solid color
+  const useGradient = config.gradientType !== 'none' && gradientTexture;
+
   return (
     <group position={[0, finalHeight, 0]}>
       {/* Shadow Catcher Mode - transparent ground that only shows shadows */}
@@ -153,6 +297,28 @@ export function GroundPlane({
           <shadowMaterial 
             transparent 
             opacity={config.shadowOpacity ?? 0.5} 
+          />
+        </mesh>
+      ) : useGradient ? (
+        /* Gradient ground plane with reduced reflections */
+        <mesh
+          ref={meshRef}
+          rotation={[-Math.PI / 2, 0, 0]}
+          receiveShadow={config.receiveShadow}
+        >
+          <planeGeometry args={[planeSize, planeSize]} />
+          <MeshReflectorMaterial
+            map={gradientTexture}
+            blur={[config.blur, config.blur]}
+            resolution={config.reflectionResolution || 512}
+            mixBlur={1}
+            mixStrength={config.reflectivity * 0.5}
+            roughness={config.roughness ?? 0.8}
+            depthScale={1}
+            minDepthThreshold={0.4}
+            maxDepthThreshold={1.4}
+            metalness={0}
+            mirror={0}
           />
         </mesh>
       ) : (
@@ -282,16 +448,100 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
             />
           </div>
 
-          {/* Color */}
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] text-white/50">Renk</span>
-            <input
-              type="color"
-              value={config.color}
-              onChange={(e) => onChange({ color: e.target.value })}
-              className="h-6 w-10 cursor-pointer rounded border border-white/10 bg-transparent"
-            />
+          {/* Ground Style Presets */}
+          <div className="space-y-2">
+            <span className="text-[10px] font-medium text-white/60">Zemin Stilleri</span>
+            <div className="grid grid-cols-4 gap-1.5 max-h-24 overflow-y-auto">
+              {GROUND_STYLE_PRESETS.map((preset) => (
+                <button
+                  key={preset.id}
+                  onClick={() => onChange(preset.config)}
+                  className="flex flex-col items-center gap-0.5 rounded-md border border-white/10 p-1 transition-all hover:border-white/30 hover:bg-white/5"
+                  title={preset.name}
+                >
+                  <div
+                    className="h-4 w-full rounded-sm"
+                    style={{ background: preset.preview }}
+                  />
+                  <span className="text-[8px] text-white/40 truncate w-full text-center">{preset.name}</span>
+                </button>
+              ))}
+            </div>
           </div>
+
+          {/* Gradient Type */}
+          <div className="space-y-1">
+            <span className="text-[10px] text-white/50">Gradyan Tipi</span>
+            <div className="grid grid-cols-3 gap-1">
+              {(['none', 'linear', 'radial'] as const).map((type) => (
+                <button
+                  key={type}
+                  onClick={() => onChange({ gradientType: type })}
+                  className={`rounded-md py-1 text-[9px] transition-all ${
+                    config.gradientType === type
+                      ? 'bg-purple-500/30 text-white border border-purple-500/50'
+                      : 'bg-white/5 text-white/60 border border-white/10 hover:bg-white/10'
+                  }`}
+                >
+                  {type === 'none' ? 'Yok' : type === 'linear' ? 'Linear' : 'Radial'}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Gradient Colors - only show if gradient is enabled */}
+          {config.gradientType !== 'none' && (
+            <div className="space-y-2 p-2 rounded-md bg-white/5 border border-white/10">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-white/50">Başlangıç Rengi</span>
+                <input
+                  type="color"
+                  value={config.gradientColorStart || '#3a3a3a'}
+                  onChange={(e) => onChange({ gradientColorStart: e.target.value })}
+                  className="h-5 w-8 cursor-pointer rounded border border-white/10 bg-transparent"
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-white/50">Bitiş Rengi</span>
+                <input
+                  type="color"
+                  value={config.gradientColorEnd || '#0a0a0a'}
+                  onChange={(e) => onChange({ gradientColorEnd: e.target.value })}
+                  className="h-5 w-8 cursor-pointer rounded border border-white/10 bg-transparent"
+                />
+              </div>
+              {config.gradientType === 'linear' && (
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-white/50">Açı</span>
+                    <span className="text-[10px] font-mono text-white/60">
+                      {config.gradientAngle || 0}°
+                    </span>
+                  </div>
+                  <ThrottledRangeInput
+                    min={0}
+                    max={360}
+                    step={15}
+                    value={config.gradientAngle || 0}
+                    onChange={(v) => onChange({ gradientAngle: v })}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Color - only show if no gradient */}
+          {config.gradientType === 'none' && (
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] text-white/50">Renk</span>
+              <input
+                type="color"
+                value={config.color}
+                onChange={(e) => onChange({ color: e.target.value })}
+                className="h-6 w-10 cursor-pointer rounded border border-white/10 bg-transparent"
+              />
+            </div>
+          )}
 
           {/* Reflectivity */}
           <div className="space-y-1">
