@@ -137,7 +137,7 @@ export interface PostProcessingConfig {
 }
 
 export const DEFAULT_POST_PROCESSING_CONFIG: PostProcessingConfig = {
-  enabled: true,
+  enabled: false, // Disabled by default for better performance
   toneMapping: 'aces',
   exposure: 1.0,
   bloom: {

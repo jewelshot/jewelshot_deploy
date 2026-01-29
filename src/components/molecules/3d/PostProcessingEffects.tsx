@@ -80,7 +80,7 @@ export function PostProcessingEffects({ config, focusConfig }: PostProcessingEff
   const dofEnabled = focusConfig?.enabled && focusConfig.dof.enabled;
 
   return (
-    <EffectComposer multisampling={4}>
+    <EffectComposer multisampling={0}>
       {/* Tone Mapping - always on */}
       <ToneMapping
         mode={toneMappingMode}

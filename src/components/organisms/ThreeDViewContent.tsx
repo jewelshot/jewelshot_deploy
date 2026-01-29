@@ -1116,7 +1116,7 @@ function SceneContent({
         ref={controlsRef}
         makeDefault
         enableDamping
-        dampingFactor={0.05}
+        dampingFactor={0.1}
         enablePan
         enableZoom
         enableRotate
@@ -1125,6 +1125,7 @@ function SceneContent({
         minDistance={0.5}
         maxDistance={20}
         target={[0, 0, 0]}
+        regress
       />
       
       {/* Axis Gizmo in corner - always visible for orientation reference */}
@@ -1225,8 +1226,8 @@ export default function ThreeDViewContent() {
   const [layerMaterials, setLayerMaterials] = useState<Record<string, MaterialPreset>>({});
   const [layersAccordionOpen, setLayersAccordionOpen] = useState(true);
   
-  // Progressive rendering state
-  const [adaptiveResolution, setAdaptiveResolution] = useState(true);
+  // Progressive rendering state - disabled by default for better responsiveness
+  const [adaptiveResolution, setAdaptiveResolution] = useState(false);
   const [currentResolution, setCurrentResolution] = useState(1);
   const [isRefining, setIsRefining] = useState(false);
   const meshRegistryRef = useRef<Map<string, THREE.Mesh>>(new Map());
@@ -2573,11 +2574,13 @@ export default function ThreeDViewContent() {
           <Canvas
             shadows
             camera={{ position: [3, 2, 3], fov: 50 }}
+            frameloop="always"
+            performance={{ min: 0.5, max: 1, debounce: 200 }}
             gl={{ 
               preserveDrawingBuffer: true, 
               antialias: true,
               failIfMajorPerformanceCaveat: false,
-              powerPreference: 'default',
+              powerPreference: 'high-performance',
               alpha: true, // Enable alpha channel for transparent backgrounds
             }}
             style={canvasBackgroundStyle}
