@@ -96,7 +96,7 @@ const nextConfig: NextConfig = {
           // ============================================
           {
             key: 'Access-Control-Allow-Origin',
-            value: process.env.NEXT_PUBLIC_APP_URL || 'https://jewelshot.ai',
+            value: '*', // Allow all origins for static assets
           },
           {
             key: 'Access-Control-Allow-Methods',
