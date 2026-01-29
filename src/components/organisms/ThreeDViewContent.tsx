@@ -15,7 +15,7 @@
 
 import React, { useState, useRef, useCallback, Suspense, useEffect, useMemo } from 'react';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
-import { OrbitControls, Center, Environment, Grid, GizmoHelper, GizmoViewport, Lightformer, TransformControls } from '@react-three/drei';
+import { OrbitControls, Center, Environment, Grid, GizmoHelper, GizmoViewport, Lightformer, TransformControls, Stats } from '@react-three/drei';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 import * as THREE from 'three';
 import { LoopSubdivision } from 'three-subdivide';
@@ -2634,6 +2634,8 @@ export default function ThreeDViewContent() {
                 selectionEnabled={!isTransforming}
               />
               <SnapshotHelper onSnapshot={handleSnapshotResult} />
+              {/* FPS Counter - temporary for debugging */}
+              <Stats className="!absolute !top-2 !right-2 !left-auto" />
             </Suspense>
           </Canvas>
 
