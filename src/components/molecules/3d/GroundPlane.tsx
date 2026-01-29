@@ -21,7 +21,7 @@ import { MeshReflectorMaterial } from '@react-three/drei';
 // TYPES
 // ============================================
 
-export type GroundMaterialType = 'matte' | 'satin' | 'glossy' | 'metallic' | 'mirror';
+export type GroundMaterialType = 'flat' | 'matte' | 'satin' | 'glossy' | 'metallic' | 'mirror';
 
 export interface GroundPlaneConfig {
   enabled: boolean;
@@ -75,10 +75,10 @@ export const DEFAULT_GROUND_CONFIG: GroundPlaneConfig = {
   opacity: 1,
   reflectivity: 0.2,
   blur: 300,
-  // Material properties
-  materialType: 'satin',
+  // Material properties - flat = exact color match with background
+  materialType: 'flat',
   metalness: 0,
-  roughness: 0.5,
+  roughness: 1,
   // Gradient
   gradientType: 'none',
   gradientColorStart: '#FFFFFF',
@@ -341,6 +341,25 @@ export function GroundPlane({
             mirror={config.materialType === 'mirror' ? 1 : 0}
           />
         </mesh>
+      ) : config.materialType === 'flat' ? (
+        /* Flat ground - exact color match with background, no reflections/shading */
+        <mesh
+          ref={meshRef}
+          rotation={[-Math.PI / 2, 0, 0]}
+          receiveShadow={false}
+          onClick={(e) => {
+            e.stopPropagation();
+            onGroundClick?.();
+          }}
+          userData={{ isGround: true }}
+        >
+          <planeGeometry args={[planeSize, planeSize]} />
+          <meshBasicMaterial 
+            color={config.color} 
+            transparent={config.opacity < 1}
+            opacity={config.opacity}
+          />
+        </mesh>
       ) : (
         /* Main reflective ground plane */
         <mesh
@@ -571,8 +590,9 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
           {/* Material Type */}
           <div className="space-y-2">
             <span className="text-[10px] text-white/50">Malzeme Tipi</span>
-            <div className="grid grid-cols-5 gap-1">
+            <div className="grid grid-cols-6 gap-1">
               {([
+                { id: 'flat', name: 'Düz', icon: '□' },
                 { id: 'matte', name: 'Mat', icon: '◐' },
                 { id: 'satin', name: 'Saten', icon: '◑' },
                 { id: 'glossy', name: 'Parlak', icon: '●' },
@@ -584,6 +604,7 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
                   onClick={() => {
                     // Apply preset values for each material type
                     const presets: Record<GroundMaterialType, { metalness: number; roughness: number; reflectivity: number }> = {
+                      flat: { metalness: 0, roughness: 1, reflectivity: 0 },
                       matte: { metalness: 0, roughness: 0.9, reflectivity: 0.05 },
                       satin: { metalness: 0, roughness: 0.5, reflectivity: 0.2 },
                       glossy: { metalness: 0, roughness: 0.1, reflectivity: 0.5 },
@@ -938,7 +959,20 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
 
 export const GROUND_PRESETS = [
   {
-    id: 'pure-white',
+    id: 'pure-white-flat',
+    name: 'Beyaz Düz',
+    config: {
+      color: '#FFFFFF',
+      materialType: 'flat' as const,
+      metalness: 0,
+      roughness: 1,
+      reflectivity: 0,
+      blur: 0,
+      showGrid: false,
+    },
+  },
+  {
+    id: 'white-matte',
     name: 'Beyaz Mat',
     config: {
       color: '#FFFFFF',
@@ -947,19 +981,6 @@ export const GROUND_PRESETS = [
       roughness: 0.9,
       reflectivity: 0.05,
       blur: 400,
-      showGrid: false,
-    },
-  },
-  {
-    id: 'white-satin',
-    name: 'Beyaz Saten',
-    config: {
-      color: '#FFFFFF',
-      materialType: 'satin' as const,
-      metalness: 0,
-      roughness: 0.5,
-      reflectivity: 0.2,
-      blur: 350,
       showGrid: false,
     },
   },
