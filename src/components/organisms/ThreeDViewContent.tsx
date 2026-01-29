@@ -73,7 +73,7 @@ import {
 // New organized right panel
 import { ThreeDRightPanel } from '@/components/organisms/ThreeDRightPanel';
 import { GroundPlane, DEFAULT_GROUND_CONFIG, type GroundPlaneConfig } from '@/components/molecules/3d/GroundPlane';
-import { DEFAULT_LIGHTING_CONFIG, type LightingConfig } from '@/components/molecules/3d/LightingPanel';
+import { DEFAULT_LIGHTING_CONFIG, type LightingConfig, type SpecularLightsConfig } from '@/components/molecules/3d/LightingPanel';
 import { DEFAULT_BACKGROUND_CONFIG, type BackgroundConfig } from '@/components/molecules/3d/BackgroundPanel';
 import { DEFAULT_EDGE_SMOOTHING_CONFIG, type EdgeSmoothingConfig } from '@/components/molecules/3d/EdgeSmoothingPanel';
 import { DEFAULT_HDR_CONFIG, type HDRConfig } from '@/components/molecules/3d/HDRPanel';
@@ -98,6 +98,60 @@ import { DEFAULT_DIAMOND_EFFECTS, type DiamondEffectConfig } from '@/lib/3d/diam
 
 // Rhino3dm - Will be loaded dynamically when needed
 // Note: 3DM support requires additional setup due to WASM complexity
+
+// Specular Highlight Lights Component
+function SpecularHighlightLights({ 
+  config, 
+  lightIntensity = 1 
+}: { 
+  config?: SpecularLightsConfig; 
+  lightIntensity?: number;
+}) {
+  if (!config?.enabled) return null;
+  
+  const intensity = (config.intensity || 1) * lightIntensity;
+  const spread = config.spread || 0.8;
+  const height = config.height || 1.5;
+  const baseColor = config.color || '#ffffff';
+  const warmCool = config.warmCool || 0;
+  
+  // Calculate warm/cool color tints
+  const warmColor = '#fffaf0';
+  const coolColor = '#f0f8ff';
+  const getColor = (warm: boolean) => {
+    if (warmCool === 0) return baseColor;
+    return warm ? warmColor : coolColor;
+  };
+  
+  // Generate light positions based on count
+  const lightCount = config.count === 'few' ? 2 : config.count === 'medium' ? 4 : 6;
+  
+  const positions: [number, number, number][] = [
+    [spread * 0.6, height, spread * 0.6],
+    [-spread * 0.6, height * 0.8, -spread * 0.4],
+    [spread * 0.4, height * 1.2, -spread * 0.5],
+    [-spread * 0.5, height * 0.7, spread * 0.5],
+    [spread * 0.8, height * 1.3, 0],
+    [-spread * 0.8, height, 0],
+  ].slice(0, lightCount) as [number, number, number][];
+  
+  const intensities = [3, 2.5, 2, 2, 1.5, 1.5].slice(0, lightCount);
+  
+  return (
+    <>
+      {positions.map((pos, i) => (
+        <pointLight
+          key={i}
+          position={pos}
+          intensity={intensities[i] * intensity}
+          color={getColor(i % 2 === 0)}
+          distance={5 + spread}
+          decay={2}
+        />
+      ))}
+    </>
+  );
+}
 
 // Types
 interface ModelLayer {
@@ -671,6 +725,8 @@ function SceneContent({
   selectionEnabled = true,
   // Ground click
   onGroundClick,
+  // Lighting config (includes specular lights)
+  lightingConfig,
 }: {
   geometry: THREE.BufferGeometry | null;
   material: MaterialPreset;
@@ -708,6 +764,8 @@ function SceneContent({
   selectionEnabled?: boolean;
   // Ground click
   onGroundClick?: () => void;
+  // Lighting config
+  lightingConfig?: LightingConfig;
 }) {
   const controlsRef = useRef<any>(null);
   const groupRef = useRef<THREE.Group>(null);
@@ -1000,13 +1058,8 @@ function SceneContent({
         <color attach="background" args={[backgroundColor]} />
       )}
       
-      {/* Specular highlight point lights - always active for sparkle effect */}
-      <pointLight position={[0.5, 1.5, 0.5]} intensity={3 * lightIntensity} color="#ffffff" distance={5} decay={2} />
-      <pointLight position={[-0.5, 1.2, 0.3]} intensity={2.5 * lightIntensity} color="#ffffff" distance={5} decay={2} />
-      <pointLight position={[0.3, 1.8, -0.4]} intensity={2 * lightIntensity} color="#ffffff" distance={5} decay={2} />
-      <pointLight position={[-0.4, 1.0, -0.5]} intensity={2 * lightIntensity} color="#fffaf0" distance={5} decay={2} />
-      <pointLight position={[0.8, 2.0, 0.8]} intensity={1.5 * lightIntensity} color="#f8f8ff" distance={6} decay={2} />
-      <pointLight position={[-0.8, 1.5, -0.8]} intensity={1.5 * lightIntensity} color="#fffff0" distance={6} decay={2} />
+      {/* Specular highlight point lights - controlled via LightingPanel */}
+      <SpecularHighlightLights config={lightingConfig?.specularLights} lightIntensity={lightIntensity} />
 
       {/* Environment: HDR or Lightformer - ONLY for reflections, never as visible background */}
       {useHDR && hdrPreset ? (
@@ -2670,6 +2723,8 @@ export default function ThreeDViewContent() {
                   setRightOpen(true);
                   setForceActiveTab('lighting');
                 }}
+                // Lighting config for specular highlights
+                lightingConfig={lightingConfig}
               />
               <SnapshotHelper onSnapshot={handleSnapshotResult} />
               {/* FPS Counter - temporary for debugging */}

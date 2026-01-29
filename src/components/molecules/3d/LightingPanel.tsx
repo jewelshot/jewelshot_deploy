@@ -23,6 +23,7 @@ import {
   ChevronRight,
   Eye,
   EyeOff,
+  Sparkles,
 } from 'lucide-react';
 
 // ============================================
@@ -97,12 +98,25 @@ export const COLOR_TEMP_PRESETS = [
   { kelvin: 8000, name: 'Mavi Gökyüzü' },
 ];
 
+// Specular highlight point lights config
+export interface SpecularLightsConfig {
+  enabled: boolean;
+  intensity: number; // Multiplier 0-5
+  count: 'few' | 'medium' | 'many'; // 2, 4, 6 lights
+  spread: number; // How far from center (0.5-2)
+  height: number; // Height above origin (0.5-3)
+  color: string;
+  warmCool: number; // -1 (cool) to 1 (warm)
+}
+
 export interface LightingConfig {
   lights: Light3D[];
   ambientIntensity: number;
   ambientColor: string;
   shadowsEnabled: boolean;
   shadowMapSize: 512 | 1024 | 2048 | 4096;
+  // NEW: Specular highlight lights
+  specularLights: SpecularLightsConfig;
   shadowBias: number;
   shadowSoftness: number; // 0-1
   environmentIntensity: number;
@@ -111,7 +125,18 @@ export interface LightingConfig {
   exposure: number; // 0-3
 }
 
+export const DEFAULT_SPECULAR_LIGHTS_CONFIG: SpecularLightsConfig = {
+  enabled: true,
+  intensity: 1.0,
+  count: 'many',
+  spread: 0.8,
+  height: 1.5,
+  color: '#ffffff',
+  warmCool: 0,
+};
+
 export const DEFAULT_LIGHTING_CONFIG: LightingConfig = {
+  specularLights: DEFAULT_SPECULAR_LIGHTS_CONFIG,
   lights: [
     {
       id: 'key',
@@ -596,7 +621,6 @@ export function LightingPanel({ config, onChange }: LightingPanelProps) {
             />
           </div>
           <ThrottledRangeInput
-            
             min={0}
             max={2}
             step={0.05}
@@ -604,6 +628,148 @@ export function LightingPanel({ config, onChange }: LightingPanelProps) {
             onChange={(v) => onChange({ ambientIntensity: v })}
             className="mt-2 w-full accent-purple-500"
           />
+        </div>
+
+        {/* Specular Highlight Lights */}
+        <div className="rounded-lg border border-white/10 bg-white/5 p-3 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-3.5 w-3.5 text-yellow-400" />
+              <span className="text-xs text-white/70">Işık Çakımları</span>
+            </div>
+            <button
+              onClick={() => onChange({ 
+                specularLights: { 
+                  ...config.specularLights, 
+                  enabled: !config.specularLights?.enabled 
+                } 
+              })}
+              className={`relative h-5 w-9 rounded-full transition-colors ${
+                config.specularLights?.enabled ? 'bg-yellow-500' : 'bg-white/20'
+              }`}
+            >
+              <span
+                className={`absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white transition-transform ${
+                  config.specularLights?.enabled ? 'translate-x-4' : 'translate-x-0'
+                }`}
+              />
+            </button>
+          </div>
+          
+          {config.specularLights?.enabled && (
+            <>
+              {/* Intensity */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-white/50">Yoğunluk</span>
+                  <span className="text-[10px] font-mono text-white/60">
+                    {(config.specularLights?.intensity || 1).toFixed(1)}x
+                  </span>
+                </div>
+                <ThrottledRangeInput
+                  min={0}
+                  max={5}
+                  step={0.1}
+                  value={config.specularLights?.intensity || 1}
+                  onChange={(v) => onChange({ 
+                    specularLights: { ...config.specularLights, intensity: v } 
+                  })}
+                />
+              </div>
+
+              {/* Light Count */}
+              <div className="space-y-1">
+                <span className="text-[10px] text-white/50">Işık Sayısı</span>
+                <div className="grid grid-cols-3 gap-1">
+                  {(['few', 'medium', 'many'] as const).map((count) => (
+                    <button
+                      key={count}
+                      onClick={() => onChange({ 
+                        specularLights: { ...config.specularLights, count } 
+                      })}
+                      className={`rounded-md py-1 text-[9px] transition-all ${
+                        config.specularLights?.count === count
+                          ? 'bg-yellow-500/20 text-yellow-300'
+                          : 'bg-white/5 text-white/50 hover:bg-white/10'
+                      }`}
+                    >
+                      {count === 'few' ? '2' : count === 'medium' ? '4' : '6'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Spread */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-white/50">Yayılım</span>
+                  <span className="text-[10px] font-mono text-white/60">
+                    {(config.specularLights?.spread || 0.8).toFixed(1)}
+                  </span>
+                </div>
+                <ThrottledRangeInput
+                  min={0.3}
+                  max={2}
+                  step={0.1}
+                  value={config.specularLights?.spread || 0.8}
+                  onChange={(v) => onChange({ 
+                    specularLights: { ...config.specularLights, spread: v } 
+                  })}
+                />
+              </div>
+
+              {/* Height */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-white/50">Yükseklik</span>
+                  <span className="text-[10px] font-mono text-white/60">
+                    {(config.specularLights?.height || 1.5).toFixed(1)}
+                  </span>
+                </div>
+                <ThrottledRangeInput
+                  min={0.5}
+                  max={4}
+                  step={0.1}
+                  value={config.specularLights?.height || 1.5}
+                  onChange={(v) => onChange({ 
+                    specularLights: { ...config.specularLights, height: v } 
+                  })}
+                />
+              </div>
+
+              {/* Color & Temperature */}
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-white/50">Renk</span>
+                <input
+                  type="color"
+                  value={config.specularLights?.color || '#ffffff'}
+                  onChange={(e) => onChange({ 
+                    specularLights: { ...config.specularLights, color: e.target.value } 
+                  })}
+                  className="h-5 w-8 cursor-pointer rounded border border-white/10 bg-transparent"
+                />
+              </div>
+
+              {/* Warm/Cool */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-white/50">Sıcak / Soğuk</span>
+                  <span className="text-[10px] font-mono text-white/60">
+                    {(config.specularLights?.warmCool || 0) > 0 ? 'Sıcak' : (config.specularLights?.warmCool || 0) < 0 ? 'Soğuk' : 'Nötr'}
+                  </span>
+                </div>
+                <ThrottledRangeInput
+                  min={-1}
+                  max={1}
+                  step={0.1}
+                  value={config.specularLights?.warmCool || 0}
+                  onChange={(v) => onChange({ 
+                    specularLights: { ...config.specularLights, warmCool: v } 
+                  })}
+                />
+              </div>
+            </>
+          )}
         </div>
 
         {/* Shadows */}
