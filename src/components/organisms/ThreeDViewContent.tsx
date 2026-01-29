@@ -815,19 +815,43 @@ function SceneContent({
       
       const boundingBox = geometry.boundingBox;
       if (boundingBox) {
+        // The model is rotated by modelRotation (default: [-PI/2, 0, 0] for Z-up to Y-up)
+        // We need to calculate the bounding box AFTER rotation to place on ground correctly
+        
+        // Apply the rotation matrix to the bounding box corners
+        const rotationMatrix = new THREE.Matrix4().makeRotationFromEuler(
+          new THREE.Euler(modelRotation[0], modelRotation[1], modelRotation[2])
+        );
+        
+        // Get all 8 corners of the bounding box
+        const corners = [
+          new THREE.Vector3(boundingBox.min.x, boundingBox.min.y, boundingBox.min.z),
+          new THREE.Vector3(boundingBox.min.x, boundingBox.min.y, boundingBox.max.z),
+          new THREE.Vector3(boundingBox.min.x, boundingBox.max.y, boundingBox.min.z),
+          new THREE.Vector3(boundingBox.min.x, boundingBox.max.y, boundingBox.max.z),
+          new THREE.Vector3(boundingBox.max.x, boundingBox.min.y, boundingBox.min.z),
+          new THREE.Vector3(boundingBox.max.x, boundingBox.min.y, boundingBox.max.z),
+          new THREE.Vector3(boundingBox.max.x, boundingBox.max.y, boundingBox.min.z),
+          new THREE.Vector3(boundingBox.max.x, boundingBox.max.y, boundingBox.max.z),
+        ];
+        
+        // Rotate all corners and compute new bounding box
+        const rotatedBox = new THREE.Box3();
+        corners.forEach(corner => {
+          corner.applyMatrix4(rotationMatrix);
+          rotatedBox.expandByPoint(corner);
+        });
+        
         const center = new THREE.Vector3();
-        boundingBox.getCenter(center);
+        rotatedBox.getCenter(center);
         
         const size = new THREE.Vector3();
-        boundingBox.getSize(size);
+        rotatedBox.getSize(size);
         const maxDim = Math.max(size.x, size.y, size.z);
         const scale = maxDim > 0 ? 2 / maxDim : 1;
         
-        // Calculate position to place model on ground (minY at y=0)
-        // After scaling, the model's minY should be at 0
-        // minY in local space * scale = 0 in world space
-        // So we offset by -minY so that minY becomes 0
-        const minY = boundingBox.min.y;
+        // minY in the rotated coordinate system
+        const minY = rotatedBox.min.y;
         
         setModelTransform({
           // Center horizontally (X and Z), but place on ground (Y)
@@ -839,11 +863,18 @@ function SceneContent({
           scale: scale,
         });
         
+        // Update bounding box for other uses (ground plane, etc.)
+        const scaledBox = rotatedBox.clone();
+        scaledBox.min.sub(new THREE.Vector3(center.x, minY, center.z)).multiplyScalar(scale);
+        scaledBox.max.sub(new THREE.Vector3(center.x, minY, center.z)).multiplyScalar(scale);
+        setModelBoundingBox(scaledBox);
+        onBoundingBoxChange?.(scaledBox);
+        
         // Auto fit to view after loading - look at the center height of the model
         setTimeout(() => {
           const modelHeight = size.y * scale;
           const lookAtY = modelHeight / 2; // Look at center of model
-          camera.position.set(4, 3 + lookAtY, 4);
+          camera.position.set(4, 2 + lookAtY, 4);
           if (controlsRef.current) {
             controlsRef.current.target.set(0, lookAtY, 0);
             controlsRef.current.update();
@@ -853,7 +884,7 @@ function SceneContent({
     } else {
       setModelTransform(null);
     }
-  }, [geometry, camera]);
+  }, [geometry, camera, modelRotation, onBoundingBoxChange]);
 
   // Center and scale layers (3DM) - place on ground
   useEffect(() => {
@@ -868,16 +899,40 @@ function SceneContent({
         }
       });
 
+      // Apply the rotation matrix to the bounding box corners (for Z-up to Y-up)
+      const rotationMatrix = new THREE.Matrix4().makeRotationFromEuler(
+        new THREE.Euler(modelRotation[0], modelRotation[1], modelRotation[2])
+      );
+      
+      // Get all 8 corners of the bounding box
+      const corners = [
+        new THREE.Vector3(combinedBox.min.x, combinedBox.min.y, combinedBox.min.z),
+        new THREE.Vector3(combinedBox.min.x, combinedBox.min.y, combinedBox.max.z),
+        new THREE.Vector3(combinedBox.min.x, combinedBox.max.y, combinedBox.min.z),
+        new THREE.Vector3(combinedBox.min.x, combinedBox.max.y, combinedBox.max.z),
+        new THREE.Vector3(combinedBox.max.x, combinedBox.min.y, combinedBox.min.z),
+        new THREE.Vector3(combinedBox.max.x, combinedBox.min.y, combinedBox.max.z),
+        new THREE.Vector3(combinedBox.max.x, combinedBox.max.y, combinedBox.min.z),
+        new THREE.Vector3(combinedBox.max.x, combinedBox.max.y, combinedBox.max.z),
+      ];
+      
+      // Rotate all corners and compute new bounding box
+      const rotatedBox = new THREE.Box3();
+      corners.forEach(corner => {
+        corner.applyMatrix4(rotationMatrix);
+        rotatedBox.expandByPoint(corner);
+      });
+
       const center = new THREE.Vector3();
-      combinedBox.getCenter(center);
+      rotatedBox.getCenter(center);
       
       const size = new THREE.Vector3();
-      combinedBox.getSize(size);
+      rotatedBox.getSize(size);
       const maxDim = Math.max(size.x, size.y, size.z);
       const scale = maxDim > 0 ? 2 / maxDim : 1;
       
-      // Get minY for ground placement
-      const minY = combinedBox.min.y;
+      // Get minY for ground placement (in rotated space)
+      const minY = rotatedBox.min.y;
 
       // Apply transform to group - center X/Z, place on ground Y
       groupRef.current.position.set(
@@ -890,13 +945,13 @@ function SceneContent({
       // Look at the center height of the model
       const modelHeight = size.y * scale;
       const lookAtY = modelHeight / 2;
-      camera.position.set(4, 3 + lookAtY, 4);
+      camera.position.set(4, 2 + lookAtY, 4);
       if (controlsRef.current) {
         controlsRef.current.target.set(0, lookAtY, 0);
         controlsRef.current.update();
       }
     }
-  }, [layers, camera]);
+  }, [layers, camera, modelRotation]);
 
   // Calculate final intensities with global multiplier
   const intensityMultiplier = lightIntensity;
@@ -997,13 +1052,15 @@ function SceneContent({
 
       {/* STL Model */}
       {geometry && modelTransform && (
-        <group rotation={modelRotation}>
-          <group
-            position={[
-              modelTransform.position.x * modelTransform.scale,
-              modelTransform.position.y * modelTransform.scale,
-              modelTransform.position.z * modelTransform.scale,
-            ]}
+        <group
+          position={[
+            modelTransform.position.x * modelTransform.scale,
+            modelTransform.position.y * modelTransform.scale,
+            modelTransform.position.z * modelTransform.scale,
+          ]}
+        >
+          <group 
+            rotation={modelRotation}
             scale={[modelTransform.scale, modelTransform.scale, modelTransform.scale]}
           >
             <mesh ref={meshRef} geometry={geometry} castShadow receiveShadow userData={{ selectable: true, id: 'stl-mesh' }}>
