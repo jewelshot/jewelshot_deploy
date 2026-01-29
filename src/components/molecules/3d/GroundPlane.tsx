@@ -48,9 +48,13 @@ export interface GroundPlaneConfig {
   gridSize: number;
   // Shadow
   receiveShadow: boolean;
-  // NEW: Shadow Catcher Mode
+  // Shadow Catcher Mode
   shadowCatcherOnly: boolean; // Only show shadows, transparent otherwise
   shadowOpacity: number; // 0-1
+  // Unlit mode - completely ignores all lighting and environment
+  unlit: boolean;
+  // Show reflections on top (when unlit)
+  showReflections: boolean;
   // NEW: Texture
   texture: 'none' | 'marble' | 'wood' | 'velvet' | 'concrete' | 'custom';
   textureScale: number;
@@ -87,9 +91,11 @@ export const DEFAULT_GROUND_CONFIG: GroundPlaneConfig = {
   showGrid: false,
   gridColor: '#CCCCCC',
   gridSize: 1,
-  receiveShadow: true,
+  receiveShadow: false,
   shadowCatcherOnly: false,
   shadowOpacity: 0.5,
+  unlit: true,
+  showReflections: false,
   texture: 'none',
   textureScale: 1,
   curvedBackground: false,
@@ -341,25 +347,70 @@ export function GroundPlane({
             mirror={config.materialType === 'mirror' ? 1 : 0}
           />
         </mesh>
-      ) : config.materialType === 'flat' ? (
-        /* Flat ground - exact color match with background, no reflections/shading */
-        <mesh
-          ref={meshRef}
-          rotation={[-Math.PI / 2, 0, 0]}
-          receiveShadow={false}
-          onClick={(e) => {
-            e.stopPropagation();
-            onGroundClick?.();
-          }}
-          userData={{ isGround: true }}
-        >
-          <planeGeometry args={[planeSize, planeSize]} />
-          <meshBasicMaterial 
-            color={config.color} 
-            transparent={config.opacity < 1}
-            opacity={config.opacity}
-          />
-        </mesh>
+      ) : (config.unlit || config.materialType === 'flat') ? (
+        /* Unlit/Flat ground - exact color match with background, completely ignores lighting */
+        <>
+          <mesh
+            ref={meshRef}
+            rotation={[-Math.PI / 2, 0, 0]}
+            receiveShadow={false}
+            onClick={(e) => {
+              e.stopPropagation();
+              onGroundClick?.();
+            }}
+            userData={{ isGround: true }}
+            renderOrder={-2}
+          >
+            <planeGeometry args={[planeSize, planeSize]} />
+            <meshBasicMaterial 
+              color={config.color} 
+              transparent={config.opacity < 1}
+              opacity={config.opacity}
+              toneMapped={false}
+            />
+          </mesh>
+          {/* Shadow overlay when shadows enabled */}
+          {config.receiveShadow && (
+            <mesh
+              rotation={[-Math.PI / 2, 0, 0]}
+              position={[0, 0.001, 0]}
+              receiveShadow={true}
+              renderOrder={-1}
+            >
+              <planeGeometry args={[planeSize, planeSize]} />
+              <shadowMaterial 
+                transparent 
+                opacity={config.shadowOpacity ?? 0.3} 
+              />
+            </mesh>
+          )}
+          {/* Reflection overlay when reflections enabled */}
+          {config.showReflections && (
+            <mesh
+              rotation={[-Math.PI / 2, 0, 0]}
+              position={[0, 0.002, 0]}
+              receiveShadow={false}
+              renderOrder={0}
+            >
+              <planeGeometry args={[planeSize, planeSize]} />
+              <MeshReflectorMaterial
+                color="#ffffff"
+                blur={[config.blur || 300, config.blur || 300]}
+                resolution={config.reflectionResolution || 512}
+                mixBlur={1}
+                mixStrength={config.reflectivity || 0.3}
+                roughness={0.8}
+                depthScale={0}
+                minDepthThreshold={0.9}
+                maxDepthThreshold={1}
+                metalness={0}
+                mirror={0}
+                transparent
+                opacity={0.5}
+              />
+            </mesh>
+          )}
+        </>
       ) : (
         /* Main reflective ground plane */
         <mesh
@@ -771,24 +822,120 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
             </div>
           </div>
 
-          {/* Shadow Catcher Mode */}
+          {/* Unlit Mode - Priority toggle */}
           <div className="pt-2 border-t border-white/10 space-y-2">
             <label className="flex cursor-pointer items-center justify-between">
-              <span className="text-[10px] text-white/60">Sadece Gölge (Shadow Catcher)</span>
+              <div>
+                <span className="text-[10px] text-white/70">Işıktan Bağımsız (Unlit)</span>
+                <p className="text-[8px] text-white/40">Arkaplanla aynı renk</p>
+              </div>
               <button
-                onClick={() => onChange({ shadowCatcherOnly: !config.shadowCatcherOnly })}
-                className={`relative h-4 w-7 rounded-full transition-colors ${
-                  config.shadowCatcherOnly ? 'bg-purple-500' : 'bg-white/20'
+                onClick={() => onChange({ unlit: !config.unlit })}
+                className={`relative h-5 w-9 rounded-full transition-colors ${
+                  config.unlit ? 'bg-green-500' : 'bg-white/20'
                 }`}
               >
                 <span
-                  className={`absolute left-0.5 top-0.5 h-3 w-3 rounded-full bg-white transition-transform ${
-                    config.shadowCatcherOnly ? 'translate-x-3' : 'translate-x-0'
+                  className={`absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white transition-transform ${
+                    config.unlit ? 'translate-x-4' : 'translate-x-0'
                   }`}
                 />
               </button>
             </label>
-            <p className="text-[9px] text-white/30">Sadece gölgeleri göster, zemin şeffaf</p>
+          </div>
+
+          {/* Shadow and Reflection options when unlit */}
+          {config.unlit && (
+            <div className="space-y-2 p-2 rounded-lg border border-white/10 bg-white/5">
+              <label className="flex cursor-pointer items-center justify-between">
+                <span className="text-[10px] text-white/60">Gölgeleri Göster</span>
+                <button
+                  onClick={() => onChange({ receiveShadow: !config.receiveShadow })}
+                  className={`relative h-4 w-7 rounded-full transition-colors ${
+                    config.receiveShadow ? 'bg-purple-500' : 'bg-white/20'
+                  }`}
+                >
+                  <span
+                    className={`absolute left-0.5 top-0.5 h-3 w-3 rounded-full bg-white transition-transform ${
+                      config.receiveShadow ? 'translate-x-3' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </label>
+
+              {config.receiveShadow && (
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-white/50">Gölge Yoğunluğu</span>
+                    <span className="text-[10px] font-mono text-white/60">
+                      {Math.round((config.shadowOpacity || 0.3) * 100)}%
+                    </span>
+                  </div>
+                  <ThrottledRangeInput
+                    min={0}
+                    max={1}
+                    step={0.05}
+                    value={config.shadowOpacity || 0.3}
+                    onChange={(v) => onChange({ shadowOpacity: v })}
+                  />
+                </div>
+              )}
+
+              <label className="flex cursor-pointer items-center justify-between">
+                <span className="text-[10px] text-white/60">Yansımaları Göster</span>
+                <button
+                  onClick={() => onChange({ showReflections: !config.showReflections })}
+                  className={`relative h-4 w-7 rounded-full transition-colors ${
+                    config.showReflections ? 'bg-purple-500' : 'bg-white/20'
+                  }`}
+                >
+                  <span
+                    className={`absolute left-0.5 top-0.5 h-3 w-3 rounded-full bg-white transition-transform ${
+                      config.showReflections ? 'translate-x-3' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </label>
+
+              {config.showReflections && (
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-white/50">Yansıma Gücü</span>
+                    <span className="text-[10px] font-mono text-white/60">
+                      {Math.round((config.reflectivity || 0.3) * 100)}%
+                    </span>
+                  </div>
+                  <ThrottledRangeInput
+                    min={0}
+                    max={1}
+                    step={0.05}
+                    value={config.reflectivity || 0.3}
+                    onChange={(v) => onChange({ reflectivity: v })}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Shadow Catcher Mode - only when not unlit */}
+          {!config.unlit && (
+            <div className="pt-2 border-t border-white/10 space-y-2">
+              <label className="flex cursor-pointer items-center justify-between">
+                <span className="text-[10px] text-white/60">Sadece Gölge (Shadow Catcher)</span>
+                <button
+                  onClick={() => onChange({ shadowCatcherOnly: !config.shadowCatcherOnly })}
+                  className={`relative h-4 w-7 rounded-full transition-colors ${
+                    config.shadowCatcherOnly ? 'bg-purple-500' : 'bg-white/20'
+                  }`}
+                >
+                  <span
+                    className={`absolute left-0.5 top-0.5 h-3 w-3 rounded-full bg-white transition-transform ${
+                      config.shadowCatcherOnly ? 'translate-x-3' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </label>
+              <p className="text-[9px] text-white/30">Sadece gölgeleri göster, zemin şeffaf</p>
             
             {config.shadowCatcherOnly && (
               <div className="space-y-1">
@@ -809,7 +956,8 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
                 />
               </div>
             )}
-          </div>
+            </div>
+          )}
 
           {/* Texture Section */}
           <div className="pt-2 border-t border-white/10 space-y-2">
