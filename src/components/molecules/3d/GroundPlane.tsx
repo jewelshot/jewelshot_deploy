@@ -181,6 +181,7 @@ interface GroundPlaneProps {
   config: GroundPlaneConfig;
   modelBoundingBox?: THREE.Box3 | null;
   onHeightChange?: (height: number) => void;
+  onGroundClick?: () => void; // Callback when ground is clicked
 }
 
 // ============================================
@@ -238,6 +239,7 @@ export function GroundPlane({
   config, 
   modelBoundingBox,
   onHeightChange,
+  onGroundClick,
 }: GroundPlaneProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const { scene } = useThree();
@@ -292,6 +294,11 @@ export function GroundPlane({
           ref={meshRef}
           rotation={[-Math.PI / 2, 0, 0]}
           receiveShadow
+          onClick={(e) => {
+            e.stopPropagation();
+            onGroundClick?.();
+          }}
+          userData={{ isGround: true }}
         >
           <planeGeometry args={[planeSize, planeSize]} />
           <shadowMaterial 
@@ -305,6 +312,11 @@ export function GroundPlane({
           ref={meshRef}
           rotation={[-Math.PI / 2, 0, 0]}
           receiveShadow={config.receiveShadow}
+          onClick={(e) => {
+            e.stopPropagation();
+            onGroundClick?.();
+          }}
+          userData={{ isGround: true }}
         >
           <planeGeometry args={[planeSize, planeSize]} />
           <MeshReflectorMaterial
@@ -327,6 +339,11 @@ export function GroundPlane({
           ref={meshRef}
           rotation={[-Math.PI / 2, 0, 0]}
           receiveShadow={config.receiveShadow}
+          onClick={(e) => {
+            e.stopPropagation();
+            onGroundClick?.();
+          }}
+          userData={{ isGround: true }}
         >
           <planeGeometry args={[planeSize, planeSize]} />
           <MeshReflectorMaterial

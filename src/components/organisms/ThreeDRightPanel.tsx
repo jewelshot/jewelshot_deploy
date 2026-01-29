@@ -9,7 +9,7 @@
 
 'use client';
 
-import React, { useState, useCallback, memo } from 'react';
+import React, { useState, useCallback, memo, useEffect } from 'react';
 import * as THREE from 'three';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -321,6 +321,10 @@ interface ThreeDRightPanelProps {
   singleGeometryWeight?: number;
   singleGeometryVolume?: number;
   singleGeometryMaterial?: string;
+  
+  // Force switch to specific tab (from external trigger like clicking ground)
+  forceActiveTab?: TabId | null;
+  onForceActiveTabHandled?: () => void;
 }
 
 // ============================================
@@ -451,8 +455,19 @@ export function ThreeDRightPanel({
   singleGeometryWeight,
   singleGeometryVolume,
   singleGeometryMaterial,
+  // Force active tab
+  forceActiveTab,
+  onForceActiveTabHandled,
 }: ThreeDRightPanelProps) {
   const [activeTab, setActiveTab] = useState<TabId>('model');
+
+  // Handle forced tab switch (e.g., when clicking on ground)
+  useEffect(() => {
+    if (forceActiveTab) {
+      setActiveTab(forceActiveTab);
+      onForceActiveTabHandled?.();
+    }
+  }, [forceActiveTab, onForceActiveTabHandled]);
 
   if (!isOpen) return null;
 

@@ -669,6 +669,8 @@ function SceneContent({
   onSelectObject,
   selectedMesh,
   selectionEnabled = true,
+  // Ground click
+  onGroundClick,
 }: {
   geometry: THREE.BufferGeometry | null;
   material: MaterialPreset;
@@ -704,6 +706,8 @@ function SceneContent({
   onSelectObject?: (objectId: string | null, mesh: THREE.Object3D | null) => void;
   selectedMesh?: THREE.Object3D | null;
   selectionEnabled?: boolean;
+  // Ground click
+  onGroundClick?: () => void;
 }) {
   const controlsRef = useRef<any>(null);
   const groupRef = useRef<THREE.Group>(null);
@@ -1053,6 +1057,9 @@ function SceneContent({
         <GroundPlane 
           config={groundConfig}
           modelBoundingBox={modelBoundingBox}
+          onGroundClick={() => {
+            onGroundClick?.();
+          }}
         />
       )}
 
@@ -1331,6 +1338,9 @@ export default function ThreeDViewContent() {
   
   // Layer selection
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
+  
+  // Force active tab in right panel (for clicking on ground, etc.)
+  const [forceActiveTab, setForceActiveTab] = useState<'model' | 'materials' | 'lighting' | 'effects' | 'view' | 'export' | null>(null);
   
   // Material Picker Modal
   const [materialPickerOpen, setMaterialPickerOpen] = useState(false);
@@ -2638,6 +2648,11 @@ export default function ThreeDViewContent() {
                 }}
                 selectedMesh={selectedMeshRef}
                 selectionEnabled={!isTransforming}
+                // Ground click - open ground settings in right panel
+                onGroundClick={() => {
+                  setRightOpen(true);
+                  setForceActiveTab('lighting');
+                }}
               />
               <SnapshotHelper onSnapshot={handleSnapshotResult} />
               {/* FPS Counter - temporary for debugging */}
@@ -3077,6 +3092,9 @@ export default function ThreeDViewContent() {
               singleGeometryWeight={singleGeometryWeight}
               singleGeometryVolume={singleGeometryVolume}
               singleGeometryMaterial={selectedMaterial?.name}
+              // Force active tab (e.g., when clicking on ground)
+              forceActiveTab={forceActiveTab}
+              onForceActiveTabHandled={() => setForceActiveTab(null)}
             />
           )}
         </div>
