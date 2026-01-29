@@ -1000,6 +1000,14 @@ function SceneContent({
         <color attach="background" args={[backgroundColor]} />
       )}
       
+      {/* Specular highlight point lights - always active for sparkle effect */}
+      <pointLight position={[0.5, 1.5, 0.5]} intensity={3 * lightIntensity} color="#ffffff" distance={5} decay={2} />
+      <pointLight position={[-0.5, 1.2, 0.3]} intensity={2.5 * lightIntensity} color="#ffffff" distance={5} decay={2} />
+      <pointLight position={[0.3, 1.8, -0.4]} intensity={2 * lightIntensity} color="#ffffff" distance={5} decay={2} />
+      <pointLight position={[-0.4, 1.0, -0.5]} intensity={2 * lightIntensity} color="#fffaf0" distance={5} decay={2} />
+      <pointLight position={[0.8, 2.0, 0.8]} intensity={1.5 * lightIntensity} color="#f8f8ff" distance={6} decay={2} />
+      <pointLight position={[-0.8, 1.5, -0.8]} intensity={1.5 * lightIntensity} color="#fffff0" distance={6} decay={2} />
+
       {/* Environment: HDR or Lightformer - ONLY for reflections, never as visible background */}
       {useHDR && hdrPreset ? (
         <Environment 
@@ -1024,12 +1032,21 @@ function SceneContent({
               rotation={light.rotation || [0, 0, 0]}
             />
           ))}
-          {/* Point-like bright spots for sharp specular highlights */}
-          <Lightformer form="circle" color="#ffffff" intensity={15 * lightIntensity} position={[2, 3, 2]} scale={0.3} />
-          <Lightformer form="circle" color="#ffffff" intensity={12 * lightIntensity} position={[-2, 4, -1]} scale={0.25} />
-          <Lightformer form="circle" color="#ffffff" intensity={10 * lightIntensity} position={[0, 5, -3]} scale={0.2} />
-          <Lightformer form="circle" color="#fffaf0" intensity={8 * lightIntensity} position={[3, 2, -2]} scale={0.35} />
-          <Lightformer form="circle" color="#f0f8ff" intensity={8 * lightIntensity} position={[-3, 3, 1]} scale={0.3} />
+          {/* Point-like bright spots for sharp specular highlights on jewelry */}
+          {/* Close to origin where jewelry sits - small but very bright */}
+          <Lightformer form="circle" color="#ffffff" intensity={50 * lightIntensity} position={[0.5, 1.5, 0.5]} scale={0.15} />
+          <Lightformer form="circle" color="#ffffff" intensity={40 * lightIntensity} position={[-0.5, 1.2, 0.3]} scale={0.12} />
+          <Lightformer form="circle" color="#ffffff" intensity={45 * lightIntensity} position={[0.3, 1.8, -0.4]} scale={0.1} />
+          <Lightformer form="circle" color="#ffffff" intensity={35 * lightIntensity} position={[-0.4, 1.0, -0.5]} scale={0.18} />
+          <Lightformer form="circle" color="#ffffff" intensity={30 * lightIntensity} position={[0.6, 2.0, 0]} scale={0.2} />
+          {/* Additional ring of lights around the object */}
+          <Lightformer form="circle" color="#fffef0" intensity={25 * lightIntensity} position={[1, 1, 1]} scale={0.25} />
+          <Lightformer form="circle" color="#f8f8ff" intensity={25 * lightIntensity} position={[-1, 1.2, 1]} scale={0.25} />
+          <Lightformer form="circle" color="#fffff0" intensity={25 * lightIntensity} position={[1, 0.8, -1]} scale={0.25} />
+          <Lightformer form="circle" color="#f0f8ff" intensity={25 * lightIntensity} position={[-1, 1.5, -1]} scale={0.25} />
+          {/* Farther lights for variety */}
+          <Lightformer form="circle" color="#ffffff" intensity={20 * lightIntensity} position={[2, 3, 2]} scale={0.4} />
+          <Lightformer form="circle" color="#ffffff" intensity={20 * lightIntensity} position={[-2, 2.5, -2]} scale={0.4} />
         </Environment>
       )}
       
