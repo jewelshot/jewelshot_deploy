@@ -141,11 +141,11 @@ export const DEFAULT_POST_PROCESSING_CONFIG: PostProcessingConfig = {
   toneMapping: 'aces',
   exposure: 1.0,
   bloom: {
-    enabled: true,
-    intensity: 0.5,
-    luminanceThreshold: 0.9,
+    enabled: false, // Disabled by default - user can enable if needed
+    intensity: 0.3,
+    luminanceThreshold: 0.95, // Higher threshold = only very bright areas bloom
     luminanceSmoothing: 0.025,
-    radius: 0.8,
+    radius: 0.5, // Smaller radius = tighter bloom
   },
   dof: {
     enabled: false,
@@ -240,7 +240,7 @@ export const POST_PROCESSING_PRESETS: PostProcessingPreset[] = [
       enabled: true,
       toneMapping: 'aces',
       exposure: 1.0,
-      bloom: { enabled: true, intensity: 0.3, luminanceThreshold: 0.95, luminanceSmoothing: 0.025, radius: 0.6 },
+      bloom: { enabled: false, intensity: 0.2, luminanceThreshold: 0.95, luminanceSmoothing: 0.025, radius: 0.5 },
       ssao: { enabled: true, intensity: 0.3, radius: 0.08, samples: 16 },
     },
   },
@@ -252,7 +252,7 @@ export const POST_PROCESSING_PRESETS: PostProcessingPreset[] = [
       enabled: true,
       toneMapping: 'aces',
       exposure: 1.1,
-      bloom: { enabled: true, intensity: 0.6, luminanceThreshold: 0.85, luminanceSmoothing: 0.03, radius: 0.9 },
+      bloom: { enabled: true, intensity: 0.25, luminanceThreshold: 0.92, luminanceSmoothing: 0.02, radius: 0.4 },
       ssao: { enabled: true, intensity: 0.5, radius: 0.1, samples: 24 },
     },
   },
@@ -264,7 +264,7 @@ export const POST_PROCESSING_PRESETS: PostProcessingPreset[] = [
       enabled: true,
       toneMapping: 'cineon',
       exposure: 1.2,
-      bloom: { enabled: true, intensity: 0.8, luminanceThreshold: 0.8, luminanceSmoothing: 0.04, radius: 1.0 },
+      bloom: { enabled: true, intensity: 0.4, luminanceThreshold: 0.88, luminanceSmoothing: 0.03, radius: 0.6 },
       vignette: { enabled: true, offset: 0.4, darkness: 0.6 },
       ssao: { enabled: true, intensity: 0.7, radius: 0.15, samples: 32 },
     },
@@ -277,7 +277,7 @@ export const POST_PROCESSING_PRESETS: PostProcessingPreset[] = [
       enabled: true,
       toneMapping: 'agx',
       exposure: 1.0,
-      bloom: { enabled: true, intensity: 0.4, luminanceThreshold: 0.9, luminanceSmoothing: 0.025, radius: 0.7 },
+      bloom: { enabled: true, intensity: 0.3, luminanceThreshold: 0.9, luminanceSmoothing: 0.025, radius: 0.5 },
       dof: { enabled: true, focusDistance: 3, focalLength: 85, bokehScale: 3 },
       vignette: { enabled: true, offset: 0.5, darkness: 0.4 },
     },
