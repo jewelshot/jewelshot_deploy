@@ -28,7 +28,7 @@ export { OrientationModal, type OrientationConfig } from './OrientationModal';
 export { EnvironmentPicker, type SelectedEnvironment, type EnvironmentType } from './EnvironmentPicker';
 
 // Ground Plane
-export { GroundPlane, GroundPlaneControls, type GroundPlaneConfig, DEFAULT_GROUND_CONFIG, GROUND_PRESETS } from './GroundPlane';
+export { GroundPlane, GroundPlaneControls, type GroundPlaneConfig, type GroundMaterialType, DEFAULT_GROUND_CONFIG, GROUND_PRESETS } from './GroundPlane';
 
 // Lighting
 export { LightingPanel, type LightingConfig, type Light3D, DEFAULT_LIGHTING_CONFIG, LIGHTING_PRESETS } from './LightingPanel';

@@ -21,6 +21,8 @@ import { MeshReflectorMaterial } from '@react-three/drei';
 // TYPES
 // ============================================
 
+export type GroundMaterialType = 'matte' | 'satin' | 'glossy' | 'metallic' | 'mirror';
+
 export interface GroundPlaneConfig {
   enabled: boolean;
   autoPosition: boolean; // Auto-position to touch model base
@@ -31,6 +33,10 @@ export interface GroundPlaneConfig {
   opacity: number;
   reflectivity: number;
   blur: number;
+  // Material Properties
+  materialType: GroundMaterialType;
+  metalness: number; // 0-1
+  roughness: number; // 0-1
   // NEW: Gradient
   gradientType: 'none' | 'linear' | 'radial';
   gradientColorStart: string;
@@ -58,8 +64,6 @@ export interface GroundPlaneConfig {
   reflectionResolution: 256 | 512 | 1024 | 2048;
   // NEW: Infinite plane
   infinitePlane: boolean;
-  // NEW: Roughness
-  roughness: number;
 }
 
 export const DEFAULT_GROUND_CONFIG: GroundPlaneConfig = {
@@ -71,6 +75,11 @@ export const DEFAULT_GROUND_CONFIG: GroundPlaneConfig = {
   opacity: 1,
   reflectivity: 0.2,
   blur: 300,
+  // Material properties
+  materialType: 'satin',
+  metalness: 0,
+  roughness: 0.5,
+  // Gradient
   gradientType: 'none',
   gradientColorStart: '#FFFFFF',
   gradientColorEnd: '#E0E0E0',
@@ -89,7 +98,6 @@ export const DEFAULT_GROUND_CONFIG: GroundPlaneConfig = {
   curvedBackgroundRadius: 3,
   reflectionResolution: 512,
   infinitePlane: false,
-  roughness: 0.8,
 };
 
 // Texture presets
@@ -324,13 +332,13 @@ export function GroundPlane({
             blur={[config.blur, config.blur]}
             resolution={config.reflectionResolution || 512}
             mixBlur={1}
-            mixStrength={config.reflectivity * 0.5}
-            roughness={config.roughness ?? 0.8}
+            mixStrength={config.reflectivity}
+            roughness={config.roughness ?? 0.5}
             depthScale={1}
             minDepthThreshold={0.4}
             maxDepthThreshold={1.4}
-            metalness={0}
-            mirror={0}
+            metalness={config.metalness ?? 0}
+            mirror={config.materialType === 'mirror' ? 1 : 0}
           />
         </mesh>
       ) : (
@@ -352,12 +360,12 @@ export function GroundPlane({
             resolution={config.reflectionResolution || 512}
             mixBlur={1}
             mixStrength={config.reflectivity}
-            roughness={config.roughness ?? 0.8}
+            roughness={config.roughness ?? 0.5}
             depthScale={1}
             minDepthThreshold={0.4}
             maxDepthThreshold={1.4}
-            metalness={0}
-            mirror={0}
+            metalness={config.metalness ?? 0}
+            mirror={config.materialType === 'mirror' ? 1 : 0}
           />
         </mesh>
       )}
@@ -560,6 +568,77 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
             </div>
           )}
 
+          {/* Material Type */}
+          <div className="space-y-2">
+            <span className="text-[10px] text-white/50">Malzeme Tipi</span>
+            <div className="grid grid-cols-5 gap-1">
+              {([
+                { id: 'matte', name: 'Mat', icon: '◐' },
+                { id: 'satin', name: 'Saten', icon: '◑' },
+                { id: 'glossy', name: 'Parlak', icon: '●' },
+                { id: 'metallic', name: 'Metalik', icon: '◉' },
+                { id: 'mirror', name: 'Ayna', icon: '◎' },
+              ] as const).map((mat) => (
+                <button
+                  key={mat.id}
+                  onClick={() => {
+                    // Apply preset values for each material type
+                    const presets: Record<GroundMaterialType, { metalness: number; roughness: number; reflectivity: number }> = {
+                      matte: { metalness: 0, roughness: 0.9, reflectivity: 0.05 },
+                      satin: { metalness: 0, roughness: 0.5, reflectivity: 0.2 },
+                      glossy: { metalness: 0, roughness: 0.1, reflectivity: 0.5 },
+                      metallic: { metalness: 0.8, roughness: 0.2, reflectivity: 0.7 },
+                      mirror: { metalness: 1, roughness: 0, reflectivity: 0.95 },
+                    };
+                    onChange({ materialType: mat.id, ...presets[mat.id] });
+                  }}
+                  className={`flex flex-col items-center rounded-md py-1.5 text-[9px] transition-all ${
+                    config.materialType === mat.id
+                      ? 'bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/50'
+                      : 'bg-white/5 text-white/50 hover:bg-white/10'
+                  }`}
+                >
+                  <span className="text-sm">{mat.icon}</span>
+                  <span className="mt-0.5">{mat.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Metalness */}
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] text-white/50">Metalik</span>
+              <span className="text-[10px] font-mono text-white/60">
+                {Math.round((config.metalness ?? 0) * 100)}%
+              </span>
+            </div>
+            <ThrottledRangeInput
+              min={0}
+              max={1}
+              step={0.05}
+              value={config.metalness ?? 0}
+              onChange={(v) => onChange({ metalness: v })}
+            />
+          </div>
+
+          {/* Roughness */}
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] text-white/50">Pürüzlülük</span>
+              <span className="text-[10px] font-mono text-white/60">
+                {Math.round((config.roughness ?? 0.5) * 100)}%
+              </span>
+            </div>
+            <ThrottledRangeInput
+              min={0}
+              max={1}
+              step={0.05}
+              value={config.roughness ?? 0.5}
+              onChange={(v) => onChange({ roughness: v })}
+            />
+          </div>
+
           {/* Reflectivity */}
           <div className="space-y-1">
             <div className="flex items-center justify-between">
@@ -569,13 +648,11 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
               </span>
             </div>
             <ThrottledRangeInput
-              
               min={0}
               max={1}
               step={0.05}
               value={config.reflectivity}
               onChange={(v) => onChange({ reflectivity: v })}
-              
             />
           </div>
 
@@ -862,41 +939,66 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
 export const GROUND_PRESETS = [
   {
     id: 'pure-white',
-    name: 'Beyaz',
+    name: 'Beyaz Mat',
     config: {
       color: '#FFFFFF',
-      reflectivity: 0.2,
+      materialType: 'matte' as const,
+      metalness: 0,
+      roughness: 0.9,
+      reflectivity: 0.05,
       blur: 400,
       showGrid: false,
     },
   },
   {
-    id: 'studio-light',
-    name: 'Açık Gri',
+    id: 'white-satin',
+    name: 'Beyaz Saten',
     config: {
-      color: '#F0F0F0',
-      reflectivity: 0.25,
+      color: '#FFFFFF',
+      materialType: 'satin' as const,
+      metalness: 0,
+      roughness: 0.5,
+      reflectivity: 0.2,
       blur: 350,
       showGrid: false,
     },
   },
   {
-    id: 'studio-dark',
-    name: 'Koyu',
+    id: 'white-glossy',
+    name: 'Beyaz Parlak',
     config: {
-      color: '#1a1a1a',
-      reflectivity: 0.4,
-      blur: 300,
+      color: '#FFFFFF',
+      materialType: 'glossy' as const,
+      metalness: 0,
+      roughness: 0.1,
+      reflectivity: 0.5,
+      blur: 200,
       showGrid: false,
     },
   },
   {
-    id: 'showroom',
-    name: 'Showroom',
+    id: 'dark-matte',
+    name: 'Koyu Mat',
     config: {
-      color: '#1a1a2e',
-      reflectivity: 0.6,
-      blur: 200,
+      color: '#1a1a1a',
+      materialType: 'matte' as const,
+      metalness: 0,
+      roughness: 0.9,
+      reflectivity: 0.1,
+      blur: 400,
+      showGrid: false,
+    },
+  },
+  {
+    id: 'metallic',
+    name: 'Metalik',
+    config: {
+      color: '#2a2a2a',
+      materialType: 'metallic' as const,
+      metalness: 0.8,
+      roughness: 0.2,
+      reflectivity: 0.7,
+      blur: 150,
       showGrid: false,
     },
   },
@@ -905,8 +1007,11 @@ export const GROUND_PRESETS = [
     name: 'Ayna',
     config: {
       color: '#000000',
-      reflectivity: 0.9,
-      blur: 100,
+      materialType: 'mirror' as const,
+      metalness: 1,
+      roughness: 0,
+      reflectivity: 0.95,
+      blur: 50,
       showGrid: false,
     },
   },
