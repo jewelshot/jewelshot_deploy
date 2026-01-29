@@ -31,8 +31,8 @@ export interface BackgroundConfig {
 
 export const DEFAULT_BACKGROUND_CONFIG: BackgroundConfig = {
   type: 'solid',
-  solidColor: '#0a0a0a',
-  gradientColors: ['#0a0a0a', '#1a1a2e'],
+  solidColor: '#FFFFFF',
+  gradientColors: ['#FFFFFF', '#E8E8E8'],
   gradientDirection: 'vertical',
   opacity: 1,
 };
@@ -42,18 +42,18 @@ export const DEFAULT_BACKGROUND_CONFIG: BackgroundConfig = {
 // ============================================
 
 export const COLOR_PRESETS = [
+  { id: 'white', name: 'Beyaz', color: '#FFFFFF' },
+  { id: 'off-white', name: 'Kırık Beyaz', color: '#F5F5F5' },
+  { id: 'silver', name: 'Gümüş', color: '#E0E0E0' },
+  { id: 'light-gray', name: 'Açık Gri', color: '#C0C0C0' },
+  { id: 'gray', name: 'Gri', color: '#808080' },
+  { id: 'slate', name: 'Arduvaz', color: '#4a4a4a' },
+  { id: 'charcoal', name: 'Kömür', color: '#2d2d2d' },
+  { id: 'dark', name: 'Koyu', color: '#1a1a1a' },
   { id: 'black', name: 'Siyah', color: '#000000' },
-  { id: 'dark', name: 'Koyu', color: '#0a0a0a' },
-  { id: 'charcoal', name: 'Kömür', color: '#1a1a1a' },
-  { id: 'slate', name: 'Arduvaz', color: '#2d2d2d' },
-  { id: 'gray', name: 'Gri', color: '#4a4a4a' },
-  { id: 'light-gray', name: 'Açık Gri', color: '#808080' },
-  { id: 'silver', name: 'Gümüş', color: '#c0c0c0' },
-  { id: 'white', name: 'Beyaz', color: '#ffffff' },
   { id: 'navy', name: 'Lacivert', color: '#0a1628' },
   { id: 'purple', name: 'Mor', color: '#1a0a28' },
   { id: 'warm', name: 'Sıcak', color: '#1a1408' },
-  { id: 'cool', name: 'Soğuk', color: '#081418' },
 ];
 
 export const GRADIENT_PRESETS = [
