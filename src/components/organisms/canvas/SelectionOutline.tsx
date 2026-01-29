@@ -40,14 +40,14 @@ export function SelectionOutline({
   const groupRef = useRef<THREE.Group>(null);
   const outlineMeshesRef = useRef<THREE.Mesh[]>([]);
   
-  // Create outline material - renders back faces only
+  // Create outline material - renders back faces only, always on top
   const material = useMemo(() => {
     return new THREE.MeshBasicMaterial({
       color: new THREE.Color(color),
       side: THREE.BackSide, // Render back faces
-      transparent: opacity < 1,
+      transparent: true,
       opacity: opacity,
-      depthTest: true,
+      depthTest: false, // Always render on top (not hidden by ground)
       depthWrite: false,
     });
   }, [color, opacity]);
@@ -91,8 +91,8 @@ export function SelectionOutline({
             // Scale up to create the outline effect
             outlineMesh.scale.multiplyScalar(thickness);
             
-            // Render order to ensure outline is behind the object
-            outlineMesh.renderOrder = -1;
+            // High render order to ensure outline renders on top of ground
+            outlineMesh.renderOrder = 999;
             
             groupRef.current?.add(outlineMesh);
             outlineMeshesRef.current.push(outlineMesh);
