@@ -1,15 +1,16 @@
 /**
- * SelectionOutline - Edge-based outline for selected objects
+ * SelectionOutline - Silhouette outline for selected objects
  * 
- * Uses EdgesGeometry + LineSegments for clean contour lines.
- * Only shows the actual edges/silhouette of the object.
+ * Uses inverted hull technique: renders a slightly larger version
+ * of the mesh behind the original, with only back faces visible.
+ * This creates a clean silhouette outline around the object's contour.
  * 
  * This approach:
- * - Shows only edges, not surfaces
+ * - Shows only outer silhouette, not internal wireframe
  * - Does not re-render the scene
  * - Does not affect scene colors
  * - No glow effect
- * - Simple and performant
+ * - Works with any geometry
  */
 
 'use client';
@@ -22,8 +23,8 @@ interface SelectionOutlineProps {
   selectedObjects: THREE.Object3D[];
   /** Outline color */
   color?: string;
-  /** Edge angle threshold in degrees (edges sharper than this are shown) */
-  thresholdAngle?: number;
+  /** Outline thickness (in world units, added to each vertex along normal) */
+  thickness?: number;
   /** Whether outline is enabled */
   enabled?: boolean;
   /** Opacity of the outline */
@@ -33,22 +34,22 @@ interface SelectionOutlineProps {
 export function SelectionOutline({
   selectedObjects,
   color = '#ff6600',
-  thresholdAngle = 15, // Show edges where angle > 15 degrees
+  thickness = 0.003, // Small offset for thin outline
   enabled = true,
   opacity = 1,
 }: SelectionOutlineProps) {
   const groupRef = useRef<THREE.Group>(null);
-  const outlineLinesRef = useRef<THREE.LineSegments[]>([]);
+  const outlineMeshesRef = useRef<THREE.Mesh[]>([]);
   
-  // Create line material
+  // Create outline material - renders back faces only
   const material = useMemo(() => {
-    return new THREE.LineBasicMaterial({
+    return new THREE.MeshBasicMaterial({
       color: new THREE.Color(color),
+      side: THREE.BackSide, // Only render back faces (inverted hull)
       transparent: opacity < 1,
       opacity: opacity,
-      depthTest: false, // Always render on top
+      depthTest: true,
       depthWrite: false,
-      linewidth: 1, // Note: linewidth > 1 only works on some platforms
     });
   }, [color, opacity]);
   
@@ -59,20 +60,20 @@ export function SelectionOutline({
     material.transparent = opacity < 1;
   }, [material, color, opacity]);
   
-  // Create/update outline edges when selection changes
+  // Create/update outline meshes when selection changes
   useEffect(() => {
     if (!groupRef.current) return;
     
     // Clear existing outlines
-    outlineLinesRef.current.forEach(line => {
-      line.geometry.dispose();
-      groupRef.current?.remove(line);
+    outlineMeshesRef.current.forEach(mesh => {
+      mesh.geometry.dispose();
+      groupRef.current?.remove(mesh);
     });
-    outlineLinesRef.current = [];
+    outlineMeshesRef.current = [];
     
     if (!enabled || selectedObjects.length === 0) return;
     
-    // Create edge outlines for each selected object
+    // Create silhouette outlines for each selected object
     selectedObjects.forEach(obj => {
       if (!obj) return;
       
@@ -80,25 +81,47 @@ export function SelectionOutline({
       obj.traverse((child) => {
         if (child instanceof THREE.Mesh && child.geometry) {
           try {
-            // Create edges geometry - only shows sharp edges
-            const edgesGeometry = new THREE.EdgesGeometry(
-              child.geometry,
-              thresholdAngle // Angle threshold in degrees
-            );
+            // Clone the geometry
+            const outlineGeometry = child.geometry.clone();
             
-            const lineSegments = new THREE.LineSegments(edgesGeometry, material);
+            // Expand vertices along normals for outline effect
+            if (outlineGeometry.attributes.position && outlineGeometry.attributes.normal) {
+              const positions = outlineGeometry.attributes.position;
+              const normals = outlineGeometry.attributes.normal;
+              
+              // Get the world scale to adjust thickness
+              child.updateWorldMatrix(true, false);
+              const worldScale = new THREE.Vector3();
+              child.matrixWorld.decompose(new THREE.Vector3(), new THREE.Quaternion(), worldScale);
+              const avgScale = (worldScale.x + worldScale.y + worldScale.z) / 3;
+              const adjustedThickness = thickness / avgScale;
+              
+              for (let i = 0; i < positions.count; i++) {
+                const nx = normals.getX(i);
+                const ny = normals.getY(i);
+                const nz = normals.getZ(i);
+                
+                positions.setX(i, positions.getX(i) + nx * adjustedThickness);
+                positions.setY(i, positions.getY(i) + ny * adjustedThickness);
+                positions.setZ(i, positions.getZ(i) + nz * adjustedThickness);
+              }
+              
+              positions.needsUpdate = true;
+            }
+            
+            const outlineMesh = new THREE.Mesh(outlineGeometry, material);
             
             // Copy the world transform from the original mesh
-            child.updateWorldMatrix(true, false);
-            lineSegments.applyMatrix4(child.matrixWorld);
+            outlineMesh.applyMatrix4(child.matrixWorld);
             
-            // High render order to ensure outline renders on top
-            lineSegments.renderOrder = 999;
+            // Render before the main object (lower render order)
+            // so the main object covers it, leaving only the outline visible
+            outlineMesh.renderOrder = -1;
             
-            groupRef.current?.add(lineSegments);
-            outlineLinesRef.current.push(lineSegments);
+            groupRef.current?.add(outlineMesh);
+            outlineMeshesRef.current.push(outlineMesh);
           } catch (e) {
-            console.warn('Failed to create edge outline for mesh:', e);
+            console.warn('Failed to create silhouette outline for mesh:', e);
           }
         }
       });
@@ -106,12 +129,12 @@ export function SelectionOutline({
     
     // Cleanup on unmount
     return () => {
-      outlineLinesRef.current.forEach(line => {
-        line.geometry.dispose();
+      outlineMeshesRef.current.forEach(mesh => {
+        mesh.geometry.dispose();
       });
-      outlineLinesRef.current = [];
+      outlineMeshesRef.current = [];
     };
-  }, [selectedObjects, enabled, material, thresholdAngle]);
+  }, [selectedObjects, enabled, material, thickness]);
   
   // Cleanup material on unmount
   useEffect(() => {
