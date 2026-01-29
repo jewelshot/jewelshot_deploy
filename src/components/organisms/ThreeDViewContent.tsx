@@ -627,7 +627,7 @@ function SelectionManager({
     <SelectionOutline
       selectedObjects={selectedObjects}
       color="#ff6600"
-      thickness={0.002}
+      thickness={0.004}
       enabled={enabled && selectedObjects.length > 0}
     />
   );
