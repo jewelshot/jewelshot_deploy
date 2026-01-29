@@ -1,15 +1,15 @@
 /**
- * SelectionOutline - Simple edge outline for selected objects
+ * SelectionOutline - Edge-based outline for selected objects
  * 
- * Uses a scaled-up back-face mesh with outline material for clean,
- * visible outlines without any post-processing effects.
+ * Uses EdgesGeometry + LineSegments for clean contour lines.
+ * Only shows the actual edges/silhouette of the object.
  * 
  * This approach:
+ * - Shows only edges, not surfaces
  * - Does not re-render the scene
  * - Does not affect scene colors
  * - No glow effect
- * - Visible outline thickness (not limited by WebGL lineWidth)
- * - Simple, performant, and reliable
+ * - Simple and performant
  */
 
 'use client';
@@ -22,8 +22,8 @@ interface SelectionOutlineProps {
   selectedObjects: THREE.Object3D[];
   /** Outline color */
   color?: string;
-  /** Outline thickness (scale factor, 1.01 = thin, 1.03 = thick) */
-  thickness?: number;
+  /** Edge angle threshold in degrees (edges sharper than this are shown) */
+  thresholdAngle?: number;
   /** Whether outline is enabled */
   enabled?: boolean;
   /** Opacity of the outline */
@@ -33,22 +33,22 @@ interface SelectionOutlineProps {
 export function SelectionOutline({
   selectedObjects,
   color = '#ff6600',
-  thickness = 1.015, // 1.5% larger = visible but not too thick
+  thresholdAngle = 15, // Show edges where angle > 15 degrees
   enabled = true,
   opacity = 1,
 }: SelectionOutlineProps) {
   const groupRef = useRef<THREE.Group>(null);
-  const outlineMeshesRef = useRef<THREE.Mesh[]>([]);
+  const outlineLinesRef = useRef<THREE.LineSegments[]>([]);
   
-  // Create outline material - renders back faces only, always on top
+  // Create line material
   const material = useMemo(() => {
-    return new THREE.MeshBasicMaterial({
+    return new THREE.LineBasicMaterial({
       color: new THREE.Color(color),
-      side: THREE.BackSide, // Render back faces
-      transparent: true,
+      transparent: opacity < 1,
       opacity: opacity,
-      depthTest: false, // Always render on top (not hidden by ground)
+      depthTest: false, // Always render on top
       depthWrite: false,
+      linewidth: 1, // Note: linewidth > 1 only works on some platforms
     });
   }, [color, opacity]);
   
@@ -59,20 +59,20 @@ export function SelectionOutline({
     material.transparent = opacity < 1;
   }, [material, color, opacity]);
   
-  // Create/update outline meshes when selection changes
+  // Create/update outline edges when selection changes
   useEffect(() => {
     if (!groupRef.current) return;
     
     // Clear existing outlines
-    outlineMeshesRef.current.forEach(mesh => {
-      mesh.geometry.dispose();
-      groupRef.current?.remove(mesh);
+    outlineLinesRef.current.forEach(line => {
+      line.geometry.dispose();
+      groupRef.current?.remove(line);
     });
-    outlineMeshesRef.current = [];
+    outlineLinesRef.current = [];
     
     if (!enabled || selectedObjects.length === 0) return;
     
-    // Create outlines for each selected object
+    // Create edge outlines for each selected object
     selectedObjects.forEach(obj => {
       if (!obj) return;
       
@@ -80,24 +80,25 @@ export function SelectionOutline({
       obj.traverse((child) => {
         if (child instanceof THREE.Mesh && child.geometry) {
           try {
-            // Clone the geometry for the outline
-            const outlineGeometry = child.geometry.clone();
-            const outlineMesh = new THREE.Mesh(outlineGeometry, material);
+            // Create edges geometry - only shows sharp edges
+            const edgesGeometry = new THREE.EdgesGeometry(
+              child.geometry,
+              thresholdAngle // Angle threshold in degrees
+            );
+            
+            const lineSegments = new THREE.LineSegments(edgesGeometry, material);
             
             // Copy the world transform from the original mesh
             child.updateWorldMatrix(true, false);
-            outlineMesh.applyMatrix4(child.matrixWorld);
+            lineSegments.applyMatrix4(child.matrixWorld);
             
-            // Scale up to create the outline effect
-            outlineMesh.scale.multiplyScalar(thickness);
+            // High render order to ensure outline renders on top
+            lineSegments.renderOrder = 999;
             
-            // High render order to ensure outline renders on top of ground
-            outlineMesh.renderOrder = 999;
-            
-            groupRef.current?.add(outlineMesh);
-            outlineMeshesRef.current.push(outlineMesh);
+            groupRef.current?.add(lineSegments);
+            outlineLinesRef.current.push(lineSegments);
           } catch (e) {
-            console.warn('Failed to create outline for mesh:', e);
+            console.warn('Failed to create edge outline for mesh:', e);
           }
         }
       });
@@ -105,12 +106,12 @@ export function SelectionOutline({
     
     // Cleanup on unmount
     return () => {
-      outlineMeshesRef.current.forEach(mesh => {
-        mesh.geometry.dispose();
+      outlineLinesRef.current.forEach(line => {
+        line.geometry.dispose();
       });
-      outlineMeshesRef.current = [];
+      outlineLinesRef.current = [];
     };
-  }, [selectedObjects, enabled, material, thickness]);
+  }, [selectedObjects, enabled, material, thresholdAngle]);
   
   // Cleanup material on unmount
   useEffect(() => {

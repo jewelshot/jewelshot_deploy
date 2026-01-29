@@ -627,7 +627,7 @@ function SelectionManager({
     <SelectionOutline
       selectedObjects={selectedObjects}
       color="#ff6600"
-      thickness={1.02}
+      thresholdAngle={1}
       enabled={enabled && selectedObjects.length > 0}
     />
   );
