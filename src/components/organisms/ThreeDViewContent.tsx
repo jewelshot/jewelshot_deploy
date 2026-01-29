@@ -1125,7 +1125,6 @@ function SceneContent({
         minDistance={0.5}
         maxDistance={20}
         target={[0, 0, 0]}
-        regress
       />
       
       {/* Axis Gizmo in corner - always visible for orientation reference */}
@@ -2575,7 +2574,6 @@ export default function ThreeDViewContent() {
             shadows
             camera={{ position: [3, 2, 3], fov: 50 }}
             frameloop="always"
-            performance={{ min: 0.5, max: 1, debounce: 200 }}
             gl={{ 
               preserveDrawingBuffer: true, 
               antialias: true,
