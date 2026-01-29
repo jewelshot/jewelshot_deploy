@@ -823,16 +823,29 @@ function SceneContent({
         const maxDim = Math.max(size.x, size.y, size.z);
         const scale = maxDim > 0 ? 2 / maxDim : 1;
         
+        // Calculate position to place model on ground (minY at y=0)
+        // After scaling, the model's minY should be at 0
+        // minY in local space * scale = 0 in world space
+        // So we offset by -minY so that minY becomes 0
+        const minY = boundingBox.min.y;
+        
         setModelTransform({
-          position: new THREE.Vector3(-center.x, -center.y, -center.z),
+          // Center horizontally (X and Z), but place on ground (Y)
+          position: new THREE.Vector3(
+            -center.x,           // Center X
+            -minY,               // Place bottom on ground (y=0)
+            -center.z            // Center Z
+          ),
           scale: scale,
         });
         
-        // Auto fit to view after loading
+        // Auto fit to view after loading - look at the center height of the model
         setTimeout(() => {
-          camera.position.set(4, 3, 4);
+          const modelHeight = size.y * scale;
+          const lookAtY = modelHeight / 2; // Look at center of model
+          camera.position.set(4, 3 + lookAtY, 4);
           if (controlsRef.current) {
-            controlsRef.current.target.set(0, 0, 0);
+            controlsRef.current.target.set(0, lookAtY, 0);
             controlsRef.current.update();
           }
         }, 100);
@@ -842,7 +855,7 @@ function SceneContent({
     }
   }, [geometry, camera]);
 
-  // Center and scale layers (3DM)
+  // Center and scale layers (3DM) - place on ground
   useEffect(() => {
     if (layers.length > 0 && groupRef.current) {
       // Compute combined bounding box
@@ -862,14 +875,24 @@ function SceneContent({
       combinedBox.getSize(size);
       const maxDim = Math.max(size.x, size.y, size.z);
       const scale = maxDim > 0 ? 2 / maxDim : 1;
+      
+      // Get minY for ground placement
+      const minY = combinedBox.min.y;
 
-      // Apply transform to group
-      groupRef.current.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
+      // Apply transform to group - center X/Z, place on ground Y
+      groupRef.current.position.set(
+        -center.x * scale,    // Center X
+        -minY * scale,        // Place bottom on ground (y=0)
+        -center.z * scale     // Center Z
+      );
       groupRef.current.scale.set(scale, scale, scale);
 
-      camera.position.set(4, 3, 4);
+      // Look at the center height of the model
+      const modelHeight = size.y * scale;
+      const lookAtY = modelHeight / 2;
+      camera.position.set(4, 3 + lookAtY, 4);
       if (controlsRef.current) {
-        controlsRef.current.target.set(0, 0, 0);
+        controlsRef.current.target.set(0, lookAtY, 0);
         controlsRef.current.update();
       }
     }
