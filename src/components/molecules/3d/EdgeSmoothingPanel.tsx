@@ -42,31 +42,31 @@ export const DEFAULT_EDGE_SMOOTHING_CONFIG: EdgeSmoothingConfig = {
 export const QUALITY_PRESETS = [
   {
     id: 'draft',
-    name: 'Taslak',
+    name: 'Düşük',
     description: 'Hızlı önizleme',
     config: {
       subdivisionLevel: 0,
       edgeSmoothing: 0,
-      tessellationQuality: 0.25,
-    },
-  },
-  {
-    id: 'preview',
-    name: 'Önizleme',
-    description: 'Dengeli performans',
-    config: {
-      subdivisionLevel: 0,
-      edgeSmoothing: 0.3,
       tessellationQuality: 0.5,
     },
   },
   {
+    id: 'preview',
+    name: 'Orta',
+    description: 'Dengeli performans',
+    config: {
+      subdivisionLevel: 0,
+      edgeSmoothing: 0.2,
+      tessellationQuality: 0.75,
+    },
+  },
+  {
     id: 'balanced',
-    name: 'Dengeli',
+    name: 'İyi',
     description: 'Varsayılan kalite',
     config: {
-      subdivisionLevel: 1,
-      edgeSmoothing: 0.5,
+      subdivisionLevel: 0,
+      edgeSmoothing: 0.4,
       tessellationQuality: 1.0,
     },
   },
@@ -75,9 +75,9 @@ export const QUALITY_PRESETS = [
     name: 'Yüksek',
     description: 'Yüksek detay',
     config: {
-      subdivisionLevel: 2,
-      edgeSmoothing: 0.7,
-      tessellationQuality: 2.0,
+      subdivisionLevel: 1,
+      edgeSmoothing: 0.6,
+      tessellationQuality: 1.5,
     },
   },
   {
@@ -85,9 +85,9 @@ export const QUALITY_PRESETS = [
     name: 'Ultra',
     description: 'Maksimum kalite',
     config: {
-      subdivisionLevel: 3,
-      edgeSmoothing: 1.0,
-      tessellationQuality: 5.0,
+      subdivisionLevel: 2,
+      edgeSmoothing: 0.8,
+      tessellationQuality: 2.0,
     },
   },
 ];
@@ -157,19 +157,16 @@ export function EdgeSmoothingPanel({
           <span className="text-[10px] font-mono text-white/60">{config.subdivisionLevel}x</span>
         </div>
         <ThrottledRangeInput
-          
           min={0}
-          max={3}
+          max={2}
           step={1}
           value={config.subdivisionLevel}
           onChange={(v) => onChange({ subdivisionLevel: v })}
-          
         />
         <div className="flex justify-between text-[9px] text-white/30">
           <span>Orijinal</span>
           <span>1x</span>
           <span>2x</span>
-          <span>3x (Yavaş)</span>
         </div>
         {config.subdivisionLevel > 0 && (
           <p className="text-[9px] text-yellow-400/70">
@@ -207,21 +204,19 @@ export function EdgeSmoothingPanel({
           <div className="flex items-center justify-between">
             <span className="text-[10px] text-white/50">NURBS Kalitesi</span>
             <span className="text-[10px] font-mono text-purple-400">
-              {config.tessellationQuality.toFixed(2)}
+              {config.tessellationQuality.toFixed(1)}
             </span>
           </div>
           <ThrottledRangeInput
-            
-            min={0.25}
-            max={5}
-            step={0.25}
+            min={0.5}
+            max={2}
+            step={0.1}
             value={config.tessellationQuality}
             onChange={(v) => onChange({ tessellationQuality: v })}
-            
           />
           <div className="flex justify-between text-[9px] text-white/30">
             <span>Hızlı</span>
-            <span>Dengeli</span>
+            <span>Normal</span>
             <span>HD</span>
           </div>
           <p className="text-[9px] text-white/40">

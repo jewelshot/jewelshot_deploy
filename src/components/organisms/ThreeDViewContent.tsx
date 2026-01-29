@@ -54,6 +54,7 @@ import {
   MousePointer2,
 } from 'lucide-react';
 import { useSidebarStore } from '@/store/sidebarStore';
+import { useViewer3DStore } from '@/store/viewer3dStore';
 import { useObjectPicker } from '@/hooks/useObjectPicker';
 import { SelectionOutline } from '@/components/organisms/canvas/SelectionOutline';
 import { Accordion } from '@/components/atoms/Accordion';
@@ -1108,17 +1109,19 @@ function SceneContent({
       {/* Grid */}
       {showGrid && (
         <Grid
-          args={[10, 10]}
-          cellSize={0.5}
-          cellThickness={0.5}
-          cellColor="#444"
-          sectionSize={2}
-          sectionThickness={1}
-          sectionColor="#666"
-          fadeDistance={15}
-          fadeStrength={1}
+          args={[20, 20]}
+          cellSize={0.25}
+          cellThickness={0.3}
+          cellColor="#333"
+          sectionSize={1}
+          sectionThickness={0.6}
+          sectionColor="#555"
+          fadeDistance={25}
+          fadeStrength={2}
           followCamera={false}
-          infiniteGrid
+          infiniteGrid={false}
+          position={[0, -0.001, 0]}
+          renderOrder={-1}
         />
       )}
       
@@ -1610,6 +1613,20 @@ export default function ThreeDViewContent() {
       setShowGrid(true);
     }
   }, [viewConfig.debugView, viewConfig.showAxes]);
+  
+  // Get viewer3d store actions for syncing weight data
+  const setStoreFileName = useViewer3DStore((state) => state.setFileName);
+  const setStoreLayers = useViewer3DStore((state) => state.setLayers);
+  
+  // Sync local layers to viewer3d store for WeightSummaryCard
+  useEffect(() => {
+    setStoreFileName(fileName);
+    // Note: We pass layers as [] since the WeightSummaryCard also accepts
+    // singleGeometryWeight props which we pass from ThreeDRightPanel
+    // For now, clear store layers to avoid type mismatch - the weight display
+    // uses the singleGeometryWeight prop path instead
+    setStoreLayers([]);
+  }, [fileName, setStoreFileName, setStoreLayers]);
   
   // Resolution change callback
   const handleResolutionChange = useCallback((ratio: number, refining: boolean) => {
