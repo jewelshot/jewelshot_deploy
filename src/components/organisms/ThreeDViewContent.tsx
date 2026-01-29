@@ -627,7 +627,7 @@ function SelectionManager({
     <SelectionOutline
       selectedObjects={selectedObjects}
       color="#ff6600"
-      thickness={0.004}
+      padding={0.005}
       enabled={enabled && selectedObjects.length > 0}
     />
   );
@@ -1116,13 +1116,13 @@ function SceneContent({
         ref={controlsRef}
         makeDefault
         enableDamping
-        dampingFactor={0.1}
+        dampingFactor={0.15}
         enablePan
         enableZoom
         enableRotate
-        rotateSpeed={3}
-        zoomSpeed={3}
-        panSpeed={3}
+        rotateSpeed={2}
+        zoomSpeed={2}
+        panSpeed={2}
         autoRotate={autoRotate || isTurntablePlaying}
         autoRotateSpeed={turntableConfig?.speed || 2}
         minDistance={0.5}

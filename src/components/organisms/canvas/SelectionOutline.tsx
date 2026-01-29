@@ -1,16 +1,8 @@
 /**
- * SelectionOutline - Silhouette outline for selected objects
+ * SelectionOutline - Bounding box outline for selected objects
  * 
- * Uses inverted hull technique: renders a slightly larger version
- * of the mesh behind the original, with only back faces visible.
- * This creates a clean silhouette outline around the object's contour.
- * 
- * This approach:
- * - Shows only outer silhouette, not internal wireframe
- * - Does not re-render the scene
- * - Does not affect scene colors
- * - No glow effect
- * - Works with any geometry
+ * Uses a simple wireframe box around the object's bounding box.
+ * This approach is simple, performant, and works from all angles.
  */
 
 'use client';
@@ -23,32 +15,31 @@ interface SelectionOutlineProps {
   selectedObjects: THREE.Object3D[];
   /** Outline color */
   color?: string;
-  /** Outline thickness (in world units, added to each vertex along normal) */
-  thickness?: number;
   /** Whether outline is enabled */
   enabled?: boolean;
   /** Opacity of the outline */
   opacity?: number;
+  /** Padding around the bounding box */
+  padding?: number;
 }
 
 export function SelectionOutline({
   selectedObjects,
   color = '#ff6600',
-  thickness = 0.003, // Small offset for thin outline
   enabled = true,
   opacity = 1,
+  padding = 0.01,
 }: SelectionOutlineProps) {
   const groupRef = useRef<THREE.Group>(null);
-  const outlineMeshesRef = useRef<THREE.Mesh[]>([]);
+  const outlineLinesRef = useRef<THREE.LineSegments[]>([]);
   
-  // Create outline material - renders back faces only
+  // Create line material
   const material = useMemo(() => {
-    return new THREE.MeshBasicMaterial({
+    return new THREE.LineBasicMaterial({
       color: new THREE.Color(color),
-      side: THREE.BackSide, // Only render back faces (inverted hull)
       transparent: opacity < 1,
       opacity: opacity,
-      depthTest: true,
+      depthTest: false,
       depthWrite: false,
     });
   }, [color, opacity]);
@@ -60,81 +51,69 @@ export function SelectionOutline({
     material.transparent = opacity < 1;
   }, [material, color, opacity]);
   
-  // Create/update outline meshes when selection changes
+  // Create/update bounding box outlines when selection changes
   useEffect(() => {
     if (!groupRef.current) return;
     
     // Clear existing outlines
-    outlineMeshesRef.current.forEach(mesh => {
-      mesh.geometry.dispose();
-      groupRef.current?.remove(mesh);
+    outlineLinesRef.current.forEach(line => {
+      line.geometry.dispose();
+      groupRef.current?.remove(line);
     });
-    outlineMeshesRef.current = [];
+    outlineLinesRef.current = [];
     
     if (!enabled || selectedObjects.length === 0) return;
     
-    // Create silhouette outlines for each selected object
+    // Create bounding box outline for each selected object
     selectedObjects.forEach(obj => {
       if (!obj) return;
       
-      // Find all meshes in the object
-      obj.traverse((child) => {
-        if (child instanceof THREE.Mesh && child.geometry) {
-          try {
-            // Clone the geometry
-            const outlineGeometry = child.geometry.clone();
-            
-            // Expand vertices along normals for outline effect
-            if (outlineGeometry.attributes.position && outlineGeometry.attributes.normal) {
-              const positions = outlineGeometry.attributes.position;
-              const normals = outlineGeometry.attributes.normal;
-              
-              // Get the world scale to adjust thickness
-              child.updateWorldMatrix(true, false);
-              const worldScale = new THREE.Vector3();
-              child.matrixWorld.decompose(new THREE.Vector3(), new THREE.Quaternion(), worldScale);
-              const avgScale = (worldScale.x + worldScale.y + worldScale.z) / 3;
-              const adjustedThickness = thickness / avgScale;
-              
-              for (let i = 0; i < positions.count; i++) {
-                const nx = normals.getX(i);
-                const ny = normals.getY(i);
-                const nz = normals.getZ(i);
-                
-                positions.setX(i, positions.getX(i) + nx * adjustedThickness);
-                positions.setY(i, positions.getY(i) + ny * adjustedThickness);
-                positions.setZ(i, positions.getZ(i) + nz * adjustedThickness);
-              }
-              
-              positions.needsUpdate = true;
-            }
-            
-            const outlineMesh = new THREE.Mesh(outlineGeometry, material);
-            
-            // Copy the world transform from the original mesh
-            outlineMesh.applyMatrix4(child.matrixWorld);
-            
-            // Render before the main object (lower render order)
-            // so the main object covers it, leaving only the outline visible
-            outlineMesh.renderOrder = -1;
-            
-            groupRef.current?.add(outlineMesh);
-            outlineMeshesRef.current.push(outlineMesh);
-          } catch (e) {
-            console.warn('Failed to create silhouette outline for mesh:', e);
-          }
-        }
-      });
+      try {
+        // Compute bounding box of the entire object
+        const box = new THREE.Box3().setFromObject(obj);
+        
+        if (box.isEmpty()) return;
+        
+        // Add padding
+        box.expandByScalar(padding);
+        
+        // Create box helper geometry
+        const boxGeometry = new THREE.BoxGeometry(
+          box.max.x - box.min.x,
+          box.max.y - box.min.y,
+          box.max.z - box.min.z
+        );
+        
+        // Convert to edges
+        const edgesGeometry = new THREE.EdgesGeometry(boxGeometry);
+        const lineSegments = new THREE.LineSegments(edgesGeometry, material);
+        
+        // Position at center of bounding box
+        const center = new THREE.Vector3();
+        box.getCenter(center);
+        lineSegments.position.copy(center);
+        
+        // High render order
+        lineSegments.renderOrder = 999;
+        
+        groupRef.current?.add(lineSegments);
+        outlineLinesRef.current.push(lineSegments);
+        
+        // Cleanup box geometry
+        boxGeometry.dispose();
+      } catch (e) {
+        console.warn('Failed to create bounding box outline:', e);
+      }
     });
     
     // Cleanup on unmount
     return () => {
-      outlineMeshesRef.current.forEach(mesh => {
-        mesh.geometry.dispose();
+      outlineLinesRef.current.forEach(line => {
+        line.geometry.dispose();
       });
-      outlineMeshesRef.current = [];
+      outlineLinesRef.current = [];
     };
-  }, [selectedObjects, enabled, material, thickness]);
+  }, [selectedObjects, enabled, material, padding]);
   
   // Cleanup material on unmount
   useEffect(() => {
