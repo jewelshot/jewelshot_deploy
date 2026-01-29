@@ -93,9 +93,9 @@ export const DEFAULT_GROUND_CONFIG: GroundPlaneConfig = {
   gridSize: 1,
   receiveShadow: false,
   shadowCatcherOnly: false,
-  shadowOpacity: 0.5,
+  shadowOpacity: 0.3,
   unlit: true,
-  showReflections: false,
+  showReflections: true,
   texture: 'none',
   textureScale: 1,
   curvedBackground: false,
@@ -348,8 +348,9 @@ export function GroundPlane({
           />
         </mesh>
       ) : (config.unlit || config.materialType === 'flat') ? (
-        /* Unlit/Flat ground - exact color match with background, completely ignores lighting */
+        /* Unlit/Flat ground - exact color match with background, but can show product reflections */
         <>
+          {/* Base layer - unlit, exact color match */}
           <mesh
             ref={meshRef}
             rotation={[-Math.PI / 2, 0, 0]}
@@ -369,6 +370,7 @@ export function GroundPlane({
               toneMapped={false}
             />
           </mesh>
+          
           {/* Shadow overlay when shadows enabled */}
           {config.receiveShadow && (
             <mesh
@@ -384,7 +386,8 @@ export function GroundPlane({
               />
             </mesh>
           )}
-          {/* Reflection overlay when reflections enabled */}
+          
+          {/* Product reflection overlay - glossy/metallic reflections of the 3D object */}
           {config.showReflections && (
             <mesh
               rotation={[-Math.PI / 2, 0, 0]}
@@ -394,19 +397,19 @@ export function GroundPlane({
             >
               <planeGeometry args={[planeSize, planeSize]} />
               <MeshReflectorMaterial
-                color="#ffffff"
-                blur={[config.blur || 300, config.blur || 300]}
-                resolution={config.reflectionResolution || 512}
-                mixBlur={1}
-                mixStrength={config.reflectivity || 0.3}
-                roughness={0.8}
-                depthScale={0}
-                minDepthThreshold={0.9}
-                maxDepthThreshold={1}
-                metalness={0}
-                mirror={0}
+                color={config.color}
+                blur={[config.blur || 200, config.blur || 200]}
+                resolution={config.reflectionResolution || 1024}
+                mixBlur={config.roughness ?? 0.3}
+                mixStrength={config.reflectivity || 0.5}
+                roughness={config.roughness ?? 0.3}
+                depthScale={1.2}
+                minDepthThreshold={0.4}
+                maxDepthThreshold={1.4}
+                metalness={config.metalness ?? 0}
+                mirror={config.materialType === 'mirror' ? 0.9 : 0.3}
                 transparent
-                opacity={0.5}
+                opacity={0.8}
               />
             </mesh>
           )}
@@ -882,36 +885,76 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
               )}
 
               <label className="flex cursor-pointer items-center justify-between">
-                <span className="text-[10px] text-white/60">Yansımaları Göster</span>
+                <div>
+                  <span className="text-[10px] text-white/70">Ürün Yansıması</span>
+                  <p className="text-[8px] text-white/40">Glossy / Metalik yansıma</p>
+                </div>
                 <button
                   onClick={() => onChange({ showReflections: !config.showReflections })}
-                  className={`relative h-4 w-7 rounded-full transition-colors ${
+                  className={`relative h-5 w-9 rounded-full transition-colors ${
                     config.showReflections ? 'bg-purple-500' : 'bg-white/20'
                   }`}
                 >
                   <span
-                    className={`absolute left-0.5 top-0.5 h-3 w-3 rounded-full bg-white transition-transform ${
-                      config.showReflections ? 'translate-x-3' : 'translate-x-0'
+                    className={`absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white transition-transform ${
+                      config.showReflections ? 'translate-x-4' : 'translate-x-0'
                     }`}
                   />
                 </button>
               </label>
 
               {config.showReflections && (
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-white/50">Yansıma Gücü</span>
-                    <span className="text-[10px] font-mono text-white/60">
-                      {Math.round((config.reflectivity || 0.3) * 100)}%
-                    </span>
+                <div className="space-y-2 mt-2 p-2 rounded-md bg-white/5 border border-white/10">
+                  {/* Reflection Strength */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-white/50">Yansıma Gücü</span>
+                      <span className="text-[10px] font-mono text-white/60">
+                        {Math.round((config.reflectivity || 0.5) * 100)}%
+                      </span>
+                    </div>
+                    <ThrottledRangeInput
+                      min={0}
+                      max={1}
+                      step={0.05}
+                      value={config.reflectivity || 0.5}
+                      onChange={(v) => onChange({ reflectivity: v })}
+                    />
                   </div>
-                  <ThrottledRangeInput
-                    min={0}
-                    max={1}
-                    step={0.05}
-                    value={config.reflectivity || 0.3}
-                    onChange={(v) => onChange({ reflectivity: v })}
-                  />
+
+                  {/* Blur / Roughness */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-white/50">Bulanıklık</span>
+                      <span className="text-[10px] font-mono text-white/60">
+                        {Math.round((config.roughness || 0.3) * 100)}%
+                      </span>
+                    </div>
+                    <ThrottledRangeInput
+                      min={0}
+                      max={1}
+                      step={0.05}
+                      value={config.roughness || 0.3}
+                      onChange={(v) => onChange({ roughness: v })}
+                    />
+                  </div>
+
+                  {/* Metallic */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-white/50">Metalik</span>
+                      <span className="text-[10px] font-mono text-white/60">
+                        {Math.round((config.metalness || 0) * 100)}%
+                      </span>
+                    </div>
+                    <ThrottledRangeInput
+                      min={0}
+                      max={1}
+                      step={0.05}
+                      value={config.metalness || 0}
+                      onChange={(v) => onChange({ metalness: v })}
+                    />
+                  </div>
                 </div>
               )}
             </div>
