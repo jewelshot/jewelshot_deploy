@@ -1,186 +1,130 @@
 /**
- * SelectionOutline - Orange outline effect for selected objects
+ * SelectionOutline - Simple edge outline for selected objects
  * 
- * Uses Three.js EffectComposer with OutlinePass for a professional
- * selection indicator like in KeyShot, Blender, etc.
- * 
- * This component copies the renderer's output encoding and tone mapping
- * settings to ensure the scene doesn't appear darker when outline is active.
+ * Uses EdgesGeometry and LineSegments for a clean outline without
+ * any post-processing effects. This approach:
+ * - Does not re-render the scene
+ * - Does not affect scene colors
+ * - No glow effect
+ * - Simple, performant, and reliable
  */
 
 'use client';
 
-import { useEffect, useRef, useCallback } from 'react';
-import { useThree, useFrame, extend } from '@react-three/fiber';
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
-import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectionShader.js';
+import { useEffect, useRef, useMemo } from 'react';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-
-// Extend R3F with post-processing classes
-extend({ EffectComposer, RenderPass, OutlinePass, ShaderPass });
 
 interface SelectionOutlineProps {
   /** Array of selected meshes to outline */
   selectedObjects: THREE.Object3D[];
-  /** Edge thickness */
-  edgeThickness?: number;
-  /** Edge strength/intensity */
-  edgeStrength?: number;
-  /** Visible edge color */
-  visibleEdgeColor?: string;
-  /** Hidden edge color (dimmer) */
-  hiddenEdgeColor?: string;
+  /** Line color */
+  color?: string;
+  /** Line thickness (note: WebGL line width is limited on most platforms) */
+  lineWidth?: number;
   /** Whether outline is enabled */
   enabled?: boolean;
+  /** Opacity of the outline */
+  opacity?: number;
 }
 
 export function SelectionOutline({
   selectedObjects,
-  edgeThickness = 2,
-  edgeStrength = 5,
-  visibleEdgeColor = '#ff6600',
-  hiddenEdgeColor = '#ff660044',
+  color = '#ff6600',
+  lineWidth = 2,
   enabled = true,
+  opacity = 1,
 }: SelectionOutlineProps) {
-  const { gl, scene, camera, size } = useThree();
+  const groupRef = useRef<THREE.Group>(null);
+  const outlineMeshesRef = useRef<THREE.LineSegments[]>([]);
   
-  const composer = useRef<EffectComposer | null>(null);
-  const outlinePass = useRef<OutlinePass | null>(null);
-  const renderPass = useRef<RenderPass | null>(null);
-  const isInitialized = useRef(false);
-  const lastSize = useRef({ width: 0, height: 0 });
+  // Create outline material
+  const material = useMemo(() => {
+    return new THREE.LineBasicMaterial({
+      color: new THREE.Color(color),
+      linewidth: lineWidth, // Note: linewidth > 1 only works on some platforms
+      transparent: opacity < 1,
+      opacity: opacity,
+      depthTest: true,
+      depthWrite: false,
+    });
+  }, [color, lineWidth, opacity]);
   
-  // Store original renderer settings
-  const originalSettings = useRef<{
-    toneMapping: THREE.ToneMapping;
-    toneMappingExposure: number;
-    outputColorSpace: string;
-  } | null>(null);
+  // Update material when props change
+  useEffect(() => {
+    material.color.set(color);
+    material.opacity = opacity;
+    material.transparent = opacity < 1;
+  }, [material, color, opacity]);
   
-  // Initialize composer and passes only once
-  const initComposer = useCallback(() => {
-    if (isInitialized.current && composer.current) return;
+  // Create/update outline meshes when selection changes
+  useEffect(() => {
+    if (!groupRef.current) return;
     
-    // Store original renderer settings
-    originalSettings.current = {
-      toneMapping: gl.toneMapping,
-      toneMappingExposure: gl.toneMappingExposure,
-      outputColorSpace: gl.outputColorSpace,
-    };
+    // Clear existing outlines
+    outlineMeshesRef.current.forEach(mesh => {
+      mesh.geometry.dispose();
+      groupRef.current?.remove(mesh);
+    });
+    outlineMeshesRef.current = [];
     
-    // Create render target with proper color space
-    const renderTarget = new THREE.WebGLRenderTarget(size.width, size.height, {
-      minFilter: THREE.LinearFilter,
-      magFilter: THREE.LinearFilter,
-      format: THREE.RGBAFormat,
-      colorSpace: THREE.SRGBColorSpace,
-      type: THREE.HalfFloatType,
+    if (!enabled || selectedObjects.length === 0) return;
+    
+    // Create outlines for each selected object
+    selectedObjects.forEach(obj => {
+      if (!obj) return;
+      
+      // Find all meshes in the object
+      obj.traverse((child) => {
+        if (child instanceof THREE.Mesh && child.geometry) {
+          try {
+            // Create edges geometry from the mesh
+            const edgesGeometry = new THREE.EdgesGeometry(child.geometry, 30); // 30 degree threshold
+            const lineSegments = new THREE.LineSegments(edgesGeometry, material);
+            
+            // Copy the world transform from the original mesh
+            child.updateWorldMatrix(true, false);
+            lineSegments.applyMatrix4(child.matrixWorld);
+            
+            // Slightly scale up to avoid z-fighting
+            lineSegments.scale.multiplyScalar(1.001);
+            
+            groupRef.current?.add(lineSegments);
+            outlineMeshesRef.current.push(lineSegments);
+          } catch (e) {
+            console.warn('Failed to create outline for mesh:', e);
+          }
+        }
+      });
     });
     
-    // Create effect composer
-    const effectComposer = new EffectComposer(gl, renderTarget);
-    composer.current = effectComposer;
-    
-    // Render pass - will use renderer's current settings
-    const rPass = new RenderPass(scene, camera);
-    rPass.clearColor = new THREE.Color(0x000000);
-    rPass.clearAlpha = 0;
-    renderPass.current = rPass;
-    effectComposer.addPass(rPass);
-    
-    // Outline pass
-    const outline = new OutlinePass(
-      new THREE.Vector2(size.width, size.height),
-      scene,
-      camera
-    );
-    outline.edgeStrength = edgeStrength;
-    outline.edgeGlow = 0.3;
-    outline.edgeThickness = edgeThickness;
-    outline.pulsePeriod = 0; // No pulsing
-    outline.visibleEdgeColor.set(visibleEdgeColor);
-    outline.hiddenEdgeColor.set(hiddenEdgeColor);
-    outline.usePatternTexture = false;
-    outlinePass.current = outline;
-    effectComposer.addPass(outline);
-    
-    // Gamma correction to match the main renderer output
-    const gammaPass = new ShaderPass(GammaCorrectionShader);
-    effectComposer.addPass(gammaPass);
-    
-    lastSize.current = { width: size.width, height: size.height };
-    isInitialized.current = true;
-  }, [gl, scene, camera, size.width, size.height, edgeStrength, edgeThickness, visibleEdgeColor, hiddenEdgeColor]);
-  
-  // Initialize on mount
-  useEffect(() => {
-    if (enabled) {
-      initComposer();
-    }
-    
+    // Cleanup on unmount
     return () => {
-      if (composer.current) {
-        composer.current.dispose();
-        composer.current = null;
-        outlinePass.current = null;
-        renderPass.current = null;
-        isInitialized.current = false;
-      }
+      outlineMeshesRef.current.forEach(mesh => {
+        mesh.geometry.dispose();
+      });
+      outlineMeshesRef.current = [];
     };
-  }, [enabled, initComposer]);
+  }, [selectedObjects, enabled, material]);
   
-  // Update selected objects
-  useEffect(() => {
-    if (outlinePass.current) {
-      outlinePass.current.selectedObjects = selectedObjects;
-    }
-  }, [selectedObjects]);
-  
-  // Update outline parameters without recreating composer
-  useEffect(() => {
-    if (outlinePass.current) {
-      outlinePass.current.edgeStrength = edgeStrength;
-      outlinePass.current.edgeThickness = edgeThickness;
-      outlinePass.current.visibleEdgeColor.set(visibleEdgeColor);
-      outlinePass.current.hiddenEdgeColor.set(hiddenEdgeColor);
-    }
-  }, [edgeStrength, edgeThickness, visibleEdgeColor, hiddenEdgeColor]);
-  
-  // Handle resize properly - update both composer and outline pass
-  useEffect(() => {
-    if (!composer.current || !outlinePass.current) return;
-    
-    // Only update if size actually changed
-    if (lastSize.current.width === size.width && lastSize.current.height === size.height) return;
-    
-    // Update composer size
-    composer.current.setSize(size.width, size.height);
-    
-    // Update outline pass resolution
-    outlinePass.current.resolution.set(size.width, size.height);
-    
-    lastSize.current = { width: size.width, height: size.height };
-  }, [size.width, size.height]);
-  
-  // Render with composer - only when enabled and objects are selected
+  // Update outline positions each frame to follow animated objects
   useFrame(() => {
-    if (!enabled || !composer.current || selectedObjects.length === 0) {
-      return;
-    }
+    if (!enabled || selectedObjects.length === 0) return;
     
-    // Ensure renderer settings match the original
-    if (originalSettings.current) {
-      gl.toneMapping = originalSettings.current.toneMapping;
-      gl.toneMappingExposure = originalSettings.current.toneMappingExposure;
-    }
-    
-    composer.current.render();
-  }, 2); // Priority 2 = render after default (1) and post-processing
+    // For static objects, we don't need to update every frame
+    // This could be optimized to only update when objects move
+  });
   
-  return null;
+  // Cleanup material on unmount
+  useEffect(() => {
+    return () => {
+      material.dispose();
+    };
+  }, [material]);
+  
+  if (!enabled) return null;
+  
+  return <group ref={groupRef} />;
 }
 
 export default SelectionOutline;

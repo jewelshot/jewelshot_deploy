@@ -626,9 +626,7 @@ function SelectionManager({
   return (
     <SelectionOutline
       selectedObjects={selectedObjects}
-      edgeStrength={4}
-      edgeThickness={1.5}
-      visibleEdgeColor="#ff6600"
+      color="#ff6600"
       enabled={enabled && selectedObjects.length > 0}
     />
   );
