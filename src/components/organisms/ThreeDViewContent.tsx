@@ -2453,8 +2453,8 @@ export default function ThreeDViewContent() {
       className="fixed inset-0 flex flex-col bg-[#0a0a0a]"
       style={{
         left: leftOpen ? '256px' : '56px',
-        right: rightOpen ? '280px' : '0',
-        transition: 'left 800ms cubic-bezier(0.4, 0.0, 0.2, 1), right 800ms cubic-bezier(0.4, 0.0, 0.2, 1)',
+        right: rightOpen ? '320px' : '0',
+        transition: 'left 500ms cubic-bezier(0.4, 0.0, 0.2, 1), right 500ms cubic-bezier(0.4, 0.0, 0.2, 1)',
       }}
     >
       {/* Top Bar */}
