@@ -566,6 +566,29 @@ function LayerModel({
   );
 }
 
+// Pixel Ratio Controller - User-controlled resolution scale
+function PixelRatioController({ scale }: { scale: number }) {
+  const { gl } = useThree();
+  const basePixelRatio = useRef(Math.min(window.devicePixelRatio || 1, 2));
+  
+  useEffect(() => {
+    const newPixelRatio = basePixelRatio.current * scale;
+    // Clamp to reasonable range (0.1 to 10)
+    const clampedRatio = Math.max(0.1, Math.min(10, newPixelRatio));
+    gl.setPixelRatio(clampedRatio);
+    
+    // Force a resize to apply the new pixel ratio
+    const canvas = gl.domElement;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    gl.setSize(width, height, false);
+    
+    console.log(`[PixelRatio] Set to ${clampedRatio.toFixed(2)} (base: ${basePixelRatio.current}, scale: ${scale})`);
+  }, [scale, gl]);
+  
+  return null;
+}
+
 // Adaptive Resolution Controller - Handles progressive rendering
 function AdaptiveResolutionController({ 
   enabled = true,
@@ -728,6 +751,8 @@ function SceneContent({
   onGroundClick,
   // Lighting config (includes specular lights)
   lightingConfig,
+  // Resolution scale
+  resolutionScale = 1,
 }: {
   geometry: THREE.BufferGeometry | null;
   material: MaterialPreset;
@@ -767,6 +792,8 @@ function SceneContent({
   onGroundClick?: () => void;
   // Lighting config
   lightingConfig?: LightingConfig;
+  // Resolution scale (0.25 = performance, 1 = default, 2+ = high quality)
+  resolutionScale?: number;
 }) {
   const controlsRef = useRef<any>(null);
   const groupRef = useRef<THREE.Group>(null);
@@ -1234,6 +1261,9 @@ function SceneContent({
         onResolutionChange={onResolutionChange}
       />
       
+      {/* User-controlled resolution scale */}
+      <PixelRatioController scale={resolutionScale} />
+      
       {/* Post-Processing Effects */}
       {postProcessingConfig.enabled && (
         <PostProcessingEffects config={postProcessingConfig} focusConfig={focusConfig} />
@@ -1318,6 +1348,9 @@ export default function ThreeDViewContent() {
   const [adaptiveResolution, setAdaptiveResolution] = useState(false);
   const [currentResolution, setCurrentResolution] = useState(1);
   const [isRefining, setIsRefining] = useState(false);
+  
+  // Resolution scale for quality control (0.25 = performance mode, 1 = default, 2+ = high quality)
+  const [resolutionScale, setResolutionScale] = useState(1);
   const meshRegistryRef = useRef<Map<string, THREE.Mesh>>(new Map());
   
   // Environment rotation (X, Y, Z in degrees)
@@ -1613,6 +1646,13 @@ export default function ThreeDViewContent() {
       setShowGrid(true);
     }
   }, [viewConfig.debugView, viewConfig.showAxes]);
+  
+  // Sync viewConfig.resolutionScale with local resolutionScale
+  useEffect(() => {
+    if (viewConfig.resolutionScale !== undefined) {
+      setResolutionScale(viewConfig.resolutionScale);
+    }
+  }, [viewConfig.resolutionScale]);
   
   // Get viewer3d store actions for syncing weight data
   const setStoreFileName = useViewer3DStore((state) => state.setFileName);
@@ -2742,6 +2782,8 @@ export default function ThreeDViewContent() {
                 }}
                 // Lighting config for specular highlights
                 lightingConfig={lightingConfig}
+                // Resolution scale for quality control
+                resolutionScale={resolutionScale}
               />
               <SnapshotHelper onSnapshot={handleSnapshotResult} />
               {/* FPS Counter - temporary for debugging */}

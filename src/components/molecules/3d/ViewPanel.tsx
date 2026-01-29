@@ -55,6 +55,8 @@ export interface ViewConfig {
   showStats: boolean;
   orthoZoom: number;
   fov: number;
+  // Resolution scale (0.25 = performance, 1 = default, 2+ = high quality)
+  resolutionScale: number;
   // Comparison
   comparison: {
     enabled: boolean;
@@ -78,6 +80,7 @@ export const DEFAULT_VIEW_CONFIG: ViewConfig = {
   cameraType: 'perspective',
   currentAngle: 'front',
   showAxes: false,
+  resolutionScale: 1,
   showStats: false,
   orthoZoom: 5,
   fov: 50,
@@ -393,6 +396,64 @@ export function ViewPanel({
           </button>
         )}
       </Section>
+
+      {/* Resolution Scale Section */}
+      <div className="rounded-lg border border-white/10 bg-white/5 p-3 space-y-3">
+        <div className="flex items-center gap-2">
+          <Maximize2 className="h-3.5 w-3.5 text-yellow-400" />
+          <span className="text-xs text-white/70">Render Kalitesi</span>
+        </div>
+
+        {/* Resolution Scale Slider */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] text-white/50">Çözünürlük Ölçeği</span>
+            <span className="text-[10px] font-mono text-yellow-400">
+              {config.resolutionScale.toFixed(2)}x
+            </span>
+          </div>
+          <ThrottledRangeInput
+            min={0.1}
+            max={3}
+            step={0.05}
+            value={config.resolutionScale}
+            onChange={(v) => onChange({ resolutionScale: v })}
+            throttleMs={50}
+          />
+          <div className="flex justify-between text-[8px] text-white/30">
+            <span>0.1x (Hızlı)</span>
+            <span>1x</span>
+            <span>3x (Kaliteli)</span>
+          </div>
+        </div>
+
+        {/* Quick Presets */}
+        <div className="grid grid-cols-5 gap-1">
+          {[
+            { value: 0.25, label: '0.25x', desc: 'Performans' },
+            { value: 0.5, label: '0.5x', desc: 'Düşük' },
+            { value: 1, label: '1x', desc: 'Normal' },
+            { value: 2, label: '2x', desc: 'Yüksek' },
+            { value: 3, label: '3x', desc: 'Ultra' },
+          ].map((preset) => (
+            <button
+              key={preset.value}
+              onClick={() => onChange({ resolutionScale: preset.value })}
+              className={`flex flex-col items-center rounded-md py-1.5 text-[8px] transition-all ${
+                Math.abs(config.resolutionScale - preset.value) < 0.05
+                  ? 'bg-yellow-500/20 text-yellow-300 ring-1 ring-yellow-500/50'
+                  : 'bg-white/5 text-white/50 hover:bg-white/10'
+              }`}
+            >
+              <span className="font-mono">{preset.label}</span>
+            </button>
+          ))}
+        </div>
+
+        <p className="text-[9px] text-white/30">
+          Düşük değerler performansı artırır (bulanık). Yüksek değerler kaliteyi artırır (yavaş).
+        </p>
+      </div>
 
       {/* Debug Views Section */}
       <Section
