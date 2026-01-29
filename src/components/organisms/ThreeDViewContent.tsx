@@ -148,11 +148,11 @@ interface MaterialPreset {
 
 // Metal material presets
 const METAL_PRESETS: MaterialPreset[] = [
-  { id: 'yellow-gold', name: 'Yellow Gold', color: '#D4AF37', metalness: 1, roughness: 0.15, envMapIntensity: 1.5 },
-  { id: 'white-gold', name: 'White Gold', color: '#E8E8E8', metalness: 1, roughness: 0.1, envMapIntensity: 1.5 },
-  { id: 'rose-gold', name: 'Rose Gold', color: '#B76E79', metalness: 1, roughness: 0.15, envMapIntensity: 1.5 },
-  { id: 'platinum', name: 'Platinum', color: '#E5E4E2', metalness: 1, roughness: 0.08, envMapIntensity: 1.8 },
-  { id: 'silver', name: 'Silver', color: '#C0C0C0', metalness: 1, roughness: 0.12, envMapIntensity: 1.6 },
+  { id: 'yellow-gold', name: 'Yellow Gold', color: '#D4AF37', metalness: 1, roughness: 0.08, envMapIntensity: 2.5 },
+  { id: 'white-gold', name: 'White Gold', color: '#E8E8E8', metalness: 1, roughness: 0.05, envMapIntensity: 2.5 },
+  { id: 'rose-gold', name: 'Rose Gold', color: '#B76E79', metalness: 1, roughness: 0.08, envMapIntensity: 2.5 },
+  { id: 'platinum', name: 'Platinum', color: '#E5E4E2', metalness: 1, roughness: 0.04, envMapIntensity: 3.0 },
+  { id: 'silver', name: 'Silver', color: '#C0C0C0', metalness: 1, roughness: 0.06, envMapIntensity: 2.8 },
 ];
 
 // Stone material presets
