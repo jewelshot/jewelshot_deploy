@@ -1,27 +1,29 @@
 /**
  * SelectionOutline - Simple edge outline for selected objects
  * 
- * Uses EdgesGeometry and LineSegments for a clean outline without
- * any post-processing effects. This approach:
+ * Uses a scaled-up back-face mesh with outline material for clean,
+ * visible outlines without any post-processing effects.
+ * 
+ * This approach:
  * - Does not re-render the scene
  * - Does not affect scene colors
  * - No glow effect
+ * - Visible outline thickness (not limited by WebGL lineWidth)
  * - Simple, performant, and reliable
  */
 
 'use client';
 
 import { useEffect, useRef, useMemo } from 'react';
-import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
 interface SelectionOutlineProps {
   /** Array of selected meshes to outline */
   selectedObjects: THREE.Object3D[];
-  /** Line color */
+  /** Outline color */
   color?: string;
-  /** Line thickness (note: WebGL line width is limited on most platforms) */
-  lineWidth?: number;
+  /** Outline thickness (scale factor, 1.01 = thin, 1.03 = thick) */
+  thickness?: number;
   /** Whether outline is enabled */
   enabled?: boolean;
   /** Opacity of the outline */
@@ -31,24 +33,24 @@ interface SelectionOutlineProps {
 export function SelectionOutline({
   selectedObjects,
   color = '#ff6600',
-  lineWidth = 2,
+  thickness = 1.015, // 1.5% larger = visible but not too thick
   enabled = true,
   opacity = 1,
 }: SelectionOutlineProps) {
   const groupRef = useRef<THREE.Group>(null);
-  const outlineMeshesRef = useRef<THREE.LineSegments[]>([]);
+  const outlineMeshesRef = useRef<THREE.Mesh[]>([]);
   
-  // Create outline material
+  // Create outline material - renders back faces only
   const material = useMemo(() => {
-    return new THREE.LineBasicMaterial({
+    return new THREE.MeshBasicMaterial({
       color: new THREE.Color(color),
-      linewidth: lineWidth, // Note: linewidth > 1 only works on some platforms
+      side: THREE.BackSide, // Render back faces
       transparent: opacity < 1,
       opacity: opacity,
       depthTest: true,
       depthWrite: false,
     });
-  }, [color, lineWidth, opacity]);
+  }, [color, opacity]);
   
   // Update material when props change
   useEffect(() => {
@@ -78,19 +80,22 @@ export function SelectionOutline({
       obj.traverse((child) => {
         if (child instanceof THREE.Mesh && child.geometry) {
           try {
-            // Create edges geometry from the mesh
-            const edgesGeometry = new THREE.EdgesGeometry(child.geometry, 30); // 30 degree threshold
-            const lineSegments = new THREE.LineSegments(edgesGeometry, material);
+            // Clone the geometry for the outline
+            const outlineGeometry = child.geometry.clone();
+            const outlineMesh = new THREE.Mesh(outlineGeometry, material);
             
             // Copy the world transform from the original mesh
             child.updateWorldMatrix(true, false);
-            lineSegments.applyMatrix4(child.matrixWorld);
+            outlineMesh.applyMatrix4(child.matrixWorld);
             
-            // Slightly scale up to avoid z-fighting
-            lineSegments.scale.multiplyScalar(1.001);
+            // Scale up to create the outline effect
+            outlineMesh.scale.multiplyScalar(thickness);
             
-            groupRef.current?.add(lineSegments);
-            outlineMeshesRef.current.push(lineSegments);
+            // Render order to ensure outline is behind the object
+            outlineMesh.renderOrder = -1;
+            
+            groupRef.current?.add(outlineMesh);
+            outlineMeshesRef.current.push(outlineMesh);
           } catch (e) {
             console.warn('Failed to create outline for mesh:', e);
           }
@@ -105,15 +110,7 @@ export function SelectionOutline({
       });
       outlineMeshesRef.current = [];
     };
-  }, [selectedObjects, enabled, material]);
-  
-  // Update outline positions each frame to follow animated objects
-  useFrame(() => {
-    if (!enabled || selectedObjects.length === 0) return;
-    
-    // For static objects, we don't need to update every frame
-    // This could be optimized to only update when objects move
-  });
+  }, [selectedObjects, enabled, material, thickness]);
   
   // Cleanup material on unmount
   useEffect(() => {
