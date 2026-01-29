@@ -1120,9 +1120,9 @@ function SceneContent({
         enablePan
         enableZoom
         enableRotate
-        rotateSpeed={1.6}
-        zoomSpeed={1.6}
-        panSpeed={1.6}
+        rotateSpeed={3}
+        zoomSpeed={3}
+        panSpeed={3}
         autoRotate={autoRotate || isTurntablePlaying}
         autoRotateSpeed={turntableConfig?.speed || 2}
         minDistance={0.5}
