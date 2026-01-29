@@ -1006,7 +1006,7 @@ function SceneContent({
       ) : (
         <Environment 
           background={false}
-          resolution={256}
+          resolution={1024}
         >
           {/* Studio Lightformers for reflections */}
           {studioPreset.lights.map((light, index) => (
@@ -1020,6 +1020,12 @@ function SceneContent({
               rotation={light.rotation || [0, 0, 0]}
             />
           ))}
+          {/* Point-like bright spots for sharp specular highlights */}
+          <Lightformer form="circle" color="#ffffff" intensity={15 * lightIntensity} position={[2, 3, 2]} scale={0.3} />
+          <Lightformer form="circle" color="#ffffff" intensity={12 * lightIntensity} position={[-2, 4, -1]} scale={0.25} />
+          <Lightformer form="circle" color="#ffffff" intensity={10 * lightIntensity} position={[0, 5, -3]} scale={0.2} />
+          <Lightformer form="circle" color="#fffaf0" intensity={8 * lightIntensity} position={[3, 2, -2]} scale={0.35} />
+          <Lightformer form="circle" color="#f0f8ff" intensity={8 * lightIntensity} position={[-3, 3, 1]} scale={0.3} />
         </Environment>
       )}
       
