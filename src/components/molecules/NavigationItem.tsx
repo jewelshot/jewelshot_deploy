@@ -26,7 +26,6 @@ import Link from 'next/link';
 import Badge from '@/components/atoms/Badge';
 import NavIcon from '@/components/atoms/NavIcon';
 import NavLabel from '@/components/atoms/NavLabel';
-import ActiveIndicator from '@/components/atoms/ActiveIndicator';
 import NavShortcut from '@/components/atoms/NavShortcut';
 
 interface BadgeConfig {
@@ -86,18 +85,15 @@ export function NavigationItem({
   return (
     <Link
       href={href}
-      className={`group relative flex animate-[fadeInSlide_400ms_ease-out_forwards] items-center gap-3 rounded-md px-3 py-2 text-[13px] font-medium opacity-0 transition-all duration-200 ${
+      className={`group flex animate-[fadeInSlide_400ms_ease-out_forwards] items-center gap-3 rounded-md px-3 py-2 text-[13px] font-medium opacity-0 transition-colors duration-200 ${
         active
-          ? 'bg-white/[0.06] text-white/90'
-          : 'text-white/40 hover:bg-white/[0.03] hover:text-white/70'
+          ? 'text-white/80'
+          : 'text-white/40 hover:text-white/60'
       }`}
       style={{
         animationDelay: `${animationDelay}ms`,
       }}
     >
-      {/* Active indicator */}
-      <ActiveIndicator active={active} />
-
       {/* Icon */}
       <NavIcon icon={Icon} active={active} />
 
