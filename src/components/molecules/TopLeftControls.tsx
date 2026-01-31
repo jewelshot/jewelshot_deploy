@@ -1,8 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import { X } from 'lucide-react';
 import FileInfo from './FileInfo';
 import { useLanguage } from '@/lib/i18n';
+import { ConfirmationModal } from './ConfirmationModal';
 
 interface TopLeftControlsProps {
   /**
@@ -30,29 +32,46 @@ export function TopLeftControls({
   visible,
 }: TopLeftControlsProps) {
   const { t } = useLanguage();
+  const [showConfirm, setShowConfirm] = useState(false);
   
   if (!visible) return null;
 
+  const handleCloseClick = () => {
+    setShowConfirm(true);
+  };
+
+  const handleConfirmClose = () => {
+    setShowConfirm(false);
+    onClose();
+  };
+
   return (
-    <div 
-      className="group flex cursor-pointer items-center gap-1 rounded-md border border-white/10 bg-[rgba(10,10,10,0.85)] px-2 py-1 backdrop-blur-[16px] transition-all hover:border-red-500/30 hover:bg-red-500/5"
-      onClick={onClose}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onClose();
-        }
-      }}
-      aria-label={t.canvas.closeImage}
-    >
-      <FileInfo fileName={fileName} fileSizeInBytes={fileSizeInBytes} />
-      <div className="h-3 w-px bg-white/10 group-hover:bg-red-500/20" />
-      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-white/40 transition-all group-hover:text-red-400">
-        <X className="h-3.5 w-3.5 shrink-0" />
+    <>
+      <div className="ctrl-container gap-1 px-2 py-1">
+        <FileInfo fileName={fileName} fileSizeInBytes={fileSizeInBytes} />
+        <div className="ctrl-divider-v h-3" />
+        <button
+          onClick={handleCloseClick}
+          className="ctrl-btn h-6 w-6 shrink-0"
+          aria-label={t.canvas.closeImage}
+          title={t.canvas.closeImage}
+        >
+          <X className="h-3.5 w-3.5 shrink-0" />
+        </button>
       </div>
-    </div>
+
+      {/* Close confirmation modal */}
+      <ConfirmationModal
+        isOpen={showConfirm}
+        title="Close Image"
+        description="Are you sure you want to close this image? Any unsaved changes will be lost."
+        confirmText="Close"
+        cancelText="Cancel"
+        onConfirm={handleConfirmClose}
+        onClose={() => setShowConfirm(false)}
+        variant="warning"
+      />
+    </>
   );
 }
 

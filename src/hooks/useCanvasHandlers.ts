@@ -13,6 +13,7 @@ import { rateLimiters } from '@/lib/rate-limiter';
 import { compressImage, shouldCompress } from '@/lib/image-compression';
 import { saveImageToGallery } from '@/lib/gallery-storage';
 import { toastManager } from '@/lib/toast-manager';
+import { clearCanvasState } from '@/lib/canvas-state-storage';
 import type {
   AdjustFilters,
   ColorFilters,
@@ -279,6 +280,10 @@ export function useCanvasHandlers(props: UseCanvasHandlersProps) {
     // 🎯 Reset background to default (none = app original background) when image is closed
     setBackground('none');
     logger.info('🎨 Background reset to default (none)');
+    
+    // 🎯 Clear persisted canvas state so image doesn't come back
+    clearCanvasState();
+    logger.info('💾 Canvas state cleared from storage');
     
     // 🎯 Dispatch image closed event for thumbnail cleanup
     const closeEvent = new CustomEvent('jewelshot:imageClosed');

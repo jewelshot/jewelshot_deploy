@@ -13,7 +13,7 @@ export interface ConfirmationModalProps {
   details?: { label: string; value: string }[];
   confirmText?: string;
   cancelText?: string;
-  variant?: 'default' | 'danger' | 'ai';
+  variant?: 'default' | 'danger' | 'ai' | 'warning';
   isLoading?: boolean;
 }
 
@@ -40,8 +40,8 @@ export function ConfirmationModal({
   const variantStyles = {
     default: {
       icon: <Sparkles className="h-5 w-5" />,
-      iconBg: 'bg-purple-500/20 text-purple-400',
-      confirmBtn: 'bg-white/10 hover:bg-white/20 text-white',
+      iconBg: 'bg-white/10 text-white/70',
+      confirmBtn: 'bg-white/10 hover:bg-white/20 text-white border-white/10',
     },
     danger: {
       icon: <Trash2 className="h-5 w-5" />,
@@ -50,8 +50,13 @@ export function ConfirmationModal({
     },
     ai: {
       icon: <Sparkles className="h-5 w-5" />,
-      iconBg: 'bg-gradient-to-br from-purple-500/20 to-pink-500/20 text-purple-400',
-      confirmBtn: 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 hover:from-purple-500/30 hover:to-pink-500/30 text-purple-300 border-purple-500/30',
+      iconBg: 'bg-white/10 text-white/70',
+      confirmBtn: 'bg-white/10 hover:bg-white/20 text-white border-white/10',
+    },
+    warning: {
+      icon: <AlertTriangle className="h-5 w-5" />,
+      iconBg: 'bg-amber-500/20 text-amber-400',
+      confirmBtn: 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border-amber-500/30',
     },
   };
 
