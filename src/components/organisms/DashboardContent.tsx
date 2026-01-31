@@ -128,7 +128,6 @@ export function DashboardContent() {
   // Core State
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState('');
-  const [hoveredImage, setHoveredImage] = useState<string | null>(null);
 
   // Data State
   const [recentImages, setRecentImages] = useState<GalleryImage[]>([]);
@@ -239,14 +238,14 @@ export function DashboardContent() {
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
           .limit(8),
-        // Last 30 days for analytics - only date and preset
+        // Last 30 days for analytics - only date and preset (limited for performance)
         supabase
           .from('images')
           .select('id, created_at, preset_name, size, file_type')
           .eq('user_id', user.id)
           .gte('created_at', thirtyDaysAgo.toISOString())
           .order('created_at', { ascending: false })
-          .limit(500),
+          .limit(100),
         // Batch images count only
         supabase
           .from('batch_images')
@@ -862,42 +861,41 @@ export function DashboardContent() {
                 <div
                   key={image.id}
                   className="group relative aspect-square overflow-hidden rounded-lg border border-white/10 bg-black/30"
-                  onMouseEnter={() => setHoveredImage(image.id)}
-                  onMouseLeave={() => setHoveredImage(null)}
                 >
                   <img
                     src={image.generated_url || image.original_url}
                     alt={image.name}
-                    className="h-full w-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                    className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
                   />
 
-                  {hoveredImage === image.id && (
-                    <div className="absolute inset-0 bg-black/70 flex items-center justify-center gap-1.5 animate-in fade-in duration-150">
-                      <button
-                        onClick={() => handleOpenInStudio(image)}
-                        className="p-1.5 rounded-md bg-white/10 hover:bg-white/20 transition-colors"
-                        title={t.dashboard.editInStudio}
-                      >
-                        <Edit3 className="h-3.5 w-3.5 text-white" />
-                      </button>
-                      <button
-                        onClick={() => handleDownload(image)}
-                        className="p-1.5 rounded-md bg-white/10 hover:bg-white/20 transition-colors"
-                        title={t.common.download}
-                      >
-                        <Download className="h-3.5 w-3.5 text-white" />
-                      </button>
-                      <a
-                        href={image.generated_url || image.original_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-1.5 rounded-md bg-white/10 hover:bg-white/20 transition-colors"
-                        title={t.dashboard.openInNew}
-                      >
-                        <ExternalLink className="h-3.5 w-3.5 text-white" />
-                      </a>
-                    </div>
-                  )}
+                  {/* CSS-only hover overlay - no state, no re-renders */}
+                  <div className="absolute inset-0 flex items-center justify-center gap-1.5 bg-black/70 opacity-0 transition-opacity duration-150 group-hover:opacity-100">
+                    <button
+                      onClick={() => handleOpenInStudio(image)}
+                      className="p-1.5 rounded-md bg-white/10 hover:bg-white/20 transition-colors"
+                      title={t.dashboard.editInStudio}
+                    >
+                      <Edit3 className="h-3.5 w-3.5 text-white" />
+                    </button>
+                    <button
+                      onClick={() => handleDownload(image)}
+                      className="p-1.5 rounded-md bg-white/10 hover:bg-white/20 transition-colors"
+                      title={t.common.download}
+                    >
+                      <Download className="h-3.5 w-3.5 text-white" />
+                    </button>
+                    <a
+                      href={image.generated_url || image.original_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1.5 rounded-md bg-white/10 hover:bg-white/20 transition-colors"
+                      title={t.dashboard.openInNew}
+                    >
+                      <ExternalLink className="h-3.5 w-3.5 text-white" />
+                    </a>
+                  </div>
                 </div>
               ))}
             </div>
