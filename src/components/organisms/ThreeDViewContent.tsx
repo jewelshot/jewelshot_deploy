@@ -2866,10 +2866,13 @@ export default function ThreeDViewContent() {
                 gizmoStyle={viewConfig.gizmoStyle}
               />
               <SnapshotHelper onSnapshot={handleSnapshotResult} />
-              {/* FPS Counter - temporary for debugging */}
-              <Stats className="!absolute !top-2 !right-2 !left-auto" />
             </Suspense>
           </Canvas>
+
+          {/* FPS Counter - positioned in viewport top-right */}
+          <div className="absolute top-14 right-2 z-10 opacity-50 hover:opacity-100 transition-opacity">
+            <Stats className="!relative !left-0 !top-0" />
+          </div>
 
           {/* Controls hint */}
           {(loadedGeometry || layers.length > 0) && (
@@ -2920,32 +2923,33 @@ export default function ThreeDViewContent() {
             </div>
           )}
         </div>
+      </div>
 
-        {/* Right Panel Toggle Button - matches Studio's RightSidebarToggle */}
-        <button
-          onClick={() => setRightOpen(!rightOpen)}
-          className={`fixed top-1/2 z-[200] flex h-8 w-3 -translate-y-1/2 cursor-pointer items-center justify-center border border-white/10 bg-[rgba(17,17,17,0.8)] panel-transition hover:border-white/20 hover:bg-white/[0.08] hover:backdrop-blur-[10px] ${
-            rightOpen
-              ? 'right-[320px] rounded-l-md border-r-0 border-l'
-              : 'right-0 rounded-l-md border-l border-r-0'
-          }`}
-          aria-label={rightOpen ? 'Close right sidebar' : 'Open right sidebar'}
-          aria-expanded={rightOpen}
-        >
-          <span className={`text-[8px] text-white/40 panel-transition hover:text-white/70`}>
-            {rightOpen ? '›' : '‹'}
-          </span>
-        </button>
+      {/* Right Panel Toggle Button - matches Studio's RightSidebarToggle */}
+      <button
+        onClick={() => setRightOpen(!rightOpen)}
+        className="fixed top-1/2 z-[200] flex h-8 w-3 -translate-y-1/2 cursor-pointer items-center justify-center border border-white/10 bg-[rgba(17,17,17,0.8)] hover:border-white/20 hover:bg-white/[0.08] hover:backdrop-blur-[10px] rounded-l-md border-l border-r-0"
+        style={{
+          right: rightOpen ? '320px' : '0px',
+          transition: 'right 400ms cubic-bezier(0.4, 0.0, 0.2, 1)',
+        }}
+        aria-label={rightOpen ? 'Close right sidebar' : 'Open right sidebar'}
+        aria-expanded={rightOpen}
+      >
+        <span className="text-[8px] text-white/40 hover:text-white/70">
+          {rightOpen ? '›' : '‹'}
+        </span>
+      </button>
 
-        {/* Right Panel - NEW ORGANIZED VERSION */}
-        <div 
-          className="fixed right-0 top-0 bottom-0 z-40 flex flex-col border-l border-white/5 bg-[#0a0a0a]"
-          style={{
-            width: rightOpen ? '320px' : '0',
-            opacity: rightOpen ? 1 : 0,
-            transition: 'width 400ms cubic-bezier(0.4, 0.0, 0.2, 1), opacity 200ms ease',
-          }}
-        >
+      {/* Right Panel */}
+      <div 
+        className="fixed right-0 top-0 bottom-0 z-40 flex flex-col border-l border-white/5 bg-[#0a0a0a]"
+        style={{
+          width: rightOpen ? '320px' : '0',
+          opacity: rightOpen ? 1 : 0,
+          transition: 'width 400ms cubic-bezier(0.4, 0.0, 0.2, 1), opacity 200ms ease',
+        }}
+      >
           {rightOpen && (
             <ThreeDRightPanel
               isOpen={rightOpen}
@@ -3313,7 +3317,6 @@ export default function ThreeDViewContent() {
             />
           )}
         </div>
-      </div>
 
       {/* Hidden file input */}
       <input
