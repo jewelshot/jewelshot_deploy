@@ -121,7 +121,7 @@ export function Sidebar() {
         <SidebarLogo />
 
         {/* Divider */}
-        <div className="my-4 h-px bg-[var(--border)]" />
+        <div className="my-2 h-px bg-[var(--border)]" />
 
         {/* Main Navigation */}
         <nav className="mb-2 flex flex-col gap-1">

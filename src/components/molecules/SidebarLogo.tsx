@@ -16,21 +16,21 @@
 
 export function SidebarLogo() {
   return (
-    <div className="group relative mb-4 flex cursor-pointer items-center justify-center gap-3 overflow-hidden rounded-xl border border-[rgba(139,92,246,0.15)] bg-gradient-to-br from-[rgba(139,92,246,0.08)] to-[rgba(99,102,241,0.05)] px-4 py-4 transition-all duration-300 ease-in-out before:absolute before:inset-0 before:bg-gradient-to-br before:from-[rgba(139,92,246,0.15)] before:to-[rgba(99,102,241,0.1)] before:opacity-0 before:transition-opacity hover:translate-y-[-1px] hover:border-[rgba(139,92,246,0.4)] hover:shadow-[0_4px_16px_rgba(139,92,246,0.2)] hover:before:opacity-100">
+    <div className="group relative flex cursor-pointer items-center gap-2.5 rounded-lg border border-[rgba(139,92,246,0.12)] bg-gradient-to-br from-[rgba(139,92,246,0.06)] to-transparent px-3 py-2.5 transition-all duration-200 hover:border-[rgba(139,92,246,0.3)] hover:bg-[rgba(139,92,246,0.08)]">
       {/* Logo Icon */}
       <img 
         src="/logo.png" 
-        alt="Jewelshot" 
-        className="relative z-10 h-10 w-10 transition-all duration-300 ease-in-out group-hover:rotate-[-5deg] group-hover:scale-110"
+        alt="Jewelshot®" 
+        className="h-8 w-8 transition-transform duration-200 group-hover:scale-105"
       />
 
       {/* Logo Text */}
-      <div className="relative z-10 flex flex-col items-start justify-center gap-0.5">
-        <span className="text-base font-bold leading-tight tracking-tight text-white">
-          Jewelshot
+      <div className="flex flex-col">
+        <span className="text-sm font-semibold leading-tight text-white">
+          Jewelshot®
         </span>
-        <span className="text-[10px] font-semibold uppercase leading-none tracking-widest text-purple-400/80">
-          STUDIO
+        <span className="text-[9px] font-medium uppercase tracking-wider text-purple-400/70">
+          Studio
         </span>
       </div>
     </div>
