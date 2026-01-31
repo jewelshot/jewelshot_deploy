@@ -111,7 +111,7 @@ export function QuickPresetsGrid({ onPresetSelect, disabled = false }: QuickPres
             disabled={disabled}
             className={`
               group relative overflow-hidden rounded-lg aspect-[4/3]
-              border border-white/10 hover:border-purple-500/50
+              border border-white/10 hover:border-white/30
               transition-all duration-300
               ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
             `}
@@ -143,7 +143,7 @@ export function QuickPresetsGrid({ onPresetSelect, disabled = false }: QuickPres
             
             {/* Hover Border Glow */}
             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-              <div className="absolute inset-0 rounded-lg ring-1 ring-purple-500/50 ring-inset" />
+              <div className="absolute inset-0 rounded-lg ring-1 ring-white/40 ring-inset" />
             </div>
           </button>
         ))}

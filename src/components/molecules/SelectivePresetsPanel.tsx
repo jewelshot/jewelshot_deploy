@@ -521,7 +521,7 @@ export function SelectivePresetsPanel({
           title={t.studio.randomGenerate}
           className={`flex items-center justify-center gap-1.5 rounded-lg px-3 py-2.5 text-xs font-medium transition-all ${
             settingsComplete && !disabled
-              ? 'bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 border border-purple-500/30'
+              ? 'bg-white/10 text-white hover:bg-white/15 border border-white/20'
               : 'bg-white/5 text-white/30 cursor-not-allowed border border-white/5'
           }`}
         >

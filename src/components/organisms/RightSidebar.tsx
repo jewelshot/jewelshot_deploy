@@ -307,48 +307,28 @@ ${libraryPreset.negativePrompt}`;
       className={`fixed bottom-0 right-0 top-0 z-[100] w-[260px] border-l border-white/10 bg-[rgba(10,10,10,0.7)] shadow-[-4px_0_24px_rgba(0,0,0,0.3)] backdrop-blur-[24px] backdrop-saturate-[200%] panel-transition ${rightOpen ? 'translate-x-0' : 'translate-x-full'}`}
     >
       <div className="sidebar-scroll flex h-full flex-col overflow-y-auto px-4 py-3">
-        {/* Header with Notification Only */}
-        <div className="flex items-center justify-end mb-3">
+        {/* Header - Settings & Notification aligned with left sidebar logo */}
+        <div className="flex items-center justify-between mb-3 min-h-[44px]">
+          {/* Settings Button - Compact */}
+          <button
+            onClick={handleSettingsButtonClick}
+            className="group flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-left transition-all hover:border-white/20 hover:bg-white/[0.06]"
+            title={getSettingsSummary()}
+          >
+            <Settings className="h-4 w-4 text-white/50 transition-transform group-hover:rotate-45 group-hover:text-white/70" />
+            <div className="max-w-[140px]">
+              <div className="text-[11px] font-medium text-white/80 truncate">
+                {getSettingsSummary()}
+              </div>
+            </div>
+          </button>
+
+          {/* Notification */}
           <NotificationCenter />
         </div>
 
-        {/* Settings Button with Thumbnail Preview */}
-        <button
-          onClick={handleSettingsButtonClick}
-          className="group relative mb-3 flex items-center gap-2 overflow-hidden rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2.5 transition-all hover:border-white/20 hover:bg-white/5"
-        >
-          {/* Thumbnail with gradient fade - positioned on the right, fades to left */}
-          {thumbnailUrl && (
-            <div className="pointer-events-none absolute inset-y-0 right-0 z-0 w-32 overflow-hidden">
-              {/* Thumbnail image */}
-              <div 
-                className="absolute inset-0 scale-125 bg-cover bg-center transition-transform duration-300 group-hover:scale-150"
-                style={{
-                  backgroundImage: `url(${thumbnailUrl})`,
-                }}
-              />
-              {/* Gradient overlay - fades from right (visible) to left (hidden) */}
-              <div 
-                className="absolute inset-0"
-                style={{
-                  background: 'linear-gradient(to left, transparent 0%, transparent 30%, rgba(10,10,10,0.5) 60%, rgba(10,10,10,1) 100%)',
-                }}
-              />
-            </div>
-          )}
-          
-          {/* Content - stays on top */}
-          <Settings className="relative z-10 h-4 w-4 text-white/60 transition-transform group-hover:rotate-45" />
-          <div className="relative z-10 flex-1 text-left">
-            <div className="text-xs font-medium text-white">{t.rightSidebar.settings}</div>
-            <div className="text-[10px] text-white/50">
-              {getSettingsSummary()}
-            </div>
-          </div>
-        </button>
-
         {/* Divider */}
-        <div className="my-2 h-px bg-white/5" />
+        <div className="mb-3 h-px bg-white/5" />
 
         {/* Preset Mode Tabs */}
         <div className="mb-3">

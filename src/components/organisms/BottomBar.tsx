@@ -25,7 +25,7 @@ const colorMap: Record<ToastType, string> = {
   success: 'border-green-500/30 bg-green-500/10 text-green-200',
   error: 'border-red-500/30 bg-red-500/10 text-red-200',
   warning: 'border-yellow-500/30 bg-yellow-500/10 text-yellow-200',
-  info: 'border-purple-500/30 bg-purple-500/10 text-purple-200',
+  info: 'border-white/20 bg-white/10 text-white/80',
   loading: 'border-blue-500/30 bg-blue-500/10 text-blue-200',
 };
 
@@ -33,7 +33,7 @@ const iconColorMap: Record<ToastType, string> = {
   success: 'text-green-400',
   error: 'text-red-400',
   warning: 'text-yellow-400',
-  info: 'text-purple-400',
+  info: 'text-white/60',
   loading: 'text-blue-400 animate-spin',
 };
 
@@ -54,7 +54,7 @@ export function BottomBar() {
 
   return (
     <footer
-      className="fixed z-50 flex h-14 items-center justify-between border-t border-[rgba(139,92,246,0.15)] bg-[rgba(10,10,10,0.7)] px-4 backdrop-blur-[24px] backdrop-saturate-[200%] panel-transition"
+      className="fixed z-50 flex h-14 items-center justify-between border-t border-white/10 bg-[rgba(10,10,10,0.7)] px-4 backdrop-blur-[24px] backdrop-saturate-[200%] panel-transition"
       style={{
         bottom: bottomOpen ? '0px' : '-56px',
         left: leftOpen ? '260px' : '0px',
