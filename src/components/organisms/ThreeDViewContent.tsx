@@ -2792,10 +2792,12 @@ export default function ThreeDViewContent() {
                 }}
                 selectedMesh={selectedMeshRef}
                 selectionEnabled={!isTransforming}
-                // Ground click - open ground settings in right panel
+                // Ground click - no auto-open, user controls sidebar manually
                 onGroundClick={() => {
-                  setRightOpen(true);
-                  setForceActiveTab('lighting');
+                  // Just switch tab if sidebar is already open
+                  if (rightOpen) {
+                    setForceActiveTab('lighting');
+                  }
                 }}
                 // Lighting config for specular highlights
                 lightingConfig={lightingConfig}
@@ -2860,16 +2862,23 @@ export default function ThreeDViewContent() {
           )}
         </div>
 
-        {/* Right Panel Toggle Button */}
+        {/* Right Panel Toggle Button - matches Studio's RightSidebarToggle */}
         <button
           onClick={() => setRightOpen(!rightOpen)}
-          className="fixed right-0 top-1/2 z-50 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-l-md border border-r-0 border-white/10 bg-[#0a0a0a] text-white/50 transition-all hover:text-white"
+          className={`fixed top-1/2 z-[200] flex h-8 w-3 -translate-y-1/2 cursor-pointer items-center justify-center border border-white/10 bg-[rgba(17,17,17,0.8)] panel-transition hover:border-white/20 hover:bg-white/[0.08] hover:backdrop-blur-[10px] ${
+            rightOpen
+              ? 'rounded-r-md border-l-0 border-r'
+              : 'rounded-l-md border-l border-r-0'
+          }`}
           style={{
             right: rightOpen ? '320px' : '0',
-            transition: 'right 500ms cubic-bezier(0.4, 0.0, 0.2, 1)',
           }}
+          aria-label={rightOpen ? 'Close right sidebar' : 'Open right sidebar'}
+          aria-expanded={rightOpen}
         >
-          {rightOpen ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
+          <span className={`text-[8px] text-white/40 panel-transition hover:text-white/70 ${rightOpen ? 'rotate-180' : 'rotate-0'}`}>
+            ‹
+          </span>
         </button>
 
         {/* Right Panel - NEW ORGANIZED VERSION */}
