@@ -2685,11 +2685,11 @@ export default function ThreeDViewContent() {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
+      {/* Main Content - fills remaining space */}
+      <div className="relative flex-1 overflow-hidden">
         {/* 3D Canvas */}
         <div 
-          className="relative flex-1"
+          className="absolute inset-0"
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
