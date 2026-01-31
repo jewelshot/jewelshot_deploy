@@ -141,13 +141,13 @@ export function PresetConfirmModal({
                   onClick={() => setSelectedJewelryType(option.value)}
                   className={`rounded-lg border p-3 text-center transition-all ${
                     selectedJewelryType === option.value
-                      ? 'border-purple-500/50 bg-purple-500/10'
+                      ? 'border-white/40 bg-white/10'
                       : 'border-white/10 bg-white/[0.02] hover:border-white/20 hover:bg-white/5'
                   }`}
                 >
                   <span className="block text-lg mb-1">{option.emoji}</span>
                   <span className={`text-[10px] font-medium ${
-                    selectedJewelryType === option.value ? 'text-purple-300' : 'text-white/60'
+                    selectedJewelryType === option.value ? 'text-white' : 'text-white/60'
                   }`}>
                     {option.label}
                   </span>

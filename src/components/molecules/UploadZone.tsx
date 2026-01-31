@@ -56,7 +56,7 @@ export function UploadZone({
       className={`relative overflow-hidden rounded-xl border-2 border-dashed transition-all duration-300 ${
         disabled || isFull
           ? 'border-white/10 bg-white/[0.02] opacity-50'
-          : 'border-purple-500/30 bg-purple-500/5 hover:border-purple-500/50 hover:bg-purple-500/10'
+          : 'border-white/20 bg-white/[0.03] hover:border-white/30 hover:bg-white/[0.06]'
       }`}
       onDrop={handleDrop}
       onDragOver={(e) => e.preventDefault()}
@@ -82,7 +82,7 @@ export function UploadZone({
           {isFull ? (
             <ImageIcon className="h-8 w-8 text-white/40" />
           ) : (
-            <Upload className="h-8 w-8 text-purple-400" />
+            <Upload className="h-8 w-8 text-white/50" />
           )}
         </div>
 
@@ -105,7 +105,7 @@ export function UploadZone({
               <p className="mt-1 text-xs text-white/40">
                 JPG, PNG, WEBP, AVIF up to 10MB each
               </p>
-              <p className="mt-2 text-[10px] text-purple-400">
+              <p className="mt-2 text-[10px] text-white/50">
                 {currentCount} / {maxFiles} images
                 {remainingSlots > 0 && ` · ${remainingSlots} slots remaining`}
               </p>

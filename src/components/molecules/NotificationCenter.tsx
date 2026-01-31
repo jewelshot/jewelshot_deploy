@@ -141,7 +141,7 @@ const localColorMap = {
   error: 'text-red-400 bg-red-500/20',
   info: 'text-blue-400 bg-blue-500/20',
   warning: 'text-yellow-400 bg-yellow-500/20',
-  reward: 'text-purple-400 bg-purple-500/20',
+  reward: 'text-white/70 bg-white/10',
 };
 
 const announcementIconMap: Record<AnnouncementType, typeof Sparkles> = {
@@ -154,7 +154,7 @@ const announcementIconMap: Record<AnnouncementType, typeof Sparkles> = {
 
 const announcementColorMap: Record<AnnouncementType, string> = {
   update: 'text-blue-400 bg-blue-500/20',
-  offer: 'text-purple-400 bg-purple-500/20',
+  offer: 'text-white/70 bg-white/10',
   alert: 'text-yellow-400 bg-yellow-500/20',
   feature: 'text-green-400 bg-green-500/20',
   maintenance: 'text-red-400 bg-red-500/20',
@@ -258,7 +258,7 @@ function AnnouncementDetailModal({ announcement, onClose, onMarkAsRead }: Announ
             {announcement.action_url && (
               <button
                 onClick={handleAction}
-                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-purple-600 px-4 py-3 font-medium text-white transition-all hover:bg-purple-700"
+                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-white/10 px-4 py-3 font-medium text-white transition-all hover:bg-white/20"
               >
                 {announcement.action_label || 'Learn More'}
                 <ExternalLink className="h-4 w-4" />
@@ -366,12 +366,12 @@ export function NotificationCenter() {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-white/10 p-4">
           <div className="flex items-center gap-2">
-            <div className="rounded-lg bg-purple-500/20 p-1.5">
-              <Bell className="h-4 w-4 text-purple-400" />
+            <div className="rounded-lg bg-white/10 p-1.5">
+              <Bell className="h-4 w-4 text-white/60" />
             </div>
             <h3 className="font-semibold text-white">Notifications</h3>
             {totalUnread > 0 && (
-              <span className="rounded-full bg-purple-500 px-2 py-0.5 text-xs font-bold text-white">
+              <span className="rounded-full bg-white/80 px-2 py-0.5 text-xs font-bold text-black">
                 {totalUnread}
               </span>
             )}
@@ -415,7 +415,7 @@ export function NotificationCenter() {
                             {announcement.title}
                           </p>
                           {!isRead && (
-                            <span className="shrink-0 h-2 w-2 rounded-full bg-purple-500" />
+                            <span className="shrink-0 h-2 w-2 rounded-full bg-white/80" />
                           )}
                         </div>
                         <p className={`mt-1 line-clamp-2 text-sm ${isRead ? 'text-white/40' : 'text-white/50'}`}>
@@ -425,7 +425,7 @@ export function NotificationCenter() {
                           <span className="text-xs text-white/30">
                             {formatTime(announcement.created_at)}
                           </span>
-                          <span className="flex items-center gap-1 text-xs text-purple-400">
+                          <span className="flex items-center gap-1 text-xs text-white/50">
                             View Details
                             <ChevronRight className="h-3 w-3" />
                           </span>
@@ -468,7 +468,7 @@ export function NotificationCenter() {
                             {notification.title}
                           </p>
                           {!notification.read && (
-                            <span className="shrink-0 h-2 w-2 rounded-full bg-purple-500" />
+                            <span className="shrink-0 h-2 w-2 rounded-full bg-white/80" />
                           )}
                         </div>
                         <p className={`mt-1 line-clamp-2 text-sm ${notification.read ? 'text-white/40' : 'text-white/50'}`}>
@@ -530,7 +530,7 @@ export function NotificationCenter() {
           <motion.span
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-purple-500 text-xs font-bold text-white"
+            className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-white/80 text-xs font-bold text-black"
           >
             {totalUnread > 9 ? '9+' : totalUnread}
           </motion.span>
