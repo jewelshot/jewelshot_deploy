@@ -86,7 +86,7 @@ export function ConfirmationModal({
           {/* Modal Card */}
           <div className="rounded-xl border border-white/[0.08] bg-[rgba(12,12,12,0.95)] backdrop-blur-xl shadow-2xl">
             {/* Content */}
-            <div className="p-5">
+            <div className="p-4">
               {/* Title */}
               <h2 
                 id="modal-title"
@@ -117,12 +117,12 @@ export function ConfirmationModal({
               )}
             </div>
 
-            {/* Actions - separated by subtle border */}
+            {/* Actions - compact buttons */}
             <div className="flex border-t border-white/[0.06]">
               <button
                 onClick={onClose}
                 disabled={isLoading}
-                className="flex-1 py-3 text-[13px] text-white/50 transition-colors hover:text-white/70 hover:bg-white/[0.02] disabled:opacity-50 rounded-bl-xl"
+                className="flex-1 py-2 text-[12px] text-white/50 transition-colors hover:text-white/70 hover:bg-white/[0.02] disabled:opacity-50 rounded-bl-xl"
               >
                 {cancelText}
               </button>
@@ -130,7 +130,7 @@ export function ConfirmationModal({
               <button
                 onClick={onConfirm}
                 disabled={isLoading}
-                className={`flex-1 py-3 text-[13px] font-medium transition-all disabled:opacity-50 rounded-br-xl ${confirmBtnStyle}`}
+                className={`flex-1 py-2 text-[12px] font-medium transition-all disabled:opacity-50 rounded-br-xl ${confirmBtnStyle}`}
               >
                 {isLoading ? (
                   <span className="flex items-center justify-center gap-2">
