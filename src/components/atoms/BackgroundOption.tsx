@@ -45,11 +45,7 @@ export function BackgroundOption({
   return (
     <button
       onClick={onClick}
-      className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-all ${
-        active
-          ? 'bg-white/10 text-white/90'
-          : 'text-white/60 hover:bg-white/5 hover:text-white/80'
-      }`}
+      className={`ctrl-option ${active ? 'active' : ''}`}
     >
       <div
         className="h-5 w-5 rounded border border-white/20"

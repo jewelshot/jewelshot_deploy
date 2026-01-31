@@ -14,6 +14,125 @@
 }
 
 /* ============================================
+   Control Components - Centralized Styles
+   Change these to update ALL controls at once
+   ============================================ */
+@layer components {
+  /* Base control button (icon buttons, action buttons) */
+  .ctrl-btn {
+    @apply flex items-center justify-center rounded-md transition-all;
+    border: 1px solid var(--ctrl-border);
+    background: var(--ctrl-bg);
+    color: var(--ctrl-text);
+  }
+  .ctrl-btn:hover {
+    border-color: var(--ctrl-border-hover);
+    background: var(--ctrl-bg-hover);
+    color: var(--ctrl-text-hover);
+  }
+  .ctrl-btn:disabled {
+    @apply cursor-not-allowed opacity-40;
+  }
+  .ctrl-btn.active {
+    border-color: var(--ctrl-border-active);
+    background: var(--ctrl-bg-active);
+    color: var(--ctrl-text-active);
+  }
+
+  /* Small control button (h-6 w-6) */
+  .ctrl-btn-sm {
+    @apply ctrl-btn h-6 w-6;
+  }
+
+  /* Medium control button (h-7 w-7) */
+  .ctrl-btn-md {
+    @apply ctrl-btn h-7 w-7;
+  }
+
+  /* Control container (groups of buttons) */
+  .ctrl-container {
+    @apply flex items-center rounded-lg backdrop-blur-[16px];
+    border: 1px solid var(--ctrl-border);
+    background: var(--ctrl-container-bg);
+  }
+
+  /* Control divider */
+  .ctrl-divider {
+    background: var(--ctrl-border);
+  }
+  .ctrl-divider-v {
+    @apply ctrl-divider w-px;
+  }
+  .ctrl-divider-h {
+    @apply ctrl-divider h-px;
+  }
+
+  /* Control dropdown/popup */
+  .ctrl-dropdown {
+    @apply rounded-lg shadow-lg backdrop-blur-[16px];
+    border: 1px solid var(--ctrl-border);
+    background: var(--ctrl-dropdown-bg);
+  }
+
+  /* Control option (in dropdowns, selectors) */
+  .ctrl-option {
+    @apply flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-all;
+    color: var(--ctrl-text);
+  }
+  .ctrl-option:hover {
+    background: var(--ctrl-bg-hover);
+    color: var(--ctrl-text-hover);
+  }
+  .ctrl-option.active {
+    background: var(--ctrl-bg-active);
+    color: var(--ctrl-text-active);
+  }
+
+  /* Control tab/segment button */
+  .ctrl-tab {
+    @apply flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition-all duration-200;
+    color: var(--ctrl-text-muted);
+  }
+  .ctrl-tab:hover {
+    color: var(--ctrl-text);
+  }
+  .ctrl-tab.active {
+    background: var(--ctrl-bg-active);
+    color: var(--ctrl-text-active);
+  }
+
+  /* Navigation item */
+  .nav-item {
+    @apply relative flex items-center gap-3 rounded-md px-3 py-2 text-[13px] font-medium transition-colors duration-200;
+    color: var(--nav-text);
+  }
+  .nav-item:hover {
+    color: var(--nav-text-hover);
+  }
+  .nav-item.active {
+    color: var(--nav-text-active);
+  }
+  .nav-item.active::after {
+    content: '';
+    @apply absolute bottom-0 left-3 right-3 h-px;
+    background: linear-gradient(to right, transparent, var(--nav-indicator), transparent);
+  }
+
+  /* Label tag (Original/Edited, status labels) */
+  .ctrl-label {
+    @apply rounded-md px-3 py-1 text-xs font-medium backdrop-blur-sm transition-all;
+    border: 1px solid var(--ctrl-border);
+    background: var(--ctrl-label-bg);
+    color: var(--ctrl-text);
+  }
+  .ctrl-label.active {
+    border-color: var(--ctrl-border-active);
+    background: var(--ctrl-bg-active);
+    color: var(--ctrl-text-active);
+  }
+}
+
+/* ============================================
    Accessibility - Focus Indicators
    ============================================ */
 
@@ -106,6 +225,30 @@
     /* Scrollbar */
     --scrollbar-thumb: rgba(255, 255, 255, 0.2);
     --scrollbar-thumb-hover: rgba(255, 255, 255, 0.3);
+
+    /* ========== Control System ========== */
+    /* Control buttons (zoom, edit, save, etc.) */
+    --ctrl-border: rgba(255, 255, 255, 0.1);
+    --ctrl-border-hover: rgba(255, 255, 255, 0.2);
+    --ctrl-border-active: rgba(255, 255, 255, 0.25);
+    --ctrl-bg: rgba(255, 255, 255, 0.03);
+    --ctrl-bg-hover: rgba(255, 255, 255, 0.08);
+    --ctrl-bg-active: rgba(255, 255, 255, 0.1);
+    --ctrl-text: rgba(255, 255, 255, 0.6);
+    --ctrl-text-hover: rgba(255, 255, 255, 0.8);
+    --ctrl-text-active: rgba(255, 255, 255, 0.9);
+    --ctrl-text-muted: rgba(255, 255, 255, 0.5);
+    
+    /* Control containers */
+    --ctrl-container-bg: rgba(10, 10, 10, 0.8);
+    --ctrl-dropdown-bg: rgba(10, 10, 10, 0.95);
+    --ctrl-label-bg: rgba(0, 0, 0, 0.6);
+
+    /* Navigation */
+    --nav-text: rgba(255, 255, 255, 0.4);
+    --nav-text-hover: rgba(255, 255, 255, 0.6);
+    --nav-text-active: rgba(255, 255, 255, 0.8);
+    --nav-indicator: rgba(255, 255, 255, 0.3);
   }
 
   /* ============================================
@@ -143,6 +286,27 @@
     /* Scrollbar */
     --scrollbar-thumb: rgba(0, 0, 0, 0.2);
     --scrollbar-thumb-hover: rgba(0, 0, 0, 0.3);
+
+    /* ========== Control System ========== */
+    --ctrl-border: rgba(0, 0, 0, 0.1);
+    --ctrl-border-hover: rgba(0, 0, 0, 0.2);
+    --ctrl-border-active: rgba(0, 0, 0, 0.25);
+    --ctrl-bg: rgba(0, 0, 0, 0.03);
+    --ctrl-bg-hover: rgba(0, 0, 0, 0.06);
+    --ctrl-bg-active: rgba(0, 0, 0, 0.1);
+    --ctrl-text: rgba(0, 0, 0, 0.6);
+    --ctrl-text-hover: rgba(0, 0, 0, 0.8);
+    --ctrl-text-active: rgba(0, 0, 0, 0.9);
+    --ctrl-text-muted: rgba(0, 0, 0, 0.5);
+    
+    --ctrl-container-bg: rgba(255, 255, 255, 0.9);
+    --ctrl-dropdown-bg: rgba(255, 255, 255, 0.98);
+    --ctrl-label-bg: rgba(255, 255, 255, 0.8);
+
+    --nav-text: rgba(0, 0, 0, 0.4);
+    --nav-text-hover: rgba(0, 0, 0, 0.6);
+    --nav-text-active: rgba(0, 0, 0, 0.8);
+    --nav-indicator: rgba(0, 0, 0, 0.2);
   }
 }
 

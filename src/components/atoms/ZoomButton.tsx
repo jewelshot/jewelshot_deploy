@@ -21,7 +21,7 @@ export function ZoomButton({
       <button
         onClick={onClick}
         disabled={disabled}
-        className="flex h-6 w-6 items-center justify-center rounded-md border border-white/10 bg-white/[0.03] text-white/60 transition-all hover:border-white/20 hover:bg-white/[0.08] hover:text-white/80 disabled:cursor-not-allowed disabled:opacity-40"
+        className="ctrl-btn-sm"
         aria-label={title}
       >
         {icon}

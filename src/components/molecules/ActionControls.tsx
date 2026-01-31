@@ -40,17 +40,17 @@ export function ActionControls({
   onToggleUI,
 }: ActionControlsProps) {
   return (
-    <div className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-[rgba(10,10,10,0.8)] p-1.5 backdrop-blur-[16px]">
+    <div className="ctrl-container gap-1.5 p-1.5">
       <ToggleAllBarsButton
         allBarsOpen={allBarsOpen}
         onClick={onToggleAllBars}
       />
-      <div className="h-5 w-px bg-white/10" />
+      <div className="ctrl-divider-v h-5" />
       <UIToggleButton
         controlsVisible={controlsVisible}
         onToggle={onToggleUI}
       />
-      <div className="h-5 w-px bg-white/10" />
+      <div className="ctrl-divider-v h-5" />
       <FullscreenButton
         isFullscreen={isFullscreen}
         onClick={onToggleFullscreen}

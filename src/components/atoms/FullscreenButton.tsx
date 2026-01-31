@@ -26,7 +26,7 @@ export function FullscreenButton({
     <Tooltip content={t.tooltips.toggleFullscreen} side="bottom">
       <button
         onClick={onClick}
-        className="flex h-7 w-7 items-center justify-center rounded-md border border-white/10 bg-white/[0.03] text-white/60 transition-all hover:border-white/20 hover:bg-white/[0.08] hover:text-white/80"
+        className="ctrl-btn-md"
         aria-label={t.tooltips.toggleFullscreen}
       >
         {isFullscreen ? (

@@ -85,19 +85,11 @@ export function NavigationItem({
   return (
     <Link
       href={href}
-      className={`group relative flex animate-[fadeInSlide_400ms_ease-out_forwards] items-center gap-3 rounded-md px-3 py-2 text-[13px] font-medium opacity-0 transition-colors duration-200 ${
-        active
-          ? 'text-white/80'
-          : 'text-white/40 hover:text-white/60'
-      }`}
+      className={`nav-item animate-[fadeInSlide_400ms_ease-out_forwards] opacity-0 ${active ? 'active' : ''}`}
       style={{
         animationDelay: `${animationDelay}ms`,
       }}
     >
-      {/* Active indicator - thin line at bottom */}
-      {active && (
-        <div className="absolute bottom-0 left-3 right-3 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-      )}
 
       {/* Icon */}
       <NavIcon icon={Icon} active={active} />

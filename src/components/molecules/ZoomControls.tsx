@@ -25,7 +25,7 @@ export function ZoomControls({
   const { t } = useLanguage();
   
   return (
-    <div className="flex items-center gap-1 rounded-lg border border-white/10 bg-[rgba(10,10,10,0.8)] p-1.5 backdrop-blur-[16px]">
+    <div className="ctrl-container gap-1 p-1.5">
       <ZoomButton
         onClick={onZoomOut}
         icon={<ZoomOut className="h-3 w-3" />}
@@ -42,7 +42,7 @@ export function ZoomControls({
         disabled={scale >= maxZoom}
       />
 
-      <div className="mx-0.5 h-4 w-px bg-white/10" />
+      <div className="ctrl-divider-v mx-0.5 h-4" />
 
       <ZoomButton
         onClick={onFitScreen}

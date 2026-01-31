@@ -36,12 +36,12 @@ export function BottomRightControls({
   onDownload,
 }: BottomRightControlsProps) {
   return (
-    <div className="flex items-center gap-1 rounded-lg border border-white/10 bg-[rgba(10,10,10,0.8)] p-1.5 backdrop-blur-[16px]">
+    <div className="ctrl-container gap-1 p-1.5">
       <EditButton onClick={onEdit} active={editActive} />
-      <div className="h-4 w-px bg-white/10" />
+      <div className="ctrl-divider-v h-4" />
       <SaveButton onClick={onSave} />
       <DownloadButton onClick={onDownload} />
-      <div className="h-4 w-px bg-white/10" />
+      <div className="ctrl-divider-v h-4" />
       <DeleteButton onClick={onDelete} />
     </div>
   );

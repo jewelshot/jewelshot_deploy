@@ -18,17 +18,13 @@ export function ViewModeSelector({
   const { t } = useLanguage();
   
   return (
-    <div className="flex items-center gap-0.5 rounded-lg border border-white/10 bg-[rgba(10,10,10,0.8)] p-0.5 backdrop-blur-[16px]">
+    <div className="ctrl-container gap-0.5 p-0.5">
       {/* Normal View */}
       <Tooltip content={t.tooltips.viewModeNormal} side="bottom">
         <button
           onClick={() => onViewModeChange('normal')}
           disabled={disabled}
-          className={`flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition-all duration-200 ${
-            viewMode === 'normal'
-              ? 'bg-white/10 text-white/80'
-              : 'text-white/50 hover:text-white/70'
-          } ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+          className={`ctrl-tab ${viewMode === 'normal' ? 'active' : ''} ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
         >
           <svg
             width="14"
@@ -51,11 +47,7 @@ export function ViewModeSelector({
         <button
           onClick={() => onViewModeChange('side-by-side')}
           disabled={disabled}
-          className={`flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition-all duration-200 ${
-            viewMode === 'side-by-side'
-              ? 'bg-white/10 text-white/80'
-              : 'text-white/50 hover:text-white/70'
-          } ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+          className={`ctrl-tab ${viewMode === 'side-by-side' ? 'active' : ''} ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
         >
           <svg
             width="14"

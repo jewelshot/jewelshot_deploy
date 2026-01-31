@@ -230,11 +230,7 @@ export default function CanvasCore({
                     />
                     {/* Label with selection indicator */}
                     <div 
-                      className={`absolute bottom-2 left-1/2 -translate-x-1/2 rounded-md px-3 py-1 text-xs font-medium backdrop-blur-sm transition-all ${
-                        activeImage === 'left'
-                          ? 'border border-white/30 bg-white/10 text-white/90'
-                          : 'border border-white/10 bg-black/60 text-white/50'
-                      }`}
+                      className={`ctrl-label absolute bottom-2 left-1/2 -translate-x-1/2 ${activeImage === 'left' ? 'active' : ''}`}
                     >
                       {activeImage === 'left' && <span className="mr-1.5">●</span>}
                       Original
@@ -274,11 +270,7 @@ export default function CanvasCore({
                   />
                   {/* Label with selection indicator */}
                   <div 
-                    className={`absolute bottom-2 left-1/2 -translate-x-1/2 rounded-md px-3 py-1 text-xs font-medium backdrop-blur-sm transition-all ${
-                      activeImage === 'right'
-                        ? 'border border-white/30 bg-white/10 text-white/90'
-                        : 'border border-white/10 bg-black/60 text-white/50'
-                    }`}
+                    className={`ctrl-label absolute bottom-2 left-1/2 -translate-x-1/2 ${activeImage === 'right' ? 'active' : ''}`}
                   >
                     {activeImage === 'right' && <span className="mr-1.5">●</span>}
                     Edited

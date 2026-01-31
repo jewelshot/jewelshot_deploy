@@ -26,11 +26,7 @@ export function EditButton({ onClick, active = false }: EditButtonProps) {
     <Tooltip content={t.common.edit} side="bottom">
       <button
         onClick={onClick}
-        className={`flex h-7 w-7 items-center justify-center rounded-md border transition-all ${
-          active
-            ? 'border-white/20 bg-white/10 text-white/80'
-            : 'border-white/10 bg-white/[0.03] text-white/60 hover:border-white/20 hover:bg-white/[0.08] hover:text-white/80'
-        }`}
+        className={`ctrl-btn-md ${active ? 'active' : ''}`}
         aria-label={t.common.edit}
       >
         <Sliders className="h-3.5 w-3.5" />

@@ -55,14 +55,14 @@ export function BackgroundSelector({
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex h-6 w-6 items-center justify-center rounded-md border border-white/10 bg-white/[0.03] text-white/60 transition-all hover:border-white/20 hover:bg-white/[0.08] hover:text-white/80"
+        className="ctrl-btn-sm"
         title="Background"
       >
         <Palette className="h-3.5 w-3.5" />
       </button>
 
       {isOpen && (
-        <div className="absolute bottom-full left-0 mb-2 w-40 rounded-lg border border-white/10 bg-[rgba(10,10,10,0.95)] p-2 shadow-lg backdrop-blur-[16px]">
+        <div className="ctrl-dropdown absolute bottom-full left-0 mb-2 w-40 p-2">
           {backgrounds.map((bg) => (
             <BackgroundOption
               key={bg.type}
