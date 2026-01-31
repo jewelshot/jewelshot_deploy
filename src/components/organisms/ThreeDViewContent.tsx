@@ -2505,14 +2505,17 @@ export default function ThreeDViewContent() {
       ? STONE_PRESETS 
       : MATTE_PRESETS;
 
+  // Calculate viewport margins based on sidebar states
+  const viewportStyle = {
+    left: leftOpen ? '256px' : '56px',
+    right: rightOpen ? '320px' : '0px',
+    transition: 'left 400ms cubic-bezier(0.4, 0.0, 0.2, 1), right 400ms cubic-bezier(0.4, 0.0, 0.2, 1)',
+  };
+
   return (
     <div 
       className="fixed top-0 bottom-0 flex flex-col bg-[#0a0a0a]"
-      style={{
-        left: leftOpen ? '256px' : '56px',
-        right: rightOpen ? '320px' : '0px',
-        transition: 'left 400ms cubic-bezier(0.4, 0.0, 0.2, 1), right 400ms cubic-bezier(0.4, 0.0, 0.2, 1)',
-      }}
+      style={viewportStyle}
     >
       {/* Top Bar */}
       <div className="flex h-12 items-center justify-between border-b border-white/10 bg-black/40 px-4 backdrop-blur-sm">
