@@ -2507,7 +2507,7 @@ export default function ThreeDViewContent() {
 
   return (
     <div 
-      className="fixed inset-0 flex flex-col bg-[#0a0a0a]"
+      className="fixed top-0 bottom-0 flex flex-col bg-[#0a0a0a]"
       style={{
         left: leftOpen ? '256px' : '56px',
         right: rightOpen ? '320px' : '0',
