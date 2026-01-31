@@ -118,9 +118,7 @@ export function Sidebar() {
       {/* Sidebar Content */}
       <div className="sidebar-scroll flex h-full flex-col overflow-y-auto px-4 py-3">
         {/* Logo */}
-        <div className="flex items-center justify-between">
-          <SidebarLogo />
-        </div>
+        <SidebarLogo />
 
         {/* Divider */}
         <div className="my-4 h-px bg-[var(--border)]" />
