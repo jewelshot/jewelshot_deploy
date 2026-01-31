@@ -2553,7 +2553,7 @@ export default function ThreeDViewContent() {
             onClick={() => setAutoRotate(!autoRotate)}
             className={`flex h-8 items-center gap-1.5 rounded-md px-2.5 text-xs transition-all ${
               autoRotate
-                ? 'bg-purple-500/20 text-purple-300'
+                ? 'bg-white/12 text-white/90'
                 : 'bg-white/5 text-white/60 hover:bg-white/10'
             }`}
             title="Auto Rotate"
@@ -2660,7 +2660,7 @@ export default function ThreeDViewContent() {
           <button
             onClick={handleSnapshot}
             disabled={!loadedGeometry && layers.length === 0}
-            className="flex h-8 items-center gap-1.5 rounded-md bg-purple-500 px-3 text-xs font-medium text-white hover:bg-purple-600 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex h-8 items-center gap-1.5 rounded-md bg-white/15 px-3 text-xs font-medium text-white/90 hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Camera className="h-3.5 w-3.5" />
             Snapshot
@@ -2693,11 +2693,11 @@ export default function ThreeDViewContent() {
         >
           {/* Drag overlay */}
           {isDragging && (
-            <div className="absolute inset-0 z-20 flex items-center justify-center bg-purple-500/20 backdrop-blur-sm">
-              <div className="rounded-2xl border-2 border-dashed border-purple-400 bg-purple-500/10 p-12 text-center">
-                <Upload className="mx-auto h-12 w-12 text-purple-400" />
+            <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/10 backdrop-blur-sm">
+              <div className="rounded-2xl border-2 border-dashed border-white/30 bg-white/5 p-12 text-center">
+                <Upload className="mx-auto h-12 w-12 text-white/60" />
                 <p className="mt-4 text-lg font-medium text-white">Drop 3D model here</p>
-                <p className="mt-2 text-sm text-purple-300">STL or 3DM format</p>
+                <p className="mt-2 text-sm text-white/50">STL or 3DM format</p>
               </div>
             </div>
           )}
@@ -2705,7 +2705,7 @@ export default function ThreeDViewContent() {
           {isLoading && (
             <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/60">
               <div className="text-center">
-                <Loader2 className="mx-auto h-8 w-8 animate-spin text-purple-400" />
+                <Loader2 className="mx-auto h-8 w-8 animate-spin text-white/60" />
                 <p className="mt-2 text-sm text-white/60">{loadingStatus || 'Loading model...'}</p>
               </div>
             </div>
@@ -2836,7 +2836,7 @@ export default function ThreeDViewContent() {
           {exportProgress && (
             <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/70 backdrop-blur-sm">
               <div className="rounded-2xl border border-white/10 bg-black/80 p-6 text-center shadow-2xl">
-                <Loader2 className="mx-auto h-8 w-8 animate-spin text-purple-400" />
+                <Loader2 className="mx-auto h-8 w-8 animate-spin text-white/60" />
                 <h3 className="mt-4 text-lg font-medium text-white">
                   {exportProgress.phase === 'capturing' ? 'Capturing Frames...' : 
                    exportProgress.phase === 'encoding' ? 'Encoding Video...' : 'Complete!'}
@@ -2846,7 +2846,7 @@ export default function ThreeDViewContent() {
                 </p>
                 <div className="mt-4 h-2 w-48 overflow-hidden rounded-full bg-white/10">
                   <div 
-                    className="h-full rounded-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-150"
+                    className="h-full rounded-full bg-white/50 transition-all duration-150"
                     style={{ width: `${(exportProgress.currentFrame / exportProgress.totalFrames) * 100}%` }}
                   />
                 </div>

@@ -255,13 +255,13 @@ function LightItem({ light, onUpdate, onDelete }: LightItemProps) {
               <div className="flex items-center justify-between text-[10px]">
                 <button
                   onClick={() => onUpdate({ useTemperature: false })}
-                  className={`rounded-l-md px-2 py-1 ${!light.useTemperature ? 'bg-purple-500/30 text-purple-300' : 'bg-white/5 text-white/50'}`}
+                  className={`rounded-l-md px-2 py-1 ${!light.useTemperature ? 'bg-white/40/30 text-white/90' : 'bg-white/5 text-white/50'}`}
                 >
                   RGB
                 </button>
                 <button
                   onClick={() => onUpdate({ useTemperature: true })}
-                  className={`rounded-r-md px-2 py-1 ${light.useTemperature ? 'bg-purple-500/30 text-purple-300' : 'bg-white/5 text-white/50'}`}
+                  className={`rounded-r-md px-2 py-1 ${light.useTemperature ? 'bg-white/40/30 text-white/90' : 'bg-white/5 text-white/50'}`}
                 >
                   Kelvin
                 </button>
@@ -489,7 +489,7 @@ function LightItem({ light, onUpdate, onDelete }: LightItemProps) {
                     <button
                       onClick={() => onUpdate({ castShadow: !light.castShadow })}
                       className={`relative h-4 w-7 rounded-full transition-colors ${
-                        light.castShadow ? 'bg-purple-500' : 'bg-white/20'
+                        light.castShadow ? 'bg-white/40' : 'bg-white/20'
                       }`}
                     >
                       <span
@@ -626,7 +626,7 @@ export function LightingPanel({ config, onChange }: LightingPanelProps) {
             step={0.05}
             value={config.ambientIntensity}
             onChange={(v) => onChange({ ambientIntensity: v })}
-            className="mt-2 w-full accent-purple-500"
+            className="mt-2 w-full accent-white"
           />
         </div>
 
@@ -778,7 +778,7 @@ export function LightingPanel({ config, onChange }: LightingPanelProps) {
           <button
             onClick={() => onChange({ shadowsEnabled: !config.shadowsEnabled })}
             className={`relative h-5 w-9 rounded-full transition-colors ${
-              config.shadowsEnabled ? 'bg-purple-500' : 'bg-white/20'
+              config.shadowsEnabled ? 'bg-white/40' : 'bg-white/20'
             }`}
           >
             <span
@@ -800,7 +800,7 @@ export function LightingPanel({ config, onChange }: LightingPanelProps) {
                   onClick={() => onChange({ shadowMapSize: size })}
                   className={`rounded-md py-1 text-[9px] transition-all ${
                     config.shadowMapSize === size
-                      ? 'bg-purple-500/20 text-purple-300'
+                      ? 'bg-white/40/20 text-white/90'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >
@@ -840,7 +840,7 @@ export function LightingPanel({ config, onChange }: LightingPanelProps) {
                 onClick={() => onChange({ toneMapping: mode })}
                 className={`rounded-md py-1 text-[8px] transition-all uppercase ${
                   config.toneMapping === mode
-                    ? 'bg-purple-500/20 text-purple-300'
+                    ? 'bg-white/40/20 text-white/90'
                     : 'bg-white/5 text-white/50 hover:bg-white/10'
                 }`}
               >
@@ -856,7 +856,7 @@ export function LightingPanel({ config, onChange }: LightingPanelProps) {
           <button
             onClick={() => onChange({ showLightHelpers: !config.showLightHelpers })}
             className={`relative h-5 w-9 rounded-full transition-colors ${
-              config.showLightHelpers ? 'bg-purple-500' : 'bg-white/20'
+              config.showLightHelpers ? 'bg-white/40' : 'bg-white/20'
             }`}
           >
             <span

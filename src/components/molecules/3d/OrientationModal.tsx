@@ -258,7 +258,7 @@ export function OrientationModal({
                   onClick={() => setAutoRotate(!autoRotate)}
                   className={`absolute bottom-3 left-3 rounded-lg px-3 py-1.5 text-xs transition-colors ${
                     autoRotate
-                      ? 'bg-purple-500/30 text-purple-300'
+                      ? 'bg-white/40/30 text-white/90'
                       : 'bg-white/10 text-white/50'
                   }`}
                 >
@@ -291,7 +291,7 @@ export function OrientationModal({
                       onClick={() => setConfig(prev => ({ ...prev, upAxis: axis }))}
                       className={`rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
                         config.upAxis === axis
-                          ? 'border-purple-500/50 bg-purple-500/20 text-white'
+                          ? 'border-white/50/50 bg-white/40/20 text-white'
                           : 'border-white/10 bg-white/5 text-white/50 hover:border-white/20'
                       }`}
                     >
@@ -447,7 +447,7 @@ export function OrientationModal({
               </button>
               <button
                 onClick={handleConfirm}
-                className="flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-500"
+                className="flex items-center gap-2 rounded-lg bg-white/15 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/40"
               >
                 <Check className="h-4 w-4" />
                 Uygula

@@ -155,7 +155,7 @@ function Section({ title, icon, expanded, onToggle, children }: SectionProps) {
         className="flex w-full items-center justify-between p-3"
       >
         <div className="flex items-center gap-2">
-          <span className="text-purple-400">{icon}</span>
+          <span className="text-white/70">{icon}</span>
           <span className="text-xs font-medium text-white/80">{title}</span>
         </div>
         {expanded ? (
@@ -233,7 +233,7 @@ export function ViewPanel({
               onClick={() => onChange({ mode: mode.id })}
               className={`flex flex-col items-center gap-1 rounded-lg border p-2 transition-all ${
                 config.mode === mode.id
-                  ? 'border-purple-500/50 bg-purple-500/10 text-purple-300'
+                  ? 'border-white/50/50 bg-white/40/10 text-white/90'
                   : 'border-white/10 bg-white/5 text-white/50 hover:bg-white/10'
               }`}
             >
@@ -250,7 +250,7 @@ export function ViewPanel({
               type="checkbox"
               checked={config.showAxes}
               onChange={(e) => onChange({ showAxes: e.target.checked })}
-              className="accent-purple-500"
+              className="accent-white"
             />
             <span className="text-[10px] text-white/60">Eksenler</span>
           </label>
@@ -259,7 +259,7 @@ export function ViewPanel({
               type="checkbox"
               checked={config.showStats}
               onChange={(e) => onChange({ showStats: e.target.checked })}
-              className="accent-purple-500"
+              className="accent-white"
             />
             <span className="text-[10px] text-white/60">İstatistikler</span>
           </label>
@@ -279,7 +279,7 @@ export function ViewPanel({
                 onClick={() => onChange({ gizmoStyle: style.id })}
                 className={`flex flex-col items-center gap-0.5 rounded-md py-2 text-[10px] transition-all ${
                   config.gizmoStyle === style.id
-                    ? 'bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/50'
+                    ? 'bg-white/40/20 text-white/90 ring-1 ring-white/25'
                     : 'bg-white/5 text-white/50 hover:bg-white/10'
                 }`}
               >
@@ -304,7 +304,7 @@ export function ViewPanel({
             onClick={() => onChange({ cameraType: 'perspective' })}
             className={`flex-1 rounded-md py-2 text-[10px] transition-all ${
               config.cameraType === 'perspective'
-                ? 'bg-purple-500/20 text-purple-300'
+                ? 'bg-white/40/20 text-white/90'
                 : 'bg-white/5 text-white/50 hover:bg-white/10'
             }`}
           >
@@ -314,7 +314,7 @@ export function ViewPanel({
             onClick={() => onChange({ cameraType: 'orthographic' })}
             className={`flex-1 rounded-md py-2 text-[10px] transition-all ${
               config.cameraType === 'orthographic'
-                ? 'bg-purple-500/20 text-purple-300'
+                ? 'bg-white/40/20 text-white/90'
                 : 'bg-white/5 text-white/50 hover:bg-white/10'
             }`}
           >
@@ -370,7 +370,7 @@ export function ViewPanel({
                 }}
                 className={`rounded-md py-1.5 text-[9px] transition-all ${
                   config.currentAngle === angle.id
-                    ? 'bg-purple-500/20 text-purple-300'
+                    ? 'bg-white/40/20 text-white/90'
                     : 'bg-white/5 text-white/50 hover:bg-white/10'
                 }`}
               >
@@ -388,7 +388,7 @@ export function ViewPanel({
                 }}
                 className={`rounded-md py-1.5 text-[9px] transition-all ${
                   config.currentAngle === angle.id
-                    ? 'bg-purple-500/20 text-purple-300'
+                    ? 'bg-white/40/20 text-white/90'
                     : 'bg-white/5 text-white/50 hover:bg-white/10'
                 }`}
               >
@@ -498,7 +498,7 @@ export function ViewPanel({
               onClick={() => onChange({ debugView: debug.id })}
               className={`rounded-md py-2 text-[9px] transition-all ${
                 config.debugView === debug.id
-                  ? 'bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/50'
+                  ? 'bg-white/40/20 text-white/90 ring-1 ring-white/25'
                   : 'bg-white/5 text-white/50 hover:bg-white/10'
               }`}
               title={debug.description}
@@ -514,7 +514,7 @@ export function ViewPanel({
               onClick={() => onChange({ debugView: debug.id })}
               className={`rounded-md py-2 text-[9px] transition-all ${
                 config.debugView === debug.id
-                  ? 'bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/50'
+                  ? 'bg-white/40/20 text-white/90 ring-1 ring-white/25'
                   : 'bg-white/5 text-white/50 hover:bg-white/10'
               }`}
               title={debug.description}
@@ -560,7 +560,7 @@ export function ViewPanel({
               comparison: { ...config.comparison, enabled: !config.comparison.enabled }
             })}
             className={`relative h-4 w-7 rounded-full transition-colors ${
-              config.comparison.enabled ? 'bg-purple-500' : 'bg-white/20'
+              config.comparison.enabled ? 'bg-white/40' : 'bg-white/20'
             }`}
           >
             <span

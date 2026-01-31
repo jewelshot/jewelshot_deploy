@@ -318,12 +318,12 @@ export function BatchExportPanel({
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-lg border border-purple-500/30 bg-purple-500/10 p-3 space-y-2"
+          className="rounded-lg border border-white/50/30 bg-white/40/10 p-3 space-y-2"
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin text-purple-400" />
-              <span className="text-xs font-medium text-purple-300">
+              <Loader2 className="h-4 w-4 animate-spin text-white/70" />
+              <span className="text-xs font-medium text-white/90">
                 Dışa Aktarılıyor: {progress.currentAngleName}
               </span>
             </div>
@@ -335,7 +335,7 @@ export function BatchExportPanel({
           {/* Progress Bar */}
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
             <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-purple-500 to-blue-500"
+              className="h-full rounded-full bg-gradient-to-r from-white/15 to-white/10"
               initial={{ width: 0 }}
               animate={{ width: `${(progress.currentAngle / progress.totalAngles) * 100}%` }}
             />
@@ -372,7 +372,7 @@ export function BatchExportPanel({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-[10px] text-white/50">Açılar</span>
-              <span className="text-[10px] text-purple-400">{selectedCount} seçili</span>
+              <span className="text-[10px] text-white/70">{selectedCount} seçili</span>
             </div>
             <div className="grid grid-cols-5 gap-1.5">
               {PRESET_ANGLES.map((angle) => {
@@ -383,13 +383,13 @@ export function BatchExportPanel({
                     onClick={() => toggleAngle(angle.id)}
                     className={`flex flex-col items-center gap-1 rounded-lg border p-2 transition-all ${
                       isSelected
-                        ? 'border-purple-500/50 bg-purple-500/10'
+                        ? 'border-white/50/50 bg-white/40/10'
                         : 'border-white/10 bg-white/5 hover:border-white/20'
                     }`}
                   >
                     <div
                       className={`flex h-5 w-5 items-center justify-center rounded-full ${
-                        isSelected ? 'bg-purple-500' : 'bg-white/10'
+                        isSelected ? 'bg-white/40' : 'bg-white/10'
                       }`}
                     >
                       {isSelected && <Check className="h-3 w-3 text-white" />}
@@ -410,7 +410,7 @@ export function BatchExportPanel({
                   className="flex items-center justify-between rounded-md bg-white/5 px-2 py-1.5"
                 >
                   <div className="flex items-center gap-2">
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-purple-500/20 text-[9px] text-purple-300">
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/40/20 text-[9px] text-white/90">
                       {index + 1}
                     </span>
                     <span className="text-xs text-white/70">{angle.name}</span>
@@ -484,7 +484,7 @@ export function BatchExportPanel({
                 <button
                   onClick={addCustomAngle}
                   disabled={!customAngle.name}
-                  className="w-full rounded-md bg-purple-500/20 py-1.5 text-[10px] text-purple-300 hover:bg-purple-500/30 disabled:opacity-50"
+                  className="w-full rounded-md bg-white/40/20 py-1.5 text-[10px] text-white/90 hover:bg-white/40/30 disabled:opacity-50"
                 >
                   Ekle
                 </button>
@@ -502,7 +502,7 @@ export function BatchExportPanel({
                   onClick={() => onChange({ format: fmt })}
                   className={`flex-1 rounded-md py-1.5 text-[10px] transition-all ${
                     config.format === fmt
-                      ? 'bg-purple-500/20 text-purple-300'
+                      ? 'bg-white/40/20 text-white/90'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >
@@ -521,7 +521,7 @@ export function BatchExportPanel({
                     onClick={() => onChange({ aspectRatio: ratio })}
                     className={`rounded-md py-1 text-[8px] transition-all ${
                       config.aspectRatio === ratio
-                        ? 'bg-purple-500/20 text-purple-300'
+                        ? 'bg-white/40/20 text-white/90'
                         : 'bg-white/5 text-white/50 hover:bg-white/10'
                     }`}
                   >
@@ -543,7 +543,7 @@ export function BatchExportPanel({
                   onClick={() => onChange({ width: res.w, height: res.h })}
                   className={`flex-1 rounded-md py-1.5 text-[10px] transition-all ${
                     config.width === res.w
-                      ? 'bg-purple-500/20 text-purple-300'
+                      ? 'bg-white/40/20 text-white/90'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >
@@ -568,7 +568,7 @@ export function BatchExportPanel({
                     })}
                     className={`flex-1 rounded-md py-1.5 text-[9px] transition-all ${
                       config.batchBackground.type === bg.id
-                        ? 'bg-purple-500/20 text-purple-300'
+                        ? 'bg-white/40/20 text-white/90'
                         : 'bg-white/5 text-white/50 hover:bg-white/10'
                     }`}
                   >
@@ -628,7 +628,7 @@ export function BatchExportPanel({
                     autoCrop: { ...config.autoCrop, enabled: !config.autoCrop.enabled } 
                   })}
                   className={`relative h-4 w-7 rounded-full transition-colors ${
-                    config.autoCrop.enabled ? 'bg-purple-500' : 'bg-white/20'
+                    config.autoCrop.enabled ? 'bg-white/40' : 'bg-white/20'
                   }`}
                 >
                   <span
@@ -662,7 +662,7 @@ export function BatchExportPanel({
                     compositeSheet: { ...config.compositeSheet, enabled: !config.compositeSheet.enabled } 
                   })}
                   className={`relative h-4 w-7 rounded-full transition-colors ${
-                    config.compositeSheet.enabled ? 'bg-purple-500' : 'bg-white/20'
+                    config.compositeSheet.enabled ? 'bg-white/40' : 'bg-white/20'
                   }`}
                 >
                   <span
@@ -709,7 +709,7 @@ export function BatchExportPanel({
                     contactSheet: { ...config.contactSheet, enabled: !config.contactSheet.enabled } 
                   })}
                   className={`relative h-4 w-7 rounded-full transition-colors ${
-                    config.contactSheet.enabled ? 'bg-purple-500' : 'bg-white/20'
+                    config.contactSheet.enabled ? 'bg-white/40' : 'bg-white/20'
                   }`}
                 >
                   <span
@@ -731,7 +731,7 @@ export function BatchExportPanel({
                         })}
                         className={`rounded px-2 py-1 text-[8px] ${
                           config.contactSheet.thumbnailSize === size
-                            ? 'bg-purple-500/20 text-purple-300'
+                            ? 'bg-white/40/20 text-white/90'
                             : 'bg-white/5 text-white/40'
                         }`}
                       >
@@ -752,7 +752,7 @@ export function BatchExportPanel({
                     spritesheet: { ...config.spritesheet, enabled: !config.spritesheet.enabled } 
                   })}
                   className={`relative h-4 w-7 rounded-full transition-colors ${
-                    config.spritesheet.enabled ? 'bg-purple-500' : 'bg-white/20'
+                    config.spritesheet.enabled ? 'bg-white/40' : 'bg-white/20'
                   }`}
                 >
                   <span
@@ -771,7 +771,7 @@ export function BatchExportPanel({
                     onChange={(e) => onChange({ 
                       spritesheet: { ...config.spritesheet, exportJson: e.target.checked } 
                     })}
-                    className="accent-purple-500"
+                    className="accent-white"
                   />
                 </label>
               )}
@@ -782,7 +782,7 @@ export function BatchExportPanel({
           <button
             onClick={onStartExport}
             disabled={config.angles.length === 0}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 py-3 text-sm font-medium text-white transition-all hover:from-purple-600 hover:to-blue-600 disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-white/15 to-white/10 py-3 text-sm font-medium text-white transition-all hover:from-white/20 hover:to-white/15 disabled:opacity-50"
           >
             <Package className="h-4 w-4" />
             {config.angles.length} Açıyı Dışa Aktar

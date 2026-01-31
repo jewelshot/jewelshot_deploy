@@ -130,6 +130,113 @@
     background: var(--ctrl-bg-active);
     color: var(--ctrl-text-active);
   }
+
+  /* ========== 3D Viewer Controls ========== */
+  
+  /* Elegant toggle switch - thin and minimal */
+  .viewer-toggle {
+    @apply relative w-7 h-3.5 rounded-full transition-colors cursor-pointer;
+    background: rgba(255, 255, 255, 0.15);
+  }
+  .viewer-toggle.active {
+    background: rgba(255, 255, 255, 0.4);
+  }
+  .viewer-toggle::after {
+    content: '';
+    @apply absolute top-0.5 left-0.5 w-2.5 h-2.5 rounded-full bg-white transition-transform shadow-sm;
+  }
+  .viewer-toggle.active::after {
+    transform: translateX(0.875rem);
+  }
+
+  /* Viewer panel button */
+  .viewer-btn {
+    @apply flex items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-[11px] font-medium transition-all;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .viewer-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.9);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+  .viewer-btn.active {
+    background: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.95);
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+  .viewer-btn:disabled {
+    @apply cursor-not-allowed opacity-40;
+  }
+
+  /* Viewer panel primary action button */
+  .viewer-btn-primary {
+    @apply viewer-btn;
+    background: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.9);
+  }
+  .viewer-btn-primary:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+  }
+
+  /* Viewer panel section/option select */
+  .viewer-option {
+    @apply flex items-center justify-center rounded-md py-1.5 text-[10px] font-medium transition-all cursor-pointer;
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .viewer-option:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.7);
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+  .viewer-option.active {
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.9);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  /* Viewer panel color swatch */
+  .viewer-swatch {
+    @apply w-full rounded-md border-2 transition-all cursor-pointer;
+    border-color: transparent;
+  }
+  .viewer-swatch:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  .viewer-swatch.active {
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2);
+  }
+
+  /* Viewer panel input field */
+  .viewer-input {
+    @apply w-full rounded-md px-2.5 py-1.5 text-[11px] font-mono transition-all;
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .viewer-input:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+    outline: none;
+  }
+  .viewer-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+  }
+
+  /* Viewer label text */
+  .viewer-label {
+    @apply text-[10px] font-medium;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  .viewer-value {
+    @apply text-[10px] font-mono;
+    color: rgba(255, 255, 255, 0.6);
+  }
 }
 
 /* ============================================
@@ -139,7 +246,7 @@
 @layer base {
   /* Visible focus indicators for keyboard navigation */
   *:focus-visible {
-    outline: 2px solid rgb(168 85 247);
+    outline: 2px solid rgba(255, 255, 255, 0.4);
     outline-offset: 2px;
     border-radius: 0.25rem;
   }

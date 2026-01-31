@@ -149,7 +149,7 @@ export function BackgroundPanel({ config, onChange }: BackgroundPanelProps) {
                   onClick={() => onChange({ solidColor: preset.color })}
                   className={`h-7 w-full rounded-md border-2 transition-all ${
                     config.solidColor === preset.color
-                      ? 'border-purple-500 ring-1 ring-purple-500/30'
+                      ? 'border-white/50 ring-1 ring-white/20'
                       : 'border-transparent hover:border-white/30'
                   }`}
                   style={{ background: preset.color }}
@@ -233,7 +233,7 @@ export function BackgroundPanel({ config, onChange }: BackgroundPanelProps) {
                     onClick={() => onChange({ gradientDirection: dir })}
                     className={`rounded-md py-2 text-[10px] transition-all ${
                       config.gradientDirection === dir
-                        ? 'bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/50'
+                        ? 'bg-white/12 text-white/90 ring-1 ring-white/25'
                         : 'bg-white/5 text-white/50 hover:bg-white/10'
                     }`}
                   >
@@ -261,7 +261,7 @@ export function BackgroundPanel({ config, onChange }: BackgroundPanelProps) {
                   className={`h-8 rounded-md border-2 transition-all ${
                     config.gradientColors[0] === preset.colors[0] &&
                     config.gradientColors[1] === preset.colors[1]
-                      ? 'border-purple-500'
+                      ? 'border-white/50'
                       : 'border-transparent hover:border-white/30'
                   }`}
                   style={{

@@ -85,7 +85,7 @@ function LayerListItem({
     <div
       className={`group relative rounded-lg border transition-all ${
         isSelected
-          ? 'border-purple-500/50 bg-purple-500/10'
+          ? 'border-white/50/50 bg-white/40/10'
           : 'border-white/5 bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.04]'
       }`}
     >
@@ -194,7 +194,7 @@ export function LayerPanel({ onLayerMaterialChange }: LayerPanelProps) {
     return (
       <div className="rounded-xl border border-white/10 bg-black/40 p-4 backdrop-blur-md">
         <div className="flex items-center gap-2 mb-3">
-          <Layers className="h-4 w-4 text-purple-400" />
+          <Layers className="h-4 w-4 text-white/70" />
           <h3 className="text-sm font-medium text-white/90">Layers</h3>
         </div>
         <div className="flex flex-col items-center justify-center py-6 text-center">
@@ -215,7 +215,7 @@ export function LayerPanel({ onLayerMaterialChange }: LayerPanelProps) {
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Layers className="h-4 w-4 text-purple-400" />
+          <Layers className="h-4 w-4 text-white/70" />
           <h3 className="text-sm font-medium text-white/90">Layers</h3>
         </div>
         <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-white/60">

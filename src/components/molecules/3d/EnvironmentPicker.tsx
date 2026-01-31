@@ -44,7 +44,7 @@ const CustomEnvItem = memo(function CustomEnvItem({
     <button
       onClick={onSelect}
       className={`flex w-full items-center gap-3 px-3 py-2 text-left transition-colors ${
-        isSelected ? 'bg-purple-500/20' : 'hover:bg-white/10'
+        isSelected ? 'bg-white/40/20' : 'hover:bg-white/10'
       }`}
     >
       <div 
@@ -57,7 +57,7 @@ const CustomEnvItem = memo(function CustomEnvItem({
             {env.name}
           </span>
           {isSelected && (
-            <Check className="h-3 w-3 flex-shrink-0 text-purple-400" />
+            <Check className="h-3 w-3 flex-shrink-0 text-white/70" />
           )}
         </div>
         <div className="flex items-center gap-2 mt-0.5">
@@ -117,7 +117,7 @@ function PresetCard({ title, description, gradient, isSelected, onClick, icon }:
       whileTap={{ scale: 0.98 }}
       className={`relative overflow-hidden rounded-lg border p-3 text-left transition-all ${
         isSelected
-          ? 'border-purple-500/50 ring-2 ring-purple-500/30'
+          ? 'border-white/50/50 ring-2 ring-white/20'
           : 'border-white/10 hover:border-white/20'
       }`}
     >
@@ -132,7 +132,7 @@ function PresetCard({ title, description, gradient, isSelected, onClick, icon }:
         <div className="mb-1 flex items-center justify-between">
           <span className="text-xs font-medium text-white">{title}</span>
           {isSelected && (
-            <div className="flex h-4 w-4 items-center justify-center rounded-full bg-purple-500">
+            <div className="flex h-4 w-4 items-center justify-center rounded-full bg-white/40">
               <Check className="h-3 w-3 text-white" />
             </div>
           )}
@@ -223,7 +223,7 @@ export function EnvironmentPicker({
           onClick={() => setActiveTab('hdri')}
           className={`flex flex-1 items-center justify-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
             activeTab === 'hdri'
-              ? 'bg-purple-500/20 text-purple-300'
+              ? 'bg-white/40/20 text-white/90'
               : 'text-white/50 hover:text-white/80'
           }`}
         >
@@ -234,7 +234,7 @@ export function EnvironmentPicker({
           onClick={() => setActiveTab('studio')}
           className={`flex flex-1 items-center justify-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
             activeTab === 'studio'
-              ? 'bg-purple-500/20 text-purple-300'
+              ? 'bg-white/40/20 text-white/90'
               : 'text-white/50 hover:text-white/80'
           }`}
         >
@@ -245,14 +245,14 @@ export function EnvironmentPicker({
           onClick={() => setActiveTab('custom')}
           className={`flex flex-1 items-center justify-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
             activeTab === 'custom'
-              ? 'bg-purple-500/20 text-purple-300'
+              ? 'bg-white/40/20 text-white/90'
               : 'text-white/50 hover:text-white/80'
           }`}
         >
           <FolderOpen className="h-3.5 w-3.5" />
           Özel
           {customEnvironments.length > 0 && (
-            <span className="rounded-full bg-purple-500/30 px-1.5 py-0.5 text-[10px]">
+            <span className="rounded-full bg-white/40/30 px-1.5 py-0.5 text-[10px]">
               {customEnvironments.length}
             </span>
           )}
@@ -334,7 +334,7 @@ export function EnvironmentPicker({
               <button
                 onClick={handleBackgroundToggle}
                 className={`relative h-5 w-9 rounded-full transition-colors ${
-                  selected.backgroundVisible ? 'bg-purple-500' : 'bg-white/20'
+                  selected.backgroundVisible ? 'bg-white/40' : 'bg-white/20'
                 }`}
               >
                 <span
@@ -371,7 +371,7 @@ export function EnvironmentPicker({
           {/* Header with refresh button */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <FolderOpen className="h-4 w-4 text-purple-400" />
+              <FolderOpen className="h-4 w-4 text-white/70" />
               <span className="text-xs text-white/70">public/environments/</span>
             </div>
             <button
@@ -387,7 +387,7 @@ export function EnvironmentPicker({
           {/* Loading state */}
           {customLoading && (
             <div className="flex items-center justify-center py-8">
-              <RefreshCw className="h-6 w-6 animate-spin text-purple-400" />
+              <RefreshCw className="h-6 w-6 animate-spin text-white/70" />
             </div>
           )}
 
@@ -398,7 +398,7 @@ export function EnvironmentPicker({
               <p className="mb-1 text-sm font-medium text-white/70">Henüz ortam dosyası yok</p>
               <p className="text-xs text-white/50">
                 HDR veya EXR dosyalarını{' '}
-                <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-purple-300">
+                <code className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-white/90">
                   public/environments/
                 </code>{' '}
                 klasörüne ekleyin
@@ -484,7 +484,7 @@ export function EnvironmentPicker({
                     <button
                       onClick={handleBackgroundToggle}
                       className={`relative h-5 w-9 rounded-full transition-colors ${
-                        selected.backgroundVisible ? 'bg-purple-500' : 'bg-white/20'
+                        selected.backgroundVisible ? 'bg-white/40' : 'bg-white/20'
                       }`}
                     >
                       <span

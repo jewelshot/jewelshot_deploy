@@ -215,7 +215,7 @@ function Section({ title, icon, expanded, onToggle, children }: SectionProps) {
         className="flex w-full items-center justify-between p-3"
       >
         <div className="flex items-center gap-2">
-          <span className="text-purple-400">{icon}</span>
+          <span className="text-white/70">{icon}</span>
           <span className="text-xs font-medium text-white/80">{title}</span>
         </div>
         {expanded ? (
@@ -386,7 +386,7 @@ export function AnnotationPanel({
         <button
           onClick={() => onChange({ enabled: !config.enabled })}
           className={`relative h-5 w-9 rounded-full transition-colors ${
-            config.enabled ? 'bg-purple-500' : 'bg-white/20'
+            config.enabled ? 'bg-white/40' : 'bg-white/20'
           }`}
         >
           <span
@@ -410,7 +410,7 @@ export function AnnotationPanel({
               <button
                 key={item.type}
                 onClick={() => handleAddAnnotation(item.type)}
-                className="flex flex-col items-center gap-1 rounded-lg border border-dashed border-white/20 bg-white/5 p-2 text-white/50 hover:border-purple-500/50 hover:bg-purple-500/5 hover:text-purple-300"
+                className="flex flex-col items-center gap-1 rounded-lg border border-dashed border-white/20 bg-white/5 p-2 text-white/50 hover:border-white/50/50 hover:bg-white/40/5 hover:text-white/90"
               >
                 {item.icon}
                 <span className="text-[9px]">{item.name}</span>
@@ -432,7 +432,7 @@ export function AnnotationPanel({
                   type="checkbox"
                   checked={config.showAllLabels}
                   onChange={(e) => onChange({ showAllLabels: e.target.checked })}
-                  className="accent-purple-500"
+                  className="accent-white"
                 />
                 <span className="text-[10px] text-white/50">Tümünü Göster</span>
               </label>
@@ -441,7 +441,7 @@ export function AnnotationPanel({
                   type="checkbox"
                   checked={config.showCalloutLines}
                   onChange={(e) => onChange({ showCalloutLines: e.target.checked })}
-                  className="accent-purple-500"
+                  className="accent-white"
                 />
                 <span className="text-[10px] text-white/50">Çizgileri Göster</span>
               </label>
@@ -473,7 +473,7 @@ export function AnnotationPanel({
             {onPickPoint && (
               <button
                 onClick={onPickPoint}
-                className="flex w-full items-center justify-center gap-1 rounded-md bg-purple-500/10 border border-purple-500/30 py-2 text-[10px] text-purple-300 hover:bg-purple-500/20"
+                className="flex w-full items-center justify-center gap-1 rounded-md bg-white/40/10 border border-white/50/30 py-2 text-[10px] text-white/90 hover:bg-white/40/20"
               >
                 <Plus className="h-3.5 w-3.5" />
                 3D Nokta Seç ve Etiket Ekle
@@ -531,7 +531,7 @@ export function AnnotationPanel({
                   onClick={() => updateGlobalLabelStyle({ fontFamily: family })}
                   className={`flex-1 rounded-md py-1.5 text-[10px] transition-all ${
                     config.globalLabelStyle.fontFamily === family
-                      ? 'bg-purple-500/20 text-purple-300'
+                      ? 'bg-white/40/20 text-white/90'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                   style={{ fontFamily: family === 'mono' ? 'monospace' : family === 'serif' ? 'serif' : 'sans-serif' }}
@@ -594,7 +594,7 @@ export function AnnotationPanel({
                     })}
                     className={`rounded-md py-1.5 text-[9px] transition-all ${
                       config.globalCalloutStyle.style === style
-                        ? 'bg-purple-500/20 text-purple-300'
+                        ? 'bg-white/40/20 text-white/90'
                         : 'bg-white/5 text-white/50 hover:bg-white/10'
                     }`}
                   >
@@ -618,7 +618,7 @@ export function AnnotationPanel({
                 type="checkbox"
                 checked={config.exportWithRender}
                 onChange={(e) => onChange({ exportWithRender: e.target.checked })}
-                className="accent-purple-500"
+                className="accent-white"
               />
             </label>
 
@@ -631,7 +631,7 @@ export function AnnotationPanel({
                     onClick={() => onChange({ exportScale: scale })}
                     className={`flex-1 rounded-md py-1.5 text-[10px] transition-all ${
                       config.exportScale === scale
-                        ? 'bg-purple-500/20 text-purple-300'
+                        ? 'bg-white/40/20 text-white/90'
                         : 'bg-white/5 text-white/50 hover:bg-white/10'
                     }`}
                   >
@@ -644,7 +644,7 @@ export function AnnotationPanel({
             <button
               onClick={handleExportAnnotations}
               disabled={config.annotations.length === 0}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 py-2 text-xs font-medium text-white transition-all hover:from-purple-600 hover:to-blue-600 disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-white/15 to-white/10 py-2 text-xs font-medium text-white transition-all hover:from-white/20 hover:to-white/15 disabled:opacity-50"
             >
               <Download className="h-3.5 w-3.5" />
               Etiketleri Dışa Aktar (JSON)

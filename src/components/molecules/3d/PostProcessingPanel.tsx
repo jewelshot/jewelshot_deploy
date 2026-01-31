@@ -304,14 +304,14 @@ function EffectSection({ title, icon, enabled, onToggle, children }: EffectSecti
         className="flex w-full items-center justify-between p-3"
       >
         <div className="flex items-center gap-2">
-          <span className={enabled ? 'text-purple-400' : 'text-white/40'}>{icon}</span>
+          <span className={enabled ? 'text-white/70' : 'text-white/40'}>{icon}</span>
           <span className={`text-xs font-medium ${enabled ? 'text-white/80' : 'text-white/50'}`}>
             {title}
           </span>
         </div>
         <div
           className={`relative h-4 w-7 rounded-full transition-colors ${
-            enabled ? 'bg-purple-500' : 'bg-white/20'
+            enabled ? 'bg-white/40' : 'bg-white/20'
           }`}
         >
           <span
@@ -445,7 +445,7 @@ export function PostProcessingPanel({ config, onChange }: PostProcessingPanelPro
         <button
           onClick={() => onChange({ enabled: !config.enabled })}
           className={`relative h-5 w-9 rounded-full transition-colors ${
-            config.enabled ? 'bg-purple-500' : 'bg-white/20'
+            config.enabled ? 'bg-white/40' : 'bg-white/20'
           }`}
         >
           <span
@@ -489,7 +489,7 @@ export function PostProcessingPanel({ config, onChange }: PostProcessingPanelPro
                     onClick={() => onChange({ toneMapping: type })}
                     className={`rounded-md py-1 text-[9px] transition-all ${
                       config.toneMapping === type
-                        ? 'bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/50'
+                        ? 'bg-white/40/20 text-white/90 ring-1 ring-white/25'
                         : 'bg-white/5 text-white/50 hover:bg-white/10'
                     }`}
                   >
@@ -689,7 +689,7 @@ export function PostProcessingPanel({ config, onChange }: PostProcessingPanelPro
               <button
                 onClick={() => updateChromaticAberration({ radialModulation: !config.chromaticAberration.radialModulation })}
                 className={`relative h-4 w-7 rounded-full transition-colors ${
-                  config.chromaticAberration.radialModulation ? 'bg-purple-500' : 'bg-white/20'
+                  config.chromaticAberration.radialModulation ? 'bg-white/40' : 'bg-white/20'
                 }`}
               >
                 <span
@@ -729,7 +729,7 @@ export function PostProcessingPanel({ config, onChange }: PostProcessingPanelPro
               <button
                 onClick={() => updateFilmGrain({ animated: !config.filmGrain.animated })}
                 className={`relative h-4 w-7 rounded-full transition-colors ${
-                  config.filmGrain.animated ? 'bg-purple-500' : 'bg-white/20'
+                  config.filmGrain.animated ? 'bg-white/40' : 'bg-white/20'
                 }`}
               >
                 <span
@@ -859,7 +859,7 @@ export function PostProcessingPanel({ config, onChange }: PostProcessingPanelPro
                   onClick={() => updateLUT({ preset })}
                   className={`rounded-md py-1.5 text-[8px] transition-all ${
                     config.lut.preset === preset
-                      ? 'bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/50'
+                      ? 'bg-white/40/20 text-white/90 ring-1 ring-white/25'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >

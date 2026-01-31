@@ -87,7 +87,7 @@ export function WeightSummaryCard({
     return (
       <div className={`rounded-xl border border-white/10 bg-black/40 p-4 backdrop-blur-md ${className}`}>
         <div className="flex items-center gap-2 mb-3">
-          <Scale className="h-4 w-4 text-purple-400" />
+          <Scale className="h-4 w-4 text-white/70" />
           <h3 className="text-sm font-medium text-white/90">
             {t.viewer3d?.weightSummary || 'Weight Summary'}
           </h3>
@@ -111,7 +111,7 @@ export function WeightSummaryCard({
       <div className={`rounded-xl border border-white/10 bg-black/40 p-4 backdrop-blur-md ${className}`}>
         {/* Header */}
         <div className="flex items-center gap-2 mb-4">
-          <Scale className="h-4 w-4 text-purple-400" />
+          <Scale className="h-4 w-4 text-white/70" />
           <h3 className="text-sm font-medium text-white/90">
             {t.viewer3d?.weightSummary || 'Weight Summary'}
           </h3>
@@ -240,7 +240,7 @@ export function WeightSummaryCard({
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Scale className="h-4 w-4 text-purple-400" />
+          <Scale className="h-4 w-4 text-white/70" />
           <h3 className="text-sm font-medium text-white/90">
             {t.viewer3d?.weightSummary || 'Weight Summary'}
           </h3>

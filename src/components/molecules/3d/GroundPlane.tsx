@@ -496,13 +496,13 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
         <span className="text-xs text-white/70">Zemin Düzlemi</span>
         <button
           onClick={() => onChange({ enabled: !config.enabled })}
-          className={`relative h-5 w-9 rounded-full transition-colors ${
-            config.enabled ? 'bg-purple-500' : 'bg-white/20'
+          className={`relative h-3.5 w-7 rounded-full transition-colors ${
+            config.enabled ? 'bg-white/40' : 'bg-white/15'
           }`}
         >
           <span
-            className={`absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white transition-transform ${
-              config.enabled ? 'translate-x-4' : 'translate-x-0'
+            className={`absolute left-0.5 top-0.5 h-2.5 w-2.5 rounded-full bg-white shadow-sm transition-transform ${
+              config.enabled ? 'translate-x-3.5' : 'translate-x-0'
             }`}
           />
         </button>
@@ -515,13 +515,13 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
             <span className="text-xs text-white/60">Otomatik Konumlandır</span>
             <button
               onClick={() => onChange({ autoPosition: !config.autoPosition })}
-              className={`relative h-4 w-7 rounded-full transition-colors ${
-                config.autoPosition ? 'bg-purple-500' : 'bg-white/20'
+              className={`relative h-3.5 w-7 rounded-full transition-colors ${
+                config.autoPosition ? 'bg-white/40' : 'bg-white/15'
               }`}
             >
               <span
-                className={`absolute left-0.5 top-0.5 h-3 w-3 rounded-full bg-white transition-transform ${
-                  config.autoPosition ? 'translate-x-3' : 'translate-x-0'
+                className={`absolute left-0.5 top-0.5 h-2.5 w-2.5 rounded-full bg-white shadow-sm transition-transform ${
+                  config.autoPosition ? 'translate-x-3.5' : 'translate-x-0'
                 }`}
               />
             </button>
@@ -577,7 +577,7 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
                   onClick={() => onChange({ gradientType: type })}
                   className={`rounded-md py-1 text-[9px] transition-all ${
                     config.gradientType === type
-                      ? 'bg-purple-500/30 text-white border border-purple-500/50'
+                      ? 'bg-white/12 text-white/90 border border-white/25'
                       : 'bg-white/5 text-white/60 border border-white/10 hover:bg-white/10'
                   }`}
                 >
@@ -669,7 +669,7 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
                   }}
                   className={`flex flex-col items-center rounded-md py-1.5 text-[9px] transition-all ${
                     config.materialType === mat.id
-                      ? 'bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/50'
+                      ? 'bg-white/12 text-white/90 ring-1 ring-white/25'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >
@@ -755,13 +755,13 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
             <span className="text-[10px] text-white/50">Grid Göster</span>
             <button
               onClick={() => onChange({ showGrid: !config.showGrid })}
-              className={`relative h-4 w-7 rounded-full transition-colors ${
-                config.showGrid ? 'bg-purple-500' : 'bg-white/20'
+              className={`relative h-3.5 w-7 rounded-full transition-colors ${
+                config.showGrid ? 'bg-white/40' : 'bg-white/15'
               }`}
             >
               <span
-                className={`absolute left-0.5 top-0.5 h-3 w-3 rounded-full bg-white transition-transform ${
-                  config.showGrid ? 'translate-x-3' : 'translate-x-0'
+                className={`absolute left-0.5 top-0.5 h-2.5 w-2.5 rounded-full bg-white shadow-sm transition-transform ${
+                  config.showGrid ? 'translate-x-3.5' : 'translate-x-0'
                 }`}
               />
             </button>
@@ -815,7 +815,7 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
                   onClick={() => onChange({ reflectionResolution: res })}
                   className={`rounded-md py-1 text-[9px] transition-all ${
                     config.reflectionResolution === res
-                      ? 'bg-purple-500/20 text-purple-300'
+                      ? 'bg-white/12 text-white/90'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >
@@ -834,13 +834,13 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
               </div>
               <button
                 onClick={() => onChange({ unlit: !config.unlit })}
-                className={`relative h-5 w-9 rounded-full transition-colors ${
-                  config.unlit ? 'bg-green-500' : 'bg-white/20'
+                className={`relative h-3.5 w-7 rounded-full transition-colors ${
+                  config.unlit ? 'bg-white/40' : 'bg-white/15'
                 }`}
               >
                 <span
-                  className={`absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white transition-transform ${
-                    config.unlit ? 'translate-x-4' : 'translate-x-0'
+                  className={`absolute left-0.5 top-0.5 h-2.5 w-2.5 rounded-full bg-white shadow-sm transition-transform ${
+                    config.unlit ? 'translate-x-3.5' : 'translate-x-0'
                   }`}
                 />
               </button>
@@ -854,13 +854,13 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
                 <span className="text-[10px] text-white/60">Gölgeleri Göster</span>
                 <button
                   onClick={() => onChange({ receiveShadow: !config.receiveShadow })}
-                  className={`relative h-4 w-7 rounded-full transition-colors ${
-                    config.receiveShadow ? 'bg-purple-500' : 'bg-white/20'
+                  className={`relative h-3.5 w-7 rounded-full transition-colors ${
+                    config.receiveShadow ? 'bg-white/40' : 'bg-white/15'
                   }`}
                 >
                   <span
-                    className={`absolute left-0.5 top-0.5 h-3 w-3 rounded-full bg-white transition-transform ${
-                      config.receiveShadow ? 'translate-x-3' : 'translate-x-0'
+                    className={`absolute left-0.5 top-0.5 h-2.5 w-2.5 rounded-full bg-white shadow-sm transition-transform ${
+                      config.receiveShadow ? 'translate-x-3.5' : 'translate-x-0'
                     }`}
                   />
                 </button>
@@ -891,13 +891,13 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
                 </div>
                 <button
                   onClick={() => onChange({ showReflections: !config.showReflections })}
-                  className={`relative h-5 w-9 rounded-full transition-colors ${
-                    config.showReflections ? 'bg-purple-500' : 'bg-white/20'
+                  className={`relative h-3.5 w-7 rounded-full transition-colors ${
+                    config.showReflections ? 'bg-white/40' : 'bg-white/15'
                   }`}
                 >
                   <span
-                    className={`absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white transition-transform ${
-                      config.showReflections ? 'translate-x-4' : 'translate-x-0'
+                    className={`absolute left-0.5 top-0.5 h-2.5 w-2.5 rounded-full bg-white shadow-sm transition-transform ${
+                      config.showReflections ? 'translate-x-3.5' : 'translate-x-0'
                     }`}
                   />
                 </button>
@@ -967,13 +967,13 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
                 <span className="text-[10px] text-white/60">Sadece Gölge (Shadow Catcher)</span>
                 <button
                   onClick={() => onChange({ shadowCatcherOnly: !config.shadowCatcherOnly })}
-                  className={`relative h-4 w-7 rounded-full transition-colors ${
-                    config.shadowCatcherOnly ? 'bg-purple-500' : 'bg-white/20'
+                  className={`relative h-3.5 w-7 rounded-full transition-colors ${
+                    config.shadowCatcherOnly ? 'bg-white/40' : 'bg-white/15'
                   }`}
                 >
                   <span
-                    className={`absolute left-0.5 top-0.5 h-3 w-3 rounded-full bg-white transition-transform ${
-                      config.shadowCatcherOnly ? 'translate-x-3' : 'translate-x-0'
+                    className={`absolute left-0.5 top-0.5 h-2.5 w-2.5 rounded-full bg-white shadow-sm transition-transform ${
+                      config.shadowCatcherOnly ? 'translate-x-3.5' : 'translate-x-0'
                     }`}
                   />
                 </button>
@@ -1012,7 +1012,7 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
                   onClick={() => onChange({ texture: tex.id as GroundPlaneConfig['texture'] })}
                   className={`flex flex-col items-center gap-1 rounded-md border p-1.5 transition-all ${
                     config.texture === tex.id
-                      ? 'border-purple-500/50 bg-purple-500/10'
+                      ? 'border-white/25 bg-white/10'
                       : 'border-white/10 bg-white/5 hover:border-white/20'
                   }`}
                 >
@@ -1052,13 +1052,13 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
               <span className="text-[10px] text-white/60">Kavisli Arka Plan</span>
               <button
                 onClick={() => onChange({ curvedBackground: !config.curvedBackground })}
-                className={`relative h-4 w-7 rounded-full transition-colors ${
-                  config.curvedBackground ? 'bg-purple-500' : 'bg-white/20'
+                className={`relative h-3.5 w-7 rounded-full transition-colors ${
+                  config.curvedBackground ? 'bg-white/40' : 'bg-white/15'
                 }`}
               >
                 <span
-                  className={`absolute left-0.5 top-0.5 h-3 w-3 rounded-full bg-white transition-transform ${
-                    config.curvedBackground ? 'translate-x-3' : 'translate-x-0'
+                  className={`absolute left-0.5 top-0.5 h-2.5 w-2.5 rounded-full bg-white shadow-sm transition-transform ${
+                    config.curvedBackground ? 'translate-x-3.5' : 'translate-x-0'
                   }`}
                 />
               </button>
@@ -1127,13 +1127,13 @@ export function GroundPlaneControls({ config, onChange }: GroundPlaneControlsPro
             </div>
             <button
               onClick={() => onChange({ infinitePlane: !config.infinitePlane })}
-              className={`relative h-4 w-7 rounded-full transition-colors ${
-                config.infinitePlane ? 'bg-purple-500' : 'bg-white/20'
+              className={`relative h-3.5 w-7 rounded-full transition-colors ${
+                config.infinitePlane ? 'bg-white/40' : 'bg-white/15'
               }`}
             >
               <span
-                className={`absolute left-0.5 top-0.5 h-3 w-3 rounded-full bg-white transition-transform ${
-                  config.infinitePlane ? 'translate-x-3' : 'translate-x-0'
+                className={`absolute left-0.5 top-0.5 h-2.5 w-2.5 rounded-full bg-white shadow-sm transition-transform ${
+                  config.infinitePlane ? 'translate-x-3.5' : 'translate-x-0'
                 }`}
               />
             </button>

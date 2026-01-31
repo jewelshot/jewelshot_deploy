@@ -248,7 +248,7 @@ function Section({ title, icon, expanded, onToggle, children }: SectionProps) {
         className="flex w-full items-center justify-between p-3"
       >
         <div className="flex items-center gap-2">
-          <span className="text-purple-400">{icon}</span>
+          <span className="text-white/70">{icon}</span>
           <span className="text-xs font-medium text-white/80">{title}</span>
         </div>
         {expanded ? (
@@ -357,7 +357,7 @@ export function MeasurementPanel({
         <button
           onClick={() => onChange({ enabled: !config.enabled })}
           className={`relative h-5 w-9 rounded-full transition-colors ${
-            config.enabled ? 'bg-purple-500' : 'bg-white/20'
+            config.enabled ? 'bg-white/40' : 'bg-white/20'
           }`}
         >
           <span
@@ -381,7 +381,7 @@ export function MeasurementPanel({
                     onClick={() => onChange({ unit })}
                     className={`flex-1 rounded-md py-1.5 text-[10px] transition-all ${
                       config.unit === unit
-                        ? 'bg-purple-500/20 text-purple-300'
+                        ? 'bg-white/40/20 text-white/90'
                         : 'bg-white/5 text-white/50 hover:bg-white/10'
                     }`}
                   >
@@ -445,7 +445,7 @@ export function MeasurementPanel({
                         onChange={(e) => onChange({
                           labelVisibility: { ...config.labelVisibility, [dim]: e.target.checked }
                         })}
-                        className="accent-purple-500"
+                        className="accent-white"
                       />
                       <span className="text-[10px] text-white/50">
                         {dim === 'width' ? 'X' : dim === 'height' ? 'Y' : 'Z'}
@@ -487,7 +487,7 @@ export function MeasurementPanel({
                   ringMeasurement: { ...config.ringMeasurement, enabled: !config.ringMeasurement.enabled }
                 })}
                 className={`relative h-4 w-7 rounded-full transition-colors ${
-                  config.ringMeasurement.enabled ? 'bg-purple-500' : 'bg-white/20'
+                  config.ringMeasurement.enabled ? 'bg-white/40' : 'bg-white/20'
                 }`}
               >
                 <span
@@ -531,7 +531,7 @@ export function MeasurementPanel({
                         })}
                         className={`rounded-md py-1.5 text-[10px] transition-all ${
                           config.ringMeasurement.region === region
-                            ? 'bg-purple-500/20 text-purple-300'
+                            ? 'bg-white/40/20 text-white/90'
                             : 'bg-white/5 text-white/50 hover:bg-white/10'
                         }`}
                       >
@@ -543,8 +543,8 @@ export function MeasurementPanel({
 
                 {/* Result */}
                 {ringSize && (
-                  <div className="rounded-lg bg-purple-500/10 border border-purple-500/30 p-3 text-center">
-                    <span className="text-[10px] text-purple-300">Yüzük Ölçüsü</span>
+                  <div className="rounded-lg bg-white/40/10 border border-white/50/30 p-3 text-center">
+                    <span className="text-[10px] text-white/90">Yüzük Ölçüsü</span>
                     <p className="text-2xl font-bold text-white">{ringSize}</p>
                     <span className="text-[10px] text-white/50">
                       {config.ringMeasurement.region} standartı
@@ -569,7 +569,7 @@ export function MeasurementPanel({
                   weightEstimation: { ...config.weightEstimation, enabled: !config.weightEstimation.enabled }
                 })}
                 className={`relative h-4 w-7 rounded-full transition-colors ${
-                  config.weightEstimation.enabled ? 'bg-purple-500' : 'bg-white/20'
+                  config.weightEstimation.enabled ? 'bg-white/40' : 'bg-white/20'
                 }`}
               >
                 <span
@@ -597,7 +597,7 @@ export function MeasurementPanel({
                         })}
                         className={`rounded-md py-1.5 text-[8px] transition-all ${
                           config.weightEstimation.material === id
-                            ? 'bg-purple-500/20 text-purple-300'
+                            ? 'bg-white/40/20 text-white/90'
                             : 'bg-white/5 text-white/50 hover:bg-white/10'
                         }`}
                       >
@@ -670,7 +670,7 @@ export function MeasurementPanel({
                   type="checkbox"
                   checked={config.showDimensions}
                   onChange={(e) => onChange({ showDimensions: e.target.checked })}
-                  className="accent-purple-500"
+                  className="accent-white"
                 />
               </label>
               <label className="flex cursor-pointer items-center justify-between rounded-md bg-white/5 px-2 py-1.5">
@@ -679,7 +679,7 @@ export function MeasurementPanel({
                   type="checkbox"
                   checked={config.showBoundingBox}
                   onChange={(e) => onChange({ showBoundingBox: e.target.checked })}
-                  className="accent-purple-500"
+                  className="accent-white"
                 />
               </label>
             </div>
@@ -689,7 +689,7 @@ export function MeasurementPanel({
           <button
             onClick={exportMeasurements}
             disabled={!dimensions}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 py-2.5 text-xs font-medium text-white transition-all hover:from-purple-600 hover:to-blue-600 disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-white/15 to-white/10 py-2.5 text-xs font-medium text-white transition-all hover:from-white/20 hover:to-white/15 disabled:opacity-50"
           >
             <Download className="h-3.5 w-3.5" />
             Ölçümleri Dışa Aktar

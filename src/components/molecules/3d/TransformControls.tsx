@@ -77,7 +77,7 @@ export function TransformControls({
       {/* Header with Reset */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Layers className="h-4 w-4 text-purple-400" />
+          <Layers className="h-4 w-4 text-white/70" />
           <span className="text-sm font-medium text-white/80">Transform</span>
         </div>
         <button
@@ -231,7 +231,7 @@ export function TransformControls({
             disabled={disabled}
             className={`flex flex-col items-center gap-1 rounded-lg border p-2 transition-colors ${
               flip.normals
-                ? 'border-purple-500/50 bg-purple-500/20 text-purple-400'
+                ? 'border-white/50/50 bg-white/40/20 text-white/70'
                 : 'border-white/10 bg-white/5 text-white/50 hover:border-white/20 hover:bg-white/10'
             } disabled:opacity-50`}
             title="Flip face normals (inside-out)"

@@ -149,7 +149,7 @@ const LayerItemRow = memo(function LayerItemRow({
       onClick={onSelect}
       className={`group flex items-center gap-2 rounded-lg border px-2 py-1.5 transition-all cursor-pointer ${
         isSelected
-          ? 'border-purple-500/50 bg-purple-500/10'
+          ? 'border-white/50/50 bg-white/40/10'
           : 'border-white/5 bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.04]'
       }`}
     >
@@ -366,7 +366,7 @@ export function LayerGroupPanel({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Layers className="h-4 w-4 text-purple-400" />
+          <Layers className="h-4 w-4 text-white/70" />
           <span className="text-sm font-medium text-white/80">Katmanlar</span>
           <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/50">
             {layers.length}

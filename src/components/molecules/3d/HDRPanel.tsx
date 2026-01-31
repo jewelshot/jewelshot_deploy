@@ -23,7 +23,7 @@ const ThrottledSlider = memo(function ThrottledSlider({
   min,
   max,
   step = 1,
-  className = 'w-full accent-purple-500',
+  className = 'w-full accent-white',
 }: {
   value: number;
   onChange: (value: number) => void;
@@ -104,7 +104,7 @@ const EnvironmentItem = memo(function EnvironmentItem({
     <button
       onClick={onSelect}
       className={`flex w-full items-center gap-3 px-3 py-2 text-left transition-colors ${
-        isSelected ? 'bg-purple-500/20' : 'hover:bg-white/10'
+        isSelected ? 'bg-white/40/20' : 'hover:bg-white/10'
       }`}
     >
       <div 
@@ -117,7 +117,7 @@ const EnvironmentItem = memo(function EnvironmentItem({
             {env.name}
           </span>
           {isSelected && (
-            <Check className="h-3 w-3 flex-shrink-0 text-purple-400" />
+            <Check className="h-3 w-3 flex-shrink-0 text-white/70" />
           )}
         </div>
         <div className="flex items-center gap-2 mt-0.5">
@@ -441,7 +441,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
         <button
           onClick={() => onChange({ enabled: !config.enabled })}
           className={`relative h-5 w-9 rounded-full transition-colors ${
-            config.enabled ? 'bg-purple-500' : 'bg-white/20'
+            config.enabled ? 'bg-white/40' : 'bg-white/20'
           }`}
         >
           <span
@@ -487,7 +487,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
               <FolderOpen className="h-3 w-3" />
               Özel
               {customEnvironments.length > 0 && (
-                <span className="rounded-full bg-purple-500/40 px-1 text-[9px]">
+                <span className="rounded-full bg-white/40/40 px-1 text-[9px]">
                   {customEnvironments.length}
                 </span>
               )}
@@ -502,7 +502,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                   <button
                     key={preset.id}
                     onClick={() => onLightformerSelect?.(preset)}
-                    className="flex flex-col items-center gap-1 rounded-lg border border-white/10 bg-white/5 p-3 transition-all hover:border-purple-500/50 hover:bg-purple-500/10"
+                    className="flex flex-col items-center gap-1 rounded-lg border border-white/10 bg-white/5 p-3 transition-all hover:border-white/50/50 hover:bg-white/40/10"
                   >
                     <div
                       className="h-8 w-8 rounded-full ring-1 ring-white/20"
@@ -527,7 +527,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                   onClick={() => setSelectedCategory(null)}
                   className={`rounded-md px-2 py-1 text-[10px] transition-all ${
                     selectedCategory === null
-                      ? 'bg-purple-500/20 text-purple-300'
+                      ? 'bg-white/40/20 text-white/90'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >
@@ -539,7 +539,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                     onClick={() => setSelectedCategory(cat)}
                     className={`rounded-md px-2 py-1 text-[10px] transition-all ${
                       selectedCategory === cat
-                        ? 'bg-purple-500/20 text-purple-300'
+                        ? 'bg-white/40/20 text-white/90'
                         : 'bg-white/5 text-white/50 hover:bg-white/10'
                     }`}
                   >
@@ -558,7 +558,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                     onClick={() => onChange({ preset: preset.id, customHDR: null, customHDRId: null })}
                     className={`flex flex-col items-center gap-1 rounded-lg border p-2 transition-all ${
                       config.preset === preset.id
-                        ? 'border-purple-500/50 bg-purple-500/10'
+                        ? 'border-white/50/50 bg-white/40/10'
                         : 'border-white/10 bg-white/5 hover:border-white/20'
                     }`}
                   >
@@ -623,7 +623,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
               {/* Loading state */}
               {customLoading && (
                 <div className="flex items-center justify-center py-6">
-                  <RefreshCw className="h-5 w-5 animate-spin text-purple-400" />
+                  <RefreshCw className="h-5 w-5 animate-spin text-white/70" />
                 </div>
               )}
 
@@ -751,7 +751,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                   onClick={() => onChange({ resolution: res })}
                   className={`rounded-md py-1 text-[9px] transition-all ${
                     config.resolution === res
-                      ? 'bg-purple-500/20 text-purple-300'
+                      ? 'bg-white/40/20 text-white/90'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >
@@ -773,7 +773,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                   step={1}
                   value={(config.rotation.x * 180) / Math.PI}
                   onChange={(v) => onChange({ rotation: { ...config.rotation, x: (v * Math.PI) / 180 } })}
-                  className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-purple-500"
+                  className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-white"
                 />
               </div>
               <div>
@@ -784,7 +784,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                   step={1}
                   value={(config.rotation.y * 180) / Math.PI}
                   onChange={(v) => onChange({ rotation: { ...config.rotation, y: (v * Math.PI) / 180 } })}
-                  className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-purple-500"
+                  className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-white"
                 />
               </div>
               <div>
@@ -795,7 +795,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                   step={1}
                   value={(config.rotation.z * 180) / Math.PI}
                   onChange={(v) => onChange({ rotation: { ...config.rotation, z: (v * Math.PI) / 180 } })}
-                  className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-purple-500"
+                  className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-white"
                 />
               </div>
             </div>
@@ -807,7 +807,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
             <button
               onClick={() => onChange({ showBackground: !config.showBackground })}
               className={`relative h-4 w-7 rounded-full transition-colors ${
-                config.showBackground ? 'bg-purple-500' : 'bg-white/20'
+                config.showBackground ? 'bg-white/40' : 'bg-white/20'
               }`}
             >
               <span
@@ -864,7 +864,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
               <button
                 onClick={() => onChange({ groundProjection: !config.groundProjection })}
                 className={`relative h-4 w-7 rounded-full transition-colors ${
-                  config.groundProjection ? 'bg-purple-500' : 'bg-white/20'
+                  config.groundProjection ? 'bg-white/40' : 'bg-white/20'
                 }`}
               >
                 <span

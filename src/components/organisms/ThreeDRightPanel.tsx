@@ -82,12 +82,12 @@ interface TabConfig {
 }
 
 const TABS: TabConfig[] = [
-  { id: 'model', label: 'Model', icon: <Box className="h-4 w-4" /> },
-  { id: 'materials', label: 'Malzeme', icon: <Palette className="h-4 w-4" /> },
-  { id: 'lighting', label: 'Işık', icon: <Sun className="h-4 w-4" /> },
-  { id: 'effects', label: 'Efekt', icon: <Sparkles className="h-4 w-4" /> },
-  { id: 'view', label: 'Görünüm', icon: <Eye className="h-4 w-4" /> },
-  { id: 'export', label: 'Export', icon: <Download className="h-4 w-4" /> },
+  { id: 'model', label: 'Model', icon: <Box className="h-3.5 w-3.5" /> },
+  { id: 'materials', label: 'Malzeme', icon: <Palette className="h-3.5 w-3.5" /> },
+  { id: 'lighting', label: 'Işık', icon: <Sun className="h-3.5 w-3.5" /> },
+  { id: 'effects', label: 'Efekt', icon: <Sparkles className="h-3.5 w-3.5" /> },
+  { id: 'view', label: 'Görünüm', icon: <Eye className="h-3.5 w-3.5" /> },
+  { id: 'export', label: 'Export', icon: <Download className="h-3.5 w-3.5" /> },
 ];
 
 // ============================================
@@ -112,7 +112,7 @@ const Section = memo(function Section({ title, icon, defaultOpen = false, childr
         className="flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-white/5"
       >
         <div className="flex items-center gap-2">
-          {icon && <span className={isOpen ? 'text-purple-400' : 'text-white/40'}>{icon}</span>}
+          {icon && <span className={isOpen ? 'text-white/70' : 'text-white/40'}>{icon}</span>}
           <span className={`text-xs font-medium ${isOpen ? 'text-white' : 'text-white/60'}`}>
             {title}
           </span>
@@ -482,7 +482,7 @@ export function ThreeDRightPanel({
             onClick={onToggle}
             className="rounded p-1 text-white/40 hover:bg-white/10 hover:text-white"
           >
-            <X className="h-4 w-4" />
+            <X className="h-3.5 w-3.5" />
           </button>
         </div>
         
@@ -492,10 +492,10 @@ export function ThreeDRightPanel({
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex flex-1 flex-col items-center gap-1 py-2.5 transition-colors ${
+              className={`flex flex-1 flex-col items-center gap-1 py-2 transition-colors ${
                 activeTab === tab.id
-                  ? 'bg-purple-500/10 text-purple-400 border-b-2 border-purple-500'
-                  : 'text-white/40 hover:text-white/60 hover:bg-white/5 border-b-2 border-transparent'
+                  ? 'bg-white/5 text-white/90 border-b border-white/30'
+                  : 'text-white/40 hover:text-white/60 hover:bg-white/[0.02] border-b border-transparent'
               }`}
             >
               {tab.icon}
@@ -506,13 +506,13 @@ export function ThreeDRightPanel({
       </div>
 
       {/* Tab Content */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto no-scrollbar">
         {/* ========== MODEL TAB ========== */}
         {activeTab === 'model' && (
           <div>
             {/* Model Info */}
             {fileName && (
-              <Section title="Model Bilgisi" icon={<Box className="h-4 w-4" />} defaultOpen>
+              <Section title="Model Bilgisi" icon={<Box className="h-3.5 w-3.5" />} defaultOpen>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between rounded-lg bg-white/5 p-3">
                     <div>
@@ -527,7 +527,7 @@ export function ThreeDRightPanel({
                       onClick={onClearModel}
                       className="rounded p-1.5 text-white/40 hover:bg-red-500/20 hover:text-red-400"
                     >
-                      <X className="h-4 w-4" />
+                      <X className="h-3.5 w-3.5" />
                     </button>
                   </div>
                 </div>
@@ -536,7 +536,7 @@ export function ThreeDRightPanel({
 
             {/* Layers - Using LayerGroupPanel for grouped view */}
             {layerItems.length > 0 && (
-              <Section title={`Katmanlar (${layerItems.length})`} icon={<Layers className="h-4 w-4" />} defaultOpen>
+              <Section title={`Katmanlar (${layerItems.length})`} icon={<Layers className="h-3.5 w-3.5" />} defaultOpen>
                 <LayerGroupPanel
                   layers={layerItems}
                   selectedLayerId={selectedLayerId}
@@ -550,7 +550,7 @@ export function ThreeDRightPanel({
             )}
 
             {/* Weight Summary */}
-            <Section title="Ağırlık Özeti" icon={<Box className="h-4 w-4" />}>
+            <Section title="Ağırlık Özeti" icon={<Box className="h-3.5 w-3.5" />}>
               <WeightSummaryCard 
                 singleGeometryWeight={singleGeometryWeight}
                 singleGeometryVolume={singleGeometryVolume}
@@ -559,55 +559,46 @@ export function ThreeDRightPanel({
             </Section>
 
             {/* Display Options */}
-            <Section title="Görüntü Ayarları" icon={<Settings className="h-4 w-4" />} defaultOpen>
-              <div className="space-y-3">
+            <Section title="Görüntü Ayarları" icon={<Settings className="h-3.5 w-3.5" />} defaultOpen>
+              <div className="space-y-2.5">
                 <label className="flex items-center justify-between cursor-pointer">
-                  <span className="flex items-center gap-2 text-xs text-white/70">
-                    <Grid3X3 className="h-4 w-4" />
-                    Grid
-                  </span>
+                  <span className="text-[11px] text-white/60">Grid</span>
                   <button
                     onClick={() => onShowGridChange(!showGrid)}
-                    className={`relative w-9 h-5 rounded-full transition-colors ${
-                      showGrid ? 'bg-purple-500' : 'bg-white/20'
+                    className={`relative w-7 h-3.5 rounded-full transition-colors ${
+                      showGrid ? 'bg-white/40' : 'bg-white/15'
                     }`}
                   >
-                    <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform ${
-                      showGrid ? 'translate-x-4' : 'translate-x-0'
+                    <span className={`absolute top-0.5 left-0.5 w-2.5 h-2.5 bg-white rounded-full transition-transform shadow-sm ${
+                      showGrid ? 'translate-x-3.5' : 'translate-x-0'
                     }`} />
                   </button>
                 </label>
 
                 <label className="flex items-center justify-between cursor-pointer">
-                  <span className="flex items-center gap-2 text-xs text-white/70">
-                    <Box className="h-4 w-4" />
-                    Wireframe
-                  </span>
+                  <span className="text-[11px] text-white/60">Wireframe</span>
                   <button
                     onClick={() => onWireframeChange(!wireframe)}
-                    className={`relative w-9 h-5 rounded-full transition-colors ${
-                      wireframe ? 'bg-purple-500' : 'bg-white/20'
+                    className={`relative w-7 h-3.5 rounded-full transition-colors ${
+                      wireframe ? 'bg-white/40' : 'bg-white/15'
                     }`}
                   >
-                    <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform ${
-                      wireframe ? 'translate-x-4' : 'translate-x-0'
+                    <span className={`absolute top-0.5 left-0.5 w-2.5 h-2.5 bg-white rounded-full transition-transform shadow-sm ${
+                      wireframe ? 'translate-x-3.5' : 'translate-x-0'
                     }`} />
                   </button>
                 </label>
 
                 <label className="flex items-center justify-between cursor-pointer">
-                  <span className="flex items-center gap-2 text-xs text-white/70">
-                    <RefreshCw className="h-4 w-4" />
-                    Otomatik Döndür
-                  </span>
+                  <span className="text-[11px] text-white/60">Otomatik Döndür</span>
                   <button
                     onClick={() => onAutoRotateChange(!autoRotate)}
-                    className={`relative w-9 h-5 rounded-full transition-colors ${
-                      autoRotate ? 'bg-purple-500' : 'bg-white/20'
+                    className={`relative w-7 h-3.5 rounded-full transition-colors ${
+                      autoRotate ? 'bg-white/40' : 'bg-white/15'
                     }`}
                   >
-                    <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform ${
-                      autoRotate ? 'translate-x-4' : 'translate-x-0'
+                    <span className={`absolute top-0.5 left-0.5 w-2.5 h-2.5 bg-white rounded-full transition-transform shadow-sm ${
+                      autoRotate ? 'translate-x-3.5' : 'translate-x-0'
                     }`} />
                   </button>
                 </label>
@@ -615,7 +606,7 @@ export function ThreeDRightPanel({
             </Section>
 
             {/* Turntable */}
-            <Section title="Turntable Animasyon" icon={<RotateCw className="h-4 w-4" />}>
+            <Section title="Turntable Animasyon" icon={<RotateCw className="h-3.5 w-3.5" />}>
               <TurntableControls
                 config={turntableConfig}
                 onChange={onTurntableChange}
@@ -626,7 +617,7 @@ export function ThreeDRightPanel({
             </Section>
 
             {/* Edge Smoothing */}
-            <Section title="Mesh Kalitesi" icon={<Settings className="h-4 w-4" />}>
+            <Section title="Mesh Kalitesi" icon={<Settings className="h-3.5 w-3.5" />}>
               <EdgeSmoothingPanel
                 config={edgeSmoothingConfig}
                 onChange={onEdgeSmoothingChange}
@@ -638,7 +629,7 @@ export function ThreeDRightPanel({
             </Section>
 
             {/* Product Transform - Position, Rotation, Scale, Flip */}
-            <Section title="Ürün Transform" icon={<Move className="h-4 w-4" />}>
+            <Section title="Ürün Transform" icon={<Move className="h-3.5 w-3.5" />}>
               <TransformControls
                 transform={productTransform}
                 flip={productFlip}
@@ -649,7 +640,7 @@ export function ThreeDRightPanel({
             </Section>
 
             {/* Camera Controls */}
-            <Section title="Kamera Kontrolleri" icon={<Camera className="h-4 w-4" />}>
+            <Section title="Kamera Kontrolleri" icon={<Camera className="h-3.5 w-3.5" />}>
               <CameraControlsPanel
                 settings={cameraSettings}
                 currentPresetId={currentCameraPresetId}
@@ -666,14 +657,14 @@ export function ThreeDRightPanel({
         {/* ========== MATERIALS TAB ========== */}
         {activeTab === 'materials' && (
           <div>
-            <Section title="Malzeme Editörü" icon={<Palette className="h-4 w-4" />} defaultOpen>
+            <Section title="Malzeme Editörü" icon={<Palette className="h-3.5 w-3.5" />} defaultOpen>
               <MaterialEditor
                 material={selectedMaterial}
                 onChange={onMaterialChange}
               />
             </Section>
 
-            <Section title="Taş Efektleri" icon={<Diamond className="h-4 w-4" />}>
+            <Section title="Taş Efektleri" icon={<Diamond className="h-3.5 w-3.5" />}>
               <DiamondPanel
                 config={diamondConfig}
                 onChange={onDiamondChange}
@@ -681,7 +672,7 @@ export function ThreeDRightPanel({
             </Section>
 
             {/* Legacy Diamond Effects with Gemstone/Cut Selection */}
-            <Section title="Taş Kesimi & Türü" icon={<Sparkles className="h-4 w-4" />}>
+            <Section title="Taş Kesimi & Türü" icon={<Sparkles className="h-3.5 w-3.5" />}>
               <DiamondEffectsPanel
                 effects={diamondEffects}
                 onChange={onDiamondEffectsChange}
@@ -699,7 +690,7 @@ export function ThreeDRightPanel({
         {activeTab === 'lighting' && (
           <div>
             {/* Quick Environment Picker */}
-            <Section title="Hızlı Ortam Seçici" icon={<ImageIcon className="h-4 w-4" />} defaultOpen>
+            <Section title="Hızlı Ortam Seçici" icon={<ImageIcon className="h-3.5 w-3.5" />} defaultOpen>
               <EnvironmentPicker
                 selected={selectedEnvironment}
                 onChange={onEnvironmentChange}
@@ -707,28 +698,28 @@ export function ThreeDRightPanel({
               />
             </Section>
 
-            <Section title="Ortam (HDR) Detaylı" icon={<ImageIcon className="h-4 w-4" />}>
+            <Section title="Ortam (HDR) Detaylı" icon={<ImageIcon className="h-3.5 w-3.5" />}>
               <HDRPanel
                 config={hdrConfig}
                 onChange={onHDRChange}
               />
             </Section>
 
-            <Section title="Işık Kaynakları" icon={<Sun className="h-4 w-4" />}>
+            <Section title="Işık Kaynakları" icon={<Sun className="h-3.5 w-3.5" />}>
               <LightingPanel
                 config={lightingConfig}
                 onChange={onLightingChange}
               />
             </Section>
 
-            <Section title="Arka Plan" icon={<Layers className="h-4 w-4" />}>
+            <Section title="Arka Plan" icon={<Layers className="h-3.5 w-3.5" />}>
               <BackgroundPanel
                 config={backgroundConfig}
                 onChange={onBackgroundChange}
               />
             </Section>
 
-            <Section title="Zemin Düzlemi" icon={<Box className="h-4 w-4" />}>
+            <Section title="Zemin Düzlemi" icon={<Box className="h-3.5 w-3.5" />}>
               <GroundPlaneControls
                 config={groundConfig}
                 onChange={onGroundChange}
@@ -740,14 +731,14 @@ export function ThreeDRightPanel({
         {/* ========== EFFECTS TAB ========== */}
         {activeTab === 'effects' && (
           <div>
-            <Section title="Post-Processing" icon={<Sparkles className="h-4 w-4" />} defaultOpen>
+            <Section title="Post-Processing" icon={<Sparkles className="h-3.5 w-3.5" />} defaultOpen>
               <PostProcessingPanelNew
                 config={postProcessingConfig}
                 onChange={onPostProcessingChange}
               />
             </Section>
 
-            <Section title="Odak Efektleri (DOF)" icon={<Eye className="h-4 w-4" />}>
+            <Section title="Odak Efektleri (DOF)" icon={<Eye className="h-3.5 w-3.5" />}>
               <FocusPanel
                 config={focusConfig}
                 onChange={onFocusChange}
@@ -759,7 +750,7 @@ export function ThreeDRightPanel({
         {/* ========== VIEW TAB ========== */}
         {activeTab === 'view' && (
           <div>
-            <Section title="Görünüm Modu" icon={<Eye className="h-4 w-4" />} defaultOpen>
+            <Section title="Görünüm Modu" icon={<Eye className="h-3.5 w-3.5" />} defaultOpen>
               <ViewPanel
                 config={viewConfig}
                 onChange={onViewChange}
@@ -769,7 +760,7 @@ export function ThreeDRightPanel({
               />
             </Section>
 
-            <Section title="Ölçümler" icon={<Box className="h-4 w-4" />}>
+            <Section title="Ölçümler" icon={<Box className="h-3.5 w-3.5" />}>
               <MeasurementPanel
                 config={measurementConfig}
                 onChange={onMeasurementChange}
@@ -778,7 +769,7 @@ export function ThreeDRightPanel({
               />
             </Section>
 
-            <Section title="Etiketler" icon={<Layers className="h-4 w-4" />}>
+            <Section title="Etiketler" icon={<Layers className="h-3.5 w-3.5" />}>
               <AnnotationPanel
                 config={annotationConfig}
                 onChange={onAnnotationChange}
@@ -786,7 +777,7 @@ export function ThreeDRightPanel({
               />
             </Section>
 
-            <Section title="Transform (Gelişmiş)" icon={<Settings className="h-4 w-4" />}>
+            <Section title="Transform (Gelişmiş)" icon={<Settings className="h-3.5 w-3.5" />}>
               <TransformPanelAdvanced
                 config={transformConfig}
                 onChange={onTransformChange}
@@ -801,7 +792,7 @@ export function ThreeDRightPanel({
           <div>
             {/* Snapshot Preview */}
             {snapshotPreview && (
-              <Section title="Önizleme" icon={<Camera className="h-4 w-4" />} defaultOpen>
+              <Section title="Önizleme" icon={<Camera className="h-3.5 w-3.5" />} defaultOpen>
                 <div className="space-y-2">
                   <div className="relative overflow-hidden rounded-lg border border-white/10">
                     <img src={snapshotPreview} alt="Snapshot" className="w-full" />
@@ -809,16 +800,14 @@ export function ThreeDRightPanel({
                   <div className="flex gap-2">
                     <button
                       onClick={onDownloadSnapshot}
-                      className="flex-1 flex items-center justify-center gap-1 rounded-lg bg-purple-500 py-2 text-xs font-medium text-white hover:bg-purple-600"
+                      className="flex-1 flex items-center justify-center gap-1 rounded-lg bg-white/10 py-1.5 text-[11px] font-medium text-white/80 hover:bg-white/15 transition-colors"
                     >
-                      <Download className="h-3.5 w-3.5" />
                       İndir
                     </button>
                     <button
                       onClick={onSaveToGallery}
-                      className="flex-1 flex items-center justify-center gap-1 rounded-lg bg-white/10 py-2 text-xs font-medium text-white hover:bg-white/20"
+                      className="flex-1 flex items-center justify-center gap-1 rounded-lg bg-white/10 py-1.5 text-[11px] font-medium text-white/80 hover:bg-white/15 transition-colors"
                     >
-                      <ImageIcon className="h-3.5 w-3.5" />
                       Galeri
                     </button>
                   </div>
@@ -833,7 +822,7 @@ export function ThreeDRightPanel({
             )}
 
             {/* General Export Panel */}
-            <Section title="Hızlı Export" icon={<Download className="h-4 w-4" />} defaultOpen>
+            <Section title="Hızlı Export" icon={<Download className="h-3.5 w-3.5" />} defaultOpen>
               <ExportPanel
                 onScreenshot={onScreenshot}
                 onVideo={onVideoExport}
@@ -843,7 +832,7 @@ export function ThreeDRightPanel({
               />
             </Section>
 
-            <Section title="Video / GIF / Görsel (Detaylı)" icon={<Video className="h-4 w-4" />}>
+            <Section title="Video / GIF / Görsel (Detaylı)" icon={<Video className="h-3.5 w-3.5" />}>
               <VideoExportPanel
                 config={videoConfig}
                 onChange={onVideoConfigChange}
@@ -855,7 +844,7 @@ export function ThreeDRightPanel({
               />
             </Section>
 
-            <Section title="Toplu Export (Çoklu Açı)" icon={<Layers className="h-4 w-4" />}>
+            <Section title="Toplu Export (Çoklu Açı)" icon={<Layers className="h-3.5 w-3.5" />}>
               <BatchExportPanel
                 config={batchConfig}
                 onChange={onBatchConfigChange}

@@ -120,7 +120,7 @@ function ColorPickerRow({ label, value, onChange, presets = [] }: ColorPickerRow
                   }}
                   className={`h-6 w-6 rounded border transition-all ${
                     value === preset.color
-                      ? 'border-purple-500 ring-2 ring-purple-500/30'
+                      ? 'border-white/50 ring-2 ring-white/20'
                       : 'border-white/20 hover:border-white/40'
                   }`}
                   style={{ backgroundColor: preset.color }}
@@ -200,7 +200,7 @@ function ToggleRow({ label, value, onChange, icon }: ToggleRowProps) {
       <button
         onClick={() => onChange(!value)}
         className={`relative h-5 w-9 rounded-full transition-colors ${
-          value ? 'bg-purple-500' : 'bg-white/20'
+          value ? 'bg-white/40' : 'bg-white/20'
         }`}
       >
         <span
@@ -469,7 +469,7 @@ export function ViewerSettingsPanel({
                 onClick={() => onQualityChange({ level })}
                 className={`rounded-lg border px-2 py-1.5 text-[10px] font-medium capitalize transition-colors ${
                   quality.level === level
-                    ? 'border-purple-500/50 bg-purple-500/20 text-white'
+                    ? 'border-white/50/50 bg-white/40/20 text-white'
                     : 'border-white/10 bg-white/5 text-white/50 hover:border-white/20'
                 }`}
               >

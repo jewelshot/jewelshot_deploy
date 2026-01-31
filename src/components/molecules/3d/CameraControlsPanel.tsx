@@ -62,7 +62,7 @@ const PresetButton = memo(function PresetButton({ preset, isSelected, onClick }:
       onClick={onClick}
       className={`flex flex-col items-center gap-1 rounded-lg border p-2 transition-all ${
         isSelected
-          ? 'border-purple-500/50 bg-purple-500/10'
+          ? 'border-white/50/50 bg-white/40/10'
           : 'border-white/10 bg-white/5 hover:border-white/20'
       }`}
       title={preset.descriptionTr}
@@ -149,7 +149,7 @@ const Slider = memo(function Slider({ label, value, onChange, min, max, step = 1
         onChange={handleChange}
         onMouseUp={handleChangeEnd}
         onTouchEnd={handleChangeEnd}
-        className="w-full accent-purple-500"
+        className="w-full accent-white"
       />
     </div>
   );
@@ -174,7 +174,7 @@ const Toggle = memo(function Toggle({ label, value, onChange }: ToggleProps) {
       <button
         onClick={handleClick}
         className={`relative h-4 w-7 rounded-full transition-colors ${
-          value ? 'bg-purple-500' : 'bg-white/20'
+          value ? 'bg-white/40' : 'bg-white/20'
         }`}
       >
         <span
@@ -241,7 +241,7 @@ export function CameraControlsPanel({
       {/* View Presets Grid */}
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <Camera className="h-4 w-4 text-purple-400" />
+          <Camera className="h-4 w-4 text-white/70" />
           <span className="text-xs font-medium text-white/70">Görünüm Ön Ayarları</span>
         </div>
         <div className="grid grid-cols-5 gap-1.5">
@@ -289,7 +289,7 @@ export function CameraControlsPanel({
               onClick={() => handleFocalLengthChange(preset.focalLength)}
               className={`rounded px-2 py-1 text-[9px] transition-colors ${
                 Math.abs(currentFocalLength - preset.focalLength) < 5
-                  ? 'bg-purple-500/30 text-purple-300'
+                  ? 'bg-white/40/30 text-white/90'
                   : 'bg-white/5 text-white/50 hover:bg-white/10'
               }`}
               title={preset.description}

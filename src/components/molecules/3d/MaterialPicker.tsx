@@ -52,7 +52,7 @@ function MaterialItem({ material, isSelected, onSelect }: MaterialItemProps) {
       onClick={onSelect}
       className={`group relative flex items-center gap-3 w-full rounded-lg border p-2 transition-all ${
         isSelected
-          ? 'border-purple-500 bg-purple-500/20'
+          ? 'border-white/50 bg-white/40/20'
           : 'border-white/10 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.05]'
       }`}
     >
@@ -92,7 +92,7 @@ function MaterialItem({ material, isSelected, onSelect }: MaterialItemProps) {
 
       {/* Selected Indicator */}
       {isSelected && (
-        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-purple-500">
+        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-white/40">
           <Check className="h-3 w-3 text-white" />
         </div>
       )}
@@ -233,7 +233,7 @@ export function MaterialPicker({
               placeholder={t.viewer3d?.searchMaterials || 'Search materials...'}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-lg bg-white/5 py-2 pl-10 pr-4 text-sm text-white placeholder-white/40 outline-none focus:ring-1 focus:ring-purple-500/50"
+              className="w-full rounded-lg bg-white/5 py-2 pl-10 pr-4 text-sm text-white placeholder-white/40 outline-none focus:ring-1 focus:ring-white/25"
             />
           </div>
         </div>

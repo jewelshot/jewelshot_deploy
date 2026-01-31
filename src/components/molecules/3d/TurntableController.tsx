@@ -139,7 +139,7 @@ export function TurntableControls({
         <button
           onClick={() => onChange({ enabled: !config.enabled })}
           className={`relative h-5 w-9 rounded-full transition-colors ${
-            config.enabled ? 'bg-purple-500' : 'bg-white/20'
+            config.enabled ? 'bg-white/40' : 'bg-white/20'
           }`}
         >
           <span
@@ -192,7 +192,7 @@ export function TurntableControls({
                   onClick={() => onChange({ axis })}
                   className={`flex-1 rounded-md py-2 text-xs font-mono transition-all ${
                     config.axis === axis
-                      ? 'bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/50'
+                      ? 'bg-white/40/20 text-white/90 ring-1 ring-white/25'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >
@@ -210,7 +210,7 @@ export function TurntableControls({
                 onClick={() => onChange({ direction: 'cw' })}
                 className={`flex flex-1 items-center justify-center gap-1 rounded-md py-2 text-xs transition-all ${
                   config.direction === 'cw'
-                    ? 'bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/50'
+                    ? 'bg-white/40/20 text-white/90 ring-1 ring-white/25'
                     : 'bg-white/5 text-white/50 hover:bg-white/10'
                 }`}
               >
@@ -221,7 +221,7 @@ export function TurntableControls({
                 onClick={() => onChange({ direction: 'ccw' })}
                 className={`flex flex-1 items-center justify-center gap-1 rounded-md py-2 text-xs transition-all ${
                   config.direction === 'ccw'
-                    ? 'bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/50'
+                    ? 'bg-white/40/20 text-white/90 ring-1 ring-white/25'
                     : 'bg-white/5 text-white/50 hover:bg-white/10'
                 }`}
               >
@@ -268,7 +268,7 @@ export function TurntableControls({
                 onClick={() => onChange({ speed: preset.value })}
                 className={`flex-1 rounded-md py-1.5 text-[10px] transition-all ${
                   Math.abs(config.speed - preset.value) < 0.01
-                    ? 'bg-purple-500/20 text-purple-300'
+                    ? 'bg-white/40/20 text-white/90'
                     : 'bg-white/5 text-white/50 hover:bg-white/10'
                 }`}
               >
@@ -283,7 +283,7 @@ export function TurntableControls({
             <button
               onClick={() => onChange({ pauseOnHover: !config.pauseOnHover })}
               className={`relative h-4 w-7 rounded-full transition-colors ${
-                config.pauseOnHover ? 'bg-purple-500' : 'bg-white/20'
+                config.pauseOnHover ? 'bg-white/40' : 'bg-white/20'
               }`}
             >
               <span
@@ -316,8 +316,8 @@ export function TurntableButton({ isEnabled, isPlaying, onToggle }: TurntableBut
       className={`flex h-8 w-8 items-center justify-center rounded-lg transition-all ${
         isEnabled
           ? isPlaying
-            ? 'bg-purple-500 text-white'
-            : 'bg-purple-500/20 text-purple-400'
+            ? 'bg-white/40 text-white'
+            : 'bg-white/40/20 text-white/70'
           : 'bg-white/10 text-white/50 hover:bg-white/15'
       }`}
       title={isEnabled ? (isPlaying ? 'Durdur' : 'Başlat') : 'Turntable'}
