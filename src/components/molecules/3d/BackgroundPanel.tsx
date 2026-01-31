@@ -31,8 +31,8 @@ export interface BackgroundConfig {
 
 export const DEFAULT_BACKGROUND_CONFIG: BackgroundConfig = {
   type: 'solid',
-  solidColor: '#FFFFFF',
-  gradientColors: ['#FFFFFF', '#E8E8E8'],
+  solidColor: '#000000',
+  gradientColors: ['#0a0a0a', '#000000'],
   gradientDirection: 'vertical',
   opacity: 1,
 };

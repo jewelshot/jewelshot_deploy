@@ -1340,7 +1340,7 @@ export default function ThreeDViewContent() {
   const [selectedStudio, setSelectedStudio] = useState<StudioPreset>(STUDIO_PRESETS[0]); // White Studio
   const [selectedHDR, setSelectedHDR] = useState<HDRPreset | null>(null); // HDR environment
   const [useHDR, setUseHDR] = useState(false); // Toggle between HDR and Lightformer
-  const [backgroundColor, setBackgroundColor] = useState('#FFFFFF');
+  const [backgroundColor, setBackgroundColor] = useState('#000000');
   const [snapshotScale, setSnapshotScale] = useState<1 | 2 | 4>(1);
   const [isDragging, setIsDragging] = useState(false);
   const [modelInfo, setModelInfo] = useState<{ vertices: number; faces: number } | null>(null);
