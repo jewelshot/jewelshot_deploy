@@ -23,7 +23,7 @@ const ThrottledSlider = memo(function ThrottledSlider({
   min,
   max,
   step = 1,
-  className = 'w-full accent-white',
+  className = 'w-full viewer-slider',
 }: {
   value: number;
   onChange: (value: number) => void;
@@ -773,7 +773,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                   step={1}
                   value={(config.rotation.x * 180) / Math.PI}
                   onChange={(v) => onChange({ rotation: { ...config.rotation, x: (v * Math.PI) / 180 } })}
-                  className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-white"
+                  className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer viewer-slider"
                 />
               </div>
               <div>
@@ -784,7 +784,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                   step={1}
                   value={(config.rotation.y * 180) / Math.PI}
                   onChange={(v) => onChange({ rotation: { ...config.rotation, y: (v * Math.PI) / 180 } })}
-                  className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-white"
+                  className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer viewer-slider"
                 />
               </div>
               <div>
@@ -795,7 +795,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                   step={1}
                   value={(config.rotation.z * 180) / Math.PI}
                   onChange={(v) => onChange({ rotation: { ...config.rotation, z: (v * Math.PI) / 180 } })}
-                  className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer accent-white"
+                  className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer viewer-slider"
                 />
               </div>
             </div>

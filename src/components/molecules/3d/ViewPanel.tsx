@@ -250,7 +250,7 @@ export function ViewPanel({
               type="checkbox"
               checked={config.showAxes}
               onChange={(e) => onChange({ showAxes: e.target.checked })}
-              className="accent-white"
+              className="viewer-slider"
             />
             <span className="text-[10px] text-white/60">Eksenler</span>
           </label>
@@ -259,7 +259,7 @@ export function ViewPanel({
               type="checkbox"
               checked={config.showStats}
               onChange={(e) => onChange({ showStats: e.target.checked })}
-              className="accent-white"
+              className="viewer-slider"
             />
             <span className="text-[10px] text-white/60">İstatistikler</span>
           </label>

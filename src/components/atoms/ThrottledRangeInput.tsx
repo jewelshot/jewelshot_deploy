@@ -22,7 +22,7 @@ export const ThrottledRangeInput = memo(function ThrottledRangeInput({
   value,
   onChange,
   throttleMs = 16,
-  className = 'w-full accent-purple-500',
+  className = 'viewer-slider',
   ...props
 }: ThrottledRangeInputProps) {
   // Local state for immediate visual feedback

@@ -2867,17 +2867,14 @@ export default function ThreeDViewContent() {
           onClick={() => setRightOpen(!rightOpen)}
           className={`fixed top-1/2 z-[200] flex h-8 w-3 -translate-y-1/2 cursor-pointer items-center justify-center border border-white/10 bg-[rgba(17,17,17,0.8)] panel-transition hover:border-white/20 hover:bg-white/[0.08] hover:backdrop-blur-[10px] ${
             rightOpen
-              ? 'rounded-r-md border-l-0 border-r'
-              : 'rounded-l-md border-l border-r-0'
+              ? 'right-[320px] rounded-l-md border-r-0 border-l'
+              : 'right-0 rounded-l-md border-l border-r-0'
           }`}
-          style={{
-            right: rightOpen ? '320px' : '0',
-          }}
           aria-label={rightOpen ? 'Close right sidebar' : 'Open right sidebar'}
           aria-expanded={rightOpen}
         >
-          <span className={`text-[8px] text-white/40 panel-transition hover:text-white/70 ${rightOpen ? 'rotate-180' : 'rotate-0'}`}>
-            ‹
+          <span className={`text-[8px] text-white/40 panel-transition hover:text-white/70`}>
+            {rightOpen ? '›' : '‹'}
           </span>
         </button>
 

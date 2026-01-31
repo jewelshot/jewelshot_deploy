@@ -477,7 +477,7 @@ export function MaterialEditor({ material, onChange, onPresetSelect }: MaterialE
             step={0.1}
             value={material.envMapIntensity}
             onChange={(v) => onChange({ envMapIntensity: v })}
-            className="w-full accent-white"
+            className="viewer-slider"
           />
         </div>
       </div>
@@ -686,7 +686,7 @@ export function MaterialEditor({ material, onChange, onPresetSelect }: MaterialE
                   step={0.5}
                   value={material.attenuationDistance || 0}
                   onChange={(v) => onChange({ attenuationDistance: v })}
-                  className="w-full accent-white"
+                  className="viewer-slider"
                 />
               </div>
             </div>
@@ -709,7 +709,7 @@ export function MaterialEditor({ material, onChange, onPresetSelect }: MaterialE
                   step={0.05}
                   value={material.specularIntensity ?? 1}
                   onChange={(v) => onChange({ specularIntensity: v })}
-                  className="w-full accent-white"
+                  className="viewer-slider"
                 />
               </div>
 

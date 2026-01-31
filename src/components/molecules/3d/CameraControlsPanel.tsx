@@ -149,7 +149,7 @@ const Slider = memo(function Slider({ label, value, onChange, min, max, step = 1
         onChange={handleChange}
         onMouseUp={handleChangeEnd}
         onTouchEnd={handleChangeEnd}
-        className="w-full accent-white"
+        className="viewer-slider"
       />
     </div>
   );

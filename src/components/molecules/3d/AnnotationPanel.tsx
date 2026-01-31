@@ -432,7 +432,7 @@ export function AnnotationPanel({
                   type="checkbox"
                   checked={config.showAllLabels}
                   onChange={(e) => onChange({ showAllLabels: e.target.checked })}
-                  className="accent-white"
+                  className="viewer-slider"
                 />
                 <span className="text-[10px] text-white/50">Tümünü Göster</span>
               </label>
@@ -441,7 +441,7 @@ export function AnnotationPanel({
                   type="checkbox"
                   checked={config.showCalloutLines}
                   onChange={(e) => onChange({ showCalloutLines: e.target.checked })}
-                  className="accent-white"
+                  className="viewer-slider"
                 />
                 <span className="text-[10px] text-white/50">Çizgileri Göster</span>
               </label>
@@ -618,7 +618,7 @@ export function AnnotationPanel({
                 type="checkbox"
                 checked={config.exportWithRender}
                 onChange={(e) => onChange({ exportWithRender: e.target.checked })}
-                className="accent-white"
+                className="viewer-slider"
               />
             </label>
 

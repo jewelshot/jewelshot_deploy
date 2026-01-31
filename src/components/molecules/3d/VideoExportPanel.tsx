@@ -786,7 +786,7 @@ export function VideoExportPanel({
                           type="checkbox"
                           checked={config.intro.fadeIn}
                           onChange={(e) => onChange({ intro: { ...config.intro, fadeIn: e.target.checked } })}
-                          className="accent-white"
+                          className="viewer-slider"
                         />
                       </label>
                     </div>
@@ -839,7 +839,7 @@ export function VideoExportPanel({
                           type="checkbox"
                           checked={config.outro.fadeOut}
                           onChange={(e) => onChange({ outro: { ...config.outro, fadeOut: e.target.checked } })}
-                          className="accent-white"
+                          className="viewer-slider"
                         />
                       </label>
                     </div>

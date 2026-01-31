@@ -544,7 +544,7 @@ export function TransformPanelAdvanced({
                 type="checkbox"
                 checked={config.snap.showGrid}
                 onChange={(e) => onChange({ snap: { ...config.snap, showGrid: e.target.checked } })}
-                className="accent-white"
+                className="viewer-slider"
               />
             </label>
           </>

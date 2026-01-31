@@ -626,7 +626,7 @@ export function LightingPanel({ config, onChange }: LightingPanelProps) {
             step={0.05}
             value={config.ambientIntensity}
             onChange={(v) => onChange({ ambientIntensity: v })}
-            className="mt-2 w-full accent-white"
+            className="mt-2 viewer-slider"
           />
         </div>
 

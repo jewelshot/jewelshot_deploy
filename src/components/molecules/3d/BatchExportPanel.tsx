@@ -771,7 +771,7 @@ export function BatchExportPanel({
                     onChange={(e) => onChange({ 
                       spritesheet: { ...config.spritesheet, exportJson: e.target.checked } 
                     })}
-                    className="accent-white"
+                    className="viewer-slider"
                   />
                 </label>
               )}

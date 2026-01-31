@@ -445,7 +445,7 @@ export function MeasurementPanel({
                         onChange={(e) => onChange({
                           labelVisibility: { ...config.labelVisibility, [dim]: e.target.checked }
                         })}
-                        className="accent-white"
+                        className="viewer-slider"
                       />
                       <span className="text-[10px] text-white/50">
                         {dim === 'width' ? 'X' : dim === 'height' ? 'Y' : 'Z'}
@@ -670,7 +670,7 @@ export function MeasurementPanel({
                   type="checkbox"
                   checked={config.showDimensions}
                   onChange={(e) => onChange({ showDimensions: e.target.checked })}
-                  className="accent-white"
+                  className="viewer-slider"
                 />
               </label>
               <label className="flex cursor-pointer items-center justify-between rounded-md bg-white/5 px-2 py-1.5">
@@ -679,7 +679,7 @@ export function MeasurementPanel({
                   type="checkbox"
                   checked={config.showBoundingBox}
                   onChange={(e) => onChange({ showBoundingBox: e.target.checked })}
-                  className="accent-white"
+                  className="viewer-slider"
                 />
               </label>
             </div>
