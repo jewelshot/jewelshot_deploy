@@ -490,7 +490,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
         description={currentActionInfo?.description || 'Are you sure you want to proceed?'}
         confirmText="Proceed"
         cancelText="Cancel"
-        variant="ai"
+        variant="default"
       />
     </div>
   );

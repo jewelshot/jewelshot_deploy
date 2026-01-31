@@ -1,8 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { X, AlertTriangle, Sparkles, Trash2 } from 'lucide-react';
 
 export interface ConfirmationModalProps {
   isOpen: boolean;
@@ -13,10 +12,16 @@ export interface ConfirmationModalProps {
   details?: { label: string; value: string }[];
   confirmText?: string;
   cancelText?: string;
-  variant?: 'default' | 'danger' | 'ai' | 'warning';
+  variant?: 'default' | 'danger' | 'warning';
   isLoading?: boolean;
 }
 
+/**
+ * ConfirmationModal
+ * 
+ * Minimal, elegant confirmation dialog.
+ * Standard design for all modals in the app.
+ */
 export function ConfirmationModal({
   isOpen,
   onClose,
@@ -31,105 +36,112 @@ export function ConfirmationModal({
 }: ConfirmationModalProps) {
   const [mounted, setMounted] = React.useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setMounted(true);
   }, []);
 
+  // Escape key to close
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape' && !isLoading) {
+      onClose();
+    }
+  }, [onClose, isLoading]);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [isOpen, handleKeyDown]);
+
   if (!isOpen || !mounted) return null;
 
-  const variantStyles = {
-    default: {
-      icon: <Sparkles className="h-5 w-5" />,
-      iconBg: 'bg-white/10 text-white/70',
-      confirmBtn: 'bg-white/10 hover:bg-white/20 text-white border-white/10',
-    },
-    danger: {
-      icon: <Trash2 className="h-5 w-5" />,
-      iconBg: 'bg-red-500/20 text-red-400',
-      confirmBtn: 'bg-red-500/20 hover:bg-red-500/30 text-red-400 border-red-500/30',
-    },
-    ai: {
-      icon: <Sparkles className="h-5 w-5" />,
-      iconBg: 'bg-white/10 text-white/70',
-      confirmBtn: 'bg-white/10 hover:bg-white/20 text-white border-white/10',
-    },
-    warning: {
-      icon: <AlertTriangle className="h-5 w-5" />,
-      iconBg: 'bg-amber-500/20 text-amber-400',
-      confirmBtn: 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border-amber-500/30',
-    },
-  };
-
-  const styles = variantStyles[variant];
+  // Variant determines confirm button style only
+  const confirmBtnStyle = {
+    default: 'bg-white/10 hover:bg-white/15 text-white/90',
+    danger: 'bg-white/10 hover:bg-red-500/20 text-white/90 hover:text-red-400',
+    warning: 'bg-white/10 hover:bg-white/15 text-white/90',
+  }[variant];
 
   const modalContent = (
     <>
-      {/* Backdrop */}
+      {/* Backdrop - subtle, not too dark */}
       <div
-        className="fixed inset-0 z-[300] bg-black/60 backdrop-blur-sm"
+        className="fixed inset-0 z-[300] bg-black/50 backdrop-blur-[2px] animate-in fade-in duration-150"
         onClick={onClose}
       />
 
-      {/* Modal */}
-      <div
-        className="fixed left-1/2 top-1/2 z-[301] w-full max-w-sm -translate-x-1/2 -translate-y-1/2 px-4"
-      >
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a0a] p-5 shadow-2xl">
-          {/* Close Button */}
-          <button
-            onClick={onClose}
-            className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-lg text-white/40 transition-colors hover:bg-white/10 hover:text-white"
-          >
-            <X className="h-4 w-4" />
-          </button>
+      {/* Modal Container */}
+      <div className="fixed inset-0 z-[301] flex items-center justify-center p-4 pointer-events-none">
+        <div 
+          className="pointer-events-auto w-full max-w-[320px] animate-in fade-in zoom-in-95 duration-200"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-title"
+        >
+          {/* Modal Card */}
+          <div className="rounded-xl border border-white/[0.08] bg-[rgba(12,12,12,0.95)] backdrop-blur-xl shadow-2xl">
+            {/* Content */}
+            <div className="p-5">
+              {/* Title */}
+              <h2 
+                id="modal-title"
+                className="text-[15px] font-medium text-white/90 mb-1"
+              >
+                {title}
+              </h2>
 
-          {/* Icon */}
-          <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl ${styles.iconBg}`}>
-            {styles.icon}
-          </div>
+              {/* Description */}
+              {description && (
+                <p className="text-[13px] text-white/50 leading-relaxed">
+                  {description}
+                </p>
+              )}
 
-          {/* Title */}
-          <h3 className="mb-2 text-lg font-semibold text-white">
-            {title}
-          </h3>
-
-          {/* Description */}
-          {description && (
-            <p className="mb-4 text-sm text-white/60">
-              {description}
-            </p>
-          )}
-
-          {/* Details */}
-          {details && details.length > 0 && (
-            <div className="mb-4 space-y-2 rounded-lg border border-white/10 bg-white/5 p-3">
-              {details.map((detail, index) => (
-                <div key={index} className="flex items-start justify-between gap-2">
-                  <span className="text-xs text-white/50">{detail.label}</span>
-                  <span className="text-right text-xs font-medium text-white/80 max-w-[200px] truncate">
-                    {detail.value || '(empty)'}
-                  </span>
+              {/* Details (optional key-value pairs) */}
+              {details && details.length > 0 && (
+                <div className="mt-4 space-y-1.5 rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2.5">
+                  {details.map((detail, index) => (
+                    <div key={index} className="flex items-center justify-between gap-3">
+                      <span className="text-[11px] text-white/40">{detail.label}</span>
+                      <span className="text-[11px] text-white/70 truncate max-w-[160px]">
+                        {detail.value || '—'}
+                      </span>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
-          )}
 
-          {/* Buttons */}
-          <div className="flex gap-2">
-            <button
-              onClick={onClose}
-              disabled={isLoading}
-              className="flex-1 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-50"
-            >
-              {cancelText}
-            </button>
-            <button
-              onClick={onConfirm}
-              disabled={isLoading}
-              className={`flex-1 rounded-lg border px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50 ${styles.confirmBtn}`}
-            >
-              {isLoading ? 'Processing...' : confirmText}
-            </button>
+            {/* Actions - separated by subtle border */}
+            <div className="flex border-t border-white/[0.06]">
+              <button
+                onClick={onClose}
+                disabled={isLoading}
+                className="flex-1 py-3 text-[13px] text-white/50 transition-colors hover:text-white/70 hover:bg-white/[0.02] disabled:opacity-50 rounded-bl-xl"
+              >
+                {cancelText}
+              </button>
+              <div className="w-px bg-white/[0.06]" />
+              <button
+                onClick={onConfirm}
+                disabled={isLoading}
+                className={`flex-1 py-3 text-[13px] font-medium transition-all disabled:opacity-50 rounded-br-xl ${confirmBtnStyle}`}
+              >
+                {isLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="h-3 w-3 rounded-full border-2 border-white/30 border-t-white/80 animate-spin" />
+                    <span>Processing</span>
+                  </span>
+                ) : (
+                  confirmText
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>

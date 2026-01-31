@@ -158,7 +158,7 @@ export function AIEditControl({
         ]}
         confirmText="Generate"
         cancelText="Cancel"
-        variant="ai"
+        variant="default"
       />
 
       {/* Keyframes */}
