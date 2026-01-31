@@ -113,7 +113,7 @@ export function Sidebar() {
 
   return (
     <aside
-      className={`fixed bottom-0 left-0 top-0 z-[100] w-[260px] border-r border-white/10 bg-[var(--panel)] shadow-[var(--shadow-lg)] backdrop-blur-[24px] backdrop-saturate-[200%] transition-all duration-[400ms] ease-[cubic-bezier(0.4,0.0,0.2,1)] ${leftOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      className={`fixed bottom-0 left-0 top-0 z-[100] w-[260px] border-r border-white/10 bg-[var(--panel)] shadow-[var(--shadow-lg)] backdrop-blur-[24px] backdrop-saturate-[200%] transition-all duration-panel ease-panel ${leftOpen ? 'translate-x-0' : '-translate-x-full'}`}
     >
       {/* Sidebar Content */}
       <div className="sidebar-scroll flex h-full flex-col overflow-y-auto px-4 py-3">

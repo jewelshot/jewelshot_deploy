@@ -47,7 +47,7 @@ export default function CatalogueRightSidebar({
 
   return (
     <aside
-      className={`fixed bottom-0 right-0 top-0 z-[90] w-[350px] border-l border-[rgba(139,92,246,0.15)] bg-[rgba(10,10,10,0.7)] shadow-[-4px_0_24px_rgba(0,0,0,0.3)] backdrop-blur-[24px] backdrop-saturate-[200%] transition-all duration-[400ms] ease-[cubic-bezier(0.4,0.0,0.2,1)] ${
+      className={`fixed bottom-0 right-0 top-0 z-[90] w-[350px] border-l border-[rgba(139,92,246,0.15)] bg-[rgba(10,10,10,0.7)] shadow-[-4px_0_24px_rgba(0,0,0,0.3)] backdrop-blur-[24px] backdrop-saturate-[200%] transition-all duration-panel ease-panel ${
         isOpen ? 'translate-x-0' : 'translate-x-full'
       }`}
     >

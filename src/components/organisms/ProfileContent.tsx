@@ -61,7 +61,7 @@ export function ProfileContent() {
 
   return (
     <main
-      className="fixed inset-0 overflow-y-auto transition-all duration-[400ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
+      className="fixed inset-0 overflow-y-auto transition-all duration-panel ease-panel"
       style={{
         paddingLeft: leftOpen ? '260px' : '0',
       }}

@@ -213,7 +213,7 @@ export function BatchContent({
       />
 
       <main
-        className="fixed transition-all duration-[400ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
+        className="fixed transition-all duration-panel ease-panel"
         style={{
           top: topOpen ? '56px' : '0px',
           bottom: bottomOpen ? '50px' : '0px',

@@ -25,7 +25,7 @@ export function TopBarToggle() {
       aria-expanded={topOpen}
     >
       <span
-        className={`text-[8px] text-white/60 transition-all duration-[400ms] ease-[cubic-bezier(0.4,0.0,0.2,1)] group-hover:text-[rgba(139,92,246,1)] ${
+        className={`text-[8px] text-white/60 transition-all duration-panel ease-panel group-hover:text-[rgba(139,92,246,1)] ${
           topOpen ? 'rotate-0' : 'rotate-180'
         }`}
       >

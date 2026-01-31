@@ -248,7 +248,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
 
   return (
     <div
-      className="fixed z-20 transition-all duration-[400ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
+      className="fixed z-20 transition-all duration-panel ease-panel"
       style={{
         top: '50%',
         transform: controlsVisible

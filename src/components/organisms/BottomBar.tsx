@@ -54,7 +54,7 @@ export function BottomBar() {
 
   return (
     <footer
-      className="fixed z-50 flex h-14 items-center justify-between border-t border-[rgba(139,92,246,0.15)] bg-[rgba(10,10,10,0.7)] px-4 backdrop-blur-[24px] backdrop-saturate-[200%] transition-all duration-[400ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
+      className="fixed z-50 flex h-14 items-center justify-between border-t border-[rgba(139,92,246,0.15)] bg-[rgba(10,10,10,0.7)] px-4 backdrop-blur-[24px] backdrop-saturate-[200%] transition-all duration-panel ease-panel"
       style={{
         bottom: bottomOpen ? '0px' : '-56px',
         left: leftOpen ? '260px' : '0px',
