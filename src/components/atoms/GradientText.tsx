@@ -37,14 +37,15 @@ export function GradientText({ children, className = '', variant = 'apple' }: Gr
     );
   }
 
-  // Apple-style flowing multi-color gradient
+  // Apple-style flowing multi-color gradient - continuous right movement
   return (
     <span
-      className={`inline-block bg-clip-text text-transparent ${className}`}
+      className={`bg-clip-text text-transparent ${className}`}
       style={{
-        backgroundImage: 'linear-gradient(90deg, #a855f7, #ec4899, #6366f1, #06b6d4, #a855f7, #ec4899)',
-        backgroundSize: '300% 100%',
-        animation: 'appleGradient 4s ease-in-out infinite',
+        backgroundImage: 'linear-gradient(90deg, #a855f7, #ec4899, #6366f1, #06b6d4, #a855f7, #ec4899, #6366f1, #06b6d4, #a855f7)',
+        backgroundSize: '200% 100%',
+        animation: 'appleGradient 4s linear infinite',
+        paddingBottom: '0.1em', // Prevent descender clipping on letters like g, y, p
       }}
     >
       {children}
@@ -53,11 +54,8 @@ export function GradientText({ children, className = '', variant = 'apple' }: Gr
           0% {
             background-position: 0% 50%;
           }
-          50% {
-            background-position: 100% 50%;
-          }
           100% {
-            background-position: 0% 50%;
+            background-position: -200% 50%;
           }
         }
       `}</style>
