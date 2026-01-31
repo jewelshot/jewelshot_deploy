@@ -41,7 +41,7 @@ export function CatalogueSettingsModal({
 
   return (
     <div
-      className="fixed z-[100] flex items-center justify-center bg-black/90 backdrop-blur-xl transition-all duration-panel ease-panel"
+      className="fixed z-[100] flex items-center justify-center bg-black/90 backdrop-blur-xl panel-transition"
       style={{
         left: leftOpen ? '260px' : '16px',
         right: rightOpen ? '276px' : '16px',

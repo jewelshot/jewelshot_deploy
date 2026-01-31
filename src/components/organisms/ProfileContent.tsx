@@ -61,7 +61,7 @@ export function ProfileContent() {
 
   return (
     <main
-      className="fixed inset-0 overflow-y-auto transition-all duration-panel ease-panel"
+      className="fixed inset-0 overflow-y-auto panel-transition"
       style={{
         paddingLeft: leftOpen ? '260px' : '0',
       }}

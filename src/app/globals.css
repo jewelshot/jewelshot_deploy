@@ -3,6 +3,17 @@
 @tailwind utilities;
 
 /* ============================================
+   Panel Transitions - Single Source of Truth
+   ============================================ */
+@layer utilities {
+  .panel-transition {
+    transition-property: all;
+    transition-duration: 400ms;
+    transition-timing-function: cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+}
+
+/* ============================================
    Accessibility - Focus Indicators
    ============================================ */
 

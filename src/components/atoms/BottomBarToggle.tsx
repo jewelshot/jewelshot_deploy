@@ -25,7 +25,7 @@ export function BottomBarToggle() {
       aria-expanded={bottomOpen}
     >
       <span
-        className={`text-[8px] text-white/60 transition-all duration-panel ease-panel group-hover:text-[rgba(139,92,246,1)] ${
+        className={`text-[8px] text-white/60 panel-transition group-hover:text-[rgba(139,92,246,1)] ${
           bottomOpen ? 'rotate-0' : 'rotate-180'
         }`}
       >

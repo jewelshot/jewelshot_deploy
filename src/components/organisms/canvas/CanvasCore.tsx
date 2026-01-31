@@ -132,7 +132,7 @@ export default function CanvasCore({
 
   return (
     <div
-      className="fixed z-10 transition-all duration-panel ease-panel"
+      className="fixed z-10 panel-transition"
       style={{
         left: `${leftPos}px`,
         right: `${rightPos}px`,
@@ -155,7 +155,7 @@ export default function CanvasCore({
           {viewMode === 'normal' ? (
             /* Single Image View */
             <div
-              className="h-full w-full transition-all duration-panel ease-panel"
+              className="h-full w-full panel-transition"
               style={{
                 paddingTop: `${imagePadding.top}px`,
                 paddingLeft: `${imagePadding.left}px`,
@@ -184,7 +184,7 @@ export default function CanvasCore({
           ) : (
             /* Side-by-Side Comparison View */
             <div
-              className="relative flex h-full w-full items-center justify-center gap-4 transition-all duration-panel ease-panel"
+              className="relative flex h-full w-full items-center justify-center gap-4 panel-transition"
               style={{
                 paddingTop: `${imagePadding.top}px`,
                 paddingLeft: `${imagePadding.left}px`,

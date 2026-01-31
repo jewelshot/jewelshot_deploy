@@ -484,7 +484,7 @@ export function DashboardContent() {
   if (loading || creditsLoading) {
     return (
       <main
-        className="fixed inset-0 flex items-center justify-center transition-all duration-panel ease-panel"
+        className="fixed inset-0 flex items-center justify-center panel-transition"
         style={{ paddingLeft: leftOpen ? '260px' : '0' }}
       >
         <div className="text-center">
@@ -500,7 +500,7 @@ export function DashboardContent() {
   // ============================================
   return (
     <main
-      className="fixed inset-0 overflow-y-auto transition-all duration-panel ease-panel"
+      className="fixed inset-0 overflow-y-auto panel-transition"
       style={{ paddingLeft: leftOpen ? '260px' : '0' }}
     >
       <div className="min-h-screen p-6">

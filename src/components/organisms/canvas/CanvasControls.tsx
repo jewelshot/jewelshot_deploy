@@ -150,7 +150,7 @@ export default function CanvasControls({
     <>
       {/* Top Left Controls - File Info (z-30 to be above ViewModeSelector) */}
       <div
-        className="fixed z-30 transition-all duration-panel ease-panel"
+        className="fixed z-30 panel-transition"
         style={{
           top: topOpen ? '80px' : '16px',
           left: leftOpen ? '276px' : '16px',
@@ -170,7 +170,7 @@ export default function CanvasControls({
       {/* Top Center Controls - View Mode Selector */}
       {hasOriginalImage && (
         <div
-          className="pointer-events-none fixed z-20 flex justify-center transition-all duration-panel ease-panel"
+          className="pointer-events-none fixed z-20 flex justify-center panel-transition"
           style={{
             top: topOpen ? '80px' : '16px',
             left: leftOpen ? '130px' : '0px',
@@ -191,7 +191,7 @@ export default function CanvasControls({
 
       {/* Top Right Controls - Zoom (hideable) & Actions (always visible) */}
       <div
-        className="fixed z-20 flex items-center gap-2 transition-all duration-panel ease-panel"
+        className="fixed z-20 flex items-center gap-2 panel-transition"
         style={{
           top: topOpen ? '80px' : '16px',
           right: rightOpen ? '276px' : '16px',
@@ -199,7 +199,7 @@ export default function CanvasControls({
       >
         {/* Zoom Controls - Hideable */}
         <div
-          className="transition-all duration-panel ease-panel"
+          className="panel-transition"
           style={{
             opacity: controlsVisible ? 1 : 0,
             transform: controlsVisible ? 'translateX(0)' : 'translateX(20px)',
@@ -226,7 +226,7 @@ export default function CanvasControls({
 
       {/* Bottom Left Controls - Background Selector */}
       <div
-        className="fixed z-30 transition-all duration-panel ease-panel"
+        className="fixed z-30 panel-transition"
         style={{
           bottom: bottomOpen ? '56px' : '16px',
           left: leftOpen ? '276px' : '16px',
@@ -245,7 +245,7 @@ export default function CanvasControls({
 
       {/* Bottom Center - AI Edit Control */}
       <div
-        className="fixed z-20 transition-all duration-panel ease-panel"
+        className="fixed z-20 panel-transition"
         style={{
           bottom: bottomOpen ? '56px' : '16px',
           left: leftOpen ? '260px' : '0px',
@@ -268,7 +268,7 @@ export default function CanvasControls({
 
       {/* Bottom Right Controls - Edit, Delete, Save, Download, Video */}
       <div
-        className="fixed z-20 transition-all duration-panel ease-panel"
+        className="fixed z-20 panel-transition"
         style={{
           bottom: bottomOpen ? '56px' : '16px',
           right: rightOpen ? '276px' : '16px',

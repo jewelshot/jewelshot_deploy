@@ -10,12 +10,6 @@ module.exports = {
       fontFamily: {
         sans: ['var(--font-inter)', 'Inter', 'sans-serif'],
       },
-      transitionDuration: {
-        'panel': '400ms',
-      },
-      transitionTimingFunction: {
-        'panel': 'cubic-bezier(0.4, 0.0, 0.2, 1)',
-      },
       colors: {
         theme: {
           primary: 'rgb(var(--theme-primary) / <alpha-value>)',

@@ -213,7 +213,7 @@ export function BatchContent({
       />
 
       <main
-        className="fixed transition-all duration-panel ease-panel"
+        className="fixed panel-transition"
         style={{
           top: topOpen ? '56px' : '0px',
           bottom: bottomOpen ? '50px' : '0px',

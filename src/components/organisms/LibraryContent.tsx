@@ -251,7 +251,7 @@ export function LibraryContent() {
 
   return (
     <div
-      className="fixed z-10 flex flex-col overflow-hidden transition-all duration-panel ease-panel"
+      className="fixed z-10 flex flex-col overflow-hidden panel-transition"
       style={{
         left: leftOpen ? '260px' : '16px',
         right: rightOpen ? '276px' : '16px',

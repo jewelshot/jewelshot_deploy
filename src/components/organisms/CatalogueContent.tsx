@@ -263,7 +263,7 @@ export default function CatalogueContent() {
 
   return (
     <div
-      className="fixed z-10 flex h-full flex-col gap-6 overflow-y-auto p-6 transition-all duration-panel ease-panel"
+      className="fixed z-10 flex h-full flex-col gap-6 overflow-y-auto p-6 panel-transition"
       style={{
         left: leftOpen ? '260px' : '16px',
         right: isRightSidebarOpen ? '366px' : '16px',

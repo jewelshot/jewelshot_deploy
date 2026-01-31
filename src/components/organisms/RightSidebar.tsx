@@ -304,7 +304,7 @@ ${libraryPreset.negativePrompt}`;
 
   return (
     <aside
-      className={`fixed bottom-0 right-0 top-0 z-[100] w-[260px] border-l border-white/10 bg-[rgba(10,10,10,0.7)] shadow-[-4px_0_24px_rgba(0,0,0,0.3)] backdrop-blur-[24px] backdrop-saturate-[200%] transition-all duration-panel ease-panel ${rightOpen ? 'translate-x-0' : 'translate-x-full'}`}
+      className={`fixed bottom-0 right-0 top-0 z-[100] w-[260px] border-l border-white/10 bg-[rgba(10,10,10,0.7)] shadow-[-4px_0_24px_rgba(0,0,0,0.3)] backdrop-blur-[24px] backdrop-saturate-[200%] panel-transition ${rightOpen ? 'translate-x-0' : 'translate-x-full'}`}
     >
       <div className="sidebar-scroll flex h-full flex-col overflow-y-auto px-4 py-3">
         {/* Header with Notification Only */}

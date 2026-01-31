@@ -2506,7 +2506,7 @@ export default function ThreeDViewContent() {
       : MATTE_PRESETS;
 
   // Calculate dynamic classes for viewport
-  const viewportClasses = `fixed top-0 bottom-0 flex flex-col bg-[#0a0a0a] transition-all duration-panel ease-panel ${
+  const viewportClasses = `fixed top-0 bottom-0 flex flex-col bg-[#0a0a0a] panel-transition ${
     leftOpen ? 'left-[256px]' : 'left-[56px]'
   } ${
     rightOpen ? 'right-[320px]' : 'right-0'
