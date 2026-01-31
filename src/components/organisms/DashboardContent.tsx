@@ -109,11 +109,11 @@ const KEYBOARD_SHORTCUTS = [
 ];
 
 const FILE_TYPE_COLORS: Record<string, string> = {
-  'image/jpeg': '#8b5cf6',
-  'image/png': '#3b82f6',
-  'image/webp': '#10b981',
-  'image/gif': '#f59e0b',
-  'other': '#6b7280',
+  'image/jpeg': '#71717a',
+  'image/png': '#a1a1aa',
+  'image/webp': '#d4d4d8',
+  'image/gif': '#52525b',
+  'other': '#3f3f46',
 };
 
 // ============================================
@@ -598,7 +598,7 @@ export function DashboardContent() {
                       className="w-full max-w-[24px] rounded-t transition-all duration-300 hover:opacity-80"
                       style={{
                         height: day.count > 0 ? `${(day.count / maxUsageCount) * 100}%` : '3px',
-                        backgroundColor: day.count > 0 ? 'rgba(168, 85, 247, 0.5)' : 'rgba(255,255,255,0.08)',
+                        backgroundColor: day.count > 0 ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255,255,255,0.08)',
                         minHeight: '3px',
                       }}
                       title={`${day.date}: ${day.count} generations`}
@@ -636,7 +636,7 @@ export function DashboardContent() {
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${planInfo.percentUsed > 90 ? 'bg-red-500/60' :
                       planInfo.percentUsed > 70 ? 'bg-yellow-500/60' :
-                        'bg-purple-500/50'
+                        'bg-white/40'
                     }`}
                   style={{ width: `${planInfo.percentUsed}%` }}
                 />
@@ -694,7 +694,7 @@ export function DashboardContent() {
                       <p className="text-[11px] text-white/70 truncate">{preset.name}</p>
                       <div className="mt-0.5 h-1 rounded-full bg-white/10 overflow-hidden">
                         <div
-                          className="h-full rounded-full bg-purple-500/40"
+                          className="h-full rounded-full bg-white/40"
                           style={{ width: `${preset.percentage}%` }}
                         />
                       </div>
@@ -764,7 +764,7 @@ export function DashboardContent() {
                 </div>
                 <button
                   onClick={handleQuickGenerate}
-                  className="flex items-center justify-center gap-2 w-full py-2 rounded-lg bg-purple-600/80 hover:bg-purple-600 text-[11px] text-white transition-colors"
+                  className="flex items-center justify-center gap-2 w-full py-2 rounded-lg bg-white/10 hover:bg-white/20 text-[11px] text-white transition-colors"
                 >
                   <Sparkles className="h-3 w-3" />
                   {t.dashboard.generate}
@@ -904,7 +904,7 @@ export function DashboardContent() {
           ) : (
             <div className="py-12 text-center">
               <p className="text-white/30 mb-2">{t.empty.noImages}</p>
-              <Link href="/studio" className="text-xs text-purple-400/80 hover:text-purple-400">
+              <Link href="/studio" className="text-xs text-white/50 hover:text-white/70">
                 {t.dashboard.createFirstImage} →
               </Link>
             </div>

@@ -19,7 +19,7 @@ const DashboardContent = dynamic(
     loading: () => (
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
-          <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-purple-500 border-t-transparent"></div>
+          <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-white/30 border-t-white"></div>
           <p className="text-sm text-white/70">Loading Dashboard...</p>
         </div>
       </div>
@@ -46,7 +46,7 @@ function DashboardFallback() {
         </p>
         <button
           onClick={() => window.location.reload()}
-          className="rounded-lg bg-purple-500 px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-600"
+          className="rounded-lg bg-white/10 px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20"
         >
           Retry
         </button>
