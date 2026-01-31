@@ -26,12 +26,11 @@ export function HeroSection() {
           </span>
         </div>
 
-        {/* Main Heading */}
+        {/* Main Heading - Zoom out from blur effect */}
         <h1
           className="mb-6 text-5xl font-bold leading-tight text-white sm:text-6xl lg:text-7xl"
           style={{
-            animation:
-              'fadeInDown 600ms cubic-bezier(0.4, 0, 0.2, 1) 100ms backwards',
+            animation: 'zoomBlurIn 1s cubic-bezier(0.16, 1, 0.3, 1) 100ms backwards',
           }}
         >
           Transform Your Jewelry
@@ -136,6 +135,22 @@ export function HeroSection() {
           to {
             opacity: 1;
             transform: translateY(0);
+          }
+        }
+        @keyframes zoomBlurIn {
+          0% {
+            opacity: 0;
+            transform: scale(1.3);
+            filter: blur(20px);
+          }
+          50% {
+            opacity: 0.8;
+            filter: blur(5px);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1);
+            filter: blur(0);
           }
         }
       `}</style>
