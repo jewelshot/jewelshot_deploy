@@ -88,8 +88,8 @@ export function NavigationItem({
       href={href}
       className={`group relative flex animate-[fadeInSlide_400ms_ease-out_forwards] items-center gap-3 rounded-md px-3 py-2 text-[13px] font-medium opacity-0 transition-all duration-200 ${
         active
-          ? 'bg-white/[0.08] text-white'
-          : 'text-white/50 hover:bg-white/[0.04] hover:text-white/90'
+          ? 'bg-white/[0.06] text-white/90'
+          : 'text-white/40 hover:bg-white/[0.03] hover:text-white/70'
       }`}
       style={{
         animationDelay: `${animationDelay}ms`,

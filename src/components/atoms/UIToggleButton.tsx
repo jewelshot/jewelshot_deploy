@@ -21,8 +21,8 @@ export default function UIToggleButton({
         onClick={onToggle}
         className={`group relative z-50 flex h-6 w-6 items-center justify-center rounded-md border transition-all duration-300 ${
           controlsVisible
-            ? 'border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] text-white/70 hover:border-purple-500/40 hover:bg-purple-500/20 hover:text-purple-400'
-            : 'border-purple-500/40 bg-purple-500/20 text-purple-400 shadow-[0_0_12px_rgba(168,85,247,0.3)] hover:border-purple-500/60 hover:bg-purple-500/30'
+            ? 'border-white/10 bg-white/[0.03] text-white/50 hover:border-white/20 hover:bg-white/[0.08] hover:text-white/70'
+            : 'border-white/20 bg-white/10 text-white/70 shadow-[0_0_12px_rgba(255,255,255,0.1)] hover:border-white/30 hover:bg-white/15'
         }`}
         aria-label={t.tooltips.toggleUI}
         style={{ cursor: 'pointer' }}
@@ -72,7 +72,7 @@ export default function UIToggleButton({
 
         {/* Pulsing indicator when hidden */}
         {!controlsVisible && (
-          <div className="absolute inset-0 animate-pulse rounded-lg bg-purple-500/10" />
+          <div className="absolute inset-0 animate-pulse rounded-lg bg-white/5" />
         )}
       </button>
     </Tooltip>

@@ -14,7 +14,7 @@ interface NavIconProps {
 export function NavIcon({ icon: Icon, active = false }: NavIconProps) {
   return (
     <Icon
-      className={`h-4 w-4 transition-colors ${active ? 'text-white' : 'text-white/60 group-hover:text-white/90'}`}
+      className={`h-4 w-4 transition-colors ${active ? 'text-white/80' : 'text-white/40 group-hover:text-white/60'}`}
     />
   );
 }
