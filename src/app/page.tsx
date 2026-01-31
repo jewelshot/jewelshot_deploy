@@ -68,9 +68,7 @@ export default function LandingPage() {
               {/* Brand */}
               <div className="lg:col-span-2">
                 <div className="mb-4 flex items-center gap-2">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-pink-500">
-                    <span className="text-lg font-bold text-white">J</span>
-                  </div>
+                  <img src="/logo.png" alt="Jewelshot" className="h-10 w-10" />
                   <span className="text-xl font-bold text-white">Jewelshot</span>
                 </div>
                 <p className="mb-6 max-w-sm text-sm leading-relaxed text-white/60">

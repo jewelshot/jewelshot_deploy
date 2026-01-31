@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, Sparkles } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { PrimaryButton } from '@/components/atoms/PrimaryButton';
 
 /**
@@ -41,9 +41,11 @@ export function Navbar() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="group flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 transition-transform group-hover:scale-110">
-              <Sparkles className="h-5 w-5 text-white" />
-            </div>
+            <img 
+              src="/logo.png" 
+              alt="Jewelshot" 
+              className="h-8 w-8 transition-transform group-hover:scale-110"
+            />
             <span className="text-xl font-bold text-white">Jewelshot</span>
           </Link>
 
