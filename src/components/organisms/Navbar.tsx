@@ -40,13 +40,13 @@ export function Navbar() {
       <div className="mx-auto max-w-7xl px-6">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="group flex items-center gap-2">
+          <Link href="/" className="group flex items-center gap-3">
             <img 
               src="/logo.png" 
               alt="Jewelshot" 
-              className="h-8 w-8 transition-transform group-hover:scale-110"
+              className="h-10 w-10 transition-transform group-hover:scale-110"
             />
-            <span className="text-xl font-bold text-white">Jewelshot</span>
+            <span className="text-2xl font-bold text-white">Jewelshot</span>
           </Link>
 
           {/* Desktop Navigation */}
