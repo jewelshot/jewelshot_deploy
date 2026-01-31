@@ -226,25 +226,8 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
     return `${buttonBaseClass} cursor-pointer ${colorClass}`;
   };
 
-  // Color classes for each button
-  // Default: Neutral gray (matching Canvas UI controllers)
-  // Hover: Colored (purple, blue, green, etc.)
-  const colors = {
-    purple:
-      'border border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] text-white/60 hover:border-[rgba(168,85,247,0.6)] hover:bg-[rgba(168,85,247,0.2)] hover:text-purple-200',
-    blue: 'border border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] text-white/60 hover:border-[rgba(59,130,246,0.6)] hover:bg-[rgba(59,130,246,0.2)] hover:text-blue-200',
-    green:
-      'border border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] text-white/60 hover:border-[rgba(34,197,94,0.6)] hover:bg-[rgba(34,197,94,0.2)] hover:text-green-200',
-    orange:
-      'border border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] text-white/60 hover:border-[rgba(249,115,22,0.6)] hover:bg-[rgba(249,115,22,0.2)] hover:text-orange-200',
-    pink: 'border border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] text-white/60 hover:border-[rgba(236,72,153,0.6)] hover:bg-[rgba(236,72,153,0.2)] hover:text-pink-200',
-    gold: 'border border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] text-white/60 hover:border-[rgba(218,165,32,0.6)] hover:bg-[rgba(218,165,32,0.2)] hover:text-yellow-200',
-    silver:
-      'border border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] text-white/60 hover:border-[rgba(192,192,192,0.6)] hover:bg-[rgba(192,192,192,0.2)] hover:text-gray-200',
-    amber:
-      'border border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] text-white/60 hover:border-[rgba(245,158,11,0.6)] hover:bg-[rgba(245,158,11,0.2)] hover:text-amber-200',
-    cyan: 'border border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] text-white/60 hover:border-[rgba(6,182,212,0.6)] hover:bg-[rgba(6,182,212,0.2)] hover:text-cyan-200',
-  };
+  // Unified neutral color for all buttons
+  const neutralColor = 'border border-white/10 bg-white/[0.03] text-white/50 hover:border-white/25 hover:bg-white/[0.08] hover:text-white/80';
 
   return (
     <div
@@ -260,7 +243,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
       }}
     >
       {/* Container matching Canvas UI */}
-      <div className="flex flex-col gap-1.5 rounded-lg border border-[rgba(139,92,246,0.2)] bg-[rgba(10,10,10,0.8)] p-1.5 backdrop-blur-[16px]">
+      <div className="flex flex-col gap-1.5 rounded-lg border border-white/10 bg-[rgba(10,10,10,0.8)] p-1.5 backdrop-blur-[16px]">
         {/* Upscale Button */}
         <Tooltip
           content={isUpscaling ? t.tooltips.upscaling : t.tooltips.upscaleImage}
@@ -269,7 +252,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
           <button
             onClick={() => handleActionClick('upscale')}
             disabled={!hasActiveImage || isUpscaling}
-            className={getButtonClass(hasActiveImage, isUpscaling, colors.purple)}
+            className={getButtonClass(hasActiveImage, isUpscaling, neutralColor)}
           >
             {isUpscaling ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -277,7 +260,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
               <>
                 <ArrowUp className="h-3.5 w-3.5" />
                 {hasActiveImage && (
-                  <span className="absolute -right-0.5 -top-0.5 flex h-3 w-3 items-center justify-center rounded-full bg-purple-500 text-[8px] font-bold text-white">
+                  <span className="absolute -right-0.5 -top-0.5 flex h-3 w-3 items-center justify-center rounded-full bg-white/80 text-[8px] font-bold text-black">
                     2×
                   </span>
                 )}
@@ -297,7 +280,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
             className={getButtonClass(
               hasActiveImage,
               isRemovingBackground,
-              colors.blue
+              neutralColor
             )}
           >
             {isRemovingBackground ? (
@@ -309,7 +292,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
         </Tooltip>
 
         {/* Divider */}
-        <div className="h-px w-full bg-[rgba(139,92,246,0.2)]" />
+        <div className="h-px w-full bg-white/10" />
 
         {/* Rotate Left Button */}
         <Tooltip
@@ -322,7 +305,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
             className={getButtonClass(
               hasActiveImage,
               isRotatingLeft,
-              colors.green
+              neutralColor
             )}
           >
             {isRotatingLeft ? (
@@ -344,7 +327,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
             className={getButtonClass(
               hasActiveImage,
               isRotatingRight,
-              colors.green
+              neutralColor
             )}
           >
             {isRotatingRight ? (
@@ -363,7 +346,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
             className={getButtonClass(
               hasActiveImage,
               isClosingUp,
-              colors.orange
+              neutralColor
             )}
           >
             {isClosingUp ? (
@@ -375,7 +358,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
         </Tooltip>
 
         {/* Divider */}
-        <div className="h-px w-full bg-[rgba(139,92,246,0.2)]" />
+        <div className="h-px w-full bg-white/10" />
 
         {/* Gemstone Enhancement Button */}
         <Tooltip
@@ -388,7 +371,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
             className={getButtonClass(
               hasActiveImage,
               isEnhancingGemstones,
-              colors.pink
+              neutralColor
             )}
           >
             {isEnhancingGemstones ? (
@@ -410,7 +393,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
             className={getButtonClass(
               hasActiveImage,
               isRecoloringMetal,
-              colors.gold
+              neutralColor
             )}
           >
             {isRecoloringMetal ? (
@@ -432,7 +415,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
             className={getButtonClass(
               hasActiveImage,
               isPolishingMetal,
-              colors.silver
+              neutralColor
             )}
           >
             {isPolishingMetal ? (
@@ -444,7 +427,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
         </Tooltip>
 
         {/* Divider */}
-        <div className="h-px w-full bg-[rgba(139,92,246,0.2)]" />
+        <div className="h-px w-full bg-white/10" />
 
         {/* Natural Light Button */}
         <Tooltip
@@ -457,7 +440,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
             className={getButtonClass(
               hasActiveImage,
               isEnhancingLight,
-              colors.amber
+              neutralColor
             )}
           >
             {isEnhancingLight ? (
@@ -479,7 +462,7 @@ export const QuickActionsBar: React.FC<QuickActionsBarProps> = ({
             className={getButtonClass(
               hasActiveImage,
               isGeneratingTurntable,
-              colors.cyan
+              neutralColor
             )}
           >
             {isGeneratingTurntable ? (

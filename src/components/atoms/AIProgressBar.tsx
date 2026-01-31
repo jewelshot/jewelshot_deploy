@@ -13,7 +13,7 @@ export function AIProgressBar({
 }: AIProgressBarProps) {
   const statusColors = {
     uploading: 'from-blue-500 to-cyan-500',
-    processing: 'from-purple-500 to-pink-500',
+    processing: 'from-white/60 to-white/40',
     completing: 'from-green-500 to-emerald-500',
   };
 
@@ -22,7 +22,7 @@ export function AIProgressBar({
       {/* Progress text */}
       <div className="flex items-center justify-between px-0.5">
         <span
-          className="text-[10px] font-medium text-purple-300"
+          className="text-[10px] font-medium text-white/70"
           style={{
             textShadow: '0 1px 2px rgba(0, 0, 0, 0.8)',
           }}
@@ -31,19 +31,19 @@ export function AIProgressBar({
         </span>
         <div className="flex gap-0.5">
           <span
-            className="h-0.5 w-0.5 animate-[bounce_1s_infinite_0ms] rounded-full bg-purple-400"
+            className="h-0.5 w-0.5 animate-[bounce_1s_infinite_0ms] rounded-full bg-white/60"
             style={{
               filter: 'drop-shadow(0 0 2px rgba(139, 92, 246, 0.6))',
             }}
           />
           <span
-            className="h-0.5 w-0.5 animate-[bounce_1s_infinite_200ms] rounded-full bg-purple-400"
+            className="h-0.5 w-0.5 animate-[bounce_1s_infinite_200ms] rounded-full bg-white/60"
             style={{
               filter: 'drop-shadow(0 0 2px rgba(139, 92, 246, 0.6))',
             }}
           />
           <span
-            className="h-0.5 w-0.5 animate-[bounce_1s_infinite_400ms] rounded-full bg-purple-400"
+            className="h-0.5 w-0.5 animate-[bounce_1s_infinite_400ms] rounded-full bg-white/60"
             style={{
               filter: 'drop-shadow(0 0 2px rgba(139, 92, 246, 0.6))',
             }}

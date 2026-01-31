@@ -102,7 +102,7 @@ export function AIEditControl({
             <select
               value={aspectRatio}
               onChange={(e) => setAspectRatio(e.target.value)}
-              className="flex-1 rounded-md border border-white/10 bg-[#1a1a1a] px-2 py-1 text-xs text-white focus:border-purple-500/50 focus:outline-none"
+              className="flex-1 rounded-md border border-white/10 bg-[#1a1a1a] px-2 py-1 text-xs text-white focus:border-white/30 focus:outline-none"
               disabled={isEditing}
             >
               {aspectRatios.map((ratio) => (

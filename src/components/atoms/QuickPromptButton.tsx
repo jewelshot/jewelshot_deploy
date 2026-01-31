@@ -41,7 +41,7 @@ export function QuickPromptButton({
 
       {/* Icon */}
       <Icon
-        className="h-3 w-3 text-purple-400 transition-transform duration-200 group-hover:scale-110"
+        className="h-3 w-3 text-white/50 transition-transform duration-200 group-hover:scale-110 group-hover:text-white/70"
         style={{
           filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8))',
         }}
@@ -51,7 +51,7 @@ export function QuickPromptButton({
       <span className="whitespace-nowrap text-[11px] font-medium">{label}</span>
 
       {/* Subtle glow on hover */}
-      <div className="pointer-events-none absolute inset-0 rounded-md bg-gradient-to-r from-purple-600/0 to-pink-600/0 opacity-0 transition-opacity duration-200 group-hover:from-purple-600/10 group-hover:to-pink-600/5 group-hover:opacity-100" />
+      <div className="pointer-events-none absolute inset-0 rounded-md bg-white/0 opacity-0 transition-opacity duration-200 group-hover:bg-white/5 group-hover:opacity-100" />
     </button>
   );
 }

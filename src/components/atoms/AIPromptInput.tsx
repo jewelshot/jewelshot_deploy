@@ -46,7 +46,7 @@ export function AIPromptInput({
 
         {/* Keyboard hint */}
         {value && (
-          <div className="absolute bottom-1.5 right-2 text-[9px] font-medium text-white/20 transition-all duration-200 group-focus-within:text-purple-400/40">
+          <div className="absolute bottom-1.5 right-2 text-[9px] font-medium text-white/20 transition-all duration-200 group-focus-within:text-white/40">
             <kbd className="rounded bg-white/5 px-1 py-0.5">⌘</kbd>
             <kbd className="rounded bg-white/5 px-1 py-0.5">↵</kbd>
           </div>

@@ -34,7 +34,7 @@ export function AIToggleButton({
         {/* Icon */}
         <div className="relative flex h-full w-full items-center justify-center">
           <ChevronUp
-            className={`h-3.5 w-3.5 text-purple-300 transition-all duration-300 ease-out group-hover:text-white ${
+            className={`h-3.5 w-3.5 text-white/60 transition-all duration-300 ease-out group-hover:text-white ${
               isExpanded ? 'rotate-0' : 'rotate-180'
             }`}
             style={{

@@ -99,7 +99,7 @@ export function QuickModeContent({ onPresetSelect, gender, jewelryType }: QuickM
           <p className="text-xs text-white/50">No presets selected</p>
           <button
             onClick={() => router.push('/library')}
-            className="mt-3 rounded-md bg-purple-500/20 px-3 py-1.5 text-[10px] font-medium text-purple-300 transition-colors hover:bg-purple-500/30"
+            className="mt-3 rounded-md bg-white/10 px-3 py-1.5 text-[10px] font-medium text-white/70 transition-colors hover:bg-white/15"
           >
             Go to Library
           </button>
@@ -120,7 +120,7 @@ export function QuickModeContent({ onPresetSelect, gender, jewelryType }: QuickM
           <p className="text-[9px] text-white/40">
             {isFiltered ? (
               <>
-                <Filter className="mr-1 inline h-3 w-3 text-purple-400" />
+                <Filter className="mr-1 inline h-3 w-3 text-white/50" />
                 {filteredCount}/{totalCount} presets
               </>
             ) : (
@@ -128,7 +128,7 @@ export function QuickModeContent({ onPresetSelect, gender, jewelryType }: QuickM
             )}
           </p>
           {isFilterActive && (
-            <span className="rounded-full bg-purple-500/20 px-1.5 py-0.5 text-[8px] text-purple-300">
+            <span className="rounded-full bg-white/10 px-1.5 py-0.5 text-[8px] text-white/60">
               {gender === 'women' ? '👩' : gender === 'men' ? '👨' : ''}
               {jewelryType ? ` ${jewelryType}` : ''}
             </span>
@@ -136,7 +136,7 @@ export function QuickModeContent({ onPresetSelect, gender, jewelryType }: QuickM
         </div>
         <button
           onClick={() => router.push('/library')}
-          className="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[9px] text-purple-400 transition-colors hover:bg-purple-500/10"
+          className="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[9px] text-white/50 transition-colors hover:bg-white/10"
         >
           <Library className="h-3 w-3" />
           <span>Edit</span>

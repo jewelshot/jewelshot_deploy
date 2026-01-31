@@ -346,7 +346,7 @@ export function EditPanel({
               }}
               className={`flex h-6 w-6 items-center justify-center rounded-md transition-all ${
                 userDragged 
-                  ? 'text-purple-400 hover:bg-purple-500/20 hover:text-purple-300' 
+                  ? 'text-white/70 hover:bg-white/15 hover:text-white' 
                   : 'text-white/40 hover:bg-white/10 hover:text-white/60'
               }`}
               aria-label="Reset Position"
