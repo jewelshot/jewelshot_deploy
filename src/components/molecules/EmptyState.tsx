@@ -1,6 +1,6 @@
 'use client';
 
-import { Camera, Upload } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import React from 'react';
 import { useLanguage } from '@/lib/i18n';
 
@@ -14,9 +14,11 @@ export function EmptyState({ onUploadClick }: EmptyStateProps) {
   return (
     <div className="flex h-full items-center justify-center">
       <div className="space-y-6 text-center">
-        {/* Camera Icon - First to appear */}
-        <Camera
-          className="mx-auto h-16 w-16 text-theme-primary-light"
+        {/* App Logo - First to appear */}
+        <img
+          src="/logo.png"
+          alt="Jewelshot"
+          className="mx-auto h-20 w-20"
           style={{
             animation: 'welcomeZoomIn 1.6s ease-out forwards',
             opacity: 0,
@@ -31,21 +33,21 @@ export function EmptyState({ onUploadClick }: EmptyStateProps) {
             opacity: 0,
           }}
         >
-          {t.studio.title}
+          Jewelshot® Studio
         </h2>
 
         {/* Subtitle - Third to appear */}
         <p
-          className="text-white/60"
+          className="text-white/50"
           style={{
             animation: 'welcomeZoomIn 1.6s ease-out 0.3s forwards',
             opacity: 0,
           }}
         >
-          {t.empty.startByUploading}
+          Transform your jewelry into stunning visuals
         </p>
 
-        {/* Button - Last to appear with pulse + floating effect */}
+        {/* Button - Last to appear with floating effect */}
         <div
           className="relative inline-block"
           style={{
@@ -54,27 +56,27 @@ export function EmptyState({ onUploadClick }: EmptyStateProps) {
             opacity: 0,
           }}
         >
-          {/* Pulse glow behind button */}
+          {/* Subtle glow behind button */}
           <div
-            className="absolute inset-0 rounded-xl bg-theme-primary"
+            className="absolute inset-0 rounded-xl bg-white/20"
             style={{
               animation:
                 'glowFadeIn 1.6s ease-out 0.45s forwards, slowPulse 3s ease-in-out 2.05s infinite',
-              filter: 'blur(12px)',
-              transform: 'scale(1.1)',
-              opacity: 0, // Start invisible, fade in with button
+              filter: 'blur(16px)',
+              transform: 'scale(1.15)',
+              opacity: 0,
             }}
           />
 
-          {/* Actual button */}
+          {/* Elegant button */}
           <button
             onClick={onUploadClick}
-            className="relative inline-flex items-center gap-2 rounded-xl border border-theme-primary/40 bg-gradient-to-br from-theme-primary/15 to-theme-primary-dark/10 px-6 py-3 font-semibold text-white transition-all hover:scale-105 hover:border-theme-primary/60 hover:shadow-[0_4px_16px_var(--theme-glow)]"
+            className="relative inline-flex items-center gap-2.5 rounded-xl border border-white/20 bg-white/[0.08] px-7 py-3.5 font-medium text-white backdrop-blur-sm transition-all hover:scale-[1.02] hover:border-white/30 hover:bg-white/[0.12] hover:shadow-[0_8px_32px_rgba(255,255,255,0.1)]"
             title={t.studio.uploadImage + ' (Ctrl+O)'}
             aria-label={t.studio.uploadImage}
           >
-            <Upload className="h-5 w-5" aria-hidden="true" />
-            {t.studio.uploadImage}
+            <Upload className="h-5 w-5 text-white/70" aria-hidden="true" />
+            <span>{t.studio.uploadImage}</span>
           </button>
         </div>
       </div>
