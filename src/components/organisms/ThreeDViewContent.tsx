@@ -582,8 +582,6 @@ function PixelRatioController({ scale }: { scale: number }) {
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
     gl.setSize(width, height, false);
-    
-    console.log(`[PixelRatio] Set to ${clampedRatio.toFixed(2)} (base: ${basePixelRatio.current}, scale: ${scale})`);
   }, [scale, gl]);
   
   return null;
@@ -1322,7 +1320,12 @@ function SnapshotHelper({
 
 export default function ThreeDViewContent() {
   // Layout state from global store (matching Studio)
-  const { leftOpen, rightOpen, setRightOpen } = useSidebarStore();
+  const { leftOpen, rightOpen, setRightOpen, closeRight } = useSidebarStore();
+  
+  // Close right sidebar on mount (3D viewer doesn't need it open by default)
+  useEffect(() => {
+    closeRight();
+  }, [closeRight]);
   
   // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
