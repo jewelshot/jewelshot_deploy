@@ -2505,15 +2505,15 @@ export default function ThreeDViewContent() {
       ? STONE_PRESETS 
       : MATTE_PRESETS;
 
+  // Calculate dynamic classes for viewport
+  const viewportClasses = `fixed top-0 bottom-0 flex flex-col bg-[#0a0a0a] transition-all duration-500 ease-out ${
+    leftOpen ? 'left-[256px]' : 'left-[56px]'
+  } ${
+    rightOpen ? 'right-[320px]' : 'right-0'
+  }`;
+
   return (
-    <div 
-      className="fixed top-0 bottom-0 flex flex-col bg-[#0a0a0a]"
-      style={{
-        left: leftOpen ? '256px' : '56px',
-        right: rightOpen ? '320px' : '0',
-        transition: 'left 500ms cubic-bezier(0.4, 0.0, 0.2, 1), right 500ms cubic-bezier(0.4, 0.0, 0.2, 1)',
-      }}
-    >
+    <div className={viewportClasses}>
       {/* Top Bar */}
       <div className="flex h-12 items-center justify-between border-b border-white/10 bg-black/40 px-4 backdrop-blur-sm">
         <div className="flex items-center gap-3">
@@ -3261,5 +3261,3 @@ export default function ThreeDViewContent() {
     </div>
   );
 }
-
-// trigger deploy Sat Jan 31 20:37:58 +03 2026
