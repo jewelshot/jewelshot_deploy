@@ -1,52 +1,7 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Sparkles } from 'lucide-react';
 import { GradientText } from '@/components/atoms/GradientText';
 import { PrimaryButton } from '@/components/atoms/PrimaryButton';
-
-/**
- * SpaceText - Letters fly in from space with staggered timing
- */
-function SpaceText({ 
-  text, 
-  startDelay = 0, 
-  letterDelay = 40,
-  className = ''
-}: { 
-  text: string; 
-  startDelay?: number; 
-  letterDelay?: number;
-  className?: string;
-}) {
-  const letters = useMemo(() => {
-    return text.split('').map((char, i) => ({
-      char,
-      delay: startDelay + i * letterDelay,
-      // Random starting position for space effect
-      translateX: (Math.random() - 0.5) * 200,
-      translateY: (Math.random() - 0.5) * 100,
-      rotate: (Math.random() - 0.5) * 30,
-    }));
-  }, [text, startDelay, letterDelay]);
-
-  return (
-    <span className={className}>
-      {letters.map((letter, i) => (
-        <span
-          key={i}
-          className="inline-block"
-          style={{
-            animation: `spaceLetterIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) ${letter.delay}ms backwards`,
-            '--start-x': `${letter.translateX}px`,
-            '--start-y': `${letter.translateY}px`,
-            '--start-rotate': `${letter.rotate}deg`,
-          } as React.CSSProperties}
-        >
-          {letter.char === ' ' ? '\u00A0' : letter.char}
-        </span>
-      ))}
-    </span>
-  );
-}
 
 /**
  * HeroSection - Main landing page hero
@@ -71,14 +26,16 @@ export function HeroSection() {
           </span>
         </div>
 
-        {/* Main Heading - Space travel letter animation */}
-        <h1 className="mb-6 text-5xl font-bold leading-tight text-white sm:text-6xl lg:text-7xl">
-          <SpaceText text="Transform Your Jewelry" startDelay={100} letterDelay={35} />
+        {/* Main Heading - Zoom out from blur effect */}
+        <h1
+          className="mb-6 text-5xl font-bold leading-tight text-white sm:text-6xl lg:text-7xl"
+          style={{
+            animation: 'zoomBlurIn 1s cubic-bezier(0.16, 1, 0.3, 1) 100ms backwards',
+          }}
+        >
+          Transform Your Jewelry
           <br />
-          <SpaceText text="Into " startDelay={800} letterDelay={35} />
-          <GradientText className="inline-block" style={{ animation: 'spaceWordIn 1s cubic-bezier(0.16, 1, 0.3, 1) 1000ms backwards' } as React.CSSProperties}>
-            Stunning Visuals
-          </GradientText>
+          Into <GradientText>Stunning Visuals</GradientText>
         </h1>
 
         {/* Subtitle */}
@@ -159,7 +116,7 @@ export function HeroSection() {
       <div className="absolute left-1/4 top-20 h-72 w-72 rounded-full bg-purple-500/10 blur-3xl" />
       <div className="absolute bottom-20 right-1/4 h-72 w-72 rounded-full bg-purple-500/5 blur-3xl" />
 
-      <style jsx global>{`
+      <style jsx>{`
         @keyframes fadeInDown {
           from {
             opacity: 0;
@@ -180,40 +137,19 @@ export function HeroSection() {
             transform: translateY(0);
           }
         }
-        @keyframes spaceLetterIn {
+        @keyframes zoomBlurIn {
           0% {
             opacity: 0;
-            transform: 
-              translateX(var(--start-x, 0)) 
-              translateY(var(--start-y, 0)) 
-              translateZ(500px)
-              rotate(var(--start-rotate, 0deg))
-              scale(3);
-            filter: blur(15px);
-          }
-          60% {
-            opacity: 0.9;
-            filter: blur(3px);
-          }
-          100% {
-            opacity: 1;
-            transform: translateX(0) translateY(0) translateZ(0) rotate(0deg) scale(1);
-            filter: blur(0);
-          }
-        }
-        @keyframes spaceWordIn {
-          0% {
-            opacity: 0;
-            transform: translateZ(800px) scale(4);
-            filter: blur(25px);
+            transform: scale(1.3);
+            filter: blur(20px);
           }
           50% {
             opacity: 0.8;
-            filter: blur(8px);
+            filter: blur(5px);
           }
           100% {
             opacity: 1;
-            transform: translateZ(0) scale(1);
+            transform: scale(1);
             filter: blur(0);
           }
         }
