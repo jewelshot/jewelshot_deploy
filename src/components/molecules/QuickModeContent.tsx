@@ -164,7 +164,6 @@ export function QuickModeContent({ onPresetSelect, gender, jewelryType }: QuickM
                   className="flex w-full items-center justify-between px-2.5 py-2 text-left transition-colors hover:bg-white/[0.05]"
                 >
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs">{category.emoji}</span>
                     <span className="text-[11px] font-medium text-white/90">
                       {category.name}
                     </span>

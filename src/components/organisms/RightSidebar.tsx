@@ -339,7 +339,7 @@ ${libraryPreset.negativePrompt}`;
         </div>
 
         {/* Preset Content based on mode */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="no-scrollbar flex-1 overflow-y-auto">
           {/* Quick Mode */}
           {presetMode === 'quick' && (
             <div className="space-y-3">
