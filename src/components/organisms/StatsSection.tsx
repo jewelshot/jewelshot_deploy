@@ -50,10 +50,10 @@ export function StatsSection() {
                 }}
               >
                 {/* Card */}
-                <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl transition-all duration-300 hover:border-amber-500/30 hover:bg-white/10">
+                <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl transition-all duration-300 hover:border-purple-500/30 hover:bg-white/10">
                   {/* Icon */}
-                  <div className="mb-4 inline-flex rounded-xl bg-amber-500/10 p-3">
-                    <Icon className="h-6 w-6 text-amber-400" />
+                  <div className="mb-4 inline-flex rounded-xl bg-purple-500/10 p-3">
+                    <Icon className="h-6 w-6 text-purple-400" />
                   </div>
 
                   {/* Value */}
@@ -74,7 +74,7 @@ export function StatsSection() {
                   </p>
 
                   {/* Hover glow effect */}
-                  <div className="absolute inset-0 -z-10 bg-gradient-to-br from-amber-500/0 to-amber-500/0 opacity-0 blur-xl transition-opacity duration-300 group-hover:from-amber-500/20 group-hover:to-transparent group-hover:opacity-100" />
+                  <div className="absolute inset-0 -z-10 bg-gradient-to-br from-purple-500/0 to-purple-500/0 opacity-0 blur-xl transition-opacity duration-300 group-hover:from-purple-500/20 group-hover:to-transparent group-hover:opacity-100" />
                 </div>
               </div>
             );

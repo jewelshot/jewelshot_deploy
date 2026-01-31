@@ -36,9 +36,9 @@ export function PrimaryButton({
 
   const variantClasses = {
     primary:
-      'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-[0_0_30px_rgba(245,158,11,0.3)] hover:shadow-[0_0_40px_rgba(245,158,11,0.5)]',
+      'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-[0_0_30px_rgba(168,85,247,0.3)] hover:shadow-[0_0_40px_rgba(168,85,247,0.5)]',
     secondary:
-      'bg-white/5 backdrop-blur-xl border border-white/10 hover:bg-white/10 hover:border-amber-500/50 text-white',
+      'bg-white/5 backdrop-blur-xl border border-white/10 hover:bg-white/10 hover:border-purple-500/50 text-white',
     ghost: 'bg-transparent hover:bg-white/5 text-white/80 hover:text-white',
   };
 

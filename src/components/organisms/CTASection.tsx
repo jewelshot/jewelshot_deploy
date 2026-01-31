@@ -11,23 +11,23 @@ export function CTASection() {
     <section className="relative overflow-hidden px-6 py-24 lg:py-32">
       <div className="relative z-10 mx-auto max-w-5xl">
         {/* CTA Card */}
-        <div className="relative overflow-hidden rounded-3xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 via-transparent to-transparent p-12 backdrop-blur-xl lg:p-16">
+        <div className="relative overflow-hidden rounded-3xl border border-purple-500/20 bg-gradient-to-br from-purple-500/10 via-transparent to-transparent p-12 backdrop-blur-xl lg:p-16">
           {/* Background Glow */}
-          <div className="absolute -left-24 -top-24 h-96 w-96 rounded-full bg-amber-500/30 blur-3xl" />
-          <div className="absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-amber-500/20 blur-3xl" />
+          <div className="absolute -left-24 -top-24 h-96 w-96 rounded-full bg-purple-500/30 blur-3xl" />
+          <div className="absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-purple-500/20 blur-3xl" />
 
           {/* Content */}
           <div className="relative z-10 text-center">
             {/* Icon */}
-            <div className="mb-6 inline-flex rounded-2xl bg-amber-500/20 p-4">
-              <Sparkles className="h-8 w-8 text-amber-300" />
+            <div className="mb-6 inline-flex rounded-2xl bg-purple-500/20 p-4">
+              <Sparkles className="h-8 w-8 text-purple-300" />
             </div>
 
             {/* Heading */}
             <h2 className="mb-4 text-4xl font-bold text-white lg:text-5xl">
               Ready to Transform Your
               <br />
-              <span className="bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-purple-300 to-purple-500 bg-clip-text text-transparent">
                 Jewelry Photography?
               </span>
             </h2>

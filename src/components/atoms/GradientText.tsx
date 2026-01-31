@@ -12,7 +12,7 @@ interface GradientTextProps {
 export function GradientText({ children, className = '' }: GradientTextProps) {
   return (
     <span
-      className={`animate-gradient bg-gradient-to-r from-amber-300 via-amber-400 to-amber-300 bg-clip-text text-transparent ${className}`}
+      className={`animate-gradient bg-gradient-to-r from-purple-300 via-purple-400 to-purple-300 bg-clip-text text-transparent ${className}`}
       style={{
         backgroundSize: '200% auto',
       }}

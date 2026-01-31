@@ -37,7 +37,7 @@ export function HowItWorksSection() {
         <div className="mb-20 text-center">
           <h2 className="mb-4 text-4xl font-bold text-white lg:text-5xl">
             Create Stunning Photos in{' '}
-            <span className="bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-purple-300 to-purple-500 bg-clip-text text-transparent">
               Three Simple Steps
             </span>
           </h2>
@@ -50,7 +50,7 @@ export function HowItWorksSection() {
         <div className="relative">
           {/* Connection Lines */}
           <div className="absolute left-1/2 top-20 hidden h-[calc(100%-160px)] w-0.5 -translate-x-1/2 lg:block">
-            <div className="h-full w-full bg-gradient-to-b from-amber-500/50 via-amber-500/20 to-transparent" />
+            <div className="h-full w-full bg-gradient-to-b from-purple-500/50 via-purple-500/20 to-transparent" />
           </div>
 
           {/* Step Cards */}
@@ -68,16 +68,16 @@ export function HowItWorksSection() {
                 {/* Icon Circle */}
                 <div className="relative flex-shrink-0">
                   {/* Glow */}
-                  <div className="absolute inset-0 rounded-full bg-amber-500/20 blur-xl" />
+                  <div className="absolute inset-0 rounded-full bg-purple-500/20 blur-xl" />
 
                   {/* Circle */}
-                  <div className="relative flex h-24 w-24 items-center justify-center rounded-full border border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-transparent backdrop-blur-xl">
-                    <step.icon className="h-10 w-10 text-amber-400" />
+                  <div className="relative flex h-24 w-24 items-center justify-center rounded-full border border-purple-500/30 bg-gradient-to-br from-purple-500/10 to-transparent backdrop-blur-xl">
+                    <step.icon className="h-10 w-10 text-purple-400" />
                   </div>
 
                   {/* Step Number */}
-                  <div className="absolute -right-2 -top-2 flex h-10 w-10 items-center justify-center rounded-full border border-amber-500/30 bg-amber-500/20 backdrop-blur-xl">
-                    <span className="text-sm font-bold text-amber-300">
+                  <div className="absolute -right-2 -top-2 flex h-10 w-10 items-center justify-center rounded-full border border-purple-500/30 bg-purple-500/20 backdrop-blur-xl">
+                    <span className="text-sm font-bold text-purple-300">
                       {step.number}
                     </span>
                   </div>
@@ -85,7 +85,7 @@ export function HowItWorksSection() {
 
                 {/* Content Card */}
                 <div
-                  className={`flex-1 rounded-2xl border border-white/5 bg-white/[0.02] p-8 backdrop-blur-xl transition-all duration-500 hover:border-amber-500/30 hover:bg-white/[0.05] ${
+                  className={`flex-1 rounded-2xl border border-white/5 bg-white/[0.02] p-8 backdrop-blur-xl transition-all duration-500 hover:border-purple-500/30 hover:bg-white/[0.05] ${
                     index % 2 === 1 ? 'lg:text-right' : ''
                   }`}
                 >
@@ -100,7 +100,7 @@ export function HowItWorksSection() {
                 {/* Arrow (only between steps) */}
                 {index < steps.length - 1 && (
                   <div className="absolute -bottom-8 left-1/2 block -translate-x-1/2 lg:hidden">
-                    <ArrowRight className="h-6 w-6 rotate-90 text-amber-500/30" />
+                    <ArrowRight className="h-6 w-6 rotate-90 text-purple-500/30" />
                   </div>
                 )}
               </div>
@@ -110,7 +110,7 @@ export function HowItWorksSection() {
       </div>
 
       {/* Background decoration */}
-      <div className="absolute left-1/4 top-1/4 h-96 w-96 rounded-full bg-amber-500/5 blur-3xl" />
+      <div className="absolute left-1/4 top-1/4 h-96 w-96 rounded-full bg-purple-500/5 blur-3xl" />
 
       <style jsx>{`
         @keyframes fadeInUp {

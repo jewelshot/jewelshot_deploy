@@ -47,12 +47,12 @@ export function ShowcaseSection() {
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-16 text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/5 px-4 py-2">
-            <Wand2 className="h-4 w-4 text-amber-400" />
-            <span className="text-sm font-medium text-amber-300">See the Magic</span>
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-purple-500/20 bg-purple-500/5 px-4 py-2">
+            <Wand2 className="h-4 w-4 text-purple-400" />
+            <span className="text-sm font-medium text-purple-300">See the Magic</span>
           </div>
           <h2 className="mb-4 text-4xl font-bold text-white sm:text-5xl">
-            Before & After <span className="bg-gradient-to-r from-amber-400 to-yellow-400 bg-clip-text text-transparent">Transformations</span>
+            Before & After <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Transformations</span>
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-white/60">
             Witness the power of AI-driven jewelry photography enhancement
@@ -67,7 +67,7 @@ export function ShowcaseSection() {
               onClick={() => setActiveIndex(index)}
               className={`rounded-full px-5 py-2 text-sm font-medium transition-all ${
                 activeIndex === index
-                  ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-white shadow-lg shadow-amber-500/25'
+                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25'
                   : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
               }`}
             >
@@ -117,7 +117,7 @@ export function ShowcaseSection() {
             <div className="absolute top-4 left-4 rounded-lg bg-black/70 px-3 py-1.5 text-sm font-medium text-white backdrop-blur-sm">
               Before
             </div>
-            <div className="absolute top-4 right-4 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-500 px-3 py-1.5 text-sm font-medium text-white">
+            <div className="absolute top-4 right-4 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-3 py-1.5 text-sm font-medium text-white">
               After
             </div>
           </div>
@@ -141,7 +141,7 @@ export function ShowcaseSection() {
               key={index}
               className="rounded-2xl border border-white/5 bg-white/[0.02] p-6 text-center backdrop-blur-sm"
             >
-              <div className="text-3xl font-bold bg-gradient-to-r from-amber-400 to-yellow-400 bg-clip-text text-transparent">
+              <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                 {stat.value}
               </div>
               <div className="mt-1 text-sm text-white/60">{stat.label}</div>

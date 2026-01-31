@@ -45,7 +45,7 @@ export function TestimonialsSection() {
         <div className="mb-16 text-center">
           <h2 className="mb-4 text-4xl font-bold text-white lg:text-5xl">
             Loved by{' '}
-            <span className="bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-purple-300 to-purple-500 bg-clip-text text-transparent">
               Jewelry Professionals
             </span>
           </h2>
@@ -66,9 +66,9 @@ export function TestimonialsSection() {
               }}
             >
               {/* Card */}
-              <div className="relative h-full overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl transition-all duration-300 hover:border-amber-500/30 hover:bg-white/10">
+              <div className="relative h-full overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl transition-all duration-300 hover:border-purple-500/30 hover:bg-white/10">
                 {/* Quote Icon */}
-                <Quote className="mb-4 h-8 w-8 text-amber-400/30" />
+                <Quote className="mb-4 h-8 w-8 text-purple-400/30" />
 
                 {/* Rating */}
                 <div className="mb-4 flex gap-1">
@@ -87,7 +87,7 @@ export function TestimonialsSection() {
 
                 {/* Author */}
                 <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-amber-400/20 to-amber-600/20 text-2xl">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-purple-400/20 to-purple-600/20 text-2xl">
                     {testimonial.image}
                   </div>
                   <div>
@@ -101,7 +101,7 @@ export function TestimonialsSection() {
                 </div>
 
                 {/* Hover glow effect */}
-                <div className="absolute inset-0 -z-10 bg-gradient-to-br from-amber-500/0 to-amber-500/0 opacity-0 blur-xl transition-opacity duration-300 group-hover:from-amber-500/20 group-hover:to-transparent group-hover:opacity-100" />
+                <div className="absolute inset-0 -z-10 bg-gradient-to-br from-purple-500/0 to-purple-500/0 opacity-0 blur-xl transition-opacity duration-300 group-hover:from-purple-500/20 group-hover:to-transparent group-hover:opacity-100" />
               </div>
             </div>
           ))}
@@ -109,7 +109,7 @@ export function TestimonialsSection() {
 
         {/* Trust Badge */}
         <div className="mt-16 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/5 px-6 py-3 backdrop-blur-xl">
+          <div className="inline-flex items-center gap-2 rounded-full border border-purple-500/20 bg-purple-500/5 px-6 py-3 backdrop-blur-xl">
             <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
             <span className="text-sm font-medium text-white">
               4.9/5 rating from 1,000+ reviews
@@ -119,8 +119,8 @@ export function TestimonialsSection() {
       </div>
 
       {/* Background decoration */}
-      <div className="absolute left-1/4 top-1/4 h-96 w-96 rounded-full bg-amber-500/5 blur-3xl" />
-      <div className="absolute bottom-1/4 right-1/4 h-96 w-96 rounded-full bg-amber-500/5 blur-3xl" />
+      <div className="absolute left-1/4 top-1/4 h-96 w-96 rounded-full bg-purple-500/5 blur-3xl" />
+      <div className="absolute bottom-1/4 right-1/4 h-96 w-96 rounded-full bg-purple-500/5 blur-3xl" />
     </section>
   );
 }
