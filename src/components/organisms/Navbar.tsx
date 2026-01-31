@@ -46,7 +46,7 @@ export function Navbar() {
               alt="Jewelshot" 
               className="h-10 w-10 transition-transform group-hover:scale-110"
             />
-            <span className="text-2xl font-bold text-white">Jewelshot</span>
+            <span className="text-2xl font-bold text-white">Jewelshot®</span>
           </Link>
 
           {/* Desktop Navigation */}

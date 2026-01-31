@@ -69,7 +69,7 @@ export default function LandingPage() {
               <div className="lg:col-span-2">
                 <div className="mb-4 flex items-center gap-3">
                   <img src="/logo.png" alt="Jewelshot" className="h-12 w-12" />
-                  <span className="text-2xl font-bold text-white">Jewelshot</span>
+                  <span className="text-2xl font-bold text-white">Jewelshot®</span>
                 </div>
                 <p className="mb-6 max-w-sm text-sm leading-relaxed text-white/60">
                   AI-powered jewelry photography platform. Transform your product images into stunning visuals that sell.

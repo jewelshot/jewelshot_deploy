@@ -17,7 +17,7 @@ export function TopBar() {
     >
       {/* Logo / Title */}
       <div className="flex items-center gap-2">
-        <span className="text-lg font-bold text-white">Jewelshot</span>
+        <span className="text-lg font-bold text-white">Jewelshot®</span>
       </div>
 
       {/* Credits now in User Profile (Sidebar) */}
