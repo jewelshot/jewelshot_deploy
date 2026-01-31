@@ -53,7 +53,7 @@ export function FeaturesSection() {
         <div className="mb-16 text-center">
           <h2 className="mb-4 text-4xl font-bold text-white lg:text-5xl">
             Everything You Need for{' '}
-            <span className="bg-gradient-to-r from-purple-300 to-purple-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent">
               Perfect Jewelry Photos
             </span>
           </h2>
@@ -78,8 +78,8 @@ export function FeaturesSection() {
       </div>
 
       {/* Background decoration */}
-      <div className="absolute left-0 top-1/2 h-96 w-96 -translate-y-1/2 rounded-full bg-purple-500/5 blur-3xl" />
-      <div className="absolute right-0 top-1/2 h-96 w-96 -translate-y-1/2 rounded-full bg-purple-500/5 blur-3xl" />
+      <div className="absolute left-0 top-1/2 h-96 w-96 -translate-y-1/2 rounded-full bg-amber-500/5 blur-3xl" />
+      <div className="absolute right-0 top-1/2 h-96 w-96 -translate-y-1/2 rounded-full bg-amber-500/5 blur-3xl" />
     </section>
   );
 }

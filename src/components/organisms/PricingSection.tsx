@@ -155,7 +155,7 @@ export function PricingSection() {
         <div className="mb-16 text-center">
           <h2 className="mb-4 text-4xl font-bold text-white lg:text-5xl">
             Simple,{' '}
-            <span className="bg-gradient-to-r from-purple-300 to-purple-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent">
               Transparent Pricing
             </span>
           </h2>
@@ -182,12 +182,12 @@ export function PricingSection() {
                     plan.id === 'founder' 
                       ? 'border-orange-500/30 bg-orange-500/20' 
                       : plan.popular 
-                      ? 'border-purple-500/30 bg-purple-500/20'
+                      ? 'border-amber-500/30 bg-amber-500/20'
                       : 'border-white/20 bg-white/10'
                   }`}>
-                    {plan.popular && <Sparkles className="h-3 w-3 text-purple-400" />}
+                    {plan.popular && <Sparkles className="h-3 w-3 text-amber-400" />}
                     <span className={`text-xs font-semibold ${
-                      plan.id === 'founder' ? 'text-orange-300' : plan.popular ? 'text-purple-300' : 'text-white/70'
+                      plan.id === 'founder' ? 'text-orange-300' : plan.popular ? 'text-amber-300' : 'text-white/70'
                     }`}>
                       {plan.badge}
                     </span>
@@ -199,8 +199,8 @@ export function PricingSection() {
               <div
                 className={`relative h-full overflow-hidden rounded-2xl border p-6 backdrop-blur-xl transition-all duration-300 ${
                   plan.highlight
-                    ? 'border-purple-500/30 bg-white/10 ring-2 ring-purple-500/20'
-                    : 'border-white/10 bg-white/5 hover:border-purple-500/20 hover:bg-white/10'
+                    ? 'border-amber-500/30 bg-white/10 ring-2 ring-amber-500/20'
+                    : 'border-white/10 bg-white/5 hover:border-amber-500/20 hover:bg-white/10'
                 }`}
               >
                 {/* Plan Name & Discount */}
@@ -263,7 +263,7 @@ export function PricingSection() {
                 <div className="space-y-3">
                   {plan.features.map((feature) => (
                     <div key={feature} className="flex items-start gap-3">
-                      <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-purple-400" />
+                      <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-400" />
                       <span className="text-sm text-white/80">{feature}</span>
                     </div>
                   ))}
@@ -271,7 +271,7 @@ export function PricingSection() {
 
                 {/* Hover glow effect */}
                 {plan.highlight && (
-                  <div className="absolute inset-0 -z-10 bg-gradient-to-br from-purple-500/20 to-transparent opacity-50 blur-xl" />
+                  <div className="absolute inset-0 -z-10 bg-gradient-to-br from-amber-500/20 to-transparent opacity-50 blur-xl" />
                 )}
               </div>
             </div>
@@ -288,8 +288,8 @@ export function PricingSection() {
       </div>
 
       {/* Background decoration */}
-      <div className="absolute left-0 top-1/2 h-96 w-96 -translate-y-1/2 rounded-full bg-purple-500/5 blur-3xl" />
-      <div className="absolute right-0 top-1/2 h-96 w-96 -translate-y-1/2 rounded-full bg-purple-500/5 blur-3xl" />
+      <div className="absolute left-0 top-1/2 h-96 w-96 -translate-y-1/2 rounded-full bg-amber-500/5 blur-3xl" />
+      <div className="absolute right-0 top-1/2 h-96 w-96 -translate-y-1/2 rounded-full bg-amber-500/5 blur-3xl" />
     </section>
   );
 }

@@ -14,14 +14,14 @@ export function HeroSection() {
       <div className="relative z-10 mx-auto max-w-6xl text-center">
         {/* Badge */}
         <div
-          className="mb-8 inline-flex items-center gap-2 rounded-full border border-purple-500/20 bg-purple-500/5 px-4 py-2 backdrop-blur-xl"
+          className="mb-8 inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/5 px-4 py-2 backdrop-blur-xl"
           style={{
             animation:
               'fadeInDown 600ms cubic-bezier(0.4, 0, 0.2, 1) backwards',
           }}
         >
-          <Sparkles className="h-4 w-4 text-purple-400" />
-          <span className="text-sm font-medium text-purple-300">
+          <Sparkles className="h-4 w-4 text-amber-400" />
+          <span className="text-sm font-medium text-amber-300">
             AI-Powered Jewelry Photography
           </span>
         </div>
@@ -78,7 +78,7 @@ export function HeroSection() {
         >
           <div className="flex items-center gap-3">
             <div className="flex -space-x-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#0a0a0a] bg-gradient-to-br from-purple-400 to-purple-600 font-bold text-white shadow-lg">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#0a0a0a] bg-gradient-to-br from-amber-400 to-amber-600 font-bold text-white shadow-lg">
                 AI
               </div>
               <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#0a0a0a] bg-gradient-to-br from-pink-400 to-pink-600 font-bold text-white shadow-lg">
@@ -114,8 +114,8 @@ export function HeroSection() {
       </div>
 
       {/* Decorative Elements */}
-      <div className="absolute left-1/4 top-20 h-72 w-72 rounded-full bg-purple-500/10 blur-3xl" />
-      <div className="absolute bottom-20 right-1/4 h-72 w-72 rounded-full bg-purple-500/5 blur-3xl" />
+      <div className="absolute left-1/4 top-20 h-72 w-72 rounded-full bg-amber-500/10 blur-3xl" />
+      <div className="absolute bottom-20 right-1/4 h-72 w-72 rounded-full bg-amber-500/5 blur-3xl" />
 
       <style jsx>{`
         @keyframes fadeInDown {

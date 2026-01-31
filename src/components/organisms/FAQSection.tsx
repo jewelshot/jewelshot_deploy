@@ -51,13 +51,13 @@ export function FAQSection() {
       <div className="mx-auto max-w-4xl">
         {/* Header */}
         <div className="mb-16 text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-purple-500/20 bg-purple-500/5 px-4 py-2">
-            <HelpCircle className="h-4 w-4 text-purple-400" />
-            <span className="text-sm font-medium text-purple-300">FAQ</span>
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/5 px-4 py-2">
+            <HelpCircle className="h-4 w-4 text-amber-400" />
+            <span className="text-sm font-medium text-amber-300">FAQ</span>
           </div>
           <h2 className="mb-4 text-4xl font-bold text-white sm:text-5xl">
             Frequently Asked{' '}
-            <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-amber-400 to-yellow-400 bg-clip-text text-transparent">
               Questions
             </span>
           </h2>
@@ -73,7 +73,7 @@ export function FAQSection() {
               key={index}
               className={`overflow-hidden rounded-2xl border transition-all duration-300 ${
                 openIndex === index
-                  ? 'border-purple-500/30 bg-purple-500/5'
+                  ? 'border-amber-500/30 bg-amber-500/5'
                   : 'border-white/10 bg-white/[0.02] hover:border-white/20'
               }`}
             >
@@ -83,7 +83,7 @@ export function FAQSection() {
               >
                 <span className="pr-4 text-lg font-medium text-white">{faq.question}</span>
                 <ChevronDown
-                  className={`h-5 w-5 flex-shrink-0 text-purple-400 transition-transform duration-300 ${
+                  className={`h-5 w-5 flex-shrink-0 text-amber-400 transition-transform duration-300 ${
                     openIndex === index ? 'rotate-180' : ''
                   }`}
                 />
@@ -100,7 +100,7 @@ export function FAQSection() {
         </div>
 
         {/* Contact CTA */}
-        <div className="mt-12 rounded-2xl border border-white/10 bg-gradient-to-br from-purple-500/10 to-pink-500/10 p-8 text-center">
+        <div className="mt-12 rounded-2xl border border-white/10 bg-gradient-to-br from-amber-500/10 to-yellow-500/10 p-8 text-center">
           <h3 className="mb-2 text-xl font-semibold text-white">Still have questions?</h3>
           <p className="mb-6 text-white/60">
             Our team is here to help. Reach out anytime.

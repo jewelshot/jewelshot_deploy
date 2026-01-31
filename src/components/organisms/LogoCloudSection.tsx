@@ -46,7 +46,7 @@ export function LogoCloudSection() {
                 </div>
 
                 {/* Hover underline */}
-                <div className="absolute -bottom-2 left-0 h-0.5 w-0 bg-gradient-to-r from-purple-500 to-transparent transition-all duration-300 group-hover:w-full" />
+                <div className="absolute -bottom-2 left-0 h-0.5 w-0 bg-gradient-to-r from-amber-500 to-transparent transition-all duration-300 group-hover:w-full" />
               </div>
             </div>
           ))}

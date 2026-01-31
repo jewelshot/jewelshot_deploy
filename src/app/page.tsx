@@ -68,7 +68,7 @@ export default function LandingPage() {
               {/* Brand */}
               <div className="lg:col-span-2">
                 <div className="mb-4 flex items-center gap-2">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-pink-500">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-yellow-500">
                     <span className="text-lg font-bold text-white">J</span>
                   </div>
                   <span className="text-xl font-bold text-white">Jewelshot</span>
@@ -93,10 +93,10 @@ export default function LandingPage() {
               <div>
                 <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-white/80">Product</h4>
                 <ul className="space-y-3 text-sm text-white/60">
-                  <li><a href="#features" className="transition-colors hover:text-purple-400">Features</a></li>
-                  <li><a href="#pricing" className="transition-colors hover:text-purple-400">Pricing</a></li>
-                  <li><a href="#showcase" className="transition-colors hover:text-purple-400">Examples</a></li>
-                  <li><a href="/docs/api" className="transition-colors hover:text-purple-400">API Docs</a></li>
+                  <li><a href="#features" className="transition-colors hover:text-amber-400">Features</a></li>
+                  <li><a href="#pricing" className="transition-colors hover:text-amber-400">Pricing</a></li>
+                  <li><a href="#showcase" className="transition-colors hover:text-amber-400">Examples</a></li>
+                  <li><a href="/docs/api" className="transition-colors hover:text-amber-400">API Docs</a></li>
                 </ul>
               </div>
 
@@ -104,10 +104,10 @@ export default function LandingPage() {
               <div>
                 <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-white/80">Company</h4>
                 <ul className="space-y-3 text-sm text-white/60">
-                  <li><a href="/about" className="transition-colors hover:text-purple-400">About</a></li>
-                  <li><a href="/blog" className="transition-colors hover:text-purple-400">Blog</a></li>
-                  <li><a href="/careers" className="transition-colors hover:text-purple-400">Careers</a></li>
-                  <li><a href="mailto:hello@jewelshot.ai" className="transition-colors hover:text-purple-400">Contact</a></li>
+                  <li><a href="/about" className="transition-colors hover:text-amber-400">About</a></li>
+                  <li><a href="/blog" className="transition-colors hover:text-amber-400">Blog</a></li>
+                  <li><a href="/careers" className="transition-colors hover:text-amber-400">Careers</a></li>
+                  <li><a href="mailto:hello@jewelshot.ai" className="transition-colors hover:text-amber-400">Contact</a></li>
                 </ul>
               </div>
 
@@ -115,10 +115,10 @@ export default function LandingPage() {
               <div>
                 <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-white/80">Legal</h4>
                 <ul className="space-y-3 text-sm text-white/60">
-                  <li><a href="/privacy" className="transition-colors hover:text-purple-400">Privacy Policy</a></li>
-                  <li><a href="/terms" className="transition-colors hover:text-purple-400">Terms of Service</a></li>
-                  <li><a href="/security" className="transition-colors hover:text-purple-400">Security</a></li>
-                  <li><a href="/gdpr" className="transition-colors hover:text-purple-400">GDPR</a></li>
+                  <li><a href="/privacy" className="transition-colors hover:text-amber-400">Privacy Policy</a></li>
+                  <li><a href="/terms" className="transition-colors hover:text-amber-400">Terms of Service</a></li>
+                  <li><a href="/security" className="transition-colors hover:text-amber-400">Security</a></li>
+                  <li><a href="/gdpr" className="transition-colors hover:text-amber-400">GDPR</a></li>
                 </ul>
               </div>
             </div>
