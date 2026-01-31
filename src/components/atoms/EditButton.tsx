@@ -28,8 +28,8 @@ export function EditButton({ onClick, active = false }: EditButtonProps) {
         onClick={onClick}
         className={`flex h-7 w-7 items-center justify-center rounded-md border transition-all ${
           active
-            ? 'border-[rgba(139,92,246,0.5)] bg-[rgba(139,92,246,0.15)] text-white'
-            : 'border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] text-white/80 hover:border-[rgba(139,92,246,0.5)] hover:bg-[rgba(139,92,246,0.15)] hover:text-white'
+            ? 'border-white/20 bg-white/10 text-white/80'
+            : 'border-white/10 bg-white/[0.03] text-white/60 hover:border-white/20 hover:bg-white/[0.08] hover:text-white/80'
         }`}
         aria-label={t.common.edit}
       >

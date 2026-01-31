@@ -235,7 +235,7 @@ export default function CanvasControls({
           pointerEvents: controlsVisible ? 'auto' : 'none',
         }}
       >
-        <div className="rounded-lg border border-[rgba(139,92,246,0.2)] bg-[rgba(10,10,10,0.8)] p-1.5 backdrop-blur-[16px]">
+        <div className="rounded-lg border border-white/10 bg-[rgba(10,10,10,0.8)] p-1.5 backdrop-blur-[16px]">
           <BackgroundSelector
             background={background}
             onBackgroundChange={onBackgroundChange}

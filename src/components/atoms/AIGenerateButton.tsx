@@ -21,7 +21,7 @@ export function AIGenerateButton({
     <button
       onClick={onClick}
       disabled={disabled || loading}
-      className="group relative overflow-hidden rounded-lg border border-[rgba(139,92,246,0.4)] bg-gradient-to-br from-[rgba(10,10,10,0.9)] to-[rgba(20,10,30,0.9)] px-4 py-2 text-white backdrop-blur-2xl transition-all duration-200 hover:border-[rgba(139,92,246,0.6)] hover:shadow-[0_0_16px_rgba(139,92,246,0.4)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+      className="group relative overflow-hidden rounded-lg border border-white/15 bg-[rgba(10,10,10,0.9)] px-4 py-2 text-white/90 backdrop-blur-2xl transition-all duration-200 hover:border-white/25 hover:bg-white/[0.08] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
       title={t.tooltips.aiGenerate}
       aria-label={t.tooltips.aiGenerate}
       style={{
@@ -31,8 +31,8 @@ export function AIGenerateButton({
       {/* Dark backdrop */}
       <div className="pointer-events-none absolute inset-0 -z-10 bg-black/50 backdrop-blur-2xl" />
 
-      {/* Purple gradient overlay */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[rgba(139,92,246,0.2)] to-[rgba(99,102,241,0.1)] transition-opacity duration-200 group-hover:from-[rgba(139,92,246,0.3)] group-hover:to-[rgba(99,102,241,0.2)]" />
+      {/* Subtle overlay */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent transition-opacity duration-200 group-hover:from-white/[0.05]" />
 
       {/* Shimmer effect */}
       {!loading && !disabled && (

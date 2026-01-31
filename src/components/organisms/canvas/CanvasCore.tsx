@@ -232,8 +232,8 @@ export default function CanvasCore({
                     <div 
                       className={`absolute bottom-2 left-1/2 -translate-x-1/2 rounded-md px-3 py-1 text-xs font-medium backdrop-blur-sm transition-all ${
                         activeImage === 'left'
-                          ? 'border border-purple-500/60 bg-purple-500/20 text-purple-300'
-                          : 'border border-white/10 bg-black/60 text-white/70'
+                          ? 'border border-white/30 bg-white/10 text-white/90'
+                          : 'border border-white/10 bg-black/60 text-white/50'
                       }`}
                     >
                       {activeImage === 'left' && <span className="mr-1.5">●</span>}
@@ -276,8 +276,8 @@ export default function CanvasCore({
                   <div 
                     className={`absolute bottom-2 left-1/2 -translate-x-1/2 rounded-md px-3 py-1 text-xs font-medium backdrop-blur-sm transition-all ${
                       activeImage === 'right'
-                        ? 'border border-purple-500/60 bg-purple-500/20 text-purple-300'
-                        : 'border border-white/10 bg-black/60 text-white/70'
+                        ? 'border border-white/30 bg-white/10 text-white/90'
+                        : 'border border-white/10 bg-black/60 text-white/50'
                     }`}
                   >
                     {activeImage === 'right' && <span className="mr-1.5">●</span>}

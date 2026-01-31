@@ -18,7 +18,7 @@ export function ViewModeSelector({
   const { t } = useLanguage();
   
   return (
-    <div className="flex items-center gap-0.5 rounded-lg border border-[rgba(139,92,246,0.2)] bg-[rgba(10,10,10,0.8)] p-0.5 backdrop-blur-[16px]">
+    <div className="flex items-center gap-0.5 rounded-lg border border-white/10 bg-[rgba(10,10,10,0.8)] p-0.5 backdrop-blur-[16px]">
       {/* Normal View */}
       <Tooltip content={t.tooltips.viewModeNormal} side="bottom">
         <button
@@ -26,8 +26,8 @@ export function ViewModeSelector({
           disabled={disabled}
           className={`flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition-all duration-200 ${
             viewMode === 'normal'
-              ? 'bg-[rgba(139,92,246,0.2)] text-[rgba(196,181,253,1)]'
-              : 'text-[rgba(196,181,253,0.6)] hover:text-[rgba(196,181,253,0.8)]'
+              ? 'bg-white/10 text-white/80'
+              : 'text-white/50 hover:text-white/70'
           } ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
         >
           <svg
@@ -53,8 +53,8 @@ export function ViewModeSelector({
           disabled={disabled}
           className={`flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition-all duration-200 ${
             viewMode === 'side-by-side'
-              ? 'bg-[rgba(139,92,246,0.2)] text-[rgba(196,181,253,1)]'
-              : 'text-[rgba(196,181,253,0.6)] hover:text-[rgba(196,181,253,0.8)]'
+              ? 'bg-white/10 text-white/80'
+              : 'text-white/50 hover:text-white/70'
           } ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
         >
           <svg
