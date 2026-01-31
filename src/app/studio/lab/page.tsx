@@ -335,8 +335,8 @@ export default function StudioLabPage() {
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/10">
-                <Settings className="h-6 w-6 text-purple-400" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/10">
+                <Settings className="h-6 w-6 text-white/60" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold">🧪 Studio Lab</h1>
@@ -350,7 +350,7 @@ export default function StudioLabPage() {
               {gender && jewelryType && (
                 <button
                   onClick={randomizeAll}
-                  className="flex items-center gap-2 rounded-lg border border-purple-500/30 bg-purple-500/10 px-4 py-2 text-purple-400 transition-colors hover:bg-purple-500/20 hover:border-purple-500/50"
+                  className="flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-white/70 transition-colors hover:bg-white/20 hover:border-white/30"
                 >
                   <Shuffle className="h-4 w-4" />
                   Random All
@@ -366,7 +366,7 @@ export default function StudioLabPage() {
               )}
               <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-2">
                 <span className="text-white/60">Selections:</span>{' '}
-                <span className="font-medium text-purple-400">
+                <span className="font-medium text-white">
                   {selectedCount}/{totalCategories}
                 </span>
               </div>
@@ -402,7 +402,7 @@ export default function StudioLabPage() {
                         onClick={() => handleGenderChange('women')}
                         className={`flex-1 rounded-lg border px-3 py-2 text-xs font-medium transition-all ${
                           gender === 'women'
-                            ? 'border-purple-500 bg-purple-500/20 text-purple-300'
+                            ? 'border-white/40 bg-white/10 text-white'
                             : 'border-white/20 bg-white/5 text-white/60 hover:border-white/40 hover:text-white'
                         }`}
                       >
@@ -462,13 +462,13 @@ export default function StudioLabPage() {
           <div className="space-y-8 w-full">
             {/* 1️⃣ UNIVERSAL FEATURES - Accordion (requires gender & jewelry) */}
             {gender && jewelryType && universalWomenCategories.length > 0 && (
-              <div className={`rounded-2xl border-2 ${gender === 'women' ? 'border-purple-500/30 bg-purple-500/5' : 'border-blue-500/30 bg-blue-500/5'}`}>
+              <div className={`rounded-2xl border-2 ${gender === 'women' ? 'border-white/20 bg-white/5' : 'border-white/20 bg-white/5'}`}>
                 <button
                   onClick={() => setShowWomenFeatures(!showWomenFeatures)}
-                  className={`w-full flex items-center justify-between p-5 ${gender === 'women' ? 'hover:bg-purple-500/10' : 'hover:bg-blue-500/10'} transition-all rounded-t-2xl`}
+                  className={`w-full flex items-center justify-between p-5 hover:bg-white/5 transition-all rounded-t-2xl`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${gender === 'women' ? 'bg-purple-500/20' : 'bg-blue-500/20'}`}>
+                    <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-white/10`}>
                       <span className="text-2xl">{gender === 'women' ? '👩' : '👨'}</span>
                     </div>
                     <div className="text-left">
@@ -486,7 +486,7 @@ export default function StudioLabPage() {
                         e.stopPropagation();
                         randomizeCategories(universalWomenCategories.map(c => c.id));
                       }}
-                      className={`rounded-lg border ${gender === 'women' ? 'border-purple-500/30 bg-purple-500/10 text-purple-400 hover:bg-purple-500/20' : 'border-blue-500/30 bg-blue-500/10 text-blue-400 hover:bg-blue-500/20'} px-3 py-1.5 text-sm transition-colors flex items-center gap-1.5`}
+                      className={`rounded-lg border border-white/20 bg-white/10 text-white/70 hover:bg-white/20 px-3 py-1.5 text-sm transition-colors flex items-center gap-1.5`}
                     >
                       <Shuffle className="h-3.5 w-3.5" />
                       Random
@@ -495,7 +495,7 @@ export default function StudioLabPage() {
                   </div>
                 </button>
                 {showWomenFeatures && (
-                  <div className={`p-5 pt-0 space-y-3 border-t ${gender === 'women' ? 'border-purple-500/20' : 'border-blue-500/20'}`}>
+                  <div className={`p-5 pt-0 space-y-3 border-t border-white/10`}>
                     {universalWomenCategories.map(category => renderCategory(category))}
                   </div>
                 )}
@@ -857,7 +857,7 @@ export default function StudioLabPage() {
                   onClick={() => setShowJsonView(false)}
                   className={`rounded px-3 py-1 text-xs font-medium transition-colors ${
                     !showJsonView
-                      ? 'bg-purple-500/20 text-purple-400'
+                      ? 'bg-white/20 text-white'
                       : 'bg-white/5 text-white/60 hover:bg-white/10'
                   }`}
                 >
@@ -867,7 +867,7 @@ export default function StudioLabPage() {
                   onClick={() => setShowJsonView(true)}
                   className={`flex items-center gap-1 rounded px-3 py-1 text-xs font-medium transition-colors ${
                     showJsonView
-                      ? 'bg-purple-500/20 text-purple-400'
+                      ? 'bg-white/20 text-white'
                       : 'bg-white/5 text-white/60 hover:bg-white/10'
                   }`}
                 >
@@ -883,7 +883,7 @@ export default function StudioLabPage() {
                 <button
                   onClick={handleGeneratePrompt}
                   disabled={selectedCount === 0}
-                  className="w-full flex items-center justify-center gap-2 rounded-lg bg-purple-600 px-4 py-3 text-sm font-medium transition-colors hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-2 rounded-lg bg-white/10 px-4 py-3 text-sm font-medium transition-colors hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Zap className="h-4 w-4" />
                   Generate Prompt ({selectedCount} blocks selected)
@@ -950,7 +950,7 @@ export default function StudioLabPage() {
                       );
                       setGeneratedPrompt(prompt);
                     }}
-                    className="w-full mt-4 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 px-6 py-3 font-semibold text-white shadow-xl transition-all hover:shadow-2xl hover:shadow-purple-500/50 disabled:cursor-not-allowed disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="w-full mt-4 rounded-lg bg-white/10 px-6 py-3 font-semibold text-white shadow-xl transition-all hover:bg-white/20 hover:shadow-2xl hover:shadow-white/20 disabled:cursor-not-allowed disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     <Zap className="h-5 w-5" />
                     Generate Full Prompt
@@ -981,7 +981,7 @@ export default function StudioLabPage() {
                           <span>{category.icon}</span>
                           <span className="text-white/60">{category.name}:</span>
                         </div>
-                        <div className="font-medium text-purple-400">
+                        <div className="font-medium text-white">
                           {block.name}
                         </div>
                       </div>
@@ -1029,7 +1029,7 @@ export default function StudioLabPage() {
               </div>
             )}
             {selectedBlockId && (
-              <div className="rounded-full bg-purple-500/20 px-2 py-0.5 text-xs text-purple-400">
+              <div className="rounded-full bg-white/10 px-2 py-0.5 text-xs text-white/70">
                 ✓
               </div>
             )}
@@ -1061,7 +1061,7 @@ export default function StudioLabPage() {
                     disabled={isDisabled}
                     className={`rounded-lg border p-2 text-left transition-all ${
                       isSelected
-                        ? 'border-purple-500 bg-purple-500/10 shadow-lg shadow-purple-500/20'
+                        ? 'border-white/40 bg-white/10 shadow-lg shadow-white/10'
                         : isDisabled
                         ? 'border-red-500/20 bg-red-500/5 opacity-40 cursor-not-allowed'
                         : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'

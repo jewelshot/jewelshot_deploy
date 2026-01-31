@@ -22,7 +22,7 @@ const Canvas = dynamic(() => import('@/components/organisms/Canvas'), {
   loading: () => (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90">
       <div className="text-center">
-        <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-purple-500 border-t-transparent"></div>
+        <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-white/30 border-t-white"></div>
         <p className="text-sm text-white/70">Loading Studio...</p>
       </div>
     </div>

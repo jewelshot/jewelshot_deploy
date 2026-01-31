@@ -188,7 +188,7 @@ export default function PresetsPage() {
     return (
       <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 text-purple-400 animate-spin mx-auto mb-4" />
+          <Loader2 className="h-12 w-12 text-white/60 animate-spin mx-auto mb-4" />
           <p className="text-white/60">Checking permissions...</p>
         </div>
       </div>
@@ -209,7 +209,7 @@ export default function PresetsPage() {
           </p>
           <button
             onClick={() => router.push('/dashboard')}
-            className="px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 font-semibold transition-colors"
+            className="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 font-semibold transition-colors"
           >
             Return to Dashboard
           </button>
@@ -224,8 +224,8 @@ export default function PresetsPage() {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/10">
-              <Sparkles className="h-6 w-6 text-purple-400" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/10">
+              <Sparkles className="h-6 w-6 text-white/60" />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -240,9 +240,9 @@ export default function PresetsPage() {
         </div>
 
         {/* Generation Settings */}
-        <div className="mb-8 rounded-2xl border border-purple-500/30 bg-purple-500/5 p-8">
+        <div className="mb-8 rounded-2xl border border-white/10 bg-white/5 p-8">
           <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-            <Settings className="h-5 w-5 text-purple-400" />
+            <Settings className="h-5 w-5 text-white/60" />
             Generation Settings
           </h2>
           
@@ -258,7 +258,7 @@ export default function PresetsPage() {
                 }}
                 className={`p-6 rounded-xl border-2 transition-all ${
                   gender === 'women'
-                    ? 'border-purple-500 bg-purple-500/20 shadow-lg shadow-purple-500/20'
+                    ? 'border-white/40 bg-white/10 shadow-lg shadow-white/10'
                     : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
                 }`}
               >
@@ -295,7 +295,7 @@ export default function PresetsPage() {
                   }}
                   className={`p-5 rounded-xl border-2 transition-all ${
                     jewelryType === 'ring'
-                      ? 'border-purple-500 bg-purple-500/20 shadow-lg shadow-purple-500/20'
+                      ? 'border-white/40 bg-white/10 shadow-lg shadow-white/10'
                       : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
                   }`}
                 >
@@ -309,7 +309,7 @@ export default function PresetsPage() {
                   }}
                   className={`p-5 rounded-xl border-2 transition-all ${
                     jewelryType === 'necklace'
-                      ? 'border-purple-500 bg-purple-500/20 shadow-lg shadow-purple-500/20'
+                      ? 'border-white/40 bg-white/10 shadow-lg shadow-white/10'
                       : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
                   }`}
                 >
@@ -323,7 +323,7 @@ export default function PresetsPage() {
                   }}
                   className={`p-5 rounded-xl border-2 transition-all ${
                     jewelryType === 'earring'
-                      ? 'border-purple-500 bg-purple-500/20 shadow-lg shadow-purple-500/20'
+                      ? 'border-white/40 bg-white/10 shadow-lg shadow-white/10'
                       : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
                   }`}
                 >
@@ -337,7 +337,7 @@ export default function PresetsPage() {
                   }}
                   className={`p-5 rounded-xl border-2 transition-all ${
                     jewelryType === 'bracelet'
-                      ? 'border-purple-500 bg-purple-500/20 shadow-lg shadow-purple-500/20'
+                      ? 'border-white/40 bg-white/10 shadow-lg shadow-white/10'
                       : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
                   }`}
                 >
@@ -362,7 +362,7 @@ export default function PresetsPage() {
                     onClick={() => setAspectRatio(ratio.value)}
                     className={`px-4 py-2 rounded-lg border transition-all text-sm ${
                       aspectRatio === ratio.value
-                        ? 'border-purple-500 bg-purple-500/20 text-purple-300'
+                        ? 'border-white/40 bg-white/10 text-white'
                         : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20 hover:bg-white/10'
                     }`}
                     title={ratio.description}
@@ -403,8 +403,8 @@ export default function PresetsPage() {
                         onClick={() => setSelectedPreset(preset)}
                         className={`rounded-xl border-2 p-5 text-left transition-all ${
                           selectedPreset?.id === preset.id
-                            ? 'border-purple-500 bg-purple-500/10 shadow-lg shadow-purple-500/20'
-                            : 'border-white/10 bg-white/5 hover:border-purple-500/50 hover:bg-white/10'
+                            ? 'border-white/40 bg-white/10 shadow-lg shadow-white/10'
+                            : 'border-white/10 bg-white/5 hover:border-white/30 hover:bg-white/10'
                         }`}
                       >
                         <div className="mb-3">
@@ -415,7 +415,7 @@ export default function PresetsPage() {
                           {preset.tags.map((tag) => (
                             <span
                               key={tag}
-                              className="rounded-full bg-purple-500/20 px-3 py-1 text-xs text-purple-300"
+                              className="rounded-full bg-white/10 px-3 py-1 text-xs text-white/70"
                             >
                               {tag}
                             </span>
@@ -446,7 +446,7 @@ export default function PresetsPage() {
                       onClick={() => setShowJsonView(false)}
                       className={`flex-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
                         !showJsonView
-                          ? 'bg-purple-500 text-white'
+                          ? 'bg-white/20 text-white'
                           : 'bg-white/5 text-white/60 hover:bg-white/10'
                       }`}
                     >
@@ -473,7 +473,7 @@ export default function PresetsPage() {
                         <div className="flex items-center justify-end mb-3">
                           <button
                             onClick={copyPromptToClipboard}
-                            className="flex items-center gap-1.5 rounded-lg border border-purple-500/30 bg-purple-500/10 px-3 py-1.5 text-sm text-purple-400 transition-colors hover:bg-purple-500/20"
+                            className="flex items-center gap-1.5 rounded-lg border border-white/20 bg-white/10 px-3 py-1.5 text-sm text-white/70 transition-colors hover:bg-white/20"
                           >
                             {copiedPrompt ? (
                               <>
@@ -523,7 +523,7 @@ export default function PresetsPage() {
                   <div className="p-4 border-t border-white/10 bg-white/5">
                     <button
                       onClick={handleUseInStudio}
-                      className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-3 font-semibold text-white transition-all hover:from-purple-500 hover:to-pink-500 hover:shadow-lg hover:shadow-purple-500/30"
+                      className="w-full flex items-center justify-center gap-2 rounded-xl bg-white/10 px-6 py-3 font-semibold text-white transition-all hover:bg-white/20 hover:shadow-lg hover:shadow-white/10"
                     >
                       Use in Studio
                       <ArrowRight className="h-5 w-5" />
