@@ -484,7 +484,7 @@ export function DashboardContent() {
   if (loading || creditsLoading) {
     return (
       <main
-        className="fixed inset-0 flex items-center justify-center transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
+        className="fixed inset-0 flex items-center justify-center transition-all duration-[400ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
         style={{ paddingLeft: leftOpen ? '260px' : '0' }}
       >
         <div className="text-center">
@@ -500,7 +500,7 @@ export function DashboardContent() {
   // ============================================
   return (
     <main
-      className="fixed inset-0 overflow-y-auto transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
+      className="fixed inset-0 overflow-y-auto transition-all duration-[400ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
       style={{ paddingLeft: leftOpen ? '260px' : '0' }}
     >
       <div className="min-h-screen p-6">

@@ -70,7 +70,7 @@ export function BatchDetailContent({
 
   return (
     <div
-      className="fixed z-10 flex h-full flex-col gap-6 overflow-y-auto p-6 transition-all duration-[800ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
+      className="fixed z-10 flex h-full flex-col gap-6 overflow-y-auto p-6 transition-all duration-[400ms] ease-[cubic-bezier(0.4,0.0,0.2,1)]"
       style={{
         left: leftOpen ? '260px' : '16px',
         right: '16px',
