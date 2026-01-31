@@ -25,7 +25,8 @@ interface AuroraBackgroundProps {
   enabled?: boolean;
 }
 
-export function AuroraBackground({ enabled = true }: AuroraBackgroundProps) {
+export function AuroraBackground({ enabled = false }: AuroraBackgroundProps) {
+  // Disabled by default - pure dark background for jewelry visibility
   if (!enabled) return null;
 
   return (
