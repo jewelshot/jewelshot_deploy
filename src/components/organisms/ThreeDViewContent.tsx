@@ -2181,10 +2181,10 @@ export default function ThreeDViewContent() {
       const { saveImageToGallery } = await import('@/lib/gallery-storage');
       await saveImageToGallery(
         imageData, 
-        `3D View: ${fileName || 'Model Snapshot'}`,
+        `JewelRender: ${fileName || 'Model Snapshot'}`,
         'manual',
         {
-          prompt: `3D View snapshot of ${fileName || 'model'}`,
+          prompt: `JewelRender snapshot of ${fileName || 'model'}`,
         }
       );
       
@@ -2244,10 +2244,10 @@ export default function ThreeDViewContent() {
       const { saveImageToGallery } = await import('@/lib/gallery-storage');
       await saveImageToGallery(
         snapshotPreview, 
-        `3D View: ${fileName || 'Unknown'}`,
+        `JewelRender: ${fileName || 'Unknown'}`,
         'manual',
         {
-          prompt: `3D View snapshot of ${fileName || 'model'}`,
+          prompt: `JewelRender snapshot of ${fileName || 'model'}`,
         }
       );
       
@@ -2518,7 +2518,7 @@ export default function ThreeDViewContent() {
       <div className="flex h-12 items-center justify-between border-b border-white/10 bg-black/40 px-4 backdrop-blur-sm">
         <div className="flex items-center gap-3">
           <Box className="h-5 w-5 text-white/60" />
-          <h1 className="text-sm font-medium text-white/80">3D View</h1>
+          <h1 className="text-sm font-medium text-white/80">JewelRender®</h1>
           {fileName && (
             <span className="rounded bg-white/10 px-2 py-0.5 text-xs text-white/50">
               {fileName}
@@ -2702,34 +2702,93 @@ export default function ThreeDViewContent() {
             </div>
           )}
 
+          {/* Loading State - Elegant */}
           {isLoading && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/60">
-              <div className="text-center">
-                <Loader2 className="mx-auto h-8 w-8 animate-spin text-white/60" />
-                <p className="mt-2 text-sm text-white/60">{loadingStatus || 'Loading model...'}</p>
+            <div className="absolute inset-0 z-10 flex items-center justify-center">
+              <div className="flex flex-col items-center gap-4 text-center">
+                <div className="relative">
+                  <div className="h-10 w-10 rounded-full border-2 border-white/10" />
+                  <div className="absolute inset-0 h-10 w-10 animate-spin rounded-full border-2 border-transparent border-t-white/50" />
+                </div>
+                <p className="text-[13px] text-white/50">{loadingStatus || 'Loading model...'}</p>
               </div>
             </div>
           )}
 
+          {/* Empty State - Elegant like Studio */}
           {!loadedGeometry && layers.length === 0 && !isLoading && (
             <div className="absolute inset-0 z-10 flex items-center justify-center">
-              <div className="text-center">
+              <div className="flex flex-col items-center gap-5 text-center">
+                {/* Logo */}
+                <img
+                  src="/logo.png"
+                  alt="JewelRender"
+                  className="h-16 w-16"
+                  style={{
+                    animation: 'fadeIn 0.8s ease-out forwards',
+                    opacity: 0,
+                  }}
+                />
+
+                {/* Title & Subtitle */}
+                <div className="space-y-1.5">
+                  <h2
+                    className="text-xl font-semibold tracking-tight text-white/90"
+                    style={{
+                      animation: 'fadeIn 0.8s ease-out 0.1s forwards',
+                      opacity: 0,
+                    }}
+                  >
+                    JewelRender®
+                  </h2>
+                  <p
+                    className="text-[13px] text-white/40"
+                    style={{
+                      animation: 'fadeIn 0.8s ease-out 0.2s forwards',
+                      opacity: 0,
+                    }}
+                  >
+                    Drop a 3D model to begin
+                  </p>
+                </div>
+
+                {/* Upload Button */}
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="mb-4 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-white/20 bg-white/5 p-12 transition-colors hover:border-white/30 hover:bg-white/10"
+                  className="group mt-2 inline-flex items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.04] px-4 py-2 text-[13px] text-white/60 transition-all duration-200 hover:border-white/15 hover:bg-white/[0.07] hover:text-white/80"
+                  style={{
+                    animation: 'fadeIn 0.8s ease-out 0.3s forwards',
+                    opacity: 0,
+                  }}
                 >
-                  <Upload className="h-12 w-12 text-white/30" />
-                  <span className="mt-4 text-lg font-medium text-white/60">
-                    Upload 3D Model
-                  </span>
-                  <span className="mt-2 text-sm text-white/40">
-                    Supports STL and 3DM formats
-                  </span>
+                  <Upload className="h-3.5 w-3.5 text-white/40 transition-colors group-hover:text-white/60" />
+                  <span>Upload Model</span>
                 </button>
-                <p className="text-xs text-white/30">
-                  Or drag and drop a file here
+
+                <p
+                  className="text-[11px] text-white/30"
+                  style={{
+                    animation: 'fadeIn 0.8s ease-out 0.4s forwards',
+                    opacity: 0,
+                  }}
+                >
+                  STL, 3DM formats supported
                 </p>
               </div>
+
+              {/* CSS Animation */}
+              <style jsx>{`
+                @keyframes fadeIn {
+                  from {
+                    opacity: 0;
+                    transform: translateY(8px);
+                  }
+                  to {
+                    opacity: 1;
+                    transform: translateY(0);
+                  }
+                }
+              `}</style>
             </div>
           )}
 

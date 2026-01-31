@@ -477,7 +477,7 @@ export function ThreeDRightPanel({
       <div className="border-b border-white/10">
         {/* Title */}
         <div className="flex items-center justify-between px-4 py-3">
-          <span className="text-sm font-medium text-white">3D Viewer</span>
+          <span className="text-sm font-medium text-white">JewelRender®</span>
           <button
             onClick={onToggle}
             className="rounded p-1 text-white/40 hover:bg-white/10 hover:text-white"
@@ -860,7 +860,7 @@ export function ThreeDRightPanel({
 
       {/* Footer */}
       <div className="border-t border-white/10 px-4 py-2 text-center">
-        <p className="text-[9px] text-white/30">JewelShot 3D Viewer v2.0</p>
+        <p className="text-[9px] text-white/30">JewelRender® v2.0</p>
       </div>
 
       {/* Material Picker Modal */}
