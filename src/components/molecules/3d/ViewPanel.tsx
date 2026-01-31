@@ -36,6 +36,7 @@ export type ViewMode = 'single' | 'split-horizontal' | 'split-vertical' | 'quad'
 export type DebugView = 'none' | 'wireframe' | 'normals' | 'uvs' | 'depth' | 'ao' | 'matcap';
 export type CameraType = 'perspective' | 'orthographic';
 export type ViewAnglePreset = 'front' | 'back' | 'top' | 'bottom' | 'left' | 'right' | 'iso' | 'custom';
+export type GizmoStyle = 'viewport' | 'viewcube' | 'none';
 
 export interface CameraPreset {
   id: string;
@@ -57,6 +58,8 @@ export interface ViewConfig {
   fov: number;
   // Resolution scale (0.25 = performance, 1 = default, 2+ = high quality)
   resolutionScale: number;
+  // Gizmo style (viewport = axis arrows, viewcube = 3D cube, none = hidden)
+  gizmoStyle: GizmoStyle;
   // Comparison
   comparison: {
     enabled: boolean;
@@ -81,6 +84,7 @@ export const DEFAULT_VIEW_CONFIG: ViewConfig = {
   currentAngle: 'front',
   showAxes: false,
   resolutionScale: 1,
+  gizmoStyle: 'viewport',
   showStats: false,
   orthoZoom: 5,
   fov: 50,
@@ -259,6 +263,31 @@ export function ViewPanel({
             />
             <span className="text-[10px] text-white/60">İstatistikler</span>
           </label>
+        </div>
+
+        {/* Gizmo Style */}
+        <div className="space-y-2 pt-2 border-t border-white/10">
+          <span className="text-[10px] text-white/50">Gizmo Stili</span>
+          <div className="grid grid-cols-3 gap-1">
+            {[
+              { id: 'viewport' as const, name: 'Eksen', icon: '⊕' },
+              { id: 'viewcube' as const, name: 'Küp', icon: '▣' },
+              { id: 'none' as const, name: 'Gizli', icon: '○' },
+            ].map((style) => (
+              <button
+                key={style.id}
+                onClick={() => onChange({ gizmoStyle: style.id })}
+                className={`flex flex-col items-center gap-0.5 rounded-md py-2 text-[10px] transition-all ${
+                  config.gizmoStyle === style.id
+                    ? 'bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/50'
+                    : 'bg-white/5 text-white/50 hover:bg-white/10'
+                }`}
+              >
+                <span className="text-base">{style.icon}</span>
+                <span>{style.name}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </Section>
 

@@ -15,7 +15,7 @@
 
 import React, { useState, useRef, useCallback, Suspense, useEffect, useMemo } from 'react';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
-import { OrbitControls, Center, Environment, Grid, GizmoHelper, GizmoViewport, Lightformer, TransformControls, Stats } from '@react-three/drei';
+import { OrbitControls, Center, Environment, Grid, GizmoHelper, GizmoViewport, GizmoViewcube, Lightformer, TransformControls, Stats } from '@react-three/drei';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 import * as THREE from 'three';
 import { LoopSubdivision } from 'three-subdivide';
@@ -753,6 +753,8 @@ function SceneContent({
   lightingConfig,
   // Resolution scale
   resolutionScale = 1,
+  // Gizmo style
+  gizmoStyle = 'viewport',
 }: {
   geometry: THREE.BufferGeometry | null;
   material: MaterialPreset;
@@ -794,6 +796,8 @@ function SceneContent({
   lightingConfig?: LightingConfig;
   // Resolution scale (0.25 = performance, 1 = default, 2+ = high quality)
   resolutionScale?: number;
+  // Gizmo style (viewport = axis arrows, viewcube = 3D cube, none = hidden)
+  gizmoStyle?: 'viewport' | 'viewcube' | 'none';
 }) {
   const controlsRef = useRef<any>(null);
   const groupRef = useRef<THREE.Group>(null);
@@ -1243,15 +1247,28 @@ function SceneContent({
         target={[0, 0, 0]}
       />
       
-      {/* Axis Gizmo in corner - always visible for orientation reference */}
-      <GizmoHelper alignment="bottom-right" margin={[60, 60]}>
-        <GizmoViewport 
-          axisColors={['#ff4444', '#44ff44', '#4488ff']}
-          labelColor="#ffffff"
-          hideNegativeAxes={false}
-          font="bold 12px Inter, system-ui, sans-serif"
-        />
-      </GizmoHelper>
+      {/* Axis Gizmo in corner - configurable style */}
+      {gizmoStyle !== 'none' && (
+        <GizmoHelper alignment="bottom-right" margin={[60, 60]}>
+          {gizmoStyle === 'viewcube' ? (
+            <GizmoViewcube 
+              color="#ffffff"
+              textColor="#000000"
+              strokeColor="#333333"
+              opacity={0.9}
+              hoverColor="#8844ff"
+              faces={['Right', 'Left', 'Top', 'Bottom', 'Front', 'Back']}
+            />
+          ) : (
+            <GizmoViewport 
+              axisColors={['#ff4444', '#44ff44', '#4488ff']}
+              labelColor="#ffffff"
+              hideNegativeAxes={false}
+              font="bold 12px Inter, system-ui, sans-serif"
+            />
+          )}
+        </GizmoHelper>
+      )}
       
       {/* Adaptive Resolution - Progressive rendering for smooth interaction */}
       {/* Disabled during auto-rotate to maintain full quality */}
@@ -2784,6 +2801,8 @@ export default function ThreeDViewContent() {
                 lightingConfig={lightingConfig}
                 // Resolution scale for quality control
                 resolutionScale={resolutionScale}
+                // Gizmo style
+                gizmoStyle={viewConfig.gizmoStyle}
               />
               <SnapshotHelper onSnapshot={handleSnapshotResult} />
               {/* FPS Counter - temporary for debugging */}
