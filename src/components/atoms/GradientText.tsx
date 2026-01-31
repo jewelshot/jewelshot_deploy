@@ -4,13 +4,14 @@ interface GradientTextProps {
   children: React.ReactNode;
   className?: string;
   variant?: 'default' | 'apple' | 'shine';
+  style?: React.CSSProperties;
 }
 
 /**
  * GradientText - Apple-style animated gradient text effect
  * Used for hero headings and emphasis
  */
-export function GradientText({ children, className = '', variant = 'apple' }: GradientTextProps) {
+export function GradientText({ children, className = '', variant = 'apple', style }: GradientTextProps) {
   if (variant === 'shine') {
     // Shine/glint effect that sweeps across
     return (
@@ -38,14 +39,20 @@ export function GradientText({ children, className = '', variant = 'apple' }: Gr
   }
 
   // Apple-style flowing multi-color gradient - continuous right movement
+  // Combine space animation with gradient animation
+  const combinedAnimation = style?.animation 
+    ? `${style.animation}, appleGradient 4s linear infinite`
+    : 'appleGradient 4s linear infinite';
+
   return (
     <span
       className={`bg-clip-text text-transparent ${className}`}
       style={{
         backgroundImage: 'linear-gradient(90deg, #a855f7, #ec4899, #6366f1, #06b6d4, #a855f7, #ec4899, #6366f1, #06b6d4, #a855f7)',
         backgroundSize: '200% 100%',
-        animation: 'appleGradient 4s linear infinite',
         paddingBottom: '0.1em', // Prevent descender clipping on letters like g, y, p
+        ...style,
+        animation: combinedAnimation,
       }}
     >
       {children}
