@@ -52,7 +52,7 @@ function MaterialItem({ material, isSelected, onSelect }: MaterialItemProps) {
       onClick={onSelect}
       className={`group relative flex items-center gap-3 w-full rounded-lg border p-2 transition-all ${
         isSelected
-          ? 'border-white/50 bg-white/40/20'
+          ? 'border-white/50 bg-white/12'
           : 'border-white/10 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.05]'
       }`}
     >

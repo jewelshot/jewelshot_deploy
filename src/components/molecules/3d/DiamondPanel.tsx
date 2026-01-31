@@ -335,7 +335,7 @@ export function DiamondPanel({ config, onChange }: DiamondPanelProps) {
             onClick={() => setSelectedCategory(null)}
             className={`rounded-md px-2 py-1 text-[9px] transition-all ${
               selectedCategory === null
-                ? 'bg-white/40/20 text-white/90'
+                ? 'bg-white/12 text-white/90'
                 : 'bg-white/5 text-white/50 hover:bg-white/10'
             }`}
           >
@@ -347,7 +347,7 @@ export function DiamondPanel({ config, onChange }: DiamondPanelProps) {
               onClick={() => setSelectedCategory(key)}
               className={`rounded-md px-2 py-1 text-[9px] transition-all ${
                 selectedCategory === key
-                  ? 'bg-white/40/20 text-white/90'
+                  ? 'bg-white/12 text-white/90'
                   : 'bg-white/5 text-white/50 hover:bg-white/10'
               }`}
             >
@@ -366,7 +366,7 @@ export function DiamondPanel({ config, onChange }: DiamondPanelProps) {
             <button
               key={preset.id}
               onClick={() => applyPreset(preset)}
-              className="flex flex-col items-center gap-1 rounded-lg border border-white/10 bg-white/5 p-2 transition-all hover:border-white/50/50"
+              className="flex flex-col items-center gap-1 rounded-lg border border-white/10 bg-white/5 p-2 transition-all hover:border-white/30"
               title={preset.description}
             >
               <div

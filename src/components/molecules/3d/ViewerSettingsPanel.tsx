@@ -199,12 +199,12 @@ function ToggleRow({ label, value, onChange, icon }: ToggleRowProps) {
       </div>
       <button
         onClick={() => onChange(!value)}
-        className={`relative h-5 w-9 rounded-full transition-colors ${
-          value ? 'bg-white/40' : 'bg-white/20'
+        className={`relative h-3.5 w-7 rounded-full transition-colors ${
+          value ? 'bg-white/40' : 'bg-white/15'
         }`}
       >
         <span
-          className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-transform ${
+          className={`absolute top-0.5 h-2.5 w-2.5 rounded-full bg-white shadow-sm transition-transform ${
             value ? 'left-[18px]' : 'left-0.5'
           }`}
         />
@@ -469,7 +469,7 @@ export function ViewerSettingsPanel({
                 onClick={() => onQualityChange({ level })}
                 className={`rounded-lg border px-2 py-1.5 text-[10px] font-medium capitalize transition-colors ${
                   quality.level === level
-                    ? 'border-white/50/50 bg-white/40/20 text-white'
+                    ? 'border-white/30 bg-white/12 text-white'
                     : 'border-white/10 bg-white/5 text-white/50 hover:border-white/20'
                 }`}
               >

@@ -258,7 +258,7 @@ export function OrientationModal({
                   onClick={() => setAutoRotate(!autoRotate)}
                   className={`absolute bottom-3 left-3 rounded-lg px-3 py-1.5 text-xs transition-colors ${
                     autoRotate
-                      ? 'bg-white/40/30 text-white/90'
+                      ? 'bg-white/15 text-white/90'
                       : 'bg-white/10 text-white/50'
                   }`}
                 >
@@ -291,7 +291,7 @@ export function OrientationModal({
                       onClick={() => setConfig(prev => ({ ...prev, upAxis: axis }))}
                       className={`rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
                         config.upAxis === axis
-                          ? 'border-white/50/50 bg-white/40/20 text-white'
+                          ? 'border-white/30 bg-white/12 text-white'
                           : 'border-white/10 bg-white/5 text-white/50 hover:border-white/20'
                       }`}
                     >
@@ -313,13 +313,13 @@ export function OrientationModal({
                     <div className="flex gap-1">
                       <button
                         onClick={() => rotateQuick('x', -90)}
-                        className="flex-1 rounded bg-white/10 p-1 text-xs hover:bg-white/20"
+                        className="flex-1 rounded bg-white/10 p-1 text-xs hover:bg-white/15"
                       >
                         <ArrowDown className="mx-auto h-3 w-3" />
                       </button>
                       <button
                         onClick={() => rotateQuick('x', 90)}
-                        className="flex-1 rounded bg-white/10 p-1 text-xs hover:bg-white/20"
+                        className="flex-1 rounded bg-white/10 p-1 text-xs hover:bg-white/15"
                       >
                         <ArrowUp className="mx-auto h-3 w-3" />
                       </button>
@@ -332,13 +332,13 @@ export function OrientationModal({
                     <div className="flex gap-1">
                       <button
                         onClick={() => rotateQuick('y', -90)}
-                        className="flex-1 rounded bg-white/10 p-1 text-xs hover:bg-white/20"
+                        className="flex-1 rounded bg-white/10 p-1 text-xs hover:bg-white/15"
                       >
                         <ArrowLeft className="mx-auto h-3 w-3" />
                       </button>
                       <button
                         onClick={() => rotateQuick('y', 90)}
-                        className="flex-1 rounded bg-white/10 p-1 text-xs hover:bg-white/20"
+                        className="flex-1 rounded bg-white/10 p-1 text-xs hover:bg-white/15"
                       >
                         <ArrowRight className="mx-auto h-3 w-3" />
                       </button>
@@ -351,13 +351,13 @@ export function OrientationModal({
                     <div className="flex gap-1">
                       <button
                         onClick={() => rotateQuick('z', -90)}
-                        className="flex-1 rounded bg-white/10 p-1 text-xs hover:bg-white/20"
+                        className="flex-1 rounded bg-white/10 p-1 text-xs hover:bg-white/15"
                       >
                         <RotateCcw className="mx-auto h-3 w-3" />
                       </button>
                       <button
                         onClick={() => rotateQuick('z', 90)}
-                        className="flex-1 rounded bg-white/10 p-1 text-xs hover:bg-white/20"
+                        className="flex-1 rounded bg-white/10 p-1 text-xs hover:bg-white/15"
                       >
                         <RotateCw className="mx-auto h-3 w-3" />
                       </button>

@@ -311,7 +311,7 @@ function EffectSection({ title, icon, enabled, onToggle, children }: EffectSecti
         </div>
         <div
           className={`relative h-4 w-7 rounded-full transition-colors ${
-            enabled ? 'bg-white/40' : 'bg-white/20'
+            enabled ? 'bg-white/40' : 'bg-white/15'
           }`}
         >
           <span
@@ -444,13 +444,13 @@ export function PostProcessingPanel({ config, onChange }: PostProcessingPanelPro
         <span className="text-xs text-white/70">Post-Processing</span>
         <button
           onClick={() => onChange({ enabled: !config.enabled })}
-          className={`relative h-5 w-9 rounded-full transition-colors ${
-            config.enabled ? 'bg-white/40' : 'bg-white/20'
+          className={`relative h-3.5 w-7 rounded-full transition-colors ${
+            config.enabled ? 'bg-white/40' : 'bg-white/15'
           }`}
         >
           <span
-            className={`absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white transition-transform ${
-              config.enabled ? 'translate-x-4' : 'translate-x-0'
+            className={`absolute left-0.5 top-0.5 h-2.5 w-2.5 rounded-full bg-white shadow-sm transition-transform ${
+              config.enabled ? 'translate-x-3.5' : 'translate-x-0'
             }`}
           />
         </button>
@@ -489,7 +489,7 @@ export function PostProcessingPanel({ config, onChange }: PostProcessingPanelPro
                     onClick={() => onChange({ toneMapping: type })}
                     className={`rounded-md py-1 text-[9px] transition-all ${
                       config.toneMapping === type
-                        ? 'bg-white/40/20 text-white/90 ring-1 ring-white/25'
+                        ? 'bg-white/12 text-white/90 ring-1 ring-white/25'
                         : 'bg-white/5 text-white/50 hover:bg-white/10'
                     }`}
                   >
@@ -689,7 +689,7 @@ export function PostProcessingPanel({ config, onChange }: PostProcessingPanelPro
               <button
                 onClick={() => updateChromaticAberration({ radialModulation: !config.chromaticAberration.radialModulation })}
                 className={`relative h-4 w-7 rounded-full transition-colors ${
-                  config.chromaticAberration.radialModulation ? 'bg-white/40' : 'bg-white/20'
+                  config.chromaticAberration.radialModulation ? 'bg-white/40' : 'bg-white/15'
                 }`}
               >
                 <span
@@ -729,7 +729,7 @@ export function PostProcessingPanel({ config, onChange }: PostProcessingPanelPro
               <button
                 onClick={() => updateFilmGrain({ animated: !config.filmGrain.animated })}
                 className={`relative h-4 w-7 rounded-full transition-colors ${
-                  config.filmGrain.animated ? 'bg-white/40' : 'bg-white/20'
+                  config.filmGrain.animated ? 'bg-white/40' : 'bg-white/15'
                 }`}
               >
                 <span
@@ -859,7 +859,7 @@ export function PostProcessingPanel({ config, onChange }: PostProcessingPanelPro
                   onClick={() => updateLUT({ preset })}
                   className={`rounded-md py-1.5 text-[8px] transition-all ${
                     config.lut.preset === preset
-                      ? 'bg-white/40/20 text-white/90 ring-1 ring-white/25'
+                      ? 'bg-white/12 text-white/90 ring-1 ring-white/25'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >

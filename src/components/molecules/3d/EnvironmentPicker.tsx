@@ -44,7 +44,7 @@ const CustomEnvItem = memo(function CustomEnvItem({
     <button
       onClick={onSelect}
       className={`flex w-full items-center gap-3 px-3 py-2 text-left transition-colors ${
-        isSelected ? 'bg-white/40/20' : 'hover:bg-white/10'
+        isSelected ? 'bg-white/12' : 'hover:bg-white/10'
       }`}
     >
       <div 
@@ -117,7 +117,7 @@ function PresetCard({ title, description, gradient, isSelected, onClick, icon }:
       whileTap={{ scale: 0.98 }}
       className={`relative overflow-hidden rounded-lg border p-3 text-left transition-all ${
         isSelected
-          ? 'border-white/50/50 ring-2 ring-white/20'
+          ? 'border-white/30 ring-2 ring-white/20'
           : 'border-white/10 hover:border-white/20'
       }`}
     >
@@ -223,7 +223,7 @@ export function EnvironmentPicker({
           onClick={() => setActiveTab('hdri')}
           className={`flex flex-1 items-center justify-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
             activeTab === 'hdri'
-              ? 'bg-white/40/20 text-white/90'
+              ? 'bg-white/12 text-white/90'
               : 'text-white/50 hover:text-white/80'
           }`}
         >
@@ -234,7 +234,7 @@ export function EnvironmentPicker({
           onClick={() => setActiveTab('studio')}
           className={`flex flex-1 items-center justify-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
             activeTab === 'studio'
-              ? 'bg-white/40/20 text-white/90'
+              ? 'bg-white/12 text-white/90'
               : 'text-white/50 hover:text-white/80'
           }`}
         >
@@ -245,14 +245,14 @@ export function EnvironmentPicker({
           onClick={() => setActiveTab('custom')}
           className={`flex flex-1 items-center justify-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium transition-colors ${
             activeTab === 'custom'
-              ? 'bg-white/40/20 text-white/90'
+              ? 'bg-white/12 text-white/90'
               : 'text-white/50 hover:text-white/80'
           }`}
         >
           <FolderOpen className="h-3.5 w-3.5" />
           Özel
           {customEnvironments.length > 0 && (
-            <span className="rounded-full bg-white/40/30 px-1.5 py-0.5 text-[10px]">
+            <span className="rounded-full bg-white/15 px-1.5 py-0.5 text-[10px]">
               {customEnvironments.length}
             </span>
           )}
@@ -333,12 +333,12 @@ export function EnvironmentPicker({
               <span className="text-xs text-white/70">Arkaplanda Göster</span>
               <button
                 onClick={handleBackgroundToggle}
-                className={`relative h-5 w-9 rounded-full transition-colors ${
-                  selected.backgroundVisible ? 'bg-white/40' : 'bg-white/20'
+                className={`relative h-3.5 w-7 rounded-full transition-colors ${
+                  selected.backgroundVisible ? 'bg-white/40' : 'bg-white/15'
                 }`}
               >
                 <span
-                  className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-transform ${
+                  className={`absolute top-0.5 h-2.5 w-2.5 rounded-full bg-white shadow-sm transition-transform ${
                     selected.backgroundVisible ? 'left-[18px]' : 'left-0.5'
                   }`}
                 />
@@ -483,12 +483,12 @@ export function EnvironmentPicker({
                     <span className="text-xs text-white/70">Arkaplanda Göster</span>
                     <button
                       onClick={handleBackgroundToggle}
-                      className={`relative h-5 w-9 rounded-full transition-colors ${
-                        selected.backgroundVisible ? 'bg-white/40' : 'bg-white/20'
+                      className={`relative h-3.5 w-7 rounded-full transition-colors ${
+                        selected.backgroundVisible ? 'bg-white/40' : 'bg-white/15'
                       }`}
                     >
                       <span
-                        className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-transform ${
+                        className={`absolute top-0.5 h-2.5 w-2.5 rounded-full bg-white shadow-sm transition-transform ${
                           selected.backgroundVisible ? 'left-[18px]' : 'left-0.5'
                         }`}
                       />

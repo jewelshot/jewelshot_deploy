@@ -104,7 +104,7 @@ const EnvironmentItem = memo(function EnvironmentItem({
     <button
       onClick={onSelect}
       className={`flex w-full items-center gap-3 px-3 py-2 text-left transition-colors ${
-        isSelected ? 'bg-white/40/20' : 'hover:bg-white/10'
+        isSelected ? 'bg-white/12' : 'hover:bg-white/10'
       }`}
     >
       <div 
@@ -440,13 +440,13 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
         <span className="text-xs text-white/70">Ortam Işığı</span>
         <button
           onClick={() => onChange({ enabled: !config.enabled })}
-          className={`relative h-5 w-9 rounded-full transition-colors ${
-            config.enabled ? 'bg-white/40' : 'bg-white/20'
+          className={`relative h-3.5 w-7 rounded-full transition-colors ${
+            config.enabled ? 'bg-white/40' : 'bg-white/15'
           }`}
         >
           <span
-            className={`absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white transition-transform ${
-              config.enabled ? 'translate-x-4' : 'translate-x-0'
+            className={`absolute left-0.5 top-0.5 h-2.5 w-2.5 rounded-full bg-white shadow-sm transition-transform ${
+              config.enabled ? 'translate-x-3.5' : 'translate-x-0'
             }`}
           />
         </button>
@@ -487,7 +487,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
               <FolderOpen className="h-3 w-3" />
               Özel
               {customEnvironments.length > 0 && (
-                <span className="rounded-full bg-white/40/40 px-1 text-[9px]">
+                <span className="rounded-full bg-white/15 px-1 text-[9px]">
                   {customEnvironments.length}
                 </span>
               )}
@@ -502,7 +502,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                   <button
                     key={preset.id}
                     onClick={() => onLightformerSelect?.(preset)}
-                    className="flex flex-col items-center gap-1 rounded-lg border border-white/10 bg-white/5 p-3 transition-all hover:border-white/50/50 hover:bg-white/40/10"
+                    className="flex flex-col items-center gap-1 rounded-lg border border-white/10 bg-white/5 p-3 transition-all hover:border-white/30 hover:bg-white/10"
                   >
                     <div
                       className="h-8 w-8 rounded-full ring-1 ring-white/20"
@@ -527,7 +527,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                   onClick={() => setSelectedCategory(null)}
                   className={`rounded-md px-2 py-1 text-[10px] transition-all ${
                     selectedCategory === null
-                      ? 'bg-white/40/20 text-white/90'
+                      ? 'bg-white/12 text-white/90'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >
@@ -539,7 +539,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                     onClick={() => setSelectedCategory(cat)}
                     className={`rounded-md px-2 py-1 text-[10px] transition-all ${
                       selectedCategory === cat
-                        ? 'bg-white/40/20 text-white/90'
+                        ? 'bg-white/12 text-white/90'
                         : 'bg-white/5 text-white/50 hover:bg-white/10'
                     }`}
                   >
@@ -558,7 +558,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                     onClick={() => onChange({ preset: preset.id, customHDR: null, customHDRId: null })}
                     className={`flex flex-col items-center gap-1 rounded-lg border p-2 transition-all ${
                       config.preset === preset.id
-                        ? 'border-white/50/50 bg-white/40/10'
+                        ? 'border-white/30 bg-white/10'
                         : 'border-white/10 bg-white/5 hover:border-white/20'
                     }`}
                   >
@@ -751,7 +751,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
                   onClick={() => onChange({ resolution: res })}
                   className={`rounded-md py-1 text-[9px] transition-all ${
                     config.resolution === res
-                      ? 'bg-white/40/20 text-white/90'
+                      ? 'bg-white/12 text-white/90'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >
@@ -807,7 +807,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
             <button
               onClick={() => onChange({ showBackground: !config.showBackground })}
               className={`relative h-4 w-7 rounded-full transition-colors ${
-                config.showBackground ? 'bg-white/40' : 'bg-white/20'
+                config.showBackground ? 'bg-white/40' : 'bg-white/15'
               }`}
             >
               <span
@@ -864,7 +864,7 @@ export function HDRPanel({ config, onChange, onLightformerSelect }: HDRPanelProp
               <button
                 onClick={() => onChange({ groundProjection: !config.groundProjection })}
                 className={`relative h-4 w-7 rounded-full transition-colors ${
-                  config.groundProjection ? 'bg-white/40' : 'bg-white/20'
+                  config.groundProjection ? 'bg-white/40' : 'bg-white/15'
                 }`}
               >
                 <span

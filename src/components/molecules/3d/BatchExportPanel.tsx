@@ -318,7 +318,7 @@ export function BatchExportPanel({
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-lg border border-white/50/30 bg-white/40/10 p-3 space-y-2"
+          className="rounded-lg border border-white/20 bg-white/10 p-3 space-y-2"
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -383,7 +383,7 @@ export function BatchExportPanel({
                     onClick={() => toggleAngle(angle.id)}
                     className={`flex flex-col items-center gap-1 rounded-lg border p-2 transition-all ${
                       isSelected
-                        ? 'border-white/50/50 bg-white/40/10'
+                        ? 'border-white/30 bg-white/10'
                         : 'border-white/10 bg-white/5 hover:border-white/20'
                     }`}
                   >
@@ -410,7 +410,7 @@ export function BatchExportPanel({
                   className="flex items-center justify-between rounded-md bg-white/5 px-2 py-1.5"
                 >
                   <div className="flex items-center gap-2">
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/40/20 text-[9px] text-white/90">
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/12 text-[9px] text-white/90">
                       {index + 1}
                     </span>
                     <span className="text-xs text-white/70">{angle.name}</span>
@@ -484,7 +484,7 @@ export function BatchExportPanel({
                 <button
                   onClick={addCustomAngle}
                   disabled={!customAngle.name}
-                  className="w-full rounded-md bg-white/40/20 py-1.5 text-[10px] text-white/90 hover:bg-white/40/30 disabled:opacity-50"
+                  className="w-full rounded-md bg-white/12 py-1.5 text-[10px] text-white/90 hover:bg-white/15 disabled:opacity-50"
                 >
                   Ekle
                 </button>
@@ -502,7 +502,7 @@ export function BatchExportPanel({
                   onClick={() => onChange({ format: fmt })}
                   className={`flex-1 rounded-md py-1.5 text-[10px] transition-all ${
                     config.format === fmt
-                      ? 'bg-white/40/20 text-white/90'
+                      ? 'bg-white/12 text-white/90'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >
@@ -521,7 +521,7 @@ export function BatchExportPanel({
                     onClick={() => onChange({ aspectRatio: ratio })}
                     className={`rounded-md py-1 text-[8px] transition-all ${
                       config.aspectRatio === ratio
-                        ? 'bg-white/40/20 text-white/90'
+                        ? 'bg-white/12 text-white/90'
                         : 'bg-white/5 text-white/50 hover:bg-white/10'
                     }`}
                   >
@@ -543,7 +543,7 @@ export function BatchExportPanel({
                   onClick={() => onChange({ width: res.w, height: res.h })}
                   className={`flex-1 rounded-md py-1.5 text-[10px] transition-all ${
                     config.width === res.w
-                      ? 'bg-white/40/20 text-white/90'
+                      ? 'bg-white/12 text-white/90'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >
@@ -568,7 +568,7 @@ export function BatchExportPanel({
                     })}
                     className={`flex-1 rounded-md py-1.5 text-[9px] transition-all ${
                       config.batchBackground.type === bg.id
-                        ? 'bg-white/40/20 text-white/90'
+                        ? 'bg-white/12 text-white/90'
                         : 'bg-white/5 text-white/50 hover:bg-white/10'
                     }`}
                   >
@@ -628,7 +628,7 @@ export function BatchExportPanel({
                     autoCrop: { ...config.autoCrop, enabled: !config.autoCrop.enabled } 
                   })}
                   className={`relative h-4 w-7 rounded-full transition-colors ${
-                    config.autoCrop.enabled ? 'bg-white/40' : 'bg-white/20'
+                    config.autoCrop.enabled ? 'bg-white/40' : 'bg-white/15'
                   }`}
                 >
                   <span
@@ -662,7 +662,7 @@ export function BatchExportPanel({
                     compositeSheet: { ...config.compositeSheet, enabled: !config.compositeSheet.enabled } 
                   })}
                   className={`relative h-4 w-7 rounded-full transition-colors ${
-                    config.compositeSheet.enabled ? 'bg-white/40' : 'bg-white/20'
+                    config.compositeSheet.enabled ? 'bg-white/40' : 'bg-white/15'
                   }`}
                 >
                   <span
@@ -709,7 +709,7 @@ export function BatchExportPanel({
                     contactSheet: { ...config.contactSheet, enabled: !config.contactSheet.enabled } 
                   })}
                   className={`relative h-4 w-7 rounded-full transition-colors ${
-                    config.contactSheet.enabled ? 'bg-white/40' : 'bg-white/20'
+                    config.contactSheet.enabled ? 'bg-white/40' : 'bg-white/15'
                   }`}
                 >
                   <span
@@ -731,7 +731,7 @@ export function BatchExportPanel({
                         })}
                         className={`rounded px-2 py-1 text-[8px] ${
                           config.contactSheet.thumbnailSize === size
-                            ? 'bg-white/40/20 text-white/90'
+                            ? 'bg-white/12 text-white/90'
                             : 'bg-white/5 text-white/40'
                         }`}
                       >
@@ -752,7 +752,7 @@ export function BatchExportPanel({
                     spritesheet: { ...config.spritesheet, enabled: !config.spritesheet.enabled } 
                   })}
                   className={`relative h-4 w-7 rounded-full transition-colors ${
-                    config.spritesheet.enabled ? 'bg-white/40' : 'bg-white/20'
+                    config.spritesheet.enabled ? 'bg-white/40' : 'bg-white/15'
                   }`}
                 >
                   <span

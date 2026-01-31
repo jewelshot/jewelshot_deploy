@@ -124,7 +124,7 @@ export function TransformControls({
                 key={deg}
                 onClick={() => rotateQuick('y', deg)}
                 disabled={disabled}
-                className="rounded bg-white/10 px-1.5 py-0.5 text-[9px] text-white/60 transition-colors hover:bg-white/20 hover:text-white disabled:opacity-50"
+                className="rounded bg-white/10 px-1.5 py-0.5 text-[9px] text-white/60 transition-colors hover:bg-white/15 hover:text-white disabled:opacity-50"
               >
                 {deg > 0 ? '+' : ''}{deg}°
               </button>
@@ -231,7 +231,7 @@ export function TransformControls({
             disabled={disabled}
             className={`flex flex-col items-center gap-1 rounded-lg border p-2 transition-colors ${
               flip.normals
-                ? 'border-white/50/50 bg-white/40/20 text-white/70'
+                ? 'border-white/30 bg-white/12 text-white/70'
                 : 'border-white/10 bg-white/5 text-white/50 hover:border-white/20 hover:bg-white/10'
             } disabled:opacity-50`}
             title="Flip face normals (inside-out)"

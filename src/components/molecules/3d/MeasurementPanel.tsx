@@ -356,13 +356,13 @@ export function MeasurementPanel({
         <span className="text-xs text-white/70">Ölçüm Araçları</span>
         <button
           onClick={() => onChange({ enabled: !config.enabled })}
-          className={`relative h-5 w-9 rounded-full transition-colors ${
-            config.enabled ? 'bg-white/40' : 'bg-white/20'
+          className={`relative h-3.5 w-7 rounded-full transition-colors ${
+            config.enabled ? 'bg-white/40' : 'bg-white/15'
           }`}
         >
           <span
-            className={`absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white transition-transform ${
-              config.enabled ? 'translate-x-4' : 'translate-x-0'
+            className={`absolute left-0.5 top-0.5 h-2.5 w-2.5 rounded-full bg-white shadow-sm transition-transform ${
+              config.enabled ? 'translate-x-3.5' : 'translate-x-0'
             }`}
           />
         </button>
@@ -381,7 +381,7 @@ export function MeasurementPanel({
                     onClick={() => onChange({ unit })}
                     className={`flex-1 rounded-md py-1.5 text-[10px] transition-all ${
                       config.unit === unit
-                        ? 'bg-white/40/20 text-white/90'
+                        ? 'bg-white/12 text-white/90'
                         : 'bg-white/5 text-white/50 hover:bg-white/10'
                     }`}
                   >
@@ -487,7 +487,7 @@ export function MeasurementPanel({
                   ringMeasurement: { ...config.ringMeasurement, enabled: !config.ringMeasurement.enabled }
                 })}
                 className={`relative h-4 w-7 rounded-full transition-colors ${
-                  config.ringMeasurement.enabled ? 'bg-white/40' : 'bg-white/20'
+                  config.ringMeasurement.enabled ? 'bg-white/40' : 'bg-white/15'
                 }`}
               >
                 <span
@@ -531,7 +531,7 @@ export function MeasurementPanel({
                         })}
                         className={`rounded-md py-1.5 text-[10px] transition-all ${
                           config.ringMeasurement.region === region
-                            ? 'bg-white/40/20 text-white/90'
+                            ? 'bg-white/12 text-white/90'
                             : 'bg-white/5 text-white/50 hover:bg-white/10'
                         }`}
                       >
@@ -543,7 +543,7 @@ export function MeasurementPanel({
 
                 {/* Result */}
                 {ringSize && (
-                  <div className="rounded-lg bg-white/40/10 border border-white/50/30 p-3 text-center">
+                  <div className="rounded-lg bg-white/10 border border-white/20 p-3 text-center">
                     <span className="text-[10px] text-white/90">Yüzük Ölçüsü</span>
                     <p className="text-2xl font-bold text-white">{ringSize}</p>
                     <span className="text-[10px] text-white/50">
@@ -569,7 +569,7 @@ export function MeasurementPanel({
                   weightEstimation: { ...config.weightEstimation, enabled: !config.weightEstimation.enabled }
                 })}
                 className={`relative h-4 w-7 rounded-full transition-colors ${
-                  config.weightEstimation.enabled ? 'bg-white/40' : 'bg-white/20'
+                  config.weightEstimation.enabled ? 'bg-white/40' : 'bg-white/15'
                 }`}
               >
                 <span
@@ -597,7 +597,7 @@ export function MeasurementPanel({
                         })}
                         className={`rounded-md py-1.5 text-[8px] transition-all ${
                           config.weightEstimation.material === id
-                            ? 'bg-white/40/20 text-white/90'
+                            ? 'bg-white/12 text-white/90'
                             : 'bg-white/5 text-white/50 hover:bg-white/10'
                         }`}
                       >

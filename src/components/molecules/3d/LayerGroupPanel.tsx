@@ -149,7 +149,7 @@ const LayerItemRow = memo(function LayerItemRow({
       onClick={onSelect}
       className={`group flex items-center gap-2 rounded-lg border px-2 py-1.5 transition-all cursor-pointer ${
         isSelected
-          ? 'border-white/50/50 bg-white/40/10'
+          ? 'border-white/30 bg-white/10'
           : 'border-white/5 bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.04]'
       }`}
     >
@@ -243,8 +243,8 @@ const GroupHeader = memo(function GroupHeader({ group, onToggleExpand, onToggleA
         }}
         className={`rounded p-1 transition-colors ${
           group.allVisible
-            ? 'text-white/70 hover:bg-white/20'
-            : 'text-white/30 hover:bg-white/20'
+            ? 'text-white/70 hover:bg-white/15'
+            : 'text-white/30 hover:bg-white/15'
         }`}
         title={group.allVisible ? 'Tümünü Gizle' : 'Tümünü Göster'}
       >

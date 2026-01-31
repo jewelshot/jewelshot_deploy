@@ -362,7 +362,7 @@ export function TransformPanelAdvanced({
                 onClick={() => onChange({ rotation: { ...config.rotation, y: preset.value } })}
                 className={`rounded-md py-1 text-[9px] transition-all ${
                   config.rotation.y === preset.value
-                    ? 'bg-white/40/20 text-white/90'
+                    ? 'bg-white/12 text-white/90'
                     : 'bg-white/5 text-white/50 hover:bg-white/10'
                 }`}
               >
@@ -444,7 +444,7 @@ export function TransformPanelAdvanced({
               onClick={() => onChange({ scale: { x: scale, y: scale, z: scale } })}
               className={`rounded-md py-1 text-[9px] transition-all ${
                 config.scale.x === scale && config.scale.y === scale && config.scale.z === scale
-                  ? 'bg-white/40/20 text-white/90'
+                  ? 'bg-white/12 text-white/90'
                   : 'bg-white/5 text-white/50 hover:bg-white/10'
               }`}
             >
@@ -468,7 +468,7 @@ export function TransformPanelAdvanced({
               onClick={() => onChange({ pivotPoint: pivot.id })}
               className={`rounded-md py-1.5 text-[9px] transition-all ${
                 config.pivotPoint === pivot.id
-                  ? 'bg-white/40/20 text-white/90'
+                  ? 'bg-white/12 text-white/90'
                   : 'bg-white/5 text-white/50 hover:bg-white/10'
               }`}
             >
@@ -500,7 +500,7 @@ export function TransformPanelAdvanced({
           <button
             onClick={() => onChange({ snap: { ...config.snap, enabled: !config.snap.enabled } })}
             className={`relative h-4 w-7 rounded-full transition-colors ${
-              config.snap.enabled ? 'bg-white/40' : 'bg-white/20'
+              config.snap.enabled ? 'bg-white/40' : 'bg-white/15'
             }`}
           >
             <span
@@ -528,7 +528,7 @@ export function TransformPanelAdvanced({
                     onClick={() => onChange({ snap: { ...config.snap, gridSize: size } })}
                     className={`rounded-md py-1 text-[9px] transition-all ${
                       config.snap.gridSize === size
-                        ? 'bg-white/40/20 text-white/90'
+                        ? 'bg-white/12 text-white/90'
                         : 'bg-white/5 text-white/50 hover:bg-white/10'
                     }`}
                   >
@@ -565,7 +565,7 @@ export function TransformPanelAdvanced({
               onClick={() => onChange({ flip: { ...config.flip, [axis]: !config.flip[axis] } })}
               className={`flex flex-col items-center gap-1 rounded-lg border p-3 transition-all ${
                 config.flip[axis]
-                  ? 'border-white/50/50 bg-white/40/10 text-white/90'
+                  ? 'border-white/30 bg-white/10 text-white/90'
                   : 'border-white/10 bg-white/5 text-white/50 hover:bg-white/10'
               }`}
             >
@@ -594,7 +594,7 @@ export function TransformPanelAdvanced({
           <button
             onClick={() => onChange({ array: { ...config.array, enabled: !config.array.enabled } })}
             className={`relative h-4 w-7 rounded-full transition-colors ${
-              config.array.enabled ? 'bg-white/40' : 'bg-white/20'
+              config.array.enabled ? 'bg-white/40' : 'bg-white/15'
             }`}
           >
             <span
@@ -615,7 +615,7 @@ export function TransformPanelAdvanced({
                   onClick={() => onChange({ array: { ...config.array, type } })}
                   className={`rounded-md py-1.5 text-[10px] transition-all ${
                     config.array.type === type
-                      ? 'bg-white/40/20 text-white/90'
+                      ? 'bg-white/12 text-white/90'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >
@@ -677,7 +677,7 @@ export function TransformPanelAdvanced({
                       onClick={() => onChange({ array: { ...config.array, axis } })}
                       className={`rounded-md py-1.5 text-[10px] transition-all ${
                         config.array.axis === axis
-                          ? 'bg-white/40/20 text-white/90'
+                          ? 'bg-white/12 text-white/90'
                           : 'bg-white/5 text-white/50 hover:bg-white/10'
                       }`}
                     >

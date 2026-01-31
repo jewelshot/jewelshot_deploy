@@ -342,7 +342,7 @@ export function VideoExportPanel({
                   onClick={() => onChange({ format })}
                   className={`rounded-md py-2 text-[10px] font-medium transition-all ${
                     config.format === format
-                      ? 'bg-white/40/20 text-white/90 ring-1 ring-white/25'
+                      ? 'bg-white/12 text-white/90 ring-1 ring-white/25'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >
@@ -362,7 +362,7 @@ export function VideoExportPanel({
                   onClick={() => applyQuality(q)}
                   className={`flex flex-col items-center rounded-md py-1.5 text-[9px] transition-all ${
                     config.quality === q
-                      ? 'bg-white/40/20 text-white/90 ring-1 ring-white/25'
+                      ? 'bg-white/12 text-white/90 ring-1 ring-white/25'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >
@@ -381,7 +381,7 @@ export function VideoExportPanel({
                 onClick={() => onChange({ animationType: 'turntable' })}
                 className={`flex flex-col items-center gap-1 rounded-md py-2 transition-all ${
                   config.animationType === 'turntable'
-                    ? 'bg-white/40/20 text-white/90 ring-1 ring-white/25'
+                    ? 'bg-white/12 text-white/90 ring-1 ring-white/25'
                     : 'bg-white/5 text-white/50 hover:bg-white/10'
                 }`}
               >
@@ -392,7 +392,7 @@ export function VideoExportPanel({
                 onClick={() => onChange({ animationType: 'static' })}
                 className={`flex flex-col items-center gap-1 rounded-md py-2 transition-all ${
                   config.animationType === 'static'
-                    ? 'bg-white/40/20 text-white/90 ring-1 ring-white/25'
+                    ? 'bg-white/12 text-white/90 ring-1 ring-white/25'
                     : 'bg-white/5 text-white/50 hover:bg-white/10'
                 }`}
               >
@@ -403,7 +403,7 @@ export function VideoExportPanel({
                 onClick={() => onChange({ animationType: 'custom' })}
                 className={`flex flex-col items-center gap-1 rounded-md py-2 transition-all ${
                   config.animationType === 'custom'
-                    ? 'bg-white/40/20 text-white/90 ring-1 ring-white/25'
+                    ? 'bg-white/12 text-white/90 ring-1 ring-white/25'
                     : 'bg-white/5 text-white/50 hover:bg-white/10'
                 }`}
                 disabled
@@ -429,7 +429,7 @@ export function VideoExportPanel({
                   onClick={() => onChange({ turntableDirection: 'cw' })}
                   className={`flex-1 rounded-md py-1.5 text-[10px] transition-all ${
                     config.turntableDirection === 'cw'
-                      ? 'bg-white/40/20 text-white/90'
+                      ? 'bg-white/12 text-white/90'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >
@@ -439,7 +439,7 @@ export function VideoExportPanel({
                   onClick={() => onChange({ turntableDirection: 'ccw' })}
                   className={`flex-1 rounded-md py-1.5 text-[10px] transition-all ${
                     config.turntableDirection === 'ccw'
-                      ? 'bg-white/40/20 text-white/90'
+                      ? 'bg-white/12 text-white/90'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >
@@ -455,7 +455,7 @@ export function VideoExportPanel({
                     onClick={() => onChange({ turntableAxis: axis })}
                     className={`flex-1 rounded-md py-1.5 text-[10px] font-mono transition-all ${
                       config.turntableAxis === axis
-                        ? 'bg-white/40/20 text-white/90'
+                        ? 'bg-white/12 text-white/90'
                         : 'bg-white/5 text-white/50 hover:bg-white/10'
                     }`}
                   >
@@ -496,7 +496,7 @@ export function VideoExportPanel({
                     onClick={() => onChange({ duration: d })}
                     className={`flex-1 rounded-md py-1.5 text-[10px] transition-all ${
                       config.duration === d
-                        ? 'bg-white/40/20 text-white/90'
+                        ? 'bg-white/12 text-white/90'
                         : 'bg-white/5 text-white/50 hover:bg-white/10'
                     }`}
                   >
@@ -514,7 +514,7 @@ export function VideoExportPanel({
                     onClick={() => onChange({ fps: f })}
                     className={`flex-1 rounded-md py-1.5 text-[10px] transition-all ${
                       config.fps === f
-                        ? 'bg-white/40/20 text-white/90'
+                        ? 'bg-white/12 text-white/90'
                         : 'bg-white/5 text-white/50 hover:bg-white/10'
                     }`}
                   >
@@ -535,7 +535,7 @@ export function VideoExportPanel({
                   onClick={() => onChange({ easing: opt.id })}
                   className={`rounded-md py-1.5 text-[9px] transition-all ${
                     config.easing === opt.id
-                      ? 'bg-white/40/20 text-white/90 ring-1 ring-white/25'
+                      ? 'bg-white/12 text-white/90 ring-1 ring-white/25'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >
@@ -560,7 +560,7 @@ export function VideoExportPanel({
                   onClick={() => onChange({ loopMode: mode.id })}
                   className={`rounded-md py-1.5 text-[8px] transition-all ${
                     config.loopMode === mode.id
-                      ? 'bg-white/40/20 text-white/90 ring-1 ring-white/25'
+                      ? 'bg-white/12 text-white/90 ring-1 ring-white/25'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >
@@ -596,7 +596,7 @@ export function VideoExportPanel({
                         watermark: { ...config.watermark, enabled: !config.watermark.enabled } 
                       })}
                       className={`relative h-4 w-7 rounded-full transition-colors ${
-                        config.watermark.enabled ? 'bg-white/40' : 'bg-white/20'
+                        config.watermark.enabled ? 'bg-white/40' : 'bg-white/15'
                       }`}
                     >
                       <span
@@ -619,7 +619,7 @@ export function VideoExportPanel({
                             })}
                             className={`rounded py-1 text-[7px] transition-all ${
                               config.watermark.position === pos.id
-                                ? 'bg-white/40/20 text-white/90'
+                                ? 'bg-white/12 text-white/90'
                                 : 'bg-white/5 text-white/40 hover:bg-white/10'
                             }`}
                           >
@@ -682,7 +682,7 @@ export function VideoExportPanel({
                         speedRamping: { ...config.speedRamping, enabled: !config.speedRamping.enabled } 
                       })}
                       className={`relative h-4 w-7 rounded-full transition-colors ${
-                        config.speedRamping.enabled ? 'bg-white/40' : 'bg-white/20'
+                        config.speedRamping.enabled ? 'bg-white/40' : 'bg-white/15'
                       }`}
                     >
                       <span
@@ -749,7 +749,7 @@ export function VideoExportPanel({
                         intro: { ...config.intro, enabled: !config.intro.enabled } 
                       })}
                       className={`relative h-4 w-7 rounded-full transition-colors ${
-                        config.intro.enabled ? 'bg-white/40' : 'bg-white/20'
+                        config.intro.enabled ? 'bg-white/40' : 'bg-white/15'
                       }`}
                     >
                       <span
@@ -771,7 +771,7 @@ export function VideoExportPanel({
                               onClick={() => onChange({ intro: { ...config.intro, duration: d } })}
                               className={`flex-1 rounded-md py-1 text-[9px] transition-all ${
                                 config.intro.duration === d
-                                  ? 'bg-white/40/20 text-white/90'
+                                  ? 'bg-white/12 text-white/90'
                                   : 'bg-white/5 text-white/40 hover:bg-white/10'
                               }`}
                             >
@@ -802,7 +802,7 @@ export function VideoExportPanel({
                         outro: { ...config.outro, enabled: !config.outro.enabled } 
                       })}
                       className={`relative h-4 w-7 rounded-full transition-colors ${
-                        config.outro.enabled ? 'bg-white/40' : 'bg-white/20'
+                        config.outro.enabled ? 'bg-white/40' : 'bg-white/15'
                       }`}
                     >
                       <span
@@ -824,7 +824,7 @@ export function VideoExportPanel({
                               onClick={() => onChange({ outro: { ...config.outro, duration: d } })}
                               className={`flex-1 rounded-md py-1 text-[9px] transition-all ${
                                 config.outro.duration === d
-                                  ? 'bg-white/40/20 text-white/90'
+                                  ? 'bg-white/12 text-white/90'
                                   : 'bg-white/5 text-white/40 hover:bg-white/10'
                               }`}
                             >
@@ -884,7 +884,7 @@ export function VideoExportPanel({
                   onClick={() => onChange({ width: size.w, height: size.h, format: 'gif' })}
                   className={`flex flex-col items-center rounded-md py-2 text-[9px] transition-all ${
                     config.width === size.w && config.format === 'gif'
-                      ? 'bg-white/40/20 text-white/90 ring-1 ring-white/25'
+                      ? 'bg-white/12 text-white/90 ring-1 ring-white/25'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >
@@ -905,7 +905,7 @@ export function VideoExportPanel({
                   onClick={() => onChange({ fps: f })}
                   className={`flex-1 rounded-md py-1.5 text-[10px] transition-all ${
                     config.fps === f
-                      ? 'bg-white/40/20 text-white/90'
+                      ? 'bg-white/12 text-white/90'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >
@@ -925,7 +925,7 @@ export function VideoExportPanel({
                   onClick={() => onChange({ duration: d })}
                   className={`flex-1 rounded-md py-1.5 text-[10px] transition-all ${
                     config.duration === d
-                      ? 'bg-white/40/20 text-white/90'
+                      ? 'bg-white/12 text-white/90'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >
@@ -967,7 +967,7 @@ export function VideoExportPanel({
                   onClick={() => onChange({ width: res.w, height: res.h })}
                   className={`flex flex-col items-center rounded-md py-2 text-[9px] transition-all ${
                     config.width === res.w
-                      ? 'bg-white/40/20 text-white/90 ring-1 ring-white/25'
+                      ? 'bg-white/12 text-white/90 ring-1 ring-white/25'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >
@@ -988,7 +988,7 @@ export function VideoExportPanel({
                   onClick={() => {}}
                   className={`rounded-md py-1.5 text-[10px] transition-all ${
                     fmt === 'png'
-                      ? 'bg-white/40/20 text-white/90 ring-1 ring-white/25'
+                      ? 'bg-white/12 text-white/90 ring-1 ring-white/25'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >
@@ -1004,7 +1004,7 @@ export function VideoExportPanel({
             <button
               onClick={() => onChange({ transparentBackground: !config.transparentBackground })}
               className={`relative h-4 w-7 rounded-full transition-colors ${
-                config.transparentBackground ? 'bg-white/40' : 'bg-white/20'
+                config.transparentBackground ? 'bg-white/40' : 'bg-white/15'
               }`}
             >
               <span

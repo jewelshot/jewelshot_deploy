@@ -378,7 +378,7 @@ export function MaterialEditor({ material, onChange, onPresetSelect }: MaterialE
               onClick={() => applyPreset(preset)}
               className={`flex flex-col items-center gap-1 rounded-lg border p-2 transition-all ${
                 material.id === preset.id
-                  ? 'border-white/50/50 bg-white/40/10'
+                  ? 'border-white/30 bg-white/10'
                   : 'border-white/10 bg-white/5 hover:border-white/20'
               }`}
             >

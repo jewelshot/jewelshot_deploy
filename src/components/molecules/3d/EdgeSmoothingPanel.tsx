@@ -139,7 +139,7 @@ export function EdgeSmoothingPanel({
               className={`flex flex-col items-center rounded-lg border p-2 transition-all ${
                 config.subdivisionLevel === preset.config.subdivisionLevel &&
                 Math.abs(config.tessellationQuality - preset.config.tessellationQuality) < 0.1
-                  ? 'border-white/50/50 bg-white/40/10'
+                  ? 'border-white/30 bg-white/10'
                   : 'border-white/10 bg-white/5 hover:border-white/20'
               }`}
               title={preset.description}
@@ -234,7 +234,7 @@ export function EdgeSmoothingPanel({
           <button
             onClick={() => onChange({ normalSmoothing: !config.normalSmoothing })}
             className={`relative h-4 w-7 rounded-full transition-colors ${
-              config.normalSmoothing ? 'bg-white/40' : 'bg-white/20'
+              config.normalSmoothing ? 'bg-white/40' : 'bg-white/15'
             }`}
           >
             <span
@@ -250,7 +250,7 @@ export function EdgeSmoothingPanel({
           <button
             onClick={() => onChange({ preserveEdges: !config.preserveEdges })}
             className={`relative h-4 w-7 rounded-full transition-colors ${
-              config.preserveEdges ? 'bg-white/40' : 'bg-white/20'
+              config.preserveEdges ? 'bg-white/40' : 'bg-white/15'
             }`}
           >
             <span

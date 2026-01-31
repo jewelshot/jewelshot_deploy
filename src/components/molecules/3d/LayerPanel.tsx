@@ -85,7 +85,7 @@ function LayerListItem({
     <div
       className={`group relative rounded-lg border transition-all ${
         isSelected
-          ? 'border-white/50/50 bg-white/40/10'
+          ? 'border-white/30 bg-white/10'
           : 'border-white/5 bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.04]'
       }`}
     >

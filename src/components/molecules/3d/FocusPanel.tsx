@@ -229,7 +229,7 @@ function Section({ title, icon, enabled, onToggle, expanded, onExpandToggle, chi
           <button
             onClick={onToggle}
             className={`relative ml-2 h-4 w-7 rounded-full transition-colors ${
-              enabled ? 'bg-white/40' : 'bg-white/20'
+              enabled ? 'bg-white/40' : 'bg-white/15'
             }`}
           >
             <span
@@ -306,13 +306,13 @@ export function FocusPanel({ config, onChange, onFocusPointPick }: FocusPanelPro
         <span className="text-xs text-white/70">Odak Efektleri</span>
         <button
           onClick={() => onChange({ enabled: !config.enabled })}
-          className={`relative h-5 w-9 rounded-full transition-colors ${
-            config.enabled ? 'bg-white/40' : 'bg-white/20'
+          className={`relative h-3.5 w-7 rounded-full transition-colors ${
+            config.enabled ? 'bg-white/40' : 'bg-white/15'
           }`}
         >
           <span
-            className={`absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white transition-transform ${
-              config.enabled ? 'translate-x-4' : 'translate-x-0'
+            className={`absolute left-0.5 top-0.5 h-2.5 w-2.5 rounded-full bg-white shadow-sm transition-transform ${
+              config.enabled ? 'translate-x-3.5' : 'translate-x-0'
             }`}
           />
         </button>
@@ -350,7 +350,7 @@ export function FocusPanel({ config, onChange, onFocusPointPick }: FocusPanelPro
                   onClick={() => onChange({ mode: mode.id })}
                   className={`flex-1 rounded-md py-1.5 text-[10px] transition-all ${
                     config.mode === mode.id
-                      ? 'bg-white/40/20 text-white/90'
+                      ? 'bg-white/12 text-white/90'
                       : 'bg-white/5 text-white/50 hover:bg-white/10'
                   }`}
                 >
@@ -365,7 +365,7 @@ export function FocusPanel({ config, onChange, onFocusPointPick }: FocusPanelPro
             <div className="space-y-2">
               <button
                 onClick={onFocusPointPick}
-                className="flex w-full items-center justify-center gap-2 rounded-md bg-white/40/10 border border-white/50/30 py-2 text-[10px] text-white/90 hover:bg-white/40/20"
+                className="flex w-full items-center justify-center gap-2 rounded-md bg-white/10 border border-white/20 py-2 text-[10px] text-white/90 hover:bg-white/12"
               >
                 <Target className="h-3.5 w-3.5" />
                 Odak Noktası Seç
@@ -415,7 +415,7 @@ export function FocusPanel({ config, onChange, onFocusPointPick }: FocusPanelPro
                     onClick={() => updateDOF({ focalLength: fl })}
                     className={`rounded-md py-1 text-[8px] transition-all ${
                       config.dof.focalLength === fl
-                        ? 'bg-white/40/20 text-white/90'
+                        ? 'bg-white/12 text-white/90'
                         : 'bg-white/5 text-white/40 hover:bg-white/10'
                     }`}
                   >
@@ -440,7 +440,7 @@ export function FocusPanel({ config, onChange, onFocusPointPick }: FocusPanelPro
                     onClick={() => updateDOF({ aperture: ap })}
                     className={`rounded-md py-1 text-[8px] transition-all ${
                       config.dof.aperture === ap
-                        ? 'bg-white/40/20 text-white/90'
+                        ? 'bg-white/12 text-white/90'
                         : 'bg-white/5 text-white/40 hover:bg-white/10'
                     }`}
                   >
@@ -455,7 +455,7 @@ export function FocusPanel({ config, onChange, onFocusPointPick }: FocusPanelPro
                     onClick={() => updateDOF({ aperture: ap })}
                     className={`rounded-md py-1 text-[8px] transition-all ${
                       config.dof.aperture === ap
-                        ? 'bg-white/40/20 text-white/90'
+                        ? 'bg-white/12 text-white/90'
                         : 'bg-white/5 text-white/40 hover:bg-white/10'
                     }`}
                   >
@@ -510,7 +510,7 @@ export function FocusPanel({ config, onChange, onFocusPointPick }: FocusPanelPro
                     onClick={() => updateBokeh({ shape: shape.id })}
                     className={`rounded-md py-2 text-lg transition-all ${
                       config.bokeh.shape === shape.id
-                        ? 'bg-white/40/20 text-white/90'
+                        ? 'bg-white/12 text-white/90'
                         : 'bg-white/5 text-white/50 hover:bg-white/10'
                     }`}
                   >
