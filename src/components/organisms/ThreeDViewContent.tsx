@@ -2727,7 +2727,7 @@ export default function ThreeDViewContent() {
               <div className="flex flex-col items-center gap-5 text-center">
                 {/* Logo */}
                 <img
-                  src="/logo.png"
+                  src="/jewelrender.png"
                   alt="JewelRender"
                   className="h-16 w-16"
                   style={{
