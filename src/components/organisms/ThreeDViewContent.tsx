@@ -703,7 +703,6 @@ function SelectionManager({
     <SelectionOutline
       selectedObjects={selectedObjects}
       color="#ff6600"
-      padding={0.005}
       enabled={enabled && selectedObjects.length > 0}
     />
   );

@@ -1,8 +1,8 @@
 /**
- * SelectionOutline - Bounding box outline for selected objects
+ * SelectionOutline - Edge outline for selected objects
  * 
- * Uses a simple wireframe box around the object's bounding box.
- * This approach is simple, performant, and works from all angles.
+ * Shows the actual mesh edges (not bounding box) for a precise outline effect.
+ * Uses EdgesGeometry to extract visible edges from the mesh.
  */
 
 'use client';
@@ -19,8 +19,8 @@ interface SelectionOutlineProps {
   enabled?: boolean;
   /** Opacity of the outline */
   opacity?: number;
-  /** Padding around the bounding box */
-  padding?: number;
+  /** Line width (note: only works on some platforms) */
+  lineWidth?: number;
 }
 
 export function SelectionOutline({
@@ -28,7 +28,7 @@ export function SelectionOutline({
   color = '#ff6600',
   enabled = true,
   opacity = 1,
-  padding = 0.01,
+  lineWidth = 1,
 }: SelectionOutlineProps) {
   const groupRef = useRef<THREE.Group>(null);
   const outlineLinesRef = useRef<THREE.LineSegments[]>([]);
@@ -41,8 +41,9 @@ export function SelectionOutline({
       opacity: opacity,
       depthTest: false,
       depthWrite: false,
+      linewidth: lineWidth,
     });
-  }, [color, opacity]);
+  }, [color, opacity, lineWidth]);
   
   // Update material when props change
   useEffect(() => {
@@ -51,7 +52,7 @@ export function SelectionOutline({
     material.transparent = opacity < 1;
   }, [material, color, opacity]);
   
-  // Create/update bounding box outlines when selection changes
+  // Create/update edge outlines when selection changes
   useEffect(() => {
     if (!groupRef.current) return;
     
@@ -64,45 +65,43 @@ export function SelectionOutline({
     
     if (!enabled || selectedObjects.length === 0) return;
     
-    // Create bounding box outline for each selected object
+    // Create edge outline for each selected object
     selectedObjects.forEach(obj => {
       if (!obj) return;
       
       try {
-        // Compute bounding box of the entire object
-        const box = new THREE.Box3().setFromObject(obj);
-        
-        if (box.isEmpty()) return;
-        
-        // Add padding
-        box.expandByScalar(padding);
-        
-        // Create box helper geometry
-        const boxGeometry = new THREE.BoxGeometry(
-          box.max.x - box.min.x,
-          box.max.y - box.min.y,
-          box.max.z - box.min.z
-        );
-        
-        // Convert to edges
-        const edgesGeometry = new THREE.EdgesGeometry(boxGeometry);
-        const lineSegments = new THREE.LineSegments(edgesGeometry, material);
-        
-        // Position at center of bounding box
-        const center = new THREE.Vector3();
-        box.getCenter(center);
-        lineSegments.position.copy(center);
-        
-        // High render order
-        lineSegments.renderOrder = 999;
-        
-        groupRef.current?.add(lineSegments);
-        outlineLinesRef.current.push(lineSegments);
-        
-        // Cleanup box geometry
-        boxGeometry.dispose();
+        // Traverse the object to find all meshes
+        obj.traverse((child) => {
+          if (child instanceof THREE.Mesh && child.geometry) {
+            // Create edges from the actual mesh geometry
+            const edgesGeometry = new THREE.EdgesGeometry(child.geometry, 30); // 30 degree threshold
+            const lineSegments = new THREE.LineSegments(edgesGeometry, material.clone());
+            
+            // Copy the mesh's world transform
+            lineSegments.position.copy(child.position);
+            lineSegments.rotation.copy(child.rotation);
+            lineSegments.scale.copy(child.scale);
+            
+            // Apply parent transforms if any
+            if (child.parent && child.parent !== obj) {
+              child.parent.updateMatrixWorld(true);
+              lineSegments.applyMatrix4(child.parent.matrixWorld);
+            }
+            
+            // Match the object's world position
+            child.updateMatrixWorld(true);
+            lineSegments.matrixAutoUpdate = false;
+            lineSegments.matrix.copy(child.matrixWorld);
+            
+            // High render order to show on top
+            lineSegments.renderOrder = 999;
+            
+            groupRef.current?.add(lineSegments);
+            outlineLinesRef.current.push(lineSegments);
+          }
+        });
       } catch (e) {
-        console.warn('Failed to create bounding box outline:', e);
+        console.warn('Failed to create edge outline:', e);
       }
     });
     
@@ -110,10 +109,13 @@ export function SelectionOutline({
     return () => {
       outlineLinesRef.current.forEach(line => {
         line.geometry.dispose();
+        if (line.material instanceof THREE.Material) {
+          line.material.dispose();
+        }
       });
       outlineLinesRef.current = [];
     };
-  }, [selectedObjects, enabled, material, padding]);
+  }, [selectedObjects, enabled, material]);
   
   // Cleanup material on unmount
   useEffect(() => {
